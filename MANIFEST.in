@@ -1,0 +1,21 @@
+include README.md
+include CHANGELOG.md
+include CITATION.cff
+include CONTRIBUTING.md
+include LICENSE
+include DISCLAIMER.md
+include THIRD_PARTY_NOTICES.md
+include pyproject.toml
+include environment-dev.yml
+recursive-include src *.py py.typed
+recursive-include tests *.py
+recursive-include benchmarks *.py *.md *.json
+recursive-include validation *.py *.md *.json
+recursive-include examples *.json *.fasta *.yml *.md
+recursive-include docs *.md *.json *.csv
+include mkdocs.yml
+recursive-include notebooks *.ipynb
+
+prune dashing_similarity
+prune ckpt
+global-exclude __pycache__ *.py[cod] *.so *.a *.o

@@ -1,0 +1,407 @@
+{
+  "checks": [
+    {
+      "category": "manual",
+      "difference": null,
+      "expected": {
+        "A": 2,
+        "C": 2,
+        "G": 2,
+        "T": 2
+      },
+      "id": "MANUAL-001",
+      "method": "hand-counted canonical composition",
+      "note": "Eight bases contain two copies of each canonical symbol.",
+      "observed": {
+        "A": 2,
+        "C": 2,
+        "G": 2,
+        "T": 2
+      },
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "manual",
+      "difference": 0.0,
+      "expected": 0.5,
+      "id": "MANUAL-002",
+      "method": "hand-counted GC fraction",
+      "note": "Four of eight bases are G or C.",
+      "observed": 0.5,
+      "status": "pass",
+      "tolerance": "exact rational result"
+    },
+    {
+      "category": "manual",
+      "difference": null,
+      "expected": {
+        "AA": 3
+      },
+      "id": "MANUAL-003",
+      "method": "overlapping exact k-mer count",
+      "note": "AAAA contains AA at zero-based starts 0, 1, and 2.",
+      "observed": {
+        "AA": 3
+      },
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "manual",
+      "difference": null,
+      "expected": [
+        0,
+        1
+      ],
+      "id": "MANUAL-004",
+      "method": "overlapping literal search",
+      "note": "AAA occurs twice in AAAA when overlaps are enabled.",
+      "observed": [
+        0,
+        1
+      ],
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "manual",
+      "difference": null,
+      "expected": "AGCTT",
+      "id": "MANUAL-005",
+      "method": "Watson-Crick reverse complement",
+      "note": "Reverse AAGCT, then complement each canonical symbol.",
+      "observed": "AGCTT",
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "boundary",
+      "difference": null,
+      "expected": {
+        "coordinate_span": 0,
+        "symbol_length": 0
+      },
+      "id": "BOUNDARY-001",
+      "method": "empty linear sequence length",
+      "note": "Empty linear DNA is a supported value object; circular empty DNA is rejected.",
+      "observed": {
+        "coordinate_span": 0,
+        "symbol_length": 0
+      },
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "boundary",
+      "difference": null,
+      "expected": {
+        "ambiguity_count": 11,
+        "symbol_length": 15
+      },
+      "id": "BOUNDARY-002",
+      "method": "complete uppercase IUPAC alphabet construction",
+      "note": "Descriptor-specific ambiguity policies remain explicit at calculation time.",
+      "observed": {
+        "ambiguity_count": 11,
+        "symbol_length": 15
+      },
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "boundary",
+      "difference": null,
+      "expected": {
+        "gc_fraction": 0.5,
+        "symbol_length": 200000
+      },
+      "id": "BOUNDARY-003",
+      "method": "bounded 200000-nt descriptor input",
+      "note": "This is a boundary regression, not an unlimited-input or performance claim.",
+      "observed": {
+        "gc_fraction": 0.5,
+        "symbol_length": 200000
+      },
+      "status": "pass",
+      "tolerance": "exact"
+    },
+    {
+      "category": "boundary",
+      "difference": null,
+      "expected": {
+        "bottom_cut": 4,
+        "top_cut": 0,
+        "wraps_origin": true
+      },
+      "id": "BOUNDARY-004",
+      "method": "circular EcoRI site crossing sequence origin",
+      "note": "GAATTC is formed across the origin of circular AATTCG.",
+      "observed": {
+        "bottom_cut": 4,
+        "top_cut": 0,
+        "wraps_origin": true
+      },
+      "status": "pass",
+      "tolerance": "exact 0-based circular coordinates"
+    },
+    {
+      "category": "clustering",
+      "difference": null,
+      "expected": [
+        [
+          "a",
+          "b"
+        ],
+        [
+          "c"
+        ]
+      ],
+      "id": "ALGORITHM-001",
+      "method": "exhaustive exact-identity threshold graph connected components",
+      "note": "This hand-check validates deterministic graph semantics; it is not a CD-HIT comparison.",
+      "observed": [
+        [
+          "a",
+          "b"
+        ],
+        [
+          "c"
+        ]
+      ],
+      "status": "pass",
+      "tolerance": "exact deterministic cluster membership and order"
+    },
+    {
+      "category": "restriction",
+      "difference": null,
+      "expected": {
+        "BamHI": [
+          12
+        ],
+        "EcoRI": [
+          4
+        ],
+        "HaeIII": [
+          26,
+          32
+        ],
+        "HindIII": [
+          19
+        ],
+        "NotI": [
+          30
+        ],
+        "SmaI": [
+          39
+        ]
+      },
+      "id": "BIOPYTHON-001",
+      "method": "DNAKit 0-based top cleavage boundary versus Biopython search minus one",
+      "note": "Bio.Restriction.search reports 1-based cleavage boundaries, so one is subtracted before comparison. Recognition-site starts use a different convention and were not compared.",
+      "observed": {
+        "BamHI": [
+          12
+        ],
+        "EcoRI": [
+          4
+        ],
+        "HaeIII": [
+          26,
+          32
+        ],
+        "HindIII": [
+          19
+        ],
+        "NotI": [
+          30
+        ],
+        "SmaI": [
+          39
+        ]
+      },
+      "status": "pass",
+      "tolerance": "exact integer positions"
+    },
+    {
+      "category": "molecular_weight",
+      "difference": null,
+      "expected": "Biopython 5-prime-phosphate convention and higher-precision residue table",
+      "id": "BIOPYTHON-002",
+      "method": "average DNA mass with explicit terminal-convention reconciliation",
+      "note": "Biopython computes sum of average unambiguous nucleotide weights minus (length-1)*18.0153 Da and states that nucleotide sequences carry a 5-prime phosphate. DNAKit uses rounded anhydrous residue masses, subtracts 61.96 Da for hydroxyl termini, and optionally adds an approximate 79.0 Da phosphate. Both unphosphorylated and phosphorylated errors are recorded across lengths; the one-Dalton tolerance validates the documented approximate model rather than claiming formula identity. A higher-precision revision should adopt one versioned mass table and explicitly test terminal formulas.",
+      "observed": [
+        {
+          "biopython_five_prime_phosphate_dalton": 331.2218,
+          "dnakit_five_prime_phosphorylated_dalton": 330.25,
+          "dnakit_unphosphorylated_dalton": 251.24999999999997,
+          "phosphorylated_difference_dalton": -0.9717999999999734,
+          "raw_difference_dalton": -79.9718,
+          "sequence": "A"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 620.4035999999999,
+          "dnakit_five_prime_phosphorylated_dalton": 619.43,
+          "dnakit_unphosphorylated_dalton": 540.43,
+          "phosphorylated_difference_dalton": -0.9735999999999194,
+          "raw_difference_dalton": -79.97359999999992,
+          "sequence": "AC"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 1253.8026999999997,
+          "dnakit_five_prime_phosphorylated_dalton": 1252.84,
+          "dnakit_unphosphorylated_dalton": 1173.84,
+          "phosphorylated_difference_dalton": -0.9626999999998134,
+          "raw_difference_dalton": -79.96269999999981,
+          "sequence": "ACGT"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 3091.9784,
+          "dnakit_five_prime_phosphorylated_dalton": 3091.0299999999997,
+          "dnakit_unphosphorylated_dalton": 3012.0299999999997,
+          "phosphorylated_difference_dalton": -0.9484000000002197,
+          "raw_difference_dalton": -79.94840000000022,
+          "sequence": "ACGTACGTAC"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 4327.7658,
+          "dnakit_five_prime_phosphorylated_dalton": 4326.83,
+          "dnakit_unphosphorylated_dalton": 4247.83,
+          "phosphorylated_difference_dalton": -0.9358000000001994,
+          "raw_difference_dalton": -79.9358000000002,
+          "sequence": "ACGTACGTACGTAC"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 9270.9154,
+          "dnakit_five_prime_phosphorylated_dalton": 9270.03,
+          "dnakit_unphosphorylated_dalton": 9191.03,
+          "phosphorylated_difference_dalton": -0.8853999999992084,
+          "raw_difference_dalton": -79.88539999999921,
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTAC"
+        },
+        {
+          "biopython_five_prime_phosphate_dalton": 18554.8263,
+          "dnakit_five_prime_phosphorylated_dalton": 18554.04,
+          "dnakit_unphosphorylated_dalton": 18475.04,
+          "phosphorylated_difference_dalton": -0.7862999999997555,
+          "raw_difference_dalton": -79.78629999999976,
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT"
+        }
+      ],
+      "status": "pass",
+      "tolerance": "abs((DNAKit unphosphorylated - Biopython) + 79.0) <= 1.0 Da"
+    },
+    {
+      "category": "alignment",
+      "difference": 0.0,
+      "expected": 0.0,
+      "id": "BIOPYTHON-003",
+      "method": "global linear-gap score; match=1 mismatch=-1 gap=-1",
+      "note": "Only optimal score is compared because equally optimal tracebacks may differ.",
+      "observed": 0.0,
+      "status": "pass",
+      "tolerance": "absolute score difference <= 1e-12"
+    },
+    {
+      "category": "search",
+      "difference": null,
+      "expected": [
+        1,
+        2
+      ],
+      "id": "BIOPYTHON-004",
+      "method": "overlapping literal subsequence search with zero-based starts",
+      "note": "Both APIs perform literal overlapping search for this canonical query.",
+      "observed": [
+        1,
+        2
+      ],
+      "status": "pass",
+      "tolerance": "exact integer positions"
+    },
+    {
+      "category": "clustering",
+      "difference": null,
+      "expected": "Bio.Cluster single/complete/average linkage merge distances",
+      "id": "BIOCLUSTER-001",
+      "method": "hierarchical clustering on the same lower-triangular identity-distance matrix",
+      "note": "Node numbering and left/right order are implementation-specific, so the deterministic merge-distance sequence is compared for this no-tie fixture.",
+      "observed": [
+        {
+          "biopython_merge_distances": [
+            0.25,
+            0.25,
+            0.75
+          ],
+          "dnakit_merge_distances": [
+            0.25,
+            0.25,
+            0.75
+          ],
+          "linkage": "single",
+          "matches": true
+        },
+        {
+          "biopython_merge_distances": [
+            0.25,
+            0.25,
+            1.0
+          ],
+          "dnakit_merge_distances": [
+            0.25,
+            0.25,
+            1.0
+          ],
+          "linkage": "complete",
+          "matches": true
+        },
+        {
+          "biopython_merge_distances": [
+            0.25,
+            0.25,
+            0.825
+          ],
+          "dnakit_merge_distances": [
+            0.25,
+            0.25,
+            0.825
+          ],
+          "linkage": "average",
+          "matches": true
+        }
+      ],
+      "status": "pass",
+      "tolerance": "absolute merge-distance difference <= 1e-12"
+    }
+  ],
+  "environment": {
+    "biopython": "1.88",
+    "biopython_license": "LicenseRef-Biopython-License-Agreement",
+    "dnakit": "0.1.0.dev0",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "primer3_cli": "not automatically discovered or executed",
+    "python": "3.10.20"
+  },
+  "generated_at_utc": "2026-08-15T04:17:53.325987+00:00",
+  "interpretation": "A passing check supports only its stated inputs, conventions, model, and tolerance. not_comparable means the reference was recorded but DNAKit has no equivalent implemented calculation. No paper-reproduction claim is made.",
+  "prohibited_backend_audit": {
+    "note": "Primer3 and NUPACK are deliberately outside this runner. These booleans describe runner behavior, not a scan of the environment.",
+    "nupack_call_attempted": false,
+    "nupack_import_attempted": false,
+    "nupack_installation_attempted": false,
+    "nupack_probe_attempted": false,
+    "primer3_automatic_discovery_attempted": false,
+    "primer3_call_attempted": false,
+    "primer3_import_attempted": false,
+    "primer3_installation_attempted": false
+  },
+  "schema_version": "dnakit.validation.v1",
+  "scope": "local_correctness_validation_not_paper_reproduction",
+  "summary": {
+    "fail": 0,
+    "not_comparable": 0,
+    "not_run": 0,
+    "pass": 15,
+    "total": 15
+  }
+}

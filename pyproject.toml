@@ -1,0 +1,121 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dnakit"
+dynamic = ["version"]
+description = "Deterministic tools for DNA sequence analysis"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "DISCLAIMER.md", "THIRD_PARTY_NOTICES.md"]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Typing :: Typed",
+]
+dependencies = [
+  "PyYAML>=6.0",
+  "rich>=13.7",
+  "tomli>=2.0; python_version < '3.11'",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "hypothesis>=6.100",
+  "mypy>=1.11",
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.8",
+  "twine>=5.0",
+  "types-PyYAML>=6.0",
+]
+docs = [
+  "mkdocs>=1.6,<2",
+  "mkdocs-material>=9.5,<10",
+  "mkdocstrings[python]>=0.27,<1",
+  "nbmake>=1.5,<2",
+]
+viz = [
+  "CairoSVG>=2.7,<3",
+  "Pillow>=10,<13",
+]
+io = [
+  "pyarrow>=19,<26",
+]
+validation = [
+  "biopython>=1.85,<2",
+]
+neural = [
+  "huggingface-hub>=0.28,<2",
+  "numpy>=1.26,<3",
+  "scikit-learn>=1.5,<2",
+  "torch>=2.5,<3",
+  "transformers>=4.49,<5",
+]
+neural-caduceus = [
+  "mamba-ssm>=2.2,<3",
+]
+neural-enformer = [
+  "enformer-pytorch>=0.8.11,<1",
+]
+neural-evo2 = [
+  "evo2>=0.5.3,<0.6",
+]
+
+[project.scripts]
+dnakit = "dnakit.cli.app:run"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "dnakit._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dnakit = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers -ra"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["dnakit"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src", "tests"]
+strict = true
+warn_unreachable = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = ["build", "dist", "dashing_similarity", "site"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+
+[tool.ruff.format]
+docstring-code-format = true

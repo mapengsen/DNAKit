@@ -1,0 +1,49 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Coverage, build, and package artifacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Environments
+.venv/
+venv/
+.conda/
+
+# Documentation and notebooks
+site/
+.jupyter/
+.ipynb_checkpoints/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local runtime output
+.cache/
+logs/
+outputs/
+/ckpt/
+
+# Local model weights and datasets
+/compared_models/models/
+/temp/
+
+# Release verification artifacts
+/rebuilt-dist/
+/testpypi-candidate/
+
+# Third-party local source/binaries are never part of DNAKit distributions.
+/dashing_similarity/

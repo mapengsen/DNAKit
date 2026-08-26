@@ -1,0 +1,10 @@
+name: dnakit-dev
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip>=24
+  - pip:
+      - -e .[dev,docs,io,validation,viz,neural]
+variables:
+  PYTHONNOUSERSITE: "1"

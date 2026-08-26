@@ -1,0 +1,185 @@
+requirement_id,csv_table_row,一级功能,二级功能,delivery_stage,default_label,alternative_label,status,shared_kernel,scope_note
+CORE-001,2,1. 核心数据对象,DNA序列对象,0.1-MVP,native,,complete,,普通用户以统一DNA(data)构造原始单序列并自动标准化；内部DNASequence仍只保存严格序列语义
+CORE-002,3,1. 核心数据对象,DNA记录对象,0.1-MVP,native,,complete,,DNA的data与id/description/features/metadata/letter_annotations参数在同一入口附加记录信息；内部DNARecord继续严格校验非空ID、feature范围及注释
+CORE-003,4,1. 核心数据对象,DNA数据集对象,0.1-MVP,native,,complete,,DNA接收单条或多条输入且始终返回DNA，下标和切片也保持DNA；DNASet/from_sequences/from_records/read_set作为高级兼容入口保留
+CORE-004,5,1. 核心数据对象,特征对象,0.1-MVP,native,,complete,,普通用户通过DNA的features=[mapping]参数内嵌特征；高级DNAFeature不可变保存type、Location、id、strand、label、score、phase、qualifiers和source
+CORE-005,6,1. 核心数据对象,Gap对象,0.1-MVP,native,,complete,,保留crossable字段；上下游片段由DNASequence parts表达并由工厂校验
+CORE-006,7,1. 核心数据对象,序列类型声明,0.1-MVP,native,,complete,,DNASequence显式保存strict/IUPAC alphabet、linear/circular topology及single/double strandedness；构造时校验符号与声明一致且对象不可变
+CORE-007,8,1. 核心数据对象,坐标系统,0.1-MVP,native,,complete,,内部Interval统一0-based半开；import_location/export_location在四种0/1-based开闭体系间严格转换，跨环状原点需显式sequence_length并转CompoundLocation
+CORE-008,9,1. 核心数据对象,结果对象,0.1-MVP,native,,complete,,MetricResult完整保存value、unit、method、algorithm_version、parameters、conditions、uncertainty、provenance和issues，并通过JSON边界测试
+IO-001,10,2. 文件读写与数据管理,序列格式,0.1-MVP,reimplementation,adapter,complete,,统一read以mode=dna返回单条或多条DNA并以mode=stream处理大文件；read_one/read_set兼容保留；内部codec覆盖FASTA、FASTQ及明确GenBank子集并保持资源上限
+IO-002,11,2. 文件读写与数据管理,注释格式,0.2-0.4-ADVANCED,reimplementation,adapter,complete,,内部严格格式codec覆盖GFF3单区间且无embedded FASTA、BED3-BED6和AGP 2.1，含坐标转换、原子写出及读取侧连续性与资源边界校验；写接口当前无独立输出资源上限
+IO-003,12,2. 文件读写与数据管理,表格格式,0.1-MVP,native,adapter,complete,table_io,TableSchema/read_table/export_table以显式schema有界读写CSV/TSV/JSON/Parquet；类型、null、schema版本及row/column/cell/input/output/decoded字节上限均测试，Parquet依赖io extra
+IO-004,13,2. 文件读写与数据管理,压缩文件,0.1-MVP,native,,complete,,ReadConfig/WriteConfig以auto/none/gzip显式控制统一序列格式的gzip路径或流读写，并保留所有权、输入字节及压缩级别边界；输出只在显式配置max_output_bytes时限制实际压缩字节
+IO-005,14,2. 文件读写与数据管理,大文件访问,0.1-MVP,native,adapter,complete,,native FASTA/FASTQ流式读取并支持iter_chunks；本地未压缩普通FASTA和严格四行FASTQ可按ID/0-based坐标/strand索引并保持FASTQ质量同步，gzip/远程/bgzip明确不在当前定义域
+IO-006,15,2. 文件读写与数据管理,元数据管理,0.1-MVP,native,,complete,,with_metadata、merge_metadata、filter_by_metadata、select_metadata和validate_metadata直接接受DNA；变换类接口对DNA输入继续返回DNA并保留标准化审计
+STD-001,16,3. 标准化与合法性检查,字符标准化,0.1-MVP,native,,complete,,normalize提供keep_ambiguous/keep_u/keep_other，默认保留IUPAC模糊碱基并删除U与其他非DNA字符；uppercase、空白/不可见字符、separator和每次删除均保留原始part/offset与normalized_offset审计
+STD-002,17,3. 标准化与合法性检查,U处理,0.1-MVP,native,,complete,,keep_u默认False并审计删除U；UPolicy仍提供delete/error/warn/replace/keep显式高级覆盖，保留U时不伪造DNASequence
+STD-003,18,3. 标准化与合法性检查,字母表检查,0.1-MVP,native,reimplementation,complete,validation,normalize/validate按显式或推断的strict/IUPAC alphabet核对规范化符号；声明冲突与不属于目标字母表的符号形成稳定错误而不自动放宽
+STD-004,19,3. 标准化与合法性检查,非法字符检测,0.1-MVP,native,,complete,validation,keep_other默认False并按原始part/offset/absolute_offset审计删除；显式保留时NormalizationResult按Unicode codepoint汇总非法符号并返回稳定issue
+STD-005,20,3. 标准化与合法性检查,模糊碱基统计,0.1-MVP,native,,complete,ambiguity,AmbiguityReport保存IUPAC总数、按符号计数/位置、分母与fraction，并在probability策略下保存逐位置A/C/G/T概率解析
+STD-006,21,3. 标准化与合法性检查,模糊碱基策略,0.1-MVP,native,reimplementation,complete,,keep_ambiguous默认True；AmbiguityPolicy仍支持delete、error、保留但计算时ignore、替换为显式IUPAC mask及按可配置base priors解析probability，每种策略均记录参数和修改
+STD-007,22,3. 标准化与合法性检查,Gap标准化,0.1-MVP,native,reimplementation,complete,,normalize_gaps按有界配置将大写连续N-run转为已知长度Gap；sequence_from_agp从严格AGP 2.1 document/组件表组装已知/未知长度Gap并完整审计方向、坐标与资源上限
+STD-008,23,3. 标准化与合法性检查,数据质量检查,0.1-MVP,native,,complete,quality,唯一推荐入口validate按DNA记录数自动检查单条或集合；validate_set兼容保留；覆盖空序列、长度、重复ID、metadata和FASTQ质量异常
+STD-009,24,3. 标准化与合法性检查,标准化审计,0.1-MVP,native,,complete,provenance,内存结果保存完整原始输入、标准化序列、步骤与修改；to_dict默认省略raw_input.content但仍序列化sequence与normalized_parts，调用方须自行完成无序列脱敏
+OPS-001,25,4. 序列内操作,序列补全,0.1-MVP,native,,complete,,reverse/complement为不同序列值变换；普通reverse_complement直接接受并返回DNA且同步注释，reverse_complement_record兼容保留用于详细审计
+OPS-002,26,4. 序列内操作,转录与翻译,0.1-MVP,native,reimplementation,complete,,transcribe支持正/反链DNA到RNA；translate支持NCBI table 1、frame 0/1/2及stop/ambiguity/incomplete策略，显式Gap拒绝且不预测表达
+OPS-003,27,4. 序列内操作,子序列提取,0.1-MVP,native,,complete,,subsequence以0-based半开坐标提取线性或环状跨原点片段；已知Gap仅在allow_gaps下保留/截短，未知长度Gap和非法边界明确拒绝
+OPS-004,28,4. 序列内操作,序列编辑,0.1-MVP,native,,complete,,无后缀insert/delete/substitute对DNA输入同步注释并返回DNA；旧record后缀接口保留完整Edit/feature审计；不允许编辑跨越Gap
+OPS-005,29,4. 序列内操作,序列生成,0.1-MVP,native,,complete,mutation,"mutate支持指定SNV和可重放随机SNV；evolution_generate和indel_generate支持EvoAug风格突变、缺失、插入、易位、局部反向互补和整条反向互补；rearrange_generate支持片段交换、倒置和重复；kmer_shuffle精确保持重叠k-mer计数；crossover支持两条等长序列的一点交叉；随机入口保存随机源和算法版本并明确线性、无Gap、ACGT边界"
+OPS-006,30,4. 序列内操作,序列拼接,0.1-MVP,native,,complete,,concat按输入顺序执行普通拼接并可加入显式Gap；concat_overlap对两段线性无Gap序列选择最长精确末端overlap且只保留一次；两者均校验alphabet、strandedness、topology和输出结构
+OPS-007,31,4. 序列内操作,Trimming和Masking,0.1-MVP,native,,complete,,无后缀trim/mask对DNA输入同步注释并返回DNA；两者保持有界Gap和区间规则，旧record接口用于详细审计
+OPS-008,32,4. 序列内操作,环状序列操作,0.2-0.4-ADVANCED,native,reimplementation,complete,,rotate/canonical_origin对DNA输入返回DNA并同步注释；circular_subsequence保留明确序列值提取语义
+OPS-009,33,4. 序列内操作,注释同步,0.2-0.4-ADVANCED,native,,complete,,普通用户调用无后缀编辑/反向互补/旋转名称即可同步feature与letter annotations；record后缀接口兼容保留完整变更审计
+DESC-001,34,5. 基础序列描述符,长度特征,0.1-MVP,native,,complete,,length_features区分symbol_length、可解析coordinate_span、canonical/ambiguity数量及known/unknown Gap；未知Gap不会被猜测为长度
+DESC-002,35,5. 基础序列描述符,碱基组成,0.1-MVP,native,,complete,,base_composition返回稳定A/C/G/T count、fraction及真实canonical分母；IUPAC按error/ignore策略处理并记录被忽略数量
+DESC-003,36,5. 基础序列描述符,GC/AT特征,0.1-MVP,native,,complete,,gc_at_content在A/C/G/T分母上返回GC/AT计数和fraction；无canonical碱基时fraction为None而不是NaN
+DESC-004,37,5. 基础序列描述符,碱基偏斜,0.1-MVP,native,,complete,,base_skew按(G-C)/(G+C)与(A-T)/(A+T)返回GC/AT skew及各自分母；零分母结果为None并保留ambiguity策略
+DESC-005,38,5. 基础序列描述符,CpG特征,0.1-MVP,reimplementation,native,complete,,cpg_features返回CG计数、eligible adjacent-pair density及count(CG)*canonical_length/(count(C)*count(G))，明确Gap/ambiguity穿越和未定义分母
+DESC-006,39,5. 基础序列描述符,k-mer统计,0.1-MVP,native,,complete,kmer,kmer_statistics提供exact overlapping/non-overlapping、canonical reverse-complement折叠、count/frequency/presence及真实观察分母，并显式控制Gap与IUPAC
+DESC-007,40,5. 基础序列描述符,序列熵,0.1-MVP,reimplementation,native,complete,complexity,shannon_entropy按base或exact k-mer分布计算可配置log-base Shannon entropy，保存observation/category数；空分布定义为0且不跨Gap除非显式允许
+DESC-008,41,5. 基础序列描述符,序列复杂度,0.2-0.4-ADVANCED,reimplementation,native,complete,complexity,linguistic_complexity实现有界observed/possible k-word乘积并记录公式；不声称DUST或外部复杂度工具等价
+DESC-009,42,5. 基础序列描述符,Homopolymer,0.1-MVP,native,,complete,,homopolymer_runs返回达到min_run_length的所有run、最长长度/各base最长值、symbol/coordinate区间及Gap穿越审计
+DESC-010,43,5. 基础序列描述符,重复比例,0.2-0.4-ADVANCED,reimplementation,native,complete,,exact_repeat_fraction按起点和unit_length顺序贪心返回首个满足条件的exact tandem-repeat runs及其union coverage、分母和比较次数；不是全局最大化搜索
+DESC-011,44,5. 基础序列描述符,窗口描述符,0.1-MVP,native,,complete,,window_descriptors按0-based半开symbol window、step和partial策略批量返回GC、entropy、CpG；默认Gap分段并保存可解析coordinate与crossed-gap状态
+DESC-012,45,5. 基础序列描述符,密码子统计,0.1-MVP,native,,complete,,codon_statistics支持frame 0/1/2和NCBI table 1，返回codon/start/stop计数与频率并审计incomplete、ambiguity、Gap中断及未知Gap后的phase
+PAT-001,46,6. 序列模式与结构注释,通用motif搜索,0.2-0.4-ADVANCED,native,reimplementation,complete,motif_scan,scan_motif默认exact/IUPAC使用native字符串匹配，受限regex标reimplementation；scan_pwm覆盖PWM，均支持链方向、环状固定长度模式与命中上限
+PAT-002,47,6. 序列模式与结构注释,ORF,0.2-0.4-ADVANCED,reimplementation,,complete,,scan_orfs扫描六阅读框，返回位置、链、frame、完整性和翻译；不预测表达
+PAT-003,48,6. 序列模式与结构注释,起止密码子,0.2-0.4-ADVANCED,reimplementation,,complete,,scan_codon_sites按遗传密码表定位六阅读框start/stop并返回统一坐标
+PAT-004,49,6. 序列模式与结构注释,启动子motif,0.2-0.4-ADVANCED,reimplementation,,complete,motif_scan,scan_promoter_motifs使用版本化固定TATA和细菌-10/-35模式，只做模式命中不预测活性
+PAT-005,50,6. 序列模式与结构注释,TF motif,0.2-0.4-ADVANCED,reimplementation,adapter,complete,motif_scan,scan_tf_pwm扫描调用方提供且版本可记录的PWM，不内置或预测真实TF结合强度
+PAT-006,51,6. 序列模式与结构注释,限制酶位点,0.2-0.4-ADVANCED,reimplementation,adapter,complete,restriction,scan_restriction_sites使用版本化小型内置酶目录或调用方定义，返回识别和双链切割坐标；不分发REBASE
+PAT-007,52,6. 序列模式与结构注释,CRISPR PAM,0.2-0.4-ADVANCED,reimplementation,,complete,guide_scan,scan_pam_candidates使用版本化PAM规则、guide长度与GC阈值返回候选，不预测编辑效率
+PAT-008,53,6. 序列模式与结构注释,CpG island,0.2-0.4-ADVANCED,reimplementation,,complete,,find_cpg_islands按显式窗口、GC、CpG observed/expected阈值返回合并区域
+PAT-009,54,6. 序列模式与结构注释,回文序列,0.2-0.4-ADVANCED,native,reimplementation,complete,,find_reverse_complement_palindromes使用native有界枚举返回反向互补回文位置、长度和序列
+PAT-010,55,6. 序列模式与结构注释,倒置重复,0.2-0.4-ADVANCED,native,reimplementation,complete,,find_inverted_repeats使用native有界枚举返回arm、loop、位置与比较审计，属于序列结构proxy而非折叠预测
+PAT-011,56,6. 序列模式与结构注释,串联重复,0.2-0.4-ADVANCED,native,reimplementation,complete,,find_tandem_repeats使用native有界枚举返回exact repeat unit、重复次数、区间和比较审计
+PAT-012,57,6. 序列模式与结构注释,微卫星,0.2-0.4-ADVANCED,native,reimplementation,complete,,find_microsatellites复用native tandem-repeat结果，专门覆盖1-6 bp单位的STR并保留阈值与命中上限
+PAT-013,58,6. 序列模式与结构注释,低复杂度区域,0.2-0.4-ADVANCED,reimplementation,,complete,complexity,find_low_complexity_regions以显式entropy/窗口规则标记简单低复杂度区域
+THERMO-001,59,7. 理化与热力学性质,分子量,0.2-0.4-ADVANCED,reimplementation,adapter,complete,,molecular_weight支持单/双链和可选5-prime phosphate，使用版本化近似质量表并明确端基约定
+THERMO-002,60,7. 理化与热力学性质,熔解温度Tm,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,melting_temperature默认使用内部复现的2-13 nt Wallace规则或2-60 nt SantaLucia 1998 nearest-neighbor Tm；显式Primer3CLIAdapter只通过用户提供的oligotm路径映射Na/Mg/dNTP/strand concentration
+THERMO-003,61,7. 理化与热力学性质,盐浓度修正,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,salt_correction内部复现SantaLucia 1998单价Na+与K+总浓度entropy修正；Mg2+/dNTP不会被静默混入native模型
+THERMO-004,62,7. 理化与热力学性质,热力学参数,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,内部nearest_neighbor返回deltaH、deltaS、deltaG、Tm、分项贡献、条件、参数集和适用范围
+THERMO-005,63,7. 理化与热力学性质,Nearest-neighbor,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,内部nearest_neighbor使用版本化SantaLucia 1998 DNA/DNA参数；当前自动验证不执行Primer3且不宣称外部科学差分
+THERMO-006,64,7. 理化与热力学性质,Duplex stability,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,duplex_stability默认以backend=native的内部NN复现评价完整Watson-Crick互补；显式backend=primer3-cli及用户ntthal路径adapter可评价canonical mismatch/dangling heterodimer并统一结果/provenance；修饰及用户预设alignment明确不支持
+THERMO-007,65,7. 理化与热力学性质,碱基堆积,0.2-0.4-ADVANCED,reimplementation,adapter,complete,thermodynamics,内部stacking_interactions返回逐dinucleotide stacking的deltaH/deltaS/deltaG与汇总
+THERMO-008,66,7. 理化与热力学性质,Hairpin,CONDITIONAL,adapter,reimplementation,conditional,thermodynamics,Primer3CLIAdapter hairpin要求用户单独安装并显式提供ntthal路径；统一消费者严格绑定序列/条件/max-loop/structure选项；受控替身验证协议和解析但不是Primer3/native/NUPACK科学差分
+THERMO-009,67,7. 理化与热力学性质,Self-dimer,CONDITIONAL,adapter,reimplementation,conditional,thermodynamics,Primer3CLIAdapter self_dimer要求用户单独安装并显式提供ntthal路径；统一消费者严格绑定序列/条件/max-loop/structure选项；许可提示GPL-2.0-or-later且以实际版本为准
+THERMO-010,68,7. 理化与热力学性质,Heterodimer,CONDITIONAL,adapter,reimplementation,conditional,thermodynamics,Primer3CLIAdapter heterodimer要求用户单独安装并显式提供ntthal路径；统一消费者严格绑定双序列/条件/max-loop/structure选项；许可提示GPL-2.0-or-later且以实际版本为准
+THERMO-011,69,7. 理化与热力学性质,二级结构,CONDITIONAL,adapter,reimplementation,conditional,thermodynamics,后端中立dot-bracket和配对概率派生指标已完成；NupackAdapter提供MFE/pfunc/pairs/subopt/sample/ensemble/target/tube有界入口并以受控替身测试，真实计算仍需用户取得许可并独立安装且当前环境未验证
+THERMO-012,70,7. 理化与热力学性质,局部熔解特征,0.2-0.4-ADVANCED,reimplementation,adapter,complete,,内部window_tm以0-based半开窗口返回Wallace或NN局部Tm、min/max和条件；明确不是实验melting profile
+THERMO-013,71,7. 理化与热力学性质,计算条件记录,0.1-MVP,native,,complete,provenance,所有温度相关结果保存ThermodynamicConditions、方法、algorithm_version、parameter_set、applicability和provenance
+FP-001,72,8. 序列表征与特征工程,整数编码,0.1-MVP,native,reimplementation,complete,,integer_encode使用版本化A=0/C=1/G=2/T=3及IUPAC/sentinel策略；Gap可error/omit/按已知长度expand并受max_output_length限制
+FP-002,73,8. 序列表征与特征工程,One-hot编码,0.1-MVP,native,reimplementation,complete,,one_hot_encode返回固定A/C/G/T四列不可变行；IUPAC支持error/fractional/zero，已知Gap支持omit/zero-row expand，未知Gap不可展开且输出有硬上限
+FP-003,74,8. 序列表征与特征工程,k-mer 特征（含 Canonical 模式）,0.1-MVP,native,reimplementation,complete,kmer,推荐入口kmer按稳定lexicographic schema返回count/frequency/binary及dense/sparse表示；canonical=True时合并反向互补k-mer；kmer_fingerprint保留为兼容别名
+FP-004,75,8. 序列表征与特征工程,Canonical 模式（并入 FP-003）,0.1-MVP,native,reimplementation,complete,kmer,保留FP-004稳定追踪编号但不再作为独立功能入口；canonical_kmer及kmer(... canonical=True)把每个ACGT word与其reverse complement折叠到lexicographic最小代表
+FP-005,76,8. 序列表征与特征工程,k-mer Sketch（MinHash/FracMinHash）,0.2-0.4-ADVANCED,reimplementation,adapter,complete,,内部minhash和fracminhash复现公开sketch方法，生成固定seed、k、canonical及selection schema的有界结果
+FP-006,77,8. 序列表征与特征工程,Motif fingerprint,0.2-0.4-ADVANCED,native,reimplementation,complete,,motif_fingerprint按稳定名称顺序编码IUPAC motif count或presence
+FP-007,78,8. 序列表征与特征工程,限制酶指纹,0.2-0.4-ADVANCED,native,reimplementation,complete,restriction,restriction_fingerprint按调用方酶panel编码位点count或presence并保留panel参数
+FP-008,79,8. 序列表征与特征工程,GC空间指纹,0.2-0.4-ADVANCED,native,reimplementation,complete,,gc_spatial_fingerprint以固定数量标准化位置bin编码GC，空bin与环状原点策略显式
+FP-009,80,8. 序列表征与特征工程,Repeat fingerprint,0.2-0.4-ADVANCED,native,reimplementation,complete,,repeat_fingerprint组合exact tandem-repeat fraction与homopolymer摘要，保留组成方法
+FP-010,81,8. 序列表征与特征工程,Coding fingerprint,0.2-0.4-ADVANCED,native,reimplementation,complete,,coding_fingerprint组合codon、start/stop和六阅读框site计数，不含表达预测
+FP-011,82,8. 序列表征与特征工程,热力学指纹,CONDITIONAL,native,adapter,complete,,thermodynamic_fingerprint固定16维v2 schema包含内部duplex及hairpin/self/heterodimer available/found/Tm/dG；结构项由显式Primer3 adapter或zero/sentinel/error缺失策略处理，adapter结果严格绑定请求并记录provenance
+FP-012,83,8. 序列表征与特征工程,混合DNA fingerprint,0.2-0.4-ADVANCED,native,,complete,,hybrid_fingerprint按稳定component顺序和显式权重拼接可解释指纹；标为native组合而非novel
+FP-013,84,8. 序列表征与特征工程,多尺度指纹,0.2-0.4-ADVANCED,native,,complete,,multiscale_fingerprint拼接多个k-mer frequency尺度与global GC，并限制尺度数和维度
+FP-014,85,8. 序列表征与特征工程,特征预处理,0.2-0.4-ADVANCED,native,reimplementation,complete,,FeaturePreprocessor支持训练集拟合的missing处理、standard/minmax/L1/L2与低方差筛选，schema可序列化
+SIM-001,86,9. 相似度、比对与搜索,Exact search,0.1-MVP,native,reimplementation,complete,,exact_search在有界target集合中比较完整literal symbol string，可显式包含reverse-complement并合并palindrome strand；空query只匹配空target
+SIM-002,87,9. 相似度、比对与搜索,Subsequence search,0.1-MVP,native,reimplementation,complete,,subsequence_search在多个有界target上返回0-based半开literal命中，支持overlap与strand选择；不跨环状原点，空query匹配每个边界
+SIM-003,88,9. 相似度、比对与搜索,Motif search,0.2-0.4-ADVANCED,native,reimplementation,complete,motif_scan,scan_motif提供exact/IUPAC/regex搜索；PWM由独立scan_pwm与PWM对象完成，二者返回统一命中对象
+SIM-004,89,9. 相似度、比对与搜索,Approximate matching,0.2-0.4-ADVANCED,native,reimplementation,complete,,approximate_search使用有界动态规划支持指定mismatch、insertion和deletion并返回路径/位置
+SIM-005,90,9. 相似度、比对与搜索,反向互补搜索,0.1-MVP,native,reimplementation,complete,,reverse_complement_search在forward/reverse两种query方向执行literal子串搜索，可合并palindrome重复命中并保存实际strand及target索引
+SIM-006,91,9. 相似度、比对与搜索,Hamming distance,0.1-MVP,native,reimplementation,complete,,hamming_distance要求等长序列并以literal符号逐位比较，返回距离及每个mismatch的0-based位置/左右符号；不把IUPAC解释为集合
+SIM-007,92,9. 相似度、比对与搜索,Edit distance,0.1-MVP,native,reimplementation,complete,,edit_distance实现带独立substitution/insertion/deletion cost的exact Levenshtein DP，可返回稳定路径及max-distance审计；预先限制max_cells且IUPAC为literal
+SIM-008,93,9. 相似度、比对与搜索,序列比对,0.2-0.4-ADVANCED,reimplementation,adapter,complete,,align_pairwise实现global、local和双端free-end semi_global，支持linear或三状态affine gap、literal IUPAC、稳定tie-break与max_cells审计；AlignmentResult同时保存matches/mismatches/indels、identity、query coverage和target coverage
+SIM-010,94,9. 相似度、比对与搜索,k-mer相似度,0.1-MVP,native,reimplementation,complete,kmer,kmer_similarity支持set/count的Jaccard、directional containment及cosine，显式k/canonical/overlap和zero-vector策略并返回共享量与分母
+SIM-011,95,9. 相似度、比对与搜索,指纹相似度,0.1-MVP,native,reimplementation,complete,,fingerprint_similarity对版本化fingerprint或同构数值向量提供weighted Tanimoto/Jaccard/cosine及Euclidean/Manhattan，并严格对齐schema与zero-vector策略
+SIM-012,96,9. 相似度、比对与搜索,Sketch相似度,0.2-0.4-ADVANCED,native,adapter,complete,,sketch_similarity以native集合运算比较兼容MinHash/FracMinHash并明确Jaccard/containment估计口径
+SIM-013,97,9. 相似度、比对与搜索,Dashing sketch相似度,CONDITIONAL,adapter,,conditional,,DashingAdapter要求调用方显式提供GPL-3.0-only可执行文件，可有界执行exact或HLL-sketch Jaccard矩阵并由DNAKit稳定生成Top-k，校验固定命令、输入/输出SHA、后端版本和provenance；契约/安全测试及本地v1.0.2-4-g0635 exact示例smoke通过但尚无科学差分，本地第三方副本不入发行归档
+SIM-014,98,9. 相似度、比对与搜索,最近邻搜索,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,nearest_neighbors对版本化内存SketchIndex执行稳定Top-k exact scan并返回共享hash和相似度
+SIM-015,99,9. 相似度、比对与搜索,数据库索引,0.2-0.4-ADVANCED,native,adapter,complete,,SketchIndex支持构建、SHA-256自校验持久化和加载；当前不包含BLAST/MMseqs2数据库索引
+SIM-016,100,9. 相似度、比对与搜索,批量相似度矩阵,0.1-MVP,native,reimplementation,complete,,similarity_matrix/pairwise_matrix按输入顺序生成有界dense矩阵并保存labels、method、value kind及权重；containment保留非对称性，其余复用标量比较语义
+DATA-001,101,10. 去重、聚类与数据划分,标准去重,0.1-MVP,native,,complete,dedup_groups,deduplicate(... equivalence="exact")按规范化sequence parts稳定分组，支持first/last/best-quality代表并返回成员、代表、动作及输入输出计数审计
+DATA-002,102,10. 去重、聚类与数据划分,反向互补去重,0.1-MVP,native,,complete,dedup_groups,deduplicate(... equivalence="reverse_complement")把正向与reverse-complement等价键稳定合并，并为每个成员记录相对代表的forward/reverse方向
+DATA-003,103,10. 去重、聚类与数据划分,环状等价去重,0.2-0.4-ADVANCED,native,,complete,,deduplicate的circular/circular_reverse_complement模式用最小旋转规范化并要求显式环状拓扑
+DATA-004,104,10. 去重、聚类与数据划分,IUPAC-aware去重,0.2-0.4-ADVANCED,native,,complete,,deduplicate_iupac区分identical、compatible和conflict，采用稳定greedy complete-link并保存所有pair关系
+DATA-005,105,10. 去重、聚类与数据划分,近似去重,0.2-0.4-ADVANCED,native,adapter,complete,dedup_groups,deduplicate_approximate复用identity/edit/k-mer/fingerprint阈值图聚类形成近重复组
+DATA-006,106,10. 去重、聚类与数据划分,冲突处理,0.1-MVP,native,,complete,,DeduplicationConfig按指定metadata field检测组内冲突并支持error/drop_group/keep_representative/keep_all；缺失数、取值、动作和可选metadata merge均审计
+DATA-007,107,10. 去重、聚类与数据划分,Identity聚类,0.2-0.4-ADVANCED,native,adapter,complete,dedup_groups,cluster_sequences的identity模式使用有界pairwise identity阈值图连通分量
+DATA-008,108,10. 去重、聚类与数据划分,k-mer聚类,0.2-0.4-ADVANCED,native,reimplementation,complete,kmer,cluster_sequences的kmer模式使用显式k/canonical参数和有界pairwise比较
+DATA-009,109,10. 去重、聚类与数据划分,指纹聚类,0.2-0.4-ADVANCED,native,reimplementation,complete,,cluster_sequences的fingerprint模式使用确定性指纹相似度阈值图
+DATA-010,110,10. 去重、聚类与数据划分,层次聚类,0.2-0.4-ADVANCED,native,reimplementation,complete,,hierarchical_cluster提供single/complete/average linkage及稳定tie-break的linkage步骤
+DATA-011,111,10. 去重、聚类与数据划分,代表序列选择,0.2-0.4-ADVANCED,native,,complete,,select_representatives支持first、shortest、longest、best_quality和medoid并保留选择审计
+DATA-012,112,10. 去重、聚类与数据划分,随机划分,0.1-MVP,native,,complete,,split(method="random")用固定seed与global largest-remainder配额分配individual记录，保存每条assignment、实际count、shuffle及preserve-order策略
+DATA-013,113,10. 去重、聚类与数据划分,分层随机划分,0.1-MVP,native,,complete,,split(method="stratified")按显式metadata_key形成strata并在全局配额内固定seed round-robin分配；missing metadata按error/separate策略处理
+DATA-014,114,10. 去重、聚类与数据划分,相似度划分,0.1-MVP,native,,complete,,split的similarity模式按显式k-mer阈值形成原子连通分量并保证不同subset不拆分；联合约束另由joint_split提供
+DATA-015,115,10. 去重、聚类与数据划分,Cluster split,0.1-MVP,native,,complete,,group/cluster元数据可作为不可拆分单元进入split，且cluster_sequences可生成identity/edit/k-mer/fingerprint labels
+DATA-016,116,10. 去重、聚类与数据划分,物种划分,0.1-MVP,native,,complete,,通过split的group模式及调用方物种metadata_key将相同值作为不可拆分原子单元；DNAKit不内置物种本体或推断taxonomy
+DATA-017,117,10. 去重、聚类与数据划分,染色体划分,0.1-MVP,native,,complete,,通过split的group模式及调用方染色体metadata_key保持同染色体记录不跨subset；只使用显式metadata且不推断坐标/assembly
+DATA-018,118,10. 去重、聚类与数据划分,个体划分,0.1-MVP,native,,complete,,通过split的group模式及调用方individual metadata_key保持同一显式个体ID为原子单元；不识别或推断身份关系
+DATA-019,119,10. 去重、聚类与数据划分,Donor/family划分,0.1-MVP,native,,complete,,通过split的group模式及调用方donor或family metadata_key保持相同组不跨subset；调用方负责字段定义且DNAKit不推断亲缘
+DATA-020,120,10. 去重、聚类与数据划分,区域/locus划分,0.1-MVP,native,,complete,,通过split的group模式及调用方region/locus metadata_key保持同标签原子分配；不从坐标重叠自动推断locus
+DATA-021,121,10. 去重、聚类与数据划分,时间划分,0.2-0.4-ADVANCED,native,,complete,,temporal_split解析ISO-8601日期，支持显式cutoff或按比例的稳定chronological分配
+DATA-022,122,10. 去重、聚类与数据划分,多约束联合划分,0.2-0.4-ADVANCED,native,,complete,,joint_split把多个metadata group与相似度连通分量合并为原子单元，用固定seed启发式平衡比例/标签并报告可行性与松弛
+DATA-023,123,10. 去重、聚类与数据划分,泄漏检测,0.2-0.4-ADVANCED,native,,complete,,detect_leakage穷举有界cross-split pairs，分别报告exact和高相似事件、方法严格性及截断策略
+DATA-024,124,10. 去重、聚类与数据划分,划分质量评价,0.2-0.4-ADVANCED,native,,complete,,evaluate_split_quality报告比例偏差、标签TV、group leakage、相似度leakage和透明汇总公式
+MOLBIO-001,125,11. 分子生物学模拟与规则设计,限制酶切,0.2-0.4-ADVANCED,reimplementation,native,complete,restriction,digest_restriction模拟版本化酶panel的完整单/多酶切割并返回cuts/fragments与坐标
+MOLBIO-002,126,11. 分子生物学模拟与规则设计,末端类型,0.2-0.4-ADVANCED,native,reimplementation,complete,,classify_restriction_end以native确定性规则返回sticky/blunt、突出链、方向和5-to-3 overhang
+MOLBIO-003,127,11. 分子生物学模拟与规则设计,Ligation,0.2-0.4-ADVANCED,native,reimplementation,complete,,check_end_compatibility和ligate_fragments以native抽象规则按明确末端与方向模拟线性/环状连接
+MOLBIO-004,128,11. 分子生物学模拟与规则设计,PCR模拟,0.2-0.4-ADVANCED,native,adapter,complete,,simulate_pcr用inward-facing primer hits预测线性或单次环状遍历产物，不预测PCR产率
+MOLBIO-005,129,11. 分子生物学模拟与规则设计,引物匹配,0.2-0.4-ADVANCED,native,reimplementation,complete,,match_primer以native字符串规则返回正反链位置、方向、mismatch及3-prime严格区，当前不允许indel
+MOLBIO-006,130,11. 分子生物学模拟与规则设计,引物性质,CONDITIONAL,native,adapter,complete,thermodynamics,primer_properties统一返回native GC/Tm并可显式计算主/配对primer结构；严格校验adapter序列/条件/选项绑定并记录版本、许可和provenance且不自动探测/执行
+MOLBIO-007,131,11. 分子生物学模拟与规则设计,引物设计接口,CONDITIONAL,adapter,native,complete,,prepare_primer_design生成严格后端中立请求；Primer3CLIDesignAdapter.design只执行用户提供的primer3_core路径并以Boulder-IO白名单/上限解析候选；反查模板坐标/左右序列/产物长度并记录许可/provenance
+MOLBIO-008,132,11. 分子生物学模拟与规则设计,Assembly模拟,0.2-0.4-ADVANCED,reimplementation,native,complete,,simulate_assembly内部复现有界组装抽象，覆盖Gibson/LCR exact-overlap及pre-digested Golden Gate/BioBrick，不模拟动力学/产率
+MOLBIO-009,133,11. 分子生物学模拟与规则设计,CRISPR候选扫描,0.2-0.4-ADVANCED,reimplementation,native,complete,guide_scan,scan_crispr_candidates复用PAM规则并可有界枚举ungapped sequence off-target，不预测效率、bulge或生物风险
+MOLBIO-010,134,11. 分子生物学模拟与规则设计,规则型序列优化,0.2-0.4-ADVANCED,native,reimplementation,complete,,optimize_sequence_rules以native固定seed贪心规则降低GC/motif/repeat透明目标并保留每步变化
+MOLBIO-011,135,11. 分子生物学模拟与规则设计,Codon optimization,0.2-0.4-ADVANCED,native,reimplementation,complete,,optimize_codons/optimize_protein_codons以native动态规划使用调用方提供且版本化的codon usage表做同义替换并核对翻译
+MOLBIO-012,136,11. 分子生物学模拟与规则设计,突变文库,0.2-0.4-ADVANCED,native,reimplementation,complete,mutation,generate_mutation_library以native枚举/抽样支持single、saturation和combinatorial substitutions，含seed与输出规模上限
+EVAL-001,137,12. DNA综合评价体系,validity,0.2-0.4-ADVANCED,native,,complete,validation,evaluate_validity审计字符、alphabet、长度、Gap与拓扑约束并返回逐序列条目
+EVAL-002,138,12. DNA综合评价体系,Ambiguity,0.2-0.4-ADVANCED,native,,complete,ambiguity,evaluate_ambiguity报告每种IUPAC符号、位置、加权比例及显式Gap分母策略
+EVAL-003,139,12. DNA综合评价体系,Sequence quality,0.2-0.4-ADVANCED,native,,complete,quality,evaluate_quality透明组合validity、ambiguity、complexity、length和completeness并保留全部分项
+EVAL-004,140,12. DNA综合评价体系,Complexity,0.2-0.4-ADVANCED,native,,complete,complexity,evaluate_complexity组合entropy、linguistic complexity、repeat cleanliness和homopolymer cleanliness
+EVAL-005,141,12. DNA综合评价体系,Uniqueness,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_uniqueness支持exact、reverse-complement、circular、IUPAC和approximate定义并报告unique fraction
+EVAL-006,142,12. DNA综合评价体系,Diversity,0.2-0.4-ADVANCED,native,,complete,,evaluate_diversity报告平均/最近邻距离、阈值cluster数量和coverage摘要
+EVAL-007,143,12. DNA综合评价体系,Redundancy,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_redundancy报告exact、threshold-near及cluster层冗余，复用明确相似度配置
+EVAL-008,144,12. DNA综合评价体系,Novelty,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_novelty定义为相对于版本化ReferenceLibrary的1-nearest-similarity，不提供绝对novelty
+EVAL-009,145,12. DNA综合评价体系,最近参考序列,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,nearest_reference返回稳定Top-k reference ID、index、similarity、coverage和exact标记
+EVAL-010,146,12. DNA综合评价体系,Memorization,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_memorization按exact或显式copy_threshold标记训练参考复制，不使用任务型模型
+EVAL-011,147,12. DNA综合评价体系,Reference similarity,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_reference_similarity汇总每条query的最近参考相似度与命中率
+EVAL-012,148,12. DNA综合评价体系,Distribution similarity,0.2-0.4-ADVANCED,native,,complete,,evaluate_distribution_similarity比较长度、GC、k-mer、motif和repeat的透明分布摘要
+EVAL-013,149,12. DNA综合评价体系,合成风险,0.2-0.4-ADVANCED,native,,complete,,evaluate_synthesis_risk返回global/local GC、homopolymer、tandem/inverted-repeat规则及位置，明确非实验成功率
+EVAL-014,150,12. DNA综合评价体系,综合评分,0.2-0.4-ADVANCED,native,,complete,,evaluate_scorecard保留每项raw/normalized值、方向、权重、缺失策略和weighted contribution
+EVAL-015,151,12. DNA综合评价体系,参考库追踪,0.2-0.4-ADVANCED,native,adapter,complete,provenance,ReferenceLibrary强制保存名称、版本、来源、日期、内容digest、filters和index_parameters
+VIZ-001,152,13. 可视化,序列文字图,0.1-MVP,native,adapter,complete,,plot_sequence生成确定性独立SVG并覆盖空序列和IUPAC
+VIZ-002,153,13. 可视化,位置高亮,0.1-MVP,native,adapter,complete,,Highlight支持0-based半开symbol坐标、优先级、标签和颜色
+VIZ-003,154,13. 可视化,样式控制,0.1-MVP,native,adapter,complete,,SVGTheme及各图配置支持颜色、字号、尺寸、标题和显示上限
+VIZ-004,155,13. 可视化,Gap显示,0.1-MVP,native,adapter,complete,,已知和未知Gap以不展开的标签显示并保留可解析坐标状态
+VIZ-005,156,13. 可视化,线性序列图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_linear_map绘制resolved linear coordinate轴与feature interval track，并记录未解析feature数量
+VIZ-006,157,13. 可视化,环状DNA图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_circular_map绘制环状backbone、feature arc、全圈feature和bp长度
+VIZ-008,158,13. 可视化,Alignment图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_alignment消费预计算AlignmentResult并分块显示query、match line和target
+VIZ-009,159,13. 可视化,相似度矩阵,0.1-MVP,native,adapter,complete,,plot_similarity_matrix消费有界SimilarityMatrixResult并保留方向性和标签顺序
+VIZ-014,160,13. 可视化,图片导出,0.1-MVP,native,adapter,complete,,原生SVG及可选CairoSVG/Pillow PNG、TIFF、PDF均支持原子写出、600 dpi、像素上限、SHA-256和覆盖策略
+VIZ-015,161,13. 可视化,交互报告,0.2-0.4-ADVANCED,native,adapter,complete,,build_html_report将调用方显式提供的记录和结果生成自包含、可搜索、可展开且HTML-escaped的本地报告，CSP禁止网络并有输入、结果和输出字节上限
+VIZ-016,162,13. 可视化,数据导出,0.1-MVP,native,adapter,complete,table_io,export_table/export_result原子导出四格式且read_table提供对称有界读取；PyArrow 25.0.1的DNAKit Parquet往返已测试
+ENG-001,163,14. 后端、性能与可复现性,统一后端接口,0.1-MVP,native,,partial,,BackendRegistry、BackendInfo和统一异常已实现；Primer3、NUPACK与显式Dashing具科学计算adapter，BLAST/MMseqs2/sourmash仍只有被动metadata/version句柄；尚未形成覆盖全部候选外部后端的统一执行层
+ENG-002,164,14. 后端、性能与可复现性,原生与外部标记,0.1-MVP,native,,complete,,ImplementationInfo/Provenance区分native、adapter、reimplementation、novel和外部后端
+ENG-003,165,14. 后端、性能与可复现性,Python API,0.1-MVP,native,,complete,,当前已实现功能均提供类型化Python API；领域模块使用显式命名空间
+ENG-004,166,14. 后端、性能与可复现性,CLI,0.1-MVP,native,,complete,,统一CLI已覆盖normalize、validate、describe、fingerprint、search、orfs、compare、convert、deduplicate、split、report和workflow；兼容独立入口也有测试
+ENG-005,167,14. 后端、性能与可复现性,配置工作流,0.1-MVP,native,,complete,,严格YAML/JSON白名单pipeline可顺序运行多个模块、限制输出目录并保存artifact/manifest；不加载任意Python callable
+ENG-006,168,14. 后端、性能与可复现性,批量计算,0.1-MVP,native,,complete,,run_batch支持有界大量DNARecord、稳定顺序、错误策略、进度回调、线程模式和resume_completed_ids
+ENG-007,169,14. 后端、性能与可复现性,并行计算,0.2-0.4-ADVANCED,native,,complete,,BatchConfig的thread模式支持有界workers/max_in_flight并验证串并行结果顺序与派生seed一致；未提供process模式
+ENG-008,170,14. 后端、性能与可复现性,分块与流式处理,0.1-MVP,native,,complete,,RecordSource和convert流式处理；搜索、匹配数、编辑距离DP单元、矩阵、相似度划分和编码输出均有显式资源上限
+ENG-009,171,14. 后端、性能与可复现性,缓存,0.2-0.4-ADVANCED,native,,complete,,CacheKey自动纳入key schema和DNAKit版本；输入/参数及所用算法/后端版本须由调用方显式放入components，JSONCache原子保存、校验payload、限制max_entry_bytes并可按key/namespace失效；无TTL或自动淘汰
+ENG-010,172,14. 后端、性能与可复现性,随机种子,0.1-MVP,native,,complete,,随机突变记录seed或rng来源、算法版本及前后状态；划分结果记录seed、shuffle和分配策略并有重放测试
+ENG-011,173,14. 后端、性能与可复现性,版本追踪,0.1-MVP,native,,complete,provenance,Provenance、BackendInfo、ReferenceLibrary和RunManifest记录DNAKit/Python/platform、依赖/后端/数据库、参数、seed及artifact hash
+ENG-012,174,14. 后端、性能与可复现性,错误与警告,0.1-MVP,native,,complete,,已实现稳定错误码、异常层次、Issue和CLI非零退出测试
+ENG-013,175,14. 后端、性能与可复现性,单元测试,0.1-MVP,native,,complete,,当前实现具有pytest正常/边界/错误测试，并纳入本地质量门
+ENG-014,176,14. 后端、性能与可复现性,一致性验证,0.2-0.4-ADVANCED,native,,partial,,人工边界与Biopython restriction/MW/alignment/search/linkage差分通过；Primer3/NUPACK/Dashing固定协议/解析/安全契约以受控替身验证但未做真实科学差分；CD-HIT/MMseqs2等大库后端未对照
+ENG-015,177,14. 后端、性能与可复现性,性能benchmark,0.2-0.4-ADVANCED,native,adapter,complete,,本机有界microbenchmark按同输入/规模/预热/重复比较DNAKit与Biopython的construct、GC及reverse-complement，并记录7项DNAKit任务的时间、tracemalloc峰值、规模扩展、seed、版本、硬件、样本及所选公开callable源码行口径；不声称跨机器或RSS结论，源码行数不是质量指标
+ENG-016,178,14. 后端、性能与可复现性,文档与教程,0.1-MVP,native,,complete,,README、安装、快速入门、各主要模块API示例、两个可执行Notebook、完整workflow、FAQ、引用许可和本地文档站均已同步
+ENG-017,179,14. 后端、性能与可复现性,可选图形入口,0.2-0.4-ADVANCED,native,,blocked,,用户要求网站演示不可输入，因此仅提供固定输入预生成只读页面；widget、可输入Web或Galaxy入口与当前范围冲突
+DATA-025,180,10. 去重、聚类与数据划分,物种排除,0.1-MVP,native,,complete,metadata_filter,exclude_species/exclude_by_metadata按显式metadata["species"]精确排除一个或多个值；所有记录缺少species字段时抛出结构化错误且不修改输入DNASet
+DATA-026,181,10. 去重、聚类与数据划分,染色体排除,0.1-MVP,native,,complete,metadata_filter,exclude_chromosomes/exclude_by_metadata按显式metadata["chromosome"]精确排除一个或多个值；所有记录缺少chromosome字段时抛出结构化错误且不修改输入DNASet
+DATA-027,182,10. 去重、聚类与数据划分,神经网络聚类,0.2-0.4-ADVANCED,adapter,,conditional,model_representations,extract_representations支持11种可选DNA基础模型并在显式调用时解析或下载checkpoint；neural_cluster_sequences执行L2归一化、可选PCA及固定seed的k-means并返回中心最近代表序列和审计字段；当前仅GROVER完成真实checkpoint的rep到k-means smoke，其余模型受独立依赖、源码、访问条款和硬件条件限制
+EVAL-016,183,12. DNA综合评价体系,Fréchet DNA distance,0.2-0.4-ADVANCED,reimplementation,adapter,conditional,model_representations,evaluate_frechet_distance默认复用DATA-027的LucaOne mean-pooling表征与L2归一化，以等价样本空间cross-Gram核范数计算两集合高斯Fréchet距离；不称为ChemNet FCD，不同模型或checkpoint不可比较，真实LucaOne运行受显式远程代码授权、依赖和硬件条件限制
+EVAL-017,184,12. DNA综合评价体系,Frag,0.2-0.4-ADVANCED,reimplementation,adapter,complete,kmer_statistics,evaluate_fragment_similarity按MOSES Frag公式计算两个集合exact k-mer出现次数向量的余弦相似度；以fixed-length DNA k-mer代替BRICS片段，默认canonical 3-mer，数值不可与分子Frag直接比较
+EVAL-018,185,12. DNA综合评价体系,SNN,0.2-0.4-ADVANCED,reimplementation,adapter,complete,hashed_kmer_fingerprint,evaluate_snn按MOSES SNN公式计算每条生成DNA到参考集合最近邻的binary Tanimoto相似度均值；默认canonical 7-mer和1024位SHA-256哈希指纹，数值不可与Morgan-fingerprint SNN直接比较

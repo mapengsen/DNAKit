@@ -1,0 +1,115 @@
+site_name: DNAKit
+site_description: 面向 DNA 序列的确定性分析工具包
+site_author: DNAKit contributors
+copyright: Support by Pengsen Ma (Hunan University, Yuelushan Laboratory)
+docs_dir: docs
+site_dir: site
+strict: true
+not_in_nav: |
+  /quickstart.md
+  /tutorials/*
+  /examples/index.md
+  /validation.md
+  /demo/index.md
+  /planning/*
+  /api/features/03_validation.md
+  /api/features/05_descriptors.md
+  /api/features/16_common_genomes.md
+  /api/features/04_ops_007_trimming_masking.md
+  /api/features/08_neural_representations.md
+
+theme:
+  name: material
+  language: zh
+  logo: assets/images/DNAKit-icon.png
+  favicon: assets/images/DNAKit-icon.png
+  font: false
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search:
+      lang: zh
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_root_heading: true
+            show_source: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  generator: false
+
+nav:
+  - 首页: index.md
+  - 安装: installation.md
+  - 快速入门教程:
+      - 功能树总览: api/features/function_tree.md
+      - 功能模块索引: api/features/index.md
+      - 1. 数据准备:
+          - （1）核心数据对象: api/features/01_core_objects.md
+          - （2）文件读写: api/features/02_io_data.md
+          - （3）下载: api/features/15_download.md
+          - （4）数据查询: api/features/22_database_query.md
+      - 2. 数据处理:
+          - （1）DNA序列标准化: api/features/03_standardization.md
+          - （2）序列内操作:
+              - OPS-001 序列补全: api/features/04_ops_001_sequence_direction.md
+              - OPS-002 转录与翻译: api/features/04_ops_002_transcription_translation.md
+              - OPS-003 子序列提取: api/features/04_ops_003_subsequence_extraction.md
+              - OPS-004 序列编辑: api/features/04_ops_004_sequence_editing.md
+              - OPS-005 序列生成: api/features/04_ops_005_mutation_generation.md
+              - OPS-006 序列拼接: api/features/04_ops_006_sequence_concatenation.md
+              - OPS-007:
+                  - Trimming（修剪）: api/features/04_ops_007_trimming.md
+                  - Masking（掩蔽）: api/features/04_ops_007_masking.md
+              - OPS-008 环状序列操作: api/features/04_ops_008_circular_sequence_operations.md
+              - OPS-010 序列切分: api/features/17_sequence_chunking.md
+          - （3）序列去重: api/features/10_deduplication.md
+          - （4）序列聚类: api/features/10_clustering.md
+          - （5）数据集整理与划分: api/features/10_datasets.md
+      - 3. 数据分析:
+          - （1）DNA描述符+表征+指纹:
+              - DNA描述符: api/features/05_all_descriptors.md
+              - 序列表征: api/features/08_fingerprints.md
+              - DNA指纹: api/features/08_feature_engineering.md
+          - （2）序列搜索:
+              - 通用搜索: api/features/09_search.md
+              - 序列模式搜索: api/features/06_patterns.md
+          - （3）理化性质: api/features/07_physicochemical.md
+          - （4）双链热力学扩展: api/features/19_duplex_thermodynamics.md
+          - （5）二级结构性质: api/features/20_secondary_structure.md
+          - （6）三维结构与力学性质: api/features/21_structure3d.md
+          - （7）光学与浓度换算: api/features/18_optics_concentration.md
+      - 4. 数据评价:
+          - （1）DNA综合评价体系: api/features/12_evaluation.md
+          - （2）相似度计算: api/features/09_similarity_alignment.md
+          - （3）序列距离与比对: api/features/09_alignment.md
+      - 5. 可视化: api/features/13_visualization.md
+      - 6. 工程化与扩展: api/features/14_engineering.md
+  - API 参考:
+      - API 总览: api/index.md
+  - 更新日志: changelog.md
+  - FAQ: faq.md
+  - 致谢与引用: acknowledgements.md

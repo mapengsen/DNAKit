@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1-demo",
+  "status": "manually-verified-and-api-checked-static-fixture",
+  "records": [
+    {"id": "seq-a", "sequence": "ACGTACGT"},
+    {"id": "seq-b", "sequence": "ACGTACGT"},
+    {"id": "seq-c", "sequence": "ACGTTCGT"}
+  ],
+  "expected": {
+    "seq-a": {
+      "symbol_length": 8,
+      "gc_fraction": 0.5,
+      "reverse_complement": "ACGTACGT",
+      "kmer_counts_k2": {"AC": 2, "CG": 2, "GT": 2, "TA": 1},
+      "wallace_tm_celsius": 24.0,
+      "linguistic_complexity_k1_to_k3": 0.38095238095238093,
+      "exact_tandem_repeat_fraction": 1.0,
+      "synthesis_risk_level": "low"
+    },
+    "dataset": {
+      "record_count": 3,
+      "unique_raw_sequence_count": 2,
+      "exact_duplicate_groups": [["seq-a", "seq-b"]]
+    }
+  },
+  "generated_by": null,
+  "note": "Static fixture checked against the local DNAKit 0.1.0.dev0 workflow; the demo performs no browser-side computation."
+}

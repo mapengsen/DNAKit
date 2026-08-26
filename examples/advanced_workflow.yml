@@ -1,0 +1,83 @@
+schema_version: dnakit-workflow-v1
+run_id: fixed-demo
+input:
+  path: fixed_demo.fasta
+  format: fasta
+  alphabet: iupac
+  compression: none
+output_dir: workflow-output
+seed: 7
+error_policy: raise
+overwrite: false
+limits:
+  max_steps: 12
+  max_records: 100
+  max_sequence_length: 10000
+  max_total_bases: 100000
+  max_fingerprint_dimension: 4096
+  max_result_bytes: 2000000
+  max_output_bytes: 10000000
+steps:
+  - id: normalized
+    operation: normalize
+    input: input
+    params:
+      uppercase: true
+      u_policy: replace
+      ambiguity_policy: ignore
+  - id: validated
+    operation: validate
+    input: normalized
+    params:
+      require_unique_ids: true
+      fail_on_invalid: true
+  - id: described
+    operation: descriptors
+    input: validated
+    params:
+      metrics: [length, gc, composition, entropy]
+  - id: fingerprinted
+    operation: fingerprint
+    input: described
+    params:
+      k: 2
+      canonical: true
+      mode: count
+      representation: sparse
+  - id: deduplicated
+    operation: deduplicate
+    input: fingerprinted
+    params:
+      equivalence: exact
+      representative_policy: first
+  - id: partitioned
+    operation: split
+    input: deduplicated
+    params:
+      method: random
+      ratios:
+        train: 0.5
+        test: 0.5
+      shuffle: true
+  - id: write_train
+    operation: write
+    input: partitioned
+    params:
+      target: splits/train.fasta
+      subset: train
+      format: fasta
+  - id: write_test
+    operation: write
+    input: partitioned
+    params:
+      target: splits/test.fasta
+      subset: test
+      format: fasta
+  - id: report
+    operation: report
+    input: partitioned
+    params:
+      target: report.html
+      title: DNAKit fixed workflow
+      max_records: 100
+      max_result_bytes: 2000000

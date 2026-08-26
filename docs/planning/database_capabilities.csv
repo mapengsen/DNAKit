@@ -1,0 +1,54 @@
+capability_id,category,capability,status,public_api,provider_or_backend,scope_note
+DBQ-001,查询,物种分类,implemented-adapter,dnakit.search.taxonomy,NCBI Datasets,学名/俗名/别名/TaxID及names/related/lineage报告；字段随提供方记录
+DBQ-002,查询,基因组组装,implemented-adapter,dnakit.search.assembly; dnakit.search.ucsc_genomes,NCBI Datasets; UCSC,参考/代表/RefSeq/GenBank/当前版本与组装元数据
+DBQ-003,查询,基因组统计,implemented-adapter,dnakit.search.assembly,NCBI Datasets,返回提供方assembly report中的长度/N50/contig/scaffold/GC/注释字段
+DBQ-004,查询,序列编号,implemented-adapter,dnakit.search.accession; dnakit.search.ena_search; dnakit.search.ensembl_lookup,NCBI Entrez; ENA; Ensembl,存在性/版本/替代信息以提供方记录为准
+DBQ-005,查询,坐标序列,implemented-adapter,dnakit.search.sequence; dnakit.search.ucsc_sequence,Ensembl; UCSC,统一输入0-based半开；支持链/上下游/Ensembl批量
+DBQ-006,查询,染色体与质粒,implemented-adapter,dnakit.search.chromosome; dnakit.search.ucsc_chromosomes,Ensembl; UCSC,染色体/细胞器/质粒/contig/scaffold名称长度及同义名
+DBQ-007,查询,基因查询,implemented-adapter,dnakit.search.gene; dnakit.search.ensembl_lookup,NCBI Datasets; Ensembl,GeneID/RefSeq/符号/别名检索与Ensembl稳定ID展开
+DBQ-008,查询,转录本查询,implemented-adapter,dnakit.search.transcripts; dnakit.search.sequence_by_id,Ensembl,转录本/外显子/UTR/翻译/canonical及cDNA/CDS/蛋白序列
+DBQ-009,查询,区域注释,implemented-adapter,dnakit.search.annotation; dnakit.search.ucsc_track_data,Ensembl; UCSC,基因/转录本/外显子/重复/变异/调控/CpG等依所选feature或track
+DBQ-010,查询,附近特征,implemented-adapter,dnakit.search.nearby,Ensembl,按显式窗口和距离排序基因/转录本/重复/变异/调控特征
+DBQ-011,查询,序列相似性,existing-plus-adapter,dnakit.similarity.exact_search; dnakit.similarity.approximate_search; dnakit.alignment.align_pairwise; dnakit.search.submit_blast,DNAKit native; NCBI BLAST,本地精确/近似/局部比对已存在；远程BLAST为异步外部服务
+DBQ-012,查询,序列来源识别,conditional-external,dnakit.search.identify,NCBI BLAST,返回最相似记录/物种及命中统计；组装和坐标仅在命中记录提供时存在
+DBQ-013,查询,序列新颖性,existing-plus-adapter,dnakit.evaluation.evaluate_novelty; dnakit.search.novelty,DNAKit native; NCBI BLAST,本地新颖性相对版本化参考库；远程分数为1减最大identity并同时报告coverage
+DBQ-014,查询,BioProject查询,implemented-adapter,dnakit.search.project; dnakit.search.ena_project,NCBI Entrez; ENA,支持提供方查询语法和分页上限
+DBQ-015,查询,BioSample查询,implemented-adapter,dnakit.search.sample; dnakit.search.ena_sample,NCBI Entrez; ENA,物种/组织/宿主/地点/时间等取决于提交元数据
+DBQ-016,查询,测序实验查询,implemented-adapter,dnakit.search.reads; dnakit.search.ena_search,ENA,Study/Experiment/Run/Analysis及library strategy筛选
+DBQ-017,查询,测序平台查询,implemented-adapter,dnakit.search.reads,ENA,平台/仪器/布局/读长字段及ENA查询表达式
+DBQ-018,查询,测序文件查询,implemented-adapter,dnakit.search.reads,ENA,FASTQ/SRA/submitted文件URL/字节/MD5/read/base count；BAM/CRAM依提交记录
+DBQ-019,查询,变异查询,implemented-adapter,dnakit.search.variant; dnakit.search.entrez,Ensembl; NCBI Entrez,rsID/HGVS/区域/SNP/Indel/结构变异
+DBQ-020,查询,临床变异查询,implemented-adapter,dnakit.search.clinical_variant,NCBI ClinVar via Entrez,提供方摘要可含临床意义/疾病/证据/冲突；不作临床判断
+DBQ-021,查询,变异频率查询,implemented-adapter,dnakit.search.variant,Ensembl,按pops/population_genotypes返回可用人群频率
+DBQ-022,查询,变异影响预测,implemented-adapter,dnakit.search.variant,Ensembl VEP,HGVS模式返回提供方转录本/密码子/氨基酸/后果注释
+DBQ-023,查询,表达数据查询,implemented-adapter,dnakit.search.expression,NCBI GEO via Entrez,查询实验与样本元数据；矩阵通过下载API获取
+DBQ-024,查询,表观基因组查询,implemented-adapter,dnakit.search.encode_search; dnakit.search.ucsc_track_data,ENCODE; UCSC,ChIP/ATAC/DNase/甲基化/峰/信号依File或track筛选
+DBQ-025,查询,同源基因查询,implemented-adapter,dnakit.search.homology; dnakit.search.ncbi_orthologs,Ensembl Compara; NCBI Datasets,直系/旁系/投影/序列及NCBI ortholog set
+DBQ-026,查询,比较基因组查询,implemented-adapter,dnakit.search.comparative_alignment; dnakit.search.map_coordinates; dnakit.search.ucsc_track_data,Ensembl Compara; UCSC,多物种比对/保守track/组装间坐标映射；共线性取决于提供方数据
+DBQ-027,查询,ID转换,implemented-adapter,dnakit.search.id_convert; dnakit.search.accession,Ensembl xrefs; NCBI Entrez,返回外部交叉引用与当前accession摘要；不是任意ID对的保证映射
+DBQ-028,查询,关联文献查询,implemented-adapter,dnakit.search.literature,NCBI PubMed via Entrez,支持PubMed查询语法及稳定分页
+DBQ-029,查询,数据库版本查询,implemented-adapter,dnakit.search.database_version; dnakit.search.genome_info,NCBI Entrez; Ensembl; UCSC,数据库更新时间/版本/记录数及每次结果provenance
+DBD-001,下载,完整基因组,existing,dnakit.download.genome,NCBI Datasets,复用已存在并验证MD5的参考基因组FASTA下载
+DBD-002,下载,部分基因组,implemented-adapter,dnakit.download.genome_package,NCBI Datasets,按染色体选择并包含FASTA/注释/报告的ZIP数据包
+DBD-003,下载,区域序列,implemented-adapter,dnakit.download.sequence,Ensembl,0-based半开区域/链/上下游/批量FASTA及manifest
+DBD-004,下载,基因组注释,implemented-adapter,dnakit.download.annotation,NCBI Datasets,GFF3/GTF/GBFF/sequence report数据包；EMBL flat file需显式URL
+DBD-005,下载,基因序列,implemented-adapter,dnakit.download.gene,NCBI Datasets,基因/RNA/CDS/UTR FASTA数据包；内含子可由展开注释与坐标序列组合
+DBD-006,下载,蛋白序列,implemented-adapter,dnakit.download.gene; dnakit.download.virus_package,NCBI Datasets,基因或病毒蛋白FASTA数据包
+DBD-007,下载,组装信息,implemented-adapter,dnakit.download.genome_package,NCBI Datasets,assembly/sequence report和注释统计随数据包
+DBD-008,下载,分类信息,implemented-adapter,dnakit.download.taxonomy,NCBI Datasets,names/lineage/summary JSONL/TSV数据包
+DBD-009,下载,基因元数据,implemented,dnakit.download.metadata,任意QueryResult,查询结果可审计导出JSON/JSONL/CSV/TSV/XML
+DBD-010,下载,病毒数据包,implemented-adapter,dnakit.download.virus_package,NCBI Datasets Virus,基因组/CDS/蛋白/annotation/BioSample报告及筛选条件
+DBD-011,下载,原始测序数据,implemented-adapter,dnakit.download.reads,ENA,公开FASTQ/SRA/submitted文件并验证提供方MD5
+DBD-012,下载,比对数据,conditional-provider,dnakit.download.reads,ENA,可下载公开submitted BAM/CRAM/SAM；不绕过受控访问且不隐式转换SRA
+DBD-013,下载,测序元数据,implemented,dnakit.download.metadata,任意QueryResult,Run/Experiment/Sample/Study等查询结果导出五种格式
+DBD-014,下载,变异数据,implemented-adapter,dnakit.download.variants; dnakit.download.ucsc_files,NCBI dbSNP; UCSC,dbSNP GRCh37/38 VCF/index/checksum文件；其他结构变异由UCSC目录选择
+DBD-015,下载,ClinVar数据,implemented-adapter,dnakit.download.variants,NCBI ClinVar,VCF/TBI/完整XML/variant summary TSV
+DBD-016,下载,表达数据,implemented-adapter,dnakit.download.expression,NCBI GEO,SOFT/MINiML/Series Matrix/common RAW；其他补充矩阵用dataset显式URL
+DBD-017,下载,调控数据,implemented-adapter,dnakit.download.encode_files; dnakit.download.ucsc_files; dnakit.download.tracks,ENCODE; UCSC; explicit HTTPS,BED/bigBed/bedGraph/bigWig/narrowPeak/broadPeak等公开文件
+DBD-018,下载,重复序列数据,implemented-adapter,dnakit.download.ucsc_files; dnakit.download.tracks,UCSC; explicit HTTPS,RepeatMasker/simple repeat/转座元件文件按目录glob或显式URL
+DBD-019,下载,保守性数据,implemented-adapter,dnakit.download.ucsc_files; dnakit.download.tracks,UCSC; explicit HTTPS,conservation BED/bigWig等按目录glob或显式URL
+DBD-020,下载,多物种比对,implemented-adapter,dnakit.download.ucsc_files; dnakit.download.metadata,UCSC; Ensembl,MAF/多序列文件通过UCSC目录；小区域比对可导出查询结果
+DBD-021,下载,坐标转换文件,implemented-adapter,dnakit.download.ucsc_files,UCSC,chain/net文件通过UCSC文件目录glob选择
+DBD-022,下载,本地BLAST数据库,conditional-external,dnakit.download.build_index,makeblastdb,显式提供可执行文件；不从PATH寻找或自动安装
+DBD-023,下载,比对工具索引,conditional-external,dnakit.download.build_index,BWA; Bowtie2; minimap2; samtools,显式可执行路径/线程/超时/输出上限及回滚manifest
+DBD-024,下载,完整分析数据包,partial,dnakit.download.dataset; dnakit.download.build_index,explicit HTTPS; external tools,可事务下载任意显式资源并生成checksum/manifest；自动解包和跨工具全流程编排未伪装为已完成

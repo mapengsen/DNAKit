@@ -1,0 +1,360 @@
+name: PyPI release gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      verified_testpypi_version:
+        description: "Exact non-development version already verified on TestPyPI"
+        required: true
+        type: string
+      verified_testpypi_run_id:
+        description: "TestPyPI workflow run ID that produced the reviewed artifact"
+        required: true
+        type: string
+      confirm_pypi_release:
+        description: "Type RELEASE-PYPI after TestPyPI verification and final release review"
+        required: true
+        default: "NO"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-inspect:
+    name: Verify tag and TestPyPI artifact without publishing credentials
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install all release dependencies
+        run: >-
+          python -m pip install --upgrade pip
+          ".[dev,docs,io,primer3,validation,viz]"
+
+      - name: Require a semantic tag, SPDX license, and matching metadata
+        env:
+          EXPECTED_TESTPYPI_VERSION: ${{ inputs.verified_testpypi_version }}
+          RELEASE_REF_NAME: ${{ github.ref_name }}
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+          VERIFIED_TESTPYPI_RUN_ID: ${{ inputs.verified_testpypi_run_id }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          import yaml
+          from packaging.metadata import Metadata
+          try:
+              import tomllib
+          except ModuleNotFoundError:
+              import tomli as tomllib
+
+          license_path = Path("LICENSE")
+          assert license_path.is_file() and not license_path.is_symlink(), (
+              "Release blocked: choose a project license and commit a regular LICENSE file."
+          )
+          assert license_path.stat().st_size > 0, "Release blocked: LICENSE is empty."
+          project = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]
+          expression = project.get("license")
+          assert isinstance(expression, str) and expression.strip(), (
+              "Release blocked: [project].license must contain an SPDX expression."
+          )
+          Metadata.from_email(
+              "Metadata-Version: 2.4\nName: dnakit-license-check\nVersion: 1.0.0\n"
+              f"License-Expression: {expression}\n",
+              validate=True,
+          )
+          license_files = project.get("license-files")
+          assert isinstance(license_files, list) and "LICENSE" in license_files, (
+              "Release blocked: [project].license-files must explicitly include LICENSE."
+          )
+
+          from dnakit._version import __version__
+
+          assert re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", __version__), (
+              "Release blocked: DNAKit must use a non-development SemVer X.Y.Z version."
+          )
+          assert __version__ == os.environ["EXPECTED_TESTPYPI_VERSION"], (
+              "Release blocked: requested TestPyPI version does not match DNAKit."
+          )
+          assert re.fullmatch(r"[1-9]\d*", os.environ["VERIFIED_TESTPYPI_RUN_ID"]), (
+              "Release blocked: TestPyPI workflow run ID must be a positive integer."
+          )
+          assert os.environ["RELEASE_REF_TYPE"] == "tag", (
+              "Release blocked: dispatch this workflow from a tag."
+          )
+          assert os.environ["RELEASE_REF_NAME"] == f"v{__version__}", (
+              "Release blocked: tag must be exactly v<version>."
+          )
+          citation = yaml.safe_load(Path("CITATION.cff").read_text(encoding="utf-8"))
+          assert str(citation.get("version")) == __version__, (
+              "Release blocked: CITATION.cff version does not match DNAKit."
+          )
+          changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          assert f"[{__version__}]" in changelog, (
+              "Release blocked: CHANGELOG.md has no entry for this version."
+          )
+          PY
+
+      - name: Check formatting
+        run: python -m ruff format --check src tests validation benchmarks
+
+      - name: Lint
+        run: python -m ruff check src tests validation benchmarks
+
+      - name: Type check
+        run: python -m mypy
+
+      - name: Run full tests
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: python -m pytest
+
+      - name: Execute tutorial notebooks
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: python -m pytest --nbmake notebooks
+
+      - name: Build documentation strictly
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: python -m mkdocs build --strict
+
+      - name: Run local correctness validation
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: >-
+          python -m validation.run_validation
+          --output "${RUNNER_TEMP}/dnakit-validation.json"
+          --force
+
+      - name: Rebuild the tagged source for comparison
+        run: python -m build --outdir rebuilt-dist
+
+      - name: Check rebuilt distribution metadata
+        run: python -m twine check rebuilt-dist/*
+
+      - name: Download the exact TestPyPI-reviewed artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dnakit-testpypi-${{ github.sha }}
+          path: testpypi-candidate
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.verified_testpypi_run_id }}
+
+      - name: Verify preserved artifact hashes
+        working-directory: testpypi-candidate
+        run: sha256sum -c SHA256SUMS
+
+      - name: Confirm exact candidate hashes exist on TestPyPI
+        env:
+          CANDIDATE_DIST: testpypi-candidate/dist
+          EXPECTED_TESTPYPI_VERSION: ${{ inputs.verified_testpypi_version }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          version = os.environ["EXPECTED_TESTPYPI_VERSION"]
+          url = f"https://test.pypi.org/pypi/dnakit/{urllib.parse.quote(version, safe='')}/json"
+          request = urllib.request.Request(url, headers={"User-Agent": "DNAKit-release-gate/1"})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              assert response.status == 200, f"TestPyPI returned HTTP {response.status}."
+              encoded = response.read(5_000_001)
+          assert len(encoded) <= 5_000_000, "TestPyPI metadata response is unexpectedly large."
+          payload = json.loads(encoded)
+          assert str(payload.get("info", {}).get("version")) == version, (
+              "TestPyPI metadata version does not match the requested release."
+          )
+          published = {
+              item["filename"]: item.get("digests", {}).get("sha256")
+              for item in payload.get("urls", [])
+          }
+          candidates = sorted(Path(os.environ["CANDIDATE_DIST"]).glob("dnakit-*"))
+          assert len(candidates) == 2, "Expected exactly one wheel and one sdist candidate."
+          for candidate in candidates:
+              assert candidate.stat().st_size <= 100_000_000, (
+                  f"Candidate archive is unexpectedly large: {candidate.name}"
+              )
+              digest_state = hashlib.sha256()
+              with candidate.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      digest_state.update(chunk)
+              digest = digest_state.hexdigest()
+              assert published.get(candidate.name) == digest, (
+                  f"Exact reviewed artifact is absent from TestPyPI: {candidate.name}"
+              )
+          PY
+
+      - name: Check reviewed distribution metadata
+        run: python -m twine check testpypi-candidate/dist/*
+
+      - name: Audit reviewed archive contents
+        env:
+          DIST_DIR: testpypi-candidate/dist
+        run: |
+          python - <<'PY'
+          import os
+          import stat
+          import tarfile
+          import zipfile
+          from pathlib import Path, PurePosixPath
+
+          dist = Path(os.environ["DIST_DIR"])
+          wheels = sorted(dist.glob("dnakit-*.whl"))
+          sdists = sorted(dist.glob("dnakit-*.tar.gz"))
+          assert len(wheels) == 1 and len(sdists) == 1, (
+              "Expected exactly one DNAKit wheel and one source distribution."
+          )
+          expected = {
+              "dnakit/__init__.py",
+              "dnakit/cli/app.py",
+              "dnakit/workflows/runner.py",
+              "dnakit/py.typed",
+          }
+          expected_package = {
+              path.relative_to("src").as_posix()
+              for path in Path("src/dnakit").rglob("*")
+              if path.is_file() and (path.suffix == ".py" or path.name == "py.typed")
+          }
+          native_suffixes = {
+              ".a", ".dll", ".dylib", ".exe", ".lib", ".o", ".obj", ".pyd", ".so"
+          }
+
+          for archive in (*wheels, *sdists):
+              assert archive.stat().st_size <= 100_000_000, f"Archive too large: {archive}"
+              if archive.suffix == ".whl":
+                  with zipfile.ZipFile(archive) as handle:
+                      entries = handle.infolist()
+                      assert all(
+                          not stat.S_ISLNK((entry.external_attr >> 16) & 0xFFFF)
+                          for entry in entries
+                      ), f"Symbolic link found in {archive}"
+                      names = [entry.filename for entry in entries]
+              else:
+                  with tarfile.open(archive, "r:gz") as handle:
+                      entries = handle.getmembers()
+                      assert all(entry.isfile() or entry.isdir() for entry in entries), (
+                          f"Link or special member found in {archive}"
+                      )
+                      names = [entry.name for entry in entries]
+              assert 0 < len(names) <= 5_000, f"Unexpected archive member count: {archive}"
+              assert len(names) == len(set(names)), f"Duplicate archive member in {archive}"
+              normalized: set[str] = set()
+              for name in names:
+                  path = PurePosixPath(name)
+                  assert not path.is_absolute() and ".." not in path.parts, (
+                      f"Unsafe archive path in {archive}: {name}"
+                  )
+                  lowered = tuple(part.lower() for part in path.parts)
+                  assert "dashing_similarity" not in lowered, f"Dashing source leaked: {name}"
+                  assert "site" not in lowered, f"Built documentation site leaked: {name}"
+                  assert not ({".cache", ".hypothesis", ".mypy_cache", ".pytest_cache", ".ruff_cache", "__pycache__"} & set(lowered)), f"Cache leaked: {name}"
+                  file_name = path.name.lower()
+                  assert not any(
+                      file_name.endswith(suffix) or f"{suffix}." in file_name
+                      for suffix in native_suffixes
+                  ), f"Native binary leaked: {name}"
+                  if path.suffix.lower() == ".csv":
+                      assert name.endswith(
+                          "/docs/planning/requirements_traceability.csv"
+                      ), f"Unexpected CSV leaked: {name}"
+                  if "dnakit" in path.parts:
+                      index = path.parts.index("dnakit")
+                      normalized.add("/".join(path.parts[index:]))
+              assert expected <= normalized, f"Required package files missing from {archive}"
+              if archive.suffix != ".whl":
+                  assert any(
+                      name.endswith("/docs/planning/requirements_traceability.csv")
+                      for name in names
+                  ), f"Traceability matrix missing from {archive}"
+              archived_package = {
+                  name
+                  for name in normalized
+                  if PurePosixPath(name).suffix == ".py"
+                  or PurePosixPath(name).name == "py.typed"
+              }
+              assert archived_package == expected_package, (
+                  f"Packaged Python files do not exactly match src/dnakit in {archive}"
+              )
+              assert any(PurePosixPath(name).name == "LICENSE" for name in names), (
+                  f"LICENSE missing from {archive}"
+              )
+          PY
+
+      - name: Smoke-test reviewed wheel and sdist in isolated environments
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: |
+          set -euo pipefail
+          WHEEL=$(find testpypi-candidate/dist -maxdepth 1 -type f -name 'dnakit-*.whl' -print -quit)
+          SDIST=$(find testpypi-candidate/dist -maxdepth 1 -type f -name 'dnakit-*.tar.gz' -print -quit)
+          WHEEL_VENV=$(mktemp -d)/venv
+          SDIST_VENV=$(mktemp -d)/venv
+          python -m venv "$WHEEL_VENV"
+          "$WHEEL_VENV/bin/python" -m pip install --upgrade pip
+          "$WHEEL_VENV/bin/python" -m pip install "$WHEEL"
+          "$WHEEL_VENV/bin/python" -c "from dnakit import DNASequence; from dnakit.ops import reverse_complement; assert reverse_complement(DNASequence('AAGC')).symbols == 'GCTT'"
+          "$WHEEL_VENV/bin/dnakit" --help
+          python -m venv "$SDIST_VENV"
+          "$SDIST_VENV/bin/python" -m pip install --upgrade pip
+          "$SDIST_VENV/bin/python" -m pip install "$SDIST"
+          "$SDIST_VENV/bin/python" -c "from dnakit import DNASequence; from dnakit.ops import reverse_complement; assert reverse_complement(DNASequence('AAGC')).symbols == 'GCTT'"
+          "$SDIST_VENV/bin/dnakit" --help
+
+      - name: Preserve the exact PyPI release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: dnakit-pypi-${{ github.sha }}
+          path: |
+            testpypi-candidate/dist/
+            testpypi-candidate/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish the exact reviewed artifact to PyPI
+    needs: build-and-inspect
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Require explicit release confirmation
+        env:
+          CONFIRM_PYPI_RELEASE: ${{ inputs.confirm_pypi_release }}
+        run: test "$CONFIRM_PYPI_RELEASE" = "RELEASE-PYPI"
+
+      - name: Download exact reviewed release candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: dnakit-pypi-${{ github.sha }}
+          path: release-candidate
+
+      - name: Verify reviewed artifact hashes
+        working-directory: release-candidate
+        run: sha256sum -c SHA256SUMS
+
+      - name: Publish to PyPI with trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: release-candidate/dist/

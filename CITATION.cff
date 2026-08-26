@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "DNAKit is a local development snapshot. Cite DNAKit plus every algorithm, database, and optional backend used by your workflow."
+title: "DNAKit"
+type: software
+version: "0.1.0.dev0"
+license: "MIT"
+authors:
+  - name: "DNAKit contributors"
+abstract: "A development-stage Python toolkit for deterministic DNA sequence standardization, descriptors, thermodynamics, fingerprints, similarity, dataset curation, evaluation, molecular-biology simulation, and visualization."
+keywords:
+  - DNA
+  - bioinformatics
+  - sequence analysis
+  - thermodynamics
+  - data curation
+  - reproducibility

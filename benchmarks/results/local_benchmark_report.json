@@ -1,0 +1,671 @@
+{
+  "benchmark_kind": "local_microbenchmark_not_a_cross_machine_claim",
+  "cases": [
+    {
+      "duration_ns": {
+        "maximum": 89710,
+        "mean": 89710.0,
+        "median": 89710,
+        "minimum": 89710,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 592,
+        "mean": 592.0,
+        "median": 592,
+        "minimum": 592,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 89710,
+          "peak_tracemalloc_bytes": 592
+        }
+      ],
+      "size_nt": 100,
+      "task": "construct"
+    },
+    {
+      "duration_ns": {
+        "maximum": 4373388,
+        "mean": 4373388.0,
+        "median": 4373388,
+        "minimum": 4373388,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 96600,
+        "mean": 96600.0,
+        "median": 96600,
+        "minimum": 96600,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 4373388,
+          "peak_tracemalloc_bytes": 96600
+        }
+      ],
+      "size_nt": 100,
+      "task": "normalize"
+    },
+    {
+      "duration_ns": {
+        "maximum": 158554,
+        "mean": 158554.0,
+        "median": 158554,
+        "minimum": 158554,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1940,
+        "mean": 1940.0,
+        "median": 1940,
+        "minimum": 1940,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 158554,
+          "peak_tracemalloc_bytes": 1940
+        }
+      ],
+      "size_nt": 100,
+      "task": "gc_content"
+    },
+    {
+      "duration_ns": {
+        "maximum": 3408180,
+        "mean": 3408180.0,
+        "median": 3408180,
+        "minimum": 3408180,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 30976,
+        "mean": 30976.0,
+        "median": 30976,
+        "minimum": 30976,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 3408180,
+          "peak_tracemalloc_bytes": 30976
+        }
+      ],
+      "size_nt": 100,
+      "task": "kmer_fingerprint"
+    },
+    {
+      "duration_ns": {
+        "maximum": 899842,
+        "mean": 899842.0,
+        "median": 899842,
+        "minimum": 899842,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 15980,
+        "mean": 15980.0,
+        "median": 15980,
+        "minimum": 15980,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 899842,
+          "peak_tracemalloc_bytes": 15980
+        }
+      ],
+      "size_nt": 100,
+      "task": "minhash"
+    },
+    {
+      "duration_ns": {
+        "maximum": 61717,
+        "mean": 61717.0,
+        "median": 61717,
+        "minimum": 61717,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1664,
+        "mean": 1664.0,
+        "median": 1664,
+        "minimum": 1664,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 61717,
+          "peak_tracemalloc_bytes": 1664
+        }
+      ],
+      "size_nt": 100,
+      "task": "subsequence_search"
+    },
+    {
+      "duration_ns": {
+        "maximum": 23589,
+        "mean": 23589.0,
+        "median": 23589,
+        "minimum": 23589,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1034,
+        "mean": 1034.0,
+        "median": 1034,
+        "minimum": 1034,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 23589,
+          "peak_tracemalloc_bytes": 1034
+        }
+      ],
+      "size_nt": 100,
+      "task": "reverse_complement"
+    },
+    {
+      "duration_ns": {
+        "maximum": 43011,
+        "mean": 43011.0,
+        "median": 43011,
+        "minimum": 43011,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 281,
+        "mean": 281.0,
+        "median": 281,
+        "minimum": 281,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 43011,
+          "peak_tracemalloc_bytes": 281
+        }
+      ],
+      "size_nt": 100,
+      "task": "construct"
+    },
+    {
+      "duration_ns": {
+        "maximum": 40655,
+        "mean": 40655.0,
+        "median": 40655,
+        "minimum": 40655,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 368,
+        "mean": 368.0,
+        "median": 368,
+        "minimum": 368,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 40655,
+          "peak_tracemalloc_bytes": 368
+        }
+      ],
+      "size_nt": 100,
+      "task": "gc_content"
+    },
+    {
+      "duration_ns": {
+        "maximum": 7116,
+        "mean": 7116.0,
+        "median": 7116,
+        "minimum": 7116,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0e8a3a26f551d33e9a22453c9733cf5a857023035b60c9e77808e33698b94bff",
+      "peak_tracemalloc_bytes": {
+        "maximum": 354,
+        "mean": 354.0,
+        "median": 354,
+        "minimum": 354,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 7116,
+          "peak_tracemalloc_bytes": 354
+        }
+      ],
+      "size_nt": 100,
+      "task": "reverse_complement"
+    },
+    {
+      "duration_ns": {
+        "maximum": 482677,
+        "mean": 482677.0,
+        "median": 482677,
+        "minimum": 482677,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 592,
+        "mean": 592.0,
+        "median": 592,
+        "minimum": 592,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 482677,
+          "peak_tracemalloc_bytes": 592
+        }
+      ],
+      "size_nt": 1000,
+      "task": "construct"
+    },
+    {
+      "duration_ns": {
+        "maximum": 25123024,
+        "mean": 25123024.0,
+        "median": 25123024,
+        "minimum": 25123024,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 358508,
+        "mean": 358508.0,
+        "median": 358508,
+        "minimum": 358508,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 25123024,
+          "peak_tracemalloc_bytes": 358508
+        }
+      ],
+      "size_nt": 1000,
+      "task": "normalize"
+    },
+    {
+      "duration_ns": {
+        "maximum": 265315,
+        "mean": 265315.0,
+        "median": 265315,
+        "minimum": 265315,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1516,
+        "mean": 1516.0,
+        "median": 1516,
+        "minimum": 1516,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 265315,
+          "peak_tracemalloc_bytes": 1516
+        }
+      ],
+      "size_nt": 1000,
+      "task": "gc_content"
+    },
+    {
+      "duration_ns": {
+        "maximum": 6061041,
+        "mean": 6061041.0,
+        "median": 6061041,
+        "minimum": 6061041,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 42842,
+        "mean": 42842.0,
+        "median": 42842,
+        "minimum": 42842,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 6061041,
+          "peak_tracemalloc_bytes": 42842
+        }
+      ],
+      "size_nt": 1000,
+      "task": "kmer_fingerprint"
+    },
+    {
+      "duration_ns": {
+        "maximum": 9534002,
+        "mean": 9534002.0,
+        "median": 9534002,
+        "minimum": 9534002,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 84604,
+        "mean": 84604.0,
+        "median": 84604,
+        "minimum": 84604,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 9534002,
+          "peak_tracemalloc_bytes": 84604
+        }
+      ],
+      "size_nt": 1000,
+      "task": "minhash"
+    },
+    {
+      "duration_ns": {
+        "maximum": 137280,
+        "mean": 137280.0,
+        "median": 137280,
+        "minimum": 137280,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1692,
+        "mean": 1692.0,
+        "median": 1692,
+        "minimum": 1692,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 137280,
+          "peak_tracemalloc_bytes": 1692
+        }
+      ],
+      "size_nt": 1000,
+      "task": "subsequence_search"
+    },
+    {
+      "duration_ns": {
+        "maximum": 439863,
+        "mean": 439863.0,
+        "median": 439863,
+        "minimum": 439863,
+        "standard_deviation": 0.0
+      },
+      "implementation": "dnakit",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 2834,
+        "mean": 2834.0,
+        "median": 2834,
+        "minimum": 2834,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 439863,
+          "peak_tracemalloc_bytes": 2834
+        }
+      ],
+      "size_nt": 1000,
+      "task": "reverse_complement"
+    },
+    {
+      "duration_ns": {
+        "maximum": 14829,
+        "mean": 14829.0,
+        "median": 14829,
+        "minimum": 14829,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 1181,
+        "mean": 1181.0,
+        "median": 1181,
+        "minimum": 1181,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 14829,
+          "peak_tracemalloc_bytes": 1181
+        }
+      ],
+      "size_nt": 1000,
+      "task": "construct"
+    },
+    {
+      "duration_ns": {
+        "maximum": 30125,
+        "mean": 30125.0,
+        "median": 30125,
+        "minimum": 30125,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 396,
+        "mean": 396.0,
+        "median": 396,
+        "minimum": 396,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 30125,
+          "peak_tracemalloc_bytes": 396
+        }
+      ],
+      "size_nt": 1000,
+      "task": "gc_content"
+    },
+    {
+      "duration_ns": {
+        "maximum": 4219,
+        "mean": 4219.0,
+        "median": 4219,
+        "minimum": 4219,
+        "standard_deviation": 0.0
+      },
+      "implementation": "biopython",
+      "input_sha256": "0ecae66913a0ee5b9f80ca475608ea9f0629de4fec978b1238b90bb35a199f98",
+      "peak_tracemalloc_bytes": {
+        "maximum": 2154,
+        "mean": 2154.0,
+        "median": 2154,
+        "minimum": 2154,
+        "standard_deviation": 0.0
+      },
+      "samples": [
+        {
+          "duration_ns": 4219,
+          "peak_tracemalloc_bytes": 2154
+        }
+      ],
+      "size_nt": 1000,
+      "task": "reverse_complement"
+    }
+  ],
+  "environment": {
+    "biopython": "1.88",
+    "cpu_count": 16,
+    "dnakit": "0.1.0.dev0",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.10.20",
+    "python_compiler": "GCC 14.3.0",
+    "python_implementation": "CPython",
+    "rich": "15.0.0"
+  },
+  "generated_at_utc": "2026-08-13T11:36:49.135166+00:00",
+  "interpretation": "Compare repeated runs only under controlled hardware and software conditions. tracemalloc excludes native allocations outside Python's allocator. Source-line counts describe selected public callable bodies and are not a quality metric.",
+  "memory_meter": "tracemalloc_peak_python_allocations",
+  "parameters": {
+    "comparison_task_policy": {
+      "biopython": [
+        "construct",
+        "gc_content",
+        "reverse_complement"
+      ],
+      "dnakit": [
+        "construct",
+        "normalize",
+        "gc_content",
+        "kmer_fingerprint",
+        "minhash",
+        "subsequence_search",
+        "reverse_complement"
+      ]
+    },
+    "implementations": [
+      "dnakit",
+      "biopython"
+    ],
+    "repeats": 1,
+    "safety_limits": {
+      "max_cases": 500,
+      "max_repeats": 50,
+      "max_size": 200000,
+      "max_total_nucleotide_runs": 20000000,
+      "max_warmups": 20
+    },
+    "seed": 20260813,
+    "sizes": [
+      100,
+      1000
+    ],
+    "tasks": [
+      "construct",
+      "normalize",
+      "gc_content",
+      "kmer_fingerprint",
+      "minhash",
+      "subsequence_search",
+      "reverse_complement"
+    ],
+    "warmups": 1
+  },
+  "schema_version": "dnakit.benchmark.v1",
+  "source_code_metrics": {
+    "biopython": {
+      "definition": "inspect.getsourcelines public callable; counts non-empty lines whose first non-whitespace character is not #; not a quality metric",
+      "entries": [
+        {
+          "nonblank_noncomment_lines": 132,
+          "qualified_name": "Bio.Seq.Seq",
+          "source_file": "/home/mapengsen/anaconda3/envs/dnakit-dev/lib/python3.10/site-packages/Bio/Seq.py",
+          "start_line": 2023,
+          "task": "construct"
+        },
+        {
+          "nonblank_noncomment_lines": 73,
+          "qualified_name": "Bio.SeqUtils.gc_fraction",
+          "source_file": "/home/mapengsen/anaconda3/envs/dnakit-dev/lib/python3.10/site-packages/Bio/SeqUtils/__init__.py",
+          "start_line": 53,
+          "task": "gc_content"
+        },
+        {
+          "nonblank_noncomment_lines": 36,
+          "qualified_name": "Bio.Seq._SeqAbstractBaseClass.reverse_complement",
+          "source_file": "/home/mapengsen/anaconda3/envs/dnakit-dev/lib/python3.10/site-packages/Bio/Seq.py",
+          "start_line": 1715,
+          "task": "reverse_complement"
+        }
+      ],
+      "total_nonblank_noncomment_lines": 241
+    },
+    "dnakit": {
+      "definition": "inspect.getsourcelines public callable; counts non-empty lines whose first non-whitespace character is not #; not a quality metric",
+      "entries": [
+        {
+          "nonblank_noncomment_lines": 170,
+          "qualified_name": "dnakit.core.sequence.DNASequence",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/core/sequence.py",
+          "start_line": 127,
+          "task": "construct"
+        },
+        {
+          "nonblank_noncomment_lines": 221,
+          "qualified_name": "dnakit.standardize.normalize.normalize",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/standardize/normalize.py",
+          "start_line": 34,
+          "task": "normalize"
+        },
+        {
+          "nonblank_noncomment_lines": 25,
+          "qualified_name": "dnakit.descriptors.basic.gc_at_content",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/descriptors/basic.py",
+          "start_line": 83,
+          "task": "gc_content"
+        },
+        {
+          "nonblank_noncomment_lines": 99,
+          "qualified_name": "dnakit.fingerprints.kmer.kmer",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/fingerprints/kmer.py",
+          "start_line": 62,
+          "task": "kmer_fingerprint"
+        },
+        {
+          "nonblank_noncomment_lines": 57,
+          "qualified_name": "dnakit.fingerprints.sketch.minhash",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/fingerprints/sketch.py",
+          "start_line": 112,
+          "task": "minhash"
+        },
+        {
+          "nonblank_noncomment_lines": 62,
+          "qualified_name": "dnakit.similarity.search.subsequence_search",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/similarity/search.py",
+          "start_line": 188,
+          "task": "subsequence_search"
+        },
+        {
+          "nonblank_noncomment_lines": 3,
+          "qualified_name": "dnakit.ops.direction.reverse_complement",
+          "source_file": "/mnt/d/Pycharm_workspace/DNA/dnakit/src/dnakit/ops/direction.py",
+          "start_line": 21,
+          "task": "reverse_complement"
+        }
+      ],
+      "total_nonblank_noncomment_lines": 637
+    }
+  },
+  "timer": "time.perf_counter_ns"
+}
