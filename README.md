@@ -4,16 +4,16 @@
 
 <p align="center">
   <a href="https://pypi.org/project/dnakit/">
-    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases&label=PyPI" alt="PyPI version">
+    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&amp;label=PyPI&amp;cacheSeconds=300" alt="PyPI version">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml">
-    <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg" alt="CI status">
+    <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status">
   </a>
   <a href="https://mapengsen.github.io/DNAKit/">
     <img src="https://img.shields.io/badge/docs-GitHub%20Pages-4051b5" alt="Documentation">
   </a>
-  <a href="https://pypi.org/project/dnakit/">
-    <img src="https://img.shields.io/pypi/pyversions/dnakit" alt="Supported Python versions">
+  <a href="https://www.python.org/downloads/">
+    <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB" alt="Python 3.10+">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/mapengsen/DNAKit" alt="MIT license">
