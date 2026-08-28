@@ -33,7 +33,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/mapengsen/DNAKit"
-Documentation = "https://github.com/mapengsen/DNAKit/tree/main/docs"
+Documentation = "https://mapengsen.github.io/DNAKit/"
 Repository = "https://github.com/mapengsen/DNAKit"
 Issues = "https://github.com/mapengsen/DNAKit/issues"
 Changelog = "https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md"

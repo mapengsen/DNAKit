@@ -4,10 +4,13 @@
 
 <p align="center">
   <a href="https://pypi.org/project/dnakit/">
-    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases&amp;label=PyPI" alt="PyPI version">
+    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases&label=PyPI" alt="PyPI version">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml">
     <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg" alt="CI status">
+  </a>
+  <a href="https://mapengsen.github.io/DNAKit/">
+    <img src="https://img.shields.io/badge/docs-GitHub%20Pages-4051b5" alt="Documentation">
   </a>
   <a href="https://pypi.org/project/dnakit/">
     <img src="https://img.shields.io/pypi/pyversions/dnakit" alt="Supported Python versions">
@@ -36,21 +39,25 @@ conda env create -f environment-dev.yml
 conda activate dnakit-dev
 ```
 
-随后可以阅读 [Python 快速入门指南](https://github.com/mapengsen/DNAKit/blob/main/docs/quickstart.md)。
+随后可以阅读 [Python 快速入门指南](https://mapengsen.github.io/DNAKit/quickstart/)。
 
-更详细的依赖、可选后端和安装说明见 [安装文档](https://github.com/mapengsen/DNAKit/blob/main/docs/installation.md)。
+更详细的依赖、可选后端和安装说明见 [安装文档](https://mapengsen.github.io/DNAKit/installation/)。
 
 # 文档
 
-完整文档位于 [DNAKit 文档首页](https://github.com/mapengsen/DNAKit/blob/main/docs/index.md) 和仓库的 [`docs`](https://github.com/mapengsen/DNAKit/tree/main/docs) 目录。
+完整文档位于 [DNAKit 文档首页](https://mapengsen.github.io/DNAKit/)；文档源文件保存在仓库的 [`docs`](https://github.com/mapengsen/DNAKit/tree/main/docs) 目录。
 
-所有功能模块可在 [功能树总览](https://github.com/mapengsen/DNAKit/blob/main/docs/api/features/function_tree.md) 中查看，常见问题见 [FAQ](https://github.com/mapengsen/DNAKit/blob/main/docs/faq.md)。
+所有功能模块可在 [功能树总览](https://mapengsen.github.io/DNAKit/api/features/function_tree/) 中查看，常见问题见 [FAQ](https://mapengsen.github.io/DNAKit/faq/)。
 
 # 支持与社区
 
+**Github仓库：**
+
+[github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
+
 如果有问题、意见或建议，可以先查看：
 
-- [常见问题](https://github.com/mapengsen/DNAKit/blob/main/docs/faq.md)
+- [常见问题](https://mapengsen.github.io/DNAKit/faq/)
 - [贡献指南](https://github.com/mapengsen/DNAKit/blob/main/CONTRIBUTING.md)
 - [GitHub Issues](https://github.com/mapengsen/DNAKit/issues)
 

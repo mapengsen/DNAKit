@@ -1,4 +1,5 @@
 site_name: DNAKit
+site_url: https://mapengsen.github.io/DNAKit/
 site_description: 面向 DNA 序列的确定性分析工具包
 site_author: DNAKit contributors
 copyright: Support by Pengsen Ma (Hunan University, Yuelushan Laboratory)
