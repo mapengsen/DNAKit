@@ -176,7 +176,7 @@ def test_workflow_config_depth_and_byte_limits_are_structured(tmp_path: Path) ->
 
     with pytest.raises(InputFormatError) as deep_error:
         load_workflow(deep)
-    assert deep_error.value.code == "INVALID_WORKFLOW_CONFIG"
+    assert deep_error.value.code == "WORKFLOW_CONFIG_STRUCTURE_LIMIT"
     with pytest.raises(InputFormatError) as size_error:
         load_workflow(oversized)
     assert size_error.value.code == "WORKFLOW_CONFIG_SIZE_LIMIT"

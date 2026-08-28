@@ -553,7 +553,17 @@ def _parse_payload(path: Path) -> tuple[dict[str, object], bytes]:
             parsed = yaml.load(text, Loader=_UniqueKeySafeLoader)
     except InputFormatError:
         raise
-    except (OSError, UnicodeError, json.JSONDecodeError, yaml.YAMLError, RecursionError) as exc:
+    except RecursionError as exc:
+        raise InputFormatError(
+            "Workflow configuration exceeds structural limits.",
+            code="WORKFLOW_CONFIG_STRUCTURE_LIMIT",
+            context={
+                "path": str(path),
+                "max_nodes": _MAX_CONFIG_NODES,
+                "max_depth": _MAX_CONFIG_DEPTH,
+            },
+        ) from exc
+    except (OSError, UnicodeError, json.JSONDecodeError, yaml.YAMLError) as exc:
         raise InputFormatError(
             "Workflow configuration could not be parsed.",
             code="INVALID_WORKFLOW_CONFIG",

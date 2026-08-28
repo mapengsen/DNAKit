@@ -87,7 +87,17 @@ def _strict_json_loads(
             object_pairs_hook=_json_object_without_duplicates,
             parse_constant=_reject_json_constant,
         )
-    except (json.JSONDecodeError, RecursionError, ValueError) as exc:
+    except RecursionError as exc:
+        raise InputFormatError(
+            "JSON structure exceeds its configured depth or node limit.",
+            code="JSON_STRUCTURE_LIMIT_EXCEEDED",
+            context={
+                **dict(context or {}),
+                "max_json_depth": config.max_json_depth,
+                "max_json_nodes": config.max_json_nodes,
+            },
+        ) from exc
+    except (json.JSONDecodeError, ValueError) as exc:
         details = dict(context or {})
         if isinstance(exc, json.JSONDecodeError):
             details.setdefault("line_number", exc.lineno)

@@ -287,7 +287,17 @@ def load_manifest(path: str | os.PathLike[str]) -> dict[str, object]:
         payload: object = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_json_object)
     except InputFormatError:
         raise
-    except (OSError, UnicodeError, json.JSONDecodeError, RecursionError) as exc:
+    except RecursionError as exc:
+        raise InputFormatError(
+            "Run manifest exceeds structural limits.",
+            code="RUN_MANIFEST_STRUCTURE_LIMIT",
+            context={
+                "path": str(source),
+                "max_nodes": _MAX_MANIFEST_NODES,
+                "max_depth": _MAX_MANIFEST_DEPTH,
+            },
+        ) from exc
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise InputFormatError(
             "Run manifest cannot be decoded.",
             code="INVALID_RUN_MANIFEST",

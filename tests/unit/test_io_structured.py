@@ -164,7 +164,7 @@ def test_delimited_embedded_json_rejects_duplicate_keys() -> None:
 
 
 @pytest.mark.parametrize("format", ["json", "jsonl"])
-def test_structured_json_converts_parser_recursion_to_stable_error(format: str) -> None:
+def test_structured_json_converts_excessive_nesting_to_stable_error(format: str) -> None:
     nested = "[" * 1_200 + "0" + "]" * 1_200
     row = f'{{"id":"one","sequence":"A","metadata":{nested}}}'
     text = f"[{row}]" if format == "json" else row + "\n"
@@ -172,7 +172,7 @@ def test_structured_json_converts_parser_recursion_to_stable_error(format: str) 
     with pytest.raises(InputFormatError) as exc_info:
         read_set(io.StringIO(text), format=format)
 
-    assert exc_info.value.code == "INVALID_JSON"
+    assert exc_info.value.code == "JSON_STRUCTURE_LIMIT_EXCEEDED"
 
 
 def test_structured_json_enforces_configured_depth_and_node_limits() -> None:

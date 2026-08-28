@@ -79,13 +79,13 @@ def test_manifest_loader_rejects_invalid_status_and_symlink_artifacts(tmp_path: 
     assert getattr(symlink_error.value, "code", None) == "INVALID_ARTIFACT_PATH"
 
 
-def test_manifest_loader_wraps_excessive_nesting(tmp_path: Path) -> None:
+def test_manifest_loader_reports_excessive_nesting(tmp_path: Path) -> None:
     target = tmp_path / "deep.json"
     target.write_text("[" * 1_200 + "0" + "]" * 1_200, encoding="utf-8")
 
     with pytest.raises(Exception) as error:
         load_manifest(target)
-    assert getattr(error.value, "code", None) == "INVALID_RUN_MANIFEST"
+    assert getattr(error.value, "code", None) == "RUN_MANIFEST_STRUCTURE_LIMIT"
 
 
 def test_manifest_loader_rejects_duplicate_json_keys(tmp_path: Path) -> None:

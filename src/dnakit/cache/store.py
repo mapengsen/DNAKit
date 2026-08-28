@@ -309,6 +309,7 @@ class JSONCache:
             KeyError,
             TypeError,
             ValueError,
+            ConfigurationError,
             json.JSONDecodeError,
             RecursionError,
         ) as exc:
