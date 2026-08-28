@@ -133,9 +133,7 @@ def evaluate_frechet_distance(
             code="FRECHET_MINIMUM_SAMPLE_SIZE",
             context={"left_count": len(left_items), "right_count": len(right_items)},
         )
-    total_symbols = sum(
-        item.sequence.symbol_length for item in left_items + right_items
-    )
+    total_symbols = sum(item.sequence.symbol_length for item in left_items + right_items)
     if total_symbols > resolved.limits.max_total_symbols:
         raise ConfigurationError(
             "Combined Fréchet inputs exceed max_total_symbols.",

@@ -48,8 +48,6 @@ assembly NCBI Datasets <返回记录数>
 gene NCBI Datasets <返回记录数>
 ```
 
-- **限制：** 返回结果为不可变 `QueryResult`，包含脱敏后的请求 URL、记录、总数、分页 token、metadata 和 provenance。记录内容及数量取决于查询时的 NCBI 数据；响应字节数、记录数和分页大小均受硬上限约束。
-
 ## 2) 坐标、转录本与区域注释 <span id="3"></span>
 
 - **作用：** 按组装和基因组坐标查询区域序列、转录本、基因注释及 UCSC 轨道命中，返回绑定坐标系的结构化记录，用于局部区域注释。
@@ -101,8 +99,6 @@ with Progress() as bar:
     result = sequence("human", regions, progress=update)
 ```
 
-- **限制：** Ensembl 请求由 adapter 转为 1-based 闭区间，并在结果中记录两套坐标口径；UCSC 原生使用 0-based start 和半开 end。区域跨度、批量数量、返回记录数和响应大小均有硬上限；实时注释和轨道内容会随提供方版本变化。
-
 ## 3) 测序、表达、调控与比较基因组 <span id="4"></span>
 
 - **作用：** 查询 ENA 测序运行、GEO 表达数据、ENCODE 调控记录、跨组装坐标映射及比较基因组比对，返回可筛选 metadata 和文件链接。
@@ -150,48 +146,3 @@ regulation ENCODE <返回记录数>
 coordinate_mapping Ensembl <返回记录数>
 comparative_alignment Ensembl <返回记录数>
 ```
-
-- **限制：** ENA 查询表达式、NCBI Entrez 语法和 ENCODE filters 均由对应提供方定义。坐标映射和比较比对只返回提供方已有的数据，不保证每个区域都有结果；所有调用均受网络、记录数、区域跨度和响应大小上限约束。
-
-## 4) BLAST、来源识别与远程新颖性 <span id="5-blast"></span>
-
-- **作用：** 提交并轮询 NCBI BLAST 异步任务，返回数据库命中、Identity、Coverage 和可能来源；也可相对所选远程数据库计算基于最佳命中的新颖性指标。
-- **API：** `dnakit.search.identify(sequence[必须], wait[可选], config[可选], database[可选], program[可选], hitlist_size[可选], expect[可选], megablast[可选], poll_interval[可选], timeout[可选], progress[可选])`、`dnakit.search.novelty(sequence[必须], wait[可选], config[可选], database[可选], program[可选], hitlist_size[可选], expect[可选], megablast[可选], poll_interval[可选], timeout[可选], progress[可选])`、`dnakit.search.wait_for_blast(job[必须], poll_interval[可选], timeout[可选], progress[可选], config[可选])`。
-- **输入：** 必填 DNA 字符串或无 Gap 的 `DNASequence`；必须在 `SearchConfig` 中提供联系邮箱。可选 BLAST 数据库、程序、命中上限、E-value、轮询间隔和总超时。
-- **示例代码：**
-
-```python
-from dnakit.search import SearchConfig, identify, wait_for_blast
-
-config = SearchConfig(email="researcher@example.org", max_records=20)
-job = identify("ACGTACGTACGT", config=config, hitlist_size=20)
-result = wait_for_blast(
-    job,
-    config=config,
-    poll_interval=60,
-    timeout=900,
-)
-
-print(result.query_type, result.provider, len(result.records))
-if result.records:
-    print(result.records[0]["identity"], result.records[0]["query_coverage"])
-print(result.metadata["novelty_score"])
-```
-
-- **示例结果：** 以下仅展示稳定的返回结构；实时命中数量和数值由 NCBI BLAST 决定。
-
-```text
-sequence_similarity NCBI BLAST <命中记录数>
-<identity: 0～1> <query_coverage: 0～1>
-<novelty_score: 0～1 或 None>
-```
-
-- **限制：** NCBI BLAST 使用异步作业。默认 `identify()`/`novelty()` 只返回 `BlastJob`，不会隐式等待；`wait_for_blast()` 的轮询间隔不得小于 60 秒。远程 `novelty_score` 定义为 `1 - 最大 identity`，必须同时检查 coverage；它不替代 `dnakit.evaluation.evaluate_novelty()` 相对于版本化本地参考库的定义。BLAST 调用遵循 [NCBI BLAST URL API](https://blast.ncbi.nlm.nih.gov/doc/blast-help/urlapi.html)。
-
-<span id="6"></span>**明确边界**
-
-- 只查询公开数据；dbGaP 等受控数据仍需用户正式授权，DNAKit 不接收或绕过凭据。
-- 远程 adapter 的可用性受网络、提供方限流、维护和数据更新影响。单元测试验证请求、解析和上限契约，不把替身响应写成实时数据库结果。
-- `QueryResult` 保留提供方原始字段，只做必要的坐标和 BLAST 命中标准化；不自动生成临床结论，也不把 annotation payload 改写成未经证据支持的自然语言解释。
-- BLAST 来源识别返回最相似记录、物种和命中统计；只有提供方命中记录包含对应字段时，结果才会附带组装与坐标。
-- 需要把查询结果保存为 JSON、JSONL、CSV、TSV 或 XML 时，使用[下载](15_download.md#query-result-export)页中的 `dnakit.download.metadata()`。

@@ -96,14 +96,14 @@ nav:
               - DNA指纹: api/features/08_feature_engineering.md
           - （2）序列搜索:
               - 通用搜索: api/features/09_search.md
-              - 序列模式搜索: api/features/06_patterns.md
+              - 序列功能搜索: api/features/06_patterns.md
           - （3）理化性质: api/features/07_physicochemical.md
           - （4）双链热力学扩展: api/features/19_duplex_thermodynamics.md
           - （5）二级结构性质: api/features/20_secondary_structure.md
           - （6）三维结构与力学性质: api/features/21_structure3d.md
-          - （7）光学与浓度换算: api/features/18_optics_concentration.md
+          - （7）换算: api/features/18_optics_concentration.md
       - 4. 数据评价:
-          - （1）DNA综合评价体系: api/features/12_evaluation.md
+          - （1）常用评价指标: api/features/12_evaluation.md
           - （2）相似度计算: api/features/09_similarity_alignment.md
           - （3）序列距离与比对: api/features/09_alignment.md
       - 5. 可视化: api/features/13_visualization.md

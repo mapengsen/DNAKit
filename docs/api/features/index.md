@@ -1,7 +1,5 @@
 # DNAKit 功能模块索引
 
-各功能页按照从输入序列到结果交付的实际使用顺序组织。功能编号保留在各页面中，用于需求追踪和 API 对照；重复指标并入所属功能。
-
 ## 1) 数据准备
 
 - [核心数据对象](01_core_objects.md)（8 项）
@@ -38,16 +36,16 @@
   - [DNA 指纹](08_feature_engineering.md)
 - **序列搜索**
   - [通用搜索](09_search.md)（SIM-001、SIM-002、SIM-004、SIM-005、SIM-014、SIM-015）
-  - [序列模式搜索](06_patterns.md)（PAT-001、PAT-003–007、PAT-009–012）
+  - [序列功能搜索](06_patterns.md)（PAT-001、PAT-003–007、PAT-009–012）
 - [理化性质](07_physicochemical.md)
 - [双链热力学扩展](19_duplex_thermodynamics.md)
 - [二级结构性质](20_secondary_structure.md)
 - [三维结构与力学性质](21_structure3d.md)
-- [光学与浓度换算](18_optics_concentration.md)
+- [换算](18_optics_concentration.md)
 
 ## 4) 数据评价
 
-- [DNA 综合评价体系](12_evaluation.md)（EVAL-001、EVAL-002、EVAL-005–008、EVAL-016–018）
+- [常用评价指标](12_evaluation.md)（EVAL-001、EVAL-002、EVAL-005–008、EVAL-016–018）
 - [相似度计算](09_similarity_alignment.md)（SIM-010–013、SIM-016 和参考/分布相似度）
 - [序列距离与比对](09_alignment.md)（SIM-006–008）
 

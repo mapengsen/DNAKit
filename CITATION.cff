@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "DNAKit is a local development snapshot. Cite DNAKit plus every algorithm, database, and optional backend used by your workflow."
+message: "DNAKit is a development preview. Cite DNAKit plus every algorithm, database, and optional backend used by your workflow."
 title: "DNAKit"
 type: software
 version: "0.1.0.dev0"

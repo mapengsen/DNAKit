@@ -27,5 +27,3 @@ AATTCCGG
 AAGG
 AATNGG
 ```
-
-- **限制：** 不允许在 Gap 内部插入，也不允许删除或替换跨越 Gap；未知长度 Gap 无法解析编辑坐标。插入/替换片段必须是线性、无 Gap，并与源序列的 strandedness 一致。无后缀函数会同步 feature 和逐碱基注释；原有 `*_record()` 仅在需要详细变更审计时使用。

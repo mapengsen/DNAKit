@@ -34,8 +34,6 @@ print(result.labels)
 (0, 0, 1)
 ```
 
-**限制：** 采用有界 exact pairwise alignment；阈值图的连通关系不等于所有组内两两均过阈值。
-
 ## 2) DATA-008 · k-mer聚类
 
 **作用：** 根据序列之间的 k-mer Jaccard、Containment 或 Cosine 相似度建立分组，返回 cluster 成员和标签，适合不做碱基级比对的组成型聚类。
@@ -67,8 +65,6 @@ print(result.labels)
 ```text
 (0, 0, 1)
 ```
-
-**限制：** 这是原生穷举阈值聚类，不自动调用 Mash、sourmash 或 Dashing。
 
 ## 3) DATA-009 · 指纹聚类
 
@@ -102,8 +98,6 @@ print(result.labels, result.method)
 (0, 0, 1) fingerprint
 ```
 
-**限制：** 当前 API 使用内置确定性指纹配置，不接收任意外部预计算矩阵。
-
 ## 4) DATA-010 · 层次聚类
 
 **作用：** 根据预先计算的序列距离逐步合并最近簇，返回 linkage、层次关系和切分标签，用于绘制树状图及观察不同距离尺度的分组。
@@ -136,8 +130,6 @@ print(len(result.linkage), result.linkage[-1].member_count)
 2 3
 ```
 
-**限制：** 返回 linkage 数据而非绘图；有界全矩阵实现适合中小数据集。
-
 ## 5) DATA-011 · 代表序列选择
 
 **作用：** 按首条、最长、medoid 等明确策略从每个 cluster 选择一条代表序列，并保留成员映射，用于压缩数据集和后续人工检查。
@@ -167,8 +159,6 @@ print(result.representative_ids)
 ```text
 ('other', 'short')
 ```
-
-**限制：** best-quality 依赖 `phred_quality`；medoid 会触发有界两两计算。
 
 ## 6) DATA-027 · 神经网络聚类 {#data-027-neural-clustering}
 
@@ -277,9 +267,3 @@ adapter 接入，但尚未在同一台机器上逐个完成全 checkpoint 数值
 **结果：** `NeuralClusteringResult` 保存 labels、cluster 成员、中心最近代表序列、
 模型名、checkpoint 路径、原始/聚类维数、inertia、可计算时的 silhouette、PCA
 解释方差、seed 和实际迭代数。
-
-**限制：** 该功能只使用预训练模型提取 rep 并做无监督聚类，不提供启动子活性、
-表达量、结合强度等任务型预测；超长序列的多个块采用等权平均。不同模型、
-checkpoint、pooling、依赖版本和硬件精度得到的 rep 不可混作同一特征空间。
-固定 seed 用于稳定初始化；不同 BLAS、PyTorch、设备或 dtype 下的浮点末位不保证
-逐位相同。

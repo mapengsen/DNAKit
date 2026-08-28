@@ -41,7 +41,7 @@ jobs:
       - name: Install all release dependencies
         run: >-
           python -m pip install --upgrade pip
-          ".[dev,docs,io,primer3,validation,viz]"
+          ".[dev,docs,io,validation,viz]"
 
       - name: Require a semantic tag, SPDX license, and matching metadata
         env:

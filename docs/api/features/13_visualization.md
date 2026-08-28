@@ -26,8 +26,6 @@ save_svg(artifact, "viz-001-sequence.svg")
 
 ![序列文字图示例](../../assets/images/visualization/viz-001-sequence.svg)
 
-- **限制**：超过上限默认报错；只有显式选择截断策略才会截断显示。
-
 ## 2) `VIZ-002` 位置高亮
 
 - **作用**：按坐标、颜色和标签高亮指定碱基或区间，使 motif、突变和其他关注位置在序列图中清晰可见。
@@ -49,8 +47,6 @@ save_svg(artifact, "viz-002-highlight.svg")
 - **示例结果（`viz-002-highlight.svg`）：**
 
 ![位置高亮示例](../../assets/images/visualization/viz-002-highlight.svg)
-
-- **限制**：坐标相对于 `DNASequence.symbols`，不把显式 Gap 长度计入索引。
 
 ## 3) `VIZ-003` 样式控制
 
@@ -75,8 +71,6 @@ save_svg(artifact, "viz-003-theme.svg")
 
 ![深色样式控制示例](../../assets/images/visualization/viz-003-theme.svg)
 
-- **限制**：颜色和字体名称接受严格格式校验。
-
 ## 4) `VIZ-004` Gap 显示
 
 - **作用**：在序列图中用专门符号显示 Gap 的位置、已知或未知长度，同时保持坐标含义，避免把缺失区域误画成真实碱基。
@@ -96,8 +90,6 @@ save_svg(artifact, "viz-004-gap.svg")
 - **示例结果（`viz-004-gap.svg`）：**
 
 ![Gap 显示示例](../../assets/images/visualization/viz-004-gap.svg)
-
-- **限制**：Gap 不会为绘图而展开成大量字符；未知 Gap 后坐标显示为未知。
 
 ## 5) `VIZ-005` 线性序列图
 
@@ -123,8 +115,6 @@ save_svg(artifact, "viz-005-linear-map.svg")
 
 ![线性序列图示例](../../assets/images/visualization/viz-005-linear-map.svg)
 
-- **限制**：要求可解析的线性 coordinate span；未解析 feature 不会被猜测绘制。
-
 ## 6) `VIZ-006` 环状 DNA 图
 
 - **作用**：把环状 DNA 及其 feature 映射到圆周坐标，显示方向、跨原点区间和标签，用于质粒或其他环状分子的结构概览。
@@ -149,8 +139,6 @@ save_svg(artifact, "viz-006-circular-map.svg")
 
 ![环状 DNA 图示例](../../assets/images/visualization/viz-006-circular-map.svg)
 
-- **限制**：不会自动选择新起点或计算未解析 feature。
-
 ## 7) `VIZ-008` Alignment 图
 
 - **作用**：将成对比对的两条序列按列绘制，区分匹配、错配、插入和删除，并显示坐标，便于人工检查差异位置。
@@ -171,5 +159,3 @@ save_svg(artifact, "viz-008-alignment.svg")
 - **示例结果（`viz-008-alignment.svg`）：**
 
 ![Alignment 图示例](../../assets/images/visualization/viz-008-alignment.svg)
-
-- **限制**：函数只消费既有结果，不负责选择比对参数。

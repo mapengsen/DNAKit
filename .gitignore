@@ -47,3 +47,4 @@ outputs/
 
 # Third-party local source/binaries are never part of DNAKit distributions.
 /dashing_similarity/
+使用方法.md

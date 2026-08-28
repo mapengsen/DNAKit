@@ -1,6 +1,6 @@
-# 序列表征
+# DNA表征
 
-将 DNA 序列转换为整数、One-hot、k-mer 特征、k-mer Sketch 或预训练神经网络 rep，从而得到可用于计算和建模的数值表示。
+将 DNA 序列embedding得到表征。
 
 ## 1) FP-001 整数编码
 
@@ -23,8 +23,6 @@ print(result.values)
 (0, 1, 2, 3)
 ```
 
-- **限制：** API 不自动 padding/truncation；已知 Gap 仅在 `gap_policy="expand"` 时展开，未知 Gap 不能展开，并受 `max_output_length` 硬上限保护。
-
 ## 2) FP-002 One-hot编码
 
 - **作用：** 把每个碱基转换为对应 A/C/G/T 的四维向量，形成“序列长度 × 4”的位置保持矩阵，便于统计模型和神经网络使用。
@@ -45,8 +43,6 @@ print(result.values[0], result.values[-1])
 ```text
 (1.0, 0.0, 0.0, 0.0) (0.0, 0.0, 0.0, 1.0)
 ```
-
-- **限制：** 不自动 padding/truncation；Gap 展开为零行且仅限已知长度，未知 Gap 不可展开。
 
 ## 3) FP-003 k-mer 特征
 
@@ -74,14 +70,6 @@ print(dict(canonical.values), canonical.dimension)
 {'AC': 2, 'CG': 1} 10
 ```
 
-<span id="4-fp-004-canonical-k-mer"></span>
-
-**Canonical 模式（原 FP-004）：** `canonical=True` 会把每个 k-mer 与其反向互补合并到同一个代表；它是 FP-003 的参数模式，不再作为独立特征类型。折叠后不保留 strand 信息。
-
-- **限制：** 只计算 exact k-mer，不提供 TF-IDF 拟合器；默认 `ambiguity_policy="error"` 会拒绝任何 IUPAC 模糊符号，改为 `ignore` 才会跳过受影响的 k-mer；默认不跨 Gap，且 `4^k` 维度受硬上限限制。Canonical 模式仅接受 A/C/G/T k-mer，不会猜测展开 IUPAC。
-
-<span id="5-fp-005-minhashfracminhash"></span>
-
 ## 4) FP-005 k-mer Sketch（MinHash/FracMinHash）
 
 - **作用：** 对序列的 k-mer 哈希进行 Bottom-k 或阈值抽样，生成体积较小且可复现的 Sketch，用于近似估计 Jaccard 相似度和检索大批序列。
@@ -105,9 +93,7 @@ print(first.hashes == second.hashes, len(first.hashes))
 True 2
 ```
 
-- **限制：** 当前内部 sketch 只接受线性、无 Gap、无模糊碱基序列；不自动调用 Mash/sourmash，也不声称与其二进制格式兼容。
-
-## 5) 神经网络表征 {#neural-representations}
+## 5) 神经网络表征
 
 - **作用：** 使用预训练 DNA 基础模型把每条序列压缩为固定长度浮点向量，用于聚类、检索或下游机器学习；向量含义取决于模型、checkpoint 和 pooling 配置。
 
@@ -121,23 +107,23 @@ True 2
 - **输出：** `RepresentationResult`，其 `representations` 是只读二维矩阵，每行对应一条输入记录；实际维度保存在 `embedding_dimension`。
 - **汇聚规则：** 支持 `mean`、`cls`、`max`、`last` pooling。超过模型上下文窗口的序列会分块，各块池化向量最后等权平均。
 
-### 5.2 支持的 11 种 rep
+### 5.2 支持的 11 种神经网络的 rep
 
 以下 `model` 名称直接来自当前 `MODEL_REGISTRY`：
 
-| 序号 | `model` | rep 来源 | 默认官方 checkpoint | 加载条件 |
-| ---: | --- | --- | --- | --- |
-| 1 | `alphagenome` | AlphaGenome all folds | [google/alphagenome-all-folds](https://huggingface.co/google/alphagenome-all-folds) | 须接受模型条款并安装[官方 research 代码](https://github.com/google-deepmind/alphagenome_research) |
-| 2 | `caduceus` | Caduceus-Ph 131k | [kuleshov-group/caduceus-ph 131k](https://huggingface.co/kuleshov-group/caduceus-ph_seqlen-131k_d_model-256_n_layer-16) | `neural`、`neural-caduceus` extras；须显式 `allow_remote_code=True` |
-| 3 | `dnabert2` | DNABERT-2-117M | [zhihan1996/DNABERT-2-117M](https://huggingface.co/zhihan1996/DNABERT-2-117M) | `neural` extra；须显式 `allow_remote_code=True` |
-| 4 | `enformer` | Enformer PyTorch | [EleutherAI/enformer-official-rough](https://huggingface.co/EleutherAI/enformer-official-rough) | `neural`、`neural-enformer` extras |
-| 5 | `evo2` | Evo 2 7B | [arcinstitute/evo2_7b](https://huggingface.co/arcinstitute/evo2_7b) | `neural`、`neural-evo2` extras；需兼容 GPU 环境 |
-| 6 | `generator` | GENERator v2 eukaryote 1.2B | [GenerTeam/GENERator-v2-eukaryote-1.2b-base](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base) | `neural` extra；须显式 `allow_remote_code=True` |
-| 7 | `grover` | GROVER | [PoetschLab/GROVER](https://huggingface.co/PoetschLab/GROVER) | `neural` extra；已完成真实 checkpoint rep + k-means smoke |
-| 8 | `hyenadna` | HyenaDNA medium 450k | [LongSafari/hyenadna-medium-450k-seqlen-hf](https://huggingface.co/LongSafari/hyenadna-medium-450k-seqlen-hf) | `neural` extra；须显式 `allow_remote_code=True` |
-| 9 | `janusdna` | JanusDNA 131k | [Harvard Dataverse DOI 10.7910/DVN/HDT0RN](https://doi.org/10.7910/DVN/HDT0RN) | checkpoint 校验官方 MD5；还须提供[官方源码](https://github.com/Qihao-Duan/JanusDNA)及 `model_source_path` |
-| 10 | `lucaone`（默认） | LucaOne gene step 36.8M | [LucaGroup/LucaOne-gene-step36.8M](https://huggingface.co/LucaGroup/LucaOne-gene-step36.8M) | `neural` extra；须显式 `allow_remote_code=True` |
-| 11 | `ntv2` | Nucleotide Transformer v2 500M multi-species | [InstaDeepAI/nucleotide-transformer-v2-500m-multi-species](https://huggingface.co/InstaDeepAI/nucleotide-transformer-v2-500m-multi-species) | `neural` extra；须显式 `allow_remote_code=True` |
+| 序号 | `model`           | rep 来源                                     | 默认官方 checkpoint                                                                                                                        | 加载条件                                                                                                   |
+| ---: | ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+|    1 | `alphagenome`     | AlphaGenome all folds                        | [google/alphagenome-all-folds](https://huggingface.co/google/alphagenome-all-folds)                                                         | 须接受模型条款并安装[官方 research 代码](https://github.com/google-deepmind/alphagenome_research)           |
+|    2 | `caduceus`        | Caduceus-Ph 131k                             | [kuleshov-group/caduceus-ph 131k](https://huggingface.co/kuleshov-group/caduceus-ph_seqlen-131k_d_model-256_n_layer-16)                     | `neural`、`neural-caduceus` extras；须显式 `allow_remote_code=True`                                  |
+|    3 | `dnabert2`        | DNABERT-2-117M                               | [zhihan1996/DNABERT-2-117M](https://huggingface.co/zhihan1996/DNABERT-2-117M)                                                               | `neural` extra；须显式 `allow_remote_code=True`                                                        |
+|    4 | `enformer`        | Enformer PyTorch                             | [EleutherAI/enformer-official-rough](https://huggingface.co/EleutherAI/enformer-official-rough)                                             | `neural`、`neural-enformer` extras                                                                     |
+|    5 | `evo2`            | Evo 2 7B                                     | [arcinstitute/evo2_7b](https://huggingface.co/arcinstitute/evo2_7b)                                                                         | `neural`、`neural-evo2` extras；需兼容 GPU 环境                                                        |
+|    6 | `generator`       | GENERator v2 eukaryote 1.2B                  | [GenerTeam/GENERator-v2-eukaryote-1.2b-base](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base)                             | `neural` extra；须显式 `allow_remote_code=True`                                                        |
+|    7 | `grover`          | GROVER                                       | [PoetschLab/GROVER](https://huggingface.co/PoetschLab/GROVER)                                                                               | `neural` extra；已完成真实 checkpoint rep + k-means smoke                                                |
+|    8 | `hyenadna`        | HyenaDNA medium 450k                         | [LongSafari/hyenadna-medium-450k-seqlen-hf](https://huggingface.co/LongSafari/hyenadna-medium-450k-seqlen-hf)                               | `neural` extra；须显式 `allow_remote_code=True`                                                        |
+|    9 | `janusdna`        | JanusDNA 131k                                | [Harvard Dataverse DOI 10.7910/DVN/HDT0RN](https://doi.org/10.7910/DVN/HDT0RN)                                                              | checkpoint 校验官方 MD5；还须提供[官方源码](https://github.com/Qihao-Duan/JanusDNA)及 `model_source_path` |
+|   10 | `lucaone`（默认） | LucaOne gene step 36.8M                      | [LucaGroup/LucaOne-gene-step36.8M](https://huggingface.co/LucaGroup/LucaOne-gene-step36.8M)                                                 | `neural` extra；须显式 `allow_remote_code=True`                                                        |
+|   11 | `ntv2`            | Nucleotide Transformer v2 500M multi-species | [InstaDeepAI/nucleotide-transformer-v2-500m-multi-species](https://huggingface.co/InstaDeepAI/nucleotide-transformer-v2-500m-multi-species) | `neural` extra；须显式 `allow_remote_code=True`                                                        |
 
 查询当前注册的全部模型，不会下载 checkpoint：
 
@@ -174,15 +160,3 @@ print(result.representations.shape)
 ```
 
 默认 checkpoint 下载到当前工作目录的 `ckpt/lucaone-gene-step36-8m/`，已有完整文件时直接复用。下载和逐序列提取默认显示进度条；可用 `checkpoint_dir`、`checkpoint_path` 或 `show_progress` 显式调整。
-
-### 5.4 与 DATA-027 聚类的关系
-
-`extract_representations()` 只返回 rep。`neural_cluster_sequences()` 在相同 rep 基础上继续执行 L2 归一化、可选 PCA 和固定 seed 的 k-means，并返回中心最近代表序列与审计字段。
-
-### 5.5 能力边界
-
-- 当前只有 GROVER 完成真实 checkpoint 的 rep 到 k-means smoke；其余模型已完成注册、checkpoint 解析和 adapter 接入，但受依赖、源码、访问条款和硬件限制，状态为 `conditional`。
-- IUPAC 模糊碱基默认替换为 `N`；可设置 `ambiguity_policy="error"` 改为报错。
-- 不同模型、checkpoint、pooling、依赖版本和硬件精度产生的 rep 不属于同一特征空间，不应混合使用。
-- checkpoint 不随 wheel/sdist 分发；使用者必须自行核对模型许可、访问条款、显存和存储需求。
-- `allow_remote_code=True` 只能在审查 checkpoint 和官方代码后显式开启，不能替代代码审计。

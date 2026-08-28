@@ -62,8 +62,6 @@ ACGT
 1
 ```
 
-- **限制：** `len(dna)` 表示记录数，不表示碱基数；碱基数使用 `symbol_length`。多记录对象读取 `symbols` 等单序列属性时会报错，应先用下标选一条。高级 `DNASequence` 仍只接受已规范化大写 DNA。
-
 ## 2) CORE-002 DNA记录对象
 
 - **作用：** 在一条 DNA 序列上附加 ID、描述、功能区和样本信息，使计算结果能够追溯到具体记录及其来源。
@@ -90,8 +88,6 @@ print(record.id, record.symbols, record.metadata["species"])
 seq-1 ACGT human
 ```
 
-- **限制：** 显式 ID 必须非空；feature 不得超出可解析坐标；metadata 必须可转为 JSON；每个 `letter_annotations` 数组必须是有限数值，且长度等于 `symbol_length`。
-
 ## 3) CORE-003 DNA数据集对象
 
 - **作用：** 使用同一个 `DNA` 对象按固定顺序管理一条或多条记录，并支持下标和切片选择，作为普通用户统一的数据输入入口。
@@ -117,8 +113,6 @@ print(dataset[1].symbols)
 ('sequence_1', 'sequence_2')
 GT
 ```
-
-- **限制：** `DNA` 会在 `max_records` 上限内物化输入；字符串列表表示多条序列。单条 multipart 序列应使用 `{"parts": [...]}`，含显式 `Gap` 的片段列表也会被识别为一条 gapped 序列。筛选、去重、聚类和划分由相应领域模块提供。
 
 ## 4) CORE-004 特征对象
 
@@ -155,8 +149,6 @@ print(feature.type, feature.location, feature.strand.value)
 motif Interval(start=1, end=3) forward
 ```
 
-- **限制：** 内部位置使用 0-based 半开区间；`phase` 仅允许 `0`、`1`、`2` 或 `None`。feature 属于对应记录，不能超出可解析的序列坐标。
-
 ## 5) CORE-005 Gap对象
 
 - **作用：** 明确保存序列中已知或未知长度的缺口，防止缺失区域在坐标计算或序列拼接时被误当成连续碱基。
@@ -179,8 +171,6 @@ print(seq.coordinate_span)
 4
 504
 ```
-
-- **限制：** 长度必须为正整数或 `None`；上下游片段由 `DNASequence.parts` 的位置表达。未知长度 Gap 的总坐标跨度为 `None`。
 
 ## 6) CORE-006 序列类型声明
 
@@ -207,8 +197,6 @@ print(seq.alphabet.value, seq.topology.value, seq.strandedness.value)
 iupac circular double
 ```
 
-- **限制：** strict 仅允许 `A/C/G/T`；IUPAC 允许标准模糊符号。gapped 类型由 `parts` 中是否存在显式 `Gap` 派生，不是单独的字符串开关。构造时会核对内容与声明，且空序列不能声明为环状。
-
 ## 7) CORE-007 坐标系统
 
 - **作用：** 把不同文件格式的坐标统一转换为 DNAKit 使用的 0-based 半开区间，避免区间截取和格式转换时出现一位偏差。
@@ -232,5 +220,3 @@ print(converted.start, converted.end)
 Interval(start=1, end=8)
 1 8
 ```
-
-- **限制：** 内部坐标固定为 0-based 半开；跨原点会返回 `CompoundLocation`。`import_location()` 不保留外部 `strand`，`export_location()` 固定返回 `Strand.UNKNOWN`，链信息应另存于 `DNAFeature.strand` 等字段。正负链的几何反转需显式调用 `reverse_strand_location(..., sequence_length=...)`；未解析位置不能导出，坐标转换不会替用户推断序列长度。

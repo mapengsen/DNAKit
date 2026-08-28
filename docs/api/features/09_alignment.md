@@ -1,12 +1,8 @@
 # 序列距离与比对
 
-本页用于比较两条 DNA 序列，包括“差异有多大”的序列距离，以及“碱基如何对应”的成对序列比对。
-
-除特别说明外，IUPAC 字符按字面符号比较，输入中的 Gap 不会被静默删除。
+比较两条 DNA 序列：“差异有多大”的序列距离，“碱基如何对应”的成对序列比对。
 
 ## 1. 序列距离
-
-序列距离返回一个差异数值，不生成加入 Gap 后的对齐序列。
 
 ### 1.1 SIM-006 · Hamming distance
 
@@ -32,8 +28,6 @@ print(result.distance, [item.position for item in result.mismatches])
 1.0 [2]
 ```
 
-**限制：** 序列必须等长且无 Gap；不计算插入和删除，IUPAC 不按集合兼容关系解释。
-
 ### 1.2 SIM-007 · Edit distance
 
 **作用：** 计算把一条序列变成另一条序列所需的最小替换、插入和删除代价，并可返回最优编辑路径，用于量化不同长度序列的差异。
@@ -57,8 +51,6 @@ print(result.distance, [step.operation for step in result.edit_path or ()])
 ```text
 1.0 ['match', 'delete', 'match', 'match']
 ```
-
-**限制：** 不接受带 Gap 的输入；`max_distance` 只标记是否超过阈值，不截断精确结果。
 
 ## 2. 成对序列比对（SIM-008）
 
@@ -139,14 +131,3 @@ print(
 ```text
 ACGT ACGT 1.0 0.5 (2, 6)
 ```
-
-**公共结果指标：**
-
-- `aligned_query`、`aligned_target`：加入比对 Gap 后的序列。
-- `score`：按匹配、错配和 Gap 参数得到的比对分数。
-- `matches`、`mismatches`、`insertions`、`deletions`：各类比对列数量。
-- `identity`：完全匹配列数占全部比对列的比例。
-- `query_coverage`、`target_coverage`：参与比对的碱基分别占原序列的比例。
-- `query_start/end`、`target_start/end`：比对区域在原序列中的范围。
-
-**限制：** 当前只接受线性、无 Gap 输入；IUPAC 按字面字符计分；计算规模受 DP 单元上限约束。Identity 和 Coverage 会随比对模式及 Gap 参数改变。

@@ -2,8 +2,6 @@
 
 对 DNA 序列进行逆序、互补或反向互补，从而得到方向转换后的新序列。
 
-三种操作语义不同，所以保留三个名称。普通注释数据最常用的反向互补可直接接收并返回 `DNA`；纯 `reverse()`、`complement()` 仍是高级序列值操作。
-
 ## 1) OPS-001.1 逆序
 
 - **作用：** 只把 DNA 序列的字符顺序倒过来而不替换碱基，用于检查或构造相反的位置顺序。
@@ -66,5 +64,3 @@ print(reverse_complement(dna).symbols)
 ```text
 GCGATT
 ```
-
-- **限制：** 三个函数都会保留 alphabet、topology 和 strandedness；`reverse()` 与 `reverse_complement()` 还会反转 multipart Gap 顺序。普通用户只需调用 `reverse_complement()`；`reverse_complement_record()` 仅在需要读取完整坐标变更审计时使用。

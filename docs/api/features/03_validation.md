@@ -46,5 +46,3 @@ False
 ```bash
 dnakit validate ACGT --sequence-length 4
 ```
-
-- **限制：** `DNA(...)` 会先完成原始文本标准化并在 `normalization` 中保留审计，`validate()` 检查构造后的对象。`sequence_length`、`min_length` 和 `max_length` 检查的是 `symbol_length`，不包含 Gap 占据的坐标长度。旧的 `validate_set()` 仍保留为兼容别名，新代码只使用 `validate()`。

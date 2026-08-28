@@ -30,8 +30,6 @@ print([(item.symbol, item.count) for item in result.ambiguity.by_symbol])
 [('N', 1), ('R', 1), ('Y', 1)]
 ```
 
-- **限制：** 若比例分母要求包含未知长度 Gap，分母和比例会明确返回 `None`，不会猜测 Gap 长度。
-
 ## 2) DESC-001 长度特征
 
 - **作用：** 计算 DNA 序列的碱基长度，并区分符号数量与 Gap 对坐标跨度的影响，用于长度筛选、分箱和窗口参数设置。
@@ -57,8 +55,6 @@ print(result.canonical_base_count)  # 8
 8
 ```
 
-- **限制：** `symbol_length` 不含 Gap；已知 Gap 计入 `coordinate_span`，存在未知长度 Gap 时 `coordinate_span` 为 `None`，不会猜测其长度。
-
 ## 3) DESC-002 碱基组成
 
 - **作用：** 统计 DNA 序列中 A、C、G、T 的数量和比例，形成基础组成向量，供 GC、偏斜、数据分布比较和建模使用。
@@ -79,8 +75,6 @@ print(dict(result.counts), result.fractions["A"])
 ```text
 {'A': 2, 'C': 1, 'G': 1, 'T': 1} 0.4
 ```
-
-- **限制：** 默认拒绝模糊 IUPAC 字符；`ignore` 只忽略并记录数量，不做概率分配。
 
 ## 4) DESC-003 GC/AT特征
 
@@ -103,8 +97,6 @@ print(result.gc_fraction, result.at_fraction)
 0.5 0.5
 ```
 
-- **限制：** 比例分母只使用 A/C/G/T；没有 canonical 碱基时比例为 `None`。局部曲线请使用 `window_descriptors`。
-
 ## 5) DESC-004 碱基偏斜
 
 - **作用：** 分别计算 `(G-C)/(G+C)` 和 `(A-T)/(A+T)`，量化互补碱基在当前链上的不对称程度，用于观察局部或整体组成偏向。
@@ -125,8 +117,6 @@ print(result.gc_skew, result.at_skew)
 ```text
 0.0 1.0
 ```
-
-- **限制：** 对应分母为零时结果为 `None`；滑动窗口 skew 尚不是该 API 的输出。
 
 ## 6) DESC-005 CpG特征
 
@@ -149,8 +139,6 @@ print(result.cpg_count, result.density, result.observed_expected)
 2 0.4 3.0
 ```
 
-- **限制：** 默认不跨 Gap 或被忽略的模糊字符；O/E 使用 `CpG × canonical_length / (C × G)`，分母不可定义时返回 `None`。
-
 ## 7) DESC-006 k-mer统计
 
 - **作用：** 枚举指定长度的 k-mer，返回数量、频率和存在性，可选择合并反向互补 k-mer，用于组成分析、相似度计算和特征建模。
@@ -172,8 +160,6 @@ print(dict(result.counts), result.denominator)
 {'AC': 1, 'CG': 1, 'GT': 1} 3
 ```
 
-- **限制：** 仅做 exact 统计；默认不跨 Gap/模糊字符，`canonical=True` 才折叠反向互补。
-
 ## 8) DESC-007 序列熵
 
 - **作用：** 根据碱基或 k-mer 的概率分布计算 Shannon entropy，量化分布均匀程度，用于识别信息量较低或组成单一的序列。
@@ -194,8 +180,6 @@ print(result.entropy)
 ```text
 2.0
 ```
-
-- **限制：** 空观察分布定义为 `0.0`；默认不跨 Gap，且这不是结构或生物学复杂度预测。
 
 ## 9) DESC-008 序列复杂度
 
@@ -219,8 +203,6 @@ print(simple.score < diverse.score)
 True
 ```
 
-- **限制：** `max_word_size` 的硬上限为 16；这是明确公式的内部 linguistic complexity，不等同于 DUST、Lempel–Ziv 或外部低复杂度工具；不支持环状序列。
-
 ## 10) DESC-009 Homopolymer
 
 - **作用：** 查找连续重复的同一种碱基，返回各区段的位置、碱基和长度，并汇总最长区段，用于筛查测序、合成和扩增风险。
@@ -242,8 +224,6 @@ print(result.longest_length, result.runs[-1].base)
 4 T
 ```
 
-- **限制：** 默认 Gap 和模糊字符会中断连续区段；坐标为 0-based 半开区间，未知 Gap 后的坐标可能不可解析。
-
 ## 11) DESC-010 重复比例
 
 - **作用：** 查找相邻重复的序列单元，返回重复区段和覆盖比例，用于量化高重复区域以及筛选可能影响比对或合成的序列。
@@ -264,8 +244,6 @@ print(result.repeat_fraction, result.runs[0].unit)
 ```text
 0.75 AT
 ```
-
-- **限制：** `max_unit_length` 不得超过 100，`min_repeats` 至少为 2。每个起点采用首个满足条件的重复单元并跳到该命中的末端，并非穷举后再选全局最大区段；只识别 exact tandem repeat，不允许 mismatch/indel，也不等同于 RepeatMasker；不支持环状序列。
 
 ## 12) DESC-011 窗口描述符
 
@@ -290,8 +268,6 @@ print(result.windows[0].symbol_start, result.windows[0].values["gc_fraction"])
 0 0.5
 ```
 
-- **限制：** 当前描述符名称仅支持 `gc`、`entropy`、`cpg`；默认按 Gap 分段，不计算重复等任意自定义 callable。
-
 ## 13) DESC-012 密码子统计
 
 - **作用：** 按指定阅读框统计密码子及起始、终止密码子，返回计数和位置，用于分析编码组成、阅读框和密码子使用情况。
@@ -313,18 +289,17 @@ print(result.codon_count, result.start_count, result.stop_count)
 3 1 1
 ```
 
-- **限制：** 当前只支持 NCBI genetic code 1；不是六阅读框 ORF 扫描，也不使用宿主密码子表。未知长度 Gap 后的 frame 会标记为未解析。
-
 ---
+
+
+
+## 14) 全部描述符计算（240项）
 
 **完整 240 项描述符**
 
 一次性计算 DNA 序列的组成、统计、理化和二核苷酸等描述符，从而得到固定顺序的 240 项特征结果。
 
 `all_descriptors()` 使用固定版本 `descriptor_schema_v1`，并同时返回不可计算原因、计算条件和来源信息。字段顺序不会随输入改变；前 180 项按输入及各自适用域计算，DNAKit 不内置二核苷酸数值表，因此后 60 项默认均为 `None`。
-
-<span id="all-descriptors"></span>
-## 14) 全部描述符计算
 
 <span id="1"></span>**最短用法**
 
@@ -642,3 +617,7 @@ dnakit describe ACGT --compact
 | 240 | `diprodb_free_energy_max`                  | `dinucleotide_property` | `kcal/mol`    | `population max of Free energy values over valid overlapping dinucleotides`                | Caller-supplied table; DNAKit bundles no numerical values          |
 
 方法、论文、数据库与网址已统一移至[致谢与主要来源](../../acknowledgements.md#methods-and-references)；许可和用户责任见[第三方声明](../../acknowledgements.md#third-party-notices)。
+
+
+
+<span id="all-descriptors"></span>

@@ -28,5 +28,3 @@ TTACAGA
 ACAGATT
 CAGA
 ```
-
-- **限制：** 线性序列会被拒绝；任何未知长度 Gap 都会令总坐标跨度不可解析，即使 origin 位于边界也不能旋转；已知 Gap 则不能把旋转起点放在其内部。`canonical_origin()` 采用正向字典序最小旋转，不考虑反向互补，且拒绝含 Gap 的序列。旧的 `rotate_record()`、`canonical_origin_record()` 只用于详细变更审计。

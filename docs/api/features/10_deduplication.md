@@ -31,8 +31,6 @@ print(result.records.ids, result.groups[0].member_ids)
 ('a', 'b') ('a', 'c')
 ```
 
-**限制：** 输入必须是 `DNARecord`；默认保留第一条，不会静默解决标签冲突。
-
 ## 2) DATA-002 · 反向互补去重
 
 **作用：** 比较序列的正向与反向互补形式，把仅链方向不同但内容相同的记录归为一组，避免双链方向造成重复计数。
@@ -60,8 +58,6 @@ print(result.groups[0].member_ids, result.groups[0].orientations)
 ```text
 ('forward', 'reverse') ('forward', 'reverse_complement')
 ```
-
-**限制：** 使用确定性的 canonical sequence 键；IUPAC 仍按序列符号处理，不执行概率匹配。
 
 ## 3) DATA-003 · 环状等价去重
 
@@ -91,8 +87,6 @@ print(result.records.ids, result.groups[0].rotation_offsets)
 ('origin-0',) (0, 2)
 ```
 
-**限制：** 线性或含 Gap 的序列会被拒绝；该功能不推断环状拓扑。
-
 ## 4) DATA-004 · IUPAC-aware去重
 
 **作用：** 把 IUPAC 模糊字符解释为碱基集合，逐位判断两条序列是完全相同、存在兼容可能还是明确冲突，用于含模糊碱基数据的等价检查。
@@ -121,8 +115,6 @@ print([(group.member_ids, group.relation) for group in result.groups])
 ```text
 [(('a', 'n'), 'compatible'), (('g',), 'singleton')]
 ```
-
-**限制：** 使用稳定 greedy complete-link，避免不兼容成员经传递关系误合并；不支持 Gap。
 
 ## 5) DATA-005 · 近似去重
 
@@ -154,5 +146,3 @@ print(result.labels, result.representatives.ids)
 ```text
 (0, 0, 1) ('a', 'c')
 ```
-
-**限制：** 当前是有界穷举两两比较和连通分量，不是 CD-HIT/MMseqs2 外部执行器。

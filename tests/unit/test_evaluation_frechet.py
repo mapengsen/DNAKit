@@ -65,9 +65,7 @@ def test_frechet_known_one_dimensional_distance_is_symmetric() -> None:
     assert forward.metrics["frechet_distance"] == pytest.approx(1.0)
     assert forward.metrics["mean_component"] == pytest.approx(1.0)
     assert forward.metrics["covariance_component"] == pytest.approx(0.0, abs=1e-12)
-    assert reverse.metrics["frechet_distance"] == pytest.approx(
-        forward.metrics["frechet_distance"]
-    )
+    assert reverse.metrics["frechet_distance"] == pytest.approx(forward.metrics["frechet_distance"])
     assert backend.calls[0] == (("AAAA", "CCCC", "GGGG", "TTTT"), False)
     assert forward.parameters["encoder"] == "lucaone"
     assert forward.parameters["lower_is_better"] is True
@@ -88,9 +86,7 @@ def test_identical_normalized_representation_distributions_have_zero_distance() 
     report = evaluate_frechet_distance(
         records,
         records,
-        config=FrechetDistanceConfig(
-            representation=RepresentationConfig(show_progress=False)
-        ),
+        config=FrechetDistanceConfig(representation=RepresentationConfig(show_progress=False)),
         backend=backend,
     )
 
@@ -129,9 +125,7 @@ def test_sample_space_result_matches_dense_covariance_formula() -> None:
         backend=_MappingBackend(vectors),
     )
     left_matrix = np.asarray([vectors[record.sequence.symbols] for record in left], dtype=float)
-    right_matrix = np.asarray(
-        [vectors[record.sequence.symbols] for record in right], dtype=float
-    )
+    right_matrix = np.asarray([vectors[record.sequence.symbols] for record in right], dtype=float)
     left_covariance = np.cov(left_matrix, rowvar=False, ddof=1)
     right_covariance = np.cov(right_matrix, rowvar=False, ddof=1)
     left_values, left_vectors = np.linalg.eigh(left_covariance)

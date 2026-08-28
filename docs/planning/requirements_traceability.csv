@@ -26,7 +26,7 @@ OPS-001,25,4. 序列内操作,序列补全,0.1-MVP,native,,complete,,reverse/com
 OPS-002,26,4. 序列内操作,转录与翻译,0.1-MVP,native,reimplementation,complete,,transcribe支持正/反链DNA到RNA；translate支持NCBI table 1、frame 0/1/2及stop/ambiguity/incomplete策略，显式Gap拒绝且不预测表达
 OPS-003,27,4. 序列内操作,子序列提取,0.1-MVP,native,,complete,,subsequence以0-based半开坐标提取线性或环状跨原点片段；已知Gap仅在allow_gaps下保留/截短，未知长度Gap和非法边界明确拒绝
 OPS-004,28,4. 序列内操作,序列编辑,0.1-MVP,native,,complete,,无后缀insert/delete/substitute对DNA输入同步注释并返回DNA；旧record后缀接口保留完整Edit/feature审计；不允许编辑跨越Gap
-OPS-005,29,4. 序列内操作,序列生成,0.1-MVP,native,,complete,mutation,"mutate支持指定SNV和可重放随机SNV；evolution_generate和indel_generate支持EvoAug风格突变、缺失、插入、易位、局部反向互补和整条反向互补；rearrange_generate支持片段交换、倒置和重复；kmer_shuffle精确保持重叠k-mer计数；crossover支持两条等长序列的一点交叉；随机入口保存随机源和算法版本并明确线性、无Gap、ACGT边界"
+OPS-005,29,4. 序列内操作,序列生成,0.1-MVP,native,,complete,mutation,"mutate支持指定SNV和可重放随机SNV；evolution_generate支持逐碱基概率突变、插入、删除以及易位、局部反向互补和整条反向互补，indel_generate支持单次连续片段插入或删除；rearrange_generate支持片段交换、倒置和重复；kmer_shuffle精确保持重叠k-mer计数；crossover支持两条等长序列的一点交叉；随机入口保存随机源和算法版本并明确线性、无Gap、ACGT边界"
 OPS-006,30,4. 序列内操作,序列拼接,0.1-MVP,native,,complete,,concat按输入顺序执行普通拼接并可加入显式Gap；concat_overlap对两段线性无Gap序列选择最长精确末端overlap且只保留一次；两者均校验alphabet、strandedness、topology和输出结构
 OPS-007,31,4. 序列内操作,Trimming和Masking,0.1-MVP,native,,complete,,无后缀trim/mask对DNA输入同步注释并返回DNA；两者保持有界Gap和区间规则，旧record接口用于详细审计
 OPS-008,32,4. 序列内操作,环状序列操作,0.2-0.4-ADVANCED,native,reimplementation,complete,,rotate/canonical_origin对DNA输入返回DNA并同步注释；circular_subsequence保留明确序列值提取语义
@@ -134,21 +134,21 @@ MOLBIO-009,133,11. 分子生物学模拟与规则设计,CRISPR候选扫描,0.2-0
 MOLBIO-010,134,11. 分子生物学模拟与规则设计,规则型序列优化,0.2-0.4-ADVANCED,native,reimplementation,complete,,optimize_sequence_rules以native固定seed贪心规则降低GC/motif/repeat透明目标并保留每步变化
 MOLBIO-011,135,11. 分子生物学模拟与规则设计,Codon optimization,0.2-0.4-ADVANCED,native,reimplementation,complete,,optimize_codons/optimize_protein_codons以native动态规划使用调用方提供且版本化的codon usage表做同义替换并核对翻译
 MOLBIO-012,136,11. 分子生物学模拟与规则设计,突变文库,0.2-0.4-ADVANCED,native,reimplementation,complete,mutation,generate_mutation_library以native枚举/抽样支持single、saturation和combinatorial substitutions，含seed与输出规模上限
-EVAL-001,137,12. DNA综合评价体系,validity,0.2-0.4-ADVANCED,native,,complete,validation,evaluate_validity审计字符、alphabet、长度、Gap与拓扑约束并返回逐序列条目
-EVAL-002,138,12. DNA综合评价体系,Ambiguity,0.2-0.4-ADVANCED,native,,complete,ambiguity,evaluate_ambiguity报告每种IUPAC符号、位置、加权比例及显式Gap分母策略
-EVAL-003,139,12. DNA综合评价体系,Sequence quality,0.2-0.4-ADVANCED,native,,complete,quality,evaluate_quality透明组合validity、ambiguity、complexity、length和completeness并保留全部分项
-EVAL-004,140,12. DNA综合评价体系,Complexity,0.2-0.4-ADVANCED,native,,complete,complexity,evaluate_complexity组合entropy、linguistic complexity、repeat cleanliness和homopolymer cleanliness
-EVAL-005,141,12. DNA综合评价体系,Uniqueness,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_uniqueness支持exact、reverse-complement、circular、IUPAC和approximate定义并报告unique fraction
-EVAL-006,142,12. DNA综合评价体系,Diversity,0.2-0.4-ADVANCED,native,,complete,,evaluate_diversity报告平均/最近邻距离、阈值cluster数量和coverage摘要
-EVAL-007,143,12. DNA综合评价体系,Redundancy,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_redundancy报告exact、threshold-near及cluster层冗余，复用明确相似度配置
-EVAL-008,144,12. DNA综合评价体系,Novelty,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_novelty定义为相对于版本化ReferenceLibrary的1-nearest-similarity，不提供绝对novelty
-EVAL-009,145,12. DNA综合评价体系,最近参考序列,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,nearest_reference返回稳定Top-k reference ID、index、similarity、coverage和exact标记
-EVAL-010,146,12. DNA综合评价体系,Memorization,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_memorization按exact或显式copy_threshold标记训练参考复制，不使用任务型模型
-EVAL-011,147,12. DNA综合评价体系,Reference similarity,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_reference_similarity汇总每条query的最近参考相似度与命中率
-EVAL-012,148,12. DNA综合评价体系,Distribution similarity,0.2-0.4-ADVANCED,native,,complete,,evaluate_distribution_similarity比较长度、GC、k-mer、motif和repeat的透明分布摘要
-EVAL-013,149,12. DNA综合评价体系,合成风险,0.2-0.4-ADVANCED,native,,complete,,evaluate_synthesis_risk返回global/local GC、homopolymer、tandem/inverted-repeat规则及位置，明确非实验成功率
-EVAL-014,150,12. DNA综合评价体系,综合评分,0.2-0.4-ADVANCED,native,,complete,,evaluate_scorecard保留每项raw/normalized值、方向、权重、缺失策略和weighted contribution
-EVAL-015,151,12. DNA综合评价体系,参考库追踪,0.2-0.4-ADVANCED,native,adapter,complete,provenance,ReferenceLibrary强制保存名称、版本、来源、日期、内容digest、filters和index_parameters
+EVAL-001,137,12. 常用评价指标,validity,0.2-0.4-ADVANCED,native,,complete,validation,evaluate_validity审计字符、alphabet、长度、Gap与拓扑约束并返回逐序列条目
+EVAL-002,138,12. 常用评价指标,Ambiguity,0.2-0.4-ADVANCED,native,,complete,ambiguity,evaluate_ambiguity报告每种IUPAC符号、位置、加权比例及显式Gap分母策略
+EVAL-003,139,12. 常用评价指标,Sequence quality,0.2-0.4-ADVANCED,native,,complete,quality,evaluate_quality透明组合validity、ambiguity、complexity、length和completeness并保留全部分项
+EVAL-004,140,12. 常用评价指标,Complexity,0.2-0.4-ADVANCED,native,,complete,complexity,evaluate_complexity组合entropy、linguistic complexity、repeat cleanliness和homopolymer cleanliness
+EVAL-005,141,12. 常用评价指标,Uniqueness,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_uniqueness支持exact、reverse-complement、circular、IUPAC和approximate定义并报告unique fraction
+EVAL-006,142,12. 常用评价指标,Diversity,0.2-0.4-ADVANCED,native,,complete,,evaluate_diversity报告平均/最近邻距离、阈值cluster数量和coverage摘要
+EVAL-007,143,12. 常用评价指标,Redundancy,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_redundancy报告exact、threshold-near及cluster层冗余，复用明确相似度配置
+EVAL-008,144,12. 常用评价指标,Novelty,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_novelty定义为相对于版本化ReferenceLibrary的1-nearest-similarity，不提供绝对novelty
+EVAL-009,145,12. 常用评价指标,最近参考序列,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,nearest_reference返回稳定Top-k reference ID、index、similarity、coverage和exact标记
+EVAL-010,146,12. 常用评价指标,Memorization,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_memorization按exact或显式copy_threshold标记训练参考复制，不使用任务型模型
+EVAL-011,147,12. 常用评价指标,Reference similarity,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_reference_similarity汇总每条query的最近参考相似度与命中率
+EVAL-012,148,12. 常用评价指标,Distribution similarity,0.2-0.4-ADVANCED,native,,complete,,evaluate_distribution_similarity比较长度、GC、k-mer、motif和repeat的透明分布摘要
+EVAL-013,149,12. 常用评价指标,合成风险,0.2-0.4-ADVANCED,native,,complete,,evaluate_synthesis_risk返回global/local GC、homopolymer、tandem/inverted-repeat规则及位置，明确非实验成功率
+EVAL-014,150,12. 常用评价指标,综合评分,0.2-0.4-ADVANCED,native,,complete,,evaluate_scorecard保留每项raw/normalized值、方向、权重、缺失策略和weighted contribution
+EVAL-015,151,12. 常用评价指标,参考库追踪,0.2-0.4-ADVANCED,native,adapter,complete,provenance,ReferenceLibrary强制保存名称、版本、来源、日期、内容digest、filters和index_parameters
 VIZ-001,152,13. 可视化,序列文字图,0.1-MVP,native,adapter,complete,,plot_sequence生成确定性独立SVG并覆盖空序列和IUPAC
 VIZ-002,153,13. 可视化,位置高亮,0.1-MVP,native,adapter,complete,,Highlight支持0-based半开symbol坐标、优先级、标签和颜色
 VIZ-003,154,13. 可视化,样式控制,0.1-MVP,native,adapter,complete,,SVGTheme及各图配置支持颜色、字号、尺寸、标题和显示上限
@@ -180,6 +180,6 @@ ENG-017,179,14. 后端、性能与可复现性,可选图形入口,0.2-0.4-ADVANC
 DATA-025,180,10. 去重、聚类与数据划分,物种排除,0.1-MVP,native,,complete,metadata_filter,exclude_species/exclude_by_metadata按显式metadata["species"]精确排除一个或多个值；所有记录缺少species字段时抛出结构化错误且不修改输入DNASet
 DATA-026,181,10. 去重、聚类与数据划分,染色体排除,0.1-MVP,native,,complete,metadata_filter,exclude_chromosomes/exclude_by_metadata按显式metadata["chromosome"]精确排除一个或多个值；所有记录缺少chromosome字段时抛出结构化错误且不修改输入DNASet
 DATA-027,182,10. 去重、聚类与数据划分,神经网络聚类,0.2-0.4-ADVANCED,adapter,,conditional,model_representations,extract_representations支持11种可选DNA基础模型并在显式调用时解析或下载checkpoint；neural_cluster_sequences执行L2归一化、可选PCA及固定seed的k-means并返回中心最近代表序列和审计字段；当前仅GROVER完成真实checkpoint的rep到k-means smoke，其余模型受独立依赖、源码、访问条款和硬件条件限制
-EVAL-016,183,12. DNA综合评价体系,Fréchet DNA distance,0.2-0.4-ADVANCED,reimplementation,adapter,conditional,model_representations,evaluate_frechet_distance默认复用DATA-027的LucaOne mean-pooling表征与L2归一化，以等价样本空间cross-Gram核范数计算两集合高斯Fréchet距离；不称为ChemNet FCD，不同模型或checkpoint不可比较，真实LucaOne运行受显式远程代码授权、依赖和硬件条件限制
-EVAL-017,184,12. DNA综合评价体系,Frag,0.2-0.4-ADVANCED,reimplementation,adapter,complete,kmer_statistics,evaluate_fragment_similarity按MOSES Frag公式计算两个集合exact k-mer出现次数向量的余弦相似度；以fixed-length DNA k-mer代替BRICS片段，默认canonical 3-mer，数值不可与分子Frag直接比较
-EVAL-018,185,12. DNA综合评价体系,SNN,0.2-0.4-ADVANCED,reimplementation,adapter,complete,hashed_kmer_fingerprint,evaluate_snn按MOSES SNN公式计算每条生成DNA到参考集合最近邻的binary Tanimoto相似度均值；默认canonical 7-mer和1024位SHA-256哈希指纹，数值不可与Morgan-fingerprint SNN直接比较
+EVAL-016,183,12. 常用评价指标,Fréchet DNA distance,0.2-0.4-ADVANCED,reimplementation,adapter,conditional,model_representations,evaluate_frechet_distance默认复用DATA-027的LucaOne mean-pooling表征与L2归一化，以等价样本空间cross-Gram核范数计算两集合高斯Fréchet距离；不称为ChemNet FCD，不同模型或checkpoint不可比较，真实LucaOne运行受显式远程代码授权、依赖和硬件条件限制
+EVAL-017,184,12. 常用评价指标,Frag,0.2-0.4-ADVANCED,reimplementation,adapter,complete,kmer_statistics,evaluate_fragment_similarity按MOSES Frag公式计算两个集合exact k-mer出现次数向量的余弦相似度；以fixed-length DNA k-mer代替BRICS片段，默认canonical 3-mer，数值不可与分子Frag直接比较
+EVAL-018,185,12. 常用评价指标,SNN,0.2-0.4-ADVANCED,reimplementation,adapter,complete,hashed_kmer_fingerprint,evaluate_snn按MOSES SNN公式计算每条生成DNA到参考集合最近邻的binary Tanimoto相似度均值；默认canonical 7-mer和1024位SHA-256哈希指纹，数值不可与Morgan-fingerprint SNN直接比较

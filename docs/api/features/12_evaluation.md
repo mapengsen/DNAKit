@@ -1,4 +1,4 @@
-# DNA 综合评价体系
+# 常用评价指标
 
 从合法性、唯一性、多样性、新颖性、Fréchet 表征分布距离、片段分布、最近邻相似度、模糊度和冗余度等方面综合评价 DNA 序列或数据集。
 
@@ -26,8 +26,6 @@ print(report.metrics["valid_fraction"])  # 1.0
 ```text
 1.0
 ```
-
-- **限制**：这是对象与规则合法性检查，不证明生物学功能正确。
 
 ## 2) `EVAL-005` Uniqueness
 
@@ -57,8 +55,6 @@ print(report.metrics["duplicate_groups"])  # (("a", "b"),)
 (('a', 'b'),)
 ```
 
-- **限制**：近似模式是有界 pairwise 计算，大型数据库应使用已验证的外部索引。
-
 ## 3) `EVAL-006` Diversity
 
 - **作用：** 计算序列集合的两两距离、最近邻距离和阈值 cluster 数量，返回整体及局部差异指标，用于判断样本覆盖是否广泛。
@@ -86,8 +82,6 @@ print(report.metrics["cluster_count"])
 1.0
 3
 ```
-
-- **限制**：结果完全依赖所选相似度和阈值，不是绝对多样性。
 
 ## 4) `EVAL-008` Novelty
 
@@ -137,8 +131,6 @@ print(report.metrics["novel_fraction"])  # 0.5
 0.5
 ```
 
-- **限制**：novelty 永远相对于给定参考库，不能脱离库版本声称“全局新颖”。
-
 ## 5) `EVAL-016` Fréchet DNA distance
 
 - **作用：** 使用同一个 DNA 基础模型分别表示两个序列集合，将两组向量近似为多元高斯分布，再计算均值和协方差的 Fréchet 距离。数值越小表示两个集合在该表征空间中的分布越接近，完全相同的表征分布趋近于 `0`。
@@ -177,7 +169,6 @@ print(report.metrics["frechet_distance"])
 ```
 
 - **进度：** checkpoint 下载和逐序列表征提取默认显示进度条；可用 `RepresentationConfig(show_progress=False)` 关闭。
-- **限制**：这是借鉴 FCD/FID 数学形式的 **Fréchet DNA 表征距离**，不是使用 ChemNet 的分子 FCD，二者数值不可比较。有限样本的均值和协方差估计存在偏差；不同模型、checkpoint、pooling、归一化或精度生成的值也不可横向比较。LucaOne 标准后端包含 checkpoint 自带代码，仍须审查后显式设置 `allow_remote_code=True`。该距离不是实验功能、生成质量或生物安全结论。
 - **依据**：[Preuer 等人的 FCD 原始论文](https://doi.org/10.1021/acs.jcim.8b00234)；[LucaOne 原始论文](https://doi.org/10.1038/s42256-025-01044-4)。
 
 ## 6) `EVAL-017` Frag
@@ -215,7 +206,6 @@ print(report.metrics["frag"])  # 0.5
 ```
 
 - **进度：** 默认显示生成集合和参考集合的 k-mer 统计进度；可用 `FragmentSimilarityConfig(show_progress=False)` 关闭。
-- **限制**：这是 MOSES Frag 的 DNA k-mer 适配，不是 BRICS Frag，数值不能与分子指标直接比较。结果依赖 `k`、canonical、模糊碱基和 Gap 策略；两个集合即使没有相同完整序列，也可能得到 `1`。
 - **依据**：[MOSES 对 Frag 的定义](https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2020.565644/full)。
 
 ## 7) `EVAL-018` SNN
@@ -255,7 +245,6 @@ ref-a
 ```
 
 - **进度：** 默认显示两组指纹构建和最近邻扫描进度；可用 `SNNConfig(show_progress=False)` 关闭。
-- **限制**：这是 MOSES SNN 的 DNA k-mer 指纹适配，不是 Morgan-fingerprint SNN。哈希碰撞、`k`、位数和反向互补折叠会影响结果；两条都没有可用 k-mer 的短序列按两个空指纹相同处理。SNN 高也可能表示训练集记忆，应结合 Novelty、Uniqueness 和 FCD 一起解释。
 - **依据**：[MOSES 对 SNN 的定义](https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2020.565644/full)。
 
 ## 8) `EVAL-002` Ambiguity
@@ -281,8 +270,6 @@ print(entry.metrics["ambiguity_fraction"])  # 0.25
 1
 0.25
 ```
-
-- **限制**：未知长度 Gap 参与分母时，比例可能明确返回 `None`。
 
 ## 9) `EVAL-007` Redundancy
 
@@ -311,5 +298,3 @@ print(report.metrics["exact_duplicate_fraction"])
 0.3333333333333333
 0.3333333333333333
 ```
-
-- **限制**：综合分数是三个透明分项的算术平均，不是训练数据质量标签。

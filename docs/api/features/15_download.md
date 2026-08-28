@@ -77,8 +77,6 @@ references/hg38/<genomic FASTA>
 <NCBI MD5> <local SHA-256>
 ```
 
-- **限制：** 物种名可能解析出多个组装；严格复现实验应使用带版本号的 `GCA_`/`GCF_` accession。默认不会保留 NCBI 原始 ZIP 包。
-
 ## 2) `DBD-002` 部分基因组数据包
 
 - **作用：** 从指定组装中只下载需要的染色体、序列类别或文件类型，并生成清单，用于减少大型基因组数据包的传输和存储量。
@@ -103,8 +101,6 @@ print(result.manifest_path)
 ```text
 downloads/human_chrM/ncbi_genome_package_manifest.json
 ```
-
-- **限制：** accession 必须带版本号；所有文件受 `DownloadConfig.max_file_bytes`、`max_total_bytes` 和 `max_files` 限制。
 
 ## 3) `DBD-003` 区域序列
 
@@ -132,8 +128,6 @@ downloads/region.fa
 downloads/region.fa.manifest.json
 ```
 
-- **限制：** 坐标统一为 0-based 半开区间；需要 Ensembl 网络服务，不是本地参考基因组随机访问。
-
 ## 4) `DBD-004` 基因组注释
 
 - **作用：** 下载与指定组装匹配的 GFF、GTF、GBFF 等基因组注释文件，并记录版本和校验值，用于基因、转录本及功能区域分析。
@@ -160,8 +154,6 @@ print(result.manifest_path)
 downloads/hg38_annotation/ncbi_genome_package_manifest.json
 ```
 
-- **限制：** 该接口下载 NCBI 数据包中的注释文件；EMBL flat file 等其他格式需要调用方提供显式 HTTPS 资源。
-
 ## 5) `DBD-005` 基因序列
 
 - **作用：** 按 GeneID 选择性下载基因组区段、RNA、CDS、UTR 和蛋白 FASTA，保留来源 accession，用于构建指定基因的本地序列集合。
@@ -186,8 +178,6 @@ print(result.manifest_path)
 downloads/gene_672/ncbi_gene_package_manifest.json
 ```
 
-- **限制：** 只接受数字型 GeneID；内含子序列不作为独立文件自动推断，可由注释和坐标序列组合获得。
-
 ## 6) `DBD-006` 蛋白序列
 
 - **作用：** 下载基因或病毒记录关联的公开蛋白 FASTA，保留蛋白 accession 和来源信息，用于翻译结果核对或蛋白参考库准备。
@@ -211,8 +201,6 @@ print(result.manifest_path)
 ```text
 downloads/gene_672_protein/ncbi_gene_package_manifest.json
 ```
-
-- **限制：** 该接口保存提供方已有的蛋白序列，不进行翻译、基因模型修正或功能预测。
 
 ## 7) `DBD-007` 组装信息
 
@@ -240,8 +228,6 @@ print(result.manifest_path)
 downloads/hg38_assembly_report/ncbi_genome_package_manifest.json
 ```
 
-- **限制：** 组装统计以 NCBI 数据包提供的报告为准，不由 DNAKit 重新推断或补齐。
-
 ## 8) `DBD-008` 分类信息
 
 - **作用：** 下载指定 TaxID 对应的科学名称、别名和完整分类谱系，保存结构化摘要，用于统一物种标识及按分类层级整理数据。
@@ -267,8 +253,6 @@ print(result.manifest_path)
 downloads/taxonomy/ncbi_taxonomy_package_manifest.json
 ```
 
-- **限制：** 只接受数字型 TaxID；名称、lineage 和 summary 字段以 NCBI 当前返回为准，不替代本地物种本体。
-
 ## 9) `DBD-009` 基因元数据 {#query-result-export}
 
 - **作用：** 把公共数据库查询得到的基因、样本或运行元数据导出为 CSV、TSV 或 JSON，便于离线筛选、审计和与下载文件关联。
@@ -291,8 +275,6 @@ print(result.manifest_path)
 downloads/samples.csv
 downloads/samples.csv.manifest.json
 ```
-
-- **限制：** 只导出查询已返回的记录，不下载原始 FASTA、FASTQ 或其他大文件；JSON 保留完整查询 envelope，表格格式主要输出记录。
 
 ## 10) `DBD-010` 病毒数据包
 
@@ -320,8 +302,6 @@ print(result.manifest_path)
 downloads/sars_cov_2/ncbi_virus_NC_045512.2_manifest.json
 ```
 
-- **限制：** `by="taxon"` 一次只接受一个 taxon；不能混合 accession 和 taxon 名称；不绕过受控病毒数据访问限制。
-
 ## 11) `DBD-011` 原始测序数据
 
 - **作用：** 按 ENA Run accession 下载单端或双端 FASTQ，依据 ENA 提供的 MD5 校验完整性，并记录样本与文件对应关系。
@@ -348,8 +328,6 @@ print(result.manifest_path)
 downloads/SRR390728_fastq/ena_fastq_manifest.json
 ```
 
-- **限制：** 只下载 ENA 返回的公开 FASTQ URL；文件数量、大小和总字节数受 `DownloadConfig` 限制。
-
 ## 12) `DBD-012` 比对数据
 
 - **作用：** 下载 ENA 公开的 BAM、CRAM 或 SAM 文件及可用校验信息，用于复用已有 reads-to-reference 比对结果而无需重新比对。
@@ -374,8 +352,6 @@ print(result.manifest_path)
 downloads/SRR390728_submitted/ena_submitted_manifest.json
 ```
 
-- **限制：** 该能力是条件支持，只有记录公开且存在 submitted 文件 URL 时才可下载；不绕过受控访问，也不把 SRA 自动转换为 BAM/CRAM。
-
 ## 13) `DBD-013` 测序元数据
 
 - **作用：** 查询并保存 ENA 的 Study、Sample、Experiment、Run 和文件链接等结构化信息，用于筛选测序数据及追踪样本来源。
@@ -398,8 +374,6 @@ print(result.manifest_path)
 downloads/ena_runs.json
 downloads/ena_runs.json.manifest.json
 ```
-
-- **限制：** 这是测序记录导出，不等于下载 FASTQ/BAM；记录字段和文件 URL 以 ENA 返回内容为准。
 
 ## 14) `DBD-014` 变异数据
 
@@ -428,8 +402,6 @@ print(result.manifest_path)
 downloads/dbsnp_grch38/dbsnp_vcf_manifest.json
 ```
 
-- **限制：** dbSNP VCF 体积很大，需要显式提高 `max_file_bytes` 和 `max_total_bytes`；当前不接受其他 dbSNP 格式。
-
 ## 15) `DBD-015` ClinVar 数据
 
 - **作用：** 下载 ClinVar 的 VCF、XML 或 TSV 发布文件及版本信息，用于本地关联变异与公开临床意义注释。
@@ -456,8 +428,6 @@ print(result.manifest_path)
 downloads/clinvar/clinvar_vcf_manifest.json
 ```
 
-- **限制：** ClinVar 文件是公开数据库发布物，不代表 DNAKit 对变异作临床判断；VCF 组装只能使用支持的 GRCh37/GRCh38。
-
 ## 16) `DBD-016` 表达数据
 
 - **作用：** 按 GEO accession 下载公开的表达矩阵或补充文件，并保存样本与来源信息，用于离线表达数据分析。
@@ -482,8 +452,6 @@ print(result.manifest_path)
 ```text
 downloads/GSE100/geo_matrix_manifest.json
 ```
-
-- **限制：** 只覆盖 GEO 的标准文件路径规则；其他补充矩阵或 RAW 文件需要调用方通过显式 HTTPS 资源下载。
 
 ## 17) `DBD-017` 调控数据
 
@@ -511,8 +479,6 @@ print(result.manifest_path)
 downloads/encode_regulation/encode_files_manifest.json
 ```
 
-- **限制：** ENCODE 文件必须来自公开 File 记录；有提供方 MD5 时会校验。UCSC/ENCODE 查询和下载均受记录数量、文件大小和总容量上限约束。
-
 ## 18) `DBD-018` 重复序列数据
 
 - **作用：** 下载与指定组装匹配的 UCSC RepeatMasker 等重复序列轨道，用于标记基因组中的重复类别和坐标区间。
@@ -534,8 +500,6 @@ print(result.manifest_path)
 ```text
 downloads/hg38_repeats/ucsc_files_manifest.json
 ```
-
-- **限制：** 文件 glob 在已获取的有限目录结果上筛选；如果目录达到服务器上限，应缩小 assembly 或 pattern 范围。
 
 ## 19) `DBD-019` 保守性数据
 
@@ -559,8 +523,6 @@ print(result.manifest_path)
 downloads/hg38_conservation/ucsc_files_manifest.json
 ```
 
-- **限制：** conservation 文件的物种、窗口和分辨率由提供方发布物决定；DNAKit 不重新计算保守性分数。
-
 ## 20) `DBD-020` 多物种比对
 
 - **作用：** 下载指定组装和物种集合的 UCSC 多物种 MAF 比对文件，用于离线查看同源区域及开展比较基因组分析。
@@ -583,8 +545,6 @@ print(result.manifest_path)
 downloads/hg38_maf/ucsc_files_manifest.json
 ```
 
-- **限制：** UCSC 目录文件可能很大；该接口下载提供方已有的比对文件，不执行多物种比对算法。
-
 ## 21) `DBD-021` 坐标转换文件
 
 - **作用：** 下载两个基因组组装版本之间的 UCSC chain 文件并记录方向，用于将区域、变异和注释坐标从一个组装映射到另一个组装。
@@ -606,5 +566,3 @@ print(result.manifest_path)
 ```text
 downloads/ucsc_chain/ucsc_files_manifest.json
 ```
-
-- **限制：** chain/net 文件只提供坐标映射数据；下载接口不执行 liftOver，也不保证不同组装间存在可用映射。

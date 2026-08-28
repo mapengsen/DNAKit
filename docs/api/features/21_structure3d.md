@@ -4,9 +4,12 @@
 
 三维性质必须来自显式坐标或轨迹，不会从普通序列伪造唯一三维结构。下列示例从项目根目录运行，结果均由当前本地源码和已下载样例实际计算得到。
 
+各项计算的论文来源和内部公式见 [FAQ：三维结构与力学性质的计算依据和参考文献](../../faq.md#structure3d-references)。
+
 ## 1) 读取单个 PDB 模型
 
 - **作用：** 读取 PDB 中指定的一个 DNA 模型，提取原子坐标、残基、链和推导序列，生成后续三维几何计算使用的结构对象。
+- **计算方法：** 按 legacy PDB 固定列规格解析 `HEADER`、`TITLE`、`MODEL` 和 `ATOM`，只保留 canonical DNA 残基；备选构象只接受空白或 `A`，重复原子按主构象优先、再按 occupancy 选择，最后按残基顺序映射 A/C/G/T 序列。这是文件解析，不是结构预测。
 - **API：** `dnakit.structure3d.load_pdb(path[必须], model_index[可选])`
 - **输入：** 必填可读的 legacy PDB 路径；可选正整数模型编号。
 - **示例代码：**
@@ -30,11 +33,10 @@ print(structure.sequence_by_chain)
 ('CGCGAATTCGCG', 'CGCGAATTCGCG')
 ```
 
-- **限制：** 只解析 ASCII legacy PDB 和 canonical DNA `ATOM` 记录，不读取 mmCIF、蛋白质或非标准残基。当前上限为 100 MB、1000000 个 DNA 原子和 10000 个模型。
-
 ## 2) 读取 PDB 多模型集合
 
 - **作用：** 从同一 PDB 或模型集合读取多个 DNA 构象，统一原子对应关系，作为 RMSF 和构象变化比较的输入。
+- **计算方法：** 使用与单模型相同的固定列解析规则，按 `MODEL` 编号分组并返回全部模型。此步只建立链/残基/原子标识，不做旋转、平移对齐或 RMSF 计算。
 - **API：** `dnakit.structure3d.load_pdb_ensemble(path[必须])`
 - **输入：** 必填包含一个或多个 DNA 模型的 legacy PDB 路径。
 - **示例代码：**
@@ -56,11 +58,10 @@ print(len(models[0].residues), models[0].sequence_by_chain)
 16 ('ATCCTAGTTATAGGAT',)
 ```
 
-- **限制：** 该 API 只读取模型，不做旋转/平移对齐、轨迹采样评估或力场校验。
-
 ## 3) 显式坐标几何分析
 
 - **作用：** 从显式 DNA 原子坐标计算回转半径、SASA、体积、形状、骨架二面角和几何氢键等指标，用于定量描述一个三维构象。
+- **计算方法：** 由原子质量加权坐标计算质心、回转半径和张量特征值；SASA 用 `vdW 半径 + probe` 球面的确定性采样点暴露比例求和，体积用 vdW 球占据的体素并集估算；骨架角由四原子二面角计算，氢键用明确的距离/角度阈值筛选。双链螺旋指标是配对 `C1′` 中心和全局轴的 DNAKit 近似值。
 - **API：** `dnakit.structure3d.analyze_structure(structure[必须], sasa_probe_radius_angstrom[可选], sasa_points_per_atom[可选], volume_grid_spacing_angstrom[可选], progress[可选])`
 - **输入：** 必填 `DNA3DStructure`；可选 0–5 Å SASA probe、24–4096 个每原子采样点、0.25–5 Å 体素间距和进度回调。
 - **示例代码：**
@@ -97,11 +98,10 @@ print(
 3.351 35.797
 ```
 
-- **限制：** SASA 使用 Fibonacci sphere 近似，体积使用体素近似；只有显式氢原子存在时才报告真正 D–H···A 几何计数。原生螺旋参数是两条等长反向互补链的全局轴近似，不是 3DNA/DSSR 局部参考系参数。
-
 ## 4) NMR/多模型 RMSF 柔性
 
 - **作用：** 在原子对应一致的多个三维模型间计算逐原子和逐残基 RMSF，量化不同位置在构象集合中的波动程度。
+- **计算方法：** 先取所有模型共有的原子键，对每个模型减去共有原子的几何中心以去除平移；对原子 `i` 计算 `RMSF_i = sqrt[Σm |r_im − <r_i>|²/M]`，残基 RMSF 再对其原子 RMSF 做均方根聚合。实现不做 Kabsch 旋转拟合。
 - **API：** `dnakit.structure3d.analyze_ensemble_flexibility(structures[必须])`
 - **输入：** 必填 2–10000 个 `DNA3DStructure` 模型，且至少有 3 个公共原子。
 - **示例代码：**
@@ -127,11 +127,10 @@ print(
 0.986 2.281
 ```
 
-- **限制：** 实现只做平移中心化，不做 Kabsch 旋转拟合；输入模型必须已在共同旋转参考系中。RMSF 不等同于持久长度或弯曲/扭转/伸展刚度。
-
 ## 5) 3DNA `bp_step.par` 标准参数解析
 
 - **作用：** 解析外部 3DNA 参数文件，汇总 shift、slide、rise、twist 等碱基对步及螺旋参数，便于结构统计和模型间比较。
+- **计算方法：** 按 3DNA `bp_step.par` 的 12 个刚体参数列解析每行，校验行数与声明碱基对数；对第二行起的 step 求平均 rise/twist，再计算 `bp/turn = 360/平均twist` 和 `pitch = 平均rise × bp/turn`。DNAKit 不重新计算 3DNA 局部参考框架。
 - **API：** `dnakit.structure3d.read_3dna_bp_step(path[必须])`
 - **输入：** 必填已存在、UTF-8 可解码且符合 3DNA `bp_step.par` 列结构的文件。
 - **示例代码：**
@@ -165,11 +164,10 @@ with TemporaryDirectory() as directory:
 10.2857
 ```
 
-- **限制：** 示例自建的文件只用于演示解析器格式，不是 3DNA 对某个结构的计算结果。DNAKit 只解析已有标准输出，不重新实现 3DNA 局部参考框架。
-
 ## 6) DSSR JSON 摘要解析
 
 - **作用：** 解析外部 DSSR JSON，提取碱基、配对、螺旋、茎环和氢键注释，转换为可查询、汇总和报告的结构化结果。
+- **计算方法：** 读取 DSSR JSON 中的程序版本以及 `nts`、`pairs`、`helices`、`stems`、`hairpins`、`hbonds` 和 `ntParams/ntPars` 字段，优先校验声明计数与数组长度后返回摘要。结构识别由生成该 JSON 的外部 DSSR 完成，DNAKit 不执行 DSSR 算法。
 - **API：** `dnakit.structure3d.read_dssr_json(path[必须])`
 - **输入：** 必填已存在的 DSSR JSON 输出文件。
 - **示例代码：**
@@ -197,38 +195,4 @@ print(result.hydrogen_bond_count, result.backbone_torsion_record_count)
 116 76
 ```
 
-- **限制：** `1ehz-dssr-example.json` 是 DSSR 官方 RNA JSON，只用于验证解析器字段架构；它不是 DNA 结果，也不是由本项目的 DNA PDB 样例生成的输出。该 API 只读摘要计数，不执行 DSSR。
-
-<span id="7"></span>**当前条件功能**
-
-以下能力尚无独立的 native 公开计算 API，因此不伪造示例数值：
-
-| 功能 | 所需附加输入/后端 |
-| --- | --- |
-| 大沟/小沟宽度与深度 | 3DNA/DSSR 或 Curves+ 的局部碱基对框架 |
-| 碱基堆积面积 | 标准碱基平面和原子分类 |
-| 静电势与电荷分布 | PQR/力场电荷及 APBS 等求解器 |
-| 持久长度、弯曲/扭转/伸展刚度 | 已对齐的轨迹/构象集合及明确力学模型 |
-| 局部柔性和变形能力 | 足够采样的实验/MD 构象集合 |
-
-<span id="8"></span>**已下载并实测的结构**
-
-| 文件 | 类型 | 模型数 | 当前解析结果摘要 |
-| --- | --- | ---: | --- |
-| `1BNA.pdb` | B-DNA 晶体 12-mer 双链 | 1 | 24 residues；Rg 13.228 Å；近似 rise 3.351 Å、twist 35.797° |
-| `1AC7.pdb` | 16-mer DNA hairpin NMR | 10 | 16 residues；平移中心化 mean atomic RMSF 0.986 Å |
-| `139D.pdb` | 平行 DNA G-quadruplex NMR | 4 | 28 residues；4 chains；mean atomic RMSF 1.138 Å |
-
-来源记录分别为 [RCSB 1BNA](https://www.rcsb.org/structure/1BNA)、[RCSB 1AC7](https://www.rcsb.org/structure/1AC7) 和 [RCSB 139D](https://www.rcsb.org/structure/139D)。下载 URL、大小和 SHA-256 在 `temp/dna_structures/manifest.json`；完整本地运行结果在 `temp/dna_structures/analysis_results.json`。
-
-一键重算会显示每个结构的进度条：
-
-```bash
-PYTHONPATH=src python examples/analyze_dna_structures.py \
-  --input-dir temp/dna_structures \
-  --output temp/dna_structures/analysis_results.json \
-  --sasa-points 96 \
-  --volume-grid 0.75
-```
-
-3DNA 参数定义可查阅 [3DNA 官方示意](https://x3dna.org/highlights/schematic-diagrams-of-base-pair-parameters)，JSON 结构见 [DSSR JSON 文档](https://x3dna.org/highlights/dssr-output-in-json-format)。
+<span id="7"></span>

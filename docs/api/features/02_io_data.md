@@ -35,8 +35,6 @@ DNA ('seq1',) ACGTN
 1
 ```
 
-- **限制：** `mode="dna"` 会物化输入，超大文件应使用 `mode="stream"`；格式自动推断只读取路径或流的 `.name` 后缀，不嗅探内容，匿名流必须显式指定 `format`。FASTA、FASTQ 和 GenBank 写出均拒绝显式 Gap；FASTA/FASTQ 遇到 feature 默认报错，只有显式选择丢弃策略才会忽略；FASTQ 还要求可编码的整数 `phred_quality`。GenBank 仅覆盖明确的常用字段子集，不声称完整 INSDC，也不支持模糊或远程 location。输入、序列和内嵌 JSON 有默认资源上限；输出只有显式设置 `WriteConfig.max_output_bytes` 时才受字节上限约束。
-
 ### 大文件参数与高级索引（需求追踪：IO-005） {#5-io-005}
 
 - **普通用户：** 使用同一个 `dnakit.read(..., mode="stream")` 逐条读取，再把返回的数据流直接交给 `dnakit.write()`；只有需要固定分块时才使用 `iter_chunks()`。
@@ -50,7 +48,6 @@ with dnakit.read("large.fa", mode="stream") as records:
 
 - **高级用户：** 需要按记录 ID 或坐标随机访问大型 FASTA/FASTQ 时，才使用索引接口；这些接口不是普通文件读取的必学入口。
 - **高级 API：** `dnakit.io.iter_chunks(values[必须], chunk_size[必须])`、`dnakit.io.build_fasta_index(source_path[必须], index_path[可选], overwrite[可选], max_records[可选], max_line_length[可选])`、`dnakit.io.load_fasta_index(index_path[必须], source_path[可选], verify_checksum[可选], max_index_bytes[可选])`、`dnakit.io.build_fastq_index(source_path[必须], index_path[可选], overwrite[可选], phred_offset[可选], max_records[可选], max_line_length[可选], max_record_bytes[可选], max_source_bytes[可选])`、`dnakit.io.load_fastq_index(index_path[必须], source_path[可选], verify_checksum[可选], max_index_bytes[可选], max_entries[可选])`、`dnakit.io.FastaIndex.fetch(record_id[必须], start[可选], end[可选], strand[可选], max_record_bytes[可选])`、`dnakit.io.FastqIndex.fetch(record_id[必须], start[可选], end[可选], strand[可选], max_record_bytes[可选])`。
-- **限制：** 索引仅支持本地未压缩普通 FASTA 和严格四行 FASTQ；gzip、远程文件和 bgzip 不在当前定义域。加载索引会用文件大小、修改时间和 SHA-256 检测陈旧源文件。
 
 ## 2) IO-002 注释格式
 
@@ -82,8 +79,6 @@ print(count)
 Interval(start=1, end=4)
 1
 ```
-
-- **限制：** GFF3 只接受单区间且不支持 embedded FASTA；BED 仅支持 3–6 列；AGP 按 2.1 连续性规则校验。读取侧有资源上限；路径写出采用原子替换，但当前写接口没有独立的记录数、行长或输出字节上限。
 
 ## 3) IO-003 表格格式
 
@@ -121,8 +116,6 @@ with TemporaryDirectory() as directory:
 1 0.75
 ```
 
-- **限制：** 不会自动放宽 schema；CSV/TSV 默认用字面量 `\N` 表示 null。Parquet 需要安装 `io` extra 中的 PyArrow，可先调用 `parquet_backend_status()` 检查。
-
 ## 4) IO-004 压缩文件
 
 - **作用：** 直接读写 gzip 压缩的序列或表格文件，无需调用方先解压，并保留与普通文件相同的解析结果。
@@ -159,5 +152,3 @@ with TemporaryDirectory() as directory:
 ```text
 seq1 ACGT
 ```
-
-- **限制：** 当前统一压缩模式只支持 `none` 和 `gzip`；`compression="auto"` 只根据路径或流的 `.name` 后缀判断，不检查 gzip magic，匿名 gzip 二进制流必须显式设为 `gzip`。流的关闭所有权由 `close_source`/`close_target` 显式控制。解压输入受读取上限约束；压缩输出仅在显式设置 `WriteConfig.max_output_bytes` 时有界，且该上限计算实际写出的压缩字节。

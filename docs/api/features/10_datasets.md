@@ -35,8 +35,6 @@ print(dict(result.counts))
 {'train': 8, 'test': 2}
 ```
 
-**限制：** 只保证记录级配额，不自动保持标签或 group 完整性。
-
 <span id="1-hash"></span>**顺序无关的 `hash` 划分**
 
 `hash` 模式在 `shuffle=True` 时使用版本化 SHA-256 计算 `seed + record.id` 的稳定排序键，在 `shuffle=False` 时按 `record.id` 的稳定字节序排列，再按比例分配记录。因此，同一批记录即使输入顺序变化，按 `record.id` 查看时分类仍完全一致；它不使用 Python 内置的进程随机化 `hash()`。
@@ -68,8 +66,6 @@ print(first.get("train").ids == second.get("train").ids)
 True
 True
 ```
-
-**限制：** `preserve_order=True` 时只保证分类一致，子集内部仍按当前输入顺序排列；要让子集内部顺序也稳定，请使用 `preserve_order=False`。如果记录 ID 是根据输入位置自动生成的，必须先提供稳定的显式 ID；增删记录后，精确配额排序可能改变部分已有记录的分组。
 
 ## 2) DATA-013 · 分层随机划分
 
@@ -109,8 +105,6 @@ print(dict(result.counts))
 {'train': 4, 'test': 4}
 ```
 
-**限制：** 小 strata 使用全局配额 round-robin；不支持自动多标签推断。
-
 ## 3) DATA-014 · 相似度划分
 
 **作用：** 先按相似度阈值建立序列组，再以整组为单位分配 train、valid、test，防止近似序列跨集合形成数据泄漏。
@@ -148,8 +142,6 @@ print({item.record_id: item.split for item in result.assignments})
 {'a': 'train', 'b': 'train', 'c': 'test', 'd': 'test'}
 ```
 
-**限制：** 当前固定使用原生 k-mer Jaccard；这是启发式配额分配，不保证恰好达到目标比例。
-
 ## 4) DATA-015 · Cluster split
 
 **作用：** 使用已有 cluster 标签作为不可拆分分组进行数据划分，保证同一 cluster 的全部记录只进入一个子集，并报告实际比例偏差。
@@ -186,8 +178,6 @@ print({item.record_id: item.split for item in result.assignments})
 {'a1': 'train', 'a2': 'train', 'b1': 'test'}
 ```
 
-**限制：** cluster label 必须由调用方提供或先用 `cluster_sequences` 生成；组大小可能造成比例偏差。
-
 ## 5) DATA-016 · 物种划分
 
 **作用：** 按物种 metadata 将记录成组后整体划分，确保同一物种不同时出现在训练集和评估集，用于检验跨物种泛化。
@@ -219,8 +209,6 @@ print({item.record_id: item.split for item in result.assignments})
 ```text
 {'h1': 'train', 'h2': 'train', 'm1': 'test'}
 ```
-
-**限制：** DNAKit 不内置 taxonomy，也不从序列推断物种或物种层级。
 
 ## 6) DATA-017 · 染色体划分
 
@@ -254,8 +242,6 @@ print({item.record_id: item.split for item in result.assignments})
 {'c1-a': 'train', 'c1-b': 'train', 'c2-a': 'test'}
 ```
 
-**限制：** 只使用显式 metadata；不识别 assembly、性染色体、线粒体或坐标重叠。
-
 ## 7) DATA-018 · 个体划分
 
 **作用：** 按个体或 donor metadata 对样本分组并整体划分，确保同一个体不跨数据子集，用于避免个体特异信息泄漏。
@@ -287,8 +273,6 @@ print({item.record_id: item.split for item in result.assignments})
 ```text
 {'p1-a': 'train', 'p1-b': 'train', 'p2-a': 'test'}
 ```
-
-**限制：** 不从记录内容识别身份，也不推断重复测量或隐含亲缘关系。
 
 ## 8) 按自定义 label 划分
 
@@ -327,8 +311,6 @@ print({item.record_id: item.split for item in result.assignments})
 {'f1-a': 'train', 'f1-b': 'train', 'f2-a': 'test'}
 ```
 
-**限制：** 每条记录必须提供指定的 metadata 字段。DNAKit 只按字段值分组，不自动推断 donor、亲缘关系、locus、时间顺序或多字段约束；分组大小也可能造成实际比例偏差。
-
 ## 9) DATA-023 · 泄漏检测
 
 **作用：** 对 train、valid、test 等集合执行跨集合精确或近似比较，返回泄漏序列对、相似度、涉及子集和汇总比例，用于验证划分独立性。
@@ -359,5 +341,3 @@ print(report.has_leakage, report.exact_event_count)
 ```text
 True 1
 ```
-
-**限制：** 受总记录数、跨集合 pair 数和事件数上限约束；k-mer/fingerprint 近似规则可能漏掉生物学相似序列。

@@ -1,8 +1,8 @@
 # 更新日志
 
-本项目遵循语义化版本。`0.1.0.dev0` 仍是本地开发快照，公开接口在首个正式版本前可能调整。
+本项目遵循语义化版本。`0.1.0.dev0` 是开发预览版，公开接口在首个正式版本前可能调整。
 
-## [Unreleased]
+## [0.1.0.dev0] - 2026-08-28
 
 ### Added
 
@@ -37,6 +37,7 @@
 
 ### Changed
 
+- `evolution_generate()` 保留 `mut_frac` 参数名，并新增逐碱基 `insert_frac`、`delete_frac` 概率；插入可用 `insert_min/insert_max` 选择单碱基或随机长度片段，算法审计版本升级为 `dnakit-evoaug-v3`。单次连续片段插入/删除继续由 `indel_generate()` 提供。
 - 文档将 FP-004 Canonical k-mer 并入 FP-003 k-mer 特征的 Canonical 模式，并将 FP-005 统一命名为 k-mer Sketch；公开 Python API 和稳定追踪编号保持兼容。
 - 普通文件读取统一为 `read(..., mode="dna"|"stream")`，验证统一为 `validate()`；无后缀编辑、反向互补和环状操作对 `DNA` 输入同步注释并返回 `DNA`，旧 `read_one/read_set/validate_set/*_record` 入口继续兼容。
 - DNA 基础模型表征和神经网络聚类的默认 checkpoint 从 GROVER 改为 `LucaGroup/LucaOne-gene-step36.8M`；默认缓存目录为 `ckpt/lucaone-gene-step36-8m/`，自定义 checkpoint 代码仍需显式授权。
@@ -62,20 +63,7 @@
 
 ### Remaining boundaries
 
-- DNAKit 自身许可证已确定为 MIT；正式发行仍需完成依赖兼容性复核、版本准备和远程发布授权。
-- 未推送 GitHub、未部署 Pages、未上传 TestPyPI/PyPI，也未执行论文复现实验。
+- DNAKit 自身许可证已确定为 MIT；本版本作为开发预览版发布，依赖兼容性仍需持续复核。
+- 尚未部署 GitHub Pages，也未执行论文复现实验。
 - NUPACK、Primer3、DSSR/3DNA 和 Dashing 不随项目安装/下载；DiProDB 数值不再内置；各外部工具/数据的许可、可能费用和真实科学差分仍由使用者按实际版本复核。
 - PyArrow 25.0.1 下的 DNAKit Parquet 写出/`read_table()` 往返已通过；其他引擎/版本交叉矩阵尚未执行。
-
-## [0.1.0.dev0] - 2026-08-13
-
-### Added
-
-- `src` 布局、Python 3.10+、类型注解、`py.typed` 和语义化开发版本。
-- 核心对象、结构化错误、标准化、基础 I/O/操作/描述符/指纹/相似度/去重/划分/可视化。
-- pytest、mypy、Ruff、构建、Conda 环境、GitHub Actions 配置和本地 MkDocs Material 网站。
-- 184 项需求审查、架构设计、依赖分析、阶段计划、固定输入只读演示和 MVP Notebook。
-
-### Limitations
-
-- 该版本号仍代表开发快照，不是已上传的软件发行版。

@@ -45,6 +45,10 @@ _EVOLUTION_PRIORITY: tuple[EvolutionAugmentation, ...] = (
 )
 _EVOLUTION_PRIORITY_INDEX = {name: index for index, name in enumerate(_EVOLUTION_PRIORITY)}
 _CANONICAL_BASES = "ACGT"
+_MUTATION_ALTERNATIVES = {
+    base: tuple(candidate for candidate in _CANONICAL_BASES if candidate != base)
+    for base in _CANONICAL_BASES
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,7 +75,7 @@ class EvolutionGenerationResult:
     rng_algorithm_version: int
     rng_state_before: RandomState
     rng_state_after: RandomState
-    algorithm_version: str = "dnakit-evoaug-v1"
+    algorithm_version: str = "dnakit-evoaug-v3"
 
     @property
     def augmentations(self) -> tuple[EvolutionAugmentation, ...]:
@@ -132,8 +136,8 @@ class CrossoverResult:
 @dataclass(frozen=True, slots=True)
 class _EvolutionParameters:
     mut_frac: float
-    delete_min: int
-    delete_max: int
+    insert_frac: float
+    delete_frac: float
     insert_min: int
     insert_max: int
     shift_min: int
@@ -141,7 +145,6 @@ class _EvolutionParameters:
     invert_min: int
     invert_max: int
     rc_prob: float
-    pad_indels: bool
 
 
 def _validate_nonnegative_int(name: str, value: int) -> int:
@@ -184,8 +187,8 @@ def _validate_probability(name: str, value: float) -> float:
 def _resolve_parameters(
     *,
     mut_frac: float,
-    delete_min: int,
-    delete_max: int,
+    insert_frac: float,
+    delete_frac: float,
     insert_min: int,
     insert_max: int,
     shift_min: int,
@@ -193,22 +196,20 @@ def _resolve_parameters(
     invert_min: int,
     invert_max: int,
     rc_prob: float,
-    pad_indels: bool,
 ) -> _EvolutionParameters:
-    if not isinstance(pad_indels, bool):
-        raise ConfigurationError(
-            "pad_indels must be boolean.",
-            code="INVALID_EVOLUTION_PARAMETER",
-            context={"pad_indels": pad_indels},
-        )
-    delete_bounds = _validate_range("delete", delete_min, delete_max)
     insert_bounds = _validate_range("insert", insert_min, insert_max)
+    if insert_bounds[0] == 0:
+        raise ConfigurationError(
+            "insert_min must be at least 1.",
+            code="INVALID_EVOLUTION_PARAMETER",
+            context={"insert_min": insert_min},
+        )
     shift_bounds = _validate_range("shift", shift_min, shift_max)
     invert_bounds = _validate_range("invert", invert_min, invert_max)
     return _EvolutionParameters(
         mut_frac=_validate_probability("mut_frac", mut_frac),
-        delete_min=delete_bounds[0],
-        delete_max=delete_bounds[1],
+        insert_frac=_validate_probability("insert_frac", insert_frac),
+        delete_frac=_validate_probability("delete_frac", delete_frac),
         insert_min=insert_bounds[0],
         insert_max=insert_bounds[1],
         shift_min=shift_bounds[0],
@@ -216,7 +217,6 @@ def _resolve_parameters(
         invert_min=invert_bounds[0],
         invert_max=invert_bounds[1],
         rc_prob=_validate_probability("rc_prob", rc_prob),
-        pad_indels=pad_indels,
     )
 
 
@@ -338,21 +338,18 @@ def _apply_mutation(
     generator: random.Random,
     mut_frac: float,
 ) -> tuple[str, EvolutionStep]:
-    mutation_attempts = round(mut_frac / 0.75 * len(symbols))
-    positions = generator.sample(range(len(symbols)), min(mutation_attempts, len(symbols)))
+    positions = tuple(position for position in range(len(symbols)) if generator.random() < mut_frac)
     chars = list(symbols)
-    changed = False
     for position in positions:
-        replacement = generator.choice(_CANONICAL_BASES)
-        changed = changed or replacement != chars[position]
-        chars[position] = replacement
+        chars[position] = generator.choice(_MUTATION_ALTERNATIVES[chars[position]])
+    mutation_count = len(positions)
     return (
         "".join(chars),
         EvolutionStep(
             "mutation",
-            changed,
-            length=len(positions),
-            mutation_attempts=mutation_attempts,
+            mutation_count > 0,
+            length=mutation_count,
+            mutation_attempts=mutation_count,
         ),
     )
 
@@ -360,20 +357,13 @@ def _apply_mutation(
 def _apply_deletion(
     symbols: str,
     generator: random.Random,
-    parameters: _EvolutionParameters,
+    delete_frac: float,
 ) -> tuple[str, EvolutionStep]:
-    _require_segment_maximum("delete", parameters.delete_max, len(symbols))
-    length = generator.randint(parameters.delete_min, parameters.delete_max)
-    start = generator.randint(0, len(symbols) - parameters.delete_max)
-    retained = symbols[:start] + symbols[start + length :]
-    if parameters.pad_indels:
-        padding = _random_dna(generator, parameters.delete_max)
-        pad_begin = length // 2
-        pad_end = length - pad_begin
-        retained = padding[:pad_begin] + retained + padding[parameters.delete_max - pad_end :]
+    retained = tuple(symbol for symbol in symbols if generator.random() >= delete_frac)
+    deletion_count = len(symbols) - len(retained)
     return (
-        retained,
-        EvolutionStep("deletion", length > 0, start=start, end=start + length, length=length),
+        "".join(retained),
+        EvolutionStep("deletion", deletion_count > 0, length=deletion_count),
     )
 
 
@@ -382,23 +372,17 @@ def _apply_insertion(
     generator: random.Random,
     parameters: _EvolutionParameters,
 ) -> tuple[str, EvolutionStep]:
-    length = generator.randint(parameters.insert_min, parameters.insert_max)
-    start = generator.randrange(len(symbols) + 1)
-    if parameters.pad_indels:
-        padding = _random_dna(generator, parameters.insert_max)
-        pad_begin = (parameters.insert_max - length) // 2
-        generated = (
-            padding[:pad_begin]
-            + symbols[:start]
-            + padding[pad_begin : pad_begin + length]
-            + symbols[start:]
-            + padding[pad_begin + length :]
-        )
-    else:
-        generated = symbols[:start] + _random_dna(generator, length) + symbols[start:]
+    parts: list[str] = []
+    inserted_length = 0
+    for symbol in symbols:
+        parts.append(symbol)
+        if generator.random() < parameters.insert_frac:
+            length = generator.randint(parameters.insert_min, parameters.insert_max)
+            parts.append(_random_dna(generator, length))
+            inserted_length += length
     return (
-        generated,
-        EvolutionStep("insertion", length > 0, start=start, end=start, length=length),
+        "".join(parts),
+        EvolutionStep("insertion", inserted_length > 0, length=inserted_length),
     )
 
 
@@ -407,6 +391,8 @@ def _apply_translocation(
     generator: random.Random,
     parameters: _EvolutionParameters,
 ) -> tuple[str, EvolutionStep]:
+    if not symbols:
+        return symbols, EvolutionStep("translocation", False, shift=0)
     magnitude = generator.randint(parameters.shift_min, parameters.shift_max)
     shift = -magnitude if generator.random() < 0.5 else magnitude
     normalized = shift % len(symbols)
@@ -452,7 +438,7 @@ def _apply_augmentation(
     if augmentation == "mutation":
         return _apply_mutation(symbols, generator, parameters.mut_frac)
     if augmentation == "deletion":
-        return _apply_deletion(symbols, generator, parameters)
+        return _apply_deletion(symbols, generator, parameters.delete_frac)
     if augmentation == "insertion":
         return _apply_insertion(symbols, generator, parameters)
     if augmentation == "translocation":
@@ -471,16 +457,15 @@ def evolution_generate(
     seed: int | None = None,
     rng: random.Random | None = None,
     mut_frac: float = 0.05,
-    delete_min: int = 0,
-    delete_max: int = 20,
-    insert_min: int = 0,
-    insert_max: int = 20,
+    insert_frac: float = 0.05,
+    delete_frac: float = 0.05,
+    insert_min: int = 1,
+    insert_max: int = 1,
     shift_min: int = 0,
     shift_max: int = 20,
     invert_min: int = 0,
     invert_max: int = 20,
     rc_prob: float = 0.5,
-    pad_indels: bool = True,
 ) -> EvolutionGenerationResult:
     """Generate one EvoAug-inspired DNA sequence variant.
 
@@ -489,12 +474,16 @@ def evolution_generate(
     reverse-complement, then mutation.  ``hard_aug=True`` applies exactly
     ``max_augmentations`` selected operations; ``False`` samples a count from
     one through that maximum.  Exactly one of ``seed`` and ``rng`` is required.
+    ``mut_frac``, ``insert_frac``, and ``delete_frac`` are independent
+    per-nucleotide probabilities for their respective selected operations.
+    A mutation always changes the selected base.  An insertion is placed after
+    the selected base and has a random inclusive length from ``insert_min`` to
+    ``insert_max``.  A deletion removes the selected base.
 
     The official EvoAug package operates on fixed-shape one-hot tensors and
     includes Gaussian noise.  This sequence-level API keeps only operations
-    that produce valid DNA symbols.  With ``pad_indels=True`` it reproduces
-    EvoAug's random-DNA padding for insertions and deletions; set it to
-    ``False`` for naturally variable-length sequence edits.
+    that produce valid DNA symbols.  Use ``indel_generate()`` when exactly one
+    random contiguous insertion or deletion is required.
     """
 
     source, symbols = _validate_input(sequence)
@@ -519,8 +508,8 @@ def evolution_generate(
         )
     parameters = _resolve_parameters(
         mut_frac=mut_frac,
-        delete_min=delete_min,
-        delete_max=delete_max,
+        insert_frac=insert_frac,
+        delete_frac=delete_frac,
         insert_min=insert_min,
         insert_max=insert_max,
         shift_min=shift_min,
@@ -528,7 +517,6 @@ def evolution_generate(
         invert_min=invert_min,
         invert_max=invert_max,
         rc_prob=rc_prob,
-        pad_indels=pad_indels,
     )
     generator, resolved_seed, random_source, state_before = _resolve_random_source(seed, rng)
     if max_augmentations == 0:
@@ -589,6 +577,57 @@ def _build_linear_sequence(source: DNASequence, symbols: str) -> DNASequence:
     )
 
 
+def _apply_contiguous_deletion(
+    symbols: str,
+    generator: random.Random,
+    minimum: int,
+    maximum: int,
+    *,
+    pad_indels: bool,
+) -> tuple[str, EvolutionStep]:
+    _require_segment_maximum("delete", maximum, len(symbols))
+    length = generator.randint(minimum, maximum)
+    start = generator.randint(0, len(symbols) - maximum)
+    generated = symbols[:start] + symbols[start + length :]
+    if pad_indels:
+        padding = _random_dna(generator, maximum)
+        pad_begin = length // 2
+        pad_end = length - pad_begin
+        generated = padding[:pad_begin] + generated + padding[maximum - pad_end :]
+    return (
+        generated,
+        EvolutionStep("deletion", length > 0, start=start, end=start + length, length=length),
+    )
+
+
+def _apply_contiguous_insertion(
+    symbols: str,
+    generator: random.Random,
+    minimum: int,
+    maximum: int,
+    *,
+    pad_indels: bool,
+) -> tuple[str, EvolutionStep]:
+    length = generator.randint(minimum, maximum)
+    start = generator.randrange(len(symbols) + 1)
+    if pad_indels:
+        padding = _random_dna(generator, maximum)
+        pad_begin = (maximum - length) // 2
+        generated = (
+            padding[:pad_begin]
+            + symbols[:start]
+            + padding[pad_begin : pad_begin + length]
+            + symbols[start:]
+            + padding[pad_begin + length :]
+        )
+    else:
+        generated = symbols[:start] + _random_dna(generator, length) + symbols[start:]
+    return (
+        generated,
+        EvolutionStep("insertion", length > 0, start=start, end=start, length=length),
+    )
+
+
 def indel_generate(
     sequence: DNASequence,
     *,
@@ -611,31 +650,39 @@ def indel_generate(
             code="INVALID_INDEL_OPERATION",
             context={"operation": operation},
         )
+    if not isinstance(pad_indels, bool):
+        raise ConfigurationError(
+            "pad_indels must be boolean.",
+            code="INVALID_EVOLUTION_PARAMETER",
+            context={"pad_indels": pad_indels},
+        )
+    source, symbols = _validate_input(sequence)
     minimum, maximum = _validate_range("indel", min_length, max_length)
-    parameters: dict[str, int] = {
-        "delete_min": 0,
-        "delete_max": 0,
-        "insert_min": 0,
-        "insert_max": 0,
-    }
+    generator, resolved_seed, random_source, state_before = _resolve_random_source(seed, rng)
     if operation == "deletion":
-        parameters["delete_min"] = minimum
-        parameters["delete_max"] = maximum
+        generated, step = _apply_contiguous_deletion(
+            symbols,
+            generator,
+            minimum,
+            maximum,
+            pad_indels=pad_indels,
+        )
     else:
-        parameters["insert_min"] = minimum
-        parameters["insert_max"] = maximum
-    return evolution_generate(
-        sequence,
-        augmentations=(operation,),
-        max_augmentations=1,
-        hard_aug=True,
-        seed=seed,
-        rng=rng,
-        delete_min=parameters["delete_min"],
-        delete_max=parameters["delete_max"],
-        insert_min=parameters["insert_min"],
-        insert_max=parameters["insert_max"],
-        pad_indels=pad_indels,
+        generated, step = _apply_contiguous_insertion(
+            symbols,
+            generator,
+            minimum,
+            maximum,
+            pad_indels=pad_indels,
+        )
+    return EvolutionGenerationResult(
+        sequence=_build_linear_sequence(source, generated),
+        steps=(step,),
+        seed=resolved_seed,
+        random_source=random_source,
+        rng_algorithm_version=random.Random.VERSION,
+        rng_state_before=state_before,
+        rng_state_after=cast(RandomState, generator.getstate()),
     )
 
 

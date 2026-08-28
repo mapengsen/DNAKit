@@ -26,8 +26,6 @@ print(primer3.available, primer3.version)
 False None
 ```
 
-- **限制**：Primer3、NUPACK 和显式 Dashing 有科学计算 adapter；NUPACK 需单独许可安装且当前无真实差分，BLAST/MMseqs2/sourmash 目前仅有被动 metadata/version 句柄。
-
 ## 2) `ENG-002` 原生与外部标记
 
 - **作用：** 为每个结果记录实现属于原生、外部适配、重新实现或新增方法，同时保存算法、后端、来源和许可信息，使计算过程可追溯。
@@ -54,8 +52,6 @@ print(provenance.implementation.label)  # adapter
 adapter
 ```
 
-- **限制**：标签描述实现来源，不代表正确性、性能或许可兼容性结论。
-
 ## 3) `ENG-003` Python API
 
 - **作用：** 通过稳定的 Python 对象、函数和结果类型调用 DNAKit 功能，便于在脚本、Notebook、测试和其他软件中组合分析流程。
@@ -78,8 +74,6 @@ print(length_features(sequence).symbol_length)  # 4
 4
 ```
 
-- **限制**：只有当前实现功能有 Python API；被阻断项目不会提供占位成功结果。
-
 ## 4) `ENG-004` CLI
 
 - **作用：** 通过命令行参数运行标准化、描述、指纹、搜索、比较等常用功能，并输出结构化 JSON，适合 shell 流程和自动化任务。
@@ -98,8 +92,6 @@ dnakit compare ACGT ACGA --method hamming
 {"base_composition": {"ambiguity_policy": "ignore", "counts": {"A": 2, "C": 2, "G": 2, "T": 2}, "cross_gaps": false, "denominator": 8, "fractions": {"A": 0.25, "C": 0.25, "G": 0.25, "T": 0.25}, "gap_count": 0, "ignored_ambiguity_count": 0, "method": "canonical_base_count", "name": "base_composition", "sequence_id": null, "unknown_gap_count": 0}, "complexity": {"ambiguity_policy": "ignore", "by_k": {"1": 1.0, "2": 0.5714285714285714, "3": 0.6666666666666666, "4": 0.8, "5": 1.0, "6": 1.0}, "cross_gaps": false, "formula": "product_k(unique_kmers/min(4**k,valid_kmer_positions))", "gap_count": 0, "max_observations": 10000000, "max_word_size": 6, "method": "vocabulary-observed-over-possible-product", "name": "linguistic_complexity", "observation_count": 33, "observed_by_k": {"1": 4, "2": 4, "3": 4, "4": 4, "5": 4, "6": 3}, "possible_by_k": {"1": 4, "2": 7, "3": 6, "4": 5, "5": 4, "6": 3}, "score": 0.3047619047619048, "sequence_id": null, "unknown_gap_count": 0}, "gc_at": {"ambiguity_policy": "ignore", "at_count": 4, "at_fraction": 0.5, "cross_gaps": false, "denominator": 8, "gap_count": 0, "gc_count": 4, "gc_fraction": 0.5, "ignored_ambiguity_count": 0, "method": "canonical_base_fraction", "name": "gc_at_content", "sequence_id": null, "unknown_gap_count": 0}, "repeat": {"ambiguity_policy": "ignore", "comparisons": 4, "cross_gaps": false, "denominator": 8, "gap_count": 0, "max_comparisons": 5000000, "max_unit_length": 20, "method": "maximal-exact-tandem-repeat-union", "min_repeats": 2, "min_unit_length": 1, "name": "exact_repeat_fraction", "repeat_count_by_unit": {"4": 1}, "repeat_fraction": 1.0, "repeated_base_count": 8, "runs": [{"repeat_count": 2, "symbol_end": 8, "symbol_start": 0, "unit": "ACGT", "unit_length": 4}], "sequence_id": null, "unknown_gap_count": 0}}
 {"costs": {"substitution": 1.0}, "distance": 1.0, "dp_cells": null, "edit_path": null, "exceeded_max_distance": false, "iupac_matching": "literal", "left_id": null, "left_length": 4, "max_cells": null, "max_distance": null, "method": "hamming", "mismatches": [{"left_symbol": "T", "position": 3, "right_symbol": "A"}], "name": "hamming_distance", "right_id": null, "right_length": 4}
 ```
-
-- **限制**：具体支持项以 `dnakit --help` 和子命令 `--help` 为准。
 
 ## 5) `ENG-005` 配置工作流
 
@@ -128,8 +120,6 @@ dnakit workflow "$DNAKIT_WORK_DIR/advanced_workflow.yml" --no-progress
   ]
 }
 ```
-
-- **限制**：只允许 8 种白名单操作，不加载任意 callable、不执行 shell 或网络。
 
 ## 6) `ENG-006` 批量计算
 
@@ -160,8 +150,6 @@ print([item.value for item in result.items])  # [1, 2]
 [1, 2]
 ```
 
-- **限制**：输入必须是 `DNARecord`；`max_records` 对原始输入流生效。
-
 ## 7) `ENG-007` 并行计算
 
 - **作用：** 使用受控工作线程并行执行独立记录任务，同时保持结果与输入顺序一致，并统一传播取消、进度和错误信息。
@@ -189,8 +177,6 @@ print(result.success_count)  # 4
 4
 ```
 
-- **限制**：当前只有 serial/thread，没有 process 模式；CPU 密集任务不会自动获得多进程加速。
-
 ## 8) `ENG-008` 分块与流式处理
 
 - **作用：** 以迭代器方式分块读取、转换和写出大文件，使内存只保留当前批次，并返回进度事件，适合超出内存容量的数据。
@@ -213,8 +199,6 @@ for chunk in iter_chunks(range(5), chunk_size=2):
 (2, 3)
 (4,)
 ```
-
-- **限制**：需要全矩阵或全局聚类的算法仍会物化其声明范围，并受显式上限约束。
 
 ## 9) `ENG-009` 缓存
 
@@ -242,8 +226,6 @@ with TemporaryDirectory() as directory:
 {'value': 4}
 ```
 
-- **限制**：没有 TTL 或自动淘汰；调用方必须把所有影响结果的版本放入 components。
-
 ## 10) `ENG-010` 随机种子
 
 - **作用：** 统一管理随机 seed 和稳定记录顺序，使随机划分、抽样、突变和聚类在相同配置下可重复，并把 seed 写入结果。
@@ -268,8 +250,6 @@ print(first.assignments == second.assignments)  # True
 True
 ```
 
-- **限制**：`random` 模式的 seed 不能抵消输入顺序变化；`hash` 模式可抵消输入顺序变化，但要求稳定唯一的 `record.id`，且软件版本和算法参数仍需一致。
-
 ## 11) `ENG-011` 版本追踪
 
 - **作用：** 生成运行清单，记录 DNAKit、Python、依赖、后端、参考库、输入及输出文件的版本与校验值，用于复现和审计一次分析。
@@ -293,8 +273,6 @@ print(provenance.platform)
 3.10.16
 Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
 ```
-
-- **限制**：默认环境信息不自动包含 git commit、硬件细节或任意数据库 hash，调用方应按任务补充。
 
 ## 12) `ENG-012` 错误与警告
 
@@ -321,8 +299,6 @@ INVALID_ALPHABET
 {'alphabet': 'strict', 'part_index': 0, 'part_offset': 1, 'symbol': 'X'}
 ```
 
-- **限制**：可恢复的质量问题通常放在结果 `issues` 中，不一定抛异常。
-
 ## 13) `ENG-013` 单元测试
 
 - **作用：** 使用自动化单元和集成测试验证 API 在正常、边界及错误输入下的返回值和异常，防止代码修改破坏既有行为。
@@ -339,8 +315,6 @@ PYTHONNOUSERSITE=1 PYTHONPATH=src:. python -m pytest -q
 ```text
 945 passed, 1 skipped
 ```
-
-- **限制**：测试通过证明当前测试范围，不等于所有输入、外部后端或实验结论都已验证。
 
 ## 14) `ENG-014` 一致性验证
 
@@ -360,8 +334,6 @@ PYTHONNOUSERSITE=1 python -m validation.run_validation \
 ```text
 Validation report written: .../report.json
 ```
-
-- **限制**：NUPACK/Dashing 仅完成 adapter 契约测试，未覆盖真实科学差分及 CD-HIT/MMseqs2/BLAST/sourmash 大库后端。
 
 ## 15) `ENG-015` 性能 benchmark
 
@@ -388,8 +360,6 @@ PYTHONNOUSERSITE=1 python -m benchmarks.benchmark_core \
 Benchmark report written: .../report.json
 ```
 
-- **限制**：结果仅适用于当前机器；`tracemalloc` 不是进程 RSS，源码行数也不是质量指标。
-
 ## 16) `ENG-016` 文档与教程
 
 - **作用：** 集中提供安装、教程、API、Notebook、workflow、FAQ、算法边界和验证证据，使用户能够找到正确入口并理解结果限制。
@@ -407,8 +377,6 @@ PYTHONNOUSERSITE=1 PYTHONPATH=src:. mkdocs serve
 INFO    -  [15:21:49] Serving on http://127.0.0.1:8000/
 ```
 
-- **限制**：本地构建不等于已经部署到公开站点。
-
 ## 17) `ENG-017` 可选图形入口
 
 - **作用：** 定义 Notebook、Web 或 Galaxy 等图形化入口可复用的 API 和结果边界；当前仅说明扩展位置，不表示已经提供完整 GUI。
@@ -425,5 +393,3 @@ PYTHONNOUSERSITE=1 PYTHONPATH=src:. mkdocs serve
 ```text
 INFO    -  [15:21:49] Serving on http://127.0.0.1:8000/
 ```
-
-- **限制**：由于当前范围明确禁止网站接收 DNA 输入，不能把静态 Demo 描述为 Web 分析应用。

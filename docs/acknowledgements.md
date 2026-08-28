@@ -144,10 +144,10 @@ DNAKit 不保证第三方资源免费、持续可用、适合商业用途或允�
 
 ### 引用 DNAKit {#citing-dnakit}
 
-仓库根目录的 `CITATION.cff` 提供机器可读元数据。DNAKit 尚未发布论文、DOI 或正式软件版本；当前可使用的临时引用是：
+仓库根目录的 `CITATION.cff` 提供机器可读元数据。DNAKit 尚未发布论文或 DOI；当前开发预览版可引用为：
 
 ```text
-DNAKit contributors. DNAKit 0.1.0.dev0 (local development snapshot), 2026.
+DNAKit contributors. DNAKit 0.1.0.dev0 (development preview), 2026.
 ```
 
 引用 DNAKit 不能替代对实际算法、参数集、后端和参考数据库的引用。项目使用的方法、论文、数据库和网站统一列在[致谢与主要来源](#acknowledgements)中；结果中的 `Provenance`、`BackendInfo`、`ReferenceLibrary` 和 `RunManifest` 用于保留这些信息。
@@ -156,7 +156,7 @@ DNAKit contributors. DNAKit 0.1.0.dev0 (local development snapshot), 2026.
 
 DNAKit 自身采用 MIT 许可证，版权人为 Pengsen Ma，完整文本见仓库根目录的 `LICENSE`。SPDX 标识符为 `MIT`。安装包同时包含 `THIRD_PARTY_NOTICES.md` 和 `DISCLAIMER.md`；网页版本见[第三方声明](#third-party-notices)和[免责声明](#disclaimer)。
 
-项目仍处于 `0.1.0.dev0` 开发版本，正式上传 TestPyPI/PyPI 前仍需完成依赖兼容性复核、版本准备和人工发布确认。
+项目仍处于 `0.1.0.dev0` 开发预览阶段，依赖兼容性和外部后端仍需按实际环境复核。
 
 第三方包的许可证不会自动成为 DNAKit 的许可证。
 
