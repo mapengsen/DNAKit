@@ -1,0 +1,4 @@
+>seq-a fixed palindromic example
+ACGTACGT
+>seq-c one substitution relative to seq-a
+ACGTTCGT

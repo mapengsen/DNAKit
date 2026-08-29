@@ -16,6 +16,16 @@ pip install dnakit==0.1.1
 python -c "import dnakit; print(dnakit.__version__)"
 ```
 
+## 其他平台
+
+项目仓库已提供以下平台适配文件：
+
+- [Bioconda 配方](https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda)；
+- [GNU Guix 包定义](https://github.com/mapengsen/DNAKit/tree/main/packaging/guix)；
+- [Galaxy Tool Shed 包装器](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)。
+
+这些适配文件固定对应 `0.1.1`，正式安装命令需要等相应平台审核并发布后才能使用。
+
 ## 开发环境
 
 在项目根目录创建并激活完整 Conda 开发环境：

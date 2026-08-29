@@ -1,0 +1,70 @@
+<tool id="dnakit_split" name="DNAKit split" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@" license="MIT">
+    <description>split a FASTA dataset reproducibly</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements" />
+    <command detect_errors="exit_code"><![CDATA[
+mkdir -p split_output &&
+dnakit split
+'$input'
+split_output
+--ratios 'train=$train_ratio,valid=$valid_ratio,test=$test_ratio'
+--method '$method'
+--seed '$seed'
+--input-format fasta
+--output-format fasta
+--overwrite
+> '$audit' &&
+cp split_output/train.fasta '$train' &&
+cp split_output/valid.fasta '$valid' &&
+cp split_output/test.fasta '$test' &&
+cp split_output/assignments.json '$assignments'
+    ]]></command>
+    <inputs>
+        <param name="input" type="data" format="fasta" label="Input sequences" />
+        <param name="method" type="select" label="Assignment method">
+            <option value="hash" selected="true">Hash (stable by record ID)</option>
+            <option value="random">Seeded random</option>
+        </param>
+        <param name="seed" type="integer" value="0" label="Random seed" />
+        <param name="train_ratio" type="float" value="0.8" min="0" max="1" label="Training fraction" />
+        <param name="valid_ratio" type="float" value="0.1" min="0" max="1" label="Validation fraction" />
+        <param name="test_ratio" type="float" value="0.1" min="0" max="1" label="Test fraction" help="The three fractions must sum to 1." />
+    </inputs>
+    <outputs>
+        <data name="train" format="fasta" label="${tool.name}: train on ${on_string}" />
+        <data name="valid" format="fasta" label="${tool.name}: valid on ${on_string}" />
+        <data name="test" format="fasta" label="${tool.name}: test on ${on_string}" />
+        <data name="assignments" format="json" label="${tool.name}: assignments on ${on_string}" />
+        <data name="audit" format="json" label="${tool.name}: audit on ${on_string}" />
+    </outputs>
+    <tests>
+        <test expect_num_outputs="5">
+            <param name="input" value="fixed_demo.fasta" ftype="fasta" />
+            <param name="method" value="hash" />
+            <param name="seed" value="0" />
+            <param name="train_ratio" value="0.5" />
+            <param name="valid_ratio" value="0.25" />
+            <param name="test_ratio" value="0.25" />
+            <output name="train" file="split_train.fasta" ftype="fasta" />
+            <output name="valid" file="split_valid.fasta" ftype="fasta" />
+            <output name="test" file="split_test.fasta" ftype="fasta" />
+            <output name="assignments" file="split_assignments.json" ftype="json" />
+            <output name="audit" ftype="json">
+                <assert_contents>
+                    <has_text text="&quot;method&quot;: &quot;hash&quot;" />
+                    <has_text text="&quot;train&quot;: 1" />
+                    <has_text text="&quot;valid&quot;: 1" />
+                    <has_text text="&quot;test&quot;: 1" />
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+Create deterministic train, validation, and test FASTA datasets. Fractions
+must be non-negative and sum to 1. The assignments output records every input
+record's destination.
+    ]]></help>
+    <expand macro="citations" />
+</tool>

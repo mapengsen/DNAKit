@@ -1,0 +1,23 @@
+<macros>
+    <token name="@TOOL_VERSION@">0.1.1</token>
+    <token name="@VERSION_SUFFIX@">0</token>
+    <token name="@PROFILE@">24.0</token>
+    <xml name="requirements">
+        <requirements>
+            <requirement type="package" version="@TOOL_VERSION@">dnakit</requirement>
+        </requirements>
+    </xml>
+    <xml name="citations">
+        <citations>
+            <citation type="bibtex"><![CDATA[
+@software{dnakit_0_1_1,
+  author = {{DNAKit contributors}},
+  title = {DNAKit},
+  version = {0.1.1},
+  year = {2026},
+  url = {https://github.com/mapengsen/DNAKit}
+}
+            ]]></citation>
+        </citations>
+    </xml>
+</macros>

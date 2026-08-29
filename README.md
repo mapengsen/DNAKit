@@ -45,6 +45,12 @@ conda activate dnakit-dev
 
 随后可以阅读 [Python 快速入门指南](https://mapengsen.github.io/DNAKit/quickstart/)。
 
+# 更多发布平台
+
+仓库已提供 [Bioconda 与 GNU Guix 配方](https://github.com/mapengsen/DNAKit/tree/main/packaging)
+以及 [Galaxy Tool Shed 包装器](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)。这些文件已固定对应
+`0.1.1`；在各平台审核通过前，仍请使用上面的 PyPI 安装方式。
+
 # 文档
 
 完整文档位于 [DNAKit 文档首页](https://mapengsen.github.io/DNAKit/)，所有功能模块可在 [功能树总览](https://mapengsen.github.io/DNAKit/api/features/function_tree/) 中查看，常见问题见 [FAQ](https://mapengsen.github.io/DNAKit/faq/)。

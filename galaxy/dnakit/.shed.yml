@@ -1,0 +1,11 @@
+name: dnakit
+owner: mapengsen
+description: Deterministic tools for DNA sequence analysis
+long_description: |
+  Galaxy wrappers for DNAKit file conversion, deduplication, deterministic
+  dataset splitting, and self-contained HTML report generation.
+homepage_url: https://mapengsen.github.io/DNAKit/
+remote_repository_url: https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit
+type: unrestricted
+categories:
+  - Sequence Analysis

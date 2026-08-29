@@ -1,0 +1,54 @@
+<tool id="dnakit_convert" name="DNAKit convert" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@" license="MIT">
+    <description>convert DNA sequence files</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements" />
+    <command detect_errors="exit_code"><![CDATA[
+dnakit convert
+'$input'
+'$output'
+#if str($input.ext) == 'fasta':
+--input-format fasta
+#else:
+--input-format fastq
+#end if
+--output-format '$output_format'
+--overwrite
+--no-progress
+> '$audit'
+    ]]></command>
+    <inputs>
+        <param name="input" type="data" format="fasta,fastq,fastqsanger" label="Input sequences" />
+        <param name="output_format" type="select" label="Output format">
+            <option value="fasta" selected="true">FASTA</option>
+            <option value="fastq">FASTQ (input records must contain qualities)</option>
+        </param>
+    </inputs>
+    <outputs>
+        <data name="output" format="fasta" label="${tool.name} on ${on_string}">
+            <change_format>
+                <when input="output_format" value="fastq" format="fastqsanger" />
+            </change_format>
+        </data>
+        <data name="audit" format="json" label="${tool.name} audit on ${on_string}" />
+    </outputs>
+    <tests>
+        <test expect_num_outputs="2">
+            <param name="input" value="fixed_demo.fasta" ftype="fasta" />
+            <param name="output_format" value="fasta" />
+            <output name="output" file="converted.fasta" ftype="fasta" />
+            <output name="audit" ftype="json">
+                <assert_contents>
+                    <has_text text="&quot;record_count&quot;: 3" />
+                    <has_text text="&quot;format&quot;: &quot;fasta&quot;" />
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+Convert a FASTA or FASTQ dataset with DNAKit. FASTQ output requires input
+records with quality scores. The audit output records the operation metadata.
+    ]]></help>
+    <expand macro="citations" />
+</tool>

@@ -1,0 +1,52 @@
+{
+  "assignment_strategy": "sha256_record_id_rank_v1_largest_remainder",
+  "assignments": [
+    {
+      "input_index": 0,
+      "record_id": "seq-a",
+      "split": "test"
+    },
+    {
+      "input_index": 1,
+      "record_id": "seq-b",
+      "split": "valid"
+    },
+    {
+      "input_index": 2,
+      "record_id": "seq-c",
+      "split": "train"
+    }
+  ],
+  "component_count": null,
+  "counts": {
+    "test": 1,
+    "train": 1,
+    "valid": 1
+  },
+  "max_pairwise_records": 5000,
+  "metadata_key": null,
+  "method": "hash",
+  "pairwise_comparison_count": 0,
+  "preserve_order": true,
+  "ratios": {
+    "test": 0.25,
+    "train": 0.5,
+    "valid": 0.25
+  },
+  "seed": 0,
+  "shuffle": true,
+  "similarity_k": 3,
+  "similarity_method": null,
+  "similarity_threshold": null,
+  "subsets": {
+    "test": [
+      "seq-a"
+    ],
+    "train": [
+      "seq-c"
+    ],
+    "valid": [
+      "seq-b"
+    ]
+  }
+}

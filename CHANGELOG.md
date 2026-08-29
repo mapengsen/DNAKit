@@ -1,5 +1,9 @@
 # Changelog。
 
+## [Unreleased]
+
+- 新增 Bioconda、GNU Guix 与 Galaxy Tool Shed 的发布适配文件。
+
 ## [0.1.1] - 2026-08-29
 
 - 发布首个不含开发版本后缀的 DNAKit 版本。

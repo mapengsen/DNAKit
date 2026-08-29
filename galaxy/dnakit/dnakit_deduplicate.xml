@@ -1,0 +1,54 @@
+<tool id="dnakit_deduplicate" name="DNAKit deduplicate" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@" license="MIT">
+    <description>remove duplicate DNA records</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements" />
+    <command detect_errors="exit_code"><![CDATA[
+dnakit deduplicate
+'$input'
+'$output'
+--equivalence '$equivalence'
+--input-format fasta
+--output-format fasta
+--representative '$representative'
+--conflict-policy error
+--overwrite
+> '$audit'
+    ]]></command>
+    <inputs>
+        <param name="input" type="data" format="fasta" label="Input sequences" />
+        <param name="equivalence" type="select" label="Duplicate equivalence">
+            <option value="exact" selected="true">Exact sequence</option>
+            <option value="reverse_complement">Sequence or reverse complement</option>
+        </param>
+        <param name="representative" type="select" label="Representative record">
+            <option value="first" selected="true">First record</option>
+            <option value="last">Last record</option>
+        </param>
+    </inputs>
+    <outputs>
+        <data name="output" format="fasta" label="${tool.name} on ${on_string}" />
+        <data name="audit" format="json" label="${tool.name} audit on ${on_string}" />
+    </outputs>
+    <tests>
+        <test expect_num_outputs="2">
+            <param name="input" value="fixed_demo.fasta" ftype="fasta" />
+            <param name="equivalence" value="exact" />
+            <param name="representative" value="first" />
+            <output name="output" file="deduplicated.fasta" ftype="fasta" />
+            <output name="audit" ftype="json">
+                <assert_contents>
+                    <has_text text="&quot;input_count&quot;: 3" />
+                    <has_text text="&quot;output_count&quot;: 2" />
+                    <has_text text="&quot;duplicate_count&quot;: 1" />
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+Remove exact duplicates or reverse-complement-equivalent records from a FASTA
+dataset. The audit output contains the representative and member mapping.
+    ]]></help>
+    <expand macro="citations" />
+</tool>
