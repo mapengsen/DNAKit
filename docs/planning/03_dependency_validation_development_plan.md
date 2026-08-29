@@ -224,7 +224,7 @@ NUPACK 自动差分验证只有两种可接受路径：取得允许本项目用�
 - 本地构建 MkDocs 和固定输入的只读演示。
 - 从单一版本源生成包版本、`dnakit --version`、构建元数据和文档版本，并验证语义化版本一致。
 - 完成根 README、安装、快速入门、每个主要模块 API 示例、可执行 Notebook 和完整工作流。
-- 核对 LICENSE、CITATION.cff、CHANGELOG、CONTRIBUTING、引用/许可证清单和已完成/部分/不可用功能文档的一致性。
+- 核对 LICENSE、CHANGELOG、README 引用信息、许可证清单和已完成/部分/不可用功能文档的一致性。
 - 输出性能 benchmark 和论文复现实验的固定数据、配置、seed、命令与结果清单。
 - 在本地审查 GitHub Actions 的 Linux 测试、构建、TestPyPI、正式 PyPI 和 Pages workflow；发布 job 保持手动审批/环境保护，当前不触发。
 

@@ -78,8 +78,6 @@ DNAKit 已完成需求审查、架构设计和阶段 3 MVP 基线的本地实现
 .gitignore
 .github/workflows/ci.yml
 CHANGELOG.md
-CITATION.cff
-CONTRIBUTING.md
 MANIFEST.in
 README.md
 environment-dev.yml

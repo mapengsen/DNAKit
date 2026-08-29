@@ -120,7 +120,7 @@ checkpoint 包含加载所需 Python 代码。DNAKit 默认拒绝执行；只有
 
 进程隔离和“由用户安装”可减少捆绑分发风险，但不能自动证明所有用途合法。商业部署、托管服务、源码/二进制再分发或期刊补充材料归档时，应按实际提交的文件重新审查。
 
-完整英文清单随源码和安装包保存为 `THIRD_PARTY_NOTICES.md`；科学方法、论文和网站见[致谢与主要来源](#acknowledgements)，一般使用风险见[免责声明](#disclaimer)。
+完整英文清单随源码和安装包保存在根目录 `DISCLAIMER.md` 的“第三方声明”章节；科学方法、论文和网站见[致谢与主要来源](#acknowledgements)，一般使用风险见[免责声明](#disclaimer)。
 
 ## 免责声明 {#disclaimer}
 
@@ -144,19 +144,19 @@ DNAKit 不保证第三方资源免费、持续可用、适合商业用途或允�
 
 ### 引用 DNAKit {#citing-dnakit}
 
-仓库根目录的 `CITATION.cff` 提供机器可读元数据。DNAKit 尚未发布论文或 DOI；当前开发预览版可引用为：
+DNAKit 尚未发布论文或 DOI；当前版本的引用信息保存在仓库 `README.md` 中，可引用为：
 
 ```text
-DNAKit contributors. DNAKit 0.1.0.dev0 (development preview), 2026.
+DNAKit contributors. DNAKit 0.1.1, 2026.
 ```
 
 引用 DNAKit 不能替代对实际算法、参数集、后端和参考数据库的引用。项目使用的方法、论文、数据库和网站统一列在[致谢与主要来源](#acknowledgements)中；结果中的 `Provenance`、`BackendInfo`、`ReferenceLibrary` 和 `RunManifest` 用于保留这些信息。
 
 ### 项目许可证 {#project-license}
 
-DNAKit 自身采用 MIT 许可证，版权人为 Pengsen Ma，完整文本见仓库根目录的 `LICENSE`。SPDX 标识符为 `MIT`。安装包同时包含 `THIRD_PARTY_NOTICES.md` 和 `DISCLAIMER.md`；网页版本见[第三方声明](#third-party-notices)和[免责声明](#disclaimer)。
+DNAKit 自身采用 MIT 许可证，版权人为 Pengsen Ma，完整文本见仓库根目录的 `LICENSE`。SPDX 标识符为 `MIT`。安装包包含合并了第三方声明的 `DISCLAIMER.md`；网页版本见[第三方声明](#third-party-notices)和[免责声明](#disclaimer)。
 
-项目仍处于 `0.1.0.dev0` 开发预览阶段，依赖兼容性和外部后端仍需按实际环境复核。
+项目当前版本为 `0.1.1`，仍处于早期开发阶段；依赖兼容性和外部后端仍需按实际环境复核。
 
 第三方包的许可证不会自动成为 DNAKit 的许可证。
 

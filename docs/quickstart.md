@@ -19,7 +19,7 @@ dataset = dnakit.DNA(["ACGT", "TTAA"])
 edited = delete(dna, 1, 2)
 reversed_dna = reverse_complement(edited)
 
-print(dnakit.__version__)  # 0.1.0.dev0
+print(dnakit.__version__)  # 0.1.1
 print(dna.symbols)         # ACG
 print(dataset.ids)         # ('sequence_1', 'sequence_2')
 print(reversed_dna.symbols)

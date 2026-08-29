@@ -269,7 +269,7 @@ print(provenance.platform)
 - **示例结果：**
 
 ```text
-0.1.0.dev0
+0.1.1
 3.10.16
 Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
 ```

@@ -4,10 +4,10 @@ DNAKit 要求 Python 3.10 或更高版本。
 
 ## 从 PyPI 安装
 
-安装 `0.1.0.dev0` 开发预览版：
+安装 `0.1.1`：
 
 ```bash
-pip install dnakit==0.1.0.dev0
+pip install dnakit==0.1.1
 ```
 
 验证安装：
@@ -27,3 +27,7 @@ conda activate dnakit-dev
 
 开发环境包含测试、类型检查、文档和构建工具。可选功能的额外依赖见
 [`pyproject.toml`](https://github.com/mapengsen/DNAKit/blob/main/pyproject.toml)。
+
+# 仓库地址
+
+[github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)

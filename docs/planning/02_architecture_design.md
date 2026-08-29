@@ -16,9 +16,7 @@ dnakit/
 ├── pyproject.toml
 ├── README.md
 ├── LICENSE
-├── CITATION.cff
 ├── CHANGELOG.md
-├── CONTRIBUTING.md
 ├── environment-dev.yml
 ├── mkdocs.yml
 ├── src/

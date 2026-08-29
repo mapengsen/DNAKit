@@ -1,6 +1,14 @@
 # 更新日志
 
-本项目遵循语义化版本。`0.1.0.dev0` 是开发预览版，公开接口在首个正式版本前可能调整。
+本项目遵循语义化版本。当前仍处于早期开发阶段，公开接口可能继续调整。
+
+## [0.1.1] - 2026-08-29
+
+### Changed
+
+- 发布首个不含开发版本后缀的 DNAKit 版本。
+- 将第三方声明合并到 `DISCLAIMER.md`，将项目引用信息移至 `README.md`。
+- 精简根目录文件并同步更新安装、打包和发布配置。
 
 ## [0.1.0.dev0] - 2026-08-28
 
@@ -14,7 +22,7 @@
 - MkDocs 文档站启用中文站内搜索框、搜索建议和结果关键词高亮。
 - `ValidationConfig(sequence_length=...)`、`dnakit validate --sequence-length` 和工作流 `validate` 步骤现可按标准化后的精确 `symbol_length` 判定序列是否合法。
 - 根目录新增 MIT 许可证文件，版权人标注为 Pengsen Ma，并将许可证纳入发行归档。
-- 新增 `THIRD_PARTY_NOTICES.md`、`DISCLAIMER.md` 及文档站“致谢与引用”合并页，明确外部工具、用户数据、费用和非临床使用边界。
+- 新增 `DISCLAIMER.md`（含第三方声明）及文档站“致谢与引用”合并页，明确外部工具、用户数据、费用和非临床使用边界。
 - 有界 GenBank 子集、GFF3、BED3–6、AGP 2.1、普通 FASTA/严格四行 FASTQ 持久索引、坐标提取、分块迭代和元数据管理。
 - 以显式 `TableSchema` 有界读写 CSV/TSV/JSON/Parquet 的 `read_table()`、`export_table()` 和不可变审计结果。
 - 复杂度/重复描述符，motif/PWM、ORF、限制酶、PAM、CpG island、回文、倒置重复、串联重复、STR 和低复杂度扫描。

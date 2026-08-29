@@ -169,8 +169,6 @@ Primer3 不再进入正式验证器。CLI adapter 只用临时受控假可执行
 .gitignore
 .github/workflows/{ci.yml,release.yml,testpypi.yml}
 CHANGELOG.md
-CITATION.cff
-CONTRIBUTING.md
 MANIFEST.in
 README.md
 environment-dev.yml

@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Deterministic tools for DNA sequence analysis"
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE", "DISCLAIMER.md", "THIRD_PARTY_NOTICES.md"]
+license-files = ["LICENSE", "DISCLAIMER.md"]
 authors = [{ name = "DNAKit contributors" }]
 requires-python = ">=3.10"
 classifiers = [
