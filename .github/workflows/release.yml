@@ -274,7 +274,10 @@ jobs:
                   ), f"Native binary leaked: {name}"
                   if path.suffix.lower() == ".csv":
                       assert name.endswith(
-                          "/docs/planning/requirements_traceability.csv"
+                          (
+                              "/docs/planning/requirements_traceability.csv",
+                              "/docs/planning/database_capabilities.csv",
+                          )
                       ), f"Unexpected CSV leaked: {name}"
                   if "dnakit" in path.parts:
                       index = path.parts.index("dnakit")
