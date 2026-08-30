@@ -92,7 +92,7 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 | 功能 | 计算依据 | 参考文献或来源 |
 | --- | --- | --- |
-| THERMO-001 分子量 | 无水 DNA 残基质量求和、末端及 5′ 磷酸修正 | 当前实现记录的是标准寡核苷酸质量公式，尚未绑定原始论文；只在[验证报告](validation.md)中记录了 Biopython 数值对照，因此该对照不能替代科学来源引用。 |
+| THERMO-001 分子量 | 无水 DNA 残基质量求和、末端及 5′ 磷酸修正 | 当前实现记录的是标准寡核苷酸质量公式，尚未绑定原始论文；本地验证包含 Biopython 数值对照，但该对照不能替代科学来源引用。 |
 | THERMO-014 260 nm 消光系数 | 相邻二核苷酸 hypochromicity 参数之和减内部单碱基参数 | Warshaw & Tinoco, 1966，[DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X)；Cantor, Warshaw & Shapiro, 1970，[DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909)。 |
 | THERMO-002 Tm（Wallace） | `2 × (A+T) + 4 × (G+C)` 短寡核苷酸经验规则 | Wallace et al., 1979，[DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543)。当前实现尚未把该 DOI 写入结果 provenance，FAQ 在此补充文献关系。 |
 | THERMO-002 Tm（nearest-neighbor） | 相邻堆积、末端、对称性、盐浓度和链浓度模型 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |

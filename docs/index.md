@@ -2,11 +2,33 @@
 
 **DNAkit: A Comprehensive Toolkit for Efficient DNA Research**
 
-DNAKit 是面向 DNA 序列的可复现分析工具包。它提供统一对象、序列/注释 I/O、标准化、操作、描述符、模式扫描、热力学、指纹、相似度、数据集整理、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型提取 rep 后进行 k-means 聚类；不包含启动子活性、表达量、TF 结合强度或 CRISPR 编辑效率等任务型深度学习预测模型。
+<p align="center">
+  <a href="https://pypi.org/project/dnakit/">
+    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&label=PyPI&logo=pypi&cacheSeconds=300" alt="PyPI version">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda">
+    <img src="https://img.shields.io/badge/Bioconda-recipe-43B02A?logo=anaconda&logoColor=white" alt="Bioconda recipe">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit">
+    <img src="https://img.shields.io/badge/Galaxy-wrapper-2C3143?logo=galaxy&logoColor=white" alt="Galaxy wrapper">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
+    <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&logoColor=white" alt="GNU Guix package">
+  </a>
+</p>
 
+DNAKit 是面向 DNA 序列的可复现分析工具包。它提供统一对象、序列/注释 I/O、标准化、操作、描述符、模式扫描、热力学、指纹、相似度、数据集整理、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型提取 rep 后进行 k-means 聚类等操作。
 
 # 支持与社区
 
-**Github仓库：**
+**Github仓库：**[github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
 
-[github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
+# 引用 DNAKit
+
+DNAKit 尚未发布论文或 DOI；当前版本的中文引用信息保存在仓库 `README_CN.md` 中，可引用为：
+
+```text
+DNAKit contributors. DNAKit 0.1.2, 2026.
+```
+
+引用 DNAKit 不能替代对实际算法、参数集、后端和参考数据库的引用。项目使用的方法、论文、数据库和网站统一列在[致谢与主要来源](acknowledgements.md#acknowledgements)中；结果中的 `Provenance`、`BackendInfo`、`ReferenceLibrary` 和 `RunManifest` 用于保留这些信息。

@@ -31,7 +31,9 @@ def test_sequence_plot_is_valid_deterministic_svg_for_iupac() -> None:
     assert first.kind == "sequence"
     assert first.svg == second.svg
     assert first.sha256 == second.sha256
+    assert first.width == first.height
     assert "matplotlib" not in first.svg
+    assert not _nodes(first.svg, "text", "plot-title")
     bases = _nodes(first.svg, "text", "base")
     assert [node.text for node in bases] == list("ARYN")
 
@@ -77,6 +79,112 @@ def test_sequence_plot_can_show_iupac_complement() -> None:
 
     complements = _nodes(artifact.svg, "text", "complement")
     assert [node.text for node in complements] == list("TYRM")
+
+
+def test_sequence_plot_can_render_custom_symbols_without_changing_semantics() -> None:
+    source_map = {"A": "*", "T": "-", "C": "+", "G": "]"}
+    config = SequencePlotConfig(
+        bases_per_line=4,
+        show_complement=True,
+        symbol_map=source_map,
+    )
+    source_map["A"] = "!"
+
+    artifact = plot_sequence(DNASequence("ATCG"), config=config)
+    bases = _nodes(artifact.svg, "text", "base")
+    complements = _nodes(artifact.svg, "text", "complement")
+
+    assert [node.text for node in bases] == ["*", "-", "+", "]"]
+    assert [node.attrib["data-source-symbol"] for node in bases] == list("ATCG")
+    assert [node.attrib["fill"] for node in bases] == [
+        "#16a34a",
+        "#dc2626",
+        "#2563eb",
+        "#d97706",
+    ]
+    assert [node.attrib["data-coordinate"] for node in bases] == ["0", "1", "2", "3"]
+    assert [node.text for node in complements] == ["-", "*", "]", "+"]
+    assert [node.attrib["data-source-symbol"] for node in complements] == list("TAGC")
+    assert artifact.metadata["symbol_map"] == {"A": "*", "C": "+", "G": "]", "T": "-"}
+    assert config.symbol_map["A"] == "*"
+    assert hash(config)
+
+
+def test_sequence_plot_custom_symbols_fall_back_and_escape_xml() -> None:
+    artifact = plot_sequence(
+        DNASequence("AN", alphabet=DNAAlphabet.IUPAC),
+        config=SequencePlotConfig(symbol_map={"A": "<"}),
+    )
+
+    assert [node.text for node in _nodes(artifact.svg, "text", "base")] == ["<", "N"]
+    assert "&lt;" in artifact.svg
+
+
+@pytest.mark.parametrize(
+    "symbol_map",
+    [
+        [("A", "*")],
+        {"a": "*"},
+        {"U": "*"},
+        {"AA": "*"},
+        {"A": ""},
+        {"A": "++"},
+        {"A": " "},
+        {"A": "\x00"},
+        {"A": 1},
+    ],
+)
+def test_sequence_plot_rejects_invalid_symbol_map(symbol_map: object) -> None:
+    with pytest.raises(ConfigurationError) as error:
+        SequencePlotConfig(symbol_map=symbol_map)  # type: ignore[arg-type]
+    assert error.value.code == "INVALID_VISUALIZATION_SYMBOL_MAP"
+
+
+def test_sequence_plot_controls_line_and_column_spacing() -> None:
+    sequence = DNASequence("ACGTACGT")
+    default = plot_sequence(sequence, config=SequencePlotConfig(bases_per_line=4))
+    spaced = plot_sequence(
+        sequence,
+        config=SequencePlotConfig(
+            bases_per_line=4,
+            column_spacing=7,
+            line_spacing=19,
+        ),
+    )
+
+    bases = _nodes(spaced.svg, "text", "base")
+    assert float(bases[1].attrib["x"]) - float(bases[0].attrib["x"]) == 19
+    assert float(bases[4].attrib["y"]) - float(bases[0].attrib["y"]) == 81
+    assert spaced.width == spaced.height
+    assert default.width == default.height
+    assert spaced.metadata["column_spacing"] == 7
+    assert spaced.metadata["line_spacing"] == 19
+
+    wide = plot_sequence(
+        DNASequence("A" * 40),
+        config=SequencePlotConfig(
+            bases_per_line=40,
+            column_spacing=7,
+            show_coordinates=False,
+        ),
+    )
+    assert wide.width == 40 * 12 + 39 * 7 + 2 * 24
+    assert wide.height == wide.width
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("column_spacing", -1),
+        ("column_spacing", True),
+        ("line_spacing", -1),
+        ("line_spacing", 1.5),
+    ],
+)
+def test_sequence_plot_rejects_invalid_spacing(name: str, value: object) -> None:
+    with pytest.raises(ConfigurationError) as error:
+        SequencePlotConfig(**{name: value})  # type: ignore[arg-type]
+    assert error.value.code == "INVALID_VISUALIZATION_CONFIG"
 
 
 def test_sequence_highlight_priority_then_input_order_is_deterministic() -> None:

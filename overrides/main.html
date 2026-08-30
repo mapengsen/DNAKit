@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+  {% if i18n_page_locale in ["zh", "en"] %}
+    <script>
+      (() => {
+        const locale = {{ i18n_page_locale | tojson }};
+        const originalFetch = window.fetch.bind(window);
+
+        window.fetch = async (input, init) => {
+          const value = input instanceof Request ? input.url : input;
+          const url = new URL(value, document.baseURI);
+          if (!url.pathname.endsWith("/search/search_index.json")) {
+            return originalFetch(input, init);
+          }
+
+          const response = await originalFetch(input, init);
+          if (!response.ok) {
+            return response;
+          }
+
+          try {
+            const payload = await response.clone().json();
+            payload.docs = payload.docs.filter(({ location }) =>
+              locale === "en"
+                ? location === "en/" || location.startsWith("en/")
+                : !location.startsWith("en/")
+            );
+            payload.config.lang = [locale];
+
+            const headers = new Headers(response.headers);
+            headers.delete("content-length");
+            headers.set("content-type", "application/json");
+            return new Response(JSON.stringify(payload), {
+              status: response.status,
+              statusText: response.statusText,
+              headers,
+            });
+          } catch {
+            return response;
+          }
+        };
+      })();
+    </script>
+  {% endif %}
+  {{ super() }}
+{% endblock %}

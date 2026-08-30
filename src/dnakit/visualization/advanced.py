@@ -102,7 +102,7 @@ def plot_linear_map(
     title: str = "Linear DNA map",
     theme: SVGTheme | None = None,
 ) -> SVGArtifact:
-    """Draw a resolved linear coordinate axis and feature intervals."""
+    """Draw a resolved linear coordinate axis and feature intervals on a square canvas."""
 
     _bounded_integer(width, "width", minimum=120, maximum=_MAX_CANVAS_DIMENSION)
     _bounded_integer(height, "height", minimum=100, maximum=_MAX_CANVAS_DIMENSION)
@@ -114,9 +114,10 @@ def plot_linear_map(
     parts = _feature_parts(features, max_features)
     resolved_theme = _resolve_theme(theme)
     span = sequence.coordinate_span
+    canvas_size = max(width, height)
     builder = SVGBuilder(
-        width,
-        height,
+        canvas_size,
+        canvas_size,
         title=title,
         description="DNAKit linear DNA coordinate and feature map",
         kind="linear-map",
@@ -131,7 +132,7 @@ def plot_linear_map(
             ),
         },
     )
-    left, right, axis_y = 60, width - 40, height // 2
+    left, right, axis_y = 60, canvas_size - 40, canvas_size // 2
     builder.line(left, axis_y, right, axis_y, stroke=resolved_theme.foreground, stroke_width=3)
     scale = (right - left) / max(1, span)
     builder.text(left, axis_y + 28, 0, fill=resolved_theme.muted)
@@ -159,7 +160,7 @@ def plot_circular_map(
     title: str = "Circular DNA map",
     theme: SVGTheme | None = None,
 ) -> SVGArtifact:
-    """Draw a resolved circular molecule and angular feature arcs."""
+    """Draw a resolved circular molecule and angular feature arcs on a square canvas."""
 
     _bounded_integer(size, "size", minimum=100, maximum=_MAX_CANVAS_DIMENSION)
     _bounded_integer(max_features, "max_features", maximum=_MAX_MAP_PARTS)
@@ -259,7 +260,7 @@ def plot_alignment(
     max_columns: int = 20_000,
     theme: SVGTheme | None = None,
 ) -> SVGArtifact:
-    """Render aligned strings in fixed-width blocks with a match line."""
+    """Render aligned strings in fixed-width blocks on a square canvas."""
 
     if not isinstance(result, AlignmentResult):
         raise ConfigurationError("result must be AlignmentResult.")
@@ -277,10 +278,13 @@ def plot_alignment(
         raise ConfigurationError("Alignment exceeds max_columns.")
     resolved_theme = _resolve_theme(theme)
     blocks = max(1, math.ceil(result.alignment_length / columns_per_line))
-    width, height = max(640, columns_per_line * 10 + 100), 70 + blocks * 72
+    natural_width = max(640, columns_per_line * 10 + 100)
+    natural_height = 70 + blocks * 72
+    canvas_size = max(natural_width, natural_height)
+    vertical_offset = (canvas_size - natural_height) / 2
     builder = SVGBuilder(
-        width,
-        height,
+        canvas_size,
+        canvas_size,
         title="DNA alignment",
         description="DNAKit pairwise alignment",
         kind="alignment",
@@ -300,7 +304,7 @@ def plot_alignment(
             "|" if left == right and left != "-" else " "
             for left, right in zip(query, target, strict=True)
         )
-        y = 50 + block * 72
+        y = vertical_offset + 50 + block * 72
         builder.text(24, y, query, class_="aligned-query", fill=resolved_theme.foreground)
         builder.text(24, y + 20, matches, class_="match-line", fill=resolved_theme.accent)
         builder.text(24, y + 40, target, class_="aligned-target", fill=resolved_theme.foreground)

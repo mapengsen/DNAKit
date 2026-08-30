@@ -6,6 +6,7 @@ import importlib
 import os
 from collections.abc import Iterator
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -13,6 +14,7 @@ from dnakit.core import DNARecord, DNASequence
 from dnakit.exceptions import ConfigurationError
 from dnakit.visualization import (
     ImageExportConfig,
+    ImageExportFormat,
     SaveConfig,
     build_html_report,
     plot_sequence,
@@ -95,13 +97,18 @@ def test_save_svg_atomic_link_failure_leaves_no_target_or_temporary_file(
 
 @pytest.mark.parametrize(
     ("suffix", "magic", "expected_format"),
-    [("png", b"\x89PNG", "png"), ("tiff", b"II*\x00", "tiff"), ("pdf", b"%PDF", "pdf")],
+    [
+        ("png", b"\x89PNG", "png"),
+        ("jpg", b"\xff\xd8\xff", "jpg"),
+        ("tiff", b"II*\x00", "tiff"),
+        ("pdf", b"%PDF", "pdf"),
+    ],
 )
 def test_save_image_optional_backend_exports_600_dpi_formats(
     tmp_path: Path, suffix: str, magic: bytes, expected_format: str
 ) -> None:
     pytest.importorskip("cairosvg")
-    if suffix == "tiff":
+    if suffix in {"png", "jpg", "tiff"}:
         pytest.importorskip("PIL")
     target = tmp_path / f"sequence.{suffix}"
     result = save_image(
@@ -112,7 +119,119 @@ def test_save_image_optional_backend_exports_600_dpi_formats(
 
     assert target.read_bytes().startswith(magic)
     assert result.format == expected_format
+    assert (
+        result.target_artifact.media_type
+        == {
+            "png": "image/png",
+            "jpg": "image/jpeg",
+            "tiff": "image/tiff",
+            "pdf": "application/pdf",
+        }[expected_format]
+    )
     assert result.target_artifact.byte_size == target.stat().st_size
+
+
+def test_save_image_defaults_extensionless_target_to_png(tmp_path: Path) -> None:
+    pytest.importorskip("cairosvg")
+    pytest.importorskip("PIL")
+    target = tmp_path / "sequence"
+
+    result = save_image(plot_sequence(DNASequence("ACGT")), target)
+
+    resolved_target = target.with_suffix(".png")
+    assert resolved_target.read_bytes().startswith(b"\x89PNG")
+    assert result.format == "png"
+    assert result.target_artifact.media_type == "image/png"
+    assert result.target_artifact.relative_path == os.path.relpath(
+        resolved_target.resolve(), Path.cwd()
+    )
+
+
+def test_save_image_applies_target_dpi_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cairosvg = pytest.importorskip("cairosvg")
+    image_module = pytest.importorskip("PIL.Image")
+    original_svg2png = cairosvg.svg2png
+    rendered_dpi: list[int] = []
+
+    def capture_svg2png(**parameters: object) -> bytes:
+        rendered_dpi.append(parameters["dpi"])  # type: ignore[arg-type]
+        return cast(bytes, original_svg2png(**parameters))
+
+    monkeypatch.setattr(cairosvg, "svg2png", capture_svg2png)
+    target = tmp_path / "sequence.png"
+    save_image(
+        plot_sequence(DNASequence("ACGT")),
+        target,
+        config=ImageExportConfig(dpi=600, width=320),
+    )
+
+    assert rendered_dpi == [96]
+    with image_module.open(target) as image:
+        assert image.size == (320, 320)
+        assert image.info["dpi"] == pytest.approx((600, 600), abs=0.01)
+
+
+def test_image_export_rejects_non_square_explicit_dimensions() -> None:
+    with pytest.raises(ConfigurationError) as error:
+        ImageExportConfig(width=320, height=240)
+
+    assert error.value.code == "INVALID_VISUALIZATION_CONFIG"
+
+
+@pytest.mark.parametrize(
+    ("image_type", "expected_suffix", "expected_format", "magic"),
+    [
+        ("png", ".png", "png", b"\x89PNG"),
+        ("svg", ".svg", "svg", b"<svg"),
+        ("jpg", ".jpg", "jpg", b"\xff\xd8\xff"),
+    ],
+)
+def test_save_image_selects_png_svg_or_jpg_and_adds_extension(
+    tmp_path: Path,
+    image_type: ImageExportFormat,
+    expected_suffix: str,
+    expected_format: str,
+    magic: bytes,
+) -> None:
+    if image_type != "svg":
+        pytest.importorskip("cairosvg")
+        pytest.importorskip("PIL")
+    target = tmp_path / f"sequence-{image_type}"
+
+    result = save_image(
+        plot_sequence(DNASequence("ACGT")),
+        target,
+        image_type=image_type,
+    )
+
+    resolved_target = target.with_suffix(expected_suffix)
+    assert resolved_target.read_bytes().startswith(magic)
+    assert result.format == expected_format
+
+
+def test_save_image_rejects_type_extension_mismatch_and_invalid_type(tmp_path: Path) -> None:
+    artifact = plot_sequence(DNASequence("ACGT"))
+
+    with pytest.raises(ConfigurationError) as mismatch_error:
+        save_image(artifact, tmp_path / "sequence.svg", image_type="jpg")
+    assert mismatch_error.value.code == "INVALID_VISUALIZATION_FORMAT"
+
+    with pytest.raises(ConfigurationError) as invalid_error:
+        save_image(artifact, tmp_path / "sequence", image_type="gif")  # type: ignore[arg-type]
+    assert invalid_error.value.code == "INVALID_VISUALIZATION_FORMAT"
+
+
+def test_save_image_rejects_transparent_jpg(tmp_path: Path) -> None:
+    with pytest.raises(ConfigurationError) as error:
+        save_image(
+            plot_sequence(DNASequence("ACGT")),
+            tmp_path / "sequence",
+            image_type="jpg",
+            config=ImageExportConfig(transparent=True),
+        )
+    assert error.value.code == "INVALID_VISUALIZATION_CONFIG"
 
 
 def test_save_image_rejects_pixel_limit_before_backend_conversion(tmp_path: Path) -> None:

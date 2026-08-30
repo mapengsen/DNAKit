@@ -148,7 +148,7 @@ class VisualizationSaveResult:
             raise ConfigurationError("source_sha256 must contain 64 hexadecimal digits.")
         if not isinstance(target_artifact, ArtifactRef):
             raise ConfigurationError("target_artifact must be ArtifactRef.")
-        if format not in {"svg", "png", "tiff", "pdf", "html"}:
+        if format not in {"svg", "png", "jpg", "tiff", "pdf", "html"}:
             raise ConfigurationError("Unknown visualization output format.")
         if not isinstance(overwritten, bool):
             raise ConfigurationError("overwritten must be a boolean.")

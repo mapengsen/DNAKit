@@ -2,6 +2,17 @@
 
 本项目遵循语义化版本。当前仍处于早期开发阶段，公开接口可能继续调整。
 
+## [Unreleased]
+
+## [0.1.2] - 2026-08-30
+
+### Changed
+
+- 可视化统一导出接口新增 JPG，支持通过 `image_type` 选择 PNG、SVG 或 JPG，无扩展名时默认导出 PNG；`SequencePlotConfig` 新增 `column_spacing`、`line_spacing` 和 `symbol_map`，可控制文字列间距、序列行间距及 DNA/IUPAC 显示字符；所有绘图改为无装饰性图内标题的正方形画布。
+- GitHub 仓库首页和 PyPI 项目说明默认改为英文，并保留简体中文切换入口。
+- 文档站提供完整中英文页面、导航和独立搜索结果，站内跳转保持当前语言。
+- 新增 Bioconda、GNU Guix 与 Galaxy Tool Shed 的发布适配文件，并精简旧规划、演示和交付报告文档。
+
 ## [0.1.1] - 2026-08-29
 
 ### Changed

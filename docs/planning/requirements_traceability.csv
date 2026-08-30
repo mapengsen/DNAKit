@@ -151,13 +151,13 @@ EVAL-014,150,12. 常用评价指标,综合评分,0.2-0.4-ADVANCED,native,,comple
 EVAL-015,151,12. 常用评价指标,参考库追踪,0.2-0.4-ADVANCED,native,adapter,complete,provenance,ReferenceLibrary强制保存名称、版本、来源、日期、内容digest、filters和index_parameters
 VIZ-001,152,13. 可视化,序列文字图,0.1-MVP,native,adapter,complete,,plot_sequence生成确定性独立SVG并覆盖空序列和IUPAC
 VIZ-002,153,13. 可视化,位置高亮,0.1-MVP,native,adapter,complete,,Highlight支持0-based半开symbol坐标、优先级、标签和颜色
-VIZ-003,154,13. 可视化,样式控制,0.1-MVP,native,adapter,complete,,SVGTheme及各图配置支持颜色、字号、尺寸、标题和显示上限
+VIZ-003,154,13. 可视化,样式控制,0.1-MVP,native,adapter,complete,,SVGTheme及各图配置支持颜色、字号、正方形尺寸、无障碍标题和显示上限且不绘制装饰性图内标题；SequencePlotConfig以column_spacing和line_spacing独立控制文字列间距与序列行间距
 VIZ-004,155,13. 可视化,Gap显示,0.1-MVP,native,adapter,complete,,已知和未知Gap以不展开的标签显示并保留可解析坐标状态
 VIZ-005,156,13. 可视化,线性序列图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_linear_map绘制resolved linear coordinate轴与feature interval track，并记录未解析feature数量
 VIZ-006,157,13. 可视化,环状DNA图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_circular_map绘制环状backbone、feature arc、全圈feature和bp长度
 VIZ-008,158,13. 可视化,Alignment图,0.2-0.4-ADVANCED,native,adapter,complete,,plot_alignment消费预计算AlignmentResult并分块显示query、match line和target
 VIZ-009,159,13. 可视化,相似度矩阵,0.1-MVP,native,adapter,complete,,plot_similarity_matrix消费有界SimilarityMatrixResult并保留方向性和标签顺序
-VIZ-014,160,13. 可视化,图片导出,0.1-MVP,native,adapter,complete,,原生SVG及可选CairoSVG/Pillow PNG、TIFF、PDF均支持原子写出、600 dpi、像素上限、SHA-256和覆盖策略
+VIZ-014,160,13. 可视化,图片导出,0.1-MVP,native,adapter,complete,,save_image支持image_type选择PNG、SVG或JPG且无扩展名时默认PNG；绘图产物与光栅输出保持正方形；原有TIFF/PDF兼容并保留原子写出、600 dpi、像素上限、SHA-256和覆盖策略
 VIZ-015,161,13. 可视化,交互报告,0.2-0.4-ADVANCED,native,adapter,complete,,build_html_report将调用方显式提供的记录和结果生成自包含、可搜索、可展开且HTML-escaped的本地报告，CSP禁止网络并有输入、结果和输出字节上限
 VIZ-016,162,13. 可视化,数据导出,0.1-MVP,native,adapter,complete,table_io,export_table/export_result原子导出四格式且read_table提供对称有界读取；PyArrow 25.0.1的DNAKit Parquet往返已测试
 ENG-001,163,14. 后端、性能与可复现性,统一后端接口,0.1-MVP,native,,partial,,BackendRegistry、BackendInfo和统一异常已实现；Primer3、NUPACK与显式Dashing具科学计算adapter，BLAST/MMseqs2/sourmash仍只有被动metadata/version句柄；尚未形成覆盖全部候选外部后端的统一执行层
@@ -183,3 +183,4 @@ DATA-027,182,10. 去重、聚类与数据划分,神经网络聚类,0.2-0.4-ADVAN
 EVAL-016,183,12. 常用评价指标,Fréchet DNA distance,0.2-0.4-ADVANCED,reimplementation,adapter,conditional,model_representations,evaluate_frechet_distance默认复用DATA-027的LucaOne mean-pooling表征与L2归一化，以等价样本空间cross-Gram核范数计算两集合高斯Fréchet距离；不称为ChemNet FCD，不同模型或checkpoint不可比较，真实LucaOne运行受显式远程代码授权、依赖和硬件条件限制
 EVAL-017,184,12. 常用评价指标,Frag,0.2-0.4-ADVANCED,reimplementation,adapter,complete,kmer_statistics,evaluate_fragment_similarity按MOSES Frag公式计算两个集合exact k-mer出现次数向量的余弦相似度；以fixed-length DNA k-mer代替BRICS片段，默认canonical 3-mer，数值不可与分子Frag直接比较
 EVAL-018,185,12. 常用评价指标,SNN,0.2-0.4-ADVANCED,reimplementation,adapter,complete,hashed_kmer_fingerprint,evaluate_snn按MOSES SNN公式计算每条生成DNA到参考集合最近邻的binary Tanimoto相似度均值；默认canonical 7-mer和1024位SHA-256哈希指纹，数值不可与Morgan-fingerprint SNN直接比较
+VIZ-007,186,13. 可视化,自定义字符表示,0.1-MVP,native,,complete,,SequencePlotConfig.symbol_map将大写DNA或IUPAC符号映射为单个可见字符；未映射符号保持原样，坐标、高亮、互补关系和碱基颜色继续使用原始符号

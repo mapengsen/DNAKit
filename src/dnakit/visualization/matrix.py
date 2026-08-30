@@ -73,7 +73,7 @@ def plot_similarity_matrix(
     *,
     config: HeatmapConfig | None = None,
 ) -> SVGArtifact:
-    """Render an existing matrix in its original order without mirroring it."""
+    """Render a matrix on a title-free square canvas without mirroring it."""
 
     if not isinstance(result, SimilarityMatrixResult):
         raise TypeError("result must be SimilarityMatrixResult.")
@@ -133,8 +133,9 @@ def plot_similarity_matrix(
     top_gutter = 190 if resolved.show_labels and labels else 60
     legend_width = 80
     matrix_size = max(1, len(indices)) * resolved.cell_size
-    width = label_gutter + matrix_size + legend_width + 28
-    height = top_gutter + matrix_size + 42
+    natural_width = label_gutter + matrix_size + legend_width + 28
+    natural_height = top_gutter + matrix_size + 42
+    canvas_size = max(natural_width, natural_height)
     metadata = {
         "display_indices": indices,
         "displayed_items": len(indices),
@@ -147,30 +148,18 @@ def plot_similarity_matrix(
         "value_min": lower,
     }
     builder = SVGBuilder(
-        width,
-        height,
+        canvas_size,
+        canvas_size,
         title=title,
         description="Heatmap of a precomputed DNA similarity or distance matrix.",
         kind="similarity-matrix",
         theme=resolved.theme,
         metadata=metadata,
     )
-    builder.text(
-        width / 2,
-        28,
-        title,
-        fill=resolved.theme.foreground,
-        font_family=resolved.theme.font_family,
-        font_size=16,
-        font_weight="bold",
-        text_anchor="middle",
-        class_="plot-title",
-    )
-
     if not indices:
         builder.text(
-            width / 2,
-            height / 2,
+            canvas_size / 2,
+            canvas_size / 2,
             "Empty matrix",
             fill=resolved.theme.muted,
             font_family=resolved.theme.font_family,

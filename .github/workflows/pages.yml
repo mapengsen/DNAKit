@@ -39,7 +39,7 @@ jobs:
       - name: Build documentation strictly
         env:
           PYTHONNOUSERSITE: "1"
-        run: python -m mkdocs build --strict
+        run: python -m mkdocs build --strict --config-file mkdocs.yml
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4

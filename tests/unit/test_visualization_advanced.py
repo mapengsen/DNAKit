@@ -31,6 +31,8 @@ def test_linear_and_circular_maps_are_valid_deterministic_svg() -> None:
     ET.fromstring(circular_artifact.svg)
     assert linear_artifact.kind == "linear-map"
     assert circular_artifact.kind == "circular-map"
+    assert linear_artifact.width == linear_artifact.height
+    assert circular_artifact.width == circular_artifact.height
     assert plot_circular_map(circular).svg == circular_artifact.svg
 
 
@@ -41,6 +43,7 @@ def test_alignment_plot_uses_precomputed_result() -> None:
     root = ET.fromstring(artifact.svg)
     assert root.attrib["data-kind"] == "alignment"
     assert artifact.metadata["columns"] == result.alignment_length
+    assert artifact.width == artifact.height
 
 
 def test_full_circle_feature_is_rendered_and_plot_parameters_are_validated() -> None:

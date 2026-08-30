@@ -2,7 +2,7 @@ site_name: DNAKit
 site_url: https://mapengsen.github.io/DNAKit/
 site_description: 面向 DNA 序列的确定性分析工具包
 site_author: DNAKit contributors
-copyright: Support by Pengsen Ma (Hunan University, Yuelushan Laboratory)
+copyright: Support by Pengsen Ma (Hunan University, Yuelushan Laboratory), https://github.com/mapengsen/DNAKit
 docs_dir: docs
 site_dir: site
 strict: true
@@ -22,6 +22,7 @@ not_in_nav: |
 theme:
   name: material
   language: zh
+  custom_dir: overrides
   logo: assets/images/DNAKit-icon.png
   favicon: assets/images/DNAKit-icon.png
   font: false
@@ -34,8 +35,74 @@ theme:
     - search.highlight
 
 plugins:
-  - search:
-      lang: zh
+  - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: zh
+          default: true
+          name: 简体中文
+          build: true
+        - locale: en
+          name: English
+          build: true
+          site_description: A reproducible toolkit for DNA sequence analysis
+          nav:
+            - Home: index.md
+            - Installation: installation.md
+            - Quick Start Tutorial:
+                - Feature Tree Overview: api/features/function_tree.md
+                - Feature Module Index: api/features/index.md
+                - 1. Data Preparation:
+                    - (1) Core Data Objects: api/features/01_core_objects.md
+                    - (2) File I/O: api/features/02_io_data.md
+                    - (3) Downloads: api/features/15_download.md
+                    - (4) Data Queries: api/features/22_database_query.md
+                    - (5) Validation: api/features/03_validation.md
+                - 2. Data Processing:
+                    - (1) DNA Sequence Standardization: api/features/03_standardization.md
+                    - (2) Intra-sequence Operations:
+                        - OPS-001 Sequence Direction Completion: api/features/04_ops_001_sequence_direction.md
+                        - OPS-002 Transcription and Translation: api/features/04_ops_002_transcription_translation.md
+                        - OPS-003 Subsequence Extraction: api/features/04_ops_003_subsequence_extraction.md
+                        - OPS-004 Sequence Editing: api/features/04_ops_004_sequence_editing.md
+                        - OPS-005 Sequence Generation: api/features/04_ops_005_mutation_generation.md
+                        - OPS-006 Sequence Concatenation: api/features/04_ops_006_sequence_concatenation.md
+                        - OPS-007:
+                            - Trimming: api/features/04_ops_007_trimming.md
+                            - Masking: api/features/04_ops_007_masking.md
+                        - OPS-008 Circular Sequence Operations: api/features/04_ops_008_circular_sequence_operations.md
+                        - OPS-010 Sequence Chunking: api/features/17_sequence_chunking.md
+                    - (3) Sequence Deduplication: api/features/10_deduplication.md
+                    - (4) Sequence Clustering: api/features/10_clustering.md
+                    - (5) Dataset Preparation and Splitting: api/features/10_datasets.md
+                - 3. Data Analysis:
+                    - (1) DNA Descriptors, Representations, and Fingerprints:
+                        - DNA Descriptors: api/features/05_all_descriptors.md
+                        - Sequence Representations: api/features/08_fingerprints.md
+                        - DNA Fingerprints: api/features/08_feature_engineering.md
+                    - (2) Sequence Search:
+                        - General Search: api/features/09_search.md
+                        - Functional Sequence Search: api/features/06_patterns.md
+                    - (3) Physicochemical Properties: api/features/07_physicochemical.md
+                    - (4) Duplex Thermodynamics: api/features/19_duplex_thermodynamics.md
+                    - (5) Secondary Structure: api/features/20_secondary_structure.md
+                    - (6) 3D Structure and Mechanics: api/features/21_structure3d.md
+                    - (7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
+                - 4. Data Evaluation:
+                    - (1) Common Evaluation Metrics: api/features/12_evaluation.md
+                    - (2) Similarity Calculation: api/features/09_similarity_alignment.md
+                    - (3) Sequence Distance and Alignment: api/features/09_alignment.md
+                - 5. Visualization: api/features/13_visualization.md
+                - 6. Engineering and Extensions: api/features/14_engineering.md
+            - API Reference:
+                - API Overview: api/index.md
+            - Changelog: changelog.md
+            - FAQ: faq.md
+            - Acknowledgements: acknowledgements.md
   - mkdocstrings:
       handlers:
         python:
@@ -73,6 +140,7 @@ nav:
           - （2）文件读写: api/features/02_io_data.md
           - （3）下载: api/features/15_download.md
           - （4）数据查询: api/features/22_database_query.md
+          - （5）合法性检查: api/features/03_validation.md
       - 2. 数据处理:
           - （1）DNA序列标准化: api/features/03_standardization.md
           - （2）序列内操作:
@@ -113,4 +181,4 @@ nav:
       - API 总览: api/index.md
   - 更新日志: changelog.md
   - FAQ: faq.md
-  - 致谢与引用: acknowledgements.md
+  - 致谢: acknowledgements.md

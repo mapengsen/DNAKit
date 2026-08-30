@@ -1,15 +1,16 @@
+<p align="right">
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/README_CN.md">简体中文</a> | <strong>English</strong>
+</p>
+
 <p align="center">
   <img alt="DNAKit logo" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/DNAKit-icon.png" width="40%">
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/dnakit/">
-    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&amp;label=PyPI&amp;cacheSeconds=300" alt="PyPI version">
-  </a>
   <a href="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml">
     <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status">
   </a>
-  <a href="https://mapengsen.github.io/DNAKit/">
+  <a href="https://mapengsen.github.io/DNAKit/en/">
     <img src="https://img.shields.io/badge/docs-GitHub%20Pages-4051b5" alt="Documentation">
   </a>
   <a href="https://www.python.org/downloads/">
@@ -21,61 +22,85 @@
 </p>
 
 <p align="center">
-  <strong>DNAkit: A Comprehensive Toolkit for Efficient DNA Research</strong>
+  <a href="https://pypi.org/project/dnakit/">
+    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&amp;label=PyPI&amp;logo=pypi&amp;cacheSeconds=300" alt="PyPI version">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda">
+    <img src="https://img.shields.io/badge/Bioconda-recipe-43B02A?logo=anaconda&amp;logoColor=white" alt="Bioconda recipe">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit">
+    <img src="https://img.shields.io/badge/Galaxy-wrapper-2C3143?logo=galaxy&amp;logoColor=white" alt="Galaxy wrapper">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
+    <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&amp;logoColor=white" alt="GNU Guix package">
+  </a>
 </p>
 
-# DNAKit 是什么？
+<p align="center">
+  <strong>DNAKit: A Comprehensive Toolkit for Efficient DNA Research</strong>
+</p>
 
-DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA 领域的 RDKit”。它覆盖标准化、文件与注释格式、基础操作、描述符、模式扫描、热力学、指纹、相似度、聚类与数据划分、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型提取 rep 后进行 k-means 聚类等各种各样的操作。
+# What is DNAKit?
 
-# 安装与快速入门
+DNAKit is a reproducible Python toolkit for DNA sequence analysis, positioned as an "RDKit for
+DNA." It covers standardization, sequence and annotation formats, basic operations, descriptors,
+pattern scanning, thermodynamics, fingerprints, similarity analysis, clustering and dataset
+splitting, comprehensive evaluation, molecular-biology simulation, and visualization. DNA
+foundation models can optionally be used to extract representations for k-means clustering.
 
-安装当前版本：
+# Installation and quick start
+
+Install the current release:
 
 ```bash
-pip install dnakit==0.1.1
+pip install dnakit==0.1.2
 ```
 
-如果需要参与开发，克隆仓库后通过 Conda 创建完整环境：
+To contribute to development, clone the repository and create the complete Conda environment:
 
 ```bash
 conda env create -f environment-dev.yml
 conda activate dnakit-dev
 ```
 
-随后可以阅读 [Python 快速入门指南](https://mapengsen.github.io/DNAKit/quickstart/)。
+Then explore the [feature tree](https://mapengsen.github.io/DNAKit/en/api/features/function_tree/).
 
-# 更多发布平台
+# Additional distribution platforms
 
-仓库已提供 [Bioconda 与 GNU Guix 配方](https://github.com/mapengsen/DNAKit/tree/main/packaging)
-以及 [Galaxy Tool Shed 包装器](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)。这些文件已固定对应
-`0.1.1`；在各平台审核通过前，仍请使用上面的 PyPI 安装方式。
+The repository provides [Bioconda and GNU Guix recipes](https://github.com/mapengsen/DNAKit/tree/main/packaging)
+and a [Galaxy Tool Shed wrapper](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit).
+These files target `0.1.1`. Until they are reviewed and published by their respective platforms,
+use the PyPI installation method above.
 
-# 文档
+# Documentation
 
-完整文档位于 [DNAKit 文档首页](https://mapengsen.github.io/DNAKit/)，所有功能模块可在 [功能树总览](https://mapengsen.github.io/DNAKit/api/features/function_tree/) 中查看，常见问题见 [FAQ](https://mapengsen.github.io/DNAKit/faq/)。
+The complete English documentation is available from the
+[DNAKit documentation homepage](https://mapengsen.github.io/DNAKit/en/), including the
+[feature tree](https://mapengsen.github.io/DNAKit/en/api/features/function_tree/) and
+[FAQ](https://mapengsen.github.io/DNAKit/en/faq/).
 
-# 支持与社区
+# Support and community
 
-**Github仓库：**
+**GitHub repository:**
 
 [github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
 
-如果有问题、意见或建议，可以先查看：
+For questions, feedback, or suggestions, see:
 
-- [常见问题](https://mapengsen.github.io/DNAKit/faq/)
+- [FAQ](https://mapengsen.github.io/DNAKit/en/faq/)
 - [GitHub Issues](https://github.com/mapengsen/DNAKit/issues)
 
-# 更新日志
+# Changelog
 
-详细版本更新记录请查看 [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md)。
+See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) for release notes.
 
-# 引用
+# Citation
 
-DNAKit 的项目论文尚未发表。当前版本可引用为：
+The DNAKit project paper has not yet been published. Cite the current version as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.1, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.2, 2026. https://github.com/mapengsen/DNAKit
 ```
 
-正式论文发表后，此处将更新为论文引用信息。使用具体算法、数据库或可选后端时，还应引用其对应来源。
+This section will be updated after the paper is published. When using specific algorithms,
+databases, or optional backends, cite their corresponding sources as well.

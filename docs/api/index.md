@@ -2,13 +2,11 @@
 
 本页列出当前源码中已实现、可导入并有测试覆盖的公开命名空间。所有坐标除格式转换处明确说明外，均为 0-based 半开区间。
 
-如果希望按当前追踪矩阵的 186 项功能逐项查看作用、输入、示例、输出和状态，请从[功能模块索引](features/index.md)进入。
+如果希望按当前追踪矩阵的 185 项功能逐项查看作用、输入、示例、输出和状态，请从[功能模块索引](features/index.md)进入。
 
 ## 顶层与核心对象 {#core-objects}
 
 普通用户只需从 `dnakit` 顶层使用 `DNA`：一条或多条序列、ID、feature、metadata 和拓扑都由 `DNA(...)` 的输入及可选参数确定，返回类型不变。`DNASequence`、`DNARecord`、`DNASet` 保留为高级内部模型和旧代码兼容接口。
-
-构造、读取、验证和序列/记录重复方法的逐项处理见[API 简化审计](../planning/08_api_simplification_audit.md)。
 
 ::: dnakit
 
@@ -308,7 +306,7 @@ if designer.info.available:
 
 ::: dnakit.visualization
 
-SVG 原生生成；`save_image()` 的 PNG/TIFF/PDF 需要 `viz` extra。`build_html_report()` 可将调用方显式提供的结果渲染为自包含、可筛选、可展开的只读 HTML。
+SVG 原生生成，所有绘图使用无装饰性图内标题的正方形画布；配置中的 `title` 仅用于 SVG 无障碍说明。`save_image()` 可选择 PNG、SVG 或 JPG，无扩展名且未指定 `image_type` 时默认 PNG。PNG/JPG 需要 `viz` extra，原有 TIFF/PDF 继续兼容。`build_html_report()` 可将调用方显式提供的结果渲染为自包含、可筛选、可展开的只读 HTML。
 
 ## 批处理、缓存、后端和工作流 {#engineering}
 

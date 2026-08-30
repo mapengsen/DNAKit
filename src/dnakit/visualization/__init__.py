@@ -13,7 +13,13 @@ from dnakit.visualization.config import (
     SequencePlotConfig,
     SVGTheme,
 )
-from dnakit.visualization.export import PathLike, save_html_report, save_image, save_svg
+from dnakit.visualization.export import (
+    ImageExportFormat,
+    PathLike,
+    save_html_report,
+    save_image,
+    save_svg,
+)
 from dnakit.visualization.matrix import plot_similarity_matrix
 from dnakit.visualization.report import build_html_report
 from dnakit.visualization.results import HTMLReportArtifact, SVGArtifact, VisualizationSaveResult
@@ -24,6 +30,7 @@ __all__ = [
     "HeatmapConfig",
     "Highlight",
     "ImageExportConfig",
+    "ImageExportFormat",
     "LimitPolicy",
     "PathLike",
     "SVGArtifact",

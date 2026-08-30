@@ -1,4 +1,4 @@
-"""Atomic persistence for standalone SVG visualization artifacts."""
+"""Atomic multi-format persistence for standalone visualization artifacts."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
 from types import TracebackType
-from typing import BinaryIO, Protocol, TypeAlias, cast
+from typing import BinaryIO, Literal, Protocol, TypeAlias, cast
 
 from dnakit.core.provenance import ArtifactRef
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
@@ -20,6 +20,25 @@ from .config import ImageExportConfig, SaveConfig
 from .results import HTMLReportArtifact, SVGArtifact, VisualizationSaveResult
 
 PathLike: TypeAlias = str | os.PathLike[str]
+ImageExportFormat: TypeAlias = Literal["png", "svg", "jpg", "jpeg", "tiff", "pdf"]
+_SVG_CSS_DPI = 96
+
+_FORMAT_BY_SUFFIX = {
+    ".svg": "svg",
+    ".png": "png",
+    ".jpg": "jpg",
+    ".jpeg": "jpg",
+    ".tif": "tiff",
+    ".tiff": "tiff",
+    ".pdf": "pdf",
+}
+_SUFFIX_BY_FORMAT = {
+    "svg": ".svg",
+    "png": ".png",
+    "jpg": ".jpg",
+    "tiff": ".tiff",
+    "pdf": ".pdf",
+}
 
 
 class _CairoSVGModule(Protocol):
@@ -51,6 +70,8 @@ class _PILImage(Protocol):
         exception: BaseException | None,
         traceback: TracebackType | None,
     ) -> bool | None: ...
+
+    def convert(self, mode: str) -> _PILImage: ...
 
     def save(self, stream: BinaryIO, *, format: str, **parameters: object) -> None: ...
 
@@ -197,15 +218,64 @@ def _svg_payload(artifact: SVGArtifact, *, transparent: bool) -> bytes:
     return cast(bytes, ET.tostring(root, encoding="utf-8", xml_declaration=False))
 
 
+def _resolve_image_target(
+    target: PathLike,
+    image_type: ImageExportFormat | None,
+) -> tuple[Path, str]:
+    path = Path(target)
+    selected_format: str | None = None
+    if image_type is not None:
+        if not isinstance(image_type, str):
+            raise TypeError("image_type must be a string or None.")
+        selected_format = image_type.lower()
+        if selected_format == "jpeg":
+            selected_format = "jpg"
+        if selected_format not in _SUFFIX_BY_FORMAT:
+            raise ConfigurationError(
+                "image_type must be png, svg, jpg, jpeg, tiff, or pdf.",
+                code="INVALID_VISUALIZATION_FORMAT",
+                context={"image_type": image_type},
+            )
+
+    suffix = path.suffix.lower()
+    if not suffix:
+        output_format = "png" if selected_format is None else selected_format
+        return path.with_suffix(_SUFFIX_BY_FORMAT[output_format]), output_format
+
+    suffix_format = _FORMAT_BY_SUFFIX.get(suffix)
+    if suffix_format is None:
+        raise ConfigurationError(
+            "Visualization output must end with .png, .svg, .jpg, .jpeg, .tif, .tiff, or .pdf.",
+            code="INVALID_VISUALIZATION_FORMAT",
+            context={"target": str(path)},
+        )
+    if selected_format is not None and selected_format != suffix_format:
+        raise ConfigurationError(
+            "image_type does not match the output path extension.",
+            code="INVALID_VISUALIZATION_FORMAT",
+            context={
+                "image_type": selected_format,
+                "target": str(path),
+                "target_format": suffix_format,
+            },
+        )
+    return path, suffix_format
+
+
 def _convert_image(
     artifact: SVGArtifact, output_format: str, config: ImageExportConfig
 ) -> tuple[bytes, int, int]:
+    if output_format == "jpg" and config.transparent:
+        raise ConfigurationError(
+            "JPG output does not support transparency.",
+            code="INVALID_VISUALIZATION_CONFIG",
+        )
     width, height = _target_dimensions(artifact, config)
     try:
         cairosvg = cast(_CairoSVGModule, importlib.import_module("cairosvg"))
     except ImportError as exc:
         raise BackendUnavailableError(
-            "PNG, TIFF, and PDF export requires the optional visualization backend.",
+            "PNG, JPG, TIFF, and PDF export requires the optional visualization backend.",
             code="VISUALIZATION_BACKEND_UNAVAILABLE",
             hint="Install DNAKit with the 'viz' extra.",
         ) from exc
@@ -220,7 +290,7 @@ def _convert_image(
         return payload, width, height
     png = cairosvg.svg2png(
         bytestring=source,
-        dpi=config.dpi,
+        dpi=_SVG_CSS_DPI,
         output_width=width,
         output_height=height,
     )
@@ -228,7 +298,7 @@ def _convert_image(
         image_module = cast(_PILImageModule, importlib.import_module("PIL.Image"))
     except ImportError as exc:
         raise BackendUnavailableError(
-            "PNG and TIFF export require Pillow from the optional visualization extra.",
+            "PNG, JPG, and TIFF export require Pillow from the optional visualization extra.",
             code="VISUALIZATION_BACKEND_UNAVAILABLE",
             hint="Install DNAKit with the 'viz' extra.",
         ) from exc
@@ -236,6 +306,14 @@ def _convert_image(
     with image_module.open(BytesIO(png)) as image:
         if output_format == "png":
             image.save(output, format="PNG", dpi=(config.dpi, config.dpi))
+        elif output_format == "jpg":
+            with image.convert("RGB") as rgb_image:
+                rgb_image.save(
+                    output,
+                    format="JPEG",
+                    quality=95,
+                    dpi=(config.dpi, config.dpi),
+                )
         else:
             image.save(output, format="TIFF", compression="tiff_lzw", dpi=(config.dpi, config.dpi))
     return output.getvalue(), width, height
@@ -245,9 +323,16 @@ def save_image(
     artifact: SVGArtifact,
     target: PathLike,
     *,
+    image_type: ImageExportFormat | None = None,
     config: ImageExportConfig | None = None,
 ) -> VisualizationSaveResult:
-    """Atomically export an SVG artifact as SVG, PNG, TIFF, or PDF."""
+    """Atomically export an SVG artifact, defaulting to PNG for extensionless targets.
+
+    ``image_type`` selects PNG, SVG, JPG, TIFF, or PDF. When ``target`` has no
+    extension, the matching extension is added automatically and PNG is used if
+    ``image_type`` is omitted. Existing callers may continue selecting a format
+    through the target extension alone.
+    """
 
     if not isinstance(artifact, SVGArtifact):
         raise TypeError("artifact must be SVGArtifact.")
@@ -256,21 +341,7 @@ def save_image(
     resolved = ImageExportConfig() if config is None else config
     if not isinstance(resolved, ImageExportConfig):
         raise TypeError("config must be ImageExportConfig or None.")
-    path = Path(target)
-    suffix = path.suffix.lower()
-    format_by_suffix = {
-        ".svg": "svg",
-        ".png": "png",
-        ".tif": "tiff",
-        ".tiff": "tiff",
-        ".pdf": "pdf",
-    }
-    output_format = format_by_suffix.get(suffix)
-    if output_format is None:
-        raise ConfigurationError(
-            "Visualization output must end with .svg, .png, .tif, .tiff, or .pdf.",
-            code="INVALID_VISUALIZATION_FORMAT",
-        )
+    path, output_format = _resolve_image_target(target, image_type)
     if output_format == "svg":
         return save_svg(
             artifact,
@@ -284,7 +355,12 @@ def save_image(
         overwrite=resolved.overwrite,
         create_parents=resolved.create_parents,
     )
-    media_type = {"png": "image/png", "tiff": "image/tiff", "pdf": "application/pdf"}[output_format]
+    media_type = {
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "tiff": "image/tiff",
+        "pdf": "application/pdf",
+    }[output_format]
     digest = hashlib.sha256(payload).hexdigest()
     target_artifact = _artifact_ref(
         path,
@@ -346,4 +422,4 @@ def save_html_report(
     )
 
 
-__all__ = ["PathLike", "save_html_report", "save_image", "save_svg"]
+__all__ = ["ImageExportFormat", "PathLike", "save_html_report", "save_image", "save_svg"]

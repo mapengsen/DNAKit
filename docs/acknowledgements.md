@@ -1,6 +1,6 @@
-# 致谢与引用 {#acknowledgements-and-citations}
+# 致谢
 
-本页合并 DNAKit 的主要来源、项目引用方式、许可证、第三方使用边界和免责声明，便于集中查阅与追溯。
+本页汇总 DNAKit 的主要来源、许可证、第三方使用边界和免责声明，便于集中查阅与追溯。
 
 ## 致谢与主要来源 {#acknowledgements}
 
@@ -140,23 +140,13 @@ DNAKit 按 MIT 许可证“按原样”提供，不作明示或默示担保，�
 
 DNAKit 不保证第三方资源免费、持续可用、适合商业用途或允许再分发。条款和费用可能变化，使用时应查看官方页面。具体分发边界见[第三方声明](#third-party-notices)。
 
-## 引用与许可证 {#citations-and-license}
-
-### 引用 DNAKit {#citing-dnakit}
-
-DNAKit 尚未发布论文或 DOI；当前版本的引用信息保存在仓库 `README.md` 中，可引用为：
-
-```text
-DNAKit contributors. DNAKit 0.1.1, 2026.
-```
-
-引用 DNAKit 不能替代对实际算法、参数集、后端和参考数据库的引用。项目使用的方法、论文、数据库和网站统一列在[致谢与主要来源](#acknowledgements)中；结果中的 `Provenance`、`BackendInfo`、`ReferenceLibrary` 和 `RunManifest` 用于保留这些信息。
+## 许可证 {#licenses}
 
 ### 项目许可证 {#project-license}
 
 DNAKit 自身采用 MIT 许可证，版权人为 Pengsen Ma，完整文本见仓库根目录的 `LICENSE`。SPDX 标识符为 `MIT`。安装包包含合并了第三方声明的 `DISCLAIMER.md`；网页版本见[第三方声明](#third-party-notices)和[免责声明](#disclaimer)。
 
-项目当前版本为 `0.1.1`，仍处于早期开发阶段；依赖兼容性和外部后端仍需按实际环境复核。
+项目当前版本为 `0.1.2`，仍处于早期开发阶段；依赖兼容性和外部后端仍需按实际环境复核。
 
 第三方包的许可证不会自动成为 DNAKit 的许可证。
 
@@ -226,5 +216,3 @@ Primer3 不再是 Python 依赖，也不在任何 extra 中。当前 `dnakit-dev
 | REBASE/JASPAR 等数据库 | 不随包再分发；由用户按许可提供并记录版本、日期、筛选和 checksum |
 | DiProDB/二核苷酸参数表 | 不内置任何 DiProDB 数值；用户按固定 JSON schema 提供其有权使用的 15×16 表，结果记录表名、版本、来源声明和 SHA-256 |
 | DNA 基础模型 checkpoint | 仅在用户显式调用 rep API 时下载到 `ckpt/`，不随包分发；逐模型核对 checkpoint/源码条款，远程代码默认拒绝；当前只完成 GROVER 真实 smoke |
-
-更详细的可用性判定见[条件与不可用功能](planning/04_conditional_and_unavailable_features.md)。

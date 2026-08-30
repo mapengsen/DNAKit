@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import cast
 
+from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 
 _COLOR_PATTERN = re.compile(r"^(?:#[0-9A-Fa-f]{3,8}|[A-Za-z][A-Za-z0-9_-]*)$")
 _FONT_PATTERN = re.compile(r"^[A-Za-z0-9 _,-]+$")
+_DNA_DISPLAY_SYMBOLS = frozenset("ACGTRYSWKMBDHVN")
 
 
 class LimitPolicy(str, Enum):
@@ -67,6 +71,50 @@ def _title(value: str | None, name: str = "title") -> None:
         )
 
 
+def _is_xml_character(value: str) -> bool:
+    codepoint = ord(value)
+    return (
+        0x20 <= codepoint <= 0xD7FF
+        or 0xE000 <= codepoint <= 0xFFFD
+        or 0x10000 <= codepoint <= 0x10FFFF
+    )
+
+
+def _symbol_map(value: Mapping[str, str]) -> FrozenDict:
+    if not isinstance(value, Mapping):
+        raise ConfigurationError(
+            "symbol_map must be a mapping.",
+            code="INVALID_VISUALIZATION_SYMBOL_MAP",
+            context={"value_type": type(value).__name__},
+        )
+    resolved: dict[str, str] = {}
+    for source_symbol, display_symbol in value.items():
+        if (
+            not isinstance(source_symbol, str)
+            or len(source_symbol) != 1
+            or source_symbol not in _DNA_DISPLAY_SYMBOLS
+        ):
+            raise ConfigurationError(
+                "symbol_map keys must be uppercase DNA or IUPAC symbols.",
+                code="INVALID_VISUALIZATION_SYMBOL_MAP",
+                context={"source_symbol": repr(source_symbol)},
+            )
+        if (
+            not isinstance(display_symbol, str)
+            or len(display_symbol) != 1
+            or display_symbol.isspace()
+            or not display_symbol.isprintable()
+            or not _is_xml_character(display_symbol)
+        ):
+            raise ConfigurationError(
+                "symbol_map values must each be one visible XML character.",
+                code="INVALID_VISUALIZATION_SYMBOL_MAP",
+                context={"source_symbol": source_symbol},
+            )
+        resolved[source_symbol] = display_symbol
+    return FrozenDict({symbol: resolved[symbol] for symbol in sorted(resolved)})
+
+
 def _coerce_policy(value: LimitPolicy | str, *, allowed: set[LimitPolicy]) -> LimitPolicy:
     try:
         policy = value if isinstance(value, LimitPolicy) else LimitPolicy(value)
@@ -110,7 +158,14 @@ class SVGTheme:
 
 @dataclass(frozen=True, slots=True)
 class SequencePlotConfig:
-    """Layout and safety limits for the gap-aware sequence text plot."""
+    """Layout and safety limits for the gap-aware sequence text plot.
+
+    ``column_spacing`` adds horizontal pixels between adjacent text columns,
+    while ``line_spacing`` adds vertical pixels between adjacent sequence rows.
+    ``symbol_map`` replaces rendered DNA/IUPAC symbols without changing sequence
+    coordinates, highlights, complements, or base colors. ``title`` supplies
+    SVG accessibility text and is not drawn inside the square plot canvas.
+    """
 
     bases_per_line: int = 60
     max_symbols: int = 10_000
@@ -122,9 +177,12 @@ class SequencePlotConfig:
     font_size: int = 14
     cell_width: int = 12
     line_height: int = 62
+    column_spacing: int = 0
+    line_spacing: int = 0
     margin: int = 24
     title: str | None = None
     theme: SVGTheme = field(default_factory=SVGTheme)
+    symbol_map: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         for name in (
@@ -137,6 +195,8 @@ class SequencePlotConfig:
             "margin",
         ):
             _positive_int(getattr(self, name), name)
+        for name in ("column_spacing", "line_spacing"):
+            _non_negative_int(getattr(self, name), name)
         _non_negative_int(self.start_coordinate, "start_coordinate")
         for name in ("show_coordinates", "show_complement"):
             if not isinstance(getattr(self, name), bool):
@@ -148,6 +208,11 @@ class SequencePlotConfig:
             raise ConfigurationError("theme must be SVGTheme.")
         object.__setattr__(
             self,
+            "symbol_map",
+            cast(Mapping[str, str], _symbol_map(self.symbol_map)),
+        )
+        object.__setattr__(
+            self,
             "limit_policy",
             _coerce_policy(self.limit_policy, allowed={LimitPolicy.ERROR, LimitPolicy.TRUNCATE}),
         )
@@ -155,7 +220,10 @@ class SequencePlotConfig:
 
 @dataclass(frozen=True, slots=True)
 class HeatmapConfig:
-    """Limits and color scale for matrix and fingerprint heatmaps."""
+    """Limits and color scale for square matrix and fingerprint heatmaps.
+
+    ``title`` supplies SVG accessibility text and is not drawn inside the plot.
+    """
 
     cell_size: int = 18
     max_rows: int = 200
@@ -221,7 +289,11 @@ class SaveConfig:
 
 @dataclass(frozen=True, slots=True)
 class ImageExportConfig:
-    """Safe raster/PDF export settings for the optional graphics backend."""
+    """Safe raster/PDF export settings for the optional graphics backend.
+
+    When both ``width`` and ``height`` are supplied, they must be equal so
+    exports from DNAKit's square plot artifacts remain square.
+    """
 
     dpi: int = 600
     width: int | None = None
@@ -238,6 +310,11 @@ class ImageExportConfig:
             value = getattr(self, name)
             if value is not None:
                 _positive_int(value, name)
+        if self.width is not None and self.height is not None and self.width != self.height:
+            raise ConfigurationError(
+                "width and height must be equal for square image output.",
+                code="INVALID_VISUALIZATION_CONFIG",
+            )
         for name in ("transparent", "overwrite", "create_parents"):
             if not isinstance(getattr(self, name), bool):
                 raise ConfigurationError(

@@ -47,6 +47,8 @@ def test_similarity_heatmap_preserves_directional_matrix_values_and_order() -> N
     ]
     assert triples == [("0", "0", "1"), ("0", "1", "1"), ("1", "0", "0.5"), ("1", "1", "1")]
     assert artifact.metadata["symmetric"] is False
+    assert artifact.width == artifact.height
+    assert not _nodes(artifact.svg, "text", "plot-title")
 
 
 def test_similarity_heatmap_escapes_labels_and_keeps_full_label_in_data() -> None:

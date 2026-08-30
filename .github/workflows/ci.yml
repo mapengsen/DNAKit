@@ -77,7 +77,7 @@ jobs:
       - name: Build documentation strictly
         env:
           PYTHONNOUSERSITE: "1"
-        run: python -m mkdocs build --strict
+        run: python -m mkdocs build --strict --config-file mkdocs.yml
 
       - name: Run local correctness validation
         env:

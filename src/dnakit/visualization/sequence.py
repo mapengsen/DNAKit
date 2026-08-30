@@ -203,7 +203,8 @@ def plot_sequence(
 
     Highlight coordinates always refer to ``DNASequence.symbols`` and therefore
     exclude :class:`~dnakit.core.Gap` spans.  Record features are deliberately
-    not rendered implicitly; linear feature maps remain an advanced module.
+    not rendered implicitly; linear feature maps remain an advanced module. The
+    result uses a square canvas without a visible decorative title.
     """
 
     sequence, sequence_id, feature_count = _coerce_input(value)
@@ -279,55 +280,55 @@ def plot_sequence(
     )
     coordinate_gutter = 72 if resolved.show_coordinates else 0
     max_columns = max((row.columns for row in rows), default=20)
-    width = max(
+    content_width = (
+        max_columns * resolved.cell_width + max(0, max_columns - 1) * resolved.column_spacing
+    )
+    natural_width = max(
         420,
         resolved.margin * 2
         + coordinate_gutter * (2 if resolved.show_coordinates else 0)
-        + max_columns * resolved.cell_width,
+        + content_width,
     )
     row_height = resolved.line_height + (resolved.font_size + 8 if resolved.show_complement else 0)
-    title_height = resolved.font_size + 32
-    height = max(
+    row_count = max(1, len(rows))
+    content_height = row_count * row_height + max(0, len(rows) - 1) * resolved.line_spacing
+    natural_height = max(
         120,
-        resolved.margin * 2 + title_height + max(1, len(rows)) * row_height,
+        resolved.margin * 2 + content_height,
     )
+    canvas_size = max(natural_width, natural_height)
+    layout_left = (canvas_size - natural_width) / 2
+    content_top = (canvas_size - content_height) / 2
     metadata = {
         "coordinate_space": "symbol-highlights; sequence-span-labels",
+        "column_spacing": resolved.column_spacing,
         "display_start_coordinate": resolved.start_coordinate,
         "displayed_symbols": display_limit,
         "feature_count_not_rendered": feature_count,
         "gap_count": len(gaps),
         "highlight_count": len(highlight_tuple),
+        "line_spacing": resolved.line_spacing,
         "sequence_id": sequence_id,
+        "symbol_map": dict(resolved.symbol_map),
         "symbol_length": sequence.symbol_length,
         "topology": sequence.topology.value,
         "truncated": truncated,
         "unknown_gap_count": sum(gap.length is None for gap in gaps),
     }
     builder = SVGBuilder(
-        width,
-        height,
+        canvas_size,
+        canvas_size,
         title=title,
         description="Gap-aware DNA symbol text plot in input order.",
         kind="sequence",
         theme=resolved.theme,
         metadata=metadata,
     )
-    builder.text(
-        resolved.margin,
-        resolved.margin + resolved.font_size,
-        title,
-        fill=resolved.theme.foreground,
-        font_family=resolved.theme.font_family,
-        font_size=resolved.font_size + 2,
-        font_weight="bold",
-        class_="plot-title",
-    )
 
     if not rows:
         builder.text(
-            width / 2,
-            height / 2,
+            canvas_size / 2,
+            canvas_size / 2,
             "Empty sequence",
             fill=resolved.theme.muted,
             font_family=resolved.theme.font_family,
@@ -344,11 +345,11 @@ def plot_sequence(
         "T": "#dc2626",
     }
     for row_index, row in enumerate(rows):
-        y = resolved.margin + title_height + row_index * row_height + resolved.font_size
-        x = resolved.margin + coordinate_gutter
+        y = content_top + row_index * (row_height + resolved.line_spacing) + resolved.font_size
+        x = layout_left + resolved.margin + coordinate_gutter
         if resolved.show_coordinates:
             builder.text(
-                resolved.margin,
+                layout_left + resolved.margin,
                 y,
                 _coordinate_label(row.cells[0].coordinate_start, resolved.start_coordinate),
                 fill=resolved.theme.muted,
@@ -356,8 +357,11 @@ def plot_sequence(
                 font_size=max(9, resolved.font_size - 2),
                 class_="coordinate coordinate-start",
             )
-        for cell in row.cells:
-            cell_width = cell.columns * resolved.cell_width
+        for cell_index, cell in enumerate(row.cells):
+            cell_width = (
+                cell.columns * resolved.cell_width
+                + max(0, cell.columns - 1) * resolved.column_spacing
+            )
             if cell.is_gap:
                 builder.rect(
                     x,
@@ -390,6 +394,7 @@ def plot_sequence(
                 assert cell.symbol_index is not None
                 active = _active_highlight(cell.symbol_index, highlight_tuple)
                 foreground = base_colors.get(cell.text, resolved.theme.muted)
+                display_symbol = resolved.symbol_map.get(cell.text, cell.text)
                 if active is not None:
                     highlight_index, highlight = active
                     builder.rect(
@@ -418,31 +423,36 @@ def plot_sequence(
                 builder.text(
                     x + cell_width / 2,
                     y,
-                    cell.text,
+                    display_symbol,
                     fill=foreground,
                     font_family=resolved.theme.font_family,
                     font_size=resolved.font_size,
                     font_weight="bold",
                     text_anchor="middle",
                     class_="base",
+                    data_source_symbol=cell.text,
                     data_symbol_index=cell.symbol_index,
                     data_coordinate=_coordinate_label(
                         cell.coordinate_start, resolved.start_coordinate
                     ),
                 )
                 if resolved.show_complement:
+                    complement_symbol = cell.text.translate(_COMPLEMENT)
                     builder.text(
                         x + cell_width / 2,
                         y + resolved.font_size + 8,
-                        cell.text.translate(_COMPLEMENT),
+                        resolved.symbol_map.get(complement_symbol, complement_symbol),
                         fill=foreground,
                         font_family=resolved.theme.font_family,
                         font_size=resolved.font_size,
                         text_anchor="middle",
                         class_="complement",
+                        data_source_symbol=complement_symbol,
                         data_symbol_index=cell.symbol_index,
                     )
             x += cell_width
+            if cell_index + 1 < len(row.cells):
+                x += resolved.column_spacing
         if resolved.show_coordinates:
             builder.text(
                 x + 8,

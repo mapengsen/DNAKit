@@ -51,7 +51,7 @@
 
 ## 5) 可视化
 
-- [可视化](13_visualization.md)（VIZ-001–006、VIZ-008–009）
+- [可视化](13_visualization.md)（VIZ-001–009）
 
 ## 6) 工程化与扩展
 
