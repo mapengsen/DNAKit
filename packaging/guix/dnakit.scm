@@ -26,7 +26,6 @@
   (propagated-inputs
    (list python-pyyaml
          python-rich
-         python-tomli
          python-typer))
   (home-page "https://github.com/mapengsen/DNAKit")
   (synopsis "Deterministic tools for DNA sequence analysis")
