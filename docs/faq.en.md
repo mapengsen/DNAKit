@@ -166,3 +166,28 @@ These references illustrate the sources of algorithms and parameters and do not 
 | 6. Dye and modification correction | `Σcount×Δε`, `Σcount×ΔMW`, and `Σlabel-peak×correction-factor` | DNAKit does not have a built-in dye parameter table and only does deterministic addition and subtraction, so there is no unified paper. The caller must document authentic experimental, literature, or manufacturer sources for each parameter. |
 
 The above citations only indicate the sources of algorithms, parameters or external tools. For free energy, hypochromicity, dye correction, or 3DNA/DSSR/NUPACK outputs provided by the caller, the actual parameter table, software version, input conditions, and data source must also be documented.
+
+## What are the references for deep-learning property prediction? {#deep-learning-property-prediction-references}
+
+The following table covers the primary model papers used by all 27 functions integrated in [deep-learning property prediction](api/features/23_deep_learning_property_prediction.md). Multiple output heads share one model paper, so the same citation is not repeated for every function.
+
+| Functions | Reference |
+| --- | --- |
+| RNA-seq, CAGE, PRO-cap, ATAC-seq, DNase-seq, ChIP-seq, splicing, and contact maps | Avsec et al., *Advancing regulatory variant effect prediction with AlphaGenome*, **Nature** 649, 1206–1218 (2026), [DOI 10.1038/s41586-025-10014-0](https://doi.org/10.1038/s41586-025-10014-0). |
+| Human and mouse regulatory tracks | Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x). |
+| Foundation encoder for 14-class single-nucleotide genome segmentation | Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z). |
+| Trained 14-class single-nucleotide genome segmentation head | de Almeida et al., *Annotating the genome at single-nucleotide resolution with DNA foundation models*, **Nature Methods** (2025), [DOI 10.1038/s41592-025-02881-2](https://doi.org/10.1038/s41592-025-02881-2). |
+| Long-context zero-shot variant effects and exon probability | Brixi et al., *Genome modelling and design across all domains of life with Evo 2*, **Nature** (2026), [DOI 10.1038/s41586-026-10176-5](https://doi.org/10.1038/s41586-026-10176-5). |
+| Allele-conditional-probability variant effects | Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272); Li et al., *GENERator-v2: Reconciling Coarse Tokenization with Single-Nucleotide Resolution in Genomic Language Modeling*, **bioRxiv** (2026), [DOI 10.64898/2026.01.27.702015](https://doi.org/10.64898/2026.01.27.702015). |
+| Central dogma, taxonomy, species, protein localization/stability, ncRNA family, and pair-interaction tasks | He et al., *Generalized biological foundation model with unified nucleic acid and protein language*, **Nature Machine Intelligence** 7, 942–953 (2025), [DOI 10.1038/s42256-025-01044-4](https://doi.org/10.1038/s42256-025-01044-4). |
+
+Direct inference also depends on the following released code or trained weights:
+
+- The 11 genomic-track tasks: [AlphaGenome research](https://github.com/google-deepmind/alphagenome_research) and [`google/alphagenome-all-folds`](https://huggingface.co/google/alphagenome-all-folds).
+- Human/mouse regulatory tracks: the [official Enformer implementation](https://github.com/google-deepmind/deepmind-research/tree/master/enformer) and [`EleutherAI/enformer-official-rough`](https://huggingface.co/EleutherAI/enformer-official-rough).
+- Single-nucleotide genome segmentation: the [Nucleotide Transformer repository](https://github.com/instadeepai/nucleotide-transformer) and [`InstaDeepAI/segment_nt`](https://huggingface.co/InstaDeepAI/segment_nt).
+- Zero-shot variant effects/exon probability: the [Evo 2 repository](https://github.com/ArcInstitute/evo2), [`arcinstitute/evo2_7b`](https://huggingface.co/arcinstitute/evo2_7b), [`arcinstitute/evo2_7b_base`](https://huggingface.co/arcinstitute/evo2_7b_base), and [`schmojo/evo2-exon-classifier`](https://huggingface.co/schmojo/evo2-exon-classifier).
+- Allele-conditional-probability variant effects: the [GENERator repository](https://github.com/GenerTeam/GENERator) and [`GenerTeam/GENERator-v2-eukaryote-1.2b-base`](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base).
+- Nucleic-acid/protein downstream tasks: [LucaOne](https://github.com/LucaOne/LucaOne), [LucaOneTasks](https://github.com/LucaOne/LucaOneTasks), and [Zenodo 10.5281/zenodo.15171943](https://doi.org/10.5281/zenodo.15171943).
+
+These citations identify the model, trained task-head, and checkpoint sources. They do not make a prediction equivalent to an experimental measurement or a clinical conclusion.

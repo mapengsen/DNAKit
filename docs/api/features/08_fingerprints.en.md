@@ -93,6 +93,8 @@ print(first.hashes == second.hashes, len(first.hashes))
 True 2
 ```
 
+<a id="neural-representations"></a>
+
 ## 5) Neural network representation
 
 - **Function:** Use the pre-trained DNA basic model to compress each sequence into a fixed-length floating point vector for clustering, retrieval or downstream machine learning; the meaning of the vector depends on the model, checkpoint and pooling configuration.

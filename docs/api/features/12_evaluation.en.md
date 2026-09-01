@@ -83,6 +83,8 @@ print(report.metrics["cluster_count"])
 3
 ```
 
+<a id="eval-008-novelty"></a>
+
 ## 4) `EVAL-008` Novelty
 
 **Reference library example preparation:**

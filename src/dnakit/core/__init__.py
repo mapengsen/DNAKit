@@ -37,7 +37,7 @@ from dnakit.core.provenance import (
     RunManifest,
 )
 from dnakit.core.record import DNARecord
-from dnakit.core.results import MetricResult, Uncertainty
+from dnakit.core.results import MetricResult, ProviderResult, Uncertainty
 from dnakit.core.sequence import DNASequence
 
 __all__ = [
@@ -67,6 +67,7 @@ __all__ = [
     "MetricResult",
     "OriginClass",
     "Provenance",
+    "ProviderResult",
     "ReferenceInfo",
     "RunManifest",
     "Strand",

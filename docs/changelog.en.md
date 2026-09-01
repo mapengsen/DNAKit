@@ -4,6 +4,15 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-01
+
+### Added
+
+- Added pretrained property-prediction APIs for AlphaGenome, Enformer, Evo 2, GENERator, LucaOneTasks, and SegmentNT, with explicit model-download, remote-code, and output-size boundaries.
+- Added capability-named optional APIs for Ensembl VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate, with the backend installed on demand through `dnakit[external-tools]`.
+- Added `dnakit[agent]`, the `dnakit-mcp` command, and a compact MCP catalog with public-function discovery, schema lookup, safety confirmation, and bounded JSON execution.
+- Added bilingual WeChat community pages and documentation navigation entries.
+
 ## [0.1.2] - 2026-08-30
 
 ### Changed

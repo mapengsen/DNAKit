@@ -24,7 +24,7 @@ conda install -c conda-forge -c bioconda dnakit
 ## GNU Guix
 
 [`guix/dnakit.scm`](guix/dnakit.scm) 是可独立加载的 Guix 包定义，包名为
-`python-dnakit`，同样使用 PyPI 源码包和固定哈希。
+`python-dnakit`，使用 GitHub 版本标签源码和固定哈希。
 
 在安装了 Guix 的系统中验证和安装：
 

@@ -2,6 +2,8 @@
 
 DNAKit 目前提供两种 DNA 指纹计算方法。每一位只有 `0` 或 `1`，可直接用于 Tanimoto/Jaccard 相似度、检索、聚类和去重。
 
+<a id="1-hashed-k-mer"></a>
+
 ## 1) Hashed k-mer 位指纹
 
 - **作用：** 提取序列中出现的 k-mer，并将其稳定哈希到固定长度 0/1 位向量，用于 Tanimoto/Jaccard 相似度、聚类和检索，同时避免显式 `4^k` 特征空间过大。

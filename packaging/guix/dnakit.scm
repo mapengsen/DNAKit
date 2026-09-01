@@ -4,7 +4,7 @@
              (gnu packages python-build)
              (gnu packages python-xyz)
              (guix build-system pyproject)
-             (guix download)
+             (guix git-download)
              ((guix licenses) #:prefix license:)
              (guix packages))
 
@@ -13,10 +13,13 @@
   (version "0.1.1")
   (source
    (origin
-     (method url-fetch)
-     (uri (pypi-uri "dnakit" version))
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/mapengsen/DNAKit")
+           (commit (string-append "v" version))))
+     (file-name (git-file-name name version))
      (sha256
-      (base32 "1jyz4fiibh21nwq2gdi4i4xjz5ryii9bnvd3xgxrzmj9kc0idmp7"))))
+      (base32 "1cra4r62x0fzwsjlbhc3gl5985dlh3p74y9v77idbmbnd76jmv2w"))))
   (build-system pyproject-build-system)
   (native-inputs
    (list python-numpy

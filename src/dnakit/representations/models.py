@@ -227,7 +227,7 @@ MODEL_REGISTRY: dict[str, DNAEmbeddingModel] = {
         chunk_length=70_000,
         chunk_unit="bp",
         default_pooling="mean",
-        required_package="evo2>=0.5.3,<0.6",
+        required_package="evo2>=0.5.3,<0.7",
         output_dimension=4_096,
         allow_patterns=_HF_MODEL_PATTERNS,
         evo2_layer="blocks.28.mlp.l3",

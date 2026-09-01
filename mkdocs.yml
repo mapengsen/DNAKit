@@ -92,6 +92,8 @@ plugins:
                     - (5) Secondary Structure: api/features/20_secondary_structure.md
                     - (6) 3D Structure and Mechanics: api/features/21_structure3d.md
                     - (7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
+                    - (8) Deep-learning Property Prediction: api/features/23_deep_learning_property_prediction.md
+                    - (9) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
                 - 4. Data Evaluation:
                     - (1) Common Evaluation Metrics: api/features/12_evaluation.md
                     - (2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -100,8 +102,10 @@ plugins:
                 - 6. Engineering and Extensions: api/features/14_engineering.md
             - API Reference:
                 - API Overview: api/index.md
+            - Agent and MCP Tools: agent_tools.md
             - Changelog: changelog.md
             - FAQ: faq.md
+            - WeChat Community: wechat.md
             - Acknowledgements: acknowledgements.md
   - mkdocstrings:
       handlers:
@@ -171,6 +175,8 @@ nav:
           - （5）二级结构性质: api/features/20_secondary_structure.md
           - （6）三维结构与力学性质: api/features/21_structure3d.md
           - （7）换算: api/features/18_optics_concentration.md
+          - （8）深度学习性质预测: api/features/23_deep_learning_property_prediction.md
+          - （9）可选生物信息功能: api/features/24_optional_bioinformatics.md
       - 4. 数据评价:
           - （1）常用评价指标: api/features/12_evaluation.md
           - （2）相似度计算: api/features/09_similarity_alignment.md
@@ -179,6 +185,8 @@ nav:
       - 6. 工程化与扩展: api/features/14_engineering.md
   - API 参考:
       - API 总览: api/index.md
+  - Agent 与 MCP 工具: agent_tools.md
   - 更新日志: changelog.md
   - FAQ: faq.md
+  - 微信社区: wechat.md
   - 致谢: acknowledgements.md

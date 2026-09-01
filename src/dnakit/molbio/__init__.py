@@ -2,6 +2,13 @@
 
 from .assembly import AssemblyFragment, simulate_assembly
 from .crispr import scan_crispr_candidates
+from .golden_gate import (
+    GoldenGateAssemblyEnzyme,
+    GoldenGateDesignEnzyme,
+    GoldenGateInput,
+    assemble_golden_gate,
+    design_golden_gate,
+)
 from .optimization import (
     CodonUsageTable,
     RuleOptimizationConfig,
@@ -63,6 +70,9 @@ __all__ = [
     "DigestFragment",
     "EndDescriptor",
     "EndTypeResult",
+    "GoldenGateAssemblyEnzyme",
+    "GoldenGateDesignEnzyme",
+    "GoldenGateInput",
     "LigationCompatibilityResult",
     "LigationFragment",
     "LigationResult",
@@ -84,8 +94,10 @@ __all__ = [
     "SequenceChange",
     "SequenceVariant",
     "as_ligation_fragment",
+    "assemble_golden_gate",
     "check_end_compatibility",
     "classify_restriction_end",
+    "design_golden_gate",
     "digest_restriction",
     "generate_mutation_library",
     "ligate_fragments",

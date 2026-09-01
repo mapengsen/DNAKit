@@ -172,3 +172,29 @@ except DNAKitError as error:
 INVALID_ALPHABET
 {'alphabet': 'strict', 'part_index': 0, 'part_offset': 1, 'symbol': 'X'}
 ```
+
+## 8) `ENG-013` Agents and MCP
+
+- **Function:** Convert stable public functions into searchable, inspectable, and callable MCP tools while reusing the existing DNAKit implementations.
+- **API**: `dnakit-mcp`, `dnakit.tools.default_tool_registry()`, and `dnakit.tools.create_server()`.
+- **Input**: A tool name and JSON arguments matching the generated schema; file writes, model downloads, and external programs also require explicit authorization.
+- **Sample Code**:
+
+```python
+from dnakit.tools import default_tool_registry
+
+registry = default_tool_registry()
+result = registry.execute(
+    "dnakit.thermodynamics.molecular_weight",
+    {"sequence": "ACGT"},
+)
+print(result["value_dalton"])
+```
+
+- **Example result:**
+
+```text
+1173.84
+```
+
+See [Agent and MCP tools](../../agent_tools.md) for client configuration.

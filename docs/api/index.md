@@ -200,6 +200,24 @@ checkpoint 自带代码，因此标准后端仍要求显式设置 `allow_remote_
 [神经网络表征](features/08_fingerprints.md#neural-representations)；rep → k-means 见
 [神经网络聚类](features/10_clustering.md#data-027-neural-clustering)。
 
+## 深度学习性质预测 {#deep-learning-property-prediction}
+
+::: dnakit.predictions
+
+`predict_properties()` 统一调度只使用官方已训练权重即可直接运行的任务，包括
+AlphaGenome、Enformer、SegmentNT、Evo 2、GENERator 和 LucaOneTasks。模型、任务、
+输入类型、依赖与输出解释见[深度学习性质预测](features/23_deep_learning_property_prediction.md)。
+
+## 可选生物信息功能 {#optional-bioinformatics}
+
+::: dnakit.annotation
+
+::: dnakit.comparative
+
+VEP、ClinVar、dbSNP、gnomAD、dN/dS 和 Golden Gate
+均通过按功能命名的方法调用；默认安装不加载可选后端。完整入口和安装方式见
+[可选生物信息功能](features/24_optional_bioinformatics.md)。
+
 ## 相似度、搜索和比对 {#similarity-alignment}
 
 ::: dnakit.similarity

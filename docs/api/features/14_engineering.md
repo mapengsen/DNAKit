@@ -172,3 +172,29 @@ except DNAKitError as error:
 INVALID_ALPHABET
 {'alphabet': 'strict', 'part_index': 0, 'part_offset': 1, 'symbol': 'X'}
 ```
+
+## 8) `ENG-013` Agent 与 MCP
+
+- **作用：** 将稳定公开功能转换成 Agent 可搜索、可描述和可调用的 MCP 工具，同时复用现有 DNAKit 实现。
+- **API**：`dnakit-mcp`、`dnakit.tools.default_tool_registry()`、`dnakit.tools.create_server()`。
+- **输入**：工具名称、符合自动生成 Schema 的 JSON 参数；文件写入、模型下载和外部程序还需显式授权。
+- **示例代码**：
+
+```python
+from dnakit.tools import default_tool_registry
+
+registry = default_tool_registry()
+result = registry.execute(
+    "dnakit.thermodynamics.molecular_weight",
+    {"sequence": "ACGT"},
+)
+print(result["value_dalton"])
+```
+
+- **示例结果：**
+
+```text
+1173.84
+```
+
+Agent 客户端配置见 [Agent 与 MCP 工具](../../agent_tools.md)。

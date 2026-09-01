@@ -93,6 +93,8 @@ print(first.hashes == second.hashes, len(first.hashes))
 True 2
 ```
 
+<a id="neural-representations"></a>
+
 ## 5) 神经网络表征
 
 - **作用：** 使用预训练 DNA 基础模型把每条序列压缩为固定长度浮点向量，用于聚类、检索或下游机器学习；向量含义取决于模型、checkpoint 和 pooling 配置。

@@ -131,4 +131,56 @@ class MetricResult(Generic[T]):
         return cast(dict[str, Any], to_json_compatible(self))
 
 
-__all__ = ["MetricResult", "Uncertainty"]
+@dataclass(frozen=True, init=False)
+class ProviderResult:
+    """Immutable output returned by one optional scientific provider call."""
+
+    operation: str
+    provider: str
+    backend: str
+    data: JSONValue
+    parameters: FrozenDict
+    metadata: FrozenDict
+    provenance: Provenance
+
+    def __init__(
+        self,
+        operation: str,
+        provider: str,
+        backend: str,
+        data: object,
+        provenance: Provenance,
+        *,
+        parameters: Mapping[str, object] | None = None,
+        metadata: Mapping[str, object] | None = None,
+    ) -> None:
+        for field_name, field_value in (
+            ("operation", operation),
+            ("provider", provider),
+            ("backend", backend),
+        ):
+            if not isinstance(field_value, str) or not field_value.strip():
+                raise ConfigurationError(
+                    f"ProviderResult {field_name} must be non-empty text.",
+                    code="INVALID_PROVIDER_RESULT",
+                )
+        if not isinstance(provenance, Provenance):
+            raise ConfigurationError(
+                "ProviderResult provenance must be Provenance.",
+                code="INVALID_PROVIDER_RESULT",
+            )
+        object.__setattr__(self, "operation", operation)
+        object.__setattr__(self, "provider", provider)
+        object.__setattr__(self, "backend", backend)
+        object.__setattr__(self, "data", freeze_json(data))
+        object.__setattr__(self, "parameters", freeze_mapping(parameters))
+        object.__setattr__(self, "metadata", freeze_mapping(metadata))
+        object.__setattr__(self, "provenance", provenance)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible copy of the complete result envelope."""
+
+        return cast(dict[str, Any], to_json_compatible(self))
+
+
+__all__ = ["MetricResult", "ProviderResult", "Uncertainty"]

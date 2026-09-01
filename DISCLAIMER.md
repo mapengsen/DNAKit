@@ -27,7 +27,7 @@ Users are responsible for verifying their rights to all supplied data, parameter
 
 # DNAKit 第三方声明 / Third-Party Notices
 
-Last reviewed: 2026-08-29.
+Last reviewed: 2026-09-01.
 
 This file is an engineering compliance inventory, not legal advice. DNAKit itself is licensed under MIT. A dependency, external executable, database, paper, or user-supplied parameter table keeps its own terms; citing a paper does not by itself grant permission to redistribute its software or data.
 
@@ -49,6 +49,8 @@ Python dependencies declared in `pyproject.toml` are resolved as separate distri
 | `viz` extra | Pillow | MIT-CMU | optional raster export |
 | `io` extra | PyArrow | Apache-2.0 | optional Parquet I/O |
 | `validation` extra | Biopython | Biopython License Agreement | validation only |
+| `external-tools` extra | ToolUniverse | Apache-2.0; verify the installed release and transitive dependencies | optional allowlisted scientific-function backend |
+| `agent` extra | FastMCP | Apache-2.0; verify the installed release and transitive dependencies | optional local MCP server |
 | `neural` extra | Hugging Face Hub, NumPy, scikit-learn, PyTorch, Transformers | Apache-2.0, BSD-family, and Apache-2.0 labels; verify resolved versions | checkpoint retrieval, inference, and k-means |
 | `neural-caduceus` extra | mamba-ssm | Apache-2.0 label; verify resolved version | optional Caduceus runtime |
 | `neural-enformer` extra | enformer-pytorch | MIT label; verify resolved version | optional Enformer runtime |
@@ -72,6 +74,7 @@ Exact versions and license texts must be checked in the distributions actually i
 
 | Resource | DNAKit integration and distribution | Terms/cost warning |
 | --- | --- | --- |
+| ToolUniverse | Optional Python dependency; DNAKit loads only an allowlisted function after an explicit call and does not vendor its source | Apache-2.0 code; remote Ensembl, NCBI, gnomAD, and EMBL-EBI services retain their own terms and availability limits. See the [official repository](https://github.com/mims-harvard/ToolUniverse). |
 | Primer3 CLI (`primer3_core`, `oligotm`, `ntthal`) | Pure external CLI adapter; explicit paths; no Python binding and no bundled binary | Primer3 source files state GPL-2.0-or-later; verify the installed release and comply with its license. See the [official repository](https://github.com/primer3-org/primer3) and [manual](https://github.com/primer3-org/primer3/blob/main/src/primer3_manual.htm). |
 | NUPACK | User installs separately; DNAKit does not download, bundle, or expose it as a hosted service | Separate NUPACK terms/subscription apply and access may require payment. Academic and commercial terms differ. Check the [official download and licensing page](https://www.nupack.org/download/overview) before use. |
 | DSSR/3DNA | User installs separately; DNAKit only parses explicitly supplied output | Academic and commercial permissions differ; free academic availability is still subject to the issued license. Check the [official DSSR licensing notice](https://home.x3dna.org/highlights/x3dna-dssr-is-funded-and-dssr-basic-academic-is-free). |

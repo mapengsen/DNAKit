@@ -1,6 +1,6 @@
 # DNAKit function tree
 
-> Update date: 2026-08-30. This function tree is synchronized with the current web navigation and function pages; the numbering follows the corresponding function page or demand tracking number, and web extension functions that are not assigned numbers retain their page names.
+> Update date: 2026-08-31. This function tree is synchronized with the current web navigation and function pages; the numbering follows the corresponding function page or demand tracking number, and web extension functions that are not assigned numbers retain their page names.
 
 ```
 Quick Start Tutorial
@@ -210,13 +210,25 @@ Quick Start Tutorial
 │   │   ├── 4. NMR/Multi-model RMSF Flexibility
 │   │   ├── 5. 3DNA bp_step.par standard parameter analysis
 │   │   └── 6. DSSR JSON summary parsing
-│   └── (7) Conversion
-│       ├── 1. Single chain molar extinction coefficient at 260 nm
-│       ├── 2. Single-chain/double-chain theoretical optical properties
-│       ├── 3. 1 nmol and mass corresponding to OD260
-│       ├── 4. A260 to molar concentration, mass concentration and total amount
-│       ├── 5. Concentration, quantity and mass interchange of substances
-│       └── 6. Explicit correction of dyes and modifying groups
+│   ├── (7) Conversion
+│   │   ├── 1. Single chain molar extinction coefficient at 260 nm
+│   │   ├── 2. Single-chain/double-chain theoretical optical properties
+│   │   ├── 3. 1 nmol and mass corresponding to OD260
+│   │   ├── 4. A260 to molar concentration, mass concentration and total amount
+│   │   ├── 5. Concentration, quantity and mass interchange of substances
+│   │   └── 6. Explicit correction of dyes and modifying groups
+│   ├── (8) Deep-learning property prediction
+│   │   ├── 1. AlphaGenome 11 output modalities and SNV track differences
+│   │   ├── 2. Enformer human/mouse regulatory tracks and SNV differences
+│   │   ├── 3. SegmentNT 14-class single-nucleotide segmentation
+│   │   ├── 4. Evo 2 zero-shot variant score and exon probability
+│   │   ├── 5. GENERator zero-shot variant score
+│   │   └── 6. Ten pretrained LucaOneTasks heads
+│   └── (9) Optional bioinformatics functions
+│       ├── 1. Ensembl VEP and variant identifier recoding
+│       ├── 2. ClinVar, dbSNP, and gnomAD annotation
+│       ├── 3. Nei–Gojobori dN/dS
+│       └── 4. Golden Gate design and reaction assembly
 ├── 4. Data evaluation
 │   ├── (1) Commonly used evaluation indicators
 │   │   ├── 1. EVAL-001 Validity

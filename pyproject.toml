@@ -67,6 +67,12 @@ io = [
 validation = [
   "biopython>=1.85,<2",
 ]
+external-tools = [
+  "tooluniverse>=1.4,<2",
+]
+agent = [
+  "fastmcp>=3.4.5,<4",
+]
 neural = [
   "huggingface-hub>=0.28,<2",
   "numpy>=1.26,<3",
@@ -81,11 +87,12 @@ neural-enformer = [
   "enformer-pytorch>=0.8.11,<1",
 ]
 neural-evo2 = [
-  "evo2>=0.5.3,<0.6",
+  "evo2>=0.5.3,<0.7; python_version >= '3.11' and python_version < '3.13'",
 ]
 
 [project.scripts]
 dnakit = "dnakit.cli.app:run"
+dnakit-mcp = "dnakit.tools.server:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

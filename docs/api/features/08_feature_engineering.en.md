@@ -2,6 +2,8 @@
 
 DNAKit currently offers two methods of DNA fingerprint calculation. Each bit has only `0` or `1`, which can be directly used for Tanimoto/Jaccard similarity, retrieval, clustering and deduplication.
 
+<a id="1-hashed-k-mer"></a>
+
 ## 1) Hashed k-mer bit fingerprint
 
 - **What it does:** Extracts k-mers occurring in a sequence and stably hashes them into fixed-length 0/1 bit vectors for use in Tanimoto/Jaccard similarity, clustering and retrieval, while avoiding excessively large explicit `4^k` feature spaces.

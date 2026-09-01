@@ -35,7 +35,7 @@ DNAKit does not yet have a published paper or DOI. The current citation informat
 maintained in the repository `README.md` and can be cited as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.2, 2026.
+DNAKit contributors. DNAKit 0.1.3, 2026.
 ```
 
 Citing DNAKit does not replace citations for the algorithms, parameter sets, backends, and

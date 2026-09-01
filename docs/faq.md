@@ -166,3 +166,28 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 | 6. 染料与修饰校正 | `Σcount×Δε`、`Σcount×ΔMW` 和 `ΣA标记峰值×校正因子` | DNAKit 不内置染料参数表，只做确定性加减法，因此没有统一论文。调用方必须为每个参数记录真实实验、文献或厂商来源。 |
 
 上述引用只说明算法、参数或外部工具的来源。对于调用方提供的自由能、hypochromicity、染料修正或 3DNA/DSSR/NUPACK 输出，还必须记录实际参数表、软件版本、输入条件和数据来源。
+
+## 深度学习性质预测有哪些参考文献？ {#deep-learning-property-prediction-references}
+
+下表覆盖[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)实际集成的 27 个功能所使用的主要模型论文。多个输出头共用同一篇模型论文，因此不按功能重复列出。
+
+| 对应功能 | 参考文献 |
+| --- | --- |
+| RNA-seq、CAGE、PRO-cap、ATAC-seq、DNase-seq、ChIP-seq、剪接和接触图 | Avsec et al., *Advancing regulatory variant effect prediction with AlphaGenome*, **Nature** 649, 1206–1218 (2026), [DOI 10.1038/s41586-025-10014-0](https://doi.org/10.1038/s41586-025-10014-0)。 |
+| 人类和小鼠调控轨道 | Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x)。 |
+| 14 类单碱基基因组分割的基础编码器 | Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z)。 |
+| 14 类单碱基基因组分割头 | de Almeida et al., *Annotating the genome at single-nucleotide resolution with DNA foundation models*, **Nature Methods** (2025), [DOI 10.1038/s41592-025-02881-2](https://doi.org/10.1038/s41592-025-02881-2)。 |
+| 长上下文零样本变异效应和外显子概率 | Brixi et al., *Genome modelling and design across all domains of life with Evo 2*, **Nature** (2026), [DOI 10.1038/s41586-026-10176-5](https://doi.org/10.1038/s41586-026-10176-5)。 |
+| 等位基因条件概率变异效应 | Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272)；Li et al., *GENERator-v2: Reconciling Coarse Tokenization with Single-Nucleotide Resolution in Genomic Language Modeling*, **bioRxiv** (2026), [DOI 10.64898/2026.01.27.702015](https://doi.org/10.64898/2026.01.27.702015)。 |
+| 中心法则、分类学、物种、蛋白定位/稳定性、ncRNA 家族和序列对互作 | He et al., *Generalized biological foundation model with unified nucleic acid and protein language*, **Nature Machine Intelligence** 7, 942–953 (2025), [DOI 10.1038/s42256-025-01044-4](https://doi.org/10.1038/s42256-025-01044-4)。 |
+
+直接推理还依赖官方代码或已训练权重，其来源如下：
+
+- RNA-seq 等 11 类轨道：[AlphaGenome research](https://github.com/google-deepmind/alphagenome_research) 和 [`google/alphagenome-all-folds`](https://huggingface.co/google/alphagenome-all-folds)。
+- 人类/小鼠调控轨道：[Enformer 官方实现](https://github.com/google-deepmind/deepmind-research/tree/master/enformer) 和 [`EleutherAI/enformer-official-rough`](https://huggingface.co/EleutherAI/enformer-official-rough)。
+- 单碱基基因组分割：[Nucleotide Transformer 仓库](https://github.com/instadeepai/nucleotide-transformer) 和 [`InstaDeepAI/segment_nt`](https://huggingface.co/InstaDeepAI/segment_nt)。
+- 零样本变异效应/外显子概率：[Evo 2 仓库](https://github.com/ArcInstitute/evo2)、[`arcinstitute/evo2_7b`](https://huggingface.co/arcinstitute/evo2_7b)、[`arcinstitute/evo2_7b_base`](https://huggingface.co/arcinstitute/evo2_7b_base) 和 [`schmojo/evo2-exon-classifier`](https://huggingface.co/schmojo/evo2-exon-classifier)。
+- 等位基因条件概率变异效应：[GENERator 仓库](https://github.com/GenerTeam/GENERator) 和 [`GenerTeam/GENERator-v2-eukaryote-1.2b-base`](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base)。
+- 核酸/蛋白下游任务：[LucaOne](https://github.com/LucaOne/LucaOne)、[LucaOneTasks](https://github.com/LucaOne/LucaOneTasks) 和 [Zenodo 10.5281/zenodo.15171943](https://doi.org/10.5281/zenodo.15171943)。
+
+这些引用说明模型、训练任务头和权重的来源，不表示预测结果等同于实验测量或临床结论。

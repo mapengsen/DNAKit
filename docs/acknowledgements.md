@@ -75,7 +75,7 @@ DNAKit 感谢为本项目提供理论基础、公开参数、格式规范、软�
 
 ## 第三方声明 {#third-party-notices}
 
-最后复核：2026-08-23。本页是工程合规清单，不是法律意见。
+最后复核：2026-09-01。本页是工程合规清单，不是法律意见。
 
 DNAKit 自身采用 MIT 许可证。第三方包、外部程序、数据库、论文和用户提供的参数表保留各自条款；引用论文不等于获得其软件或数据的再分发许可。
 
@@ -91,6 +91,8 @@ DNAKit 的 wheel 和 sdist 不包含 DiProDB 数值表、Primer3、NUPACK、DSSR
 | `viz` | CairoSVG；Pillow | LGPL-3.0-or-later；MIT-CMU |
 | `io` | PyArrow | Apache-2.0 |
 | `validation` | Biopython | Biopython License Agreement |
+| `external-tools` | ToolUniverse | Apache-2.0；以实际安装版本和传递依赖为准 |
+| `agent` | FastMCP | Apache-2.0；以实际安装版本和传递依赖为准 |
 | `neural` | Hugging Face Hub、NumPy、scikit-learn、PyTorch、Transformers | Apache-2.0、BSD 系列、Apache-2.0；以实际安装版本为准 |
 | `neural-caduceus` | mamba-ssm | Apache-2.0；以实际安装版本为准 |
 | `neural-enformer` | enformer-pytorch | MIT；以实际安装版本为准 |
@@ -102,6 +104,7 @@ DNAKit 的 wheel 和 sdist 不包含 DiProDB 数值表、Primer3、NUPACK、DSSR
 
 | 资源 | DNAKit 处理方式 | 使用前必须确认 |
 | --- | --- | --- |
+| ToolUniverse | 作为可选 Python 依赖安装；仅在显式调用白名单功能时按需加载，不复制其源码 | 代码为 Apache-2.0；Ensembl、NCBI、gnomAD、EMBL-EBI 等远程服务仍适用各自条款和可用性限制；见[官方仓库](https://github.com/mims-harvard/ToolUniverse) |
 | Primer3 CLI | 仅通过显式 `primer3_core`、`oligotm`、`ntthal` 路径调用；不含 `primer3-py` 或二进制 | 官方源码标记 GPL-2.0-or-later；核对[仓库](https://github.com/primer3-org/primer3)与实际版本 |
 | NUPACK | 用户单独取得并安装；不下载、不打包、不作为在线服务提供 | 独立条款/订阅，可能收费，学术和商业条件不同；见[官方许可页](https://www.nupack.org/download/overview) |
 | DSSR/3DNA | 用户单独安装；DNAKit 只解析显式输出 | 学术与商业权限不同；免费 academic Basic 仍受许可约束；见[官方说明](https://home.x3dna.org/highlights/x3dna-dssr-is-funded-and-dssr-basic-academic-is-free) |
@@ -146,7 +149,7 @@ DNAKit 不保证第三方资源免费、持续可用、适合商业用途或允�
 
 DNAKit 自身采用 MIT 许可证，版权人为 Pengsen Ma，完整文本见仓库根目录的 `LICENSE`。SPDX 标识符为 `MIT`。安装包包含合并了第三方声明的 `DISCLAIMER.md`；网页版本见[第三方声明](#third-party-notices)和[免责声明](#disclaimer)。
 
-项目当前版本为 `0.1.2`，仍处于早期开发阶段；依赖兼容性和外部后端仍需按实际环境复核。
+项目当前版本为 `0.1.3`，仍处于早期开发阶段；依赖兼容性和外部后端仍需按实际环境复核。
 
 第三方包的许可证不会自动成为 DNAKit 的许可证。
 

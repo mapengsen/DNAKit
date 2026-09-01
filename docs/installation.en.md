@@ -4,10 +4,10 @@ DNAKit requires Python 3.10 or higher.
 
 ## Install from PyPI
 
-Install `0.1.2`:
+Install `0.1.3`:
 
 ```bash
-pip install dnakit==0.1.2
+pip install dnakit==0.1.3
 ```
 
 Verify installation:
@@ -37,6 +37,27 @@ conda activate dnakit-dev
 
 The development environment contains testing, type checking, documentation, and build tools. For additional dependencies on optional functions see
 [`pyproject.toml`](https://github.com/mapengsen/DNAKit/blob/main/pyproject.toml).
+
+## Optional bioinformatics backend
+
+Install the optional backend used by the VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
+functions:
+
+```bash
+python -m pip install "dnakit[external-tools]"
+```
+
+The default `pip install dnakit` neither installs nor loads this backend.
+
+## Agents and MCP
+
+Install the MCP server used by Codex, Claude, Cursor, and other MCP-capable Agents:
+
+```bash
+python -m pip install "dnakit[agent]"
+```
+
+Run `dnakit-mcp` after installation. See [Agent and MCP tools](agent_tools.md) for configuration.
 
 # Warehouse address
 

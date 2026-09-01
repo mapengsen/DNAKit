@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-01
+
+### Added
+
+- 新增 AlphaGenome、Enformer、Evo 2、GENERator、LucaOneTasks 和 SegmentNT 的预训练性质预测接口，并对模型下载、远程代码和输出大小设置显式边界。
+- 新增按功能命名的可选生物信息 API：Ensembl VEP、ClinVar、dbSNP、gnomAD、dN/dS 和 Golden Gate；通过 `dnakit[external-tools]` 按需安装后端。
+- 新增 `dnakit[agent]`、`dnakit-mcp` 和紧凑 MCP 工具目录；自动发现公开功能并提供搜索、Schema 查询、安全确认和有界 JSON 调用。
+- 新增中英文微信社区页面和文档导航入口。
+
 ## [0.1.2] - 2026-08-30
 
 ### Changed

@@ -200,6 +200,26 @@ See all 11 models, checkpoints, dependencies and remote code boundaries
 [Neural Network Representation](features/08_fingerprints.md#neural-representations); rep → k-means see
 [Neural network clustering](features/10_clustering.md#data-027-neural-clustering).
 
+## Deep-learning property prediction {#deep-learning-property-prediction}
+
+::: dnakit.predictions
+
+`predict_properties()` provides one interface for official tasks that can run directly with
+released trained weights from AlphaGenome, Enformer, SegmentNT, Evo 2, GENERator, and
+LucaOneTasks. See [Deep-learning property prediction](features/23_deep_learning_property_prediction.md)
+for model/task inputs, dependencies, and output semantics.
+
+## Optional bioinformatics functions {#optional-bioinformatics}
+
+::: dnakit.annotation
+
+::: dnakit.comparative
+
+Capability-named methods expose VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate without
+loading the optional backend during a default
+installation. See [Optional bioinformatics functions](features/24_optional_bioinformatics.md) for
+all entry points and installation instructions.
+
 ## Similarity, search and comparison {#similarity-alignment}
 
 ::: dnakit.similarity

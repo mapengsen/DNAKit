@@ -37,6 +37,21 @@
 </p>
 
 <p align="center">
+  <a href="https://mapengsen.github.io/DNAKit/">
+    <img src="https://img.shields.io/badge/MCP_Server-Available-blue" alt="DNAKit MCP server">
+  </a>
+  <a href="https://mapengsen.github.io/DNAKit/">
+    <img src="https://img.shields.io/badge/Website-DNAKit-blue" alt="DNAKit website">
+  </a>
+  <a href="https://mapengsen.github.io/DNAKit/en/wechat/">
+    <img src="https://img.shields.io/badge/WeChat-Community-07C160" alt="WeChat community">
+  </a>
+  <a href="https://x.com/PengsenMa">
+    <img src="https://img.shields.io/badge/X-Follow-000000" alt="Follow Pengsen Ma on X">
+  </a>
+</p>
+
+<p align="center">
   <strong>DNAKit: A Comprehensive Toolkit for Efficient DNA Research</strong>
 </p>
 
@@ -46,15 +61,22 @@ DNAKit is a reproducible Python toolkit for DNA sequence analysis, positioned as
 DNA." It covers standardization, sequence and annotation formats, basic operations, descriptors,
 pattern scanning, thermodynamics, fingerprints, similarity analysis, clustering and dataset
 splitting, comprehensive evaluation, molecular-biology simulation, and visualization. DNA
-foundation models can optionally be used to extract representations for k-means clustering.
+foundation models can optionally be used for direct property prediction or to extract
+representations for k-means clustering.
 
 # Installation and quick start
 
 Install the current release:
 
 ```bash
-pip install dnakit==0.1.2
+pip install dnakit==0.1.3
 ```
+
+Install the optional VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
+backend with `pip install "dnakit[external-tools]"`.
+
+To expose DNAKit to an MCP-capable Agent, install `dnakit[agent]` and configure the
+`dnakit-mcp` command in the Agent client.
 
 To contribute to development, clone the repository and create the complete Conda environment:
 
@@ -99,7 +121,7 @@ See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) f
 The DNAKit project paper has not yet been published. Cite the current version as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.2, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.3, 2026. https://github.com/mapengsen/DNAKit
 ```
 
 This section will be updated after the paper is published. When using specific algorithms,
