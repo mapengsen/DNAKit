@@ -103,6 +103,7 @@ _MODEL_NAMES = frozenset(
         "dnakit.datasets.neural_cluster_sequences",
         "dnakit.evaluation.evaluate_frechet_distance",
         "dnakit.predictions.ensure_prediction_checkpoint",
+        "dnakit.predictions.predict_enformer_benchmark",
         "dnakit.predictions.predict_pair_properties",
         "dnakit.predictions.predict_properties",
         "dnakit.predictions.predict_sequence_properties",

@@ -57,9 +57,9 @@ print(report.metrics["duplicate_groups"])  # (("a", "b"),)
 
 ## 3) `EVAL-006` Diversity
 
-- **作用：** 计算序列集合的两两距离、最近邻距离和阈值 cluster 数量，返回整体及局部差异指标，用于判断样本覆盖是否广泛。
+- **作用：** 默认计算归一化相似度距离、最近邻距离和阈值 cluster；第二种方法按论文公式计算全部序列对的平均原始 Levenshtein 距离。
 - **API**：`dnakit.evaluation.evaluate_diversity(value[必须], config[可选])`；`config` 使用 `dnakit.evaluation.DiversityEvaluationConfig`。
-- **输入**：`DNASet`；可选相似度方法、k 和聚类阈值。
+- **输入**：`DNASet`；默认 `calculation="similarity"`，论文方法使用 `calculation="levenshtein"`；可设置 `show_progress=True` 显示两两比较进度。
 - **示例代码**：
 
 ```python
@@ -82,6 +82,32 @@ print(report.metrics["cluster_count"])
 1.0
 3
 ```
+
+- **第二种方法（平均两两 Levenshtein 距离）：**
+
+```python
+from dnakit import DNARecord, DNASequence, DNASet
+from dnakit.evaluation import DiversityEvaluationConfig, evaluate_diversity
+
+records = DNASet([
+    DNARecord(DNASequence("AAAA"), "a"),
+    DNARecord(DNASequence("AAAT"), "b"),
+    DNARecord(DNASequence("CCCC"), "c"),
+])
+report = evaluate_diversity(
+    records,
+    config=DiversityEvaluationConfig(calculation="levenshtein"),
+)
+print(report.metrics["mean_pairwise_levenshtein_distance"])
+```
+
+- **示例结果：**
+
+```text
+3.0
+```
+
+该值是未归一化的编辑操作数，越大表示集合内部序列差异越大；少于两条序列时公式无定义，返回 `None`。不同序列长度的数据集不宜直接比较。
 
 <a id="eval-008-novelty"></a>
 
@@ -111,9 +137,9 @@ queries = DNASet([
 ])
 ```
 
-- **作用：** 把每条查询序列与版本化参考库比较，按相似度和覆盖度阈值判断是否新颖，返回逐条最近命中及集合的新颖序列比例。
+- **作用：** 默认以 `1 - 最近参考相似度` 评价新颖性；第二种方法按论文公式计算每条查询到参考库的最小原始 Levenshtein 距离，再取集合平均值。
 - **API**：`dnakit.evaluation.evaluate_novelty(queries[必须], reference[必须], config[可选])`；`config` 使用 `dnakit.evaluation.ReferenceSearchConfig`。
-- **输入**：query 集合和 `ReferenceLibrary`；可选方法、阈值、k 和覆盖率。
+- **输入**：query 集合和非空 `ReferenceLibrary`；默认 `novelty_calculation="similarity"`，论文方法使用 `novelty_calculation="levenshtein"`；可设置 `show_progress=True`。
 - **示例代码**：接在“参考库示例准备”之后运行。
 
 ```python
@@ -132,6 +158,45 @@ print(report.metrics["novel_fraction"])  # 0.5
 ```text
 0.5
 ```
+
+- **第二种方法（平均最近参考 Levenshtein 距离）：**
+
+```python
+from dnakit import DNARecord, DNASequence, DNASet
+from dnakit.evaluation import (
+    ReferenceSearchConfig,
+    create_reference_library,
+    evaluate_novelty,
+)
+
+reference = create_reference_library(
+    DNASet([
+        DNARecord(DNASequence("AAAA"), "ref-a"),
+        DNARecord(DNASequence("CCCC"), "ref-c"),
+    ]),
+    name="training",
+    version="1",
+    source="local:example",
+)
+queries = DNASet([
+    DNARecord(DNASequence("AAAA"), "copy"),
+    DNARecord(DNASequence("GGGG"), "query-new"),
+])
+report = evaluate_novelty(
+    queries,
+    reference,
+    config=ReferenceSearchConfig(novelty_calculation="levenshtein"),
+)
+print(report.metrics["mean_nearest_levenshtein_distance"])
+```
+
+- **示例结果：**
+
+```text
+2.0
+```
+
+该值是未归一化的编辑操作数，越大表示查询集合离参考集合越远。此模式不使用相似度、coverage 或 `copy_threshold`；逐条 `is_novel` 仅表示最近编辑距离大于 `0`。DNAKit 不会自动填充或截断序列。
 
 ## 5) `EVAL-016` Fréchet DNA distance
 

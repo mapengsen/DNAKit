@@ -581,7 +581,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("validation/results/local_validation_report.json"),
+        default=Path("others/validation/results/local_validation_report.json"),
     )
     parser.add_argument("--skip-optional", action="store_true")
     parser.add_argument("--force", action="store_true")

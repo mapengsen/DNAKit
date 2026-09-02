@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
+from os import PathLike
 
 from dnakit.core import DNARecord
 from dnakit.exceptions import (
@@ -16,8 +17,10 @@ from dnakit.exceptions import (
 from .backends import PredictionBackend, create_prediction_backend
 from .checkpoints import PredictionCheckpointInfo, ensure_prediction_checkpoint
 from .models import (
+    AmbiguityPolicy,
     BiologicalSequence,
     BiologicalSequencePair,
+    PredictionDType,
     PredictionInput,
     PredictionInputKind,
     PropertyPredictionConfig,
@@ -263,6 +266,38 @@ def predict_sequence_properties(
     return predict_properties(inputs, config=config, backend=backend)
 
 
+def predict_enformer_benchmark(
+    inputs: Iterable[BiologicalSequence | DNARecord],
+    *,
+    task: str,
+    checkpoint_dir: str | PathLike[str] | None = None,
+    checkpoint_path: str | PathLike[str] | None = None,
+    device: str = "auto",
+    dtype: PredictionDType = "auto",
+    batch_size: int = 1,
+    max_length: int | None = None,
+    max_records: int = 1_000,
+    ambiguity_policy: AmbiguityPolicy = "replace_with_n",
+    show_progress: bool = True,
+) -> PropertyPredictionResult:
+    """Run one of the 27 fully fine-tuned Enformer NT Revised/GB tasks."""
+
+    config = PropertyPredictionConfig(
+        model="enformer",
+        task=task,
+        checkpoint_dir=checkpoint_dir,
+        checkpoint_path=checkpoint_path,
+        device=device,
+        dtype=dtype,
+        batch_size=batch_size,
+        max_length=max_length,
+        max_records=max_records,
+        ambiguity_policy=ambiguity_policy,
+        show_progress=show_progress,
+    )
+    return predict_sequence_properties(inputs, config=config)
+
+
 def predict_pair_properties(
     inputs: Iterable[BiologicalSequencePair],
     *,
@@ -286,6 +321,7 @@ def predict_variant_effects(
 
 
 __all__ = [
+    "predict_enformer_benchmark",
     "predict_pair_properties",
     "predict_properties",
     "predict_sequence_properties",

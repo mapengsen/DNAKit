@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from dnakit.core import DNARecord
 from dnakit.datasets import (
     ClusterConfig,
@@ -10,6 +12,7 @@ from dnakit.datasets import (
     deduplicate,
     deduplicate_iupac,
 )
+from dnakit.similarity import edit_distance
 
 from ._shared import (
     EvaluationInput,
@@ -20,6 +23,7 @@ from ._shared import (
     pair_similarity,
     record_for,
     report,
+    require_pairwise_compatible,
 )
 from .config import DiversityEvaluationConfig, UniquenessEvaluationConfig
 from .results import EvaluationReport
@@ -117,17 +121,19 @@ def _similarity_state(
         [1.0 if left == right else 0.0 for right in range(len(records))]
         for left in range(len(records))
     ]
-    for left in range(len(records)):
-        for right in range(left + 1, len(records)):
-            similarity, _ = pair_similarity(
-                records[left],
-                records[right],
-                method=config.method,
-                k=config.k,
-                canonical=config.canonical,
-                max_alignment_cells=config.limits.max_alignment_cells,
-            )
-            matrix[left][right] = matrix[right][left] = similarity
+    for left, right in _pair_indices(
+        len(records),
+        show_progress=config.show_progress,
+    ):
+        similarity, _ = pair_similarity(
+            records[left],
+            records[right],
+            method=config.method,
+            k=config.k,
+            canonical=config.canonical,
+            max_alignment_cells=config.limits.max_alignment_cells,
+        )
+        matrix[left][right] = matrix[right][left] = similarity
     return tuple(tuple(row) for row in matrix), comparisons
 
 
@@ -149,18 +155,91 @@ def _component_count(matrix: tuple[tuple[float, ...], ...], threshold: float) ->
     return len({find(index) for index in range(len(matrix))})
 
 
+def _pair_indices(
+    record_count: int,
+    *,
+    show_progress: bool,
+) -> Iterable[tuple[int, int]]:
+    pairs = (
+        (left, right) for left in range(record_count) for right in range(left + 1, record_count)
+    )
+    if not show_progress:
+        return pairs
+    from rich.progress import track
+
+    return track(
+        pairs,
+        description="Diversity sequence pairs",
+        total=pair_count(record_count),
+    )
+
+
+def _evaluate_levenshtein_diversity(
+    records: tuple[DNARecord, ...],
+    config: DiversityEvaluationConfig,
+) -> EvaluationReport:
+    comparisons = pair_count(len(records))
+    enforce_pair_limit(comparisons, config.limits)
+    for record in records:
+        require_pairwise_compatible(record.sequence, role="diversity")
+    distances = tuple(
+        float(
+            edit_distance(
+                records[left],
+                records[right],
+                max_cells=config.limits.max_alignment_cells,
+            ).distance
+        )
+        for left, right in _pair_indices(
+            len(records),
+            show_progress=config.show_progress,
+        )
+    )
+    mean_distance = mean(distances)
+    return report(
+        name="diversity",
+        method="mean-pairwise-levenshtein-distance",
+        version="eval-diversity-levenshtein-v1",
+        parameters={
+            "calculation": config.calculation,
+            "formula": "sum_{i != j} Levenshtein(x_i,x_j) / (n*(n-1))",
+            "distance_units": "edit operations",
+            "normalization": "none",
+            "sequence_preprocessing": "none; no padding or truncation",
+            "ambiguity_policy": "literal IUPAC symbols",
+            "topology_policy": "linearized at stored origin; no circular rotation",
+            "undefined_policy": "score=None when fewer than two records",
+            "show_progress": config.show_progress,
+            "limits": config.limits,
+            "reference": "https://doi.org/10.1016/j.compbiomed.2024.109440",
+        },
+        metrics={
+            "score": mean_distance,
+            "diversity": mean_distance,
+            "record_count": len(records),
+            "mean_pair_distance": mean_distance,
+            "mean_pairwise_levenshtein_distance": mean_distance,
+            "minimum_pairwise_levenshtein_distance": min(distances) if distances else None,
+            "maximum_pairwise_levenshtein_distance": max(distances) if distances else None,
+            "pairwise_comparison_count": comparisons,
+        },
+    )
+
+
 def evaluate_diversity(
     value: EvaluationInput,
     *,
     config: DiversityEvaluationConfig | None = None,
 ) -> EvaluationReport:
-    """Report exhaustive mean distance, nearest-neighbor distance, and cluster coverage."""
+    """Evaluate diversity with similarity summaries or mean pairwise Levenshtein distance."""
 
     resolved = DiversityEvaluationConfig() if config is None else config
     if not isinstance(resolved, DiversityEvaluationConfig):
         raise TypeError("config must be DiversityEvaluationConfig or None.")
     items = materialize_input(value, limits=resolved.limits)
     records = tuple(record_for(item) for item in items)
+    if resolved.calculation == "levenshtein":
+        return _evaluate_levenshtein_diversity(records, resolved)
     matrix, comparisons = _similarity_state(records, resolved)
     distances = tuple(
         1.0 - matrix[left][right]
@@ -185,6 +264,7 @@ def evaluate_diversity(
         method="exhaustive-pair-distance-and-threshold-components",
         version="eval-diversity-v1",
         parameters={
+            "calculation": resolved.calculation,
             "similarity_method": resolved.method,
             "distance_definition": "1 - pair similarity",
             "k": resolved.k,
@@ -194,6 +274,7 @@ def evaluate_diversity(
             "short_k_policy": "literal equality when either sequence is shorter than k",
             "topology_policy": "linearized at stored origin; no circular rotation",
             "singleton_policy": "score=1; pair metrics undefined",
+            "show_progress": resolved.show_progress,
             "limits": resolved.limits,
         },
         metrics={

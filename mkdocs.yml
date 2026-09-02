@@ -22,7 +22,7 @@ not_in_nav: |
 theme:
   name: material
   language: zh
-  custom_dir: overrides
+  custom_dir: others/overrides
   logo: assets/images/DNAKit-icon.png
   favicon: assets/images/DNAKit-icon.png
   font: false
@@ -93,7 +93,8 @@ plugins:
                     - (6) 3D Structure and Mechanics: api/features/21_structure3d.md
                     - (7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
                     - (8) Deep-learning Property Prediction: api/features/23_deep_learning_property_prediction.md
-                    - (9) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
+                    - (9) Deep-learning Checkpoint Download: api/features/25_deep_learning_checkpoint_download.md
+                    - (10) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
                 - 4. Data Evaluation:
                     - (1) Common Evaluation Metrics: api/features/12_evaluation.md
                     - (2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -176,7 +177,8 @@ nav:
           - （6）三维结构与力学性质: api/features/21_structure3d.md
           - （7）换算: api/features/18_optics_concentration.md
           - （8）深度学习性质预测: api/features/23_deep_learning_property_prediction.md
-          - （9）可选生物信息功能: api/features/24_optional_bioinformatics.md
+          - （9）深度学习任务 Checkpoint 下载: api/features/25_deep_learning_checkpoint_download.md
+          - （10）可选生物信息功能: api/features/24_optional_bioinformatics.md
       - 4. 数据评价:
           - （1）常用评价指标: api/features/12_evaluation.md
           - （2）相似度计算: api/features/09_similarity_alignment.md

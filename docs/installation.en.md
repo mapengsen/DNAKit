@@ -49,6 +49,20 @@ python -m pip install "dnakit[external-tools]"
 
 The default `pip install dnakit` neither installs nor loads this backend.
 
+## Deep-learning property prediction
+
+Install the Enformer regulatory-track and NT Revised/Genomic Benchmarks task-checkpoint
+inference dependencies:
+
+```bash
+python -m pip install "dnakit[neural,neural-enformer]"
+```
+
+The 27 task checkpoints are not distributed in the package. Download the required file using the
+[central download instructions](api/features/25_deep_learning_checkpoint_download.md); place files under `./ckpt/enformer-benchmarks/` by default, or pass
+`checkpoint_dir`/`checkpoint_path`. See [Deep-learning property prediction](api/features/23_deep_learning_property_prediction.md)
+for the other model dependencies and boundaries.
+
 ## Agents and MCP
 
 Install the MCP server used by Codex, Claude, Cursor, and other MCP-capable Agents:

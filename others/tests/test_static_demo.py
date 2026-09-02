@@ -21,12 +21,12 @@ from dnakit.thermodynamics import melting_temperature
 
 
 def test_fixed_demo_matches_current_deterministic_apis() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     source_payload = json.loads(
-        (root / "examples/fixed_demo_expected.json").read_text(encoding="utf-8")
+        (root / "others/examples/fixed_demo_expected.json").read_text(encoding="utf-8")
     )
     docs_payload = json.loads((root / "docs/demo/data/fixed_demo.json").read_text(encoding="utf-8"))
-    records = read_set(root / "examples/fixed_demo.fasta")
+    records = read_set(root / "others/examples/fixed_demo.fasta")
     record = records[0]
     expected = source_payload["expected"]["seq-a"]
 

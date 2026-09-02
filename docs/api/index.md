@@ -207,6 +207,9 @@ checkpoint 自带代码，因此标准后端仍要求显式设置 `allow_remote_
 `predict_properties()` 统一调度只使用官方已训练权重即可直接运行的任务，包括
 AlphaGenome、Enformer、SegmentNT、Evo 2、GENERator 和 LucaOneTasks。模型、任务、
 输入类型、依赖与输出解释见[深度学习性质预测](features/23_deep_learning_property_prediction.md)。
+新增的 `predict_enformer_benchmark()` 可调用 NT Revised 18 项与 Genomic Benchmarks
+9 项完整微调 checkpoint；权重可放入默认目录，也可通过 `checkpoint_dir` 或
+`checkpoint_path` 指定。文件清单与放置方法见[深度学习任务 Checkpoint 下载](features/25_deep_learning_checkpoint_download.md)。
 
 ## 可选生物信息功能 {#optional-bioinformatics}
 
@@ -273,7 +276,7 @@ assert alignment.query_coverage == 1.0
 
 ::: dnakit.evaluation
 
-reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 定义为相对于该库的 `1 - nearest_similarity`；memorization 是 exact 或显式阈值近似复制。
+reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 默认定义为相对于该库的 `1 - nearest_similarity`，也可选择论文中的平均最近参考 Levenshtein 距离；diversity 同样支持平均两两 Levenshtein 距离。memorization 是 exact 或显式阈值近似复制。
 
 `evaluate_synthesis_risk()` 的输出是透明规则和命中位置，不是供应商接单规则、结构预测或实验成功概率。`evaluate_scorecard()` 保留每一分项、归一化方向、权重、缺失策略和贡献。
 
@@ -385,8 +388,8 @@ with TemporaryDirectory() as directory:
     cache.put(key, {"value": 1})
     assert cache.get(key) == {"value": 1}
 
-    config_path = copy2("examples/advanced_workflow.yml", root)
-    copy2("examples/fixed_demo.fasta", root)
+    config_path = copy2("others/examples/advanced_workflow.yml", root)
+    copy2("others/examples/fixed_demo.fasta", root)
     loaded = load_workflow(config_path)
     dry_run = run_workflow(config_path, dry_run=True)
     assert loaded.spec.schema_version == "dnakit-workflow-v1"

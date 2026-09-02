@@ -4,6 +4,16 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+### Added
+
+- Added mean raw pairwise Levenshtein distance for Diversity and mean raw nearest-reference Levenshtein distance for Novelty, while retaining the default similarity algorithms and adding explicit selection, resource limits, and optional progress display.
+- Added 27 local fully fine-tuned checkpoint classifiers: 18 NT Revised and nine Genomic Benchmarks tasks, with default/custom/exact paths plus safe task, label, and full-state validation.
+- Added `predict_enformer_benchmark()`, the task registry, Agent-tool exposure, per-function bilingual documentation, and a standalone download-instructions page for all 27 weight files.
+
+### Changed
+
+- Moved tests, examples, notebooks, MkDocs overrides, and local validation assets under `others/`, with matching pytest, Mypy, Ruff, packaging, CI, and documentation paths.
+
 ## [0.1.3] - 2026-09-01
 
 ### Added

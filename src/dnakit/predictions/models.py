@@ -9,6 +9,13 @@ from typing import Literal, TypeAlias
 
 from dnakit.exceptions import ConfigurationError, SequenceError
 
+from .enformer_benchmarks import (
+    ENFORMER_BENCHMARK_CHECKPOINTS_URL,
+    ENFORMER_BENCHMARK_TASKS,
+    get_enformer_benchmark_task,
+    is_enformer_benchmark_task,
+)
+
 PredictionInputKind: TypeAlias = Literal["sequence", "pair", "variant"]
 PredictionOutputKind: TypeAlias = Literal[
     "classification",
@@ -64,8 +71,11 @@ MODEL_REGISTRY: dict[str, DirectPredictionModel] = {
         "enformer",
         "Enformer",
         "https://github.com/google-deepmind/deepmind-research/tree/master/enformer",
-        ("EleutherAI/enformer-official-rough",),
-        "DNAKit uses the documented PyTorch port of the released Enformer weights.",
+        ("EleutherAI/enformer-official-rough", ENFORMER_BENCHMARK_CHECKPOINTS_URL),
+        (
+            "DNAKit uses the documented PyTorch port for the released regulatory-track "
+            "weights and supports local task-specific NT Revised/GB checkpoints."
+        ),
     ),
     "evo2": DirectPredictionModel(
         "evo2",
@@ -287,6 +297,20 @@ TASK_REGISTRY.update(
     }
 )
 
+for _benchmark in ENFORMER_BENCHMARK_TASKS.values():
+    TASK_REGISTRY[("enformer", _benchmark.name)] = _task(
+        "enformer",
+        _benchmark.name,
+        _benchmark.display_name,
+        ("sequence",),
+        "classification",
+        _benchmark.description,
+        notes=(
+            f"Fully fine-tuned checkpoint {_benchmark.checkpoint_filename} from "
+            f"{_benchmark.dataset_name}; no fitting is performed at prediction time."
+        ),
+    )
+
 
 _MODEL_ALIASES = {
     "alpha-genome": "alphagenome",
@@ -352,6 +376,8 @@ def get_prediction_task(model: str, task: str) -> DirectPredictionTask:
     if not isinstance(task, str) or not task.strip():
         raise ConfigurationError("task must be non-empty text.", code="INVALID_PREDICTION_TASK")
     key = task.strip().lower().replace("-", "_").replace(" ", "_")
+    if canonical_model == "enformer" and is_enformer_benchmark_task(key):
+        key = get_enformer_benchmark_task(key).name
     canonical_task = _TASK_ALIASES.get((canonical_model, key), key)
     resolved = TASK_REGISTRY.get((canonical_model, canonical_task))
     if resolved is None:

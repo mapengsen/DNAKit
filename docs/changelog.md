@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+### Added
+
+- Diversity 新增平均两两原始 Levenshtein 距离，Novelty 新增平均最近参考原始 Levenshtein 距离；保留默认相似度算法，支持显式选择、资源上限和可选进度条。
+- 新增 27 个基于本地完整微调 checkpoint 的序列分类任务：NT Revised 18 项、Genomic Benchmarks 9 项；支持默认目录、自定义目录或精确文件路径，安全加载并校验任务、标签和完整参数结构。
+- 新增 `predict_enformer_benchmark()`、任务注册表、Agent 工具入口，以及逐功能中英文文档；27 个权重文件通过独立的统一下载说明页提供。
+
+### Changed
+
+- 将测试、示例、Notebook、MkDocs override 和本地验证资源统一迁移至 `others/`，并同步更新 pytest、Mypy、Ruff、打包、CI 和文档路径。
+
 ## [0.1.3] - 2026-09-01
 
 ### Added

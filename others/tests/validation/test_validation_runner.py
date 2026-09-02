@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-from validation.run_validation import build_report, write_report
+from others.validation.run_validation import build_report, write_report
 
 
 def test_validation_report_has_manual_checks_and_explicit_nupack_boundary() -> None:

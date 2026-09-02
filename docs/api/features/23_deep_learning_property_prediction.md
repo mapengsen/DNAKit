@@ -2,7 +2,7 @@
 
 本页只收录**官方已经发布预训练任务头、可以直接推理**的功能。DNAKit 只加载现成权重，不会在本地重新训练或微调模型。原有的[神经网络表征](08_fingerprints.md)仍只负责提取 embedding。
 
-下面每个功能都单独说明作用、预测方法、API、输入与输出。示例结果中的占位符只表示输出结构；具体数值、标签数和轨道数取决于输入、物种、组织筛选条件及实际 checkpoint。
+本页当前共 54 个可直接推理的功能。下面每个功能都单独说明作用、预测方法、API、输入与输出。示例结果中的占位符只表示输出结构；具体数值、标签数和轨道数取决于输入、物种、组织筛选条件及实际 checkpoint。
 
 本章涉及的模型论文、官方仓库和权重来源统一收录在 [FAQ：深度学习性质预测的参考文献](../../faq.md#deep-learning-property-prediction-references)。
 
@@ -654,6 +654,7 @@ print(output.metadata["predicted_label"])
 <官方预测标签>
 ```
 
+
 ## 19) SupKTax 分类
 
 - **作用：** 使用官方 SupKTax checkpoint 对 gene 序列进行分类。
@@ -1002,4 +1003,843 @@ print(output.metadata["predicted_label"])
 ```text
 ('probability',)
 <官方预测标签>
+```
+
+## 28) H2A.Z 组蛋白变体区域判别
+
+- **作用：** 判断输入序列是否对应 H2A.Z（H2AFZ）ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h2afz"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H2AFZ.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H2AFZ.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h2afz",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 29) H3K27ac 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K27ac ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k27ac"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K27ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27ac.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k27ac",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 30) H3K27me3 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K27me3 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k27me3"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K27me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27me3.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k27me3",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 31) H3K36me3 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K36me3 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k36me3"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K36me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K36me3.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k36me3",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 32) H3K4me1 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K4me1 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me1"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me1.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k4me1",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 33) H3K4me2 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K4me2 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me2"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me2.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me2.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k4me2",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 34) H3K4me3 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K4me3 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me3"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me3.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k4me3",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 35) H3K9ac 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K9ac ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k9ac"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K9ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9ac.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k9ac",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 36) H3K9me3 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H3K9me3 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k9me3"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K9me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9me3.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h3k9me3",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **本地示例 checkpoint 的 CUDA smoke 结果：**
+
+```text
+('0', '1')
+[0.04569203 0.95430803]
+1
+```
+
+## 37) H4K20me1 组蛋白修饰区域判别
+
+- **作用：** 判断输入序列是否对应 H4K20me1 ChIP-seq 峰区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h4k20me1"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H4K20me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H4K20me1.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 250)],
+    task="h4k20me1",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 38) 增强子判别
+
+- **作用：** 判断输入序列属于增强子还是非增强子。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="enhancers"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `enhancers.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 100)],
+    task="enhancers",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 39) 增强子类型分类
+
+- **作用：** 在非增强子、组织特异增强子和组织不变增强子之间进行三分类。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="enhancers_types"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `enhancers_types.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers_types.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 100)],
+    task="enhancers_types",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>, <类别2概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 40) 启动子判别
+
+- **作用：** 判断输入序列属于启动子还是非启动子。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_all"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_all.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 75)],
+    task="promoter_all",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 41) 非 TATA 启动子判别
+
+- **作用：** 判断输入序列属于非 TATA 启动子还是负样本。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_no_tata"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_no_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_no_tata.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 75)],
+    task="promoter_no_tata",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 42) TATA 启动子判别
+
+- **作用：** 判断输入序列属于 TATA 启动子还是负样本。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_tata"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_tata.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 75)],
+    task="promoter_tata",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 43) 剪接受体位点判别
+
+- **作用：** 判断序列中央上下文是否包含剪接受体位点。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_acceptors"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_acceptors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_acceptors.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 150)],
+    task="splice_sites_acceptors",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 44) 剪接位点类型分类
+
+- **作用：** 在无剪接位点、剪接受体和剪接供体之间进行三分类。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_all"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_all.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 150)],
+    task="splice_sites_all",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>, <类别2概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 45) 剪接供体位点判别
+
+- **作用：** 判断序列中央上下文是否包含剪接供体位点。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_donors"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_donors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_donors.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 150)],
+    task="splice_sites_donors",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 46) 编码区与基因间区判别
+
+- **作用：** 判断输入来自蛋白编码区还是基因间区。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="demo_coding_vs_intergenomic_seqs"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `demo_coding_vs_intergenomic_seqs.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_coding_vs_intergenomic_seqs.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 50)],
+    task="demo_coding_vs_intergenomic_seqs",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 47) 人类与线虫序列判别
+
+- **作用：** 判断输入基因组片段来自人类还是秀丽隐杆线虫。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="demo_human_or_worm"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `demo_human_or_worm.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_human_or_worm.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 50)],
+    task="demo_human_or_worm",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 48) 果蝇增强子判别
+
+- **作用：** 判断输入是否属于 Stark 果蝇增强子集合。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="drosophila_enhancers_stark"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `drosophila_enhancers_stark.ckpt`；默认放在 `./ckpt/enformer-benchmarks/drosophila_enhancers_stark.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 500)],
+    task="drosophila_enhancers_stark",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 49) 小鼠增强子判别
+
+- **作用：** 判断输入是否属于 Ensembl 小鼠增强子。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="dummy_mouse_enhancers_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `dummy_mouse_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/dummy_mouse_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 500)],
+    task="dummy_mouse_enhancers_ensembl",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 50) 人类 Cohn 增强子判别
+
+- **作用：** 判断输入是否属于 Cohn 人类增强子集合。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_enhancers_cohn"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_enhancers_cohn.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_cohn.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 125)],
+    task="human_enhancers_cohn",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 51) 人类 Ensembl 增强子判别
+
+- **作用：** 判断输入是否属于 Ensembl 人类增强子。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_enhancers_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 75)],
+    task="human_enhancers_ensembl",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 52) 人类调控元件类型分类
+
+- **作用：** 在人类增强子、启动子和开放染色质区域之间进行三分类。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_ensembl_regulatory"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_ensembl_regulatory.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ensembl_regulatory.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 100)],
+    task="human_ensembl_regulatory",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>, <类别2概率>)
+<概率最高的 checkpoint 标签>
+```
+
+## 53) 人类非 TATA 启动子判别
+
+- **作用：** 判断输入是否属于人类非 TATA 启动子。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_nontata_promoters"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_nontata_promoters.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_nontata_promoters.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", ("ACGT" * 63)[:251])],
+    task="human_nontata_promoters",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **本地示例 checkpoint 的 CUDA smoke 结果：**
+
+```text
+('negative', 'positive')
+[3.8891116e-08 1.0000000e+00]
+positive
+```
+
+## 54) 人类开放染色质区域判别
+
+- **作用：** 判断输入是否属于 Ensembl 人类开放染色质区域。
+- **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
+- **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_ocr_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
+- **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
+- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_ocr_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ocr_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **示例代码：**
+
+```python
+from dnakit.predictions import BiologicalSequence, predict_enformer_benchmark
+
+result = predict_enformer_benchmark(
+    [BiologicalSequence("sequence-1", "ACGT" * 80)],
+    task="human_ocr_ensembl",
+    checkpoint_dir="/data/enformer-checkpoints",
+    device="cuda",
+)
+output = result.records[0].output
+print(output.output_names)
+print(output.values)
+print(output.metadata["predicted_label"])
+```
+
+- **示例结果（数值随序列与 checkpoint 而变化）：**
+
+```text
+(<类别0概率>, <类别1概率>)
+<概率最高的 checkpoint 标签>
 ```

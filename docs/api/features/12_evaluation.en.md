@@ -57,9 +57,9 @@ print(report.metrics["duplicate_groups"])  # (("a", "b"),)
 
 ## 3) `EVAL-006` Diversity
 
-- **Function:** Calculate the pairwise distance, nearest neighbor distance and threshold cluster number of the sequence collection, and return the overall and local difference indicators, which are used to determine whether the sample coverage is extensive.
+- **Function:** By default, calculate normalized similarity distances, nearest-neighbor distances, and threshold clusters. A second method follows the paper's mean raw pairwise Levenshtein-distance formula.
 - **API**: `dnakit.evaluation.evaluate_diversity(value[required], config[optional])`; `config` uses `dnakit.evaluation.DiversityEvaluationConfig`.
-- **Input**: `DNASet`; optional similarity method, k and clustering threshold.
+- **Input**: `DNASet`; the default is `calculation="similarity"`, while the paper method uses `calculation="levenshtein"`; set `show_progress=True` to display pairwise progress.
 - **Sample Code**:
 
 ```python
@@ -82,6 +82,32 @@ print(report.metrics["cluster_count"])
 1.0
 3
 ```
+
+- **Second method (mean pairwise Levenshtein distance):**
+
+```python
+from dnakit import DNARecord, DNASequence, DNASet
+from dnakit.evaluation import DiversityEvaluationConfig, evaluate_diversity
+
+records = DNASet([
+    DNARecord(DNASequence("AAAA"), "a"),
+    DNARecord(DNASequence("AAAT"), "b"),
+    DNARecord(DNASequence("CCCC"), "c"),
+])
+report = evaluate_diversity(
+    records,
+    config=DiversityEvaluationConfig(calculation="levenshtein"),
+)
+print(report.metrics["mean_pairwise_levenshtein_distance"])
+```
+
+- **Example results:**
+
+```text
+3.0
+```
+
+The value is an unnormalized count of edit operations; larger values mean greater within-set sequence differences. The formula is undefined for fewer than two records and returns `None`. Avoid directly comparing datasets with different sequence-length distributions.
 
 <a id="eval-008-novelty"></a>
 
@@ -111,9 +137,9 @@ queries = DNASet([
 ])
 ```
 
-- **Function:** Compare each query sequence with the versioned reference library, determine whether it is novel based on similarity and coverage thresholds, and return the proportion of novel sequences in recent hits and sets one by one.
+- **Function:** By default, evaluate novelty as `1 - nearest-reference similarity`. A second method computes each query's minimum raw Levenshtein distance to the reference library and averages those distances.
 - **API**: `dnakit.evaluation.evaluate_novelty(queries[required], reference[required], config[optional])`; `config` uses `dnakit.evaluation.ReferenceSearchConfig`.
-- **Input**: query collection and `ReferenceLibrary`; optional methods, threshold, k and coverage.
+- **Input**: query collection and a non-empty `ReferenceLibrary`; the default is `novelty_calculation="similarity"`, while the paper method uses `novelty_calculation="levenshtein"`; `show_progress=True` is optional.
 - **Example Code**: Run after "Reference Library Example Preparation".
 
 ```python
@@ -132,6 +158,45 @@ print(report.metrics["novel_fraction"])  # 0.5
 ```text
 0.5
 ```
+
+- **Second method (mean nearest-reference Levenshtein distance):**
+
+```python
+from dnakit import DNARecord, DNASequence, DNASet
+from dnakit.evaluation import (
+    ReferenceSearchConfig,
+    create_reference_library,
+    evaluate_novelty,
+)
+
+reference = create_reference_library(
+    DNASet([
+        DNARecord(DNASequence("AAAA"), "ref-a"),
+        DNARecord(DNASequence("CCCC"), "ref-c"),
+    ]),
+    name="training",
+    version="1",
+    source="local:example",
+)
+queries = DNASet([
+    DNARecord(DNASequence("AAAA"), "copy"),
+    DNARecord(DNASequence("GGGG"), "query-new"),
+])
+report = evaluate_novelty(
+    queries,
+    reference,
+    config=ReferenceSearchConfig(novelty_calculation="levenshtein"),
+)
+print(report.metrics["mean_nearest_levenshtein_distance"])
+```
+
+- **Example results:**
+
+```text
+2.0
+```
+
+The value is an unnormalized count of edit operations; larger values mean the queries are farther from the reference set. This mode does not use similarity, coverage, or `copy_threshold`; per-query `is_novel` only means that the nearest edit distance is greater than `0`. DNAKit does not pad or truncate sequences automatically.
 
 ## 5) `EVAL-016` Fréchet DNA distance
 

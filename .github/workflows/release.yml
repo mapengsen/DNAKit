@@ -109,10 +109,10 @@ jobs:
           PY
 
       - name: Check formatting
-        run: python -m ruff format --check src tests validation benchmarks
+        run: python -m ruff format --check src others/tests others/validation benchmarks
 
       - name: Lint
-        run: python -m ruff check src tests validation benchmarks
+        run: python -m ruff check src others/tests others/validation benchmarks
 
       - name: Type check (advisory)
         continue-on-error: true
@@ -126,7 +126,7 @@ jobs:
       - name: Execute tutorial notebooks
         env:
           PYTHONNOUSERSITE: "1"
-        run: python -m pytest --nbmake notebooks
+        run: python -m pytest --nbmake others/notebooks
 
       - name: Build documentation strictly
         env:
@@ -137,7 +137,7 @@ jobs:
         env:
           PYTHONNOUSERSITE: "1"
         run: >-
-          python -m validation.run_validation
+          python -m others.validation.run_validation
           --output "${RUNNER_TEMP}/dnakit-validation.json"
           --force
 

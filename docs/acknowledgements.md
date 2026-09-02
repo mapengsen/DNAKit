@@ -27,6 +27,7 @@ DNAKit 感谢为本项目提供理论基础、公开参数、格式规范、软�
 | k-mer 保持打乱 | `reimplementation` | [uShuffle 论文](https://pmc.ncbi.nlm.nih.gov/articles/PMC2375906/)；DNAKit 采用 de Bruijn 多重图上的随机 Euler 路径实现，精确保持指定重叠 k-mer 计数 |
 | Dashing Jaccard adapter | `adapter` | Baker & Langmead, 2019, DOI [`10.1186/s13059-019-1875-0`](https://doi.org/10.1186/s13059-019-1875-0)；实际 Dashing 版本、k、exact/HLL 模式和 sketch size |
 | DNA 基础模型 rep 与 k-means | `adapter` | 实际运行时引用所选模型及 checkpoint： [DNABERT-2](https://github.com/MAGICS-LAB/DNABERT_2)、[Nucleotide Transformer](https://github.com/instadeepai/nucleotide-transformer)、[HyenaDNA](https://github.com/HazyResearch/hyena-dna)、[Caduceus](https://github.com/kuleshov-group/caduceus)、[GROVER](https://huggingface.co/PoetschLab/GROVER)、[LucaOne](https://github.com/LucaOne/LucaOne)、[GENERator](https://github.com/GenerTeam/GENERator)、[Enformer PyTorch](https://github.com/lucidrains/enformer-pytorch)、[AlphaGenome research](https://github.com/google-deepmind/alphagenome_research)、[JanusDNA](https://github.com/Qihao-Duan/JanusDNA)或[Evo 2](https://github.com/ArcInstitute/evo2)；聚类记录实际 scikit-learn 版本、pooling、PCA、seed 和 checkpoint 来源 |
+| NT Revised/Genomic Benchmarks 任务分类 | `adapter` | 主干引用 [Enformer](https://doi.org/10.1038/s41592-021-01252-x)；任务引用 [NT Revised](https://huggingface.co/datasets/InstaDeepAI/nucleotide_transformer_downstream_tasks_revised)或 [Genomic Benchmarks](https://doi.org/10.1186/s12863-023-01123-8)；完整微调协议引用 [GENERator 附录 C.4](https://arxiv.org/abs/2502.07272)；同时记录实际 checkpoint 文件、标签映射和来源链接 |
 | Fréchet DNA distance | `reimplementation` + `adapter` | Fréchet 高斯距离沿用 [FCD 原始论文](https://doi.org/10.1021/acs.jcim.8b00234)的数学形式；表征另行引用实际模型和 checkpoint，默认模型引用 [LucaOne](https://doi.org/10.1038/s42256-025-01044-4)。该指标不是 ChemNet FCD |
 | DNA Frag / SNN | `reimplementation` + `adapter` | 指标公式参考 [MOSES](https://doi.org/10.3389/fphar.2020.565644)；DNA 适配分别用 fixed-length k-mer 代替 BRICS 片段、用 hashed k-mer 位指纹代替 Morgan 指纹，数值不可与分子指标直接比较 |
 | DNA 260 nm 消光系数 | `reimplementation` | Warshaw & Tinoco, 1966, DOI [`10.1016/0022-2836(66)90115-X`](https://doi.org/10.1016/0022-2836(66)90115-X)；Cantor, Warshaw & Shapiro, 1970, DOI [`10.1002/bip.1970.360090909`](https://doi.org/10.1002/bip.1970.360090909)；实际参数集版本 |
@@ -81,7 +82,7 @@ DNAKit 自身采用 MIT 许可证。第三方包、外部程序、数据库、�
 
 ### 分发边界 {#distribution-boundary}
 
-DNAKit 的 wheel 和 sdist 不包含 DiProDB 数值表、Primer3、NUPACK、DSSR/3DNA、Dashing、BLAST、MMseqs2、sourmash、REBASE、JASPAR、DNA 基础模型 checkpoint 或其数据库，也不会自动下载外部程序。存在 CLI adapter 时，用户仍须单独安装并提供显式路径。模型 checkpoint 只在用户显式调用表征 API 时下载到本地 `ckpt/`，不等于随 DNAKit 再分发。
+DNAKit 的 wheel 和 sdist 不包含 DiProDB 数值表、Primer3、NUPACK、DSSR/3DNA、Dashing、BLAST、MMseqs2、sourmash、REBASE、JASPAR、DNA 基础模型 checkpoint 或其数据库，也不会自动下载外部程序。存在 CLI adapter 时，用户仍须单独安装并提供显式路径。表征 API 只在用户显式调用时把允许下载的模型放入本地 `ckpt/`；新增的 27 个任务 checkpoint 则由用户从[统一的 Google Drive 文件夹](https://drive.google.com/drive/folders/1lrZXzkrgAJMqM0wAmnIeZ4DEp0XFNIRI?usp=sharing)自行下载并放置，二者都不等于随 DNAKit 再分发。
 
 `pyproject.toml` 中的 Python 依赖由安装器作为独立发行包解析，不被复制进 DNAKit wheel。NCBI、Ensembl、ENA、ENCODE 和 UCSC 数据也不随 wheel/sdist 分发；adapter 只在用户显式调用时访问公开接口。直接依赖的主要许可如下；实际发布前仍须检查锁定版本及传递依赖。
 

@@ -42,7 +42,8 @@
 - [Secondary structure properties](20_secondary_structure.md)
 - [Three-dimensional structure and mechanical properties](21_structure3d.md)
 - [Conversion](18_optics_concentration.md)
-- [Deep-learning property prediction](23_deep_learning_property_prediction.md) (official direct tasks from 6 model families)
+- [Deep-learning property prediction](23_deep_learning_property_prediction.md) (54 direct-inference functions, including 27 local fully fine-tuned checkpoint classifiers)
+- [Deep-learning task checkpoint download](25_deep_learning_checkpoint_download.md) (download and local placement for 27 task weights)
 - [Optional bioinformatics functions](24_optional_bioinformatics.md) (variant annotation, protein analysis, dN/dS, and Golden Gate)
 
 ## 4) Data evaluation

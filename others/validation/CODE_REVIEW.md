@@ -1,6 +1,6 @@
 # 本地验证与 benchmark 代码审查
 
-审查范围：`benchmarks/**`、`validation/**`、`tests/test_benchmarks.py`、`tests/validation/**`。
+审查范围：`benchmarks/**`、`others/validation/**`、`others/tests/test_benchmarks.py`、`others/tests/validation/**`。
 
 结论：未发现阻止本地使用的代码问题。输出使用同目录临时文件与原子链接/替换，默认拒绝覆盖；JSON 禁止 NaN；输入规模、重复、预热、案例数和总 nucleotide-runs 均有硬上限；随机输入使用显式 seed 和 SHA-256 摘要；脚本记录环境、参数、计时器和内存计量定义。
 

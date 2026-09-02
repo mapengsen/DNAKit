@@ -49,6 +49,17 @@ python -m pip install "dnakit[external-tools]"
 
 默认的 `pip install dnakit` 不会安装或加载该后端。
 
+## 深度学习性质预测
+
+安装 Enformer 轨道以及 NT Revised/Genomic Benchmarks 任务 checkpoint 推理依赖：
+
+```bash
+python -m pip install "dnakit[neural,neural-enformer]"
+```
+
+27 个任务 checkpoint 不随安装包分发，请根据[统一下载说明](api/features/25_deep_learning_checkpoint_download.md)下载。文件默认放在 `./ckpt/enformer-benchmarks/`，也可在调用时使用 `checkpoint_dir` 或
+`checkpoint_path` 指定。其他模型的依赖和边界见[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)。
+
 ## Agent 与 MCP
 
 如需让 Codex、Claude、Cursor 等支持 MCP 的 Agent 调用 DNAKit：

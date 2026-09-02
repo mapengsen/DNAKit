@@ -74,7 +74,7 @@ def test_descriptor_schema_has_exact_stable_240_field_layout() -> None:
 
 
 def test_complete_descriptor_document_lists_schema_in_exact_order() -> None:
-    document = (Path(__file__).parents[2] / "docs/api/features/05_all_descriptors.md").read_text(
+    document = (Path(__file__).parents[3] / "docs/api/features/05_all_descriptors.md").read_text(
         encoding="utf-8"
     )
     documented_rows = tuple(

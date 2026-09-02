@@ -218,13 +218,16 @@
 │   │   ├── 5. 浓度、物质的量和质量互换
 │   │   └── 6. 染料和修饰基团的显式校正
 │   ├── （8）深度学习性质预测
-│   │   ├── 1. AlphaGenome 11 类功能轨道及 SNV 轨道差值
-│   │   ├── 2. Enformer 人/鼠调控轨道及 SNV 轨道差值
-│   │   ├── 3. SegmentNT 14 类单碱基基因组分割
-│   │   ├── 4. Evo 2 零样本变异评分与 exon 概率
-│   │   ├── 5. GENERator 零样本变异评分
-│   │   └── 6. LucaOneTasks 10 个已训练下游任务
-│   └── （9）可选生物信息功能
+│   │   ├── 1. 11 类基因组功能轨道及 SNV 轨道差值
+│   │   ├── 2. 人/鼠调控轨道及 SNV 轨道差值
+│   │   ├── 3. 14 类单碱基基因组分割
+│   │   ├── 4. 长上下文零样本变异评分与外显子概率
+│   │   ├── 5. 等位基因条件概率变异评分
+│   │   ├── 6. 10 个核酸/蛋白已训练下游任务
+│   │   ├── 7. NT Revised 18 个完整微调分类任务
+│   │   └── 8. Genomic Benchmarks 9 个完整微调分类任务
+│   ├── （9）深度学习任务 Checkpoint 下载
+│   └── （10）可选生物信息功能
 │       ├── 1. Ensembl VEP 与变异标识转换
 │       ├── 2. ClinVar、dbSNP 与 gnomAD 注释
 │       ├── 3. Nei–Gojobori dN/dS
@@ -233,8 +236,8 @@
 │   ├── （1）常用评价指标
 │   │   ├── 1. EVAL-001 Validity
 │   │   ├── 2. EVAL-005 Uniqueness
-│   │   ├── 3. EVAL-006 Diversity
-│   │   ├── 4. EVAL-008 Novelty
+│   │   ├── 3. EVAL-006 Diversity（相似度 / 平均两两 Levenshtein）
+│   │   ├── 4. EVAL-008 Novelty（相似度 / 平均最近参考 Levenshtein）
 │   │   ├── 5. EVAL-016 Fréchet DNA distance
 │   │   ├── 6. EVAL-017 Frag
 │   │   ├── 7. EVAL-018 SNN

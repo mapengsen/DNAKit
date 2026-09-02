@@ -86,6 +86,21 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 匹配必须连续且完全相同，不允许中断、mismatch 或 indel。`min_repeats_by_unit` 可以修改阈值，但必须为 1～6 bp 的每种单元长度都提供阈值。
 
+## Diversity 和 Novelty 有哪些计算方法与参考文献？ {#diversity-novelty-references}
+
+DNAKit 保留原有归一化相似度方法，并新增论文中的原始 Levenshtein 距离方法：
+
+| 指标 | 默认方法 | 第二种方法 |
+| --- | --- | --- |
+| Diversity | `calculation="similarity"`：距离定义为 `1 - pair_similarity`，`score` 为平均最近邻距离，并同时返回平均两两距离和阈值 cluster 摘要。 | `calculation="levenshtein"`：`Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对原始编辑距离的平均值。 |
+| Novelty | `novelty_calculation="similarity"`：每条查询为 `1 - nearest_reference_similarity`。 | `novelty_calculation="levenshtein"`：`meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`。 |
+
+第二种方法依据 Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440，[DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440)，其中第 2.8 节公式 (20) 和 (21) 将距离说明为 Levenshtein 距离。该文沿用了 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022，[PMLR 论文页](https://proceedings.mlr.press/v162/jain22a.html)中的术语。
+
+文章有[官方 GitHub 仓库](https://github.com/powidla/nonB-DNA-structures-generation)，相关代码位于 [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb)。截至 2026-09-02，该仓库没有声明开源许可证，并且 notebook 使用固定 100 bp、展平 one-hot/KDTree 及分块计算，与正文公式并不完全一致。因此 DNAKit 没有复制该代码，而是用自身有界 Levenshtein 实现正文公式；不会隐式填充或截断序列，结果也不保证复现论文 Table 2 的 notebook 数值。
+
+Levenshtein 结果单位为“编辑操作数”，没有归一化；数值越大表示越多样或越远离参考库。比较不同数据集时应尽量保证序列长度分布一致。
+
 ## 理化性质的计算依据和参考文献是什么？ {#physicochemical-references}
 
 [理化性质](api/features/07_physicochemical.md)中的功能不使用机器学习模型。它们分为理论公式、公开经验参数模型、DNAKit 内部透明规则和外部 Primer3 热力学结构预测。下表逐项列出实际依据；没有论文来源的内部规则会明确标注，不用不存在的引用补充包装。
@@ -169,12 +184,14 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 ## 深度学习性质预测有哪些参考文献？ {#deep-learning-property-prediction-references}
 
-下表覆盖[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)实际集成的 27 个功能所使用的主要模型论文。多个输出头共用同一篇模型论文，因此不按功能重复列出。
+下表覆盖[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)实际集成的 54 个功能所使用的主要模型论文、任务数据集和训练协议。多个输出头共用同一篇论文，因此不按功能重复列出。
 
 | 对应功能 | 参考文献 |
 | --- | --- |
 | RNA-seq、CAGE、PRO-cap、ATAC-seq、DNase-seq、ChIP-seq、剪接和接触图 | Avsec et al., *Advancing regulatory variant effect prediction with AlphaGenome*, **Nature** 649, 1206–1218 (2026), [DOI 10.1038/s41586-025-10014-0](https://doi.org/10.1038/s41586-025-10014-0)。 |
 | 人类和小鼠调控轨道 | Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x)。 |
+| NT Revised 18 个分类任务 | 主干模型：Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x)；任务定义：Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z)，以及[修订数据集说明](https://huggingface.co/datasets/InstaDeepAI/nucleotide_transformer_downstream_tasks_revised)；完整微调协议：Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272)，附录 C.4。 |
+| Genomic Benchmarks 9 个分类任务 | 主干模型：Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x)；任务数据集：Grešová et al., *Genomic benchmarks: a collection of datasets for genomic sequence classification*, **BMC Genomic Data** 24, 25 (2023), [DOI 10.1186/s12863-023-01123-8](https://doi.org/10.1186/s12863-023-01123-8)；完整微调协议：Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272)，附录 C.4。 |
 | 14 类单碱基基因组分割的基础编码器 | Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z)。 |
 | 14 类单碱基基因组分割头 | de Almeida et al., *Annotating the genome at single-nucleotide resolution with DNA foundation models*, **Nature Methods** (2025), [DOI 10.1038/s41592-025-02881-2](https://doi.org/10.1038/s41592-025-02881-2)。 |
 | 长上下文零样本变异效应和外显子概率 | Brixi et al., *Genome modelling and design across all domains of life with Evo 2*, **Nature** (2026), [DOI 10.1038/s41586-026-10176-5](https://doi.org/10.1038/s41586-026-10176-5)。 |
@@ -185,6 +202,7 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 - RNA-seq 等 11 类轨道：[AlphaGenome research](https://github.com/google-deepmind/alphagenome_research) 和 [`google/alphagenome-all-folds`](https://huggingface.co/google/alphagenome-all-folds)。
 - 人类/小鼠调控轨道：[Enformer 官方实现](https://github.com/google-deepmind/deepmind-research/tree/master/enformer) 和 [`EleutherAI/enformer-official-rough`](https://huggingface.co/EleutherAI/enformer-official-rough)。
+- 27 个任务分类 checkpoint：从[统一的 Google Drive checkpoint 文件夹](https://drive.google.com/drive/folders/1lrZXzkrgAJMqM0wAmnIeZ4DEp0XFNIRI?usp=sharing)下载；任务定义来自 [NT Revised 数据集](https://huggingface.co/datasets/InstaDeepAI/nucleotide_transformer_downstream_tasks_revised)和 [Genomic Benchmarks 仓库](https://github.com/ML-Bioinfo-CEITEC/genomic_benchmarks)，DNAKit 不随包重新分发这些权重。
 - 单碱基基因组分割：[Nucleotide Transformer 仓库](https://github.com/instadeepai/nucleotide-transformer) 和 [`InstaDeepAI/segment_nt`](https://huggingface.co/InstaDeepAI/segment_nt)。
 - 零样本变异效应/外显子概率：[Evo 2 仓库](https://github.com/ArcInstitute/evo2)、[`arcinstitute/evo2_7b`](https://huggingface.co/arcinstitute/evo2_7b)、[`arcinstitute/evo2_7b_base`](https://huggingface.co/arcinstitute/evo2_7b_base) 和 [`schmojo/evo2-exon-classifier`](https://huggingface.co/schmojo/evo2-exon-classifier)。
 - 等位基因条件概率变异效应：[GENERator 仓库](https://github.com/GenerTeam/GENERator) 和 [`GenerTeam/GENERator-v2-eukaryote-1.2b-base`](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base)。

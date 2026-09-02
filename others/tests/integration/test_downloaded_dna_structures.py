@@ -16,7 +16,7 @@ from dnakit.structure3d import (
     read_dssr_json,
 )
 
-_DATA = Path(__file__).resolve().parents[2] / "temp" / "dna_structures"
+_DATA = Path(__file__).resolve().parents[3] / "temp" / "dna_structures"
 
 
 def _sample(name: str) -> Path:

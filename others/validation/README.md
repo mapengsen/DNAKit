@@ -20,6 +20,6 @@ Primer3 与 NUPACK 均不在本验证器中：不自动发现、不安装、不�
 示例：
 
 ```bash
-python -m validation.run_validation \
-  --output validation/results/local_validation_report.json
+python -m others.validation.run_validation \
+  --output others/validation/results/local_validation_report.json
 ```

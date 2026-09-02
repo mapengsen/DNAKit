@@ -42,7 +42,8 @@
 - [二级结构性质](20_secondary_structure.md)
 - [三维结构与力学性质](21_structure3d.md)
 - [换算](18_optics_concentration.md)
-- [深度学习性质预测](23_deep_learning_property_prediction.md)（6 个模型家族的官方现成任务）
+- [深度学习性质预测](23_deep_learning_property_prediction.md)（54 个可直接推理功能，含 27 个本地完整微调 checkpoint 分类任务）
+- [深度学习任务 Checkpoint 下载](25_deep_learning_checkpoint_download.md)（27 个任务权重的下载与本地放置）
 - [可选生物信息功能](24_optional_bioinformatics.md)（变异注释、蛋白分析、dN/dS 和 Golden Gate）
 
 ## 4) 数据评价

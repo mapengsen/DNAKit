@@ -71,6 +71,24 @@ def test_diversity_and_redundancy_publish_definitions_and_singleton_semantics() 
     assert singleton.metrics["mean_pair_distance"] is None
 
 
+def test_levenshtein_diversity_uses_the_published_mean_pairwise_formula() -> None:
+    records = _set(("a", "AAAA"), ("b", "AAAT"), ("c", "AATT"))
+    config = DiversityEvaluationConfig(calculation="levenshtein")
+
+    diversity = evaluate_diversity(records, config=config)
+    singleton = evaluate_diversity(_set(("only", "AAAA")), config=config)
+
+    assert diversity.method == "mean-pairwise-levenshtein-distance"
+    assert diversity.algorithm_version == "eval-diversity-levenshtein-v1"
+    assert diversity.metrics["score"] == pytest.approx(4 / 3)
+    assert diversity.metrics["mean_pairwise_levenshtein_distance"] == pytest.approx(4 / 3)
+    assert diversity.metrics["minimum_pairwise_levenshtein_distance"] == 1.0
+    assert diversity.metrics["maximum_pairwise_levenshtein_distance"] == 2.0
+    assert diversity.metrics["pairwise_comparison_count"] == 3
+    assert diversity.parameters["normalization"] == "none"
+    assert singleton.metrics["score"] is None
+
+
 def test_collection_pairwise_limit_is_checked() -> None:
     records = _set(("a", "AAAA"), ("b", "AAAT"), ("c", "AATT"))
     config = DiversityEvaluationConfig(
@@ -79,6 +97,16 @@ def test_collection_pairwise_limit_is_checked() -> None:
     with pytest.raises(ConfigurationError) as error:
         evaluate_diversity(records, config=config)
     assert error.value.code == "EVALUATION_PAIRWISE_LIMIT"
+
+    with pytest.raises(ConfigurationError) as levenshtein_error:
+        evaluate_diversity(
+            records,
+            config=DiversityEvaluationConfig(
+                calculation="levenshtein",
+                limits=EvaluationLimits(max_pairwise_comparisons=2),
+            ),
+        )
+    assert levenshtein_error.value.code == "EVALUATION_PAIRWISE_LIMIT"
 
 
 def test_empty_collection_has_declared_vacuous_uniqueness_and_diversity() -> None:

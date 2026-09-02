@@ -20,7 +20,7 @@ python -m pip install -e ".[agent]"
 深度学习预测、数据库查询或 ToolUniverse 后端仍需安装各自的可选依赖。例如：
 
 ```bash
-python -m pip install "dnakit[agent,external-tools,neural]"
+python -m pip install "dnakit[agent,external-tools,neural,neural-enformer]"
 ```
 
 ## 2) 启动服务
@@ -70,7 +70,7 @@ MCP 服务只暴露六个紧凑入口，避免一次发送数百个工具 Schema
 5. `describe_dnakit_tool`：查看完整输入 Schema 和安全属性；
 6. `call_dnakit_tool`：执行具体 DNAKit 功能。
 
-当前源码会自动发现 322 个公开函数，其中 319 个可以直接通过 JSON 参数调用。两个必须接收 Python
+当前源码会自动发现 326 个公开函数，其中 323 个可以直接通过 JSON 参数调用。两个必须接收 Python
 回调的底层批处理函数，以及任意命令执行底层函数保持 Python-only。普通批量任务可由 Agent 多次调用具体
 DNAKit 功能完成。
 
@@ -99,6 +99,7 @@ call_dnakit_tool(
 
 - `DNASequence` 可以直接使用序列字符串；`DNARecord` 使用包含 `sequence` 和 `id` 的对象。
 - 配置类使用普通 JSON 对象，Agent 可通过工具 Schema 查看字段和默认值。
+- 27 个本地任务 checkpoint 可通过 `dnakit.predictions.predict_enformer_benchmark` 调用；它属于模型工具，Agent 执行前仍需显式确认并提供 checkpoint 路径。
 - Python callback、已打开文件、活动 backend 实例等对象不能通过 JSON 传入。
 - 文件写入、模型下载和外部程序功能默认拒绝执行；确认目标及许可后，需要显式设置
   `allow_side_effects=true`。

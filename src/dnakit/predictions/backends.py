@@ -10,7 +10,8 @@ import os
 import re
 import sys
 import tempfile
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, TypeVar, cast
@@ -24,6 +25,7 @@ from dnakit.exceptions import (
 )
 
 from .checkpoints import PredictionCheckpointInfo
+from .enformer_benchmarks import get_enformer_benchmark_task, is_enformer_benchmark_task
 from .models import (
     BiologicalSequence,
     BiologicalSequencePair,
@@ -47,6 +49,11 @@ _ENFORMER_TARGET_URLS = {
         "manuscripts/cross2020/targets_mouse.txt"
     ),
 }
+_ENFORMER_BENCHMARK_FORMAT = "enformer_full_finetune_best_valid_v2_epoch_validation"
+_ENFORMER_BENCHMARK_MAX_CHECKPOINT_BYTES = 2_000_000_000
+_ENFORMER_BENCHMARK_MAX_SEQUENCE_LENGTH = 196_608
+_ENFORMER_EMBEDDING_DIM = 3_072
+_ENFORMER_DOWNSAMPLE = 128
 
 
 class PredictionBackend(Protocol):
@@ -512,6 +519,324 @@ class _EnformerBackend:
                         )
                     )
         return results
+
+
+def _checkpoint_labels(payload: Mapping[str, object], num_classes: int) -> tuple[str, ...]:
+    mapping = payload.get("label_mapping")
+    if not isinstance(mapping, Mapping) or len(mapping) != num_classes:
+        raise BackendExecutionError(
+            "The Enformer task checkpoint has an invalid label mapping.",
+            code="INVALID_MODEL_CHECKPOINT",
+        )
+    labels = [""] * num_classes
+    for label, index in mapping.items():
+        if (
+            not isinstance(label, str)
+            or not label
+            or isinstance(index, bool)
+            or not isinstance(index, int)
+            or not 0 <= index < num_classes
+            or labels[index]
+        ):
+            raise BackendExecutionError(
+                "The Enformer task checkpoint has an invalid label mapping.",
+                code="INVALID_MODEL_CHECKPOINT",
+            )
+        labels[index] = label
+    if any(not label for label in labels):
+        raise BackendExecutionError(
+            "The Enformer task checkpoint label mapping is incomplete.",
+            code="INVALID_MODEL_CHECKPOINT",
+        )
+    return tuple(labels)
+
+
+class _EnformerBenchmarkBackend:
+    def __init__(
+        self,
+        checkpoints: PredictionCheckpointInfo,
+        config: PropertyPredictionConfig,
+    ) -> None:
+        self.config = config
+        self.spec = get_enformer_benchmark_task(config.task)
+        self.torch = _require_module("torch", "Enformer benchmark", "torch>=2.5")
+        enformer_pytorch = _require_module(
+            "enformer_pytorch",
+            "Enformer benchmark",
+            "enformer-pytorch>=0.8.11",
+        )
+        self.device = _resolve_torch_device(self.torch, config.device)
+        self.checkpoint = _path(checkpoints)
+        self.payload = self._load_checkpoint()
+        self.num_classes = self._integer_metadata("num_classes")
+        if self.num_classes != self.spec.num_classes:
+            raise BackendExecutionError(
+                "The checkpoint class count does not match the selected Enformer task.",
+                code="INVALID_MODEL_CHECKPOINT",
+                context={
+                    "task": self.spec.name,
+                    "expected": self.spec.num_classes,
+                    "actual": self.num_classes,
+                },
+            )
+        self.labels = _checkpoint_labels(self.payload, self.num_classes)
+        self._validate_metadata()
+        self.checkpoint_metadata = {
+            "format": self.payload["format"],
+            "saved_at_utc": self.payload.get("saved_at_utc", ""),
+            "fold_id_one_based": self.payload.get("fold_id_one_based"),
+        }
+        self.model = self._create_model(enformer_pytorch)
+        # On CUDA, the assigned memory-mapped CPU state is no longer needed after
+        # ``to(device)``. Keep only compact provenance instead of retaining a second
+        # roughly 0.9-GB checkpoint mapping for the lifetime of the backend.
+        del self.payload
+
+    def _load_checkpoint(self) -> Mapping[str, object]:
+        try:
+            size = self.checkpoint.stat().st_size
+        except OSError as exc:
+            raise BackendExecutionError(
+                "Could not inspect the Enformer task checkpoint.",
+                code="MODEL_CHECKPOINT_NOT_FOUND",
+                context={"path": str(self.checkpoint)},
+            ) from exc
+        if not 1 <= size <= _ENFORMER_BENCHMARK_MAX_CHECKPOINT_BYTES:
+            raise BackendExecutionError(
+                "The Enformer task checkpoint exceeds the allowed size or is empty.",
+                code="INVALID_MODEL_CHECKPOINT",
+                context={"path": str(self.checkpoint), "bytes": size},
+            )
+        try:
+            payload = self.torch.load(
+                self.checkpoint,
+                map_location="cpu",
+                weights_only=True,
+                mmap=True,
+            )
+        except Exception as exc:
+            raise BackendExecutionError(
+                "Could not safely load the Enformer task checkpoint.",
+                code="MODEL_LOAD_FAILED",
+                context={"path": str(self.checkpoint), "error_type": type(exc).__name__},
+            ) from exc
+        if not isinstance(payload, Mapping):
+            raise BackendExecutionError(
+                "The Enformer task checkpoint root must be a mapping.",
+                code="INVALID_MODEL_CHECKPOINT",
+            )
+        return cast(Mapping[str, object], payload)
+
+    def _integer_metadata(self, name: str) -> int:
+        value = self.payload.get(name)
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise BackendExecutionError(
+                "The Enformer task checkpoint metadata is incomplete.",
+                code="INVALID_MODEL_CHECKPOINT",
+                context={"field": name},
+            )
+        return value
+
+    def _validate_metadata(self) -> None:
+        checkpoint_format = self.payload.get("format")
+        family = self.payload.get("family")
+        task = self.payload.get("task")
+        if checkpoint_format != _ENFORMER_BENCHMARK_FORMAT:
+            raise BackendExecutionError(
+                "The file is not a supported Enformer full-finetune checkpoint.",
+                code="INVALID_MODEL_CHECKPOINT",
+                context={"format": checkpoint_format},
+            )
+        if (
+            family != self.spec.family
+            or not isinstance(task, str)
+            or (task.lower() != self.spec.checkpoint_task.lower())
+        ):
+            raise BackendExecutionError(
+                "The checkpoint does not belong to the selected Enformer task.",
+                code="MODEL_CHECKPOINT_TASK_MISMATCH",
+                context={
+                    "selected_task": self.spec.name,
+                    "checkpoint_family": family,
+                    "checkpoint_task": task,
+                },
+            )
+
+    def _create_model(self, enformer_pytorch: Any) -> Any:
+        torch = self.torch
+        num_classes = self.num_classes
+
+        class EnformerSequenceClassifier(torch.nn.Module):  # type: ignore[misc,name-defined]
+            def __init__(self) -> None:
+                super().__init__()
+                self.backbone = enformer_pytorch.Enformer.from_hparams(
+                    output_heads={},
+                    target_length=-1,
+                    use_tf_gamma=False,
+                    use_checkpointing=False,
+                )
+                self.classifier = torch.nn.Linear(_ENFORMER_EMBEDDING_DIM, num_classes)
+
+            def forward(self, one_hot: Any, lengths: Any) -> Any:
+                embeddings = self.backbone(one_hot, return_only_embeddings=True)
+                valid_bins = (lengths + _ENFORMER_DOWNSAMPLE - 1) // _ENFORMER_DOWNSAMPLE
+                positions = torch.arange(embeddings.shape[1], device=embeddings.device)
+                mask = positions.unsqueeze(0) < valid_bins.unsqueeze(1)
+                pooled = (embeddings * mask.unsqueeze(-1)).sum(dim=1)
+                pooled = pooled / valid_bins.unsqueeze(-1)
+                return self.classifier(pooled)
+
+        state = self.payload.get("model_state_dict")
+        if not isinstance(state, Mapping):
+            raise BackendExecutionError(
+                "The Enformer task checkpoint has no model_state_dict.",
+                code="INVALID_MODEL_CHECKPOINT",
+            )
+        classifier_weight = state.get("classifier.weight")
+        classifier_bias = state.get("classifier.bias")
+        if (
+            not isinstance(classifier_weight, torch.Tensor)
+            or tuple(classifier_weight.shape) != (num_classes, _ENFORMER_EMBEDDING_DIM)
+            or not isinstance(classifier_bias, torch.Tensor)
+            or tuple(classifier_bias.shape) != (num_classes,)
+        ):
+            raise BackendExecutionError(
+                "The Enformer task checkpoint classification head is incompatible.",
+                code="INVALID_MODEL_CHECKPOINT",
+            )
+        try:
+            with torch.device("meta"):
+                model = EnformerSequenceClassifier()
+            model.load_state_dict(state, strict=True, assign=True)
+            model = model.to(self.device).eval()
+        except Exception as exc:
+            raise BackendExecutionError(
+                "The Enformer task checkpoint parameters are incompatible.",
+                code="MODEL_LOAD_FAILED",
+                context={"task": self.spec.name, "error_type": type(exc).__name__},
+            ) from exc
+        return model
+
+    def _autocast(self) -> Any:
+        requested = self.config.dtype
+        if self.device.type == "cuda":
+            if requested == "float32":
+                return nullcontext()
+            if requested == "auto":
+                dtype = (
+                    self.torch.bfloat16
+                    if bool(self.torch.cuda.is_bf16_supported())
+                    else self.torch.float16
+                )
+            else:
+                dtype = _torch_dtype(self.torch, requested)
+            return self.torch.autocast("cuda", dtype=dtype)
+        if self.device.type == "cpu" and requested == "bfloat16":
+            return self.torch.autocast("cpu", dtype=self.torch.bfloat16)
+        return nullcontext()
+
+    def _encode(self, sequences: Sequence[str]) -> tuple[Any, Any]:
+        maximum = max(len(sequence) for sequence in sequences)
+        encoded = self.torch.full(
+            (len(sequences), maximum),
+            ord("N"),
+            dtype=self.torch.long,
+            device=self.device,
+        )
+        for row, sequence in enumerate(sequences):
+            encoded[row, : len(sequence)] = self.torch.tensor(
+                list(sequence.encode("ascii")),
+                dtype=self.torch.long,
+                device=self.device,
+            )
+        lookup = self.torch.zeros(256, 4, dtype=self.torch.float32, device=self.device)
+        for base, index in zip("ACGT", range(4), strict=True):
+            lookup[ord(base), index] = 1.0
+        lengths = self.torch.tensor(
+            [len(sequence) for sequence in sequences],
+            dtype=self.torch.long,
+            device=self.device,
+        )
+        return lookup[encoded], lengths
+
+    def _output(self, probabilities: Any, logits: Any, length: int) -> PredictionOutput:
+        predicted_index = int(probabilities.argmax())
+        metadata = {
+            "axes": ("class",),
+            "predicted_index": predicted_index,
+            "predicted_label": self.labels[predicted_index],
+            "confidence": float(probabilities[predicted_index]),
+            "logits": tuple(float(value) for value in logits),
+            "dataset_family": self.spec.family,
+            "dataset_name": self.spec.dataset_name,
+            "checkpoint_filename": self.spec.checkpoint_filename,
+            "checkpoint_format": self.checkpoint_metadata["format"],
+            "checkpoint_saved_at_utc": self.checkpoint_metadata["saved_at_utc"],
+            "fold_id_one_based": self.checkpoint_metadata["fold_id_one_based"],
+            "sequence_length": length,
+            "valid_bins": (length + _ENFORMER_DOWNSAMPLE - 1) // _ENFORMER_DOWNSAMPLE,
+            "pooling": "valid-bin mean",
+            "checkpoint_is_fine_tuned": True,
+        }
+        return PredictionOutput(probabilities, self.labels, metadata)
+
+    def predict(
+        self,
+        inputs: Sequence[PredictionInput],
+        *,
+        show_progress: bool,
+    ) -> Sequence[PredictionOutput]:
+        prepared: list[tuple[int, str]] = []
+        limit = int(self.config.max_length or _ENFORMER_BENCHMARK_MAX_SEQUENCE_LENGTH)
+        for index, item in enumerate(inputs):
+            if not isinstance(item, BiologicalSequence):
+                raise AssertionError("Enformer benchmark received a non-sequence input.")
+            sequence = _dna(item.sequence, self.config, item.id)
+            if len(sequence) > limit:
+                raise SequenceError(
+                    "Enformer benchmark input exceeds the configured sequence limit.",
+                    code="PREDICTION_SEQUENCE_TOO_LONG",
+                    context={"record_id": item.id, "length": len(sequence), "max_length": limit},
+                )
+            prepared.append((index, sequence))
+
+        ordered = sorted(prepared, key=lambda item: len(item[1]))
+        outputs: list[PredictionOutput | None] = [None] * len(inputs)
+        for batch in _batches(
+            ordered,
+            batch_size=self.config.batch_size,
+            enabled=show_progress,
+            description=f"Predicting {self.spec.display_name}",
+        ):
+            indices = [item[0] for item in batch]
+            sequences = [item[1] for item in batch]
+            one_hot, lengths = self._encode(sequences)
+            try:
+                with self.torch.inference_mode(), self._autocast():
+                    logits = self.model(one_hot, lengths).float()
+                    probabilities = logits.softmax(dim=-1)
+            except (ConfigurationError, SequenceError):
+                raise
+            except Exception as exc:
+                raise BackendExecutionError(
+                    "Enformer benchmark inference failed.",
+                    code="PROPERTY_PREDICTION_FAILED",
+                    context={"task": self.spec.name, "error_type": type(exc).__name__},
+                ) from exc
+            logits_cpu = logits.detach().cpu()
+            probabilities_cpu = probabilities.detach().cpu()
+            for row, index in enumerate(indices):
+                outputs[index] = self._output(
+                    probabilities_cpu[row].numpy(),
+                    logits_cpu[row].numpy(),
+                    len(sequences[row]),
+                )
+        if any(output is None for output in outputs):
+            raise BackendExecutionError(
+                "Enformer benchmark returned incomplete predictions.",
+                code="INVALID_PREDICTION_OUTPUT",
+            )
+        return cast(Sequence[PredictionOutput], outputs)
 
 
 def _alphagenome_device(jax: Any, requested: str) -> Any:
@@ -1427,6 +1752,8 @@ def create_prediction_backend(
 
     if config.model == "segmentnt":
         return _SegmentNTBackend(checkpoints, config)
+    if config.model == "enformer" and is_enformer_benchmark_task(config.task):
+        return _EnformerBenchmarkBackend(checkpoints, config)
     if config.model == "enformer":
         return _EnformerBackend(checkpoints, config)
     if config.model == "alphagenome":

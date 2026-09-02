@@ -208,6 +208,10 @@ See all 11 models, checkpoints, dependencies and remote code boundaries
 released trained weights from AlphaGenome, Enformer, SegmentNT, Evo 2, GENERator, and
 LucaOneTasks. See [Deep-learning property prediction](features/23_deep_learning_property_prediction.md)
 for model/task inputs, dependencies, and output semantics.
+The new `predict_enformer_benchmark()` wrapper runs the 18 NT Revised and nine Genomic
+Benchmarks fully fine-tuned checkpoints from the default location or a caller-supplied
+`checkpoint_dir`/`checkpoint_path`. See [Deep-learning task checkpoint download](features/25_deep_learning_checkpoint_download.md)
+for filenames and placement rules.
 
 ## Optional bioinformatics functions {#optional-bioinformatics}
 
@@ -275,7 +279,7 @@ Features include exact/reverse-complement/circular/IUPAC/approximate deduplicati
 
 ::: dnakit.evaluation
 
-The reference-based method must first call `create_reference_library()` binding name, version, source, date, filter, index parameters and content digest. novelty is defined as `1 - nearest_similarity` relative to the library; memorization is exact or explicit threshold approximate replication.
+Reference-based methods must first call `create_reference_library()` to bind name, version, source, date, filters, index parameters, and a content digest. Novelty defaults to `1 - nearest_similarity`, with the paper's mean nearest-reference Levenshtein distance available as a second method; diversity likewise supports mean pairwise Levenshtein distance. Memorization means an exact or explicit-threshold near copy.
 
 The output of `evaluate_synthesis_risk()` is transparent rules and hit locations, not supplier order taking rules, structure predictions, or experiment success probabilities. `evaluate_scorecard()` Retain each component, normalization direction, weight, missing strategy and contribution.
 
@@ -387,8 +391,8 @@ with TemporaryDirectory() as directory:
     cache.put(key, {"value": 1})
     assert cache.get(key) == {"value": 1}
 
-    config_path = copy2("examples/advanced_workflow.yml", root)
-    copy2("examples/fixed_demo.fasta", root)
+    config_path = copy2("others/examples/advanced_workflow.yml", root)
+    copy2("others/examples/fixed_demo.fasta", root)
     loaded = load_workflow(config_path)
     dry_run = run_workflow(config_path, dry_run=True)
     assert loaded.spec.schema_version == "dnakit-workflow-v1"

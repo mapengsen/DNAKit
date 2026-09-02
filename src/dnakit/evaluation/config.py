@@ -14,6 +14,8 @@ from dnakit.representations import RepresentationConfig
 
 GapDenominatorPolicy: TypeAlias = Literal["exclude", "include_known", "error"]
 PairSimilarityMethod: TypeAlias = Literal["exact", "identity", "edit", "kmer"]
+DiversityCalculation: TypeAlias = Literal["similarity", "levenshtein"]
+NoveltyCalculation: TypeAlias = Literal["similarity", "levenshtein"]
 UniquenessEquivalence: TypeAlias = Literal[
     "exact",
     "reverse_complement",
@@ -264,6 +266,8 @@ class DiversityEvaluationConfig:
     canonical: bool = True
     cluster_threshold: float = 0.9
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
+    calculation: DiversityCalculation = "similarity"
+    show_progress: bool = False
 
     def __post_init__(self) -> None:
         if self.method not in {"exact", "identity", "edit", "kmer"}:
@@ -276,6 +280,10 @@ class DiversityEvaluationConfig:
         )
         if not isinstance(self.limits, EvaluationLimits):
             raise ConfigurationError("limits must be EvaluationLimits.")
+        if self.calculation not in {"similarity", "levenshtein"}:
+            raise ConfigurationError("Unknown diversity calculation.")
+        if not isinstance(self.show_progress, bool):
+            raise ConfigurationError("show_progress must be boolean.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -288,6 +296,8 @@ class ReferenceSearchConfig:
     min_coverage: float = 0.0
     copy_threshold: float = 0.9
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
+    novelty_calculation: NoveltyCalculation = "similarity"
+    show_progress: bool = False
 
     def __post_init__(self) -> None:
         if self.method not in {"exact", "identity", "edit", "kmer"}:
@@ -305,6 +315,10 @@ class ReferenceSearchConfig:
         )
         if not isinstance(self.limits, EvaluationLimits):
             raise ConfigurationError("limits must be EvaluationLimits.")
+        if self.novelty_calculation not in {"similarity", "levenshtein"}:
+            raise ConfigurationError("Unknown novelty calculation.")
+        if not isinstance(self.show_progress, bool):
+            raise ConfigurationError("show_progress must be boolean.")
 
 
 @dataclass(frozen=True, slots=True)

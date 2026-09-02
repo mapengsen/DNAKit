@@ -11,6 +11,12 @@ from dnakit.download import DownloadConfig, RemoteFile, download_file
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DownloadError
 from dnakit.representations import default_checkpoint_root, ensure_model_checkpoint
 
+from .enformer_benchmarks import (
+    ENFORMER_BENCHMARK_CHECKPOINTS_URL,
+    EnformerBenchmarkTask,
+    get_enformer_benchmark_task,
+    is_enformer_benchmark_task,
+)
 from .models import PropertyPredictionConfig
 
 _HF_PATTERNS = (
@@ -58,11 +64,75 @@ def default_prediction_checkpoint_root() -> Path:
     return default_checkpoint_root()
 
 
+def enformer_benchmark_checkpoint_path(
+    task: str,
+    *,
+    checkpoint_dir: str | Path | None = None,
+) -> Path:
+    """Return the canonical local path for one of the 27 Enformer checkpoints."""
+
+    spec = get_enformer_benchmark_task(task)
+    if checkpoint_dir is None:
+        root = default_prediction_checkpoint_root() / "enformer-benchmarks"
+    else:
+        root = Path(checkpoint_dir).expanduser().resolve()
+    return (root / spec.checkpoint_filename).resolve()
+
+
 def _root(config: PropertyPredictionConfig) -> Path:
     return (
         default_prediction_checkpoint_root()
         if config.checkpoint_dir is None
         else Path(config.checkpoint_dir).expanduser().resolve()
+    )
+
+
+def _benchmark_candidates(root: Path, spec: EnformerBenchmarkTask) -> tuple[Path, ...]:
+    family_dir = "nt-revised" if spec.family == "nt" else "genomic-benchmarks"
+    return (
+        root / spec.checkpoint_filename,
+        root / "enformer-benchmarks" / spec.checkpoint_filename,
+        root / family_dir / spec.checkpoint_filename,
+    )
+
+
+def _missing_benchmark_checkpoint(path: Path, spec: EnformerBenchmarkTask) -> ConfigurationError:
+    return ConfigurationError(
+        "The selected Enformer task checkpoint is not installed.",
+        code="MODEL_CHECKPOINT_NOT_FOUND",
+        context={
+            "task": spec.name,
+            "family": spec.family,
+            "checkpoint_filename": spec.checkpoint_filename,
+            "download_url": ENFORMER_BENCHMARK_CHECKPOINTS_URL,
+            "expected_path": str(path),
+        },
+        hint=(
+            f"Download {spec.checkpoint_filename} from {ENFORMER_BENCHMARK_CHECKPOINTS_URL} "
+            f"and place it at {path}, or pass checkpoint_path to its exact local file."
+        ),
+    )
+
+
+def _enformer_benchmark_checkpoint(
+    config: PropertyPredictionConfig,
+) -> PredictionCheckpointInfo:
+    spec = get_enformer_benchmark_task(config.task)
+    if config.checkpoint_dir is None:
+        path = enformer_benchmark_checkpoint_path(config.task)
+    else:
+        root = Path(config.checkpoint_dir).expanduser().resolve()
+        candidates = _benchmark_candidates(root, spec)
+        path = next(
+            (candidate.resolve() for candidate in candidates if candidate.is_file()),
+            candidates[0].resolve(),
+        )
+    if not path.is_file():
+        raise _missing_benchmark_checkpoint(path, spec)
+    return PredictionCheckpointInfo(
+        (str(path),),
+        False,
+        (ENFORMER_BENCHMARK_CHECKPOINTS_URL,),
     )
 
 
@@ -234,6 +304,20 @@ def _representation_checkpoint(
 def _explicit_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpointInfo:
     assert config.checkpoint_path is not None
     path = Path(config.checkpoint_path).expanduser().resolve()
+    if config.model == "enformer" and is_enformer_benchmark_task(config.task):
+        spec = get_enformer_benchmark_task(config.task)
+        if path.is_dir():
+            path = next(
+                (
+                    candidate.resolve()
+                    for candidate in _benchmark_candidates(path, spec)
+                    if candidate.is_file()
+                ),
+                path / spec.checkpoint_filename,
+            )
+        if not path.is_file():
+            raise _missing_benchmark_checkpoint(path, spec)
+        return PredictionCheckpointInfo((str(path),), False, ("explicit",))
     if not path.is_dir():
         raise ConfigurationError(
             "checkpoint_path must be an existing checkpoint directory.",
@@ -274,6 +358,8 @@ def ensure_prediction_checkpoint(
         return PredictionCheckpointInfo((), False, ("official-source-download",))
     if config.checkpoint_path is not None:
         return _explicit_checkpoint(config)
+    if config.model == "enformer" and is_enformer_benchmark_task(config.task):
+        return _enformer_benchmark_checkpoint(config)
     if config.model == "segmentnt":
         return _segmentnt_checkpoint(config)
     if config.model == "evo2" and config.task == "exon_probability":
@@ -286,5 +372,6 @@ def ensure_prediction_checkpoint(
 __all__ = [
     "PredictionCheckpointInfo",
     "default_prediction_checkpoint_root",
+    "enformer_benchmark_checkpoint_path",
     "ensure_prediction_checkpoint",
 ]

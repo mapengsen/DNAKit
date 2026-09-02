@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- 将测试、示例、Notebook、MkDocs override 和本地验证资源统一迁移至 `others/`，并同步更新打包、CI、文档和工具配置。
+- Diversity 和 Novelty 新增论文定义的原始 Levenshtein 距离计算方式，保留原有相似度方法，并提供资源上限、进度条、测试及中英文引用说明。
+- 新增 NT Revised 18 项与 Genomic Benchmarks 9 项完整微调 checkpoint 分类预测，支持独立的统一下载说明页、本地可配置路径、安全加载、Agent 调用及逐功能文档。
+
 ## [0.1.3] - 2026-09-01
 
 - 新增 AlphaGenome、Enformer、Evo 2、GENERator、LucaOneTasks 和 SegmentNT 的预训练性质预测接口，并对模型下载、远程代码和输出大小设置显式边界。

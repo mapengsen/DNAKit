@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import heapq
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 
 from dnakit.core import DNA, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
+from dnakit.similarity import edit_distance
 
 from ._shared import (
     EvaluationInput,
+    InputItem,
     digest_json,
     enforce_pair_limit,
     materialize_input,
@@ -19,6 +21,8 @@ from ._shared import (
     pair_similarity,
     record_for,
     report,
+    require_nonempty,
+    require_pairwise_compatible,
     sequence_digest_payload,
 )
 from .config import ReferenceSearchConfig
@@ -26,6 +30,20 @@ from .results import EvaluationEntry, EvaluationReport, ReferenceLibrary
 
 _ReferenceHit = tuple[float, float | None, int, str, bool]
 _RankedReferenceHit = tuple[float, int, _ReferenceHit]
+
+
+def _tracked_query_items(
+    items: tuple[InputItem, ...],
+    *,
+    show_progress: bool,
+    description: str,
+) -> Iterable[tuple[int, InputItem]]:
+    indexed = enumerate(items)
+    if not show_progress:
+        return indexed
+    from rich.progress import track
+
+    return track(indexed, description=description, total=len(items))
 
 
 def create_reference_library(
@@ -76,7 +94,11 @@ def _nearest_entries(
     comparisons = pair_count(len(query_items), len(reference_items))
     enforce_pair_limit(comparisons, config.limits)
     entries: list[EvaluationEntry] = []
-    for query_index, query_item in enumerate(query_items):
+    for query_index, query_item in _tracked_query_items(
+        query_items,
+        show_progress=config.show_progress,
+        description="Reference similarity queries",
+    ):
         query_record = record_for(query_item)
         ranked_hits: list[_RankedReferenceHit] = []
         for reference_index, reference_item in enumerate(reference_items):
@@ -157,6 +179,123 @@ def _nearest_entries(
     return tuple(entries)
 
 
+def _evaluate_levenshtein_novelty(
+    queries: EvaluationInput,
+    reference: ReferenceLibrary,
+    config: ReferenceSearchConfig,
+) -> EvaluationReport:
+    if not isinstance(reference, ReferenceLibrary):
+        raise ConfigurationError(
+            "reference must be ReferenceLibrary.", code="UNVERSIONED_REFERENCE"
+        )
+    query_items = materialize_input(queries, limits=config.limits)
+    reference_items = materialize_input(reference.records, limits=config.limits)
+    require_nonempty(reference_items, "Levenshtein novelty")
+    comparisons = pair_count(len(query_items), len(reference_items))
+    enforce_pair_limit(comparisons, config.limits)
+    reference_records = tuple(record_for(item) for item in reference_items)
+    for record in reference_records:
+        require_pairwise_compatible(record.sequence, role="reference")
+
+    entries: list[EvaluationEntry] = []
+    distances: list[float] = []
+    for query_index, query_item in _tracked_query_items(
+        query_items,
+        show_progress=config.show_progress,
+        description="Novelty Levenshtein queries",
+    ):
+        query_record = record_for(query_item)
+        require_pairwise_compatible(query_record.sequence, role="query")
+        nearest_distance: float | None = None
+        nearest_index = 0
+        for reference_index, reference_record in enumerate(reference_records):
+            distance = float(
+                edit_distance(
+                    query_record,
+                    reference_record,
+                    max_cells=config.limits.max_alignment_cells,
+                ).distance
+            )
+            if nearest_distance is None or distance < nearest_distance:
+                nearest_distance = distance
+                nearest_index = reference_index
+        if nearest_distance is None:
+            raise AssertionError("A non-empty reference must produce one nearest distance.")
+        nearest_record = reference_records[nearest_index]
+        longest = max(
+            query_record.sequence.symbol_length,
+            nearest_record.sequence.symbol_length,
+        )
+        coverage = (
+            1.0
+            if longest == 0
+            else min(
+                query_record.sequence.symbol_length,
+                nearest_record.sequence.symbol_length,
+            )
+            / longest
+        )
+        is_novel = nearest_distance > 0.0
+        distances.append(nearest_distance)
+        entries.append(
+            EvaluationEntry(
+                query_item.subject_id,
+                query_index,
+                FrozenDict(
+                    {
+                        "nearest_reference_id": nearest_record.id,
+                        "nearest_reference_index": nearest_index,
+                        "nearest_levenshtein_distance": nearest_distance,
+                        "nearest_coverage": coverage,
+                        "novelty": nearest_distance,
+                        "exact_match": not is_novel,
+                        "is_novel": is_novel,
+                        "threshold": 0.0,
+                    }
+                ),
+            )
+        )
+    materialized = tuple(entries)
+    novelty_values = tuple(distances)
+    novel_count = sum(entry.metrics["is_novel"] is True for entry in materialized)
+    mean_distance = mean(novelty_values)
+    return report(
+        name="novelty",
+        method="mean-nearest-reference-levenshtein-distance",
+        version="eval-novelty-levenshtein-v1",
+        parameters={
+            "novelty_calculation": config.novelty_calculation,
+            "formula": "mean_i min_s Levenshtein(query_i,reference_s)",
+            "distance_units": "edit operations",
+            "normalization": "none",
+            "sequence_preprocessing": "none; no padding or truncation",
+            "ambiguity_policy": "literal IUPAC symbols",
+            "threshold_rule": "is_novel iff nearest Levenshtein distance > 0",
+            "similarity_and_copy_threshold_settings_used": False,
+            "topology_policy": "linearized at stored origin; no circular rotation",
+            "tie_break": "distance-asc,reference-input-index-asc",
+            "show_progress": config.show_progress,
+            "limits": config.limits,
+            "reference": reference.to_dict(),
+            "definition_reference": "https://doi.org/10.1016/j.compbiomed.2024.109440",
+        },
+        metrics={
+            "score": mean_distance,
+            "query_count": len(materialized),
+            "reference_count": len(reference_records),
+            "novel_count": novel_count,
+            "novel_fraction": novel_count / len(materialized) if materialized else None,
+            "mean_novelty": mean_distance,
+            "mean_nearest_levenshtein_distance": mean_distance,
+            "minimum_nearest_levenshtein_distance": min(novelty_values) if novelty_values else None,
+            "maximum_nearest_levenshtein_distance": max(novelty_values) if novelty_values else None,
+            "pairwise_comparison_count": comparisons,
+        },
+        entries=materialized,
+        reference=reference,
+    )
+
+
 def nearest_reference(
     queries: EvaluationInput,
     reference: ReferenceLibrary,
@@ -213,11 +352,13 @@ def evaluate_novelty(
     *,
     config: ReferenceSearchConfig | None = None,
 ) -> EvaluationReport:
-    """Score novelty as ``1 - nearest similarity`` relative to one versioned library."""
+    """Evaluate novelty by nearest similarity or raw nearest Levenshtein distance."""
 
     resolved = ReferenceSearchConfig() if config is None else config
     if not isinstance(resolved, ReferenceSearchConfig):
         raise TypeError("config must be ReferenceSearchConfig or None.")
+    if resolved.novelty_calculation == "levenshtein":
+        return _evaluate_levenshtein_novelty(queries, reference, resolved)
     _validate_copy_search_thresholds(resolved)
     nearest_entries = _nearest_entries(queries, reference, resolved)
     entries: list[EvaluationEntry] = []
@@ -248,6 +389,7 @@ def evaluate_novelty(
         method=f"one-minus-nearest-{resolved.method}-similarity",
         version="eval-novelty-v1",
         parameters={
+            "novelty_calculation": resolved.novelty_calculation,
             "copy_threshold": resolved.copy_threshold,
             "threshold_rule": "novel iff no hit or nearest_similarity < copy_threshold",
             "k": resolved.k,
@@ -255,6 +397,7 @@ def evaluate_novelty(
             "min_similarity": resolved.min_similarity,
             "min_coverage": resolved.min_coverage,
             "topology_policy": "linearized at stored origin; no circular rotation",
+            "show_progress": resolved.show_progress,
             "limits": resolved.limits,
             "reference": reference.to_dict(),
         },

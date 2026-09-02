@@ -147,6 +147,47 @@ def test_novelty_memorization_and_reference_similarity_share_reference_contract(
     assert similarity.metrics["mean_nearest_similarity"] == 0.5
 
 
+def test_levenshtein_novelty_uses_the_published_nearest_reference_formula() -> None:
+    reference = _reference()
+    queries = _set(("copy", "AAAA"), ("near", "AAAT"), ("tie", "GGGG"))
+
+    novelty = evaluate_novelty(
+        queries,
+        reference,
+        config=ReferenceSearchConfig(novelty_calculation="levenshtein"),
+    )
+
+    assert novelty.method == "mean-nearest-reference-levenshtein-distance"
+    assert novelty.algorithm_version == "eval-novelty-levenshtein-v1"
+    assert novelty.metrics["score"] == pytest.approx(5 / 3)
+    assert novelty.metrics["mean_nearest_levenshtein_distance"] == pytest.approx(5 / 3)
+    assert novelty.metrics["novel_count"] == 2
+    assert novelty.metrics["novel_fraction"] == pytest.approx(2 / 3)
+    assert novelty.metrics["pairwise_comparison_count"] == 6
+    assert novelty.entries[0].metrics["nearest_levenshtein_distance"] == 0.0
+    assert novelty.entries[1].metrics["nearest_levenshtein_distance"] == 1.0
+    assert novelty.entries[2].metrics["nearest_reference_id"] == "train-a"
+    assert novelty.provenance.reference is not None
+    assert novelty.provenance.reference.checksum == reference.digest
+
+
+def test_levenshtein_novelty_requires_a_nonempty_reference() -> None:
+    empty_reference = create_reference_library(
+        DNASet([]),
+        name="empty",
+        version="1",
+        source="local:test",
+    )
+
+    with pytest.raises(ConfigurationError) as error:
+        evaluate_novelty(
+            _set(("query", "AAAA")),
+            empty_reference,
+            config=ReferenceSearchConfig(novelty_calculation="levenshtein"),
+        )
+    assert error.value.code == "EMPTY_EVALUATION_DATASET"
+
+
 def test_reference_search_limit_precedes_pairwise_work() -> None:
     reference = _reference()
     queries = _set(("a", "AAAA"), ("b", "CCCC"))

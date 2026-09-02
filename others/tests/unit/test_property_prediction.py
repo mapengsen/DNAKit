@@ -12,17 +12,26 @@ import pytest
 from dnakit.core import DNARecord, DNASequence
 from dnakit.exceptions import BackendExecutionError, ConfigurationError, SequenceError
 from dnakit.predictions import (
+    ENFORMER_BENCHMARK_CHECKPOINTS_URL,
     BiologicalSequence,
     BiologicalSequencePair,
     PredictionOutput,
     PropertyPredictionConfig,
     VariantContext,
+    available_enformer_benchmark_tasks,
     available_prediction_models,
     available_prediction_tasks,
+    enformer_benchmark_checkpoint_path,
+    ensure_prediction_checkpoint,
+    get_enformer_benchmark_task,
     get_prediction_task,
     predict_properties,
 )
-from dnakit.predictions.backends import _LUCA_PRESETS, _LucaOneTasksBackend
+from dnakit.predictions.backends import (
+    _LUCA_PRESETS,
+    _checkpoint_labels,
+    _LucaOneTasksBackend,
+)
 from dnakit.predictions.models import PredictionInput
 
 
@@ -54,6 +63,15 @@ def test_direct_prediction_registry_excludes_embedding_only_models() -> None:
     )
     assert len(available_prediction_tasks("alphagenome")) == 11
     assert len(available_prediction_tasks("lucaone")) == 10
+    assert len(available_enformer_benchmark_tasks()) == 27
+    assert len(available_enformer_benchmark_tasks("nt")) == 18
+    assert len(available_enformer_benchmark_tasks("gb")) == 9
+    assert len(available_prediction_tasks("enformer")) == 29
+    assert get_prediction_task("enformer", "NT_H3K9me3.ckpt").name == "h3k9me3"
+    assert (
+        get_prediction_task("enformer", "gb_human_nontata_promoters").name
+        == "human_nontata_promoters"
+    )
     assert available_prediction_tasks("evo2") == ("exon_probability", "variant_effect")
     assert "segmentnt:genomic_segmentation" in available_prediction_tasks()
     assert get_prediction_task("segment-nt", "segmentation").name == "genomic_segmentation"
@@ -62,6 +80,61 @@ def test_direct_prediction_registry_excludes_embedding_only_models() -> None:
         with pytest.raises(ConfigurationError) as error:
             available_prediction_tasks(embedding_only)
         assert error.value.code == "INVALID_PREDICTION_MODEL"
+
+
+def test_enformer_benchmark_task_metadata_and_checkpoint_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    nt_task = get_enformer_benchmark_task("H3K9me3.ckpt")
+    gb_task = get_enformer_benchmark_task("gb_human_nontata_promoters")
+    assert nt_task.family == "nt"
+    assert nt_task.checkpoint_filename == "H3K9me3.ckpt"
+    assert gb_task.family == "gb"
+    assert gb_task.checkpoint_filename == "human_nontata_promoters.ckpt"
+
+    monkeypatch.chdir(tmp_path)
+    assert enformer_benchmark_checkpoint_path("h3k9me3") == (
+        tmp_path / "ckpt" / "enformer-benchmarks" / "H3K9me3.ckpt"
+    )
+
+    custom = tmp_path / "downloaded"
+    custom.mkdir()
+    checkpoint = custom / gb_task.checkpoint_filename
+    checkpoint.touch()
+    config = PropertyPredictionConfig(
+        model="enformer",
+        task="human_nontata_promoters",
+        checkpoint_dir=custom,
+    )
+    resolved = ensure_prediction_checkpoint(config)
+    assert resolved.paths == (str(checkpoint.resolve()),)
+    assert resolved.downloaded is False
+    assert resolved.sources == (ENFORMER_BENCHMARK_CHECKPOINTS_URL,)
+
+
+def test_missing_enformer_benchmark_checkpoint_has_actionable_path(tmp_path: Path) -> None:
+    config = PropertyPredictionConfig(
+        model="enformer",
+        task="h2afz",
+        checkpoint_dir=tmp_path,
+    )
+    with pytest.raises(ConfigurationError) as error:
+        ensure_prediction_checkpoint(config)
+    assert error.value.code == "MODEL_CHECKPOINT_NOT_FOUND"
+    assert error.value.context["checkpoint_filename"] == "H2AFZ.ckpt"
+    assert error.value.context["download_url"] == ENFORMER_BENCHMARK_CHECKPOINTS_URL
+    assert ENFORMER_BENCHMARK_CHECKPOINTS_URL in (error.value.hint or "")
+    assert str(tmp_path / "H2AFZ.ckpt") in (error.value.hint or "")
+
+
+def test_enformer_checkpoint_labels_are_sorted_by_stored_index() -> None:
+    assert _checkpoint_labels({"label_mapping": {"positive": 1, "negative": 0}}, 2) == (
+        "negative",
+        "positive",
+    )
+    with pytest.raises(BackendExecutionError) as error:
+        _checkpoint_labels({"label_mapping": {"negative": 0, "positive": 0}}, 2)
+    assert error.value.code == "INVALID_MODEL_CHECKPOINT"
 
 
 def test_prediction_inputs_normalize_and_validate_variant_context() -> None:

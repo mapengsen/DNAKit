@@ -86,6 +86,21 @@ Microsatellite invokes the same tandem repeat algorithm, but fixes the repeat un
 
 Matches must be consecutive and identical, no breaks, mismatches, or indels allowed. `min_repeats_by_unit` The threshold can be modified, but a threshold must be provided for each unit length from 1 to 6 bp.
 
+## What calculation methods and references are available for Diversity and Novelty? {#diversity-novelty-references}
+
+DNAKit retains its normalized-similarity methods and adds the paper's raw Levenshtein-distance methods:
+
+| Metric | Default method | Second method |
+| --- | --- | --- |
+| Diversity | `calculation="similarity"`: distance is `1 - pair_similarity`; `score` is mean nearest-neighbor distance, with mean pair distance and threshold-cluster summaries also reported. | `calculation="levenshtein"`: `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered sequence pairs. |
+| Novelty | `novelty_calculation="similarity"`: each query receives `1 - nearest_reference_similarity`. | `novelty_calculation="levenshtein"`: `meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`. |
+
+The second methods follow Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440, [DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440). Section 2.8, equations (20) and (21), specifies Levenshtein distance. The terminology is inherited from Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022, [PMLR paper page](https://proceedings.mlr.press/v162/jain22a.html).
+
+The article has an [official GitHub repository](https://github.com/powidla/nonB-DNA-structures-generation), with the relevant code in [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb). As of 2026-09-02, the repository declares no open-source license, and its notebook uses fixed 100-bp preprocessing, flattened one-hot/KDTree operations, and chunk-local calculations that do not fully match the published equations. DNAKit therefore does not copy that code: it independently implements the published formulas with its bounded Levenshtein routine, performs no implicit padding or truncation, and does not claim exact reproduction of the notebook values in Table 2.
+
+Levenshtein results are unnormalized counts of edit operations. Larger values mean greater diversity or greater distance from the reference library; compare datasets with similar sequence-length distributions.
+
 ## What are the calculation basis and references for physical and chemical properties? {#physicochemical-references}
 
 The functions in [Physical and Chemical Properties](api/features/07_physicochemical.md) do not use machine learning models. They are divided into theoretical formulations, public empirical parametric models, DNAKit internal transparency rules, and external Primer3 thermodynamic structure predictions. The table below itemizes the actual basis; internal rules for unsourced papers are clearly marked, without supplementary packaging with non-existent citations.
@@ -169,12 +184,14 @@ The above citations only indicate the sources of algorithms, parameters or exter
 
 ## What are the references for deep-learning property prediction? {#deep-learning-property-prediction-references}
 
-The following table covers the primary model papers used by all 27 functions integrated in [deep-learning property prediction](api/features/23_deep_learning_property_prediction.md). Multiple output heads share one model paper, so the same citation is not repeated for every function.
+The following table covers the primary model papers, task datasets, and training protocols used by all 54 functions integrated in [deep-learning property prediction](api/features/23_deep_learning_property_prediction.md). Multiple output heads share one paper, so the same citation is not repeated for every function.
 
 | Functions | Reference |
 | --- | --- |
 | RNA-seq, CAGE, PRO-cap, ATAC-seq, DNase-seq, ChIP-seq, splicing, and contact maps | Avsec et al., *Advancing regulatory variant effect prediction with AlphaGenome*, **Nature** 649, 1206–1218 (2026), [DOI 10.1038/s41586-025-10014-0](https://doi.org/10.1038/s41586-025-10014-0). |
 | Human and mouse regulatory tracks | Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x). |
+| 18 NT Revised classification tasks | Backbone: Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x); task definitions: Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z), and the [revised dataset card](https://huggingface.co/datasets/InstaDeepAI/nucleotide_transformer_downstream_tasks_revised); full-fine-tuning protocol: Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272), Appendix C.4. |
+| 9 Genomic Benchmarks classification tasks | Backbone: Avsec et al., *Effective gene expression prediction from sequence by integrating long-range interactions*, **Nature Methods** 18, 1196–1203 (2021), [DOI 10.1038/s41592-021-01252-x](https://doi.org/10.1038/s41592-021-01252-x); task datasets: Grešová et al., *Genomic benchmarks: a collection of datasets for genomic sequence classification*, **BMC Genomic Data** 24, 25 (2023), [DOI 10.1186/s12863-023-01123-8](https://doi.org/10.1186/s12863-023-01123-8); full-fine-tuning protocol: Wu et al., *GENERator: A Long-Context Generative Genomic Foundation Model*, arXiv (2025), [arXiv:2502.07272](https://arxiv.org/abs/2502.07272), Appendix C.4. |
 | Foundation encoder for 14-class single-nucleotide genome segmentation | Dalla-Torre et al., *Nucleotide Transformer: building and evaluating robust foundation models for human genomics*, **Nature Methods** 22, 287–297 (2025), [DOI 10.1038/s41592-024-02523-z](https://doi.org/10.1038/s41592-024-02523-z). |
 | Trained 14-class single-nucleotide genome segmentation head | de Almeida et al., *Annotating the genome at single-nucleotide resolution with DNA foundation models*, **Nature Methods** (2025), [DOI 10.1038/s41592-025-02881-2](https://doi.org/10.1038/s41592-025-02881-2). |
 | Long-context zero-shot variant effects and exon probability | Brixi et al., *Genome modelling and design across all domains of life with Evo 2*, **Nature** (2026), [DOI 10.1038/s41586-026-10176-5](https://doi.org/10.1038/s41586-026-10176-5). |
@@ -185,6 +202,7 @@ Direct inference also depends on the following released code or trained weights:
 
 - The 11 genomic-track tasks: [AlphaGenome research](https://github.com/google-deepmind/alphagenome_research) and [`google/alphagenome-all-folds`](https://huggingface.co/google/alphagenome-all-folds).
 - Human/mouse regulatory tracks: the [official Enformer implementation](https://github.com/google-deepmind/deepmind-research/tree/master/enformer) and [`EleutherAI/enformer-official-rough`](https://huggingface.co/EleutherAI/enformer-official-rough).
+- The 27 task-classification checkpoints are downloaded from the [shared Google Drive checkpoint folder](https://drive.google.com/drive/folders/1lrZXzkrgAJMqM0wAmnIeZ4DEp0XFNIRI?usp=sharing); task definitions come from the [NT Revised dataset](https://huggingface.co/datasets/InstaDeepAI/nucleotide_transformer_downstream_tasks_revised) and [Genomic Benchmarks repository](https://github.com/ML-Bioinfo-CEITEC/genomic_benchmarks), and DNAKit does not redistribute these weights inside the package.
 - Single-nucleotide genome segmentation: the [Nucleotide Transformer repository](https://github.com/instadeepai/nucleotide-transformer) and [`InstaDeepAI/segment_nt`](https://huggingface.co/InstaDeepAI/segment_nt).
 - Zero-shot variant effects/exon probability: the [Evo 2 repository](https://github.com/ArcInstitute/evo2), [`arcinstitute/evo2_7b`](https://huggingface.co/arcinstitute/evo2_7b), [`arcinstitute/evo2_7b_base`](https://huggingface.co/arcinstitute/evo2_7b_base), and [`schmojo/evo2-exon-classifier`](https://huggingface.co/schmojo/evo2-exon-classifier).
 - Allele-conditional-probability variant effects: the [GENERator repository](https://github.com/GenerTeam/GENERator) and [`GenerTeam/GENERator-v2-eukaryote-1.2b-base`](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base).

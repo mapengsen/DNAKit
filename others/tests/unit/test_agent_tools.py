@@ -90,6 +90,14 @@ def test_agent_adapter_constructs_nested_prediction_configuration() -> None:
     assert value.show_progress is False
 
 
+def test_enformer_benchmark_prediction_is_registered_as_model_tool() -> None:
+    manifest = default_tool_registry().describe("predictions.predict_enformer_benchmark")
+
+    assert manifest["agent_compatible"] is True
+    assert manifest["effect"] == "model"
+    assert manifest["requires_confirmation"] is True
+
+
 def test_agent_result_contains_plain_json_values() -> None:
     result = default_tool_registry().execute(
         "dnakit.ops.reverse_complement",

@@ -22,7 +22,7 @@ Deep-learning prediction, database access, and ToolUniverse-backed capabilities 
 optional dependencies. For example:
 
 ```bash
-python -m pip install "dnakit[agent,external-tools,neural]"
+python -m pip install "dnakit[agent,external-tools,neural,neural-enformer]"
 ```
 
 ## 2) Start the server
@@ -75,7 +75,7 @@ to the model at once:
 5. `describe_dnakit_tool` returns the complete schema and safety metadata;
 6. `call_dnakit_tool` executes one selected DNAKit function.
 
-The current source discovers 322 public functions, of which 319 accept JSON-adaptable inputs. Two
+The current source discovers 326 public functions, of which 323 accept JSON-adaptable inputs. Two
 low-level batch functions that require Python callbacks and the arbitrary command executor remain
 Python-only. An Agent can perform ordinary batching by making repeated calls to a selected DNAKit
 function.
@@ -106,6 +106,7 @@ provenance.
 
 - A `DNASequence` accepts sequence text; a `DNARecord` accepts an object with `sequence` and `id`.
 - Configuration classes use ordinary JSON objects whose fields are documented by the tool schema.
+- The 27 local task checkpoints are callable through `dnakit.predictions.predict_enformer_benchmark`; it is a model tool, so an Agent still needs explicit confirmation and a checkpoint path.
 - Python callbacks, open file handles, and live backend instances cannot be passed through JSON.
 - File writes, model downloads, and external programs are denied by default and require an explicit
   `allow_side_effects=true` after review.

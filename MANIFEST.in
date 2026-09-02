@@ -5,15 +5,16 @@ include LICENSE
 include DISCLAIMER.md
 include pyproject.toml
 include environment-dev.yml
+include others/__init__.py
 recursive-include src *.py py.typed
-recursive-include tests *.py
+recursive-include others/tests *.py
 recursive-include benchmarks *.py *.md *.json
-recursive-include validation *.py *.md *.json
-recursive-include examples *.json *.fasta *.yml *.md
+recursive-include others/validation *.py *.md *.json
+recursive-include others/examples *.json *.fasta *.yml *.md
 recursive-include docs *.md *.json *.csv
-recursive-include overrides *.html
+recursive-include others/overrides *.html
 include mkdocs.yml
-recursive-include notebooks *.ipynb
+recursive-include others/notebooks *.ipynb
 
 prune dashing_similarity
 prune ckpt

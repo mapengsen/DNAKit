@@ -39,6 +39,7 @@ outputs/
 
 # Local model weights and datasets
 /compared_models/models/
+/best_ckpts_by_task/
 /temp/
 
 # Release verification artifacts

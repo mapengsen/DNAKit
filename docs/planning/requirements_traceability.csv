@@ -139,9 +139,9 @@ EVAL-002,138,12. 常用评价指标,Ambiguity,0.2-0.4-ADVANCED,native,,complete,
 EVAL-003,139,12. 常用评价指标,Sequence quality,0.2-0.4-ADVANCED,native,,complete,quality,evaluate_quality透明组合validity、ambiguity、complexity、length和completeness并保留全部分项
 EVAL-004,140,12. 常用评价指标,Complexity,0.2-0.4-ADVANCED,native,,complete,complexity,evaluate_complexity组合entropy、linguistic complexity、repeat cleanliness和homopolymer cleanliness
 EVAL-005,141,12. 常用评价指标,Uniqueness,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_uniqueness支持exact、reverse-complement、circular、IUPAC和approximate定义并报告unique fraction
-EVAL-006,142,12. 常用评价指标,Diversity,0.2-0.4-ADVANCED,native,,complete,,evaluate_diversity报告平均/最近邻距离、阈值cluster数量和coverage摘要
+EVAL-006,142,12. 常用评价指标,Diversity,0.2-0.4-ADVANCED,native,,complete,,evaluate_diversity保留相似度摘要并新增论文公式的全体序列对平均原始Levenshtein距离
 EVAL-007,143,12. 常用评价指标,Redundancy,0.2-0.4-ADVANCED,native,,complete,dedup_groups,evaluate_redundancy报告exact、threshold-near及cluster层冗余，复用明确相似度配置
-EVAL-008,144,12. 常用评价指标,Novelty,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_novelty定义为相对于版本化ReferenceLibrary的1-nearest-similarity，不提供绝对novelty
+EVAL-008,144,12. 常用评价指标,Novelty,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_novelty支持相对于版本化ReferenceLibrary的1-nearest-similarity及论文公式的平均最近原始Levenshtein距离
 EVAL-009,145,12. 常用评价指标,最近参考序列,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,nearest_reference返回稳定Top-k reference ID、index、similarity、coverage和exact标记
 EVAL-010,146,12. 常用评价指标,Memorization,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_memorization按exact或显式copy_threshold标记训练参考复制，不使用任务型模型
 EVAL-011,147,12. 常用评价指标,Reference similarity,0.2-0.4-ADVANCED,native,adapter,complete,reference_search,evaluate_reference_similarity汇总每条query的最近参考相似度与命中率

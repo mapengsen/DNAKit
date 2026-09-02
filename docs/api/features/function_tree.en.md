@@ -218,13 +218,16 @@ Quick Start Tutorial
 │   │   ├── 5. Concentration, quantity and mass interchange of substances
 │   │   └── 6. Explicit correction of dyes and modifying groups
 │   ├── (8) Deep-learning property prediction
-│   │   ├── 1. AlphaGenome 11 output modalities and SNV track differences
-│   │   ├── 2. Enformer human/mouse regulatory tracks and SNV differences
-│   │   ├── 3. SegmentNT 14-class single-nucleotide segmentation
-│   │   ├── 4. Evo 2 zero-shot variant score and exon probability
-│   │   ├── 5. GENERator zero-shot variant score
-│   │   └── 6. Ten pretrained LucaOneTasks heads
-│   └── (9) Optional bioinformatics functions
+│   │   ├── 1. Eleven genomic output modalities and SNV track differences
+│   │   ├── 2. Human/mouse regulatory tracks and SNV differences
+│   │   ├── 3. Fourteen-class single-nucleotide segmentation
+│   │   ├── 4. Long-context zero-shot variant score and exon probability
+│   │   ├── 5. Allele-conditional-probability variant score
+│   │   ├── 6. Ten trained nucleic-acid/protein downstream tasks
+│   │   ├── 7. Eighteen fully fine-tuned NT Revised classifiers
+│   │   └── 8. Nine fully fine-tuned Genomic Benchmarks classifiers
+│   ├── (9) Deep-learning task checkpoint download
+│   └── (10) Optional bioinformatics functions
 │       ├── 1. Ensembl VEP and variant identifier recoding
 │       ├── 2. ClinVar, dbSNP, and gnomAD annotation
 │       ├── 3. Nei–Gojobori dN/dS
@@ -233,8 +236,8 @@ Quick Start Tutorial
 │   ├── (1) Commonly used evaluation indicators
 │   │   ├── 1. EVAL-001 Validity
 │   │   ├── 2. EVAL-005 Uniqueness
-│   │   ├── 3. EVAL-006 Diversity
-│   │   ├── 4. EVAL-008 Novelty
+│   │   ├── 3. EVAL-006 Diversity (similarity / mean pairwise Levenshtein)
+│   │   ├── 4. EVAL-008 Novelty (similarity / mean nearest-reference Levenshtein)
 │   │   ├── 5. EVAL-016 Fréchet DNA distance
 │   │   ├── 6. EVAL-017 Frag
 │   │   ├── 7. EVAL-018 SNN
