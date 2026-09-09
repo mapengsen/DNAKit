@@ -48,6 +48,11 @@ outputs/
 
 # Third-party local source/binaries are never part of DNAKit distributions.
 /dashing_similarity/
+
+# Local paper drafts, plans, and supporting images
+/image/
+/实验安排.md
+/提示词.md
 使用方法.md
 /write_paper/
 /backup/
