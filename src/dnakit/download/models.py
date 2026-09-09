@@ -208,7 +208,6 @@ class IndexBuildResult:
     output_prefix: str
     artifacts: tuple[IndexArtifact, ...]
     command_output: str
-    elapsed_seconds: float
     manifest_path: str
     provenance: Provenance
 

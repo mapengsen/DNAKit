@@ -82,10 +82,10 @@ jobs:
           PY
 
       - name: Check formatting
-        run: python -m ruff format --check src others/tests others/validation benchmarks
+        run: python -m ruff format --check src others/tests others/validation
 
       - name: Lint
-        run: python -m ruff check src others/tests others/validation benchmarks
+        run: python -m ruff check src others/tests others/validation
 
       - name: Type check (advisory)
         continue-on-error: true
@@ -191,6 +191,8 @@ jobs:
                           (
                               "/docs/planning/requirements_traceability.csv",
                               "/docs/planning/database_capabilities.csv",
+                              "/docs/planning/table1_dnakit_capabilities.csv",
+                              "/docs/assets/data/distribution.csv",
                           )
                       ), f"Unexpected CSV leaked: {name}"
                   if "dnakit" in path.parts:

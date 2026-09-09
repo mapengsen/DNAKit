@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Final, Literal
 
 from rich.console import Console
-from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 
 import dnakit
 from dnakit import DNARecord, DNASequence
@@ -497,7 +497,6 @@ def build_report(*, include_optional: bool = True, show_progress: bool = True) -
         SpinnerColumn(),
         TextColumn("{task.description}"),
         BarColumn(),
-        TimeElapsedColumn(),
         console=Console(stderr=True),
         disable=not show_progress,
     )

@@ -1702,12 +1702,11 @@ class _LucaOneTasksBackend:
                 arguments.extend(("--topk", str(self.config.top_k)))
             progress_ui: Any | None = None
             if show_progress:
-                from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+                from rich.progress import Progress, SpinnerColumn, TextColumn
 
                 progress_ui = Progress(
                     SpinnerColumn(),
                     TextColumn("Running official LucaOneTasks predictor"),
-                    TimeElapsedColumn(),
                 )
                 progress_ui.start()
                 progress_ui.add_task("lucaone", total=None)

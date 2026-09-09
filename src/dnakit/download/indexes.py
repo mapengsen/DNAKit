@@ -206,7 +206,6 @@ def build_index(
                 {"path": item.path, "byte_size": item.byte_size, "sha256": item.sha256}
                 for item in artifacts
             ],
-            "elapsed_seconds": command.elapsed_seconds,
             "provenance": provenance.to_dict(),
         }
         staged_manifest = work / manifest.name
@@ -224,7 +223,6 @@ def build_index(
         str(final_prefix),
         artifacts,
         command.output,
-        command.elapsed_seconds,
         str(manifest),
         provenance,
     )

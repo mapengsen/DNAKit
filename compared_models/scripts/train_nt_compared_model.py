@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 import traceback
 from pathlib import Path
 from typing import Any
@@ -271,74 +270,6 @@ def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def cuda_device_index(device: str) -> int | None:
-    if not str(device).startswith("cuda") or not torch.cuda.is_available() or torch.cuda.device_count() <= 0:
-        return None
-    index = torch.device(device).index
-    if index is None:
-        index = torch.cuda.current_device()
-    if index < 0 or index >= torch.cuda.device_count():
-        return None
-    return int(index)
-
-
-def safe_reset_peak_memory_stats(device: str) -> str | None:
-    device_index = cuda_device_index(device)
-    if device_index is None:
-        return None
-    try:
-        torch.cuda.reset_peak_memory_stats(device_index)
-    except RuntimeError as exc:
-        return f"{type(exc).__name__}: {exc}"
-    return None
-
-
-def clear_profile_hooks(model: nn.Module) -> None:
-    for module in model.modules():
-        module._forward_hooks.clear()
-        module._forward_pre_hooks.clear()
-        for attr_name in ("total_ops", "total_params"):
-            if hasattr(module, attr_name):
-                delattr(module, attr_name)
-
-
-def safe_profile_model_from_loader(
-    model: nn.Module,
-    train_loader,
-    *,
-    device: str,
-    output_path: Path,
-    pair_mode: bool,
-) -> dict[str, Any]:
-    try:
-        from visualdna.utils.model_profile import profile_model_from_loader
-    except ModuleNotFoundError as exc:
-        payload = {
-            "status": "skipped",
-            "reason": f"missing_optional_dependency: {exc}",
-        }
-        write_json(output_path, payload)
-        return payload
-
-    try:
-        return profile_model_from_loader(
-            model,
-            train_loader,
-            device=device,
-            pair_mode=pair_mode,
-            output_path=output_path,
-        )
-    except Exception as exc:
-        payload = {
-            "status": "partial",
-            "reason": f"profile_error: {type(exc).__name__}: {exc}",
-        }
-        write_json(output_path, payload)
-        return payload
-    finally:
-        clear_profile_hooks(model)
-
-
 def write_run_config(
     args: argparse.Namespace,
     *,
@@ -377,37 +308,6 @@ def write_run_config(
     write_json(log_dir / "dataset_meta.json", meta)
 
 
-def runtime_payload(
-    *,
-    start_time: float,
-    dist_context,
-) -> dict[str, Any]:
-    payload = {
-        "wall_time_seconds": round(time.perf_counter() - start_time, 6),
-        "device": dist_context.device,
-        "distributed": dist_context.is_distributed,
-        "rank": dist_context.rank,
-        "world_size": dist_context.world_size,
-    }
-    device_index = cuda_device_index(dist_context.device)
-    if device_index is not None:
-        try:
-            max_allocated = torch.cuda.max_memory_allocated(device_index)
-            max_reserved = torch.cuda.max_memory_reserved(device_index)
-            properties = torch.cuda.get_device_properties(device_index)
-        except RuntimeError as exc:
-            payload["cuda_memory_stats_error"] = f"{type(exc).__name__}: {exc}"
-        else:
-            payload["max_cuda_memory_allocated_bytes"] = int(max_allocated)
-            payload["max_cuda_memory_allocated_mib"] = round(float(max_allocated) / (1024 ** 2), 3)
-            payload["max_cuda_memory_reserved_bytes"] = int(max_reserved)
-            payload["max_cuda_memory_reserved_mib"] = round(float(max_reserved) / (1024 ** 2), 3)
-            payload["cuda_device_name"] = properties.name
-            payload["cuda_device_total_memory_bytes"] = int(properties.total_memory)
-            payload["cuda_device_total_memory_mib"] = round(float(properties.total_memory) / (1024 ** 2), 3)
-    return payload
-
-
 def run_single(
     args: argparse.Namespace,
     *,
@@ -416,9 +316,6 @@ def run_single(
     log_dir: Path,
     dist_context,
 ) -> dict[str, Any]:
-    start_time = time.perf_counter()
-    cuda_memory_stats_error = safe_reset_peak_memory_stats(dist_context.device)
-
     set_seed(args.seed)
     spec = get_model_spec(model_name)
     resolved_finetune_method = validate_finetune_method(spec, args.finetune_method)
@@ -474,15 +371,6 @@ def run_single(
         ia3_feedforward_modules=args.ia3_feedforward_modules,
     )
 
-    model_profile = None
-    if dist_context.is_main_process:
-        model_profile = safe_profile_model_from_loader(
-            model,
-            loaders["train"],
-            device=dist_context.device,
-            output_path=log_dir / "model_profile.json",
-            pair_mode=pair_mode,
-        )
     if dist_context.is_distributed:
         barrier()
     model = maybe_wrap_model(model, dist_context)
@@ -522,12 +410,6 @@ def run_single(
         monitor_mode=monitor_mode,
         early_stopping_patience=args.early_stopping_patience,
     )
-    runtime = runtime_payload(start_time=start_time, dist_context=dist_context)
-    if cuda_memory_stats_error is not None:
-        runtime["cuda_memory_stats_reset_error"] = cuda_memory_stats_error
-    if dist_context.is_main_process:
-        write_json(log_dir / "runtime.json", runtime)
-
     summary = trainer.report_run_summary(
         fit_result,
         status="ok",
@@ -542,8 +424,6 @@ def run_single(
         world_size=dist_context.world_size,
         token_readout=args.token_readout,
         finetune_method=resolved_finetune_method,
-        model_profile=model_profile,
-        runtime=runtime,
         monitor=monitor,
         chunk_length=spec.chunk_length,
         chunk_unit=spec.chunk_unit,

@@ -49,7 +49,7 @@ DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA �
 Pypi安装当前版本：
 
 ```bash
-pip install dnakit==0.1.3
+pip install dnakit==0.1.4
 ```
 
 如需 VEP、ClinVar、dbSNP、gnomAD、dN/dS 和 Golden Gate
@@ -95,7 +95,9 @@ conda activate dnakit-dev
 DNAKit 的项目论文尚未发表。当前版本可引用为：
 
 ```text
-DNAKit contributors. DNAKit 0.1.3, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.4, 2026. https://github.com/mapengsen/DNAKit
 ```
 
 正式论文发表后，此处将更新为论文引用信息。使用具体算法、数据库或可选后端时，还应引用其对应来源。
+
+当前工作区还提供[生物信息学 Python API](docs/api/features/27_bioinformatics.md)：原生 DNA 编码、生成评价、统计和约束优化，以及可选格式编解码与比对/NGS 专业后端。使用 `python -m pip install -e ".[bio]"` 安装。

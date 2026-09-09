@@ -12,6 +12,12 @@ Ordinary users only need to use `DNA` from the top level of `dnakit`: one or mor
 
 Core results `MetricResult` hold value, unit, method, algorithm version, parameters, conditions, provenance, and issues; domain results can use a more specialized immutable schema.
 
+## General-purpose Python LLM API
+
+::: dnakit.llm
+
+`call_llm()` and `acall_llm()` send a custom prompt and explicitly supplied text/JSON to a configured compatible endpoint and return `LLMResult`. Use `file_path` to explicitly select one local text file or `read_llm_file()` for an offline preview. They do not implicitly read other files, sample data, or execute model output. See [general-purpose LLM calls](../agent_tools.md#custom-llm) for configuration, privacy boundaries, and examples.
+
 ## I/O and metadata
 
 ::: dnakit.io
@@ -421,3 +427,7 @@ dnakit workflow --help
 `python -m dnakit.cli.workflow run CONFIG` is reserved for compatibility/development entry.
 
 The item-by-item scope is based on the [ requirements tracking matrix ](../planning/requirements_traceability.csv).
+
+## Bioinformatics Python APIs {#bioinformatics}
+
+Import `dnakit.bioinformatics` submodules for native DNA encodings, generative metrics, phylogenetics, statistics, constraint optimization and cloning, with explicit optional codecs and specialist alignment/NGS backends. See the [complete API guide](features/27_bioinformatics.md) for dependencies, return types, formulas and limitations. No new CLI is provided.

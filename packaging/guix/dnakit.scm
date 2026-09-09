@@ -4,6 +4,7 @@
              (gnu packages python-build)
              (gnu packages python-xyz)
              (guix build-system pyproject)
+             (guix gexp)
              (guix git-download)
              ((guix licenses) #:prefix license:)
              (guix packages))
@@ -21,6 +22,19 @@
      (sha256
       (base32 "1cra4r62x0fzwsjlbhc3gl5985dlh3p74y9v77idbmbnd76jmv2w"))))
   (build-system pyproject-build-system)
+  (arguments
+   (list
+    ;; Tests import the source-only benchmarks and validation modules.
+    #:test-flags #~(list "-o" "pythonpath=.")
+    #:phases
+    #~(modify-phases %standard-phases
+        (add-after 'unpack 'patch-test-shells
+          (lambda _
+            ;; The test executables are generated after patch-shebangs.
+            (substitute* '("tests/unit/test_external_backend_adapters.py"
+                           "tests/unit/test_remote_download.py")
+              (("#!/bin/sh")
+               (string-append "#!" (which "sh")))))))))
   (native-inputs
    (list python-numpy
          python-pytest

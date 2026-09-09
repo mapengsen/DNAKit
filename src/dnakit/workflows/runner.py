@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from time import perf_counter
 from typing import Any, Literal, cast
 
 from dnakit.core import ArtifactRef, DNAAlphabet, DNARecord, DNASet, Issue, IssueSeverity
@@ -150,7 +149,6 @@ class WorkflowStepResult:
     params: FrozenDict
     started_at: str | None
     finished_at: str | None
-    duration_seconds: float
     input_sha256: str | None
     record_count: int | None
     summary: FrozenDict
@@ -167,7 +165,6 @@ class WorkflowStepResult:
         *,
         started_at: str | None = None,
         finished_at: str | None = None,
-        duration_seconds: float = 0.0,
         input_sha256: str | None = None,
         record_count: int | None = None,
         summary: Mapping[str, object] | None = None,
@@ -178,8 +175,6 @@ class WorkflowStepResult:
             raise ConfigurationError("Workflow step result identifiers must be non-empty.")
         if status not in {"planned", "succeeded", "failed", "skipped", "blocked"}:
             raise ConfigurationError("Workflow step result status is invalid.")
-        if duration_seconds < 0:
-            raise ConfigurationError("Workflow step duration must be non-negative.")
         if record_count is not None and (
             isinstance(record_count, bool) or not isinstance(record_count, int) or record_count < 0
         ):
@@ -191,7 +186,6 @@ class WorkflowStepResult:
         object.__setattr__(self, "params", freeze_mapping(params))
         object.__setattr__(self, "started_at", started_at)
         object.__setattr__(self, "finished_at", finished_at)
-        object.__setattr__(self, "duration_seconds", float(duration_seconds))
         object.__setattr__(self, "input_sha256", input_sha256)
         object.__setattr__(self, "record_count", record_count)
         object.__setattr__(self, "summary", freeze_mapping(summary))
@@ -1377,7 +1371,6 @@ def run_workflow(
             continue
 
         step_started_at = _utc_now()
-        timer = perf_counter()
         input_digest = _state_digest(state, step)
         try:
             _emit(
@@ -1426,7 +1419,6 @@ def run_workflow(
             _check_result_size(outcome.state.results, plan.spec, step_id=step.id)
             states[step.id] = outcome.state
             outputs.extend(outcome.artifacts)
-            elapsed = perf_counter() - timer
             artifact_summaries = tuple(
                 _artifact_summary(artifact, plan.output_dir) for artifact in outcome.artifacts
             )
@@ -1438,7 +1430,6 @@ def run_workflow(
                 _params(step),
                 started_at=step_started_at,
                 finished_at=_utc_now(),
-                duration_seconds=elapsed,
                 input_sha256=input_digest,
                 record_count=len(outcome.state.records),
                 summary=outcome.summary,
@@ -1468,7 +1459,6 @@ def run_workflow(
                 started_at=started_at,
             )
         except Exception as error:
-            elapsed = perf_counter() - timer
             payload = _error_payload(error)
             result = WorkflowStepResult(
                 step.id,
@@ -1478,7 +1468,6 @@ def run_workflow(
                 _params(step),
                 started_at=step_started_at,
                 finished_at=_utc_now(),
-                duration_seconds=elapsed,
                 input_sha256=input_digest,
                 record_count=len(state.records),
                 error=payload,

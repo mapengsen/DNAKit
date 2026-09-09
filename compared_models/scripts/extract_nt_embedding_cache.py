@@ -174,12 +174,11 @@ class CacheLock:
                     owner_path = self.lock_path / "owner.json"
                     try:
                         owner = json.loads(owner_path.read_text(encoding="utf-8"))
-                        owner_text = f", owner_pid={owner.get('pid')}"
+                        owner_text = f" (owner_pid={owner.get('pid')})"
                     except Exception:
                         owner_text = ""
                     print(
-                        f"[cache] waiting for lock: {self.lock_path} "
-                        f"({int(now - started_at)}s elapsed{owner_text})",
+                        f"[cache] waiting for lock: {self.lock_path}{owner_text}",
                         flush=True,
                     )
                     last_report_at = now

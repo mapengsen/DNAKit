@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml">
-    <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI status">
+    <img src="https://github.com/mapengsen/DNAKit/actions/workflows/ci.yml/badge.svg?branch=main&event=push" alt="CI status">
   </a>
   <a href="https://mapengsen.github.io/DNAKit/en/">
     <img src="https://img.shields.io/badge/docs-GitHub%20Pages-4051b5" alt="Documentation">
@@ -23,16 +23,16 @@
 
 <p align="center">
   <a href="https://pypi.org/project/dnakit/">
-    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&amp;label=PyPI&amp;logo=pypi&amp;cacheSeconds=300" alt="PyPI version">
+    <img src="https://img.shields.io/pypi/v/dnakit?include_prereleases=true&label=PyPI&logo=pypi&cacheSeconds=300" alt="PyPI version">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda">
-    <img src="https://img.shields.io/badge/Bioconda-recipe-43B02A?logo=anaconda&amp;logoColor=white" alt="Bioconda recipe">
+    <img src="https://img.shields.io/badge/Bioconda-recipe-43B02A?logo=anaconda&logoColor=white" alt="Bioconda recipe">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit">
-    <img src="https://img.shields.io/badge/Galaxy-wrapper-2C3143?logo=galaxy&amp;logoColor=white" alt="Galaxy wrapper">
+    <img src="https://img.shields.io/badge/Galaxy-wrapper-2C3143?logo=galaxy&logoColor=white" alt="Galaxy wrapper">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
-    <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&amp;logoColor=white" alt="GNU Guix package">
+    <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&logoColor=white" alt="GNU Guix package">
   </a>
 </p>
 
@@ -69,7 +69,7 @@ representations for k-means clustering.
 Install the current release:
 
 ```bash
-pip install dnakit==0.1.3
+pip install dnakit==0.1.4
 ```
 
 Install the optional VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
@@ -121,8 +121,9 @@ See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) f
 The DNAKit project paper has not yet been published. Cite the current version as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.3, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.4, 2026. https://github.com/mapengsen/DNAKit
 ```
 
-This section will be updated after the paper is published. When using specific algorithms,
-databases, or optional backends, cite their corresponding sources as well.
+The paper has been submitted for publication, this section will be updated after the paper is published. When using specific algorithms,databases, or optional backends, cite their corresponding sources as well.
+
+The working tree also provides [bioinformatics Python APIs](docs/api/features/27_bioinformatics.en.md): native DNA encodings, generative metrics, statistics and specification-based optimization, plus optional format codecs and specialist alignment/NGS backends. Install these with `python -m pip install -e ".[bio]"`.

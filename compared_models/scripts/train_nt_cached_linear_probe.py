@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 import traceback
 from pathlib import Path
 from typing import Any
@@ -148,61 +147,6 @@ def build_eval_only_result(test_metrics: dict[str, float]) -> dict[str, Any]:
     }
 
 
-def cuda_device_index(device: str) -> int | None:
-    if not str(device).startswith("cuda") or not torch.cuda.is_available() or torch.cuda.device_count() <= 0:
-        return None
-    index = torch.device(device).index
-    if index is None:
-        index = torch.cuda.current_device()
-    if index < 0 or index >= torch.cuda.device_count():
-        return None
-    return int(index)
-
-
-def safe_reset_peak_memory_stats(device: str) -> str | None:
-    device_index = cuda_device_index(device)
-    if device_index is None:
-        return None
-    try:
-        torch.cuda.reset_peak_memory_stats(device_index)
-    except RuntimeError as exc:
-        return f"{type(exc).__name__}: {exc}"
-    return None
-
-
-def runtime_payload(*, start_time: float, device: str) -> dict[str, Any]:
-    payload = {
-        "wall_time_seconds": round(time.perf_counter() - start_time, 6),
-        "device": device,
-        "distributed": False,
-        "rank": 0,
-        "world_size": 1,
-        "cached_embedding": True,
-    }
-    device_index = cuda_device_index(device)
-    if device_index is None:
-        return payload
-    try:
-        max_allocated = torch.cuda.max_memory_allocated(device_index)
-        max_reserved = torch.cuda.max_memory_reserved(device_index)
-        properties = torch.cuda.get_device_properties(device_index)
-    except RuntimeError as exc:
-        payload["cuda_memory_stats_error"] = f"{type(exc).__name__}: {exc}"
-        return payload
-    payload.update(
-        {
-            "max_cuda_memory_allocated_bytes": int(max_allocated),
-            "max_cuda_memory_allocated_mib": round(float(max_allocated) / (1024 ** 2), 3),
-            "max_cuda_memory_reserved_bytes": int(max_reserved),
-            "max_cuda_memory_reserved_mib": round(float(max_reserved) / (1024 ** 2), 3),
-            "cuda_device_name": properties.name,
-            "cuda_device_total_memory_bytes": int(properties.total_memory),
-            "cuda_device_total_memory_mib": round(float(properties.total_memory) / (1024 ** 2), 3),
-        }
-    )
-    return payload
-
-
 class CachedFeatureDataset(Dataset):
     def __init__(self, features: torch.Tensor, labels: torch.Tensor) -> None:
         if features.ndim != 2:
@@ -333,22 +277,6 @@ def build_loader(
     )
 
 
-def build_model_profile(model: nn.Module, *, feature_dim: int, num_labels: int, cache_meta: dict[str, Any]) -> dict[str, Any]:
-    total_params = sum(parameter.numel() for parameter in model.parameters())
-    trainable_params = sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad)
-    return {
-        "status": "cached_linear_probe",
-        "cached_embedding": True,
-        "feature_dim": int(feature_dim),
-        "num_labels": int(num_labels),
-        "total_params": int(total_params),
-        "total_params_m": round(float(total_params) / 1_000_000, 6),
-        "trainable_params": int(trainable_params),
-        "trainable_params_m": round(float(trainable_params) / 1_000_000, 6),
-        "backbone_model_name": cache_meta.get("model_name"),
-    }
-
-
 def validate_cache(args: argparse.Namespace, payload: dict[str, Any]) -> dict[str, Any]:
     meta = payload.get("meta")
     if not isinstance(meta, dict):
@@ -394,8 +322,6 @@ def write_run_config(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
-    started_at = time.perf_counter()
-    cuda_memory_stats_error = safe_reset_peak_memory_stats(args.device)
     set_seed(args.seed)
 
     cache_path = Path(args.cache_path)
@@ -452,13 +378,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     feature_dim = int(payload["features"].shape[1])
     num_labels = int(cache_meta["num_labels"])
     model = nn.Linear(feature_dim, num_labels)
-    profile = build_model_profile(
-        model,
-        feature_dim=feature_dim,
-        num_labels=num_labels,
-        cache_meta=cache_meta,
-    )
-    write_json(log_dir / "model_profile.json", profile)
 
     optimizer, scheduler = build_optimizer_and_scheduler(
         optimizer_name=args.optimizer_name,
@@ -497,10 +416,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             fit_result = build_eval_only_result(test_metrics)
             fit_result["monitor"] = args.monitor
             fit_result["monitor_mode"] = monitor_mode
-            runtime = runtime_payload(start_time=started_at, device=args.device)
-            if cuda_memory_stats_error is not None:
-                runtime["cuda_memory_stats_reset_error"] = cuda_memory_stats_error
-            write_json(log_dir / "runtime.json", runtime)
             return trainer.report_run_summary(
                 fit_result,
                 output_name=args.eval_output_name,
@@ -520,8 +435,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 cache_path=str(cache_path),
                 checkpoint_path=str(checkpoint_path),
                 checkpoint_meta=checkpoint_meta,
-                model_profile=profile,
-                runtime=runtime,
                 monitor=args.monitor,
                 chunk_length=cache_meta.get("model_spec", {}).get("chunk_length"),
                 chunk_unit=cache_meta.get("model_spec", {}).get("chunk_unit"),
@@ -540,11 +453,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         monitor_mode=monitor_mode,
         early_stopping_patience=args.early_stopping_patience,
     )
-    runtime = runtime_payload(start_time=started_at, device=args.device)
-    if cuda_memory_stats_error is not None:
-        runtime["cuda_memory_stats_reset_error"] = cuda_memory_stats_error
-    write_json(log_dir / "runtime.json", runtime)
-
     return trainer.report_run_summary(
         fit_result,
         status="ok",
@@ -561,8 +469,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         finetune_method="frozen_linear_probe",
         cached_embedding=True,
         cache_path=str(cache_path),
-        model_profile=profile,
-        runtime=runtime,
         monitor=args.monitor,
         chunk_length=cache_meta.get("model_spec", {}).get("chunk_length"),
         chunk_unit=cache_meta.get("model_spec", {}).get("chunk_unit"),

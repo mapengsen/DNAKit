@@ -81,7 +81,6 @@ class BlastProgress:
 
     rid: str
     status: str
-    elapsed_seconds: float
 
 
 def _endpoint_origin(url: str) -> tuple[str, str]:
@@ -438,9 +437,8 @@ def wait_for_blast(
             )
         time.sleep(float(poll_interval))
         status = blast_status(job, config=resolved, api_url=api_url)
-        elapsed = time.monotonic() - started
         if progress is not None:
-            progress(BlastProgress(job.rid, status.status, elapsed))
+            progress(BlastProgress(job.rid, status.status))
         if status.status == "ready":
             if status.has_hits is False:
                 return QueryResult(

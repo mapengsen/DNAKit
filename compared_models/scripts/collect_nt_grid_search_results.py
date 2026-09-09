@@ -16,7 +16,7 @@ except ModuleNotFoundError:  # pragma: no cover
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="汇总 compared_models NT 网格搜索产生的 metrics/profile/runtime JSON。",
+        description="汇总 compared_models NT 网格搜索产生的分类指标和运行配置 JSON。",
     )
     parser.add_argument("--log-root", required=True, help="网格搜索输出根目录。")
     parser.add_argument(
@@ -92,8 +92,6 @@ def build_row(metrics_path: Path, log_root: Path) -> dict[str, Any]:
     run_dir = metrics_path.parent
     metrics = read_json(metrics_path)
     run_config = read_json(run_dir / "run_config.json")
-    profile = read_json(run_dir / "model_profile.json")
-    runtime = read_json(run_dir / "runtime.json")
     dataset_meta = read_json(run_dir / "dataset_meta.json")
 
     row: dict[str, Any] = {
@@ -117,21 +115,6 @@ def build_row(metrics_path: Path, log_root: Path) -> dict[str, Any]:
         "input_schema": metrics.get("input_schema") or run_config.get("input_schema") or dataset_meta.get("input_schema"),
         "chunk_length": metrics.get("chunk_length") or get_nested(run_config, "model_spec", "chunk_length"),
         "chunk_unit": metrics.get("chunk_unit") or get_nested(run_config, "model_spec", "chunk_unit"),
-        "total_params": profile.get("total_params"),
-        "total_params_m": profile.get("total_params_m"),
-        "trainable_params": profile.get("trainable_params"),
-        "trainable_params_m": profile.get("trainable_params_m"),
-        "gmacs": profile.get("gmacs"),
-        "gflops": profile.get("gflops"),
-        "activation_memory_mib": profile.get("activation_memory_mib"),
-        "forward_backward_activation_mib": profile.get("forward_backward_activation_mib"),
-        "profile_status": profile.get("status"),
-        "profile_errors": json.dumps(profile.get("errors", {}), ensure_ascii=False),
-        "wall_time_seconds": runtime.get("wall_time_seconds"),
-        "max_cuda_memory_allocated_mib": runtime.get("max_cuda_memory_allocated_mib"),
-        "max_cuda_memory_reserved_mib": runtime.get("max_cuda_memory_reserved_mib"),
-        "cuda_device_name": runtime.get("cuda_device_name"),
-        "cuda_device_total_memory_mib": runtime.get("cuda_device_total_memory_mib"),
         "metrics_path": str(metrics_path),
         "run_dir": str(run_dir),
         "relative_run_dir": str(run_dir.relative_to(log_root)),

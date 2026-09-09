@@ -95,6 +95,8 @@ plugins:
                     - (8) Deep-learning Property Prediction: api/features/23_deep_learning_property_prediction.md
                     - (9) Deep-learning Checkpoint Download: api/features/25_deep_learning_checkpoint_download.md
                     - (10) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
+                    - (11) Gene Names and Intervals: api/features/26_gene_annotation.md
+                    - (12) Bioinformatics Python APIs: api/features/27_bioinformatics.md
                 - 4. Data Evaluation:
                     - (1) Common Evaluation Metrics: api/features/12_evaluation.md
                     - (2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -111,6 +113,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          paths: [src]
           options:
             docstring_style: google
             show_root_heading: true
@@ -179,6 +182,8 @@ nav:
           - （8）深度学习性质预测: api/features/23_deep_learning_property_prediction.md
           - （9）深度学习任务 Checkpoint 下载: api/features/25_deep_learning_checkpoint_download.md
           - （10）可选生物信息功能: api/features/24_optional_bioinformatics.md
+          - （11）基因名称与区间注释: api/features/26_gene_annotation.md
+          - （12）生物信息学 Python API: api/features/27_bioinformatics.md
       - 4. 数据评价:
           - （1）常用评价指标: api/features/12_evaluation.md
           - （2）相似度计算: api/features/09_similarity_alignment.md

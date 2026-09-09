@@ -12,6 +12,12 @@
 
 核心结果 `MetricResult` 保存 value、unit、method、algorithm version、parameters、conditions、provenance 和 issues；领域结果可使用更专门的不可变 schema。
 
+## 通用大模型 Python API
+
+::: dnakit.llm
+
+`call_llm()` 和 `acall_llm()` 将自定义提示词及显式传入的文本/JSON 发给配置的兼容接口，返回 `LLMResult`，可在任意 Python 步骤中使用。也可用 `file_path` 明确指定一个本地文本文件，或用 `read_llm_file()` 先在本地预览。不隐式读取其他文件、不自动抽样、不执行模型输出。配置、隐私边界和完整代码见[通用大模型调用](../agent_tools.md#custom-llm)。
+
 ## I/O 与元数据
 
 ::: dnakit.io
@@ -418,3 +424,7 @@ dnakit workflow --help
 `python -m dnakit.cli.workflow run CONFIG` 保留为兼容/开发入口。
 
 逐项范围以[需求追踪矩阵](../planning/requirements_traceability.csv)为准。
+
+## 生物信息学 Python API {#bioinformatics}
+
+按模块导入 `dnakit.bioinformatics`，使用原生 DNA 编码、生成评价、系统发育、统计、约束优化与克隆，以及明确的可选格式编解码和比对/NGS 专业后端。[完整 API 指南](features/27_bioinformatics.md)列出依赖、返回类型、公式与边界。本扩展不增加 CLI。

@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 import traceback
 from pathlib import Path
 
@@ -145,7 +144,6 @@ def main() -> None:
             results.append(payload)
             continue
 
-        started_at = time.perf_counter()
         try:
             resolved_finetune_method = validate_finetune_method(spec, args.finetune_method)
             model = build_linear_probe_model(
@@ -177,7 +175,6 @@ def main() -> None:
                 "num_labels": int(task_meta["num_labels"]),
                 "input_schema": task_meta.get("input_schema", "single_sequence"),
                 "finetune_method": resolved_finetune_method,
-                "elapsed_seconds": round(time.perf_counter() - started_at, 6),
             }
         except Exception as exc:
             payload = {
@@ -188,7 +185,6 @@ def main() -> None:
                 "error_type": type(exc).__name__,
                 "error_message": str(exc),
                 "traceback": traceback.format_exc(),
-                "elapsed_seconds": round(time.perf_counter() - started_at, 6),
             }
             if not args.continue_on_error:
                 write_json(model_log_dir / "metrics.json", payload)

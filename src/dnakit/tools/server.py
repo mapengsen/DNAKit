@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import importlib
-import time
 from collections.abc import Callable, Mapping
 from typing import Protocol, cast
 
@@ -239,7 +238,6 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
         arguments: dict[str, object] | None = None,
         allow_side_effects: bool = False,
     ) -> dict[str, object]:
-        started = time.perf_counter()
         try:
             result = resolved_registry.execute(
                 tool_name,
@@ -249,7 +247,6 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
             return {
                 "ok": True,
                 "tool": resolved_registry.resolve(tool_name).name,
-                "elapsed_ms": round((time.perf_counter() - started) * 1_000, 3),
                 "result": result,
             }
         except Exception as exc:

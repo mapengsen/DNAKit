@@ -45,7 +45,7 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
 
 CATEGORY_LABELS: dict[str, tuple[str, str]] = {
     "alignment": ("序列比对", "alignment"),
-    "annotation": ("变异注释", "variant annotation"),
+    "annotation": ("基因与变异注释", "gene and variant annotation"),
     "backends": ("计算后端", "computational backends"),
     "batch": ("批量处理", "batch processing"),
     "chunking": ("序列切分", "sequence chunking"),
@@ -104,16 +104,19 @@ _MODEL_NAMES = frozenset(
         "dnakit.evaluation.evaluate_frechet_distance",
         "dnakit.predictions.ensure_prediction_checkpoint",
         "dnakit.predictions.predict_enformer_benchmark",
+        "dnakit.predictions.predict_custom_properties",
         "dnakit.predictions.predict_pair_properties",
         "dnakit.predictions.predict_properties",
         "dnakit.predictions.predict_sequence_properties",
         "dnakit.predictions.predict_variant_effects",
+        "dnakit.predictions.train_custom_property_model",
         "dnakit.representations.ensure_model_checkpoint",
         "dnakit.representations.extract_representations",
     }
 )
 _EXTERNAL_PROCESS_NAMES = frozenset(
     {
+        "dnakit.annotation.annotate_genes",
         "dnakit.download.build_index",
         "dnakit.thermodynamics.probe_primer3",
     }

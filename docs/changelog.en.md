@@ -4,8 +4,17 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-09-09
+
+- Added reference-based gene annotation with minimap2, configurable reference preparation, and Python/CLI interfaces.
+- Added general-purpose synchronous/asynchronous LLM calls, provider configuration, and bounded file inputs.
+- Added traditional machine-learning property models and classification/regression distribution plots.
+
 ### Added
 
+- Add Python-only `dnakit.bioinformatics`: native encodings, generative metrics, phylogenetics, count/distance statistics, motif/specification/cloning/DAG APIs; optional codecs, general ML, and specialist MSA/BLAST/HMMER/NGS backends. See [implementation boundaries](api/features/27_bioinformatics.md). New `bio-*` dependency extras, an offline example and numerical/real-tool validation tests.
+
+- Added user-defined DNA property classification/regression training with linear probing for all 11 registered models, full fine-tuning for seven Transformers models, seeded 80/10/10 splitting, comprehensive single/multi-target metrics, and privacy-bounded arbitrary-file schema analysis through OpenAI-compatible APIs.
 - Added mean raw pairwise Levenshtein distance for Diversity and mean raw nearest-reference Levenshtein distance for Novelty, while retaining the default similarity algorithms and adding explicit selection, resource limits, and optional progress display.
 - Added 27 local fully fine-tuned checkpoint classifiers: 18 NT Revised and nine Genomic Benchmarks tasks, with default/custom/exact paths plus safe task, label, and full-state validation.
 - Added `predict_enformer_benchmark()`, the task registry, Agent-tool exposure, per-function bilingual documentation, and a standalone download-instructions page for all 27 weight files.

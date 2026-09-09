@@ -9,7 +9,7 @@ runner = CliRunner()
 
 
 def test_import_exposes_version() -> None:
-    assert dnakit.__version__ == "0.1.3"
+    assert dnakit.__version__ == "0.1.4"
 
 
 def test_import_exposes_core_and_standardization_api() -> None:

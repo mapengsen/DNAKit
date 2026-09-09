@@ -1,10 +1,239 @@
-# 深度学习性质预测
+# 性质预测：深度学习与机器学习
 
-本页只收录**官方已经发布预训练任务头、可以直接推理**的功能。DNAKit 只加载现成权重，不会在本地重新训练或微调模型。原有的[神经网络表征](08_fingerprints.md)仍只负责提取 embedding。
+本页包含三条路径：
+
+1. **用户自定义性质：** 从用户文件训练分类或回归模型，支持全量微调和线性探测；
+2. **官方现成性质：** 加载官方已经发布的任务头直接推理，不在本地重新训练。
+3. **机器学习性质：** 使用 scikit-learn 或可选的 XGBoost、LightGBM、CatBoost，训练自己的分类或回归模型。
+
+原有的[神经网络表征](08_fingerprints.md)仍只负责提取 embedding。下面先介绍自定义训练；随后编号 1–54 的内容仍表示 54 个官方直接推理功能。
 
 本页当前共 54 个可直接推理的功能。下面每个功能都单独说明作用、预测方法、API、输入与输出。示例结果中的占位符只表示输出结构；具体数值、标签数和轨道数取决于输入、物种、组织筛选条件及实际 checkpoint。
 
 本章涉及的模型论文、官方仓库和权重来源统一收录在 [FAQ：深度学习性质预测的参考文献](../../faq.md#deep-learning-property-prediction-references)。
+
+## 机器学习分类与回归
+
+与深度学习共用 `CustomPropertyTrainingConfig`、`train_custom_property_model()` 和 `predict_custom_properties()`。设置 `finetune_method="machine_learning"` 后，`model` 表示机器学习算法；embedding 主干另用 `embedding_model` 指定。
+
+安装基础机器学习及表格读取依赖（不需要 PyTorch）：
+
+```bash
+python -m pip install -e ".[ml]"
+```
+
+安装三个可选提升树库：
+
+```bash
+python -m pip install -e ".[xgboost,lightgbm,catboost]"
+```
+
+如需 DNA 模型 embedding，再安装 `.[neural]` 及所选主干要求的附加依赖。缺少某个可选算法库时只会影响该算法，调用时会给出对应安装命令。
+
+### 模型覆盖
+
+目前登记 37 类算法。以下是完整模型名称；`available_machine_learning_models()` 返回每类支持的任务和依赖，不会导入或安装模型库。
+
+| 任务范围 | `model` |
+| --- | --- |
+| 分类和回归 | `ridge`、`sgd`、`svm`、`linear_svm`、`nu_svm`、`knn`、`decision_tree`、`extra_tree`、`random_forest`、`extra_trees`、`gradient_boosting`、`hist_gradient_boosting`、`adaboost`、`bagging`、`gaussian_process`、`mlp`、`dummy`、`xgboost`、`lightgbm`、`catboost` |
+| 仅分类 | `logistic_regression`、`perceptron`、`gaussian_nb`、`multinomial_nb`、`bernoulli_nb`、`complement_nb`、`lda`、`qda` |
+| 仅回归 | `linear_regression`、`lasso`、`elastic_net`、`bayesian_ridge`、`ard`、`huber`、`ransac`、`theil_sen`、`kernel_ridge` |
+
+`mlp` 是 scikit-learn 的浅层神经网络，`dummy` 是基线。这里的范围是监督性质预测，不包括聚类、异常检测及自动模型搜索。各算法仍有自己的样本量、参数和计算成本约束；例如高斯过程不适合直接用于超大样本集。
+
+### 三种输入特征
+
+| `feature_source` | 行为 |
+| --- | --- |
+| `sequence`（默认） | 序列长度、GC 比例、模糊碱基比例，加固定顺序的 k-mer 频率；`kmer_k=3`，允许 1–6，维度为 `3 + 4**kmer_k`。含模糊碱基的窗口跳过，GC 分母只含 A/C/G/T；无有效窗口或碱基时相应频率为 0。无需深度学习权重。 |
+| `embedding` | 冻结 `embedding_model`（默认 `dnabert2`）提取向量，再训练机器学习模型。沿用 checkpoint、pooling、batch_size、device 等表征参数。 |
+| `numeric` | 使用显式 `DataMapping.feature_fields`，按给出的列顺序读取数值；可设置 `sequence_field=None`，输入文件不需要序列。缺失、无穷、非数值特征会报错，当前不自动填补。 |
+
+数值特征列必须显式指定，不能与标签、ID、split 或序列字段重叠。推理时必须保留训练时的特征列名称与顺序。不要把目标派生列或其他泄漏信息选为特征。
+
+下面使用自己的序列数据训练随机森林回归：
+
+```python
+from dnakit.predictions import (
+    CustomPropertyTrainingConfig, DataMapping,
+    train_custom_property_model, predict_custom_properties,
+)
+
+config = CustomPropertyTrainingConfig(
+    task_type="regression",  # 分类改为 classification
+    finetune_method="machine_learning",
+    model="random_forest",
+    model_params={"n_estimators": 300, "max_depth": 12},
+    feature_source="sequence",
+    kmer_k=3,
+    mapping=DataMapping(sequence_field="sequence", label_fields=("target",)),
+    output_dir="runs/random-forest",
+    workers=6,
+    seed=42,
+)
+result = train_custom_property_model("my_labels.csv", config=config)
+print(result.metrics["test"])
+
+predictions = predict_custom_properties(
+    "new_sequences.csv", model_dir=result.output_dir,
+    trust_model=True,  # 仅加载自己训练或来源可信的模型
+)
+print(predictions.predictions)
+```
+
+使用数值特征时改为 `feature_source="numeric"`，并传入例如 `DataMapping(sequence_field=None, feature_fields=("gc", "length"), label_fields=("target",))`；使用 embedding 时改为 `feature_source="embedding", embedding_model="dnabert2"`，并按主干要求设置 `allow_remote_code` 等参数。
+
+### 训练、评估与保存
+
+默认仍为种子 42、80%/10%/10% 划分；已映射的 split 列优先。标签模式、测试指标和深度学习路径一致。多标签、多输出分类及多目标回归按目标分别训练估计器；训练中恒定的二值标签使用恒定分类器。分类预测取最大概率类别，多标签使用 `threshold`。
+
+`model_params` 直接传给所选估计器构造函数，接受可序列化的参数，不接受任意 Python 估计器对象。`workers` 控制默认 `n_jobs` 和数值库线程数（0 按 1 处理），CatBoost 使用 `thread_count`；模型参数可覆盖估计器的并行数和随机种子。`standardize_features=True` 默认在训练集上拟合标准化器，验证和测试只做变换。`multinomial_nb`、`complement_nb` 要求非负输入，使用保持非负性的 MaxAbsScaler；不会把负 embedding 静默平移成非负数据。
+
+无 `predict_proba` 的分类器（如 RidgeClassifier、LinearSVC）使用训练集内部最多 3 折 sigmoid 概率校准，每类至少需要 2 个训练样本。标准化也在每个校准训练折内拟合，验证集和测试集不参与。校准行为记录在结果 warnings 中。参见 [scikit-learn 概率校准 API](https://scikit-learn.org/stable/modules/generated/sklearn.calibration.CalibratedClassifierCV.html)。
+
+机器学习路径不使用深度学习的 `epochs`、AdamW 参数或梯度累积；迭代次数、树数量等通过 `model_params` 设置。验证集只用于评估，不会自动调参或选择最优模型。
+
+回归标签沿用现有接口的训练集均值/标准差归一化，报告和预测恢复到原始单位。分类 `class_weight` / `class_weights` 字典使用从 0 开始的编码类别索引；类别顺序保存在 `model.json` 的 `target_schema.class_names` 中，也可使用算法支持的 `"balanced"` 等选项。
+
+输出包括 `model.json`、`estimator.joblib`、`metrics.json`、`data_inspection.json`、`splits.csv`、`test_predictions.jsonl`。估计器文件包含拟合好的特征变换；manifest 记录特征顺序、配置、标签语义和 Python/依赖版本。机器学习没有神经网络训练 history，结果的 `history` 为空。
+
+joblib 加载可能执行 Python 代码，因此机器学习推理必须显式设置 `trust_model=True`；仅用于自己训练或来源可信的工件。重新加载会核对 manifest 记录的 Python 和依赖版本，版本不一致时要求使用原训练环境。该约束依据 [scikit-learn 模型持久化说明](https://scikit-learn.org/stable/model_persistence.html)。
+
+可直接编辑并运行 `others/examples/train_machine_learning_properties.py`；`--demo` 使用人工数据验证完整训练和重新加载流程：
+
+```bash
+python others/examples/train_machine_learning_properties.py --demo
+```
+
+## 用户自定义深度学习分类与回归
+
+先安装训练与常见表格格式依赖：`python -m pip install "dnakit[training]"`。
+
+`train_custom_property_model()` 接受一个本地数据文件，自动或按用户指定的映射找出 ID、DNA/RNA 序列、一个或多个标签以及可选 split。默认随机种子为 42，训练/验证/测试比例为 0.8/0.1/0.1；若映射了已有 split 列，则使用文件中的划分。`task_type` 必须由用户明确指定为 `classification` 或 `regression`，不会仅凭标签外观替用户决定科学任务。
+
+内置读取器支持 CSV、TSV、其他单字符分隔文本、JSON、JSONL、YAML、XML、Excel、Parquet、SQLite、FASTA、FASTQ 和 GenBank。嵌套 JSON/YAML/XML 可使用点路径；FASTA/FASTQ 描述中的 `key=value` 会映射为 `header.key`。其他格式可实现 `DataReader` 协议。大模型只生成受约束的声明式 `DataMapping`，不会生成或执行 Python、SQL、正则表达式或 shell 代码。
+
+### 标签语义
+
+- 一个分类标签列：二分类或多分类；
+- 多个二值标签列：自动识别 one-hot 多分类或多标签分类，也可用 `classification_mode` 明确指定；
+- 多个非二值分类列：多输出分类，每列保留独立类别表；
+- 一个或多个数值标签列：单目标或多目标回归。
+
+分类报告包括 Accuracy、Balanced Accuracy、Precision、Recall、F1、Jaccard、MCC、Cohen's kappa、Log loss、AUROC、Average Precision、混淆矩阵及逐类别/逐标签结果；多标签任务另含 subset accuracy、Hamming loss、LRAP 和 coverage error。回归报告包括 MAE、MSE、RMSE、R²、explained variance、median absolute error、max error、bias、MAPE、SMAPE、Pearson 和 Spearman，并同时给出汇总与逐目标结果。F1、AUROC 等分类指标不会伪装成回归指标；样本不足或数学上未定义的指标返回 `null`。
+
+### 模型与微调方式
+
+默认 `finetune_method="full"`。当前 Transformers 路径支持 DNABERT-2、NT-v2、HyenaDNA、Caduceus、GROVER、LucaOne 和 GENERator 的全量微调；全部已登记表征模型均可做 `linear_probe`，包括 AlphaGenome、Enformer、Evo 2 和 JanusDNA。请用 `available_custom_training_models()` 获取当前版本的实际支持矩阵。需要 checkpoint 自带代码的模型仍必须显式设置 `allow_remote_code=True`。
+
+### 训练参数（Python API）
+
+直接在 `CustomPropertyTrainingConfig` 中修改参数，无需命令行参数。全量微调与线性探测使用相同默认值：
+
+| Python 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `workers` | `6` | CPU 数据加载进程数；`0` 表示在主进程加载 |
+| `batch_size` | `32` | 每个训练设备的单批样本数，不是梯度累积后的批大小 |
+| `learning_rate` | `1e-4` | AdamW 学习率，即 lr |
+| `beta1` | `0.9` | AdamW 一阶矩衰减系数 |
+| `beta2` | `0.95` | AdamW 二阶矩衰减系数 |
+| `weight_decay` | `0.1` | AdamW 权重衰减 |
+
+`workers` 用于训练、验证和测试的数据取样及 CPU 批组装，编码器和 GPU 运算仍在主进程；它不控制初次文件解析或大模型请求的并发数。固定种子决定划分和每轮样本顺序，调整 workers 不会改变顺序。当前训练器在 `device` 指定的单个设备运行（例如 `"cuda:0"`），尚未实现多卡 DDP；不会根据显卡数量自动增大批大小。`gradient_accumulation_steps` 默认 `1`，可通过 Python 配置。
+
+使用 `workers>0` 的 Python 脚本需要下例的 `if __name__ == "__main__":` 保护；Notebook 或不支持子进程的环境建议设置 `workers=0`。数据加载进程在训练完成、提前停止或异常时释放。
+
+```python
+import os
+
+from dnakit.predictions import (
+    CustomPropertyTrainingConfig,
+    LLMSchemaConfig,
+    train_custom_property_model,
+)
+
+def main():
+    result = train_custom_property_model(
+        "my_labels.xlsx",
+        config=CustomPropertyTrainingConfig(
+            task_type="regression",  # 或 "classification"
+            model="dnabert2",
+            finetune_method="full",  # 或 "linear_probe"
+            output_dir="runs/my-property",
+            workers=6,
+            batch_size=32,
+            learning_rate=1e-4,
+            beta1=0.9,
+            beta2=0.95,
+            weight_decay=0.1,
+            seed=42,
+            train_ratio=0.8,
+            validation_ratio=0.1,
+            test_ratio=0.1,
+            allow_remote_code=True,
+            llm=LLMSchemaConfig(
+                provider="deepseek",
+                model="deepseek-v4-flash",
+                api_key=os.environ["DEEPSEEK_API_KEY"],
+            ),  # 不需要大模型辅助时省略 llm
+        ),
+    )
+    print(result.metrics["test"])
+
+
+if __name__ == "__main__":
+    main()
+```
+
+训练结果目录包含 `model.json`、`head.npz`、`metrics.json`、`history.json`、`data_inspection.json`、`splits.csv` 和 `test_predictions.jsonl`；全量微调还包含 `backbone/`。`model.json` 的 `training` 字段记录实际 workers、批大小、学习率、两个 beta 和 weight decay。`predict_custom_properties()` 可重新加载这些产物进行推理。
+
+仓库提供可直接编辑参数的脚本 `others/examples/train_custom_properties.py`：修改输入文件与配置后，在 IDE 中运行即可；脚本默认不启用大模型辅助。
+
+### 大模型服务商与数据分享范围
+
+不仅支持 DeepSeek。`LLMSchemaConfig(provider=..., model=...)` 内置以下连接预设，统一调用 OpenAI 兼容的 `POST /chat/completions`，不需要安装各厂商 SDK。`available_schema_llm_providers()` 可离线查询这些预设。除兼容旧用法的 DeepSeek 默认模型外，必须自行填写账号可用的模型 ID；配置不会自动切换模型或服务商。
+
+| `provider` | 默认 `base_url` | 默认密钥环境变量 |
+| --- | --- | --- |
+| `deepseek` | `https://api.deepseek.com` | `DEEPSEEK_API_KEY` |
+| `gemini` | `https://generativelanguage.googleapis.com/v1beta/openai` | `GEMINI_API_KEY` |
+| `qwen` | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `DASHSCOPE_API_KEY` |
+| `kimi` | `https://api.moonshot.cn/v1` | `MOONSHOT_API_KEY` |
+| `openrouter` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` |
+| `openai` | `https://api.openai.com/v1` | `OPENAI_API_KEY` |
+| `custom` | 必须显式指定 | `LLM_API_KEY` |
+
+例如，仅分享字段与类型结构，使用 Google Gemini 辅助分析：
+
+```python
+from dnakit.predictions import LLMSchemaConfig, inspect_property_data
+
+llm = LLMSchemaConfig(
+    provider="gemini",
+    model="gemini-3.8-flash",  # 可替换为账号可用的文本/JSON 模型。
+    include_sample_values=False,
+)
+inspection = inspect_property_data("my_labels.xlsx", llm=llm)
+print(inspection.mapping.to_dict())
+print(inspection.recommendations)
+# 训练时将同一个 llm 传给 CustomPropertyTrainingConfig(llm=llm, ...)。
+```
+
+`api_key` 仍可在 Python 中传入，或用 `api_key_env` 指定自己的环境变量名；不要将真实密钥写进示例或版本库。`base_url` 可覆盖预设，密钥只发送到你配置的地址，HTTP 重定向被拒绝。Gemini 此处使用其[官方 OpenAI 兼容接口](https://ai.google.dev/gemini-api/docs/openai)，不是原生 `generateContent` 或 Vertex AI 接口。
+
+千问默认地址为北京地域，官方仍支持该域名；也可以填控制台提供的业务空间专属地址，例如 `https://<业务空间ID>.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。地域地址和 API Key 必须匹配，见[千问接口说明](https://help.aliyun.com/zh/model-studio/compatibility-of-openai-with-dashscope)。Kimi 国际站可使用 `base_url="https://api.moonshot.ai/v1"`，参见 [Kimi 快速开始](https://platform.kimi.ai/docs/overview)。OpenRouter 的模型名须使用其平台的完整 ID，且应检查目标模型支持的参数，见 [OpenRouter 快速开始](https://openrouter.ai/docs/quickstart)和[结构化输出说明](https://openrouter.ai/docs/guides/features/structured-outputs)；数据将由其平台路由到所选模型的提供方。
+
+兼容参数可以直接在 Python 中调整：
+
+- `temperature=None`（默认）：不发送温度参数，适用于不接受自定义温度的模型；需要时可显式设置。
+- `token_limit_parameter="auto"`（默认）：OpenAI 使用 `max_completion_tokens`，其他兼容服务使用 `max_tokens`；也可显式选择这两个字段之一。依据 [OpenAI Docs 的 Chat Completions 参数说明](https://developers.openai.com/api/reference/python/resources/chat/subresources/completions/methods/create)，旧 `max_tokens` 不兼容部分推理模型。
+- `json_mode=True`（默认）：要求 JSON Object 输出。若模型不支持该接口参数，可设为 `False`；提示词仍要求 JSON，返回结果仍须经过严格映射校验。
+- `extra_body`：传递模型专用参数，例如支持关闭思考的千问模型可设 `{"enable_thinking": False}`；支持该选项的 Kimi 模型可设 `{"thinking": {"type": "disabled"}}`。不会统一强行关闭所有模型的思考模式，需按[千问](https://help.aliyun.com/zh/model-studio/qwen-structured-output)或 [Kimi 模型参数](https://platform.kimi.ai/docs/api/models-overview)确认支持情况。请求当前为非流式；只支持流式思考的模型需关闭思考或改用支持非流式的模型。
+
+`extra_body` 不允许覆盖消息、鉴权信息、模型、输出 token 上限等核心字段。输出被截断时会明确报错，应调整 `max_output_tokens` 或模型专用思考参数，不会自动扩大额度重试。服务商预设表示接口接入能力，不保证该平台的每个模型都支持此任务；当前已做模拟接口测试，未用各平台付费密钥逐一联网验证。
+
+默认最多分享 8 条样本、12,000 个字符及结构摘要，**不会整表上传**；小文件也至少保留一条完整记录不分享。`include_sample_values=False` 只发送字段/类型结构。`DataInspection` 记录分享的样本数和字符数；密钥不进入请求正文、结果、异常展示或训练产物。
 
 ## 1) RNA-seq 覆盖与表达
 
@@ -463,7 +692,7 @@ mouse
 - **作用：** 为人 DNA 序列中的每个碱基预测 14 类基因和调控元件概率。
 - **预测方法：** 使用带训练完成分割头的 `InstaDeepAI/segment_nt`，即 NT-v2 骨干网络加 U-Net 分割头；对二分类 logits 做 softmax 后返回“该特征存在”的概率。
 - **API：** `dnakit.predictions.predict_sequence_properties(inputs[必须], config=PropertyPredictionConfig(model="segmentnt", task="genomic_segmentation", allow_remote_code=True)[必须], backend[可选])`
-- **输入：** 最长 30,000 bp 的人 `BiologicalSequence`。14 类为 protein-coding gene、lncRNA、exon、intron、splice donor、splice acceptor、5′ UTR、3′ UTR、CTCF-bound、polyA signal，以及组织特异/不变的 enhancer 和 promoter。
+- **输入：** 最长 30,000 bp 的人 `BiologicalSequence`。14 个类别分别列在下方的 14.1–14.14 子节中。
 - **示例代码：**
 
 ```python
@@ -492,6 +721,64 @@ print(len(output.output_names))
 (4000, 14)
 14
 ```
+
+以下 14 个类别共用上述预测接口，每类对应 `output.values` 的一列，实际列名与顺序以 `output.output_names` 为准。
+
+### 14.1) 蛋白质编码基因（protein-coding gene）
+
+预测每个碱基属于蛋白质编码基因区域的概率。
+
+### 14.2) 长链非编码 RNA（lncRNA）
+
+预测每个碱基属于长链非编码 RNA 基因区域的概率。
+
+### 14.3) 外显子（exon）
+
+预测每个碱基属于外显子区域的概率。
+
+### 14.4) 内含子（intron）
+
+预测每个碱基属于内含子区域的概率。
+
+### 14.5) 剪接供体位点（splice donor）
+
+预测每个碱基属于剪接供体位点的概率。
+
+### 14.6) 剪接受体位点（splice acceptor）
+
+预测每个碱基属于剪接受体位点的概率。
+
+### 14.7) 5′ 非翻译区（5′ UTR）
+
+预测每个碱基属于 5′ 非翻译区的概率。
+
+### 14.8) 3′ 非翻译区（3′ UTR）
+
+预测每个碱基属于 3′ 非翻译区的概率。
+
+### 14.9) CTCF 结合区域（CTCF-bound）
+
+预测每个碱基属于 CTCF 结合区域的概率。
+
+### 14.10) 多聚腺苷酸化信号（polyA signal）
+
+预测每个碱基属于多聚腺苷酸化信号的概率。
+
+### 14.11) 组织特异性增强子（tissue-specific enhancer）
+
+预测每个碱基属于组织特异性增强子区域的概率。
+
+### 14.12) 组织不变性增强子（tissue-invariant enhancer）
+
+预测每个碱基属于组织不变性增强子区域的概率。
+
+### 14.13) 组织特异性启动子（tissue-specific promoter）
+
+预测每个碱基属于组织特异性启动子区域的概率。
+
+### 14.14) 组织不变性启动子（tissue-invariant promoter）
+
+预测每个碱基属于组织不变性启动子区域的概率。
 
 ## 15) 长上下文零样本变异效应
 
@@ -653,7 +940,6 @@ print(output.metadata["predicted_label"])
 ('probability',)
 <官方预测标签>
 ```
-
 
 ## 19) SupKTax 分类
 

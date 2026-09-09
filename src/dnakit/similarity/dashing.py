@@ -562,7 +562,6 @@ def _provenance(
     executable: Path,
     version: str,
     *,
-    elapsed_seconds: float,
     execution_output_sha256: str,
     hybrid: bool,
 ) -> Provenance:
@@ -576,7 +575,6 @@ def _provenance(
         metadata={
             "probe_mode": "explicit-scientific-execution",
             "command_profile": _COMMAND_PROFILE,
-            "elapsed_seconds": elapsed_seconds,
             "execution_output_sha256": execution_output_sha256,
             "redistributed": False,
             "shell": False,
@@ -786,7 +784,6 @@ class DashingAdapter:
             provenance = _provenance(
                 self.executable_path,
                 version,
-                elapsed_seconds=execution.elapsed_seconds,
                 execution_output_sha256=execution_digest,
                 hybrid=False,
             )
@@ -887,13 +884,8 @@ class DashingAdapter:
         backend = matrix.provenance.backend
         if backend is None or backend.version is None:  # pragma: no cover - matrix invariant.
             raise AssertionError("Dashing matrix provenance is missing its backend version")
-        elapsed_value = backend.metadata["elapsed_seconds"]
         output_digest_value = backend.metadata["execution_output_sha256"]
-        if (
-            isinstance(elapsed_value, bool)
-            or not isinstance(elapsed_value, (int, float))
-            or not isinstance(output_digest_value, str)
-        ):  # pragma: no cover - created by _provenance.
+        if not isinstance(output_digest_value, str):  # pragma: no cover - created by _provenance.
             raise AssertionError("Dashing matrix provenance metadata is invalid")
         parameters = freeze_mapping(
             {
@@ -905,7 +897,6 @@ class DashingAdapter:
         provenance = _provenance(
             self.executable_path,
             backend.version,
-            elapsed_seconds=float(elapsed_value),
             execution_output_sha256=output_digest_value,
             hybrid=True,
         )

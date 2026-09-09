@@ -198,3 +198,7 @@ print(result["value_dalton"])
 ```
 
 See [Agent and MCP tools](../../agent_tools.md) for client configuration.
+
+<span id="custom-llm"></span>
+
+General-purpose LLM calls (Python API), including custom prompts, file input, provider configuration, and safety boundaries, have moved to [Agent and MCP tools → General-purpose LLM calls](../../agent_tools.md#custom-llm).

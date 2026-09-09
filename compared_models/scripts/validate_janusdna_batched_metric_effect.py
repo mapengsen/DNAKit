@@ -4,7 +4,6 @@ import argparse
 import json
 import math
 import sys
-import time
 import traceback
 from pathlib import Path
 from typing import Any
@@ -561,7 +560,6 @@ def summarize_impact(
 
 
 def validate_task(args: argparse.Namespace, task_name: str) -> dict[str, Any]:
-    started_at = time.perf_counter()
     task_log_dir = Path(args.log_root) / task_name
     task_log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -664,7 +662,6 @@ def validate_task(args: argparse.Namespace, task_name: str) -> dict[str, Any]:
         "batched_best_valid": batched_train_result["best_valid"],
         "batched_best_test": batched_train_result["best_test"],
         "impact": impact,
-        "elapsed_seconds": round(time.perf_counter() - started_at, 6),
     }
     write_json(task_log_dir / "summary.json", payload)
     return payload
@@ -672,7 +669,6 @@ def validate_task(args: argparse.Namespace, task_name: str) -> dict[str, Any]:
 
 def main() -> None:
     args = build_parser().parse_args()
-    started_at = time.perf_counter()
     log_root = Path(args.log_root)
     log_root.mkdir(parents=True, exist_ok=True)
     task_names = parse_task_names(args.task_name, args.processed_download)
@@ -702,7 +698,6 @@ def main() -> None:
         "model_name": args.model_name,
         "tasks": task_names,
         "results": results,
-        "elapsed_seconds": round(time.perf_counter() - started_at, 6),
     }
     write_json(log_root / "janusdna_batched_metric_effect_summary.json", aggregate)
     print(json.dumps(aggregate, indent=2, ensure_ascii=False))

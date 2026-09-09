@@ -4,8 +4,17 @@
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-09-09
+
+- 新增基于参考基因组和 minimap2 的基因注释，支持参考资源准备及 Python/CLI 调用。
+- 新增通用同步/异步 LLM 调用、提供方配置和有界文件输入。
+- 新增传统机器学习性质建模与分类/回归标签分布可视化。
+
 ### Added
 
+- 新增仅 Python API 的 `dnakit.bioinformatics`：原生编码、生成评价、系统发育、计数/距离统计、motif/约束/克隆/DAG；可选编解码、通用机器学习和 MSA/BLAST/HMMER/NGS 专业后端。新增 `bio-*` 可选依赖、离线示例和数值/真实工具测试，详见[实现边界](api/features/27_bioinformatics.md)。
+
+- 新增用户自定义 DNA 性质分类/回归训练：支持 11 种已登记模型的线性探测、7 种 Transformers 模型的全量微调、默认 seed 42 的 8:1:1 划分、单/多目标完整指标，以及通过 OpenAI-compatible 接口进行隐私有界的任意文件结构分析与声明式映射。
 - Diversity 新增平均两两原始 Levenshtein 距离，Novelty 新增平均最近参考原始 Levenshtein 距离；保留默认相似度算法，支持显式选择、资源上限和可选进度条。
 - 新增 27 个基于本地完整微调 checkpoint 的序列分类任务：NT Revised 18 项、Genomic Benchmarks 9 项；支持默认目录、自定义目录或精确文件路径，安全加载并校验任务、标签和完整参数结构。
 - 新增 `predict_enformer_benchmark()`、任务注册表、Agent 工具入口，以及逐功能中英文文档；27 个权重文件通过独立的统一下载说明页提供。

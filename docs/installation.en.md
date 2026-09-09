@@ -4,10 +4,10 @@ DNAKit requires Python 3.10 or higher.
 
 ## Install from PyPI
 
-Install `0.1.3`:
+Install `0.1.4`:
 
 ```bash
-pip install dnakit==0.1.3
+pip install dnakit==0.1.4
 ```
 
 Verify installation:

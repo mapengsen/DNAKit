@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
+from itertools import pairwise
 from typing import cast
 
 from dnakit.core._json import FrozenDict
@@ -273,6 +274,83 @@ class HeatmapConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class DistributionPlotConfig:
+    """Sample proportions by category or numeric bin on a square canvas.
+
+    Explicit bin edges must cover all valid values. Category order, when given,
+    must include all observed labels; unobserved categories get zero counts.
+    """
+
+    bins: int = 30
+    bin_edges: Sequence[float] | None = None
+    categories: Sequence[str] | None = None
+    size: int = 720
+    font_size: int = 16
+    tick_font_size: int = 12
+    value_font_size: int = 11
+    bar_width: float = 0.9
+    label_rotation: int = 0
+    max_tick_labels: int = 12
+    show_values: bool = False
+    show_grid: bool = True
+    x_label: str | None = None
+    y_label: str = "Sample proportion (%)"
+    title: str | None = None
+    max_values: int = 1_000_000
+    theme: SVGTheme = field(default_factory=SVGTheme)
+
+    def __post_init__(self) -> None:
+        for name in (
+            "bins",
+            "size",
+            "font_size",
+            "tick_font_size",
+            "value_font_size",
+            "max_tick_labels",
+            "max_values",
+        ):
+            _positive_int(getattr(self, name), name)
+        if self.bins > 1000 or self.size < 320:
+            raise ConfigurationError("bins must be <= 1000 and size must be >= 320.")
+        _finite_optional(self.bar_width, "bar_width")
+        if self.bar_width is None or not 0 < self.bar_width <= 1:
+            raise ConfigurationError("bar_width must be in (0, 1].")
+        if isinstance(self.label_rotation, bool) or self.label_rotation not in (0, 45, 90):
+            raise ConfigurationError("label_rotation must be 0, 45, or 90.")
+        for name in ("show_values", "show_grid"):
+            if not isinstance(getattr(self, name), bool):
+                raise ConfigurationError(f"{name} must be a boolean.")
+        for name in ("x_label", "y_label", "title"):
+            _title(getattr(self, name), name)
+        if not isinstance(self.theme, SVGTheme):
+            raise ConfigurationError("theme must be SVGTheme.")
+        if self.bin_edges is not None:
+            edges = tuple(self.bin_edges)
+            if not 2 <= len(edges) <= 1001:
+                raise ConfigurationError("bin_edges must contain 2 to 1001 finite boundaries.")
+            for edge in edges:
+                _finite_optional(edge, "bin_edges")
+                if edge is None:
+                    raise ConfigurationError("bin_edges must contain finite numbers.")
+            if any(left >= right for left, right in pairwise(edges)):
+                raise ConfigurationError("bin_edges must be strictly increasing.")
+            object.__setattr__(self, "bin_edges", edges)
+        if self.categories is not None:
+            if isinstance(self.categories, str):
+                raise ConfigurationError("categories must be a sequence of labels.")
+            categories = tuple(self.categories)
+            if not 1 <= len(categories) <= 1000:
+                raise ConfigurationError("categories must contain 1 to 1000 labels.")
+            for label in categories:
+                _title(label, "category")
+                if label is None:
+                    raise ConfigurationError("Category labels cannot be None.")
+            if len(set(categories)) != len(categories):
+                raise ConfigurationError("categories must be unique.")
+            object.__setattr__(self, "categories", categories)
+
+
+@dataclass(frozen=True, slots=True)
 class SaveConfig:
     """Filesystem policy for deterministic SVG persistence."""
 
@@ -323,6 +401,7 @@ class ImageExportConfig:
 
 
 __all__ = [
+    "DistributionPlotConfig",
     "HeatmapConfig",
     "ImageExportConfig",
     "LimitPolicy",

@@ -55,10 +55,10 @@ jobs:
           ".[dev,docs,io,validation,viz]"
 
       - name: Check formatting
-        run: python -m ruff format --check src others/tests others/validation benchmarks
+        run: python -m ruff format --check src others/tests others/validation
 
       - name: Lint
-        run: python -m ruff check src others/tests others/validation benchmarks
+        run: python -m ruff check src others/tests others/validation
 
       - name: Type check (advisory)
         continue-on-error: true

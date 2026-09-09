@@ -1,20 +1,14 @@
 # 安装
 
-DNAKit 要求 Python 3.10 或更高版本。
-
 ## 从 PyPI 安装
 
-安装 `0.1.3`：
+安装 `0.1.4`：
 
 ```bash
-pip install dnakit==0.1.3
+pip install dnakit==0.1.4
 ```
 
-验证安装：
-
-```bash
-python -c "import dnakit; print(dnakit.__version__)"
-```
+地址为：[pypi.org/project/dnakit](https://pypi.org/project/dnakit/)
 
 ## 其他平台
 
@@ -73,3 +67,7 @@ python -m pip install "dnakit[agent]"
 # 仓库地址
 
 [github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
+
+## 生物信息学 Python API 可选依赖
+
+当前工作区可使用 `python -m pip install -e ".[bio]"` 安装全部 Python 分析依赖，或仅安装 `.[bio-analysis]`。MAFFT、BLAST、HMMER、BWA、samtools、bcftools 等可执行程序需单独安装。详见[依赖与实现方式](api/features/27_bioinformatics.md#dependencies)。

@@ -253,7 +253,7 @@ def test_end_to_end_workflow_records_all_steps_and_artifacts(tmp_path: Path) -> 
     audited_steps = execution["steps"]
     assert isinstance(audited_steps, list)
     assert [item["id"] for item in audited_steps] == [step["id"] for step in steps]
-    assert all(item["duration_seconds"] >= 0 for item in audited_steps)
+    assert all("duration_seconds" not in item for item in audited_steps)
     assert audited_steps[-1]["artifacts"][0]["sha256"]
 
 

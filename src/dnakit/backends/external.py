@@ -53,7 +53,6 @@ class BoundedCommandResult:
 
     return_code: int
     output: str
-    elapsed_seconds: float
 
 
 def _validated_command_arguments(arguments: Iterable[str]) -> tuple[str, ...]:
@@ -184,7 +183,7 @@ def execute_bounded_command(
     environment = os.environ.copy()
     environment.update({"LANG": "C", "LC_ALL": "C"})
     command = (str(executable), *resolved_arguments)
-    started = time.monotonic()
+    deadline = time.monotonic() + float(timeout_seconds)
     try:
         process = subprocess.Popen(
             command,
@@ -231,7 +230,6 @@ def execute_bounded_command(
     timed_out = False
     artifact_too_large: Path | None = None
     monitored_output_bytes = 0
-    deadline = started + float(timeout_seconds)
     try:
         while process.poll() is None:
             if output_too_large.is_set():
@@ -317,7 +315,6 @@ def execute_bounded_command(
     return BoundedCommandResult(
         return_code=process.returncode,
         output=bytes(output).decode("utf-8", errors="replace"),
-        elapsed_seconds=time.monotonic() - started,
     )
 
 

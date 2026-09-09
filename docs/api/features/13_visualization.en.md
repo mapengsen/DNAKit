@@ -201,3 +201,113 @@ save_image(artifact, "viz-008-alignment", image_type="png")
 - **Example results (`viz-008-alignment.png`):**
 
 ![Alignment diagram example](../../assets/images/visualization/viz-008-alignment.png){ width="640" }
+
+## 9) `VIZ-009` Classification and regression sample distributions {#viz-009}
+
+Read named CSV columns and create one proportion plot per column. **Bar height is the category/bin count divided by that column's valid sample count**, displayed as a percentage. The heights sum to 100% before display rounding. These plots describe the sample distribution, not a model's confidence for an individual sample.
+
+- `classification`: one bar per observed category, in first-seen order by default. Explicit `categories` set the order and can include absent labels with zero counts; all observed labels must be included.
+- `regression`: a histogram with 30 equal-width bins by default. Set `bins` or provide strictly increasing `bin_edges` covering every valid sample. Bins include their left edge; only the final bin includes its right edge. Constant columns use one 100% bin. Unequal-width bins still show proportions, not density.
+- Blank/whitespace cells and Python `None` are skipped and reported. Empty columns, invalid numeric values, NaN/infinity in regression, duplicate headers, missing columns, and malformed rows raise errors. Classification labels are trimmed strings; `0` and `0.0` remain separate categories.
+- Multiple columns are normalized independently using the same task and style. Call separately for mixed classification/regression data. The default limit is 1,000,000 rows including blank cells, and at most 1,000 categories/bins; exceeding limits raises rather than truncating data.
+
+The repository includes a [200-row synthetic CSV](../../assets/data/distribution.csv) at `docs/assets/data/distribution.csv`, with `label`, `score`, and `score_alt` columns. Labels 0, 1, and 2 have 40, 100, and 60 samples respectively. Run examples from the repository root after installing DNAKit. PNG/JPG/PDF export requires `python -m pip install -e ".[viz]"`; SVG needs only the base installation.
+
+To plot category proportions with percentage labels and a custom font size:
+
+```bash
+python -m dnakit.cli plot-distribution \
+  --input docs/assets/data/distribution.csv \
+  --column label \
+  --task classification \
+  --output outputs/label_distribution.png \
+  --category 0 \
+  --category 1 \
+  --category 2 \
+  --show-values \
+  --font-family sans-serif \
+  --font-size 18 \
+  --color '#2563eb' \
+  --dpi 150
+```
+
+![Category proportions of 20%, 50%, and 30%](../../assets/images/visualization/viz-009-classification.png){ width="480" }
+
+To plot a continuous column as a histogram of sample proportions:
+
+```bash
+python -m dnakit.cli plot-distribution \
+  --input docs/assets/data/distribution.csv \
+  --column score \
+  --task regression \
+  --output outputs/score_distribution.png \
+  --bins 30 \
+  --bar-width 0.95 \
+  --font-size 18 \
+  --color '#ea580c' \
+  --dpi 150
+```
+
+![Regression sample proportions](../../assets/images/visualization/viz-009-regression.png){ width="480" }
+
+Repeat `--column` and `--output` for multiple columns, with one filename per column in matching order. Use `--bin-edges '0,2,4,6,8,10'` for explicit edges instead of automatic bins; for negative starting edges use `--bin-edges=-10,-5,0,5,10,15`. Automatic ranges are independent per column; supply common edges to compare matching intervals.
+
+The Python API returns a dictionary of SVG artifacts for subsequent export:
+
+```python
+from dnakit.visualization import (
+    DistributionPlotConfig,
+    ImageExportConfig,
+    SVGTheme,
+    plot_csv_distributions,
+    save_image,
+)
+
+plots = plot_csv_distributions(
+    "docs/assets/data/distribution.csv",
+    columns=["score", "score_alt"],
+    task="regression",
+    config=DistributionPlotConfig(
+        bins=25,
+        size=800,
+        font_size=20,
+        tick_font_size=14,
+        theme=SVGTheme(font_family="sans-serif", accent="#ea580c"),
+    ),
+)
+for column, artifact in plots.items():
+    print(column, artifact.metadata["counts"], artifact.metadata["proportions"])
+    save_image(
+        artifact,
+        f"outputs/{column}.png",
+        config=ImageExportConfig(dpi=150, create_parents=True),
+    )
+```
+
+For an existing list, use `plot_distribution(values, task=..., config=...)`. Metadata includes `total_count`, `valid_count`, `missing_count`, `labels`, `counts`, `proportions`, and `bin_edges`.
+
+| Configuration / CLI | Default | Meaning |
+| --- | --- | --- |
+| `bins` / `--bins` | `30` | Number of automatic numeric bins |
+| `bin_edges` / `--bin-edges` | `None` | Explicit boundaries, overriding `bins` |
+| `categories` / repeated `--category` | `None` | Explicit category order including optional absent labels |
+| `size` / `--size` | `720` | Square SVG canvas side, at least 320 |
+| `font_size` / `--font-size` | `16` | Axis label font size |
+| `tick_font_size` / `--tick-font-size` | `12` | Tick label font size |
+| `value_font_size` / `--value-font-size` | `11` | Bar percentage font size |
+| `theme.font_family` / `--font-family` | API `monospace`; CLI `sans-serif` | Installed font family |
+| `theme.accent` / `--color` | `#2563eb` | Bar color |
+| `theme.background` / `--background` | `#ffffff` | Background color; API themes also configure grid/text colors |
+| `bar_width` / `--bar-width` | `0.9` | Fraction of the category slot/bin width; 1 removes gaps |
+| `label_rotation` / `--label-rotation` | `0` | X tick rotation: 0, 45, or 90 degrees |
+| `max_tick_labels` / `--max-tick-labels` | `12` | X tick density; histograms also retain the rightmost edge |
+| `show_values` / `--show-values` | `False` | Show bar percentages; leave off for dense histograms |
+| `show_grid` / `--grid`, `--no-grid` | `True` | Horizontal grid lines |
+| `x_label` / `--x-label` | CSV column name | X axis label |
+| `y_label` / `--y-label` | `Sample proportion (%)` | Y axis label; normalization remains sample proportion |
+| Export `dpi` / `--dpi` | `600` | Default raster side is approximately `size × dpi / 96` pixels |
+| `encoding` / `--encoding` | `utf-8-sig` | CSV encoding, accepting UTF-8 BOM |
+| `delimiter` / `--delimiter` | `,` | Single-character delimiter |
+| `max_values` / `--max-values` | `1000000` | Input row limit, including blank cells |
+
+Export supports PNG, SVG, JPG, TIFF, and PDF. Extensionless filenames receive `.png`. The CLI creates parent directories and refuses to overwrite existing files unless `--overwrite` is supplied. As with existing plots, `title` is SVG accessibility text rather than an in-plot heading.

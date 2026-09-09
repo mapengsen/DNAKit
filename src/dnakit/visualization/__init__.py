@@ -6,12 +6,18 @@ from dnakit.visualization.advanced import (
     plot_linear_map,
 )
 from dnakit.visualization.config import (
+    DistributionPlotConfig,
     HeatmapConfig,
     ImageExportConfig,
     LimitPolicy,
     SaveConfig,
     SequencePlotConfig,
     SVGTheme,
+)
+from dnakit.visualization.distribution import (
+    DistributionTask,
+    plot_csv_distributions,
+    plot_distribution,
 )
 from dnakit.visualization.export import (
     ImageExportFormat,
@@ -26,6 +32,8 @@ from dnakit.visualization.results import HTMLReportArtifact, SVGArtifact, Visual
 from dnakit.visualization.sequence import Highlight, plot_sequence
 
 __all__ = [
+    "DistributionPlotConfig",
+    "DistributionTask",
     "HTMLReportArtifact",
     "HeatmapConfig",
     "Highlight",
@@ -41,6 +49,8 @@ __all__ = [
     "build_html_report",
     "plot_alignment",
     "plot_circular_map",
+    "plot_csv_distributions",
+    "plot_distribution",
     "plot_linear_map",
     "plot_sequence",
     "plot_similarity_matrix",

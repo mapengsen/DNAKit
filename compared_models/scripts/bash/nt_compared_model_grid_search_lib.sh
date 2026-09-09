@@ -63,7 +63,7 @@ Launcher args:
   --skip-existing               skip jobs whose metrics.json has status ok
   --dry-run                     print commands without launching jobs
   --stop-on-failure             stop scheduling new jobs after the first failure
-  --no-collect                  do not collect metrics/profile/runtime into CSV/JSON
+  --no-collect                  do not collect task metrics and configuration into CSV/JSON
   --help                        show this help
 
 Fixed defaults:
@@ -1211,7 +1211,7 @@ collect_grid_results() {
   if (( ! COLLECT_RESULTS || DRY_RUN )); then
     return 0
   fi
-  echo "[launcher] Collecting metrics/profile/runtime summaries."
+  echo "[launcher] Collecting task metrics and configuration summaries."
   if ! conda run --no-capture-output -n "$COLLECT_CONDA_ENV" python -u "$COLLECT_SCRIPT" --log-root "$LOG_ROOT"; then
     echo "[launcher] Result collection failed; training outputs are still available under ${LOG_ROOT}." >&2
     return 1

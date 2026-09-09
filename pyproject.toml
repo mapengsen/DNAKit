@@ -39,6 +39,13 @@ Issues = "https://github.com/mapengsen/DNAKit/issues"
 Changelog = "https://mapengsen.github.io/DNAKit/en/changelog/"
 
 [project.optional-dependencies]
+bio-analysis = ["numpy>=1.26,<3", "scipy>=1.11,<2", "scikit-learn>=1.5,<2"]
+bio-formats = ["biopython>=1.85,<2"]
+bio-reads = ["pysam>=0.22,<0.25"]
+bio-plots = ["matplotlib>=3.8,<4"]
+bio-assembly = ["pydna>=5.5,<6"]
+bio = ["dnakit[bio-analysis,bio-formats,bio-reads,bio-plots,bio-assembly]"]
+bio-validation = ["scikit-bio>=0.7.3,<0.8", "statsmodels>=0.14,<1"]
 dev = [
   "build>=1.2",
   "hypothesis>=6.100",
@@ -80,6 +87,30 @@ neural = [
   "torch>=2.5,<3",
   "transformers>=4.49,<5",
 ]
+training = [
+  "huggingface-hub>=0.28,<2",
+  "numpy>=1.26,<3",
+  "openpyxl>=3.1,<4",
+  "pandas>=2.2,<4",
+  "pyarrow>=19,<26",
+  "scikit-learn>=1.5,<2",
+  "torch>=2.5,<3",
+  "transformers>=4.49,<5",
+  "xlrd>=2.0,<3",
+]
+ml = [
+  "numpy>=1.26,<3",
+  "scikit-learn>=1.5,<2",
+  "joblib>=1.4,<2",
+  "threadpoolctl>=3.1,<4",
+  "openpyxl>=3.1,<4",
+  "pandas>=2.2,<4",
+  "pyarrow>=19,<26",
+  "xlrd>=2.0,<3",
+]
+xgboost = ["dnakit[ml]", "xgboost>=2.1,<4"]
+lightgbm = ["dnakit[ml]", "lightgbm>=4.5,<5"]
+catboost = ["dnakit[ml]", "catboost>=1.2,<2"]
 neural-caduceus = [
   "mamba-ssm>=2.2,<3",
 ]

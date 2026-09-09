@@ -1,0 +1,1479 @@
+{
+  "schema_version": 1,
+  "review_scope": "显式命名方法、独立公开操作与指标定义；别名/包装合并，参数组合不乘计。摘要是源代码变更后的复核提醒，不是科学等价性的自动证明。",
+  "reviewed_classes": [
+    "dnakit.backends.BackendRegistry",
+    "dnakit.backends.external.ExternalCLIAdapter",
+    "dnakit.core.DNASet",
+    "dnakit.core.DNASequence",
+    "dnakit.io.source.RecordSource",
+    "dnakit.bioinformatics.reads.IndexedReference",
+    "dnakit.bioinformatics.motifs.MotifModel",
+    "dnakit.bioinformatics.optimization.Specification",
+    "dnakit.bioinformatics.phylogeny.TreeNode",
+    "dnakit.cache.JSONCache",
+    "dnakit.bioinformatics.cloning.CloningPlan",
+    "dnakit.bioinformatics.features.FeatureAnalysis",
+    "dnakit.fingerprints.FeaturePreprocessor"
+  ],
+  "groups": [
+    {
+      "name": "sequence_index",
+      "category": "A",
+      "replaces": [
+        "A007"
+      ],
+      "scope_note": "FASTA与含质量的FASTQ索引各计一项；FASTA原生/pysam/samtools-fai属于同一索引能力",
+      "items": [
+        {
+          "key": "fasta",
+          "capability": "FASTA随机访问索引构建与重载"
+        },
+        {
+          "key": "fastq",
+          "capability": "FASTQ随机访问索引构建与重载"
+        }
+      ]
+    },
+    {
+      "name": "参考索引方法",
+      "category": "A",
+      "replaces": [
+        "A009"
+      ],
+      "scope_note": "每种专用索引方法计一项；samtools-fai已并入FASTA索引，不能再计；samtools-dict此前只覆盖了接口而未在范围说明中列明",
+      "items": [
+        {
+          "key": "makeblastdb",
+          "capability": "参考索引方法：makeblastdb"
+        },
+        {
+          "key": "bwa",
+          "capability": "参考索引方法：bwa"
+        },
+        {
+          "key": "bowtie2-build",
+          "capability": "参考索引方法：bowtie2-build"
+        },
+        {
+          "key": "minimap2",
+          "capability": "参考索引方法：minimap2"
+        },
+        {
+          "key": "samtools-dict",
+          "capability": "参考索引方法：samtools-dict"
+        }
+      ]
+    },
+    {
+      "name": "序列分块策略",
+      "category": "A",
+      "replaces": [
+        "A032"
+      ],
+      "scope_note": "按公开分块策略计数；同策略的FASTA包装和长度/步长不额外计数",
+      "items": [
+        {
+          "key": "fixed",
+          "capability": "序列分块策略：fixed"
+        },
+        {
+          "key": "sliding",
+          "capability": "序列分块策略：sliding"
+        },
+        {
+          "key": "random",
+          "capability": "序列分块策略：random"
+        },
+        {
+          "key": "multiscale",
+          "capability": "序列分块策略：multiscale"
+        },
+        {
+          "key": "curriculum",
+          "capability": "序列分块策略：curriculum"
+        }
+      ]
+    },
+    {
+      "name": "测序记录排序",
+      "category": "A",
+      "replaces": [
+        "A035"
+      ],
+      "scope_note": "排序与随机打乱各计一项；ID/名称/长度等排序键不拆计",
+      "items": [
+        {
+          "key": "sort",
+          "capability": "测序记录排序：sort"
+        },
+        {
+          "key": "shuffle",
+          "capability": "测序记录排序：shuffle"
+        }
+      ]
+    },
+    {
+      "name": "Sanger预处理",
+      "category": "A",
+      "replaces": [
+        "A077"
+      ],
+      "scope_note": "ABI解码与Mott质量修剪是不同操作；修剪阈值不拆计",
+      "items": [
+        {
+          "key": "abi_decode",
+          "capability": "Sanger预处理：abi_decode"
+        },
+        {
+          "key": "mott_trim",
+          "capability": "Sanger预处理：mott_trim"
+        }
+      ]
+    },
+    {
+      "name": "内存记录选择",
+      "category": "A",
+      "replaces": [],
+      "scope_note": "DNASet.get/select为记录选择能力；不把数据容器本身计作功能",
+      "items": [
+        {
+          "key": "lookup",
+          "capability": "按ID或输入位置选择内存记录"
+        }
+      ]
+    },
+    {
+      "name": "连续变体生成",
+      "category": "B",
+      "replaces": [
+        "B004"
+      ],
+      "scope_note": "连续插入和连续删除分别计数；位置、长度、随机种子不拆计",
+      "items": [
+        {
+          "key": "insertion",
+          "capability": "连续变体生成：insertion"
+        },
+        {
+          "key": "deletion",
+          "capability": "连续变体生成：deletion"
+        }
+      ]
+    },
+    {
+      "name": "片段重排",
+      "category": "B",
+      "replaces": [
+        "B006"
+      ],
+      "scope_note": "片段交换、倒置、重复是独立重排操作；迭代次数不拆计",
+      "items": [
+        {
+          "key": "exchange",
+          "capability": "片段重排：exchange"
+        },
+        {
+          "key": "inversion",
+          "capability": "片段重排：inversion"
+        },
+        {
+          "key": "duplication",
+          "capability": "片段重排：duplication"
+        }
+      ]
+    },
+    {
+      "name": "motif匹配",
+      "category": "B",
+      "replaces": [
+        "B010"
+      ],
+      "scope_note": "三种公开匹配语义分别计数；双链扫描和启动子panel是同方法的输入/包装",
+      "items": [
+        {
+          "key": "exact",
+          "capability": "motif匹配：exact"
+        },
+        {
+          "key": "iupac",
+          "capability": "motif匹配：iupac"
+        },
+        {
+          "key": "regex",
+          "capability": "motif匹配：regex"
+        }
+      ]
+    },
+    {
+      "name": "CRISPR分析",
+      "category": "B",
+      "replaces": [
+        "B016"
+      ],
+      "scope_note": "候选发现和对显式参考的脱靶检查分别计数；仅计当前实现的匹配/评分能力",
+      "items": [
+        {
+          "key": "candidate",
+          "capability": "PAM与CRISPR候选扫描"
+        },
+        {
+          "key": "offtarget",
+          "capability": "显式参考CRISPR脱靶扫描"
+        }
+      ]
+    },
+    {
+      "name": "成对比对",
+      "category": "B",
+      "replaces": [
+        "B022"
+      ],
+      "scope_note": "全局、局部和半全局动态规划边界不同，分别计数；评分参数不拆计",
+      "items": [
+        {
+          "key": "global",
+          "capability": "成对比对：global"
+        },
+        {
+          "key": "local",
+          "capability": "成对比对：local"
+        },
+        {
+          "key": "semi_global",
+          "capability": "成对比对：semi_global"
+        }
+      ]
+    },
+    {
+      "name": "相似度与距离方法",
+      "category": "B",
+      "replaces": [
+        "B025",
+        "B026",
+        "B027",
+        "B101"
+      ],
+      "scope_note": "相同系数在k-mer、指纹、Sketch或丰度矩阵入口间合并；Manhattan/cityblock为别名；不是每个入口都支持所有方法，以所列API和实际参数为准；成对计算与置换检验是不同产物",
+      "items": [
+        {
+          "key": "jaccard",
+          "capability": "相似度与距离方法：jaccard"
+        },
+        {
+          "key": "containment",
+          "capability": "相似度与距离方法：containment"
+        },
+        {
+          "key": "cosine",
+          "capability": "相似度与距离方法：cosine"
+        },
+        {
+          "key": "tanimoto",
+          "capability": "相似度与距离方法：tanimoto"
+        },
+        {
+          "key": "euclidean",
+          "capability": "相似度与距离方法：euclidean"
+        },
+        {
+          "key": "manhattan",
+          "capability": "相似度与距离方法：manhattan"
+        },
+        {
+          "key": "braycurtis",
+          "capability": "相似度与距离方法：braycurtis"
+        },
+        {
+          "key": "unweighted_unifrac",
+          "capability": "相似度与距离方法：unweighted_unifrac"
+        },
+        {
+          "key": "weighted_unifrac",
+          "capability": "相似度与距离方法：weighted_unifrac"
+        }
+      ]
+    },
+    {
+      "name": "BLAST搜索",
+      "category": "B",
+      "replaces": [
+        "B030"
+      ],
+      "scope_note": "按已校验的BLAST程序计数；本地与远程、提交/轮询/取回不重复计数；本地包装为blastn，其他程序以远程入口实际支持为准",
+      "items": [
+        {
+          "key": "blastn",
+          "capability": "BLAST搜索：blastn"
+        },
+        {
+          "key": "blastp",
+          "capability": "BLAST搜索：blastp"
+        },
+        {
+          "key": "blastx",
+          "capability": "BLAST搜索：blastx"
+        },
+        {
+          "key": "tblastn",
+          "capability": "BLAST搜索：tblastn"
+        },
+        {
+          "key": "tblastx",
+          "capability": "BLAST搜索：tblastx"
+        }
+      ]
+    },
+    {
+      "name": "Profile HMM搜索",
+      "category": "B",
+      "replaces": [
+        "B033"
+      ],
+      "scope_note": "按核酸/蛋白的已实现搜索程序各计一项",
+      "items": [
+        {
+          "key": "nhmmer",
+          "capability": "Profile HMM搜索：nhmmer"
+        },
+        {
+          "key": "hmmsearch",
+          "capability": "Profile HMM搜索：hmmsearch"
+        }
+      ]
+    },
+    {
+      "name": "多序列比对",
+      "category": "B",
+      "replaces": [
+        "B034"
+      ],
+      "scope_note": "MAFFT、MUSCLE5、Clustal Omega分别计数；程序路径和线程数不拆计",
+      "items": [
+        {
+          "key": "mafft",
+          "capability": "多序列比对：mafft"
+        },
+        {
+          "key": "muscle",
+          "capability": "多序列比对：muscle"
+        },
+        {
+          "key": "clustalo",
+          "capability": "多序列比对：clustalo"
+        }
+      ]
+    },
+    {
+      "name": "系统发育建树",
+      "category": "B",
+      "replaces": [
+        "B036"
+      ],
+      "scope_note": "NJ与UPGMA分别计数",
+      "items": [
+        {
+          "key": "nj",
+          "capability": "系统发育建树：nj"
+        },
+        {
+          "key": "upgma",
+          "capability": "系统发育建树：upgma"
+        }
+      ]
+    },
+    {
+      "name": "reads参考比对",
+      "category": "B",
+      "replaces": [
+        "B044"
+      ],
+      "scope_note": "BWA与Bowtie2分别计数；单端/双端与参数不拆计",
+      "items": [
+        {
+          "key": "bwa",
+          "capability": "reads参考比对：bwa"
+        },
+        {
+          "key": "bowtie2",
+          "capability": "reads参考比对：bowtie2"
+        }
+      ]
+    },
+    {
+      "name": "分子组装方法",
+      "category": "B",
+      "replaces": [
+        "B084"
+      ],
+      "scope_note": "每种组装方法计数；原生与pydna的同方法包装合并，酶和片段数不拆计",
+      "items": [
+        {
+          "key": "gibson",
+          "capability": "分子组装方法：gibson"
+        },
+        {
+          "key": "lcr",
+          "capability": "分子组装方法：lcr"
+        },
+        {
+          "key": "golden_gate",
+          "capability": "分子组装方法：golden_gate"
+        },
+        {
+          "key": "biobrick",
+          "capability": "分子组装方法：biobrick"
+        }
+      ]
+    },
+    {
+      "name": "密码子优化输入",
+      "category": "B",
+      "replaces": [
+        "B086"
+      ],
+      "scope_note": "DNA同义重编码和蛋白到DNA的反向翻译是不同操作；密码子表和随机预算不拆计",
+      "items": [
+        {
+          "key": "dna",
+          "capability": "DNA同义密码子优化"
+        },
+        {
+          "key": "protein",
+          "capability": "蛋白反向翻译与密码子优化"
+        }
+      ]
+    },
+    {
+      "name": "序列优化约束",
+      "category": "B",
+      "replaces": [
+        "B087"
+      ],
+      "scope_note": "19种原生约束、外部BLAST匹配约束及接受自定义Specification的求解各计一项；同规则的硬约束/软目标、窗口和阈值不乘计；规则评价与在优化中应用合并；固定长度求解不能据length规则宣称支持长度改变",
+      "items": [
+        {
+          "key": "gc",
+          "capability": "序列优化约束：gc"
+        },
+        {
+          "key": "avoid_pattern",
+          "capability": "序列优化约束：avoid_pattern"
+        },
+        {
+          "key": "pattern_count",
+          "capability": "序列优化约束：pattern_count"
+        },
+        {
+          "key": "sequence",
+          "capability": "序列优化约束：sequence"
+        },
+        {
+          "key": "translation",
+          "capability": "序列优化约束：translation"
+        },
+        {
+          "key": "length",
+          "capability": "序列优化约束：length"
+        },
+        {
+          "key": "avoid_changes",
+          "capability": "序列优化约束：avoid_changes"
+        },
+        {
+          "key": "unique_kmers",
+          "capability": "序列优化约束：unique_kmers"
+        },
+        {
+          "key": "avoid_stop",
+          "capability": "序列优化约束：avoid_stop"
+        },
+        {
+          "key": "avoid_codons",
+          "capability": "序列优化约束：avoid_codons"
+        },
+        {
+          "key": "avoid_rare_codons",
+          "capability": "序列优化约束：avoid_rare_codons"
+        },
+        {
+          "key": "hairpin",
+          "capability": "序列优化约束：hairpin"
+        },
+        {
+          "key": "heterodimer",
+          "capability": "序列优化约束：heterodimer"
+        },
+        {
+          "key": "avoid_matches",
+          "capability": "序列优化约束：avoid_matches"
+        },
+        {
+          "key": "tm",
+          "capability": "序列优化约束：tm"
+        },
+        {
+          "key": "cai",
+          "capability": "序列优化约束：cai"
+        },
+        {
+          "key": "codon_usage",
+          "capability": "序列优化约束：codon_usage"
+        },
+        {
+          "key": "harmonize",
+          "capability": "序列优化约束：harmonize"
+        },
+        {
+          "key": "regions_compatibility",
+          "capability": "序列优化约束：regions_compatibility"
+        },
+        {
+          "key": "blast_matches",
+          "capability": "序列优化约束：blast_matches"
+        },
+        {
+          "key": "custom_solver",
+          "capability": "序列优化约束：custom_solver"
+        }
+      ]
+    },
+    {
+      "name": "突变文库方法",
+      "category": "B",
+      "replaces": [
+        "B089"
+      ],
+      "scope_note": "单突变、饱和突变、组合突变文库分别计数；位点数和组合阶数不再乘计",
+      "items": [
+        {
+          "key": "single",
+          "capability": "突变文库方法：single"
+        },
+        {
+          "key": "saturation",
+          "capability": "突变文库方法：saturation"
+        },
+        {
+          "key": "combinatorial",
+          "capability": "突变文库方法：combinatorial"
+        }
+      ]
+    },
+    {
+      "name": "距离矩阵置换检验",
+      "category": "B",
+      "replaces": [
+        "B092"
+      ],
+      "scope_note": "按实际统计量分别计数；排列次数、种子不拆计，距离矩阵校验为准备步骤",
+      "items": [
+        {
+          "key": "permanova",
+          "capability": "距离矩阵置换检验：permanova"
+        },
+        {
+          "key": "anosim",
+          "capability": "距离矩阵置换检验：anosim"
+        },
+        {
+          "key": "permdisp",
+          "capability": "距离矩阵置换检验：permdisp"
+        }
+      ]
+    },
+    {
+      "name": "Mantel相关检验",
+      "category": "B",
+      "replaces": [
+        "B093"
+      ],
+      "scope_note": "Pearson与Spearman相关的置换检验分别计数",
+      "items": [
+        {
+          "key": "pearson",
+          "capability": "Mantel相关检验：pearson"
+        },
+        {
+          "key": "spearman",
+          "capability": "Mantel相关检验：spearman"
+        }
+      ]
+    },
+    {
+      "name": "排序与约束排序",
+      "category": "B",
+      "replaces": [
+        "B095"
+      ],
+      "scope_note": "每种排序方法计数；PCoA快捷入口不重复",
+      "items": [
+        {
+          "key": "pcoa",
+          "capability": "排序与约束排序：pcoa"
+        },
+        {
+          "key": "ca",
+          "capability": "排序与约束排序：ca"
+        },
+        {
+          "key": "cca",
+          "capability": "排序与约束排序：cca"
+        },
+        {
+          "key": "rda",
+          "capability": "排序与约束排序：rda"
+        }
+      ]
+    },
+    {
+      "name": "组成变换",
+      "category": "B",
+      "replaces": [
+        "B096"
+      ],
+      "scope_note": "CLR/ILR/ALR及各自逆变换分别计数；基底/参考组分为参数",
+      "items": [
+        {
+          "key": "clr",
+          "capability": "组成变换：clr"
+        },
+        {
+          "key": "ilr",
+          "capability": "组成变换：ilr"
+        },
+        {
+          "key": "alr",
+          "capability": "组成变换：alr"
+        },
+        {
+          "key": "inverse_clr",
+          "capability": "组成变换：inverse_clr"
+        },
+        {
+          "key": "inverse_ilr",
+          "capability": "组成变换：inverse_ilr"
+        },
+        {
+          "key": "inverse_alr",
+          "capability": "组成变换：inverse_alr"
+        }
+      ]
+    },
+    {
+      "name": "组成丰度差异",
+      "category": "B",
+      "replaces": [
+        "B097"
+      ],
+      "scope_note": "两个实现分别计数；不声明ANCOM-BC2",
+      "items": [
+        {
+          "key": "ancom",
+          "capability": "ANCOM组成丰度差异分析"
+        },
+        {
+          "key": "ancom_bc",
+          "capability": "ANCOM-BC组成丰度差异分析"
+        }
+      ]
+    },
+    {
+      "name": "群落alpha多样性",
+      "category": "B",
+      "replaces": [
+        "B100"
+      ],
+      "scope_note": "四种已实现生态多样性指标各计一项；样本数不是功能数",
+      "items": [
+        {
+          "key": "observed",
+          "capability": "群落alpha多样性：observed"
+        },
+        {
+          "key": "shannon",
+          "capability": "群落alpha多样性：shannon"
+        },
+        {
+          "key": "simpson",
+          "capability": "群落alpha多样性：simpson"
+        },
+        {
+          "key": "inverse_simpson",
+          "capability": "群落alpha多样性：inverse_simpson"
+        }
+      ]
+    },
+    {
+      "name": "Sketch生成",
+      "category": "C",
+      "replaces": [
+        "C298"
+      ],
+      "scope_note": "bottom-k MinHash与阈值采样FracMinHash各计一项；seed/k/Sketch大小不拆计",
+      "items": [
+        {
+          "key": "minhash",
+          "capability": "Sketch生成：minhash"
+        },
+        {
+          "key": "fracminhash",
+          "capability": "Sketch生成：fracminhash"
+        }
+      ]
+    },
+    {
+      "name": "特征预处理方法",
+      "category": "C",
+      "replaces": [
+        "C299"
+      ],
+      "scope_note": "四种缩放/归一化与两种缺失填补方法分别计数；none/error不产生新变换；低方差筛选归特征分析variance项，拟合与持出变换不重复计数",
+      "items": [
+        {
+          "key": "standard",
+          "capability": "特征预处理方法：standard"
+        },
+        {
+          "key": "minmax",
+          "capability": "特征预处理方法：minmax"
+        },
+        {
+          "key": "l1",
+          "capability": "特征预处理方法：l1"
+        },
+        {
+          "key": "l2",
+          "capability": "特征预处理方法：l2"
+        },
+        {
+          "key": "mean_imputation",
+          "capability": "特征预处理方法：mean_imputation"
+        },
+        {
+          "key": "zero_imputation",
+          "capability": "特征预处理方法：zero_imputation"
+        }
+      ]
+    },
+    {
+      "name": "特征分析方法",
+      "category": "C",
+      "replaces": [
+        "C300"
+      ],
+      "scope_note": "12种已实现降维/筛选方法各计一项；none/scale-only归预处理；variance同时覆盖预处理器的低方差过滤；维数、选中特征数和参数不拆计；监督LDA降维与F列LDA分类输出不同",
+      "items": [
+        {
+          "key": "pca",
+          "capability": "特征分析方法：pca"
+        },
+        {
+          "key": "tsne",
+          "capability": "特征分析方法：tsne"
+        },
+        {
+          "key": "lda",
+          "capability": "特征分析方法：lda"
+        },
+        {
+          "key": "latent_dirichlet",
+          "capability": "特征分析方法：latent_dirichlet"
+        },
+        {
+          "key": "variance",
+          "capability": "特征分析方法：variance"
+        },
+        {
+          "key": "chi2",
+          "capability": "特征分析方法：chi2"
+        },
+        {
+          "key": "f_classif",
+          "capability": "特征分析方法：f_classif"
+        },
+        {
+          "key": "f_regression",
+          "capability": "特征分析方法：f_regression"
+        },
+        {
+          "key": "mutual_info_classif",
+          "capability": "特征分析方法：mutual_info_classif"
+        },
+        {
+          "key": "mutual_info_regression",
+          "capability": "特征分析方法：mutual_info_regression"
+        },
+        {
+          "key": "information_gain",
+          "capability": "特征分析方法：information_gain"
+        },
+        {
+          "key": "pearson",
+          "capability": "特征分析方法：pearson"
+        }
+      ]
+    },
+    {
+      "name": "去重规则",
+      "category": "D",
+      "replaces": [
+        "D001"
+      ],
+      "scope_note": "四种规范等价规则、IUPAC相容和阈值近似去重分别计数；近似度量和代表选择为依赖方法，不相乘",
+      "items": [
+        {
+          "key": "exact",
+          "capability": "去重规则：exact"
+        },
+        {
+          "key": "reverse_complement",
+          "capability": "去重规则：reverse_complement"
+        },
+        {
+          "key": "circular",
+          "capability": "去重规则：circular"
+        },
+        {
+          "key": "circular_reverse_complement",
+          "capability": "去重规则：circular_reverse_complement"
+        },
+        {
+          "key": "iupac",
+          "capability": "去重规则：iupac"
+        },
+        {
+          "key": "approximate",
+          "capability": "去重规则：approximate"
+        }
+      ]
+    },
+    {
+      "name": "聚类算法",
+      "category": "D",
+      "replaces": [
+        "D002"
+      ],
+      "scope_note": "贪心阈值聚类、single/complete/average层次聚类和10种特征聚类算法共14项；agglomerative默认Ward单列，其他linkage归对应层次项；神经聚类归kmeans，embedding/PCA预处理不再乘计",
+      "items": [
+        {
+          "key": "greedy_threshold",
+          "capability": "聚类算法：greedy_threshold"
+        },
+        {
+          "key": "single_linkage",
+          "capability": "聚类算法：single_linkage"
+        },
+        {
+          "key": "complete_linkage",
+          "capability": "聚类算法：complete_linkage"
+        },
+        {
+          "key": "average_linkage",
+          "capability": "聚类算法：average_linkage"
+        },
+        {
+          "key": "kmeans",
+          "capability": "聚类算法：kmeans"
+        },
+        {
+          "key": "minibatch_kmeans",
+          "capability": "聚类算法：minibatch_kmeans"
+        },
+        {
+          "key": "dbscan",
+          "capability": "聚类算法：dbscan"
+        },
+        {
+          "key": "spectral",
+          "capability": "聚类算法：spectral"
+        },
+        {
+          "key": "affinity_propagation",
+          "capability": "聚类算法：affinity_propagation"
+        },
+        {
+          "key": "mean_shift",
+          "capability": "聚类算法：mean_shift"
+        },
+        {
+          "key": "ward_agglomerative",
+          "capability": "聚类算法：ward_agglomerative"
+        },
+        {
+          "key": "birch",
+          "capability": "聚类算法：birch"
+        },
+        {
+          "key": "gmm",
+          "capability": "聚类算法：gmm"
+        },
+        {
+          "key": "mcl",
+          "capability": "聚类算法：mcl"
+        }
+      ]
+    },
+    {
+      "name": "代表序列策略",
+      "category": "D",
+      "replaces": [
+        "D003"
+      ],
+      "scope_note": "每种公开代表选择策略计数；medoid距离度量和输入簇数不乘计",
+      "items": [
+        {
+          "key": "first",
+          "capability": "代表序列策略：first"
+        },
+        {
+          "key": "shortest",
+          "capability": "代表序列策略：shortest"
+        },
+        {
+          "key": "longest",
+          "capability": "代表序列策略：longest"
+        },
+        {
+          "key": "best_quality",
+          "capability": "代表序列策略：best_quality"
+        },
+        {
+          "key": "medoid",
+          "capability": "代表序列策略：medoid"
+        }
+      ]
+    },
+    {
+      "name": "数据划分策略",
+      "category": "D",
+      "replaces": [
+        "D004"
+      ],
+      "scope_note": "五种基础划分、时间划分、联合约束划分和采用已有split字段共8项；训练接口的随机/分层包装归同一条目",
+      "items": [
+        {
+          "key": "random",
+          "capability": "数据划分策略：random"
+        },
+        {
+          "key": "hash",
+          "capability": "数据划分策略：hash"
+        },
+        {
+          "key": "stratified",
+          "capability": "数据划分策略：stratified"
+        },
+        {
+          "key": "group",
+          "capability": "数据划分策略：group"
+        },
+        {
+          "key": "similarity",
+          "capability": "数据划分策略：similarity"
+        },
+        {
+          "key": "temporal",
+          "capability": "数据划分策略：temporal"
+        },
+        {
+          "key": "joint",
+          "capability": "数据划分策略：joint"
+        },
+        {
+          "key": "preassigned",
+          "capability": "数据划分策略：preassigned"
+        }
+      ]
+    },
+    {
+      "name": "区间集合操作",
+      "category": "D",
+      "replaces": [
+        "D009"
+      ],
+      "scope_note": "并集、交集和差集分别计数；参考序列/链分组是作用范围",
+      "items": [
+        {
+          "key": "union",
+          "capability": "区间集合操作：union"
+        },
+        {
+          "key": "intersection",
+          "capability": "区间集合操作：intersection"
+        },
+        {
+          "key": "difference",
+          "capability": "区间集合操作：difference"
+        }
+      ]
+    },
+    {
+      "name": "预测性能指标",
+      "category": "F",
+      "replaces": [
+        "F099"
+      ],
+      "scope_note": "29类明确实现的指标/混淆矩阵各计一项；sensitivity并入recall；accuracy含多标签subset及多输出exact-match；micro/macro/weighted/samples、逐类逐目标不另计；缺失统计条件按实现返回None；分类Jaccard与B列序列/丰度相似度属于不同评价任务",
+      "items": [
+        {
+          "key": "mae",
+          "capability": "预测性能指标：mae"
+        },
+        {
+          "key": "mse",
+          "capability": "预测性能指标：mse"
+        },
+        {
+          "key": "rmse",
+          "capability": "预测性能指标：rmse"
+        },
+        {
+          "key": "r2",
+          "capability": "预测性能指标：r2"
+        },
+        {
+          "key": "explained_variance",
+          "capability": "预测性能指标：explained_variance"
+        },
+        {
+          "key": "median_absolute_error",
+          "capability": "预测性能指标：median_absolute_error"
+        },
+        {
+          "key": "max_error",
+          "capability": "预测性能指标：max_error"
+        },
+        {
+          "key": "mean_bias_error",
+          "capability": "预测性能指标：mean_bias_error"
+        },
+        {
+          "key": "mape",
+          "capability": "预测性能指标：mape"
+        },
+        {
+          "key": "smape",
+          "capability": "预测性能指标：smape"
+        },
+        {
+          "key": "pearson_r",
+          "capability": "预测性能指标：pearson_r"
+        },
+        {
+          "key": "spearman_r",
+          "capability": "预测性能指标：spearman_r"
+        },
+        {
+          "key": "accuracy",
+          "capability": "预测性能指标：accuracy"
+        },
+        {
+          "key": "balanced_accuracy",
+          "capability": "预测性能指标：balanced_accuracy"
+        },
+        {
+          "key": "matthews_correlation_coefficient",
+          "capability": "预测性能指标：matthews_correlation_coefficient"
+        },
+        {
+          "key": "cohen_kappa",
+          "capability": "预测性能指标：cohen_kappa"
+        },
+        {
+          "key": "log_loss",
+          "capability": "预测性能指标：log_loss"
+        },
+        {
+          "key": "confusion_matrix",
+          "capability": "预测性能指标：confusion_matrix"
+        },
+        {
+          "key": "precision",
+          "capability": "预测性能指标：precision"
+        },
+        {
+          "key": "recall",
+          "capability": "预测性能指标：recall"
+        },
+        {
+          "key": "f1",
+          "capability": "预测性能指标：f1"
+        },
+        {
+          "key": "jaccard",
+          "capability": "预测性能指标：jaccard"
+        },
+        {
+          "key": "auroc",
+          "capability": "预测性能指标：auroc"
+        },
+        {
+          "key": "average_precision",
+          "capability": "预测性能指标：average_precision"
+        },
+        {
+          "key": "specificity",
+          "capability": "预测性能指标：specificity"
+        },
+        {
+          "key": "top_2_accuracy",
+          "capability": "预测性能指标：top_2_accuracy"
+        },
+        {
+          "key": "hamming_loss",
+          "capability": "预测性能指标：hamming_loss"
+        },
+        {
+          "key": "label_ranking_average_precision",
+          "capability": "预测性能指标：label_ranking_average_precision"
+        },
+        {
+          "key": "coverage_error",
+          "capability": "预测性能指标：coverage_error"
+        }
+      ]
+    },
+    {
+      "name": "分布相似度指标",
+      "category": "G",
+      "replaces": [
+        "G011"
+      ],
+      "scope_note": "五种已实现分布比较按比较对象与统计定义逐项计数；返回的mean综合分数是固定汇总，不另计",
+      "items": [
+        {
+          "key": "length_ks",
+          "capability": "分布相似度指标：length_ks"
+        },
+        {
+          "key": "gc_ks",
+          "capability": "分布相似度指标：gc_ks"
+        },
+        {
+          "key": "kmer_total_variation",
+          "capability": "分布相似度指标：kmer_total_variation"
+        },
+        {
+          "key": "motif_rate_difference",
+          "capability": "分布相似度指标：motif_rate_difference"
+        },
+        {
+          "key": "repeat_fraction_ks",
+          "capability": "分布相似度指标：repeat_fraction_ks"
+        }
+      ]
+    },
+    {
+      "name": "生成集合核距离",
+      "category": "G",
+      "replaces": [
+        "G014"
+      ],
+      "scope_note": "高斯核MMD平方和三次多项式核KID分别计数；维数/样本数/子采样不拆计",
+      "items": [
+        {
+          "key": "mmd",
+          "capability": "生成集合核距离：mmd"
+        },
+        {
+          "key": "kid",
+          "capability": "生成集合核距离：kid"
+        }
+      ]
+    },
+    {
+      "name": "PRDC几何指标",
+      "category": "G",
+      "replaces": [
+        "G015"
+      ],
+      "scope_note": "四种不同几何统计量分别计数；不是分类模型的precision/recall；邻居数不乘计",
+      "items": [
+        {
+          "key": "precision",
+          "capability": "PRDC几何指标：precision"
+        },
+        {
+          "key": "recall",
+          "capability": "PRDC几何指标：recall"
+        },
+        {
+          "key": "density",
+          "capability": "PRDC几何指标：density"
+        },
+        {
+          "key": "coverage",
+          "capability": "PRDC几何指标：coverage"
+        }
+      ]
+    },
+    {
+      "name": "clipped几何指标",
+      "category": "G",
+      "replaces": [
+        "G016"
+      ],
+      "scope_note": "两个已实现的clipped几何统计量分别计数；裁剪阈值为参数",
+      "items": [
+        {
+          "key": "clipped_density",
+          "capability": "clipped几何指标：clipped_density"
+        },
+        {
+          "key": "clipped_coverage",
+          "capability": "clipped几何指标：clipped_coverage"
+        }
+      ]
+    },
+    {
+      "name": "缓存操作",
+      "category": "I",
+      "replaces": [
+        "I005"
+      ],
+      "scope_note": "读取、写入、单项失效、全部清理为独立公开操作；缓存键和文件数不拆计",
+      "items": [
+        {
+          "key": "get",
+          "capability": "缓存操作：get"
+        },
+        {
+          "key": "put",
+          "capability": "缓存操作：put"
+        },
+        {
+          "key": "invalidate",
+          "capability": "缓存操作：invalidate"
+        },
+        {
+          "key": "clear",
+          "capability": "缓存操作：clear"
+        }
+      ]
+    },
+    {
+      "name": "后端管理",
+      "category": "I",
+      "replaces": [
+        "I006"
+      ],
+      "scope_note": "注册、注销、发现、可用性探测、惰性加载分别计数；probe_all及具体后端状态包装不另计",
+      "items": [
+        {
+          "key": "register",
+          "capability": "后端管理：register"
+        },
+        {
+          "key": "unregister",
+          "capability": "后端管理：unregister"
+        },
+        {
+          "key": "discover",
+          "capability": "后端管理：discover"
+        },
+        {
+          "key": "probe",
+          "capability": "后端管理：probe"
+        },
+        {
+          "key": "load",
+          "capability": "后端管理：load"
+        }
+      ]
+    },
+    {
+      "name": "外部工具版本",
+      "category": "I",
+      "replaces": [],
+      "scope_note": "通过ExternalCLIAdapter.version执行有时限的版本查询，与探测可执行文件是否存在不同",
+      "items": [
+        {
+          "key": "version",
+          "capability": "显式查询外部工具版本"
+        }
+      ]
+    }
+  ],
+  "reviewed_sources": {
+    "dnakit.alignment.align_pairwise": "32db198b49be344716116d767806071ee8a539bbe6698b7927f3947750933d51",
+    "dnakit.alignment.pairwise.AlignmentConfig": "c8017bb65a026bfe5ddd428d997a92e6d39db0263d699240671d20d5ea34d991",
+    "dnakit.backends.BackendRegistry": "20921f3c6d13b6e2cc601a5ac27f81ce2a455e347d3d4743d2422a71c5d05994",
+    "dnakit.backends.BackendRegistry.discover": "b8c0d723ee49c8ded1eac75ec7291987a5d4b60d9086e12a5a6609c137b654a8",
+    "dnakit.backends.BackendRegistry.load": "7a9b3fa8d89ad4ef07112e4c0517eb26d6ed33ac56a323d4c909e35c74f3b3e3",
+    "dnakit.backends.BackendRegistry.probe": "e8e82176f3aada6b8e943430b5eb79f99ab7181fe7822d0b828ff7457e82ba66",
+    "dnakit.backends.BackendRegistry.probe_all": "90587185eb076e3fc236f00e809496531dccf5e5516ef4a74f6622826174bac8",
+    "dnakit.backends.BackendRegistry.register": "aac14cb1a7186a950bd75c3ca5093630602f8112ef0a0d0c83c5cb90e1566287",
+    "dnakit.backends.BackendRegistry.registrations": "7b2d759bf3e2233a69b3044742a336af9b94288075de2b0f7dbdc3f6d9e895aa",
+    "dnakit.backends.BackendRegistry.unregister": "e599c3337a1cfcdc0b6407a0e7b85a9b10bcbd4e729ff9854969c244aeb6509b",
+    "dnakit.backends.external.ExternalCLIAdapter": "d8fd26af8a7947738cf8b93914a8aa85db5ec349b5019a9205fe48ecd2c32af7",
+    "dnakit.backends.external.ExternalCLIAdapter.probe": "d7f0cb67ea3785a9ab26808aa1e2cc429c040e0bce14c7af886734d9c448923b",
+    "dnakit.backends.external.ExternalCLIAdapter.version": "acafaa4a10253f35389f2724cc68c7269c88bdb4d48381bf8e54a07f97d63549",
+    "dnakit.bioinformatics.alignment.align_sequences": "b22d5cde5deebd61b5253365bdf70b987853b712cf8238ccf40c7ce25e0b9dfb",
+    "dnakit.bioinformatics.alignment.build_blast_database": "a07531b7e4957ba03caab0f9f104419867d2dd0dfb0e12390857302418ef2150",
+    "dnakit.bioinformatics.alignment.local_blast": "71abe094a873cd4a04241e042da5a5fb5906eff4eca54a75cca7db21f05c17eb",
+    "dnakit.bioinformatics.alignment.search_profile": "6a659860f12b0da788cea1176d33da30b94a954cb10042afcf86824bfa4a47b8",
+    "dnakit.bioinformatics.cloning.CloningPlan": "ae98f6ff134824cca80d6e9e74acb655dc14712bb73698cdaa7fa89a576d64e0",
+    "dnakit.bioinformatics.cloning.assemble_duplexes": "945bd9419a13375578033323c7334b9ffb814396fd2d56472c591f957afdbfaf",
+    "dnakit.bioinformatics.cloning.read_sanger": "7c18a5147ea6ca1dfb6a904339157b1d63cadd538bf2134baa5a00c66df87b04",
+    "dnakit.bioinformatics.counts.ancom_bc": "7507da72da9c814e1ab5da7c9dfc8a72e52d92b6f522d6a09f560ac518579373",
+    "dnakit.bioinformatics.features.FeatureAnalysis": "619ce43f4e7b2e4a6a5f5d8edb59af74706f5624236069b8cf0ff89ac894aec4",
+    "dnakit.bioinformatics.features.FeatureAnalysis.transform": "cd531819ae2c24c0fdb6b0b1c2383aa54fe28a6892a7d035be2139d5e0a41428",
+    "dnakit.bioinformatics.features.analyze_features": "77aee3d78da657996a03dc3f9662e0cb1709fe2911c64579f8ce34b9b7f87987",
+    "dnakit.bioinformatics.features.cluster_features": "3336996f87a59c2dcc0add04de8df6e6b21dc1b22ab0e24827a9af9ef0e472ca",
+    "dnakit.bioinformatics.metrics.clipped_manifold_metrics": "87b9052d571669c251285f6b5bbc668ce88f22b50da201796f03c91a054611bf",
+    "dnakit.bioinformatics.metrics.kernel_distance": "05398f706d9de38b5855433ad69bf42b10313a3764877d373a85c101b205a45a",
+    "dnakit.bioinformatics.metrics.manifold_metrics": "91476c42ebdda08857d256c19ac56ee5b56f4616e5c1cd9d3ee489c354fff579",
+    "dnakit.bioinformatics.motifs.MotifModel": "72638510ed4141c4c6cad448b8934a758c3d8009a9f3dc1d545730b33c8f86c2",
+    "dnakit.bioinformatics.ngs.map_reads": "32c393c05e0e27bef28bbef918fd753597ad013b17b8bfe72a344eebcb3a3740",
+    "dnakit.bioinformatics.optimization.Specification": "b47acf977ec9a8891a20c199440fc61c4f9c179f34f9f8f95e3254a16666a087",
+    "dnakit.bioinformatics.optimization.Specification.evaluate": "03e4f8ef1f6a25b4874fbd61699159ac038d1f4a7090c0ba3f5ade868054aa00",
+    "dnakit.bioinformatics.optimization.blast_match_specification": "4a9bfc664b273de428fff3a58f83c8821fd26453b6c5956ace9e9953058c84c8",
+    "dnakit.bioinformatics.optimization.optimize_sequence": "395ac8df74e7afd7f699ec07eb045478bb7293788a53cb9518dfc8e5290b8c89",
+    "dnakit.bioinformatics.optimization.specification": "8602099b31311df3085b7179b29625af40134290dfc650fe9511832fdfe8c306",
+    "dnakit.bioinformatics.phylogeny.TreeNode": "27fa6f7fcf9764530b4295d93e474d2cf8005454a196b1f518f0c97c06759bdf",
+    "dnakit.bioinformatics.phylogeny.build_tree": "e7e5137453711a8b6d8370f9096ffadb50896c77798a80a1239fbcb8aeef48d8",
+    "dnakit.bioinformatics.phylogeny.unifrac": "b5e8d992e5d5db315cef483dbada43bea9eae636e6ae900c2db38f8e6dcbc9f6",
+    "dnakit.bioinformatics.reads.IndexedReference": "0933d7b4aa017b520a145b9af95fe5709ca10dffd6e5da70b478af8e35bc5f37",
+    "dnakit.bioinformatics.reads.arrange_reads": "0137511cc30fff8103fb31767d623b8a7c1de262e1d7fb223fd06414062b3b77",
+    "dnakit.bioinformatics.reads.index_reference": "53076fc73895e405002dd5a343362262d2c99ee5a32315e934fc4bca93b9ffef",
+    "dnakit.bioinformatics.statistics.alpha_diversity": "0cbc73a767762ce875e7f5c7527ede748600de2a7c39f4a0bada9d59af77008c",
+    "dnakit.bioinformatics.statistics.ancom": "dd1b34632ff69c4c31890c2ee2fa1752a46c98b7bdc0813f26bee101150d4eae",
+    "dnakit.bioinformatics.statistics.beta_diversity": "8b278c29956932c3ac72136abd92968e470a36e2a82639ce4c127c8a65189e97",
+    "dnakit.bioinformatics.statistics.composition_transform": "3881eea3cebf840c76fa12d0cd16344ed7f4fe66550eae5a45994c01c5f11a60",
+    "dnakit.bioinformatics.statistics.distance_matrix": "4aec41c132f8e1373ab7585afb631d9b6c566a93932b663616572de08f129c62",
+    "dnakit.bioinformatics.statistics.distance_test": "999506b2815d5dc72e03cf3c84a9297ba5e3fae08f8e2f2f59d1123997b83538",
+    "dnakit.bioinformatics.statistics.mantel": "ba5853ef2de95c322a8bb30891f6c48ef3eb6513e10962a097eba71fedb1b61b",
+    "dnakit.bioinformatics.statistics.ordination": "aa9e365be479d6eeb46339adb6676b758b921ff0344931a94d878a034d4f6264",
+    "dnakit.bioinformatics.statistics.pcoa": "dd36499e8fe45aa2c12887b7abb90933479d95df999ba434889508ef67078354",
+    "dnakit.bioinformatics.workflows.query_regions": "343f3f321c15659b8d3457333650196dfce10437248629ac08b3057302b7de3a",
+    "dnakit.cache.JSONCache": "af4371d178fe5928993ca6f9be5134a9fb2937e012fcb403ae523e6a068c3e07",
+    "dnakit.cache.JSONCache.clear": "9f0bc0d161f5d8dd1ccbd115b4921e4b679c1d72b48094efedc07de33a704dde",
+    "dnakit.cache.JSONCache.get": "1aec7db31e50af0d49789dccd78c4a851071b680dc3f818d56d18056038a3ae4",
+    "dnakit.cache.JSONCache.invalidate": "4bac3b94dd1f7693facf9c5a2639181d72a6462367f0fe111c0ca8ff14f5b100",
+    "dnakit.cache.JSONCache.put": "eaa93b437e67370873ee1868f7ee9ffdabc71e9d0d33bd8e135196f403d3b300",
+    "dnakit.chunking.ChunkingConfig": "df5d03e82552e07a1c27cdc4ed7c359c981168e513ffa20d7c7a7db751693d55",
+    "dnakit.chunking.iter_fasta_chunks": "a18ccab78e00a782086081dfd5e8d84ff8170e9cf79303a59a830dcc724f2c30",
+    "dnakit.chunking.iter_sequence_chunks": "0e2cd8449565035574a0eda51c13852f3f01db6a34dcdfff89eeeddcdf5dde0c",
+    "dnakit.chunking.make_length_curriculum": "46f7b693e2e1b6711cf08bc63d643ac4854b3669a056b1e8eef0fe60d53263c8",
+    "dnakit.core.DNASequence": "8ad1a212d0cb6a0e120f713ea0e4305dab2ff800bab1ed0d2b105ab921e3f18b",
+    "dnakit.core.DNASet": "8c8ea9978ecfcaf2ba84c2023da1355395d2bf5710be051647a1db71181eb064",
+    "dnakit.core.DNASet.get": "083889211dddac0c74b561640ba3ac6cfeb67b79f35a1c35491576058b70c40a",
+    "dnakit.core.DNASet.select": "6e3aba8ef39d9a49cbcfe9fdbe91ce4b2f18f0f759abfa09f6a285c73554e843",
+    "dnakit.datasets.cluster_sequences": "c224ee1800972cf6cbd85e159d9b0246c49c27be530205e5f5a1b5439a52140d",
+    "dnakit.datasets.config.ClusterConfig": "d34e9c47ed0a0f9501a4afbaee3719128b8eb92f9722e915693e3eb681ee4b5e",
+    "dnakit.datasets.config.DeduplicationConfig": "5ebcb9cb73715b5890e517f383e6a782f54b7ad4d646ec4e0541123b7780289b",
+    "dnakit.datasets.config.HierarchicalClusteringConfig": "bcf7b707edf7c5695914ed5fc6db666722cd339fa6915e392508a3389766d7a4",
+    "dnakit.datasets.config.JointSplitConfig": "3f53cf9969ea769e20c2ee57be65651fae2f1d208d4a98b675a3d051dd625219",
+    "dnakit.datasets.config.SplitConfig": "3454608eeee1f9bc82b66f2b87081fb671e497101b660983db73ab19f8684a3a",
+    "dnakit.datasets.deduplicate": "5fcab6e4c9bcad2e04ecf1ec93dfbeebb188d0710ac81b839c9ad6f7a1e8a173",
+    "dnakit.datasets.deduplicate_approximate": "872321055ec079b63047e33e39607b854db4c6c1580691979e6d375f7456b6e1",
+    "dnakit.datasets.deduplicate_iupac": "4e39787ecc25a037668ca4a33f76a7a70d9135f09884e4df810c44d9c0809238",
+    "dnakit.datasets.hierarchical_cluster": "e297a3344c9037a0db877f2beb174f8ba6ff696df2d17c7418353532c427e05a",
+    "dnakit.datasets.joint_split": "635b84a7ce118283d9279ec3b429fc7eb114ac46588a2cdf7d7a11fa9d4220ec",
+    "dnakit.datasets.neural_cluster_sequences": "d819471a203a6473ec6eb15ced7fbf7f698411106bab88c4a4289835679005eb",
+    "dnakit.datasets.select_representatives": "0643b932fc0c0144da65e8be2bdc09fc51e652f0a895b6201adfbc7c5c07a026",
+    "dnakit.datasets.split": "53e354fb3b060dfd20dabd95dfb226ed546c7a9b847358b0af8319c38fb3e092",
+    "dnakit.datasets.temporal_split": "142aedd2ba823394d1f9b14dcdbff6326a298e565434614be3512fe4ec9e5152",
+    "dnakit.download.build_index": "5b45a5184efc9e9b8bb8d98013315f31cdb2fc84340231a59edb60dba64914de",
+    "dnakit.evaluation.evaluate_distribution_similarity": "32b0075dd9705cd2f6b3008979ec090c4f44f74fec6040a7e01c0b2faeb78da4",
+    "dnakit.fingerprints.FeaturePreprocessor": "5ed21daed98e77fb1722658d535bd2f94eef954cdaf87824fb2a59e9b383cd1c",
+    "dnakit.fingerprints.FeaturePreprocessor.transform": "a499048a36141b5374d8f436922a2aa2a1ea1e72949096084348e1968ee18eb8",
+    "dnakit.fingerprints.fit_preprocessor": "1cc315c0fc1c0becaae8ec32f81f44735af7e25bf31332931ea3af0e8089d868",
+    "dnakit.fingerprints.fracminhash": "64a3e7db8f4d78bb112fad7c5989d5cfe70fd97bd4f1a7dd3fb94972fc415bde",
+    "dnakit.fingerprints.minhash": "b9f48177f9e963067cce2d63681d83e6c6f510530ab4a00d56ccc8b8fb548b9f",
+    "dnakit.io.build_fasta_index": "a12fe5c95d881422109aada9162333fd67aeb65777e85d7ff2ce4700734af58c",
+    "dnakit.io.build_fastq_index": "72a6fc326e76abab6bf1168406b6d3f849f600bc856cd230ce323868686109e2",
+    "dnakit.io.load_fasta_index": "c1fd8b0d28df4b46b6f222d1a00fe0f7243d85fb0364ac8bd366ed4afb55754e",
+    "dnakit.io.load_fastq_index": "e6d3a6dae1373b41369ee42302bef0e7a46f372c9ec43ad52311f6eeadb06c5a",
+    "dnakit.io.parquet_backend_status": "5cdfde715889fc1f42b1bc62e17ac6e3cdd7ada1a8ba67ce1ede4dc838eabec4",
+    "dnakit.io.require_parquet_backend": "3ae188e1c6880386c3469eee5bebd21d8743d2d3017c14df996748a68895295d",
+    "dnakit.io.source.RecordSource": "3a521e19fe6968231318ce779e6dbbd4a72fad1d8d88e855e9d111078d0d2f97",
+    "dnakit.molbio.assemble_golden_gate": "78c6f808f12316f8318e0306c131780838bbcae07ba20538ec1c2476452697f3",
+    "dnakit.molbio.generate_mutation_library": "5563b7d7221f11192282d8d8fb48828dcb8a59f18ca84a22be449c45ac543a01",
+    "dnakit.molbio.optimize_codons": "cd86a7db94f7d54c8a4804a97f212233099c2efbeab05869da62042017fcc6b3",
+    "dnakit.molbio.optimize_protein_codons": "49f5346c73b7498d46bf0a3d0d2b39fa3967d330e06eb7cdaef9156304e4b7b3",
+    "dnakit.molbio.optimize_sequence_rules": "545de0767e9f20dc5ca341f2fbfc14c931076c8181357ff80412a81895d42f23",
+    "dnakit.molbio.scan_crispr_candidates": "b41f6f17efa35463c86337da143d4c66e3deb00dd18fb97344f44d25e00aa99b",
+    "dnakit.molbio.simulate_assembly": "bc934a828460eec8801f3cbc446421c6659b0b3643208b0be6c9409bafaf9034",
+    "dnakit.ops.indel_generate": "3f5b7d920ca271058aad12c27e12fc3850f8cd9b996d56152bce5894f2474ed4",
+    "dnakit.ops.rearrange_generate": "1a4241c9f3a6849f0683e7a4542b33165e3211cc2826cb6cf9f61e063cb552d8",
+    "dnakit.patterns.scan_motif": "a1780dcb1aa9d3e538edea591a46519d4166b0056337b46f390020b52b120c48",
+    "dnakit.patterns.scan_pam_candidates": "6ec7b98a30d5d38681dada965554ebdc14cfca2762520af834b9841e2f15bacf",
+    "dnakit.patterns.scan_promoter_motifs": "a6b5435addbed0950ba40844930564f6d97985060bec52de271b84d4d766bd2a",
+    "dnakit.predictions.compute_metrics": "ed17bb770c9344f8968508f074906cfec3daeeb5f3779b5baa6f3f50acdb3940",
+    "dnakit.predictions.custom_training.targets._multilabel_metrics": "b83297fadcac39b85f4d35d87ffaeb3813124e25693bf19c4605f26ee1d5f949",
+    "dnakit.predictions.custom_training.targets._regression_metrics": "b3d94b253a6538e1142e465d977ffdeb0b45ccb68f5157e0ccb8a8db8b40e424",
+    "dnakit.predictions.custom_training.targets._single_classification_metrics": "9b8c6b7c268668c541c8f50a48e62f3c6c265bb077902870b0d3ada333d77111",
+    "dnakit.predictions.split_property_data": "dbca40457dab6d96eaed562c496349671f47f81dee9d0925da623808fe18ae60",
+    "dnakit.search.blast_results": "a999bc9d3310b92d6763ca74ac7b7c6afc1e61a9ba6f0f6acf5b51fef20f4e3a",
+    "dnakit.search.blast_status": "40676b73ea48f987f27389388a64f177de3d259a77060cabe667db751d2d887f",
+    "dnakit.search.identify": "5da5e0e0e8de25c20ca4d3b027dc91dfb0747ac6df79ac04b76ecf6c110f191c",
+    "dnakit.search.novelty": "7ca7c796ef20d7cd1c55590f487b3d262491666d4c2ca7fb14857da8e475eb56",
+    "dnakit.search.submit_blast": "d4ee958b378830d239eb9959a8a043d114d2a924f5adc65c8c074efd3897ced5",
+    "dnakit.search.wait_for_blast": "2f9e2567a977202f377d813b91e18e5f5b82f157a8ff0a8a7703cc85e03f12f0",
+    "dnakit.secondary_structure.probe_nupack": "783cbee9a2cb084f06cb07f1ab75e6920bc63f7b23db43d6294b7d1e628d077e",
+    "dnakit.similarity.find_subsequence": "ec6eeaa3bff5e5c6152f825f0dacd1a5c9695f6169449c05f37bf701923ead3b",
+    "dnakit.similarity.fingerprint_similarity": "eaa56e2f3f40eeeee5c2cb7d09c7550cd9dac41540f93d842423335f51e340f4",
+    "dnakit.similarity.kmer_similarity": "6a596be61121bacb192309698d1a41803ad84ac03961937939f1fb6093788d50",
+    "dnakit.similarity.kmer_vector_similarity": "ab4205349bf0802dea31cf3cde96cee6304c59def2ed627db3528ec8e47ee866",
+    "dnakit.similarity.reverse_complement_search": "8863b4e195fdc41e375e9af68f1b276199a4b50b2319934885ec7a798f3291ee",
+    "dnakit.similarity.sketch_similarity": "8013a2c57c467c082bed34ccad9544ebc78910f684fc8af405ea36ee862b046e",
+    "dnakit.similarity.subsequence_search": "ec6eeaa3bff5e5c6152f825f0dacd1a5c9695f6169449c05f37bf701923ead3b",
+    "dnakit.thermodynamics.conditional_capabilities": "12639f581b6d1d8ac6c8082329e5c589df8cdfb0ee22cfc7aa15734e870c16b9",
+    "dnakit.thermodynamics.probe_primer3": "1aad7719a5eeadb69306e3088afb3b500ced5e025dbb690f247c96e5cdedc78b",
+    "dnakit.thermodynamics.validate_primer3_result": "a7ac2adff982cc379e962b185479f72b82b953696ea0f2ddcc2abc32ffee45ea",
+    "dnakit.download.variants": "f1d722fec5d169945c44d2739432a08e0e1466b21fc8d53c9a4ac4d8cad9e3dd"
+  },
+  "reviewed_files": {
+    "src/dnakit/alignment/pairwise.py": "06ced88fe6583612388d2a6ade0668c7d7ccbc20422c29385a7cfaa79a8bd4f3",
+    "src/dnakit/backends/external.py": "7805ebf855938a77179e76413db94bc1de72068277d70137574954a46fa68c43",
+    "src/dnakit/backends/registry.py": "49b625fe95ac6d2697b06cba77383309a736b7a220b67b940931132490a4d0b9",
+    "src/dnakit/bioinformatics/alignment.py": "b02bc6f757babc969d391ccd7c3212dd953948db4b0eb6c6f379bf96eb13eab8",
+    "src/dnakit/bioinformatics/cloning.py": "9b1097c465141affa490dd1947fa2888defdc8651ee7fd1a22f0d430b743556d",
+    "src/dnakit/bioinformatics/counts.py": "a082eb87818932adf637037755ebb72cbc61208ce0ee5fab202a6e15bd94a346",
+    "src/dnakit/bioinformatics/features.py": "aff45f4ac9ab4229bb970a154228a48086de53990390751ae5f12fba26a88477",
+    "src/dnakit/bioinformatics/metrics.py": "1ff3bf54e0bd9ae7112791fc83f0f9ef028909ad620d852bb3f2eddc77427c66",
+    "src/dnakit/bioinformatics/motifs.py": "7f0c2d5076d75104abe919a20c66dc0e7773fa08717587af9c9b1c30c5a13e8c",
+    "src/dnakit/bioinformatics/ngs.py": "69dbf27a9d12b536bb3f037e371e4ea165c6fc872c740332e4a95cc95207a48c",
+    "src/dnakit/bioinformatics/optimization.py": "2214208a21bd6d6e567e5a0960feb7b021b69f946bd649ceb92d2d51f4a67f47",
+    "src/dnakit/bioinformatics/phylogeny.py": "5137e590bae54abc51efc0245dd6040a511e36e1511dbfcc245b5f67422bc978",
+    "src/dnakit/bioinformatics/reads.py": "6e1bcd38b76fef7f13cf8b9626b75b3ea2960f05b88e7b83825863052e648ce4",
+    "src/dnakit/bioinformatics/statistics.py": "f36e5e98b45559ad9afac259f30b88b0c3f78faa60837919206e96f62ea36fa7",
+    "src/dnakit/bioinformatics/workflows.py": "fd5932ec5c7df7ec1c397e37dc1d706fb25e8c0d3e4258186d9ce074ce1bc5a2",
+    "src/dnakit/cache/store.py": "c87d63a943539e896e0caf4088d8931a9954968277944de1df9034feff4c87ac",
+    "src/dnakit/chunking.py": "ca9eb58adbcd9e82290bf922eef8a4970c86e5921e5d3dedb0a5581e9e8ad11b",
+    "src/dnakit/core/collection.py": "beee7cf741f99a343e1b7b01b3e28c428c2f60dde2b707bf2ece12f761b39309",
+    "src/dnakit/core/sequence.py": "54b5830d37acf82b7b950161525cbb97cd3c2c6b36bedc34d690e2ae36b206ee",
+    "src/dnakit/datasets/advanced_deduplicate.py": "ecec2868a1a34625988033647b4ad73f38ba4fedf38b52fe7c0cbcb20d386302",
+    "src/dnakit/datasets/advanced_split.py": "2c58910a715e265cb5bd4691d5faeb314d9d5c70bd132db7a23411e8aa5e23c5",
+    "src/dnakit/datasets/clustering.py": "dab51489ae3f908df1de060e465966fb27e23afe44773e06cbaaa8d19122a4f3",
+    "src/dnakit/datasets/config.py": "90a2b354c10913defd60bc8b2cb3b7d1b975c4c8b12cb6c5137ca6714c60f3e9",
+    "src/dnakit/datasets/deduplicate.py": "f8ef48e688635828a3790c9fb70687177d610eaec96e4bfc12914524b5877f82",
+    "src/dnakit/datasets/neural_clustering.py": "4b6aabd92c1d888a9fd66e49681b117de4c194c049b76cbfe904c68a97f54e4f",
+    "src/dnakit/datasets/split.py": "262a482ef934b9f536dad1384042dae179593738a1e32e950477d6485b5a2b8d",
+    "src/dnakit/download/indexes.py": "52a83dad34a98a95948abe1c9bafefd3140c8acb8d3a6aba71e30680b9b0a9d5",
+    "src/dnakit/evaluation/distribution.py": "86e00ac18017c90e7e74b499dd82b701495c65ab5940d9c7c359d49e43779562",
+    "src/dnakit/fingerprints/advanced.py": "2040cf1fbd590a607689bd9ca685406cfe0c2e09041eb8ee6951ce66e55b8006",
+    "src/dnakit/fingerprints/sketch.py": "c58e8a890b85e04709c0919edec0aa7fb6daf830abef3c6465f9f59e8379c228",
+    "src/dnakit/io/indexed.py": "892205da0a0908169b3522516901f3e46c02781e1b4345b5d0650e1b1bc07902",
+    "src/dnakit/io/parquet.py": "9b90281e8dcd3b01d7e681390234c02b8a59274f27be3defbc8c3fc659e273a0",
+    "src/dnakit/io/source.py": "0f04065e44133f26df6ab78f54908ba48b7569ddbd43062e6422008320c4a967",
+    "src/dnakit/molbio/assembly.py": "c034ceefe8523821d9668008a5727225474c84bdc9c3b3697d38070da6f4b36a",
+    "src/dnakit/molbio/crispr.py": "9961fe3a590ddd6c855bd49f4b5d2d65f32842c93b64987fc09e16b9fb1a6ad0",
+    "src/dnakit/molbio/golden_gate.py": "97d2c16bab623620ceb6b1e12095262a2ed729214111da46852121a8e596eca1",
+    "src/dnakit/molbio/optimization.py": "80beddb7be1954a8bb0aa7d6181298fe269c19405450b2f017476869fbcd469a",
+    "src/dnakit/ops/evolution.py": "e53b6996b99290058baebe473c453e56c3916b38d26bddfbfc4325e0e2fceff5",
+    "src/dnakit/patterns/crispr.py": "391e77b6a17e40a828910048e6c0af58be8e5c7ddd7b6ad2fdfc349a8c4d5e85",
+    "src/dnakit/patterns/motif.py": "9226706a83ec3264528061afdd40f446be047cb252d4372354242e30170f2186",
+    "src/dnakit/predictions/custom_training/splitting.py": "ba598ac26d1f16f60f751a04963cade6590b67ee7c08db0b86a3a1bb561e4f7e",
+    "src/dnakit/predictions/custom_training/targets.py": "df7cf2c03bb68a32df4c26da3a98914d9eff0136475fa1d636f4804dad1a43e3",
+    "src/dnakit/search/blast.py": "8f97eb106bd2cccd2a8ff1bc7e7454efa14a34e9bdffd38e70ad78d7963285da",
+    "src/dnakit/secondary_structure/nupack.py": "1f673c4439a4ab10d3924031ba771fc5178305ef8004feeaae6a0ab11b3fb10f",
+    "src/dnakit/similarity/search.py": "c764b2fb36cfb378b0f667e89ac4d5c08ed2ffaba4919c3c9727ebe01061f51c",
+    "src/dnakit/similarity/sketch.py": "fa27b8f28c82e2b19842ae5392801716c2ac1d0bdc6689c4dc453fd6c261fcfe",
+    "src/dnakit/similarity/vector.py": "0be133a0a9acad9c419964de3c7039bb566e19373ad6a63e4e1a4bbaa76cf9da",
+    "src/dnakit/thermodynamics/backends.py": "d7112f155135860541940133847ca97355eda66689ebf8914c05976b507fddf8",
+    "src/dnakit/download/catalogs.py": "8d94c1339fd052be3d3e4119371019dfa38a623f6c057d1bc20e4ad2cd2370e3"
+  }
+}

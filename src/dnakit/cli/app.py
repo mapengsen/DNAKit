@@ -10,14 +10,16 @@ import sys
 import tempfile
 from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
-from typing import Annotated, NoReturn, Protocol
+from typing import TYPE_CHECKING, Annotated, NoReturn, Protocol
 
 import typer
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from dnakit._version import __version__
+from dnakit.cli.gene_annotation import annotate_genes_command
+from dnakit.cli.visualization import plot_distribution_command
 from dnakit.core import DNAAlphabet, DNARecord, DNASequence
 from dnakit.datasets import DeduplicationConfig, SplitConfig, deduplicate, split
 from dnakit.descriptors import (
@@ -43,6 +45,9 @@ from dnakit.standardize import normalize as normalize_sequence
 from dnakit.standardize import validate as validate_sequence
 from dnakit.visualization import SaveConfig, build_html_report, save_html_report
 
+if TYPE_CHECKING:
+    from dnakit.predictions import DataMapping, LLMSchemaConfig
+
 app = typer.Typer(
     help="Deterministic tools for DNA sequence analysis.",
     no_args_is_help=True,
@@ -50,6 +55,9 @@ app = typer.Typer(
 )
 console = Console()
 error_console = Console(stderr=True)
+
+app.command("annotate-genes")(annotate_genes_command)
+app.command("plot-distribution")(plot_distribution_command)
 
 
 class _JSONResult(Protocol):
@@ -128,7 +136,6 @@ def _download_genome_with_progress(
         SpinnerColumn(),
         TextColumn("{task.description}"),
         TextColumn("{task.completed} bytes"),
-        TimeElapsedColumn(),
         console=error_console,
         transient=True,
     ) as display:
@@ -214,7 +221,6 @@ def _tracked(records: Iterable[DNARecord], *, enabled: bool) -> Iterator[DNAReco
     with Progress(
         SpinnerColumn(),
         TextColumn("Processed {task.completed} records"),
-        TimeElapsedColumn(),
         console=error_console,
         transient=True,
     ) as progress:
@@ -805,6 +811,323 @@ def split_command(
             staged_files.append((staged_manifest, manifest_path))
             _commit_staged_files(staged_files, overwrite=overwrite)
         _json_output(result.to_dict())
+    except (DNAKitError, OSError, TypeError, ValueError) as exc:
+        _abort(exc)
+
+
+def _comma_fields(value: str | None) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    fields = tuple(item.strip() for item in value.split(",") if item.strip())
+    if not fields:
+        raise ValueError("A comma-separated field list must not be empty.")
+    return fields
+
+
+def _custom_data_mapping(
+    *,
+    input_format: str,
+    sequence_field: str | None,
+    label_fields: str | None,
+    id_field: str | None,
+    split_field: str | None,
+    record_path: str | None,
+    delimiter: str | None,
+    sheet_name: str | None,
+    table_name: str | None,
+) -> DataMapping | None:
+    from dnakit.predictions import DataMapping
+
+    explicit = (
+        any(
+            value is not None
+            for value in (
+                sequence_field,
+                label_fields,
+                id_field,
+                split_field,
+                record_path,
+                delimiter,
+                sheet_name,
+                table_name,
+            )
+        )
+        or input_format != "auto"
+    )
+    if not explicit:
+        return None
+    return DataMapping(
+        format=input_format,  # type: ignore[arg-type]
+        sequence_field=sequence_field or "sequence",
+        label_fields=_comma_fields(label_fields),
+        id_field=id_field,
+        split_field=split_field,
+        record_path=record_path,
+        delimiter=delimiter,
+        sheet_name=sheet_name,
+        table_name=table_name,
+    )
+
+
+def _llm_schema_config(
+    *,
+    use_llm: bool,
+    model: str,
+    base_url: str,
+    api_key_env: str,
+    share_values: bool,
+) -> LLMSchemaConfig | None:
+    from dnakit.predictions import LLMSchemaConfig
+
+    if not use_llm:
+        return None
+    return LLMSchemaConfig(
+        model=model,
+        base_url=base_url,
+        api_key_env=api_key_env,
+        include_sample_values=share_values,
+    )
+
+
+@app.command("property-models")
+def property_models_command() -> None:
+    """List DNA models available for full fine-tuning and linear probing."""
+
+    from dnakit.predictions import available_custom_training_models
+
+    _json_output([model.to_dict() for model in available_custom_training_models()])
+
+
+@app.command("inspect-property-data")
+def inspect_property_data_command(
+    input_path: Annotated[Path, typer.Argument(help="Local user dataset to inspect.")],
+    input_format: Annotated[
+        str,
+        typer.Option(
+            "--input-format",
+            help="auto, csv, tsv, json, jsonl, yaml, xml, excel, parquet, sqlite, or FASTA-like.",
+        ),
+    ] = "auto",
+    sequence_field: Annotated[str | None, typer.Option(help="Sequence field or dot path.")] = None,
+    label_fields: Annotated[
+        str | None, typer.Option(help="Comma-separated label fields or dot paths.")
+    ] = None,
+    id_field: Annotated[str | None, typer.Option(help="Optional record-ID field.")] = None,
+    split_field: Annotated[
+        str | None, typer.Option(help="Optional train/validation/test field.")
+    ] = None,
+    record_path: Annotated[
+        str | None, typer.Option(help="Optional structured-record container path.")
+    ] = None,
+    delimiter: Annotated[str | None, typer.Option(help="Optional one-character delimiter.")] = None,
+    sheet_name: Annotated[str | None, typer.Option(help="Optional Excel sheet name.")] = None,
+    table_name: Annotated[str | None, typer.Option(help="Optional SQLite table name.")] = None,
+    use_llm: Annotated[
+        bool, typer.Option("--use-llm/--no-llm", help="Use bounded LLM schema analysis.")
+    ] = False,
+    llm_model: Annotated[str, typer.Option(help="OpenAI-compatible model name.")] = (
+        "deepseek-v4-flash"
+    ),
+    llm_base_url: Annotated[str, typer.Option(help="OpenAI-compatible API base URL.")] = (
+        "https://api.deepseek.com"
+    ),
+    llm_api_key_env: Annotated[
+        str, typer.Option(help="Environment variable containing the LLM API key.")
+    ] = "DEEPSEEK_API_KEY",
+    llm_share_values: Annotated[
+        bool,
+        typer.Option(
+            "--llm-share-values/--llm-structure-only",
+            help="Share bounded sample values or only field/type structure.",
+        ),
+    ] = True,
+) -> None:
+    """Inspect arbitrary local data and print the selected declarative mapping."""
+
+    from dnakit.predictions import inspect_property_data
+
+    try:
+        mapping = _custom_data_mapping(
+            input_format=input_format,
+            sequence_field=sequence_field,
+            label_fields=label_fields,
+            id_field=id_field,
+            split_field=split_field,
+            record_path=record_path,
+            delimiter=delimiter,
+            sheet_name=sheet_name,
+            table_name=table_name,
+        )
+        llm = _llm_schema_config(
+            use_llm=use_llm,
+            model=llm_model,
+            base_url=llm_base_url,
+            api_key_env=llm_api_key_env,
+            share_values=llm_share_values,
+        )
+        _json_output(inspect_property_data(input_path, mapping=mapping, llm=llm).to_dict())
+    except (DNAKitError, OSError, TypeError, ValueError) as exc:
+        _abort(exc)
+
+
+@app.command("train-property")
+def train_property_command(
+    input_path: Annotated[Path, typer.Argument(help="Local supervised dataset.")],
+    output_dir: Annotated[Path, typer.Argument(help="New model artifact directory.")],
+    task_type: Annotated[
+        str, typer.Option(help="Required task type: classification or regression.")
+    ],
+    model: Annotated[str, typer.Option(help="Registered DNA foundation model.")] = "dnabert2",
+    finetune_method: Annotated[str, typer.Option(help="full (default) or linear_probe.")] = "full",
+    classification_mode: Annotated[
+        str,
+        typer.Option(help="auto, binary, multiclass, multilabel, or multioutput."),
+    ] = "auto",
+    input_format: Annotated[str, typer.Option("--input-format")] = "auto",
+    sequence_field: Annotated[str | None, typer.Option(help="Sequence field or dot path.")] = None,
+    label_fields: Annotated[
+        str | None, typer.Option(help="Comma-separated target fields or dot paths.")
+    ] = None,
+    id_field: Annotated[str | None, typer.Option(help="Optional record-ID field.")] = None,
+    split_field: Annotated[str | None, typer.Option(help="Optional split field.")] = None,
+    record_path: Annotated[
+        str | None, typer.Option(help="Structured-record container path.")
+    ] = None,
+    delimiter: Annotated[str | None, typer.Option(help="Optional one-character delimiter.")] = None,
+    sheet_name: Annotated[str | None, typer.Option(help="Optional Excel sheet name.")] = None,
+    table_name: Annotated[str | None, typer.Option(help="Optional SQLite table name.")] = None,
+    use_llm: Annotated[bool, typer.Option("--use-llm/--no-llm")] = False,
+    llm_model: Annotated[str, typer.Option(help="OpenAI-compatible schema model.")] = (
+        "deepseek-v4-flash"
+    ),
+    llm_base_url: Annotated[str, typer.Option(help="OpenAI-compatible API base URL.")] = (
+        "https://api.deepseek.com"
+    ),
+    llm_api_key_env: Annotated[
+        str, typer.Option(help="Environment variable containing the LLM API key.")
+    ] = "DEEPSEEK_API_KEY",
+    llm_share_values: Annotated[
+        bool, typer.Option("--llm-share-values/--llm-structure-only")
+    ] = True,
+    train_ratio: Annotated[float, typer.Option(help="Training fraction.")] = 0.8,
+    validation_ratio: Annotated[float, typer.Option(help="Validation fraction.")] = 0.1,
+    test_ratio: Annotated[float, typer.Option(help="Test fraction.")] = 0.1,
+    seed: Annotated[int, typer.Option(help="Random split/training seed.")] = 42,
+    epochs: Annotated[int, typer.Option(help="Maximum training epochs.")] = 10,
+    batch_size: Annotated[int, typer.Option(help="Training batch size.")] = 8,
+    learning_rate: Annotated[
+        float | None, typer.Option(help="Optional learning-rate override.")
+    ] = None,
+    checkpoint_dir: Annotated[Path | None, typer.Option(help="Checkpoint cache root.")] = None,
+    checkpoint_path: Annotated[Path | None, typer.Option(help="Existing local checkpoint.")] = None,
+    max_length: Annotated[int | None, typer.Option(help="Tokenizer/model input limit.")] = None,
+    device: Annotated[str, typer.Option(help="auto, cpu, cuda, or cuda:N.")] = "auto",
+    allow_remote_code: Annotated[
+        bool,
+        typer.Option(
+            "--allow-remote-code/--deny-remote-code",
+            help="Opt in to reviewed checkpoint-provided Python code.",
+        ),
+    ] = False,
+    overwrite: Annotated[bool, typer.Option("--overwrite")] = False,
+) -> None:
+    """Train a custom DNA property classifier or regressor and emit full metrics."""
+
+    from dnakit.predictions import CustomPropertyTrainingConfig, train_custom_property_model
+
+    try:
+        mapping = _custom_data_mapping(
+            input_format=input_format,
+            sequence_field=sequence_field,
+            label_fields=label_fields,
+            id_field=id_field,
+            split_field=split_field,
+            record_path=record_path,
+            delimiter=delimiter,
+            sheet_name=sheet_name,
+            table_name=table_name,
+        )
+        llm = _llm_schema_config(
+            use_llm=use_llm,
+            model=llm_model,
+            base_url=llm_base_url,
+            api_key_env=llm_api_key_env,
+            share_values=llm_share_values,
+        )
+        config = CustomPropertyTrainingConfig(
+            task_type=task_type,  # type: ignore[arg-type]
+            model=model,
+            finetune_method=finetune_method,  # type: ignore[arg-type]
+            classification_mode=classification_mode,  # type: ignore[arg-type]
+            mapping=mapping,
+            llm=llm,
+            output_dir=output_dir,
+            train_ratio=train_ratio,
+            validation_ratio=validation_ratio,
+            test_ratio=test_ratio,
+            seed=seed,
+            epochs=epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+            checkpoint_dir=checkpoint_dir,
+            checkpoint_path=checkpoint_path,
+            max_length=max_length,
+            device=device,
+            allow_remote_code=allow_remote_code,
+            overwrite=overwrite,
+        )
+        _json_output(train_custom_property_model(input_path, config=config).to_dict())
+    except (DNAKitError, OSError, TypeError, ValueError) as exc:
+        _abort(exc)
+
+
+@app.command("predict-property")
+def predict_property_command(
+    input_path: Annotated[Path, typer.Argument(help="Local sequence dataset to predict.")],
+    model_dir: Annotated[Path, typer.Argument(help="Saved custom-property model directory.")],
+    input_format: Annotated[str, typer.Option("--input-format")] = "auto",
+    sequence_field: Annotated[str | None, typer.Option(help="Sequence field or dot path.")] = None,
+    id_field: Annotated[str | None, typer.Option(help="Optional record-ID field.")] = None,
+    record_path: Annotated[
+        str | None, typer.Option(help="Structured-record container path.")
+    ] = None,
+    delimiter: Annotated[str | None, typer.Option(help="Optional one-character delimiter.")] = None,
+    sheet_name: Annotated[str | None, typer.Option(help="Optional Excel sheet name.")] = None,
+    table_name: Annotated[str | None, typer.Option(help="Optional SQLite table name.")] = None,
+    batch_size: Annotated[int, typer.Option(help="Inference batch size.")] = 8,
+    device: Annotated[str, typer.Option(help="auto, cpu, cuda, or cuda:N.")] = "auto",
+    threshold: Annotated[float | None, typer.Option(help="Multilabel threshold override.")] = None,
+    allow_remote_code: Annotated[
+        bool, typer.Option("--allow-remote-code/--deny-remote-code")
+    ] = False,
+) -> None:
+    """Predict properties with a saved user-defined model."""
+
+    from dnakit.predictions import predict_custom_properties
+
+    try:
+        mapping = _custom_data_mapping(
+            input_format=input_format,
+            sequence_field=sequence_field,
+            label_fields=None,
+            id_field=id_field,
+            split_field=None,
+            record_path=record_path,
+            delimiter=delimiter,
+            sheet_name=sheet_name,
+            table_name=table_name,
+        )
+        _json_output(
+            predict_custom_properties(
+                input_path,
+                model_dir=model_dir,
+                mapping=mapping,
+                batch_size=batch_size,
+                device=device,
+                threshold=threshold,
+                allow_remote_code=allow_remote_code,
+            ).to_dict()
+        )
     except (DNAKitError, OSError, TypeError, ValueError) as exc:
         _abort(exc)
 

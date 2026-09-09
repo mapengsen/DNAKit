@@ -1,5 +1,12 @@
-"""Variant annotation and population-frequency APIs."""
+"""Reference-based gene annotation, variant annotation, and population frequencies."""
 
+from dnakit.annotation.gene_models import (
+    GeneAnnotationConfig,
+    GeneAnnotationResult,
+    GeneRecord,
+    GeneSegment,
+)
+from dnakit.annotation.genes import annotate_genes
 from dnakit.annotation.variants import (
     annotate_rsid_vep,
     annotate_variant_vep,
@@ -16,7 +23,12 @@ from dnakit.annotation.variants import (
 from dnakit.core import ProviderResult
 
 __all__ = [
+    "GeneAnnotationConfig",
+    "GeneAnnotationResult",
+    "GeneRecord",
+    "GeneSegment",
     "ProviderResult",
+    "annotate_genes",
     "annotate_rsid_vep",
     "annotate_variant_vep",
     "get_clinvar_significance",

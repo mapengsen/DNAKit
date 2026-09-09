@@ -174,7 +174,6 @@ ENG-011,173,14. 后端、性能与可复现性,版本追踪,0.1-MVP,native,,comp
 ENG-012,174,14. 后端、性能与可复现性,错误与警告,0.1-MVP,native,,complete,,已实现稳定错误码、异常层次、Issue和CLI非零退出测试
 ENG-013,175,14. 后端、性能与可复现性,单元测试,0.1-MVP,native,,complete,,当前实现具有pytest正常/边界/错误测试，并纳入本地质量门
 ENG-014,176,14. 后端、性能与可复现性,一致性验证,0.2-0.4-ADVANCED,native,,partial,,人工边界与Biopython restriction/MW/alignment/search/linkage差分通过；Primer3/NUPACK/Dashing固定协议/解析/安全契约以受控替身验证但未做真实科学差分；CD-HIT/MMseqs2等大库后端未对照
-ENG-015,177,14. 后端、性能与可复现性,性能benchmark,0.2-0.4-ADVANCED,native,adapter,complete,,本机有界microbenchmark按同输入/规模/预热/重复比较DNAKit与Biopython的construct、GC及reverse-complement，并记录7项DNAKit任务的时间、tracemalloc峰值、规模扩展、seed、版本、硬件、样本及所选公开callable源码行口径；不声称跨机器或RSS结论，源码行数不是质量指标
 ENG-016,178,14. 后端、性能与可复现性,文档与教程,0.1-MVP,native,,complete,,README、安装、快速入门、各主要模块API示例、两个可执行Notebook、完整workflow、FAQ、引用许可和本地文档站均已同步
 ENG-017,179,14. 后端、性能与可复现性,可选图形入口,0.2-0.4-ADVANCED,native,,blocked,,用户要求网站演示不可输入，因此仅提供固定输入预生成只读页面；widget、可输入Web或Galaxy入口与当前范围冲突
 DATA-025,180,10. 去重、聚类与数据划分,物种排除,0.1-MVP,native,,complete,metadata_filter,exclude_species/exclude_by_metadata按显式metadata["species"]精确排除一个或多个值；所有记录缺少species字段时抛出结构化错误且不修改输入DNASet

@@ -198,3 +198,7 @@ print(result["value_dalton"])
 ```
 
 Agent 客户端配置见 [Agent 与 MCP 工具](../../agent_tools.md)。
+
+<span id="custom-llm"></span>
+
+通用大模型调用（Python API）已移至 [Agent 与 MCP 工具 → 通用大模型调用](../../agent_tools.md#custom-llm)，包括自定义提示词、文件输入、服务商配置和安全边界。

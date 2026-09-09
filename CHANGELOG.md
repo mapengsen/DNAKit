@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-09-09
+
+- 新增基于参考基因组和 minimap2 的基因注释，支持参考资源准备及 Python/CLI 调用。
+- 新增通用同步/异步 LLM 调用、提供方配置和有界文件输入。
+- 新增传统机器学习性质建模与分类/回归标签分布可视化。
+- 新增 `dnakit.bioinformatics` 生物信息分析 API、可选依赖及对应验证。
+- 新增自定义 DNA 性质训练，支持基础模型线性探测、全量微调与文件结构分析。
+
 - 将测试、示例、Notebook、MkDocs override 和本地验证资源统一迁移至 `others/`，并同步更新打包、CI、文档和工具配置。
 - Diversity 和 Novelty 新增论文定义的原始 Levenshtein 距离计算方式，保留原有相似度方法，并提供资源上限、进度条、测试及中英文引用说明。
 - 新增 NT Revised 18 项与 Genomic Benchmarks 9 项完整微调 checkpoint 分类预测，支持独立的统一下载说明页、本地可配置路径、安全加载、Agent 调用及逐功能文档。

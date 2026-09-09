@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 import traceback
 from pathlib import Path
 from typing import Any
@@ -106,24 +105,6 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def _max_memory_payload(device: str) -> dict[str, Any]:
-    if not str(device).startswith("cuda") or not torch.cuda.is_available():
-        return {}
-    device_index = torch.device(device).index
-    if device_index is None:
-        device_index = torch.cuda.current_device()
-    return {
-        "max_cuda_memory_allocated_mib": round(
-            torch.cuda.max_memory_allocated(device_index) / (1024 ** 2),
-            3,
-        ),
-        "max_cuda_memory_reserved_mib": round(
-            torch.cuda.max_memory_reserved(device_index) / (1024 ** 2),
-            3,
-        ),
-    }
-
-
 def _move_features_to_head(model: torch.nn.Module, features: torch.Tensor) -> torch.Tensor:
     head = model.head
     if features.device != head.weight.device or features.dtype != head.weight.dtype:
@@ -164,12 +145,8 @@ def _diff_payload(left: torch.Tensor, right: torch.Tensor) -> dict[str, Any]:
 
 def main() -> None:
     args = build_parser().parse_args()
-    started_at = time.perf_counter()
     log_root = Path(args.log_root)
     output_path = log_root / args.model_name / "batched_encode_equivalence.json"
-
-    if str(args.device).startswith("cuda") and torch.cuda.is_available():
-        torch.cuda.reset_peak_memory_stats()
 
     progress = tqdm(
         total=6,
@@ -276,8 +253,6 @@ def main() -> None:
             "logit_atol": float(args.logit_atol),
             "embedding_diff": embedding_diff,
             "logit_diff": logit_diff,
-            "elapsed_seconds": round(time.perf_counter() - started_at, 6),
-            **_max_memory_payload(args.device),
         }
         write_json(output_path, payload)
         progress.update()
@@ -288,8 +263,6 @@ def main() -> None:
             "error_type": type(exc).__name__,
             "error_message": str(exc),
             "traceback": traceback.format_exc(),
-            "elapsed_seconds": round(time.perf_counter() - started_at, 6),
-            **_max_memory_payload(args.device),
         }
         write_json(output_path, payload)
         progress.close()
