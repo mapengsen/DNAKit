@@ -16,6 +16,27 @@ from dnakit import encode, workflows
 from dnakit.exceptions import ConfigurationError
 
 
+@pytest.mark.parametrize(
+    "directory",
+    [
+        "databases/_providers",
+        "encode/_backend",
+        "workflows/common",
+        "workflows/prs",
+        "workflows/support",
+    ],
+)
+def test_installed_backend_resources_match_recorded_checksums(directory: str) -> None:
+    root = Path(workflows.__file__).parents[1] / directory
+    manifest = json.loads((root / "UPSTREAM.json").read_text())
+    for entry in manifest["files"]:
+        resource = root / entry["path"]
+        expected = entry.get("adapted_sha256", entry.get("sha256"))
+        assert hashlib.sha256(resource.read_bytes()).hexdigest() == expected, (
+            f"Bundled resource bytes changed: {directory}/{entry['path']}"
+        )
+
+
 def test_simulated_children_inherit_one_allele_from_each_parent_without_global_rng_change() -> None:
     locus = {
         "chromosome": "1",

@@ -19,3 +19,10 @@
 
 # Bundled skill resources use byte-level checksums; preserve upstream bytes on checkout.
 skills/** -text -eol
+
+# Native backend manifests also verify exact resource bytes after installation.
+src/dnakit/databases/_providers/** -text -eol
+src/dnakit/encode/_backend/** -text -eol
+src/dnakit/workflows/common/** -text -eol
+src/dnakit/workflows/prs/** -text -eol
+src/dnakit/workflows/support/** -text -eol
