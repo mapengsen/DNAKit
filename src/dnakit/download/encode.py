@@ -7,6 +7,7 @@ from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 from urllib.parse import quote, urlsplit
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, DownloadError
 from dnakit.search import QueryResult
 from dnakit.search._http import require_https_base
@@ -38,6 +39,7 @@ def files(
     config: DownloadConfig | None = None,
     progress: Callable[[DownloadProgress], None] | None = None,
     download_base_url: str = DEFAULT_ENCODE_DOWNLOAD_URL,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download public ENCODE file records, verifying advertised MD5 values when present."""
 
@@ -101,3 +103,5 @@ def files(
 
 
 __all__ = ["DEFAULT_ENCODE_DOWNLOAD_URL", "files"]
+
+_register_public_verbose(globals())

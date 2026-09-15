@@ -21,6 +21,7 @@ from typing import (
     get_type_hints,
 )
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASequence, DNASet
 from dnakit.exceptions import ConfigurationError
 
@@ -386,7 +387,9 @@ def _format_annotation(annotation: object) -> str:
     return inspect.formatannotation(annotation)
 
 
-def analyze_callable(function: Callable[..., object] | type[object]) -> CallPlan:
+def analyze_callable(
+    function: Callable[..., object] | type[object], *, verbose: bool = True
+) -> CallPlan:
     """Resolve one callable into a bounded JSON input schema and conversion plan."""
 
     try:
@@ -402,6 +405,15 @@ def analyze_callable(function: Callable[..., object] | type[object]) -> CallPlan
             incompatibilities=(f"signature unavailable: {exc}",),
         )
     hints = _resolve_hints(function)
+    file_input = getattr(function, "__dnakit_file_input__", None)
+    if file_input:
+        from dnakit.io import ReadConfig, WriteConfig
+
+        native_input = hints.get(file_input, Any)
+        hints[file_input] = str | list[str] | native_input
+        hints.setdefault("read_config", ReadConfig | None)
+        hints.setdefault("write_config", WriteConfig | None)
+        hints.setdefault("output_path", str | None)
     plans: list[ParameterPlan] = []
     properties: dict[str, object] = {}
     required_names: list[str] = []
@@ -416,6 +428,14 @@ def analyze_callable(function: Callable[..., object] | type[object]) -> CallPlan
             continue
         annotation = hints.get(parameter.name, parameter.annotation)
         supported, schema, reason = _annotation_schema(annotation)
+        if parameter.name == file_input:
+            schema = dict(schema)
+            schema["description"] = (
+                "Accepts a sequence file path, an array of file paths, or DNA records. "
+                "For large files pass paths directly and set output_path; do not read "
+                "the full dataset into Agent results first. The output directory is "
+                "created by this operation and should not already exist."
+            )
         required = parameter.default is inspect.Parameter.empty
         has_default = not required
         if supported and has_default:
@@ -447,6 +467,9 @@ def analyze_callable(function: Callable[..., object] | type[object]) -> CallPlan
         "properties": properties,
         "additionalProperties": accepts_keyword_arguments,
     }
+    description = inspect.getdoc(function)
+    if description:
+        input_schema["description"] = description[:8_000]
     if required_names:
         input_schema["required"] = required_names
     return_annotation = hints.get("return", signature.return_annotation)
@@ -491,7 +514,7 @@ def _construct_class(value: object, annotation: type[object], *, path: str) -> o
         ) from exc
 
 
-def coerce_value(value: object, annotation: object, *, path: str) -> object:
+def coerce_value(value: object, annotation: object, *, path: str, verbose: bool = True) -> object:
     """Convert one JSON-compatible value to a public DNAKit annotation."""
 
     if annotation is inspect.Parameter.empty or annotation is Any or annotation is object:
@@ -519,6 +542,15 @@ def coerce_value(value: object, annotation: object, *, path: str) -> object:
     if origin is Annotated:
         return coerce_value(value, arguments[0], path=path)
     if origin in (Union, types.UnionType):
+        # Preserve path strings before trying rich DNA types.
+        # DNA(value) accepts strings permissively; trying it first would turn a
+        # filesystem path into sequence content before file dispatch can see it.
+        if (
+            isinstance(value, str)
+            and str in arguments
+            and any(marker in value for marker in ("/", "\\", "."))
+        ):
+            return value
         failures: list[str] = []
         for option in arguments:
             supported, _, _ = _annotation_schema(option)
@@ -656,6 +688,7 @@ def coerce_arguments(
     arguments: Mapping[str, object],
     *,
     path: str = "arguments",
+    verbose: bool = True,
 ) -> tuple[tuple[object, ...], dict[str, object]]:
     """Validate a JSON argument mapping and construct positional/keyword inputs."""
 
@@ -729,3 +762,5 @@ __all__ = [
     "coerce_arguments",
     "coerce_value",
 ]
+
+_register_public_verbose(globals())

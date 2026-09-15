@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 from dnakit.patterns._shared import (
     SequenceInput,
@@ -67,6 +68,7 @@ def find_reverse_complement_palindromes(
     max_comparisons: int = 5_000_000,
     max_comparison_cells: int = 50_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> PatternResult[PalindromeHit]:
     """Find IUPAC-compatible reverse-complement palindromes within fragments."""
 
@@ -151,6 +153,7 @@ def find_inverted_repeats(
     max_comparisons: int = 5_000_000,
     max_comparison_cells: int = 50_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> PatternResult[InvertedRepeatHit]:
     """Find exact/IUPAC-compatible inverted-repeat arms with bounded loops."""
 
@@ -301,6 +304,7 @@ def find_tandem_repeats(
     max_comparisons: int = 5_000_000,
     max_comparison_cells: int = 50_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> PatternResult[TandemRepeatHit]:
     """Find maximal exact repeats using the smallest accepted period at each start."""
 
@@ -426,6 +430,7 @@ def find_microsatellites(
     max_comparisons: int = 5_000_000,
     max_comparison_cells: int = 50_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> PatternResult[TandemRepeatHit]:
     """Find exact 1--6 bp STRs with explicit per-unit repeat thresholds."""
 
@@ -478,3 +483,5 @@ __all__ = [
     "find_reverse_complement_palindromes",
     "find_tandem_repeats",
 ]
+
+_register_public_verbose(globals())

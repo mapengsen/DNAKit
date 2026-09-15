@@ -1,5 +1,6 @@
 """Deterministic dependency-free encodings and fixed-schema fingerprints."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.fingerprints._shared import (
     FingerprintAmbiguityPolicy,
     FingerprintRepresentation,
@@ -107,3 +108,5 @@ __all__ = [
     "restriction_fingerprint",
     "thermodynamic_fingerprint",
 ]
+
+_register_public_verbose(globals())

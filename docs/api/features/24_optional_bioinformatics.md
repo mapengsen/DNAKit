@@ -258,4 +258,4 @@ print(result.data["product_sequence"])
 - 未安装可选依赖时会抛出 `BackendUnavailableError`，并提示安装 `dnakit[external-tools]`。
 - 远程提供方可能限流、维护或改变数据库版本；请保存 `result.provenance`。
 - ClinVar、VEP、dbSNP 和 gnomAD 输出仅用于研究注释，不能直接作为临床诊断。
-- DNAKit 不公开任意 ToolUniverse 工具执行入口，只允许调用本页列出的功能。
+- 本页列出的功能使用 DNAKit 随包提供的封装，不再导入 ToolUniverse。更多接口见[统一 Skill 接口](../../llm_tools/native_skills.md)。

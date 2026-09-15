@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Literal, TypeAlias
 from urllib.parse import urlparse
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import ConfigurationError
 from dnakit.representations import get_embedding_model
@@ -445,7 +446,7 @@ class CustomTrainingModel:
         }
 
 
-def available_custom_training_models() -> tuple[CustomTrainingModel, ...]:
+def available_custom_training_models(*, verbose: bool = True) -> tuple[CustomTrainingModel, ...]:
     """Return training support for every registered DNA representation model."""
 
     from dnakit.representations import available_embedding_models
@@ -466,7 +467,7 @@ def available_custom_training_models() -> tuple[CustomTrainingModel, ...]:
     return tuple(models)
 
 
-def get_custom_training_model(name: str) -> CustomTrainingModel:
+def get_custom_training_model(name: str, *, verbose: bool = True) -> CustomTrainingModel:
     """Resolve fine-tuning capabilities for a registered DNA model."""
 
     canonical = get_embedding_model(name).name
@@ -480,6 +481,11 @@ class CustomPropertyTrainingConfig:
     With ``finetune_method='machine_learning'``, ``model`` selects an estimator
     family, ``model_params`` configures it, and ``feature_source`` selects sequence
     features, frozen embeddings, or explicitly mapped numeric columns.
+
+    Set ``cv_folds=10`` for complete cross-validation on a training-only source,
+    followed by a final fit on all its rows. This ML-only mode ignores the three
+    split ratios, rejects mapped split columns, and never reads an external test
+    set. Fold membership and held-out predictions are saved locally.
     """
 
     task_type: TaskType
@@ -524,6 +530,7 @@ class CustomPropertyTrainingConfig:
     model_params: Mapping[str, object] = field(default_factory=dict)
     kmer_k: int = 3
     standardize_features: bool = True
+    cv_folds: int | None = None
 
     def __post_init__(self) -> None:
         if self.task_type not in {"classification", "regression"}:
@@ -535,6 +542,16 @@ class CustomPropertyTrainingConfig:
             raise ConfigurationError(
                 "finetune_method must be 'full', 'linear_probe' or 'machine_learning'.",
                 code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
+        if self.cv_folds is not None and (
+            isinstance(self.cv_folds, bool)
+            or not isinstance(self.cv_folds, int)
+            or not 2 <= self.cv_folds <= 100
+            or self.finetune_method != "machine_learning"
+        ):
+            raise ConfigurationError(
+                "cv_folds must be an integer in [2, 100] for machine_learning training.",
+                code="INVALID_CUSTOM_CV",
             )
         if self.finetune_method == "machine_learning":
             from .ml_models import validate_ml_config
@@ -602,11 +619,11 @@ class CustomPropertyTrainingConfig:
             isinstance(value, bool)
             or not isinstance(value, (int, float))
             or not math.isfinite(value)
-            or value <= 0
+            or (value <= 0 if self.cv_folds is None else value < 0)
             for value in ratios
         ) or not math.isclose(sum(ratios), 1.0, rel_tol=0.0, abs_tol=1e-9):
             raise ConfigurationError(
-                "train/validation/test ratios must be positive and sum to 1.",
+                "Split ratios must sum to 1 and be positive (nonnegative in CV mode).",
                 code="INVALID_CUSTOM_SPLIT",
             )
         for name, bounded_integer, lower, upper in (
@@ -923,8 +940,14 @@ class CustomPropertyPredictionResult:
     label_names: tuple[str, ...]
     predictions: tuple[FrozenDict, ...]
     probabilities: tuple[FrozenDict, ...] = ()
+    output_file: FrozenDict | None = None
 
     def to_dict(self) -> dict[str, object]:
+        if self.output_file is not None:
+            return {
+                "model_dir": self.model_dir,
+                **to_json_compatible(self.output_file),
+            }
         return {
             "model_dir": self.model_dir,
             "record_ids": list(self.record_ids),
@@ -950,3 +973,5 @@ __all__ = [
     "available_custom_training_models",
     "get_custom_training_model",
 ]
+
+_register_public_verbose(globals())

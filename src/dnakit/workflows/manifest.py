@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import ArtifactRef, Issue, Provenance, RunManifest
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
@@ -66,6 +67,7 @@ def artifact_from_path(
     media_type: str,
     schema_version: str,
     max_bytes: int | None = None,
+    verbose: bool = True,
 ) -> ArtifactRef:
     """Hash one regular file without copying its contents into the manifest."""
 
@@ -202,6 +204,7 @@ def save_manifest(
     path: str | os.PathLike[str],
     *,
     overwrite: bool = False,
+    verbose: bool = True,
 ) -> ArtifactRef:
     """Persist a manifest atomically as canonical JSON."""
 
@@ -253,7 +256,7 @@ def save_manifest(
     )
 
 
-def load_manifest(path: str | os.PathLike[str]) -> dict[str, object]:
+def load_manifest(path: str | os.PathLike[str], *, verbose: bool = True) -> dict[str, object]:
     """Load and minimally validate a persisted manifest without executing it."""
 
     try:
@@ -363,3 +366,5 @@ def load_manifest(path: str | os.PathLike[str]) -> dict[str, object]:
 
 
 __all__ = ["RunManifestBuilder", "artifact_from_path", "load_manifest", "save_manifest"]
+
+_register_public_verbose(globals())

@@ -1,5 +1,7 @@
 # Legality check
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Checks a DNA sequence, record, or data set for compliance with rules such as alphabet, length, gap, quality, and metadata, and returns a structured list of questions.
 
 Whenever an error is found, the `is_valid` of the returned result is `False`; all issues are still stored in the structured `issues`.

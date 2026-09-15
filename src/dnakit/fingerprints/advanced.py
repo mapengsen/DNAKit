@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from itertools import islice
 from typing import Literal, Protocol, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Provenance, Topology
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.descriptors import codon_statistics, exact_repeat_fraction, gc_at_content
@@ -214,10 +215,7 @@ def _result(
 
 
 def motif_fingerprint(
-    value: SequenceInput,
-    motifs: Mapping[str, str],
-    *,
-    binary: bool = False,
+    value: SequenceInput, motifs: Mapping[str, str], *, binary: bool = False, verbose: bool = True
 ) -> AdvancedFingerprintResult:
     """Encode ordered exact/IUPAC motif counts or presence."""
 
@@ -249,6 +247,7 @@ def restriction_fingerprint(
     *,
     binary: bool = False,
     max_enzymes: int = 10_000,
+    verbose: bool = True,
 ) -> AdvancedFingerprintResult:
     """Encode recognition-site counts for a versioned/user-defined panel."""
 
@@ -283,9 +282,7 @@ def restriction_fingerprint(
 
 
 def gc_spatial_fingerprint(
-    value: SequenceInput,
-    *,
-    bins: int = 10,
+    value: SequenceInput, *, bins: int = 10, verbose: bool = True
 ) -> AdvancedFingerprintResult:
     """Pool canonical GC fraction over a fixed number of normalized-position bins."""
 
@@ -323,7 +320,7 @@ def gc_spatial_fingerprint(
     )
 
 
-def repeat_fingerprint(value: SequenceInput) -> AdvancedFingerprintResult:
+def repeat_fingerprint(value: SequenceInput, *, verbose: bool = True) -> AdvancedFingerprintResult:
     """Encode homopolymer/tandem-repeat summary values."""
 
     repeat = exact_repeat_fraction(value)
@@ -351,10 +348,7 @@ def repeat_fingerprint(value: SequenceInput) -> AdvancedFingerprintResult:
 
 
 def coding_fingerprint(
-    value: SequenceInput,
-    *,
-    frame: int = 0,
-    genetic_code: int = 1,
+    value: SequenceInput, *, frame: int = 0, genetic_code: int = 1, verbose: bool = True
 ) -> AdvancedFingerprintResult:
     """Encode codon/start/stop/ORF summaries without activity prediction."""
 
@@ -379,6 +373,7 @@ def thermodynamic_fingerprint(
     missing_strategy: ThermodynamicMissingStrategy = "zero",
     missing_value: float = -999.0,
     max_loop: int = 30,
+    verbose: bool = True,
 ) -> AdvancedFingerprintResult:
     """Encode a fixed v2 duplex/hairpin/dimer schema with explicit missing data."""
 
@@ -566,9 +561,7 @@ def thermodynamic_fingerprint(
 
 
 def multiscale_fingerprint(
-    value: SequenceInput,
-    *,
-    k_values: Iterable[int] = (1, 2, 3),
+    value: SequenceInput, *, k_values: Iterable[int] = (1, 2, 3), verbose: bool = True
 ) -> AdvancedFingerprintResult:
     """Concatenate frequency k-mer vectors at explicit scales plus global GC."""
 
@@ -614,6 +607,7 @@ def hybrid_fingerprint(
     components: Mapping[str, AdvancedFingerprintResult],
     *,
     weights: Mapping[str, int | float] | None = None,
+    verbose: bool = True,
 ) -> AdvancedFingerprintResult:
     """Concatenate named compatible component results with optional scalar weights."""
 
@@ -706,6 +700,7 @@ def fit_preprocessor(
     missing_strategy: Literal["error", "mean", "zero"] = "error",
     variance_threshold: float = 0.0,
     max_rows: int = DEFAULT_MAX_PREPROCESS_ROWS,
+    verbose: bool = True,
 ) -> FeaturePreprocessor:
     """Fit imputation/scaling/low-variance parameters on training rows only."""
 
@@ -827,3 +822,5 @@ __all__ = [
     "restriction_fingerprint",
     "thermodynamic_fingerprint",
 ]
+
+_register_public_verbose(globals())

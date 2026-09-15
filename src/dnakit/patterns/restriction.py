@@ -6,6 +6,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import CompoundLocation, Interval, Strand, UnresolvedLocation
 from dnakit.exceptions import ConfigurationError
 from dnakit.patterns._shared import (
@@ -154,6 +155,7 @@ def scan_restriction_sites(
     max_scan_length: int = 1_000_000,
     max_scan_cells: int = 50_000_000,
     max_enzymes: int = 10_000,
+    verbose: bool = True,
 ) -> PatternResult[RestrictionSiteHit]:
     """Scan a small built-in or user-provided restriction-enzyme panel.
 
@@ -279,3 +281,5 @@ __all__ = [
     "RestrictionEnzyme",
     "scan_restriction_sites",
 ]
+
+_register_public_verbose(globals())

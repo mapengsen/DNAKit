@@ -38,8 +38,7 @@
   (native-inputs
    (list python-numpy
          python-pytest
-         python-setuptools
-         python-wheel))
+         python-setuptools))
   (propagated-inputs
    (list python-pyyaml
          python-rich

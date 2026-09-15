@@ -9,12 +9,16 @@ import re
 import tempfile
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import replace
-from pathlib import Path, PurePosixPath
+from http.client import HTTPException
+from pathlib import Path, PureWindowsPath
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import unquote, urlsplit
 from urllib.request import Request, urlopen
 
+from dnakit._download_progress import with_download_progress
+from dnakit._network_retry import retry_transient
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit._version import __version__
 from dnakit.exceptions import ConfigurationError, DownloadError
 from dnakit.search._http import redact_url
@@ -32,7 +36,7 @@ ProgressCallback = Callable[[DownloadProgress], None]
 _SAFE_FILENAME = re.compile(r"^[^/\\\x00]{1,255}$")
 
 
-def resolved_config(config: DownloadConfig | None) -> DownloadConfig:
+def resolved_config(config: DownloadConfig | None, *, verbose: bool = True) -> DownloadConfig:
     if config is None:
         return DownloadConfig()
     if not isinstance(config, DownloadConfig):
@@ -62,9 +66,17 @@ def _https_url(url: str) -> str:
 def _filename(resource: RemoteFile) -> str:
     raw = resource.filename
     if raw is None:
-        raw = unquote(PurePosixPath(urlsplit(resource.url).path).name)
-    if not isinstance(raw, str) or _SAFE_FILENAME.fullmatch(raw) is None or raw in {".", ".."}:
-        raise ConfigurationError("Download filename is unsafe.", code="INVALID_DOWNLOAD_FILENAME")
+        raw = unquote(urlsplit(resource.url).path.rsplit("/", 1)[-1])
+    if (
+        not isinstance(raw, str)
+        or _SAFE_FILENAME.fullmatch(raw) is None
+        or raw in {".", ".."}
+        or PureWindowsPath(raw).drive
+    ):
+        raise ConfigurationError(
+            "Download filename is missing or unsafe; specify a plain filename.",
+            code="INVALID_DOWNLOAD_FILENAME",
+        )
     return raw
 
 
@@ -80,6 +92,8 @@ def _content_length(response: Any) -> int | None:
     return value if value >= 0 else None
 
 
+@with_download_progress("target")
+@retry_transient
 def download_file(
     resource: RemoteFile,
     target: str | os.PathLike[str],
@@ -90,6 +104,7 @@ def download_file(
     file_count: int = 1,
     headers: Mapping[str, str] | None = None,
     max_bytes_override: int | None = None,
+    verbose: bool = True,
 ) -> DownloadedFile:
     """Stream one HTTPS resource to an atomic, checksummed local file."""
 
@@ -181,6 +196,12 @@ def download_file(
                                     total,
                                 )
                             )
+                    if total is not None and completed != total:
+                        raise DownloadError(
+                            "Downloaded byte count does not match Content-Length.",
+                            code="DOWNLOAD_LENGTH_MISMATCH",
+                            context={"expected_bytes": total, "actual_bytes": completed},
+                        )
             except HTTPError as exc:
                 raise DownloadError(
                     "Remote server returned an HTTP error.",
@@ -189,7 +210,7 @@ def download_file(
                 ) from exc
             except DownloadError:
                 raise
-            except (OSError, TimeoutError, URLError) as exc:
+            except (OSError, TimeoutError, URLError, HTTPException) as exc:
                 raise DownloadError(
                     "Could not download the remote file.",
                     code="DOWNLOAD_NETWORK_ERROR",
@@ -237,6 +258,58 @@ def download_file(
     finally:
         if temp_path is not None:
             temp_path.unlink(missing_ok=True)
+
+
+def download_url(
+    url: str,
+    output_dir: str | os.PathLike[str],
+    *,
+    filename: str | None = None,
+    expected_md5: str | None = None,
+    expected_sha256: str | None = None,
+    config: DownloadConfig | None = None,
+    progress: ProgressCallback | None = None,
+    headers: Mapping[str, str] | None = None,
+    verbose: bool = True,
+) -> DownloadedFile:
+    """Download a file from a direct HTTPS URL into a local output directory.
+
+    Only ``url`` and ``output_dir`` are required. Create missing directories
+    automatically and infer the filename from the URL's last path component,
+    percent-decoded and without query parameters. Pass ``filename`` to rename
+    the download or when the URL has no filename; it must be a plain filename,
+    not a path. The URL must have no embedded credentials or fragment.
+
+    Download the response bytes as-is, including compressed archives. Links to
+    web pages return their page content; this function does not resolve share
+    pages or extract archives. Optional ``headers`` are sent with the request.
+    Use ``config=DownloadConfig(overwrite=True)`` to replace an existing file;
+    by default, an existing filename raises ``FileExistsError``.
+
+    Reuse streaming progress, bounded retries and atomic writes from
+    ``download_file``. Return ``DownloadedFile`` with the absolute local
+    ``path``, byte size, MD5 and SHA-256. Supplying ``expected_md5`` or
+    ``expected_sha256`` also verifies the contents before installing the file.
+    """
+
+    resource = RemoteFile(
+        _https_url(url),
+        filename=filename,
+        expected_md5=expected_md5,
+        expected_sha256=expected_sha256,
+    )
+    name = _filename(resource)
+    output = Path(output_dir).expanduser().resolve()
+    if output.exists() and not output.is_dir():
+        raise NotADirectoryError(f"output_dir must be a directory: {output}")
+    return download_file(
+        resource,
+        output / name,
+        config=config,
+        progress=progress,
+        headers=headers,
+        verbose=verbose,
+    )
 
 
 def _write_manifest(
@@ -316,6 +389,7 @@ def _install_staged_files(
         backup_dir.rmdir()
 
 
+@with_download_progress("output_dir")
 def dataset(
     resources: Iterable[RemoteFile],
     output_dir: str | os.PathLike[str],
@@ -326,6 +400,7 @@ def dataset(
     config: DownloadConfig | None = None,
     progress: ProgressCallback | None = None,
     headers: Mapping[str, str] | None = None,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download an explicit list of public files and write an integrity manifest."""
 
@@ -453,6 +528,7 @@ def tracks(
     source: str = "public genomic tracks",
     config: DownloadConfig | None = None,
     progress: ProgressCallback | None = None,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download explicit BED/bigBed/bedGraph/bigWig/peak resources."""
 
@@ -466,4 +542,13 @@ def tracks(
     )
 
 
-__all__ = ["ProgressCallback", "dataset", "download_file", "resolved_config", "tracks"]
+__all__ = [
+    "ProgressCallback",
+    "dataset",
+    "download_file",
+    "download_url",
+    "resolved_config",
+    "tracks",
+]
+
+_register_public_verbose(globals())

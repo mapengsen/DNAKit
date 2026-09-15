@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from graphlib import CycleError, TopologicalSorter
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics.reads import Region
 from dnakit.exceptions import ConfigurationError
 
@@ -31,7 +32,9 @@ class StepResult:
     error: str | None = None
 
 
-def run_workflow(steps: Iterable[Step], *, fail_fast: bool = True) -> tuple[StepResult, ...]:
+def run_workflow(
+    steps: Iterable[Step], *, fail_fast: bool = True, verbose: bool = True
+) -> tuple[StepResult, ...]:
     """Run a checked DAG; failures block dependents, independent steps can continue.
 
     Functions are supplied as actual Python callables, never evaluated/imported
@@ -80,7 +83,11 @@ def run_workflow(steps: Iterable[Step], *, fail_fast: bool = True) -> tuple[Step
 
 
 def query_regions(
-    left: Iterable[Region], right: Iterable[Region], *, operation: str = "intersection"
+    left: Iterable[Region],
+    right: Iterable[Region],
+    *,
+    operation: str = "intersection",
+    verbose: bool = True,
 ) -> tuple[Region, ...]:
     """Combine intervals by reference and strand, merging adjacent spans."""
     if operation not in {"union", "intersection", "difference"}:
@@ -114,3 +121,6 @@ def query_regions(
                 result.append(Region(reference, start, position, strand))
                 start = None
     return tuple(result)
+
+
+_register_public_verbose(globals(), ("run_workflow", "query_regions"))

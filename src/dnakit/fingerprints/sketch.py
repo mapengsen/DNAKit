@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Iterable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Gap, Topology
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
@@ -118,6 +119,7 @@ def minhash(
     seed: int = 0,
     max_hashes: int = DEFAULT_MAX_SKETCH_HASHES,
     max_unique_hashes: int = DEFAULT_MAX_UNIQUE_HASHES,
+    verbose: bool = True,
 ) -> SketchResult:
     """Return the smallest distinct 64-bit SHA-256-derived k-mer hashes."""
 
@@ -178,6 +180,7 @@ def fracminhash(
     seed: int = 0,
     max_hashes: int = DEFAULT_MAX_SKETCH_HASHES,
     max_unique_hashes: int = DEFAULT_MAX_UNIQUE_HASHES,
+    verbose: bool = True,
 ) -> SketchResult:
     """Retain hashes below ``floor(2**64 / scaled)`` with a hard output limit."""
 
@@ -244,3 +247,5 @@ __all__ = [
     "fracminhash",
     "minhash",
 ]
+
+_register_public_verbose(globals())

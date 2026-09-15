@@ -6,6 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import (
     CompoundLocation,
     DNASequence,
@@ -409,3 +410,5 @@ __all__ = [
     "RestrictionSiteHit",
     "TandemRepeatHit",
 ]
+
+_register_public_verbose(globals(), ("validate_finite_score",))

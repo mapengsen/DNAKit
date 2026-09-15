@@ -9,8 +9,9 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from rich.console import Console
-from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
+from rich.progress import BarColumn, SpinnerColumn, TaskProgressColumn, TextColumn
 
+from dnakit._progress import Progress
 from dnakit.exceptions import DNAKitError
 from dnakit.workflows import WorkflowProgress, WorkflowRunResult, run_workflow
 

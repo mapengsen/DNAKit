@@ -7,6 +7,7 @@ import os
 import stat
 from pathlib import Path
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 _BINARY_SIGNATURES = (
@@ -48,6 +49,7 @@ def read_llm_file(
     *,
     encoding: str = "utf-8-sig",
     max_bytes: int = 64_000,
+    verbose: bool = True,
 ) -> str:
     """Read one complete bounded local text file, without any API call.
 
@@ -138,3 +140,6 @@ def read_llm_file(
     if not content.strip():
         raise InputFormatError("The selected file contains no text.", code="EMPTY_LLM_FILE")
     return content
+
+
+_register_public_verbose(globals(), ("read_llm_file",))

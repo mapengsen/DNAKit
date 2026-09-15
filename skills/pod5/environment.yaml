@@ -1,0 +1,10 @@
+name: damlab-skill-pod5
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+    - pod5

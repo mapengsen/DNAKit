@@ -1,5 +1,6 @@
 """Unified, bounded adapters for public biological database queries."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.search.blast import (
     DEFAULT_NCBI_BLAST_URL,
     BlastJob,
@@ -49,6 +50,7 @@ from dnakit.search.ncbi import (
     DEFAULT_NCBI_DATASETS_URL,
     DEFAULT_NCBI_EUTILS_URL,
     accession,
+    accessions,
     assembly,
     clinical_variant,
     database_version,
@@ -69,6 +71,7 @@ from dnakit.search.ucsc import genomes as ucsc_genomes
 from dnakit.search.ucsc import sequence as ucsc_sequence
 from dnakit.search.ucsc import track_data as ucsc_track_data
 from dnakit.search.ucsc import tracks as ucsc_tracks
+from dnakit.search.web import read_webpage, web_search
 
 __all__ = [
     "DEFAULT_ENA_PORTAL_URL",
@@ -86,6 +89,7 @@ __all__ = [
     "QueryResult",
     "SearchConfig",
     "accession",
+    "accessions",
     "annotation",
     "assembly",
     "blast_results",
@@ -112,6 +116,7 @@ __all__ = [
     "nearby",
     "novelty",
     "project",
+    "read_webpage",
     "reads",
     "regulation",
     "sample",
@@ -129,4 +134,7 @@ __all__ = [
     "variant",
     "virus",
     "wait_for_blast",
+    "web_search",
 ]
+
+_register_public_verbose(globals())

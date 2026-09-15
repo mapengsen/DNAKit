@@ -1,5 +1,7 @@
 # OPS-007 Trimming
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Trimming removes specified lengths from the left and right ends of a DNA sequence, returning a new, shortened sequence.
 
 - **Function:** Identify and delete adapters, primers or low-quality bases from both ends of the sequence, and return retained fragments and trimming coordinates for preprocessing of reads and amplification products.

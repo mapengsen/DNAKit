@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from itertools import product
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.descriptors._dinucleotide import DINUCLEOTIDE_PROPERTY_SPECS
 
 DESCRIPTOR_SCHEMA_VERSION = "descriptor_schema_v1"
@@ -399,7 +400,7 @@ DESCRIPTOR_SCHEMA_V1 = _build_schema()
 DESCRIPTOR_NAMES_V1 = tuple(field.name for field in DESCRIPTOR_SCHEMA_V1)
 
 
-def descriptor_schema_v1() -> tuple[DescriptorField, ...]:
+def descriptor_schema_v1(*, verbose: bool = True) -> tuple[DescriptorField, ...]:
     """Return the immutable, ordered 240-field schema."""
 
     return DESCRIPTOR_SCHEMA_V1
@@ -412,3 +413,5 @@ __all__ = [
     "DescriptorField",
     "descriptor_schema_v1",
 ]
+
+_register_public_verbose(globals())

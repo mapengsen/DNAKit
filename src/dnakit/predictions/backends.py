@@ -16,6 +16,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, TypeVar, cast
 
+from dnakit._backend_errors import backend_failure
+from dnakit._dependency_hints import model_dependency_hint
+from dnakit._verbosity import progress_enabled
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends import execute_bounded_command
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -77,7 +81,7 @@ def _require_module(name: str, model: str, requirement: str | None = None) -> An
             f"The {model} prediction backend is not installed.",
             code="MISSING_NEURAL_DEPENDENCY",
             context={"model": model, "dependency": dependency},
-            hint=f"Install the official prediction dependency: {dependency}",
+            hint=model_dependency_hint(model, dependency),
         ) from exc
 
 
@@ -116,6 +120,16 @@ def _resolve_torch_device(torch: Any, requested: str) -> Any:
             code="INVALID_PREDICTION_DEVICE",
             context={"device": requested},
         )
+    if (
+        device.type == "cuda"
+        and device.index is not None
+        and device.index >= torch.cuda.device_count()
+    ):
+        raise ConfigurationError(
+            "Requested CUDA device index is unavailable.",
+            code="INVALID_PREDICTION_DEVICE",
+            context={"device": requested, "device_count": torch.cuda.device_count()},
+        )
     if device.type == "mps" and (
         not hasattr(torch.backends, "mps") or not bool(torch.backends.mps.is_available())
     ):
@@ -146,7 +160,7 @@ def _batches(
 ) -> Iterable[Sequence[_T]]:
     starts: Iterable[int] = range(0, len(values), batch_size)
     if enabled:
-        from rich.progress import track
+        from dnakit._progress import track
 
         starts = track(starts, description=description)
     for start in starts:
@@ -787,7 +801,10 @@ class _EnformerBenchmarkBackend:
         show_progress: bool,
     ) -> Sequence[PredictionOutput]:
         prepared: list[tuple[int, str]] = []
-        limit = int(self.config.max_length or _ENFORMER_BENCHMARK_MAX_SEQUENCE_LENGTH)
+        limit = min(
+            self.config.max_length or _ENFORMER_BENCHMARK_MAX_SEQUENCE_LENGTH,
+            _ENFORMER_BENCHMARK_MAX_SEQUENCE_LENGTH,
+        )
         for index, item in enumerate(inputs):
             if not isinstance(item, BiologicalSequence):
                 raise AssertionError("Enformer benchmark received a non-sequence input.")
@@ -810,17 +827,18 @@ class _EnformerBenchmarkBackend:
         ):
             indices = [item[0] for item in batch]
             sequences = [item[1] for item in batch]
-            one_hot, lengths = self._encode(sequences)
             try:
+                one_hot, lengths = self._encode(sequences)
                 with self.torch.inference_mode(), self._autocast():
                     logits = self.model(one_hot, lengths).float()
                     probabilities = logits.softmax(dim=-1)
             except (ConfigurationError, SequenceError):
                 raise
             except Exception as exc:
-                raise BackendExecutionError(
+                raise backend_failure(
                     "Enformer benchmark inference failed.",
                     code="PROPERTY_PREDICTION_FAILED",
+                    error=exc,
                     context={"task": self.spec.name, "error_type": type(exc).__name__},
                 ) from exc
             logits_cpu = logits.detach().cpu()
@@ -884,10 +902,7 @@ class _AlphaGenomeBackend:
             raise BackendUnavailableError(
                 "AlphaGenome research code is required for local property prediction.",
                 code="MISSING_NEURAL_DEPENDENCY",
-                hint=(
-                    "Install https://github.com/google-deepmind/alphagenome_research "
-                    "or pass model_source_path to its checkout."
-                ),
+                hint=model_dependency_hint("AlphaGenome"),
             ) from exc
         if config.dtype not in {"auto", "float32"}:
             raise ConfigurationError(
@@ -995,8 +1010,8 @@ class _AlphaGenomeBackend:
         import numpy as np
 
         iterable: Iterable[PredictionInput] = inputs
-        if show_progress:
-            from rich.progress import track
+        if progress_enabled(show_progress):
+            from dnakit._progress import track
 
             iterable = track(inputs, description="Predicting AlphaGenome tracks")
         results: list[PredictionOutput] = []
@@ -1211,8 +1226,8 @@ class _Evo2ExonBackend:
         show_progress: bool,
     ) -> Sequence[PredictionOutput]:
         iterable: Iterable[PredictionInput] = inputs
-        if show_progress:
-            from rich.progress import track
+        if progress_enabled(show_progress):
+            from dnakit._progress import track
 
             iterable = track(inputs, description="Predicting Evo 2 exon probability")
         results: list[PredictionOutput] = []
@@ -1483,10 +1498,7 @@ class _LucaOneTasksBackend:
             raise BackendUnavailableError(
                 "LucaOneTasks prediction requires an explicit official source checkout.",
                 code="MISSING_NEURAL_DEPENDENCY",
-                hint=(
-                    "Clone https://github.com/LucaOne/LucaOneTasks, install its official "
-                    "environment, and pass model_source_path."
-                ),
+                hint=model_dependency_hint("LucaOneTasks"),
             )
         self.root = Path(config.model_source_path).expanduser().resolve()
         self.source = self.root / "src"
@@ -1496,6 +1508,7 @@ class _LucaOneTasksBackend:
                 "model_source_path is not a LucaOneTasks checkout.",
                 code="MISSING_NEURAL_DEPENDENCY",
                 context={"path": str(self.root)},
+                hint=model_dependency_hint("LucaOneTasks"),
             )
         self.preset = _LUCA_PRESETS[config.task]
 
@@ -1701,8 +1714,10 @@ class _LucaOneTasksBackend:
             if self.preset.task_type == "multi_class":
                 arguments.extend(("--topk", str(self.config.top_k)))
             progress_ui: Any | None = None
-            if show_progress:
-                from rich.progress import Progress, SpinnerColumn, TextColumn
+            if progress_enabled(show_progress):
+                from rich.progress import SpinnerColumn, TextColumn
+
+                from dnakit._progress import Progress
 
                 progress_ui = Progress(
                     SpinnerColumn(),
@@ -1744,8 +1759,7 @@ class _LucaOneTasksBackend:
 
 
 def create_prediction_backend(
-    checkpoints: PredictionCheckpointInfo,
-    config: PropertyPredictionConfig,
+    checkpoints: PredictionCheckpointInfo, config: PropertyPredictionConfig, *, verbose: bool = True
 ) -> PredictionBackend:
     """Create the lazy official adapter selected by ``config``."""
 
@@ -1769,3 +1783,5 @@ def create_prediction_backend(
 
 
 __all__ = ["PredictionBackend", "create_prediction_backend"]
+
+_register_public_verbose(globals())

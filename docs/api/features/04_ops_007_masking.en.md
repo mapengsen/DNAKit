@@ -1,5 +1,7 @@
 # OPS-007 Masking
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Masking uses specified characters to replace the sequence of one or more target intervals in the DNA sequence with any character N, retaining the original sequence length and coordinates.
 
 - **Function:** Mask low-quality, low-complexity, or specified regions without changing sequence length and coordinates to prevent these positions from affecting search, statistics, or modeling.

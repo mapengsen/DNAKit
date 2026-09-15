@@ -72,6 +72,7 @@ def test_cli_download_genome_emits_manifest_without_network(
         assert query == "hg38"
         assert output_dir == tmp_path
         assert kwargs.get("progress") is None
+        assert kwargs.get("show_progress") is False
         return _FakeDownloadResult()
 
     cli_app = importlib.import_module("dnakit.cli.app")

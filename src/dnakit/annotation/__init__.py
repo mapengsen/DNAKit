@@ -1,5 +1,6 @@
 """Reference-based gene annotation, variant annotation, and population frequencies."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.annotation.gene_models import (
     GeneAnnotationConfig,
     GeneAnnotationResult,
@@ -41,3 +42,5 @@ __all__ = [
     "search_clinvar_variants",
     "search_gnomad_variants",
 ]
+
+_register_public_verbose(globals())

@@ -7,6 +7,7 @@ from collections import Counter
 from collections.abc import Iterable, Iterator
 from itertools import islice
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.descriptors._shared import (
@@ -119,6 +120,7 @@ def window_descriptors(
     entropy_log_base: float = 2.0,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> WindowDescriptorResult:
     """Calculate GC, Shannon entropy, and/or CpG values in ordered windows.
 
@@ -201,3 +203,5 @@ def window_descriptors(
 
 
 __all__ = ["window_descriptors"]
+
+_register_public_verbose(globals())

@@ -1,5 +1,8 @@
 """Public DNA normalization and validation API."""
 
+from dnakit._processing.dispatch import register as _register_inputs
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .config import (
     AmbiguityPolicy,
     DatasetValidationConfig,
@@ -39,6 +42,11 @@ from .results import (
 )
 from .validate import validate, validate_set
 
+_register_inputs(globals(), ("normalize",), mode="normalize")
+_register_inputs(globals(), ("normalize_gaps",), mode="sequence")
+_register_inputs(globals(), ("validate",), mode="report")
+_register_inputs(globals(), ("validate_set",), mode="collection")
+
 __all__ = [
     "AGPAssemblyConfig",
     "AGPAssemblyResult",
@@ -75,3 +83,5 @@ __all__ = [
     "validate",
     "validate_set",
 ]
+
+_register_public_verbose(globals())

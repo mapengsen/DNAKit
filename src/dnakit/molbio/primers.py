@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from itertools import islice
 from typing import Protocol, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNAAlphabet, DNASequence, Issue, IssueSeverity, Strand, Topology
 from dnakit.exceptions import BackendExecutionError, ConfigurationError
 from dnakit.thermodynamics import (
@@ -122,6 +123,7 @@ def match_primer(
     max_hits: int = 100_000,
     max_template_length: int = 10_000_000,
     max_comparison_cells: int = 100_000_000,
+    verbose: bool = True,
 ) -> PrimerMatchResult:
     """Find ungapped primer matches and report mismatches in primer 5'-to-3' order."""
 
@@ -254,6 +256,7 @@ def simulate_pcr(
     max_products: int = 10_000,
     max_total_product_bases: int = 100_000_000,
     max_template_length: int = 10_000_000,
+    verbose: bool = True,
 ) -> PCRResult:
     """Predict inward-facing linear or single-traversal circular amplicons."""
 
@@ -493,6 +496,7 @@ def primer_properties(
     structure_adapter: PrimerStructureAdapter | None = None,
     max_loop: int = 30,
     output_structure: bool = False,
+    verbose: bool = True,
 ) -> PrimerPropertiesResult:
     """Calculate GC/Tm and explicitly execute an optional structure adapter."""
 
@@ -754,6 +758,7 @@ def prepare_primer_design(
     conditions: ThermodynamicConditions | None = None,
     max_excluded_regions: int = 10_000,
     max_template_length: int = 10_000_000,
+    verbose: bool = True,
 ) -> PrimerDesignInterfaceResult:
     """Validate and serialize a backend-neutral primer-design request only."""
 
@@ -897,3 +902,5 @@ __all__ = [
     "primer_properties",
     "simulate_pcr",
 ]
+
+_register_public_verbose(globals())

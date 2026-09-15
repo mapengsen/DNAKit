@@ -1,5 +1,7 @@
 # OPS-008 Circular sequence operation
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Rotate the origin of a circular DNA, or extract a sequence fragment that spans the circular origin.
 
 - **Function:** Respecify the storage starting point without changing the content of the circular DNA, or intercept the fragments spanning the origin, and correctly convert the old and new coordinates.

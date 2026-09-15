@@ -1,0 +1,69 @@
+---
+name: gunc
+description: >
+  Detect chimerism/contamination in prokaryotic genomes/MAGs. Use this skill when working with gunc: installing, choosing
+  parameters, running commands, interpreting outputs, or troubleshooting.
+  Upstream: https://github.com/grp-bork/gunc. For stage routing use tool-selection /
+  metagenomics-workflow.
+license: MIT
+category: analysis-tools
+tags: ['qc', 'contamination', 'chimerism']
+upstream: https://github.com/grp-bork/gunc
+stage: assessment
+---
+
+## DNAKit execution
+
+Use `dnakit skills doctor gunc` to inspect scientific dependencies. Read [DNAKIT.md](DNAKIT.md) for this skill's DNAKit functions and bundled script entrypoints. Keep the workflow, input checks and reporting requirements below.
+
+
+# GUNC
+
+Upstream: [GUNC](https://github.com/grp-bork/gunc)
+
+## Citation
+
+Orakov, A. *et al.* GUNC: detection of chimerism and contamination in prokaryotic genomes. *Genome Biol.* **22**, 178 (2021). https://doi.org/10.1186/s13059-021-02393-0
+
+See also [docs/references.md](references/upstream-docs/references.md).
+
+## Analytical thinking
+
+CheckM-style metrics estimate surplus marker copies but under-detect some
+**clade-level chimeras** (contigs from distinct lineages merged into one bin).
+GUNC was built for those underdetected contamination types; the paper
+conservatively estimated substantial residual contamination in public genomes
+even after conventional QC.
+
+Use GUNC **with** CheckM2 before strong claims on novel lineages, GEMs, or
+BGCs tied to a single MAG. Contamination types to keep distinct in text:
+
+| Type | Rough meaning |
+|------|----------------|
+| Redundant | Extra copies from related genome content |
+| Non-redundant / chimeric | Foreign-lineage fragments in one “genome” |
+
+Single-coverage binning can hide co-abundant contaminants within one sample —
+multi-coverage binning + GUNC is a strong pair (Mattock & Watson 2023).
+
+## How to run
+
+```bash
+conda install -c bioconda gunc  # if packaged; else follow upstream
+
+gunc run -i bins/ --db_file $GUNC_DB -r temp/gunc -t 16
+```
+
+## Key parameters
+
+| Item | Notes |
+|------|-------|
+| DB | Download/pin GUNC DB |
+| With CheckM2 | Combine filters; discordant calls → manual review |
+| Novel lineages | Higher scrutiny; GUNC DB taxonomy limits apply |
+
+## Related skills
+
+`checkm2` · `mag-qc` · `drep` · `basalt` · `study-design` · `tool-selection`
+
+<!-- DNAKit documentation-link portability edit, 2026-09-12: bundled repository docs locally; see UPSTREAM.md. -->

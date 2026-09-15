@@ -1,5 +1,23 @@
 # 性质预测：深度学习与机器学习
 
+新增的 AlphaGenome、ESM、Evo 2、NVIDIA NIM 等 **14 个已有模型调用接口**见[已训练模型的预测接口](../native/models.md)，每个函数均列出参数、返回值及已登记的凭据要求。CADD、AlphaMissense、SpliceAI 等变异注释与评分入口见[变异分析接口](../native/variants.md)。下方继续介绍 DNAKit 的自定义训练与预测流程。
+
+缺少或无法导入预测依赖时，DNAKit 会先向终端标准错误输出安装提示，再抛出原有异常；异常中也保留安装命令。`verbose=False` 关闭运行进度，依赖错误提示仍保留。DNAKit 不会自动执行安装。
+
+在 **DNAKit 项目根目录**，按所用功能安装：
+
+| 功能 | 安装命令 |
+| --- | --- |
+| Enformer（含 27 个分类任务） | `python -m pip install -e ".[neural,neural-enformer]"` |
+| 通用 PyTorch / Transformers 主干 | `python -m pip install -e ".[neural]"` |
+| 自定义深度学习训练 | `python -m pip install -e ".[training]"` |
+| 基础机器学习 | `python -m pip install -e ".[ml]"` |
+| XGBoost / LightGBM / CatBoost | 分别使用 `.[xgboost]` / `.[lightgbm]` / `.[catboost]` |
+
+通过发布包安装的用户，可将 `-e ".[选项]"` 改成 `"dnakit[选项]"`，无需源码目录。Evo 2、Caduceus 及需要官方源码的模型会显示各自的安装提示；Evo 2 的 extra 要求 Python 3.11–3.12，AlphaGenome、LucaOneTasks、JanusDNA 仍需满足官方环境要求。
+
+多个模型可以共用满足各自版本约束的 PyTorch 或 TensorFlow；二者不能互相替代。上述命令不强制升级或重新安装已满足要求的包，只补齐缺失或不兼容的依赖。当前 `neural` / `training` 的 PyTorch 范围是 `>=2.5,<3`，没有为每个模型固定不同版本；第三方模型仍可能有更严格的约束。参见 [pip 安装行为](https://pip.pypa.io/en/stable/cli/pip_install/)。
+
 本页包含三条路径：
 
 1. **用户自定义性质：** 从用户文件训练分类或回归模型，支持全量微调和线性探测；
@@ -11,6 +29,29 @@
 本页当前共 54 个可直接推理的功能。下面每个功能都单独说明作用、预测方法、API、输入与输出。示例结果中的占位符只表示输出结构；具体数值、标签数和轨道数取决于输入、物种、组织筛选条件及实际 checkpoint。
 
 本章涉及的模型论文、官方仓库和权重来源统一收录在 [FAQ：深度学习性质预测的参考文献](../../faq.md#deep-learning-property-prediction-references)。
+
+## 输入与输出的异常处理
+
+直接预测拒绝空序列和非法字符，并在序列错误中提供 `record_id`。Enformer 任务允许
+1、199、200、201 bp 等长度；默认上限为 196608 bp，显式 `max_length` 可以收紧限制，
+不能放宽模型上限。不会静默截断输入；IUPAC 符号按 `ambiguity_policy` 处理。
+
+`PredictionOutput` 拒绝空、非有限、复数或无法转换的数值，以及重复输出列名。
+直接分类／分割任务要求输出为 `[0,1]` 概率；Enformer 分类还要求输出维度等于类别数、
+概率和在 `1e-5` 容差内等于 1。连续分数、回归和轨道输出不套用概率范围。
+自定义后端也必须遵守所选任务的输出约定。
+
+直接预测及 embedding 公共入口将内存不足（包括后端异常链中的 OOM）报告为
+`MODEL_OUT_OF_MEMORY`，提示减小批次、释放内存或使用支持的其他设备；不自动输出替代预测。
+显式指定不存在的 CUDA 设备或编号会在模型加载前报错。
+
+## 权重缓存与自动下载 {#checkpoint-cache}
+
+预测前会检查本地预训练权重：缺失时只下载当前模型或任务所需的文件，并提示开始、完成及本地绝对路径；已有权重直接复用。`verbose=False` 可关闭提示。Enformer 任务默认存放在 `./ckpt/enformer-benchmarks/`，其他主干存放在 `./ckpt/<模型目录>/`。机器学习使用的 embedding 主干同样按需下载。用户训练的分类器（`estimator.joblib`）和神经网络任务头（`head.npz`）没有登记公共下载来源，需保留 `model_dir` 中的训练输出。LucaOneTasks 使用所提供源码目录中的官方下载流程。
+
+Enformer 的 27 个分类任务无需指定权重路径即可预测。使用 `checkpoint_dir` 可指定缓存目录：已有文件也会在其 `enformer-benchmarks/` 及对应任务类别的 `nt-revised/` 或 `genomic-benchmarks/` 子目录中查找；缺失时直接下载到指定目录。也可使用 `checkpoint_path` 指定精确文件路径，所选 Enformer 任务的文件缺失时会下载到该路径。两个参数不能同时使用。
+
+安装命令为 `python -m pip install "dnakit[neural,neural-enformer]"`，其中已包含 Google Drive 下载所需的 `gdown`。下载先写入临时文件，检查后再放入正式路径；失败或中断的文件不会被当作完整权重。预测时继续校验任务和模型参数，类别含义以 `output.output_names` 中的标签为准。
 
 ## 机器学习分类与回归
 
@@ -1297,7 +1338,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h2afz"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H2AFZ.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H2AFZ.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H2AFZ.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H2AFZ.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1328,7 +1369,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k27ac"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K27ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27ac.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K27ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27ac.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1359,7 +1400,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k27me3"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K27me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27me3.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K27me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K27me3.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1390,7 +1431,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k36me3"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K36me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K36me3.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K36me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K36me3.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1421,7 +1462,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me1"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me1.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K4me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me1.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1452,7 +1493,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me2"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me2.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me2.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K4me2.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me2.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1483,7 +1524,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k4me3"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K4me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me3.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K4me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K4me3.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1514,7 +1555,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k9ac"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K9ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9ac.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K9ac.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9ac.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1545,7 +1586,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h3k9me3"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H3K9me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9me3.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H3K9me3.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H3K9me3.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1577,7 +1618,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="h4k20me1"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `H4K20me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H4K20me1.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`H4K20me1.ckpt`；默认放在 `./ckpt/enformer-benchmarks/H4K20me1.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1608,7 +1649,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="enhancers"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `enhancers.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`enhancers.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1639,7 +1680,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="enhancers_types"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `enhancers_types.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers_types.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`enhancers_types.ckpt`；默认放在 `./ckpt/enformer-benchmarks/enhancers_types.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1670,7 +1711,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_all"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_all.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`promoter_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_all.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1701,7 +1742,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_no_tata"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_no_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_no_tata.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`promoter_no_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_no_tata.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1732,7 +1773,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="promoter_tata"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `promoter_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_tata.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`promoter_tata.ckpt`；默认放在 `./ckpt/enformer-benchmarks/promoter_tata.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1763,7 +1804,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_acceptors"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_acceptors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_acceptors.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`splice_sites_acceptors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_acceptors.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1794,7 +1835,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_all"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_all.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`splice_sites_all.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_all.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1825,7 +1866,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="splice_sites_donors"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `splice_sites_donors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_donors.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`splice_sites_donors.ckpt`；默认放在 `./ckpt/enformer-benchmarks/splice_sites_donors.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1856,7 +1897,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="demo_coding_vs_intergenomic_seqs"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `demo_coding_vs_intergenomic_seqs.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_coding_vs_intergenomic_seqs.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`demo_coding_vs_intergenomic_seqs.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_coding_vs_intergenomic_seqs.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1887,7 +1928,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="demo_human_or_worm"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `demo_human_or_worm.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_human_or_worm.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`demo_human_or_worm.ckpt`；默认放在 `./ckpt/enformer-benchmarks/demo_human_or_worm.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1918,7 +1959,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="drosophila_enhancers_stark"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `drosophila_enhancers_stark.ckpt`；默认放在 `./ckpt/enformer-benchmarks/drosophila_enhancers_stark.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`drosophila_enhancers_stark.ckpt`；默认放在 `./ckpt/enformer-benchmarks/drosophila_enhancers_stark.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1949,7 +1990,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="dummy_mouse_enhancers_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `dummy_mouse_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/dummy_mouse_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`dummy_mouse_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/dummy_mouse_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -1980,7 +2021,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_enhancers_cohn"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_enhancers_cohn.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_cohn.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`human_enhancers_cohn.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_cohn.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -2011,7 +2052,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_enhancers_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`human_enhancers_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_enhancers_ensembl.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -2042,7 +2083,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 3 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_ensembl_regulatory"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_ensembl_regulatory.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ensembl_regulatory.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`human_ensembl_regulatory.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ensembl_regulatory.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -2073,7 +2114,7 @@ print(output.metadata["predicted_label"])
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_nontata_promoters"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_nontata_promoters.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_nontata_promoters.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`human_nontata_promoters.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_nontata_promoters.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python
@@ -2105,7 +2146,7 @@ positive
 - **预测方法：** 加载该任务已经完整微调的 Enformer 主干与分类头，对最终层 embedding 做有效 bin 均值池化，再用 softmax 返回 2 个类别概率；运行时不训练或微调。
 - **API：** `dnakit.predictions.predict_enformer_benchmark(inputs[必须], task="human_ocr_ensembl"[必须], checkpoint_dir或checkpoint_path[可选])`
 - **输入：** `BiologicalSequence` 或 `DNARecord`；允许 A/C/G/T 和 IUPAC 模糊碱基，不会静默截断生物学序列。
-- **Checkpoint：** 根据[统一下载说明](25_deep_learning_checkpoint_download.md)下载 `human_ocr_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ocr_ensembl.ckpt`，也可使用自定义目录或精确路径。
+- **Checkpoint：** 缺失时自动下载（见[权重缓存说明](#checkpoint-cache)）`human_ocr_ensembl.ckpt`；默认放在 `./ckpt/enformer-benchmarks/human_ocr_ensembl.ckpt`，也可使用自定义目录或精确路径。
 - **示例代码：**
 
 ```python

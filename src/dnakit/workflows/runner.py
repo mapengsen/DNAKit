@@ -13,6 +13,7 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import ArtifactRef, DNAAlphabet, DNARecord, DNASet, Issue, IssueSeverity
 from dnakit.core._json import FrozenDict, freeze_mapping, to_json_compatible
 from dnakit.core.provenance import Provenance
@@ -1157,6 +1158,7 @@ def run_workflow(
     dry_run: bool = False,
     resume: bool = False,
     progress: ProgressCallback | None = None,
+    verbose: bool = True,
 ) -> WorkflowRunResult:
     """Execute one bounded local JSON/YAML workflow without commands or network access.
 
@@ -1535,3 +1537,5 @@ __all__ = [
     "WorkflowStepResult",
     "run_workflow",
 ]
+
+_register_public_verbose(globals())

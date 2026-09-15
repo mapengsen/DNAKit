@@ -1,0 +1,2916 @@
+{
+  "scope": "Public functions added by the skill migration; aliases and existing-function extensions excluded",
+  "total": 484,
+  "modules": {
+    "databases": 455,
+    "encode": 20,
+    "workflows": 6,
+    "sequence_retrieval": 3
+  },
+  "functions": [
+    {
+      "name": "dnakit.databases.alpha_genome_predict_interval",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.alpha_genome_predict_interval",
+      "signature": "(*, chromosome, start, end, output_types=None, ontology_terms=None, organism=None, sequence_length=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.alpha_genome_score_variant",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.alpha_genome_score_variant",
+      "signature": "(*, chromosome, position, reference_bases, alternate_bases, output_type=None, organism=None, sequence_length=None, top_n=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.alpha_missense_get_protein_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.alpha_missense_get_protein_scores",
+      "signature": "(*, uniprot_id, max_residues=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.alpha_missense_get_residue_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.alpha_missense_get_residue_scores",
+      "signature": "(*, uniprot_id, position, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.alpha_missense_get_variant_score",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.alpha_missense_get_variant_score",
+      "signature": "(*, uniprot_id, variant, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.alphafold_get_prediction",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.alphafold_get_prediction",
+      "signature": "(*, qualifier=None, uniprot_id=None, uniprot_accession=None, accession=None, sequence_checksum=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ar_xiv_search_papers",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.ar_xiv_search_papers",
+      "signature": "(*, query, limit=None, sort_by=None, sort_order=None, date_from=None, date_to=None, category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.bio_bank_japan_phewas_by_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.bio_bank_japan_phewas_by_variant",
+      "signature": "(*, rsid=None, variant=None, limit=None, max_pval=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.bio_grid_get_interactions",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.bio_grid_get_interactions",
+      "signature": "(*, gene_names=None, gene_name=None, organism=None, interaction_type=None, evidence_types=None, limit=None, throughput=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.bio_rxiv_get_preprint",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.bio_rxiv_get_preprint",
+      "signature": "(*, doi, server=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.bio_rxiv_list_recent_preprints",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.bio_rxiv_list_recent_preprints",
+      "signature": "(*, start_date=None, end_date=None, server=None, cursor=None, query=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.blast_protein_search",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.blast_protein_search",
+      "signature": "(*, sequence, database=None, expect=None, hitlist_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.bvbrc_search_epitopes",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.bvbrc_search_epitopes",
+      "signature": "(*, taxon_id=None, protein_name=None, epitope_type=None, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.c_bio_portal_get_cancer_studies",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.c_bio_portal_get_cancer_studies",
+      "signature": "(*, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.c_bio_portal_get_gene_info",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.c_bio_portal_get_gene_info",
+      "signature": "(*, entrez_gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.c_bio_portal_get_molecular_profiles",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.c_bio_portal_get_molecular_profiles",
+      "signature": "(*, study_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.c_bio_portal_get_mutations",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.c_bio_portal_get_mutations",
+      "signature": "(*, study_id, gene_list, sample_list_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.c_bio_portal_get_samples",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.c_bio_portal_get_samples",
+      "signature": "(*, study_id, page_size=None, page_number=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cadd_get_position_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cadd_get_position_scores",
+      "signature": "(*, chrom, pos, version=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cadd_get_range_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cadd_get_range_scores",
+      "signature": "(*, chrom, start, end, version=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cadd_get_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cadd_get_scores",
+      "signature": "(*, variant, assembly='hg38', verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cadd_get_variant_score",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cadd_get_variant_score",
+      "signature": "(*, chrom, pos, ref, alt, version=None, include_annotations=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.call",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.call",
+      "signature": "(operation, arguments=None, *, max_result_bytes=20000000, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cellx_gene_download_h5ad",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.cellx_gene_download_h5ad",
+      "signature": "(*, operation=None, dataset_id, output_path=None, census_version=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cellx_gene_get_cell_metadata",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.cellx_gene_get_cell_metadata",
+      "signature": "(*, operation=None, organism=None, obs_value_filter=None, column_names=None, census_version=None, gene=None, tissue=None, max_cells=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cellx_gene_get_embeddings",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.cellx_gene_get_embeddings",
+      "signature": "(*, operation=None, organism=None, embedding_name=None, census_version=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cellx_gene_get_expression_data",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.cellx_gene_get_expression_data",
+      "signature": "(*, operation=None, organism=None, obs_value_filter=None, var_value_filter=None, obs_column_names=None, var_column_names=None, census_version=None, gene=None, tissue=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_embl_get_drug_mechanisms",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ch_embl_get_drug_mechanisms",
+      "signature": "(*, limit=None, offset=None, drug_chembl_id=None, drug_name=None, molecule_chembl_id=None, chembl_id=None, drug_chembl_id__exact=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_embl_get_molecule",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ch_embl_get_molecule",
+      "signature": "(*, chembl_id=None, format=None, molecule_chembl_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_embl_get_target_activities",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ch_embl_get_target_activities",
+      "signature": "(*, target_chembl_id__exact=None, limit=None, offset=None, target_chembl_id=None, chembl_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_embl_search_drugs",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ch_embl_search_drugs",
+      "signature": "(*, query=None, max_phase=None, limit=None, offset=None, molecule_chembl_id=None, q=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_embl_search_targets",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ch_embl_search_targets",
+      "signature": "(*, target_chembl_id=None, pref_name__contains=None, organism=None, target_type=None, fields=None, limit=None, offset=None, q=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_ipatlas_enrichment_analysis",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.ch_ipatlas_enrichment_analysis",
+      "signature": "(*, operation=None, bed_data=None, motif=None, gene_list=None, genome=None, antigen_class=None, cell_type_class=None, threshold=None, distance=None, gene=None, cell_type=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_ipatlas_get_experiments",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.ch_ipatlas_get_experiments",
+      "signature": "(*, operation=None, genome=None, antigen=None, cell_type=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_ipatlas_get_peak_data",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.ch_ipatlas_get_peak_data",
+      "signature": "(*, operation=None, experiment_id=None, genome=None, format=None, threshold=None, gene=None, experiment_type=None, limit=None, peak_file=None, flank_bp=None, max_file_bytes=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ch_ipatlas_search_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.ch_ipatlas_search_datasets",
+      "signature": "(*, operation=None, antigen=None, cell_type=None, genome=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_get_molecular_profile",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_get_molecular_profile",
+      "signature": "(*, molecular_profile_id, evidence_limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_get_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_get_variant",
+      "signature": "(*, variant_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_get_variants_by_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_get_variants_by_gene",
+      "signature": "(*, gene_id=None, gene_name=None, gene_symbol=None, gene=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_search_assertions",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_search_assertions",
+      "signature": "(*, limit=None, therapy=None, therapy_name=None, disease=None, disease_name=None, variant_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_search_evidence_items",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_search_evidence_items",
+      "signature": "(*, limit=None, status=None, therapy=None, therapy_name=None, disease=None, disease_name=None, molecular_profile=None, evidence_type=None, significance=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_search_genes",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_search_genes",
+      "signature": "(*, limit=None, name=None, query=None, gene_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.civic_search_therapies",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.civic_search_therapies",
+      "signature": "(*, limit=None, name=None, query=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_dosage_by_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_dosage_by_gene",
+      "signature": "(*, gene=None, gene_symbol=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_dosage_region_search",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_dosage_region_search",
+      "signature": "(*, chromosome, start, end, assembly=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_get_actionability_adult",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_get_actionability_adult",
+      "signature": "(*, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_get_actionability_pediatric",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_get_actionability_pediatric",
+      "signature": "(*, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_get_dosage_sensitivity",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_get_dosage_sensitivity",
+      "signature": "(*, gene=None, include_regions=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_get_gene_validity",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_get_gene_validity",
+      "signature": "(*, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_get_variant_classifications",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_get_variant_classifications",
+      "signature": "(*, gene=None, variant=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_search_actionability",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_search_actionability",
+      "signature": "(*, gene, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_search_dosage_sensitivity",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_search_dosage_sensitivity",
+      "signature": "(*, gene, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_gen_search_gene_validity",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_gen_search_gene_validity",
+      "signature": "(*, gene, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_var_get_clinical_significance",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_var_get_clinical_significance",
+      "signature": "(*, variant_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_var_get_variant_details",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_var_get_variant_details",
+      "signature": "(*, variant_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clin_var_search_variants",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.clin_var_search_variants",
+      "signature": "(*, gene=None, condition=None, variant_id=None, variant_name=None, max_results=None, limit=None, clinical_significance=None, gene_symbol=None, significance=None, query=None, variant=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.clinical_trials_search_studies",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.clinical_trials_search_studies",
+      "signature": "(*, operation=None, query_cond=None, query_intr=None, query_term=None, filter_status=None, filter_phase=None, filter_study_type=None, page_size=None, next_page_token=None, query=None, condition=None, status=None, max_results=None, intervention=None, sponsor=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.coding_variant_fraction",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.coding_variant_fraction",
+      "signature": "(*, file, vaf_threshold=None, annotation=None, header_rows=None, vaf_col=None, so_col=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cosmic_get_mutations_by_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cosmic_get_mutations_by_gene",
+      "signature": "(*, operation=None, gene=None, gene_name=None, max_results=None, genome_build=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.cosmic_search_mutations",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.cosmic_search_mutations",
+      "signature": "(*, operation=None, terms=None, query=None, max_results=None, genome_build=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.crossref_search_works",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.crossref_search_works",
+      "signature": "(*, query, limit=None, offset=None, filter=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ctd_get_chemical_gene_interactions",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.ctd_get_chemical_gene_interactions",
+      "signature": "(*, input_terms, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dbsnp_get_frequencies",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.dbsnp_get_frequencies",
+      "signature": "(*, rsid, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dbsnp_get_variant_by_rsid",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.dbsnp_get_variant_by_rsid",
+      "signature": "(*, rsid, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dep_map_get_gene_dependencies",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.dep_map_get_gene_dependencies",
+      "signature": "(*, gene_symbol, model_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dep_map_search_cell_lines",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.dep_map_search_cell_lines",
+      "signature": "(*, query, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.describe",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.describe",
+      "signature": "(operation, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dgidb_get_drug_gene_interactions",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.dgidb_get_drug_gene_interactions",
+      "signature": "(*, genes=None, gene_name=None, gene=None, interaction_sources=None, interaction_types=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dgidb_get_gene_druggability",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.dgidb_get_gene_druggability",
+      "signature": "(*, genes=None, gene_name=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dis_ge_net_get_disease_genes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.dis_ge_net_get_disease_genes",
+      "signature": "(*, operation=None, disease, min_score=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dis_ge_net_get_gda",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.dis_ge_net_get_gda",
+      "signature": "(*, operation=None, gene=None, disease=None, source=None, min_score=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dis_ge_net_get_vda",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.dis_ge_net_get_vda",
+      "signature": "(*, operation=None, variant=None, gene=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dis_ge_net_search_disease",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.dis_ge_net_search_disease",
+      "signature": "(*, operation=None, disease, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dis_ge_net_search_gene",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.dis_ge_net_search_gene",
+      "signature": "(*, operation=None, gene, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dna_gibson_design",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.dna_gibson_design",
+      "signature": "(*, operation=None, fragments, overlap_length=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dna_golden_gate_assemble",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.dna_golden_gate_assemble",
+      "signature": "(*, operation=None, fragments, enzyme=None, circular=None, labels=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dna_golden_gate_design",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.dna_golden_gate_design",
+      "signature": "(*, operation=None, parts, enzyme=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dna_translate_reading_frames",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.dna_translate_reading_frames",
+      "signature": "(*, operation=None, sequence, frame=None, genetic_code=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dna_virtual_digest",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.dna_virtual_digest",
+      "signature": "(*, operation=None, sequence, enzymes=None, circular=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.download_file",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.download_file",
+      "signature": "(*, url, output_path=None, timeout=None, return_content=None, chunk_size=None, follow_redirects=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.drugbank_get_drug_basic_info_by_drug_name_or_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.drugbank_get_drug_basic_info_by_drug_name_or_id",
+      "signature": "(*, query, case_sensitive=None, exact_match=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.drugbank_get_pharmacology_by_drug_name_or_drugbank_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.drugbank_get_pharmacology_by_drug_name_or_drugbank_id",
+      "signature": "(*, query, case_sensitive=None, exact_match=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.drugbank_get_targets_by_drug_name_or_drugbank_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.drugbank_get_targets_by_drug_name_or_drugbank_id",
+      "signature": "(*, query, case_sensitive=None, exact_match=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.drugbank_vocab_search",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.drugbank_vocab_search",
+      "signature": "(*, query, search_fields=None, case_sensitive=None, exact_match=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.dyna_mut2_predict_stability",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.dyna_mut2_predict_stability",
+      "signature": "(*, operation=None, pdb_id, chain, mutation, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.e_qtl_get_associations",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.e_qtl_get_associations",
+      "signature": "(*, dataset_id, size=None, gene_id=None, variant=None, molecular_trait_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.e_qtl_list_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.e_qtl_list_datasets",
+      "signature": "(*, size=None, quant_method=None, tissue_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.enaportal_search_samples",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.enaportal_search_samples",
+      "signature": "(*, query, limit=None, fields=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.enaportal_search_studies",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.enaportal_search_studies",
+      "signature": "(*, query, limit=None, fields=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_get_biosample",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_get_biosample",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_get_chromatin_state",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_get_chromatin_state",
+      "signature": "(*, biosample_term_name=None, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_get_experiment",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_get_experiment",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_list_files",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_list_files",
+      "signature": "(*, file_type=None, assay_title=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_annotations",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_annotations",
+      "signature": "(*, annotation_type=None, biosample_term_name=None, organism=None, assembly=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_biosamples",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_biosamples",
+      "signature": "(*, organism=None, biosample_type=None, treatment=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_chromatin_accessibility",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_chromatin_accessibility",
+      "signature": "(*, assay_type=None, biosample_term_name=None, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_experiments",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_experiments",
+      "signature": "(*, assay_title=None, target=None, organism=None, status=None, limit=None, biosample=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_histone_experiments",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_histone_experiments",
+      "signature": "(*, histone_mark=None, target=None, biosample_term_name=None, biosample=None, organism=None, limit=None, biosample_term=None, cell_type=None, tissue=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.encode_search_rnaseq_experiments",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.encode_search_rnaseq_experiments",
+      "signature": "(*, biosample_term_name=None, biosample=None, cell_type=None, tissue=None, organism=None, assay_type=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.enrichr_enrich",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.enrichr_enrich",
+      "signature": "(*, operation=None, gene_list, library=None, top_n=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.enrichr_gene_enrichment_analysis",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.enrichr_gene_enrichment_analysis",
+      "signature": "(*, gene_list, libs=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_compara_get_gene_tree",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_compara_get_gene_tree",
+      "signature": "(*, gene, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_compara_get_orthologues",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_compara_get_orthologues",
+      "signature": "(*, gene, species=None, target_species=None, target_taxon=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_compara_get_paralogues",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_compara_get_paralogues",
+      "signature": "(*, gene, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_homology",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_homology",
+      "signature": "(*, species, symbol, target_species=None, target_taxon=None, type=None, sequence=None, aligned=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_overlap_features",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_overlap_features",
+      "signature": "(*, species, region, feature=None, biotype=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_regulatory_features",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_regulatory_features",
+      "signature": "(*, region, species=None, feature, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_sequence",
+      "signature": "(*, id, type=None, species=None, multiple_sequences=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_structural_variants",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_structural_variants",
+      "signature": "(*, species, region=None, feature=None, chrom=None, start=None, end=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_get_sv_detail",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_get_sv_detail",
+      "signature": "(*, species, id=None, sv_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_lookup_gene",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_lookup_gene",
+      "signature": "(*, gene_id=None, species=None, id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_seq_get_id_sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_seq_get_id_sequence",
+      "signature": "(*, ensembl_id, type=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_seq_get_region_sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_seq_get_region_sequence",
+      "signature": "(*, region, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_var_get_variant_consequences",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ensembl_var_get_variant_consequences",
+      "signature": "(*, variant_id, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_vep_annotate_hgvs",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ensembl_vep_annotate_hgvs",
+      "signature": "(*, hgvs_notation, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_vep_annotate_rsid",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ensembl_vep_annotate_rsid",
+      "signature": "(*, variant_id=None, rsid=None, rs_id=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_vep_region",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ensembl_vep_region",
+      "signature": "(*, species, region, allele=None, AncestralAllele=None, Blosum62=None, CADD=None, Conservation=None, DisGeNET=None, GeneSplicer=None, GO=None, LoF=None, MaxEntScan=None, Phenotypes=None, SIFT=None, PolyPhen=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ensembl_vep_variant_recoder",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ensembl_vep_variant_recoder",
+      "signature": "(*, variant_id, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm2_score_missense_variant",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm2_score_missense_variant",
+      "signature": "(*, sequence, position, mutant, wild_type=None, model_id=None, wait_for_model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_describe_sae_feature",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_describe_sae_feature",
+      "signature": "(*, feature_id, sae_model=None, model=None, n_proteins=None, top_residues_per_protein=None, use_cache=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_explain_variant_mechanism",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_explain_variant_mechanism",
+      "signature": "(*, sequence, position, ref_aa, alt_aa, window=None, top_k_features=None, include_descriptions=None, model=None, sae_model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_get_region_sae_features",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_get_region_sae_features",
+      "signature": "(*, sequence, start_position, end_position, top_k_features=None, model=None, sae_model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_get_sae_features",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_get_sae_features",
+      "signature": "(*, sequence, model=None, sae_model=None, position=None, window=None, top_k_per_residue=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_score_sequence",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_score_sequence",
+      "signature": "(*, sequence, model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_score_variant_sae_batch",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_score_variant_sae_batch",
+      "signature": "(*, sequence, variants, window=None, top_k_features=None, model=None, sae_model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.esm_score_variant_sae_disruption",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.esm_score_variant_sae_disruption",
+      "signature": "(*, sequence, position, ref_aa, alt_aa, window=None, top_k_features=None, model=None, sae_model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.europe_pmc_search_articles",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.europe_pmc_search_articles",
+      "signature": "(*, query, limit=None, require_has_ft=None, fulltext_terms=None, enrich_missing_abstract=None, extract_terms_from_fulltext=None, page_size=None, pageSize=None, source=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.europepmc_disease_target_score",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.europepmc_disease_target_score",
+      "signature": "(*, efoId, pageSize=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.eve_get_gene_info",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.eve_get_gene_info",
+      "signature": "(*, gene_symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.eve_get_variant_score",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.eve_get_variant_score",
+      "signature": "(*, variant=None, chrom=None, pos=None, ref=None, alt=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.evo2_score_variant",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.evo2_score_variant",
+      "signature": "(*, ref_sequence=None, alt_sequence=None, sequence=None, position=None, reference=None, alternate=None, model=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.execute",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.execute",
+      "signature": "(request, arguments=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.execute_tool",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.execute_tool",
+      "signature": "(*, tool_name, arguments=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.expression_atlas_disease_target_score",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.expression_atlas_disease_target_score",
+      "signature": "(*, efoId, pageSize=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.expression_atlas_search_differential",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.expression_atlas_search_differential",
+      "signature": "(*, gene=None, condition=None, species=None, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.expression_atlas_search_experiments",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.expression_atlas_search_experiments",
+      "signature": "(*, gene=None, condition=None, species=None, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.favor_annotate_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.favor_annotate_variant",
+      "signature": "(*, variant, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_active_ingredient_info_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_active_ingredient_info_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_adverse_reactions_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_adverse_reactions_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_boxed_warning_info_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_boxed_warning_info_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_clinical_studies_info_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_clinical_studies_info_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_indications_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_indications_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fda_get_mechanism_of_action_by_drug_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.fda_get_mechanism_of_action_by_drug_name",
+      "signature": "(*, drug_name, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.finn_gen_get_variant_finemapping",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.finn_gen_get_variant_finemapping",
+      "signature": "(*, variant, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene_alleles",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene_alleles",
+      "signature": "(*, gene_id, limit=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene_disease_models",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene_disease_models",
+      "signature": "(*, gene_id, limit=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene_expression",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene_expression",
+      "signature": "(*, gene_id, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene_interactions",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene_interactions",
+      "signature": "(*, gene_id, interaction_type=None, limit=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_base_get_gene_orthologs",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_base_get_gene_orthologs",
+      "signature": "(*, gene_id, limit=None, page=None, stringency=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.fly_mine_search",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.fly_mine_search",
+      "signature": "(*, q, size=None, format=None, facet_Category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.four_dn_search_data",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.four_dn_search_data",
+      "signature": "(*, operation=None, query=None, item_type=None, file_type=None, assay_title=None, biosource_name=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gbif_get_species",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gbif_get_species",
+      "signature": "(*, speciesKey, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gbif_search_species",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gbif_search_species",
+      "signature": "(*, query, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_get_clinical_data",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_get_clinical_data",
+      "signature": "(*, project_id=None, primary_site=None, disease_type=None, vital_status=None, gender=None, size=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_get_mutation_frequency",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_get_mutation_frequency",
+      "signature": "(*, gene_symbol=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_get_ssm_by_gene",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_get_ssm_by_gene",
+      "signature": "(*, gene_symbol, project_id=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_get_survival",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_get_survival",
+      "signature": "(*, project_id, gene_symbol=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_list_files",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_list_files",
+      "signature": "(*, data_type=None, size=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_list_projects",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_list_projects",
+      "signature": "(*, program=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gdc_search_cases",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gdc_search_cases",
+      "signature": "(*, project_id=None, size=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gen_cc_get_classifications",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.gen_cc_get_classifications",
+      "signature": "(*, operation=None, gene_symbol=None, disease=None, submitter=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gen_cc_search_disease",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.gen_cc_search_disease",
+      "signature": "(*, operation=None, disease=None, disease_name=None, classification=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gen_cc_search_gene",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.gen_cc_search_gene",
+      "signature": "(*, operation=None, gene_symbol, classification=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.genebass_gene_burden_phewas",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.genebass_gene_burden_phewas",
+      "signature": "(*, gene, burden_set=None, limit=None, max_pval=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.geo_search_atacseq_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.geo_search_atacseq_datasets",
+      "signature": "(*, query=None, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.geo_search_chipseq_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.geo_search_chipseq_datasets",
+      "signature": "(*, query, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.geo_search_rnaseq_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.geo_search_rnaseq_datasets",
+      "signature": "(*, query=None, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.get_joint_associated_diseases_by_hpo_id_list",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.get_joint_associated_diseases_by_hpo_id_list",
+      "signature": "(*, HPO_ID_list, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_gene_constraints",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_gene_constraints",
+      "signature": "(*, gene_symbol, reference_genome=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_sv_by_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_sv_by_gene",
+      "signature": "(*, gene_symbol, reference_genome=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_sv_by_region",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_sv_by_region",
+      "signature": "(*, chrom, start, stop=None, reference_genome=None, end=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_sv_detail",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_sv_detail",
+      "signature": "(*, variant_id=None, dataset=None, sv_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_variant",
+      "signature": "(*, variant_id, dataset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_get_variant_populations",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_get_variant_populations",
+      "signature": "(*, variant_id, dataset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gnomad_search_variants",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gnomad_search_variants",
+      "signature": "(*, query=None, dataset=None, variant=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.go_get_annotations_for_gene",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.go_get_annotations_for_gene",
+      "signature": "(*, gene_id, rows=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.go_search_terms",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.go_search_terms",
+      "signature": "(*, query, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtdb_get_species",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gtdb_get_species",
+      "signature": "(*, operation=None, species, max_genomes=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtdb_get_taxon_info",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gtdb_get_taxon_info",
+      "signature": "(*, operation=None, taxon, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtdb_search_genomes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gtdb_search_genomes",
+      "signature": "(*, operation=None, query, page=None, items_per_page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtdb_search_taxon",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.gtdb_search_taxon",
+      "signature": "(*, operation=None, query, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_calculate_eqtl",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_calculate_eqtl",
+      "signature": "(*, operation=None, gencode_id, variant_id, tissue_site_detail_id, dataset_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_get_expression_summary",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_get_expression_summary",
+      "signature": "(*, gene_symbol=None, ensembl_gene_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_get_median_gene_expression",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_get_median_gene_expression",
+      "signature": "(*, operation=None, gencode_id=None, tissue_site_detail_id=None, dataset_id=None, page=None, items_per_page=None, gene_symbol=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_get_multi_tissue_eqtls",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_get_multi_tissue_eqtls",
+      "signature": "(*, operation=None, gencode_id, variant_id=None, dataset_id=None, page=None, items_per_page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_get_single_tissue_eqtls",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_get_single_tissue_eqtls",
+      "signature": "(*, operation=None, gencode_id=None, variant_id=None, tissue_site_detail_id=None, dataset_id=None, page=None, items_per_page=None, gene_symbol=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_get_tissue_sites",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_get_tissue_sites",
+      "signature": "(*, operation=None, dataset_id=None, page=None, items_per_page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gtex_query_eqtl",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.gtex_query_eqtl",
+      "signature": "(*, gene_symbol=None, ensembl_gene_id=None, page=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_associations_for_snp",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_associations_for_snp",
+      "signature": "(*, rs_id, sort=None, direction=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_associations_for_study",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_associations_for_study",
+      "signature": "(*, accession_id, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_associations_for_trait",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_associations_for_trait",
+      "signature": "(*, disease_trait=None, efo_uri=None, efo_id=None, efo_trait=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_snp_by_id",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_snp_by_id",
+      "signature": "(*, rs_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_snps_for_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_snps_for_gene",
+      "signature": "(*, size=None, page=None, gene_symbol=None, gene=None, mapped_gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_studies_for_trait",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_studies_for_trait",
+      "signature": "(*, disease_trait=None, efo_uri=None, efo_id=None, efo_trait=None, cohort=None, gxe=None, full_pvalue_set=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_study_by_id",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_study_by_id",
+      "signature": "(*, study_id=None, accession_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_get_variants_for_trait",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_get_variants_for_trait",
+      "signature": "(*, disease_trait=None, trait=None, efo_uri=None, efo_id=None, efo_trait=None, size=None, limit=None, page=None, sort=None, direction=None, p_value_threshold=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_search_associations",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_search_associations",
+      "signature": "(*, disease_trait=None, query=None, efo_uri=None, efo_id=None, efo_trait=None, rs_id=None, accession_id=None, p_value=None, p_value_threshold=None, sort=None, direction=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_search_associations_by_gene",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_search_associations_by_gene",
+      "signature": "(*, gene_name, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_search_snps",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_search_snps",
+      "signature": "(*, rs_id=None, mapped_gene=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.gwas_search_studies",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.gwas_search_studies",
+      "signature": "(*, disease_trait=None, efo_uri=None, efo_id=None, efo_trait=None, cohort=None, gxe=None, full_pvalue_set=None, size=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.harmonizome_get_gene",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.harmonizome_get_gene",
+      "signature": "(*, gene_symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hgnc_fetch_gene_by_symbol",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.hgnc_fetch_gene_by_symbol",
+      "signature": "(*, symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hmdb_get_diseases",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.hmdb_get_diseases",
+      "signature": "(*, operation=None, hmdb_id=None, compound_name=None, pubchem_cid=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hmdb_get_metabolite",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.hmdb_get_metabolite",
+      "signature": "(*, operation=None, hmdb_id=None, compound_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hmdb_search",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.hmdb_search",
+      "signature": "(*, operation=None, query, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_get_cancer_prognostics_by_gene",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_get_cancer_prognostics_by_gene",
+      "signature": "(*, ensembl_id=None, gene_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_get_protein_interactions_by_gene",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_get_protein_interactions_by_gene",
+      "signature": "(*, gene_name, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_get_rna_expression_by_source",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_get_rna_expression_by_source",
+      "signature": "(*, gene_name, source_type, source_name, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_get_rna_expression_in_specific_tissues",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_get_rna_expression_in_specific_tissues",
+      "signature": "(*, ensembl_id=None, tissue_names=None, tissues=None, gene_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_get_subcellular_location",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_get_subcellular_location",
+      "signature": "(*, gene_name, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpa_search_genes_by_query",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.hpa_search_genes_by_query",
+      "signature": "(*, search_query, max_results=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpo_get_diseases_by_phenotype",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.hpo_get_diseases_by_phenotype",
+      "signature": "(*, term_id=None, limit=None, offset=None, hp_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpo_get_genes_by_phenotype",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.hpo_get_genes_by_phenotype",
+      "signature": "(*, term_id, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpo_get_term",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.hpo_get_term",
+      "signature": "(*, term_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.hpo_search_terms",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.hpo_search_terms",
+      "signature": "(*, query, max_results=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.humanbase_ppi_analysis",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.humanbase_ppi_analysis",
+      "signature": "(*, gene_list=None, tissue=None, max_node=None, interaction=None, string_mode=None, genes=None, top_n=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_get_epitope_antigens",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_get_epitope_antigens",
+      "signature": "(*, structure_id, limit=None, offset=None, order=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_get_epitope_mhc",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_get_epitope_mhc",
+      "signature": "(*, structure_id, limit=None, offset=None, order=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_search_bcell",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_search_bcell",
+      "signature": "(*, limit=None, offset=None, order=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_search_epitopes",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_search_epitopes",
+      "signature": "(*, sequence_contains=None, structure_type=None, limit=None, offset=None, order=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_search_mhc",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_search_mhc",
+      "signature": "(*, limit=None, offset=None, order=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.iedb_search_tcell_assays",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.iedb_search_tcell_assays",
+      "signature": "(*, sequence=None, sequence_contains=None, mhc_class=None, qualitative_measure=None, limit=None, offset=None, select=None, filters=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.igsr_list_data_collections",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.igsr_list_data_collections",
+      "signature": "(*, operation=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.igsr_search_populations",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.igsr_search_populations",
+      "signature": "(*, operation=None, superpopulation=None, query=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.igsr_search_samples",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.igsr_search_samples",
+      "signature": "(*, operation=None, population=None, data_collection=None, sample_name=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.imgt_get_gene_info",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.imgt_get_gene_info",
+      "signature": "(*, operation=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.imgt_search_genes",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.imgt_search_genes",
+      "signature": "(*, operation=None, query=None, gene_type=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.imm_port_search_studies",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.imm_port_search_studies",
+      "signature": "(*, query, condition_or_disease=None, assay_method=None, research_focus=None, species=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.intact_get_complex_details",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.intact_get_complex_details",
+      "signature": "(*, complex_ac, format=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.intact_get_interaction_network",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.intact_get_interaction_network",
+      "signature": "(*, identifier=None, uniprot_id=None, protein_id=None, gene_symbol=None, gene_name=None, depth=None, limit=None, size=None, format=None, protein_name=None, protein=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.intact_get_interactions",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.intact_get_interactions",
+      "signature": "(*, identifier, format=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.intact_search_interactions",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.intact_search_interactions",
+      "signature": "(*, query, first=None, max=None, format=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.inter_pro_get_entries_for_protein",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.inter_pro_get_entries_for_protein",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.inter_pro_get_protein_domains",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.inter_pro_get_protein_domains",
+      "signature": "(*, protein_id=None, accession=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.jaspar_get_matrix",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.jaspar_get_matrix",
+      "signature": "(*, matrix_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.jaspar_get_matrix_versions",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.jaspar_get_matrix_versions",
+      "signature": "(*, base_id, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.jaspar_get_transcription_factors",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.jaspar_get_transcription_factors",
+      "signature": "(*, collection=None, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.jaspar_search_matrices",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.jaspar_search_matrices",
+      "signature": "(*, search=None, name=None, collection=None, tax_group=None, species=None, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_find_genes",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_find_genes",
+      "signature": "(*, keyword=None, organism=None, query=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_get_gene_info",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_get_gene_info",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_get_gene_pathways",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_get_gene_pathways",
+      "signature": "(*, gene_id=None, gene_symbol=None, gene=None, organism=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_get_pathway_genes",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_get_pathway_genes",
+      "signature": "(*, pathway_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_get_pathway_info",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_get_pathway_info",
+      "signature": "(*, pathway_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.kegg_search_pathway",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.kegg_search_pathway",
+      "signature": "(*, keyword, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ldlink_get_proxies",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ldlink_get_proxies",
+      "signature": "(*, variant, population=None, r2_threshold=None, genome_build=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.list_operations",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.list_operations",
+      "signature": "(*, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.marrvel_get_gene",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.marrvel_get_gene",
+      "signature": "(*, symbol=None, gene_symbol=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.marrvel_get_omim_phenotypes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.marrvel_get_omim_phenotypes",
+      "signature": "(*, symbol=None, gene_symbol=None, gene=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mave_db_get_effect_matrix",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.mave_db_get_effect_matrix",
+      "signature": "(*, urn, uniprot_id=None, score_field=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.med_rxiv_get_preprint",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.med_rxiv_get_preprint",
+      "signature": "(*, doi=None, server=None, query=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgi_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgi_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgi_get_phenotypes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgi_get_phenotypes",
+      "signature": "(*, gene_id, limit=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgi_search_genes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgi_search_genes",
+      "signature": "(*, query, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_get_genome",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_get_genome",
+      "signature": "(*, genome_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_get_go_terms",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_get_go_terms",
+      "signature": "(*, analysis_id, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_get_interpro",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_get_interpro",
+      "signature": "(*, analysis_id, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_get_study_detail",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_get_study_detail",
+      "signature": "(*, study_accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_get_taxonomy",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_get_taxonomy",
+      "signature": "(*, analysis_id, rna_type=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_list_analyses",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_list_analyses",
+      "signature": "(*, study_accession, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_list_biomes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_list_biomes",
+      "signature": "(*, depth=None, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_search_genomes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_search_genomes",
+      "signature": "(*, taxonomy=None, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.mgnify_search_studies",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.mgnify_search_studies",
+      "signature": "(*, biome=None, search=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_get_gene_diseases",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_get_gene_diseases",
+      "signature": "(*, subject, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_get_gene_phenotypes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_get_gene_phenotypes",
+      "signature": "(*, subject, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_search",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_search",
+      "signature": "(*, query, category=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_search_gene",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_search_gene",
+      "signature": "(*, query, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_get_associations",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_get_associations",
+      "signature": "(*, subject=None, object=None, category, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_get_entity",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_get_entity",
+      "signature": "(*, entity_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_get_histopheno",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_get_histopheno",
+      "signature": "(*, entity_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_get_mappings",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_get_mappings",
+      "signature": "(*, entity_id, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_phenotype_similarity_search",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_phenotype_similarity_search",
+      "signature": "(*, phenotypes, group=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.monarch_v3_search",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.monarch_v3_search",
+      "signature": "(*, query=None, limit=None, category=None, q=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_gene_batch_query",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.my_gene_batch_query",
+      "signature": "(*, gene_ids, species=None, fields=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_gene_get_gene_annotation",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.my_gene_get_gene_annotation",
+      "signature": "(*, gene_id, fields=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_gene_query_genes",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.my_gene_query_genes",
+      "signature": "(*, query=None, species=None, fields=None, size=None, q=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_variant_get_pathogenicity_scores",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.my_variant_get_pathogenicity_scores",
+      "signature": "(*, variant_id, fields=None, assembly=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_variant_get_variant_annotation",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.my_variant_get_variant_annotation",
+      "signature": "(*, variant_id, fields=None, assembly=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.my_variant_query_variants",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.my_variant_query_variants",
+      "signature": "(*, query=None, fields=None, size=None, assembly=None, variant_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbi_fetch_accessions",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbi_fetch_accessions",
+      "signature": "(*, operation=None, uids, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbi_get_sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbi_get_sequence",
+      "signature": "(*, operation=None, accession, format=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbi_search_nucleotide",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbi_search_nucleotide",
+      "signature": "(*, operation=None, organism=None, gene=None, strain=None, keywords=None, seq_type=None, query=None, limit=None, sort=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbi_sra_search_runs",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbi_sra_search_runs",
+      "signature": "(*, operation=None, study=None, organism=None, strategy=None, platform=None, source=None, query=None, limit=None, sort=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_gene",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_gene_by_symbol",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_gene_by_symbol",
+      "signature": "(*, symbol, taxon=None, organism=None, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_genome_assembly",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_genome_assembly",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_orthologs",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_orthologs",
+      "signature": "(*, gene_id, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_sequence_reports",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_sequence_reports",
+      "signature": "(*, accession, page_size=None, page_token=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_get_taxonomy",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_get_taxonomy",
+      "signature": "(*, tax_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_list_genomes_by_taxon",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_list_genomes_by_taxon",
+      "signature": "(*, taxon, limit=None, reference_only=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbidatasets_suggest_taxonomy",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbidatasets_suggest_taxonomy",
+      "signature": "(*, query, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbigene_get_summary",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbigene_get_summary",
+      "signature": "(*, id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbigene_search",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.ncbigene_search",
+      "signature": "(*, term, retmax=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ncbiprotein_get_summary",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.ncbiprotein_get_summary",
+      "signature": "(*, id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.nvidia_nim_alphafold2",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.nvidia_nim_alphafold2",
+      "signature": "(*, sequence, algorithm=None, databases=None, e_value=None, iterations=None, relax_prediction=None, skip_template_search=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.nvidia_nim_esmfold",
+      "page": "api/native/models.md",
+      "anchor": "dnakit.databases.nvidia_nim_esmfold",
+      "signature": "(*, sequence, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ols_get_term_ancestors",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.ols_get_term_ancestors",
+      "signature": "(*, operation=None, term_iri=None, term_id=None, ontology=None, include_obsolete=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ols_get_term_children",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.ols_get_term_children",
+      "signature": "(*, operation=None, term_iri=None, term_id=None, ontology=None, include_obsolete=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ols_get_term_info",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.ols_get_term_info",
+      "signature": "(*, operation=None, id=None, term_id=None, term_iri=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ols_search_terms",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.ols_search_terms",
+      "signature": "(*, operation=None, query, rows=None, size=None, ontology=None, exact_match=None, include_obsolete=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.omim_get_clinical_synopsis",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.omim_get_clinical_synopsis",
+      "signature": "(*, operation=None, mim_number, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.omim_get_entry",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.omim_get_entry",
+      "signature": "(*, operation=None, mim_number, include=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.omim_get_gene_map",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.omim_get_gene_map",
+      "signature": "(*, operation=None, mim_number=None, chromosome=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.omim_search",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.omim_search",
+      "signature": "(*, operation=None, query, limit=None, start=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.onco_kb_annotate_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.onco_kb_annotate_variant",
+      "signature": "(*, operation=None, gene=None, gene_symbol=None, variant=None, tumor_type=None, alteration=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_associated_drugs_by_disease_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_associated_drugs_by_disease_efo_id",
+      "signature": "(*, efoId, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_associated_drugs_by_target_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_associated_drugs_by_target_ensembl_id",
+      "signature": "(*, ensemblId, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_associated_phenotypes_by_disease_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_associated_phenotypes_by_disease_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_associated_targets_by_disease_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_associated_targets_by_disease_efo_id",
+      "signature": "(*, efoId, size=None, index=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_credible_set_detail",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_credible_set_detail",
+      "signature": "(*, studyLocusId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_ancestors_parents_by_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_ancestors_parents_by_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_descendants_children_by_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_descendants_children_by_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_description_by_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_description_by_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_id_description_by_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_id_description_by_name",
+      "signature": "(*, diseaseName=None, query=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_synonyms_by_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_synonyms_by_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_disease_therapeutic_areas_by_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_disease_therapeutic_areas_by_efo_id",
+      "signature": "(*, efoId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_diseases_phenotypes_by_target_ensembl",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_diseases_phenotypes_by_target_ensembl",
+      "signature": "(*, ensemblId, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_drug_adverse_events_by_chembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_drug_adverse_events_by_chembl_id",
+      "signature": "(*, chemblId, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_drug_chemb_id_by_generic_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_drug_chemb_id_by_generic_name",
+      "signature": "(*, drugName=None, query=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_drug_indications_by_chembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_drug_indications_by_chembl_id",
+      "signature": "(*, chemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_drug_mechanisms_of_action_by_chembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_drug_mechanisms_of_action_by_chembl_id",
+      "signature": "(*, chemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_drug_warnings_by_chembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_drug_warnings_by_chembl_id",
+      "signature": "(*, chemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_evidence_by_datasource",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_evidence_by_datasource",
+      "signature": "(*, efoId=None, ensemblId=None, gene_symbol=None, disease_name=None, datasourceIds=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_gwas_study",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_gwas_study",
+      "signature": "(*, studyId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_publications_by_target_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_publications_by_target_ensembl_id",
+      "signature": "(*, entityId, additionalIds=None, startYear=None, startMonth=None, endYear=None, endMonth=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_similar_entities_by_disease_efo_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_similar_entities_by_disease_efo_id",
+      "signature": "(*, efoId, threshold, size, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_study_credible_sets",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_study_credible_sets",
+      "signature": "(*, studyIds, size=None, index=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_classes_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_classes_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_gene_ontology_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_gene_ontology_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_genomic_location_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_genomic_location_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_homologues_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_homologues_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_id_description_by_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_id_description_by_name",
+      "signature": "(*, targetName, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_interactions_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_interactions_by_ensembl_id",
+      "signature": "(*, ensemblId, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_safety_profile_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_safety_profile_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_target_tractability_by_ensembl_id",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_target_tractability_by_ensembl_id",
+      "signature": "(*, ensemblId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_variant_credible_sets",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_variant_credible_sets",
+      "signature": "(*, variantId=None, size=None, variant_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_get_variant_info",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_get_variant_info",
+      "signature": "(*, variantId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_map_any_disease_id_to_all_other_ids",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_map_any_disease_id_to_all_other_ids",
+      "signature": "(*, inputId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_multi_entity_search_by_query_string",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_multi_entity_search_by_query_string",
+      "signature": "(*, queryString, entityNames=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_search_gwas_studies_by_disease",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_search_gwas_studies_by_disease",
+      "signature": "(*, diseaseIds=None, enableIndirect=None, disease_name=None, disease=None, trait=None, size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.open_targets_target_disease_evidence",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.open_targets_target_disease_evidence",
+      "signature": "(*, efoId=None, ensemblId=None, gene_symbol=None, disease_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.openalex_get_author",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.openalex_get_author",
+      "signature": "(*, author_id, mailto=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.openalex_literature_search",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.openalex_literature_search",
+      "signature": "(*, search_keywords=None, query=None, max_results=None, limit=None, num_results=None, year_from=None, start_year=None, year_to=None, end_year=None, open_access=None, require_has_fulltext=None, fulltext_terms=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.openalex_search_works",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.openalex_search_works",
+      "signature": "(*, search=None, query=None, filter=None, require_has_fulltext=None, fulltext_terms=None, per_page=None, limit=None, page=None, sort=None, mailto=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_classification",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_classification",
+      "signature": "(*, operation=None, orpha_code=None, lang=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_disease",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_disease",
+      "signature": "(*, operation=None, orpha_code=None, lang=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_disease_genes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_disease_genes",
+      "signature": "(*, orpha_code, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_epidemiology",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_epidemiology",
+      "signature": "(*, operation=None, orpha_code=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_gene_diseases",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_gene_diseases",
+      "signature": "(*, operation=None, gene_name=None, gene_symbol=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_genes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_genes",
+      "signature": "(*, operation=None, orpha_code=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_icd_mapping",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_icd_mapping",
+      "signature": "(*, operation=None, orpha_code=None, coding_system=None, lang=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_natural_history",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_natural_history",
+      "signature": "(*, operation=None, orpha_code=None, orphacode=None, orpha_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_get_phenotypes",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_get_phenotypes",
+      "signature": "(*, operation=None, orpha_code=None, orpha_id=None, orphacode=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_search_by_name",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_search_by_name",
+      "signature": "(*, operation=None, name=None, exact=None, lang=None, limit=None, query=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.orphanet_search_diseases",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.orphanet_search_diseases",
+      "signature": "(*, operation=None, query, limit=None, lang=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.osl_get_efo_id_by_disease_name",
+      "page": "api/native/phenotypes.md",
+      "anchor": "dnakit.databases.osl_get_efo_id_by_disease_name",
+      "signature": "(*, disease, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.panther_enrichment",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.panther_enrichment",
+      "signature": "(*, gene_list, organism=None, annotation_dataset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.panther_ortholog",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.panther_ortholog",
+      "signature": "(*, gene_id, organism=None, target_organism=None, ortholog_type=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pdb_get_structure",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.pdb_get_structure",
+      "signature": "(*, pdb_id, format='cif', max_bytes=10000000, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pdbe_get_uniprot_mappings",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.pdbe_get_uniprot_mappings",
+      "signature": "(*, pdb_id=None, uniprot_id=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pdbe_sifts_get_best_structures",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.pdbe_sifts_get_best_structures",
+      "signature": "(*, uniprot_accession, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pfam_get_protein_annotations",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.pfam_get_protein_annotations",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.plant_reactome_get_pathway",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.plant_reactome_get_pathway",
+      "signature": "(*, pathway_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.plant_reactome_list_species",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.plant_reactome_list_species",
+      "signature": "(*, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.plant_reactome_search_pathways",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.plant_reactome_search_pathways",
+      "signature": "(*, query, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.powo_search_plants",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.powo_search_plants",
+      "signature": "(*, q, f=None, perPage=None, cursor=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.progenetix_cnv_search",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.progenetix_cnv_search",
+      "signature": "(*, reference_name, start, end, variant_type=None, filters=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.progenetix_list_cohorts",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.progenetix_list_cohorts",
+      "signature": "(*, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.progenetix_list_filtering_terms",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.progenetix_list_filtering_terms",
+      "signature": "(*, prefixes=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.progenetix_search_biosamples",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.progenetix_search_biosamples",
+      "signature": "(*, filters, limit=None, skip=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.proteins_api_get_features",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.proteins_api_get_features",
+      "signature": "(*, accession, format=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.proteins_api_search",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.proteins_api_search",
+      "signature": "(*, query=None, size=None, offset=None, format=None, gene_symbol=None, gene=None, reviewed=None, organism=None, taxid=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_chem_get_cid_by_compound_name",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.pub_chem_get_cid_by_compound_name",
+      "signature": "(*, name=None, compound_name=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_chem_get_compound_properties_by_cid",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.pub_chem_get_compound_properties_by_cid",
+      "signature": "(*, cid, properties=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_med_get_article",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.pub_med_get_article",
+      "signature": "(*, pmid, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_med_get_cited_by",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.pub_med_get_cited_by",
+      "signature": "(*, pmid, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_med_get_related",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.pub_med_get_related",
+      "signature": "(*, pmid, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.pub_med_search_articles",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.pub_med_search_articles",
+      "signature": "(*, query, limit=None, mindate=None, maxdate=None, datetype=None, include_abstract=None, sort=None, max_results=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.quick_go_annotations_by_gene",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.quick_go_annotations_by_gene",
+      "signature": "(*, gene_product_id, aspect=None, taxon_id=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rcsbdata_get_entry",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.rcsbdata_get_entry",
+      "signature": "(*, pdb_id=None, entry_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.re_map_get_transcription_factor_binding",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.re_map_get_transcription_factor_binding",
+      "signature": "(*, gene_name, cell_type=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_analysis_pathway_enrichment",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_analysis_pathway_enrichment",
+      "signature": "(*, identifiers, page_size=None, include_disease=None, projection=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_content_search",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_content_search",
+      "signature": "(*, query, species=None, types=None, rows=None, start=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_disease_target_score",
+      "page": "api/native/targets.md",
+      "anchor": "dnakit.databases.reactome_disease_target_score",
+      "signature": "(*, efoId, pageSize=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_get_participants",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_get_participants",
+      "signature": "(*, stId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_get_pathway",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_get_pathway",
+      "signature": "(*, stId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_get_pathway_reactions",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_get_pathway_reactions",
+      "signature": "(*, stId, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.reactome_map_uniprot_to_pathways",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.reactome_map_uniprot_to_pathways",
+      "signature": "(*, uniprot_id=None, id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.read_executed_notebook",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.read_executed_notebook",
+      "signature": "(*, data_folder=None, notebook_path=None, search=None, regex=None, max_output_chars=None, include_source=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.regulome_db_query_variant",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.regulome_db_query_variant",
+      "signature": "(*, rsid=None, variant=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_annotations",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_annotations",
+      "signature": "(*, rgd_id, aspect=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_gene",
+      "signature": "(*, rgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_orthologs",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_orthologs",
+      "signature": "(*, rgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_qtls_in_region",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_qtls_in_region",
+      "signature": "(*, chromosome, start, stop, map_key, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_strain",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_strain",
+      "signature": "(*, symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_get_strain_annotations",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_get_strain_annotations",
+      "signature": "(*, symbol, category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_search_genes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_search_genes",
+      "signature": "(*, query, species=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.rgd_search_strains",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.rgd_search_strains",
+      "signature": "(*, query=None, strain_type=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.screen_get_regulatory_elements",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.screen_get_regulatory_elements",
+      "signature": "(*, gene_name=None, query=None, element_type=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.search",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.databases.search",
+      "signature": "(query, *, limit=10, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.search_clinical_trials",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.search_clinical_trials",
+      "signature": "(*, condition=None, intervention=None, query_term=None, pageSize=None, pageToken=None, overall_status=None, max_results=None, limit=None, status=None, keyword=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.semantic_scholar_search_papers",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.semantic_scholar_search_papers",
+      "signature": "(*, query, limit=None, year=None, sort=None, include_abstract=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sequence_count_residues",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.sequence_count_residues",
+      "signature": "(*, operation=None, sequence=None, uniprot_id=None, residue, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sequence_dn_ds",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.sequence_dn_ds",
+      "signature": "(*, seq1=None, seq2=None, fasta1_path=None, fasta2_path=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sequence_gc_content",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.sequence_gc_content",
+      "signature": "(*, operation=None, sequence, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sequence_reverse_complement",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.sequence_reverse_complement",
+      "signature": "(*, operation=None, sequence, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sequence_stats",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.sequence_stats",
+      "signature": "(*, operation=None, sequence=None, uniprot_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sgd_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.sgd_get_gene",
+      "signature": "(*, sgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sgd_get_go_annotations",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.sgd_get_go_annotations",
+      "signature": "(*, sgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sgd_get_interactions",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.sgd_get_interactions",
+      "signature": "(*, sgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sgd_get_phenotypes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.sgd_get_phenotypes",
+      "signature": "(*, sgd_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sgd_search",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.sgd_search",
+      "signature": "(*, query, category=None, limit=None, offset=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.splice_ai_get_max_delta",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.splice_ai_get_max_delta",
+      "signature": "(*, variant, genome=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.splice_ai_predict_pangolin",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.splice_ai_predict_pangolin",
+      "signature": "(*, variant, genome=None, distance=None, mask=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.splice_ai_predict_splice",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.splice_ai_predict_splice",
+      "signature": "(*, variant, genome=None, distance=None, mask=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sra_get_experiment",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.sra_get_experiment",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.sra_search_experiments",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.sra_search_experiments",
+      "signature": "(*, query=None, organism=None, library_strategy=None, platform=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_functional_enrichment",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_functional_enrichment",
+      "signature": "(*, protein_ids, species=None, category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_get_functional_annotations",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_get_functional_annotations",
+      "signature": "(*, identifiers, species=None, category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_get_functional_enrichment",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_get_functional_enrichment",
+      "signature": "(*, identifiers, species=9606, category=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_get_interaction_partners",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_get_interaction_partners",
+      "signature": "(*, identifiers=None, species=None, limit=None, required_score=None, protein_ids=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_get_network",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_get_network",
+      "signature": "(*, identifiers=None, species=None, limit=None, required_score=None, protein_ids=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.string_ppi_enrichment",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.string_ppi_enrichment",
+      "signature": "(*, protein_ids, species=None, confidence_score=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.structure_annotate_per_residue",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.structure_annotate_per_residue",
+      "signature": "(*, operation=None, pdb_id=None, pdb_content=None, target_chain=None, partner_chains=None, ligand_resnames=None, distance_cutoff=None, core_rsa_cutoff=None, include_secondary_structure=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.tark_get_mane_transcripts",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.tark_get_mane_transcripts",
+      "signature": "(*, gene=None, ensembl_id=None, refseq_id=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.tark_get_transcript",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.databases.tark_get_transcript",
+      "signature": "(*, stable_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.tpmi_phewas_by_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.tpmi_phewas_by_variant",
+      "signature": "(*, rsid=None, variant=None, limit=None, max_pval=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ucsc_get_encode_c_cres",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.ucsc_get_encode_c_cres",
+      "signature": "(*, genome=None, chrom, start, end, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.ukbtopmed_phewas_by_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.ukbtopmed_phewas_by_variant",
+      "signature": "(*, rsid=None, variant=None, limit=None, max_pval=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_bind_get_dataset",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.uni_bind_get_dataset",
+      "signature": "(*, operation=None, dataset_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_bind_list_tfs",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.uni_bind_list_tfs",
+      "signature": "(*, operation=None, search=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_bind_search_datasets",
+      "page": "api/native/regulation.md",
+      "anchor": "dnakit.databases.uni_bind_search_datasets",
+      "signature": "(*, operation=None, tf_name=None, species=None, cell_line=None, collection=None, order=None, page=None, page_size=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_get_disease_variants_by_accession",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_get_disease_variants_by_accession",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_get_entry_by_accession",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_get_entry_by_accession",
+      "signature": "(*, accession, compact=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_get_features_by_accession",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_get_features_by_accession",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_get_function_by_accession",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_get_function_by_accession",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_get_sequence_by_accession",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_get_sequence_by_accession",
+      "signature": "(*, accession, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.uni_prot_search",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.uni_prot_search",
+      "signature": "(*, query, organism=None, limit=None, min_length=None, max_length=None, fields=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.usda_plants_get_characteristics",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.usda_plants_get_characteristics",
+      "signature": "(*, symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.usda_plants_get_profile",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.usda_plants_get_profile",
+      "signature": "(*, symbol, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.variant_validator_gene2transcripts",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.variant_validator_gene2transcripts",
+      "signature": "(*, gene_symbol, gene=None, gene_name=None, transcript_set=None, genome_build=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.variant_validator_validate_variant",
+      "page": "api/native/variants.md",
+      "anchor": "dnakit.databases.variant_validator_validate_variant",
+      "signature": "(*, genome_build, variant_description, select_transcripts, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.vcf_count_variants",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.vcf_count_variants",
+      "signature": "(*, operation=None, vcf_path, pass_only=None, regions=None, min_qual=None, include_expr=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.vcf_normalize",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.vcf_normalize",
+      "signature": "(*, operation=None, vcf_path, multiallelics=None, reference_fasta=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.vcf_summary_stats",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.databases.vcf_summary_stats",
+      "signature": "(*, operation=None, vcf_path, pass_only=None, regions=None, min_qual=None, include_expr=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.web_search",
+      "page": "api/native/literature.md",
+      "anchor": "dnakit.databases.web_search",
+      "signature": "(*, query, max_results=None, search_type=None, backend=None, region=None, safesearch=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.wiki_pathways_search",
+      "page": "api/native/pathways.md",
+      "anchor": "dnakit.databases.wiki_pathways_search",
+      "signature": "(*, query, organism=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.worm_base_get_expression",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.worm_base_get_expression",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.worm_base_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.worm_base_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.worm_base_get_phenotypes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.worm_base_get_phenotypes",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.xenbase_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.xenbase_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.xenbase_search_genes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.xenbase_search_genes",
+      "signature": "(*, query, species=None, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.zfin_get_gene",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.zfin_get_gene",
+      "signature": "(*, gene_id, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.zfin_get_gene_expression",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.zfin_get_gene_expression",
+      "signature": "(*, gene_id, limit=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.databases.zfin_get_gene_phenotypes",
+      "page": "api/native/organisms.md",
+      "anchor": "dnakit.databases.zfin_get_gene_phenotypes",
+      "signature": "(*, gene_id, limit=None, page=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.download.ena.sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.download.ena.sequence",
+      "signature": "(accession, output_path, *, format='fasta', config=None, search_config=None, api_base_url='https://www.ebi.ac.uk/ena/browser/api', verbose=True)"
+    },
+    {
+      "name": "dnakit.download.ncbi.sequence",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.download.ncbi.sequence",
+      "signature": "(accession, output_path, *, database='nuccore', format='fasta', seq_start=None, seq_stop=None, strand=1, config=None, search_config=None, api_base_url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils', verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.batch_download",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.batch_download",
+      "signature": "(download_dir, file_format=None, output_type=None, output_category=None, assembly=None, assay_title=None, organism='Homo sapiens', organ=None, biosample_type=None, target=None, preferred_default=None, organize_by='experiment', verify_md5=True, limit=100, dry_run=True, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.compare_experiments",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.compare_experiments",
+      "signature": "(accession1, accession2, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.download_files",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.download_files",
+      "signature": "(file_accessions, download_dir, organize_by='flat', verify_md5=True, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.export_data",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.export_data",
+      "signature": "(format='csv', assay_title=None, organism=None, organ=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_citations",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_citations",
+      "signature": "(accession=None, export_format='json', *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_experiment",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_experiment",
+      "signature": "(accession, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_facets",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_facets",
+      "signature": "(search_type='Experiment', assay_title=None, organism=None, organ=None, biosample_type=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_file_info",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_file_info",
+      "signature": "(accession, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_metadata",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_metadata",
+      "signature": "(metadata_type, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_provenance",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_provenance",
+      "signature": "(file_path=None, source_accession=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.get_references",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.get_references",
+      "signature": "(experiment_accession=None, reference_type=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.link_reference",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.link_reference",
+      "signature": "(experiment_accession, reference_type, reference_id, description='', *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.list_files",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.list_files",
+      "signature": "(experiment_accession, file_format=None, file_type=None, output_type=None, output_category=None, assembly=None, status=None, preferred_default=None, limit=200, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.list_tracked",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.list_tracked",
+      "signature": "(assay_title=None, organism=None, organ=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.log_derived_file",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.log_derived_file",
+      "signature": "(file_path, source_accessions, description='', file_type='', tool_used='', parameters='', *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.manage_credentials",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.manage_credentials",
+      "signature": "(action, access_key=None, secret_key=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.search_experiments",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.search_experiments",
+      "signature": "(assay_title=None, organism='Homo sapiens', organ=None, biosample_type=None, biosample_term_name=None, target=None, status='released', lab=None, award=None, assembly=None, replication_type=None, life_stage=None, sex=None, treatment=None, genetic_modification=None, perturbed=None, search_term=None, date_released_from=None, date_released_to=None, limit=25, offset=0, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.search_files",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.search_files",
+      "signature": "(file_format=None, file_type=None, output_type=None, output_category=None, assembly=None, assay_title=None, organism=None, organ=None, biosample_type=None, target=None, status='released', preferred_default=None, search_term=None, limit=25, offset=0, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.summarize_collection",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.summarize_collection",
+      "signature": "(assay_title=None, organism=None, organ=None, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.encode.track_experiment",
+      "page": "api/native/encode.md",
+      "anchor": "dnakit.encode.track_experiment",
+      "signature": "(accession, fetch_publications=True, fetch_pipelines=True, notes='', *, verbose=True)"
+    },
+    {
+      "name": "dnakit.search.ncbi.accessions",
+      "page": "api/native/sequences.md",
+      "anchor": "dnakit.search.ncbi.accessions",
+      "signature": "(uids, *, database='nuccore', config=None, api_base_url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils', verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.resource_path",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.workflows.resource_path",
+      "signature": "(skill_id, resource, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.run",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.workflows.run",
+      "signature": "(skill_id, script, *, arguments=None, workdir=None, timeout_seconds=300.0, max_output_bytes=1000000, verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.run_support",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.workflows.run_support",
+      "signature": "(name, *, arguments=None, workdir=None, timeout_seconds=300, max_output_bytes=1000000, verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.scripts",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.workflows.scripts",
+      "signature": "(skill_id, *, verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.simulate_inheritance",
+      "page": "api/native/analysis.md",
+      "anchor": "dnakit.workflows.simulate_inheritance",
+      "signature": "(father, mother, trait_registry, disease_registry, *, offspring_count=3, generation=1, mutation_rate=0.001, seed=None, verbose=True)"
+    },
+    {
+      "name": "dnakit.workflows.write_wes_report",
+      "page": "api/native/execution.md",
+      "anchor": "dnakit.workflows.write_wes_report",
+      "signature": "(input_report, output_dir, *, language='en', title=None, logo_left=None, logo_right=None, font_path=None, overwrite=False, verbose=True)"
+    }
+  ]
+}

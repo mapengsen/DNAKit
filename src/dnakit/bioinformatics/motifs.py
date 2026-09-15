@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import input_path, matrix, positive, require, sequence_text
 from dnakit.exceptions import ConfigurationError
 
@@ -70,6 +71,7 @@ def build_motif(
     name: str = "motif",
     background: Mapping[str, float] | None = None,
     pseudocount: float = 0.5,
+    verbose: bool = True,
 ) -> MotifModel:
     """Create a 4 x width model in A,C,G,T row order; pseudocount is per cell."""
     np = require("numpy", "bio-analysis")
@@ -117,7 +119,12 @@ def build_motif(
 
 
 def fpr_threshold(
-    model: MotifModel, fpr: float = 1e-4, *, precision: int = 1000, max_states: int = 200_000
+    model: MotifModel,
+    fpr: float = 1e-4,
+    *,
+    precision: int = 1000,
+    max_states: int = 200_000,
+    verbose: bool = True,
 ) -> float:
     """Conservative background FPR threshold using a quantized dynamic program.
 
@@ -156,6 +163,7 @@ def scan_motif_model(
     threshold: float,
     both_strands: bool = True,
     circular: bool = False,
+    verbose: bool = True,
 ) -> tuple[dict[str, Any], ...]:
     """Native log-odds scan; reverse hits report forward-reference half-open coordinates.
 
@@ -198,7 +206,7 @@ def scan_motif_model(
 
 
 def read_motifs(
-    path: str | Path, *, format: str = "jaspar", pseudocount: float = 0.5
+    path: str | Path, *, format: str = "jaspar", pseudocount: float = 0.5, verbose: bool = True
 ) -> tuple[MotifModel, ...]:
     """Use Biopython only as a JASPAR/MEME/TRANSFAC file codec."""
     with input_path(path).open(encoding="utf-8") as handle:
@@ -220,6 +228,7 @@ def dotplot(
     word_length: int = 10,
     max_matches: int = 1_000_000,
     axes: Any = None,
+    verbose: bool = True,
 ) -> Any:
     """Exact-word forward and reverse-complement dot plot (native word index)."""
     a = sequence_text(left)
@@ -254,3 +263,8 @@ def dotplot(
     axes.set(xlabel="Left position (0-based)", ylabel="Right position (0-based)")
     axes.legend()
     return axes
+
+
+_register_public_verbose(
+    globals(), ("build_motif", "fpr_threshold", "scan_motif_model", "read_motifs", "dotplot")
+)

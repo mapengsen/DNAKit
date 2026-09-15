@@ -37,21 +37,6 @@
 </p>
 
 <p align="center">
-  <a href="https://mapengsen.github.io/DNAKit/">
-    <img src="https://img.shields.io/badge/MCP_Server-Available-blue" alt="DNAKit MCP server">
-  </a>
-  <a href="https://mapengsen.github.io/DNAKit/">
-    <img src="https://img.shields.io/badge/Website-DNAKit-blue" alt="DNAKit website">
-  </a>
-  <a href="https://mapengsen.github.io/DNAKit/en/wechat/">
-    <img src="https://img.shields.io/badge/WeChat-Community-07C160" alt="WeChat community">
-  </a>
-  <a href="https://x.com/PengsenMa">
-    <img src="https://img.shields.io/badge/X-Follow-000000" alt="Follow Pengsen Ma on X">
-  </a>
-</p>
-
-<p align="center">
   <strong>DNAKit: A Comprehensive Toolkit for Efficient DNA Research</strong>
 </p>
 
@@ -75,8 +60,14 @@ pip install dnakit==0.1.4
 Install the optional VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
 backend with `pip install "dnakit[external-tools]"`.
 
-To expose DNAKit to an MCP-capable Agent, install `dnakit[agent]` and configure the
+To expose DNAKit to an MCP-capable Agent, run `pip install "dnakit[agent]"` and configure the
 `dnakit-mcp` command in the Agent client.
+
+This source checkout also includes a curated DNA/genomics Skill catalog. Install the checkout
+with `python -m pip install -e "."`, then search with `dnakit skills search "variant annotation"`
+or install the discovery skill with `dnakit skills install dnakit --agent codex`.
+See the [Skills tutorial](docs/llm_tools/skills.en.md) for Claude Code, Cursor, MCP, and citations.
+DNAKit code remains MIT; bundled Skills retain their [original licenses and attribution](THIRD_PARTY_NOTICES.md).
 
 To contribute to development, clone the repository and create the complete Conda environment:
 
@@ -84,15 +75,6 @@ To contribute to development, clone the repository and create the complete Conda
 conda env create -f environment-dev.yml
 conda activate dnakit-dev
 ```
-
-Then explore the [feature tree](https://mapengsen.github.io/DNAKit/en/api/features/function_tree/).
-
-# Additional distribution platforms
-
-The repository provides [Bioconda and GNU Guix recipes](https://github.com/mapengsen/DNAKit/tree/main/packaging)
-and a [Galaxy Tool Shed wrapper](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit).
-These files target `0.1.1`. Until they are reviewed and published by their respective platforms,
-use the PyPI installation method above.
 
 # Documentation
 
@@ -112,6 +94,13 @@ For questions, feedback, or suggestions, see:
 - [FAQ](https://mapengsen.github.io/DNAKit/en/faq/)
 - [GitHub Issues](https://github.com/mapengsen/DNAKit/issues)
 
+# Additional distribution platforms
+
+The repository provides [Bioconda and GNU Guix recipes](https://github.com/mapengsen/DNAKit/tree/main/packaging)
+and a [Galaxy Tool Shed wrapper](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit).
+These files target `0.1.1`. Until they are reviewed and published by their respective platforms,
+use the PyPI installation method above.
+
 # Changelog
 
 See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) for release notes.
@@ -124,6 +113,6 @@ The DNAKit project paper has not yet been published. Cite the current version as
 DNAKit contributors. DNAKit 0.1.4, 2026. https://github.com/mapengsen/DNAKit
 ```
 
-The paper has been submitted for publication, this section will be updated after the paper is published. When using specific algorithms,databases, or optional backends, cite their corresponding sources as well.
+This section will be updated with the paper citation after publication. When using specific algorithms, databases, or optional backends, cite their corresponding sources as well.
 
 The working tree also provides [bioinformatics Python APIs](docs/api/features/27_bioinformatics.en.md): native DNA encodings, generative metrics, statistics and specification-based optimization, plus optional format codecs and specialist alignment/NGS backends. Install these with `python -m pip install -e ".[bio]"`.

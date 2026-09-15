@@ -1,0 +1,326 @@
+{
+  "source": "ClawBio/ClawBio",
+  "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d",
+  "license": "MIT",
+  "attribution": "ClawBio contributors",
+  "files": [
+    {
+      "path": "clinical_variant_reporter/SKILL.md",
+      "original_path": "skills/clinical-variant-reporter/SKILL.md",
+      "sha256": "d4c1ef5e9106967d2b5c1fa385a62b259f4f93390f7976e3ddb40b5252b529e8",
+      "adapted_sha256": "d4c1ef5e9106967d2b5c1fa385a62b259f4f93390f7976e3ddb40b5252b529e8"
+    },
+    {
+      "path": "clinical_variant_reporter/acmg_engine.py",
+      "original_path": "skills/clinical-variant-reporter/acmg_engine.py",
+      "sha256": "2f0ca9661384f87a94b3da9e1712af2846e95f1ddca4a3dba6676df5dd0f2915",
+      "adapted_sha256": "f3402b390a3055cd479ef49fe8af8a2d5f41c154a23ab812602399230023fa1e"
+    },
+    {
+      "path": "clinical_variant_reporter/clinical_variant_reporter.py",
+      "original_path": "skills/clinical-variant-reporter/clinical_variant_reporter.py",
+      "sha256": "41449db1a0f7a69f3c184443861365f2b83cb3af11b950035319cc5a806ffb9a",
+      "adapted_sha256": "ee2576a54aa9c8fc6d4d6e8a8fe9713bfc911beb84febc17149883d0915ab600"
+    },
+    {
+      "path": "clinical_variant_reporter/example_data/demo_evidence_cache.json",
+      "original_path": "skills/clinical-variant-reporter/example_data/demo_evidence_cache.json",
+      "sha256": "850736b6b2387ef3d5eb385abae3cff77fb29ce275fe293d961c386444e6a8fd",
+      "adapted_sha256": "850736b6b2387ef3d5eb385abae3cff77fb29ce275fe293d961c386444e6a8fd"
+    },
+    {
+      "path": "clinical_variant_reporter/example_data/giab_acmg_panel.vcf",
+      "original_path": "skills/clinical-variant-reporter/example_data/giab_acmg_panel.vcf",
+      "sha256": "b4044dcdebd2cb7044f72582f9363175777b44793ae2b217065c4a387238ab78",
+      "adapted_sha256": "b4044dcdebd2cb7044f72582f9363175777b44793ae2b217065c4a387238ab78"
+    },
+    {
+      "path": "clinical_variant_reporter/self_audit.py",
+      "original_path": "skills/clinical-variant-reporter/self_audit.py",
+      "sha256": "6282f9a727846b4cdfe03574eb4219ddfac36e61eaab3e337d1931ba21f6f93a",
+      "adapted_sha256": "98a4a3c177e9178538e42979307c6d19c5c38d4226d5ba0a9783f2f781ba68f1"
+    },
+    {
+      "path": "clinical_trial_finder/SKILL.md",
+      "original_path": "skills/clinical-trial-finder/SKILL.md",
+      "sha256": "259988a502c786e73a421460fc7dae54a5644fccbe92dc0866bd34e6840b7533",
+      "adapted_sha256": "259988a502c786e73a421460fc7dae54a5644fccbe92dc0866bd34e6840b7533"
+    },
+    {
+      "path": "clinical_trial_finder/api.py",
+      "original_path": "skills/clinical-trial-finder/api.py",
+      "sha256": "be9b2d109b2ea6c5cc22b81a9fd7bc76e3e8b3413155c577e78c35b7d2f16d4e",
+      "adapted_sha256": "7d01fc00ab160eb27a206c01943dfcf9d4b24c848ce37da5dcaadd8e8873360e"
+    },
+    {
+      "path": "clinical_trial_finder/clinical_trial_finder.py",
+      "original_path": "skills/clinical-trial-finder/clinical_trial_finder.py",
+      "sha256": "73d7b8995b89f720938f681b1355e9aec1736048743da16f47fd77534f7f8dbc",
+      "adapted_sha256": "9772348e56fc4679d0955190c8c080af48eaa65a2ed56a8b0753fc00d3e9da83"
+    },
+    {
+      "path": "clinical_trial_finder/constants.py",
+      "original_path": "skills/clinical-trial-finder/constants.py",
+      "sha256": "fd49d51109876ca767d03764b782ee4c4833a16484f746e50ac7067f3b29f32d",
+      "adapted_sha256": "82ab19855db9c6d85cf8a50ea6c0676d0de62776045919a47168d903b085978c"
+    },
+    {
+      "path": "clinical_trial_finder/demo_input.txt",
+      "original_path": "skills/clinical-trial-finder/demo_input.txt",
+      "sha256": "c8ce6a9f245273ef8b9255bae663cac9dca4346a269a76d93553e70fe648a33f",
+      "adapted_sha256": "c8ce6a9f245273ef8b9255bae663cac9dca4346a269a76d93553e70fe648a33f"
+    },
+    {
+      "path": "clinical_trial_finder/euctr.py",
+      "original_path": "skills/clinical-trial-finder/euctr.py",
+      "sha256": "942497f65c0493a02f1fa5ae1536a9954aebcb8806982c4cdee92619810e5e0c",
+      "adapted_sha256": "ca038b1ad004f5907b52f7562deaa06100f327000223119dea664c9b880d9776"
+    },
+    {
+      "path": "clinical_trial_finder/examples/README.md",
+      "original_path": "skills/clinical-trial-finder/examples/README.md",
+      "sha256": "027f20de9dcf05714d0c0665fcb9dfac719455df2ac30cc27500563cf0a80038",
+      "adapted_sha256": "027f20de9dcf05714d0c0665fcb9dfac719455df2ac30cc27500563cf0a80038"
+    },
+    {
+      "path": "clinical_trial_finder/examples/demo_output/fhir_bundle.json",
+      "original_path": "skills/clinical-trial-finder/examples/demo_output/fhir_bundle.json",
+      "sha256": "d4a4c5ca2607af2a03d13b52320ee7ea2837ec73a10dff7a3666125ac3059d40",
+      "adapted_sha256": "d4a4c5ca2607af2a03d13b52320ee7ea2837ec73a10dff7a3666125ac3059d40"
+    },
+    {
+      "path": "clinical_trial_finder/examples/demo_output/report.md",
+      "original_path": "skills/clinical-trial-finder/examples/demo_output/report.md",
+      "sha256": "63627269f9c55610023522b115b53553cb8029953ecb677f135e201204eeb35d",
+      "adapted_sha256": "63627269f9c55610023522b115b53553cb8029953ecb677f135e201204eeb35d"
+    },
+    {
+      "path": "clinical_trial_finder/examples/demo_output/summary.json",
+      "original_path": "skills/clinical-trial-finder/examples/demo_output/summary.json",
+      "sha256": "8e5d7b6e183b6e5c5f58066d6af95c182226733429457605abf53588bcbd8dd2",
+      "adapted_sha256": "8e5d7b6e183b6e5c5f58066d6af95c182226733429457605abf53588bcbd8dd2"
+    },
+    {
+      "path": "clinical_trial_finder/examples/demo_output/tables/trials.csv",
+      "original_path": "skills/clinical-trial-finder/examples/demo_output/tables/trials.csv",
+      "sha256": "42f25950b286828ffa89c8ceb1a14d423530a3148bc0e6f0efd7f668a60f2976",
+      "adapted_sha256": "42f25950b286828ffa89c8ceb1a14d423530a3148bc0e6f0efd7f668a60f2976"
+    },
+    {
+      "path": "clinical_trial_finder/gwas_bridge.py",
+      "original_path": "skills/clinical-trial-finder/gwas_bridge.py",
+      "sha256": "985ba7fd4b1a66111b899eb6d46a0be9a292dcbe9ad2230d8eac6540fa582435",
+      "adapted_sha256": "15f30ff605b72dba3fb6a93bd304049de76ef239b1d8daed7142d8e48e880977"
+    },
+    {
+      "path": "clinical_trial_finder/opentargets.py",
+      "original_path": "skills/clinical-trial-finder/opentargets.py",
+      "sha256": "c587bd9a8e714f17fa70af63adbd2314c13fdc2a8b9caa771f2db9d2166c6e78",
+      "adapted_sha256": "26453a9aa738e40089f8bcef4368f3b62f01f36f3b25f71fb3c6cd417afb3600"
+    },
+    {
+      "path": "clinical_trial_finder/writers.py",
+      "original_path": "skills/clinical-trial-finder/writers.py",
+      "sha256": "3e9d815b85dc0f6f069ad22975686da5f67f1afdf1aaf0a847d15c9f9e92b03a",
+      "adapted_sha256": "c272371ea96129d948738678f39009e3f56787a7c0fe4f25f513283535f28479"
+    },
+    {
+      "path": "omics_target_evidence_mapper/SKILL.md",
+      "original_path": "skills/omics-target-evidence-mapper/SKILL.md",
+      "sha256": "f33e17be2c772c7dabc59d258912c4022a488a4fe44ce87bbd672df6fb52dc24",
+      "adapted_sha256": "f33e17be2c772c7dabc59d258912c4022a488a4fe44ce87bbd672df6fb52dc24"
+    },
+    {
+      "path": "omics_target_evidence_mapper/examples/demo_input.json",
+      "original_path": "skills/omics-target-evidence-mapper/examples/demo_input.json",
+      "sha256": "798af4e6f38e4a79773461bdbe227f22215a9ec4618adafc64d1d02d33fa0ec8",
+      "adapted_sha256": "798af4e6f38e4a79773461bdbe227f22215a9ec4618adafc64d1d02d33fa0ec8"
+    },
+    {
+      "path": "omics_target_evidence_mapper/examples/expected_output.md",
+      "original_path": "skills/omics-target-evidence-mapper/examples/expected_output.md",
+      "sha256": "38c519249b53fce3d9170e09fd6ece85b727c006f67199bc6f805d293a9ea1db",
+      "adapted_sha256": "38c519249b53fce3d9170e09fd6ece85b727c006f67199bc6f805d293a9ea1db"
+    },
+    {
+      "path": "omics_target_evidence_mapper/omics_target_evidence_mapper.py",
+      "original_path": "skills/omics-target-evidence-mapper/omics_target_evidence_mapper.py",
+      "sha256": "fd16461941c3ac29d128bdc31a89c07d06055c78c597a99ae6f49cf565b17500",
+      "adapted_sha256": "87a5d05082da8b26c73a2491769059b95cf322e20fa148be74eb97508329d8a2"
+    },
+    {
+      "path": "gwas_lookup/INTENTS.json",
+      "original_path": "skills/gwas-lookup/INTENTS.json",
+      "sha256": "175697ac163e7da72c2a81999f3a365e61a4aa7b8ec9f571a947fa07cbc9720f",
+      "adapted_sha256": "175697ac163e7da72c2a81999f3a365e61a4aa7b8ec9f571a947fa07cbc9720f"
+    },
+    {
+      "path": "gwas_lookup/SKILL.md",
+      "original_path": "skills/gwas-lookup/SKILL.md",
+      "sha256": "1add53f8a0b331d7a5d09eb97003f679438b623102514a101d1df159f5fe8316",
+      "adapted_sha256": "1add53f8a0b331d7a5d09eb97003f679438b623102514a101d1df159f5fe8316"
+    },
+    {
+      "path": "gwas_lookup/data/demo_rs3798220.json",
+      "original_path": "skills/gwas-lookup/data/demo_rs3798220.json",
+      "sha256": "970e7955ce6ce85b807d6c8b4c417957799e77f59dfae67f53cf8b8fcf82f1b0",
+      "adapted_sha256": "970e7955ce6ce85b807d6c8b4c417957799e77f59dfae67f53cf8b8fcf82f1b0"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup.py",
+      "sha256": "873389bbf8d0c085d86e47a9fd077fc4d34c3f8f9f787083e10cf664c6a4095f",
+      "adapted_sha256": "c2a280a189b2d2fe10ab3ad51434214c7c1d1ca9d40db5ba203605d84459e7af"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/__init__.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/__init__.py",
+      "sha256": "b17952c5fc776cd619bca7cc2d127c2ae9027d5d2e37a9ef12d66a33d0d3e48b",
+      "adapted_sha256": "3be603f66c7d375b425353748177894cd859dc6eb8289d895e76c4d21545a933"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/base_client.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/base_client.py",
+      "sha256": "a8b3314071bb565345954309dd04e2d1df6f3a1801d22b1485a048b6c2a008fc",
+      "adapted_sha256": "149ea35a6940b141973d75b4536bf7eebebee92ad65419a73d0847389d765a27"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/ensembl.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/ensembl.py",
+      "sha256": "5702204ae957b9fcbb4987fdb72d51e708fe55958ea8050b4fd2717d1a235d75",
+      "adapted_sha256": "d40e78d02a77bc29bc66aaf829443d50ba35d8b48f6e844b05facf4042dc75e9"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/eqtl_catalogue.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/eqtl_catalogue.py",
+      "sha256": "2f8bb1fe5928a70fdd74ccda920095a9c042631b9bd5f764abd3eceede48983e",
+      "adapted_sha256": "0408c417aa51b87c0a31ece523d3322d48b3581de3337b28cd0342a62a508075"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/finngen.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/finngen.py",
+      "sha256": "250efd4e57ac761a7ebd7bfe3aab14179a17625e9b105fda41734fe570511059",
+      "adapted_sha256": "a72ca6dcf61236ba49e5b2787e0d4eee984de99100da7193cfea9f11889b1593"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/gtex.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/gtex.py",
+      "sha256": "31344ae4e9a51435b659a01a4f7e13fca050a890fa0e1d44a374e23eff8544ed",
+      "adapted_sha256": "70e83afc012e7cbaeee3d90025ec74b09e49cecaf5a3980a4caf2ca126d94c06"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/gwas_catalog.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/gwas_catalog.py",
+      "sha256": "466ff7b3d87ea0dab4c980abedee148252e046b6a0062c029e379adc3c4d4eca",
+      "adapted_sha256": "da588ba401d667da802bbccc6b695d54a5873cc12993d8f9544b8742a1ae3dcd"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/open_targets.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/open_targets.py",
+      "sha256": "96d13c321c30b517562e5071c9b04c314ff1507ccdf168bb3327f2a0c5c9347e",
+      "adapted_sha256": "2a2c1896233db6f5bc4a54f8bfed54e8db0c12c5ff56ebd6688bbd0f29d23dbf"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/pheweb_bbj.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/pheweb_bbj.py",
+      "sha256": "11522eb6dc2d52299ec565f89b58ef869c6817b3a805b065a1c65ba0ab1d026d",
+      "adapted_sha256": "7bffd6a5031fce4d8a14cbe05ae1752ca967572273890c056eeeec29902296ef"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/pheweb_ukb.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/pheweb_ukb.py",
+      "sha256": "9153eb33b0d8a449cd769d340ca1f678b37601859a3776221e5dea94be588c00",
+      "adapted_sha256": "74ee8e25972c40f87afcc3f4dc83f64c5f169b77eee2b6cb6661cda69526fa61"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_api/portaldev.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_api/portaldev.py",
+      "sha256": "cd92a83721edea18a2dbd2f2e80879cf713f8ea14d67e36f5edf1a64cadf8522",
+      "adapted_sha256": "e0e2b52f1b6c4735cc890dba6ba2dcfc2f921e807d334342cebbf30616f89ec9"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_core/__init__.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_core/__init__.py",
+      "sha256": "01e0fb943a7ee9e467379dfa7e945b5523f922d3cd09a8bfc5abf58dfdf3ade9",
+      "adapted_sha256": "44456f05f77a25f55bb9825ebf6251f867f19909bbcef87ef9436b5bc3fc9b60"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_core/normalise.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_core/normalise.py",
+      "sha256": "16ae5880ea863c781c2e783e1fab00df56c4e105a646e0a1fefb82bbbf802935",
+      "adapted_sha256": "2c88e67a858317e40884dbfb6a6eda9c3ef8a0ff6a47147a3c8190f3a1be2e3c"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_core/report.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_core/report.py",
+      "sha256": "7bb49a9717aefbb78f736ad4b52b3712ebd2f1e30bbe427d834414dae45e4ff3",
+      "adapted_sha256": "f8a9abb4893889c8f85d4e3938c9d86d299b11913438541438bf224013ff286a"
+    },
+    {
+      "path": "gwas_lookup/gwas_lookup_core/resolve.py",
+      "original_path": "skills/gwas-lookup/gwas_lookup_core/resolve.py",
+      "sha256": "e96bbfa3a5875a905603a02c08923a497b0f139ee52a16f00fa8c09fa320b2c8",
+      "adapted_sha256": "1ba30757807fd15d2a59ef20c7e321fece2fdd93292f342647ab8c679cef2d07"
+    },
+    {
+      "path": "fine_mapping/SKILL.md",
+      "original_path": "skills/fine-mapping/SKILL.md",
+      "sha256": "acbcf59f1fe682ecb6cf19bf02546d525ef7a11e90b964f0a43d781266253be1",
+      "adapted_sha256": "acbcf59f1fe682ecb6cf19bf02546d525ef7a11e90b964f0a43d781266253be1"
+    },
+    {
+      "path": "fine_mapping/fine_mapping.py",
+      "original_path": "skills/fine-mapping/fine_mapping.py",
+      "sha256": "ee24bfc6d164016e86e988661a69ac814dca817adc3b629bb2c64222dccae9be",
+      "adapted_sha256": "bd77dba7a64005d8efd9da3436ef9522d677ee25fbf17ae171201a146e6e2f2f"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/__init__.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "adapted_sha256": "3ace2d6abbce93933ab57201041d0c9ab4a6920b261420a24b4a4ef88a093fd7"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/abf.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/abf.py",
+      "sha256": "a76c0e3a3856366c3f9a941414ca3c4bf8b9d0c6f984cddfeeb4c13663fd68ad",
+      "adapted_sha256": "db8bf517ae1219bdf4c25c9dc0eab1827ad01136f0dc28d0e0161876de54e612"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/credible_sets.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/credible_sets.py",
+      "sha256": "c452ae9b1ab9d3d481961da952b412684e12851491e3bf79c15202da933ad2ac",
+      "adapted_sha256": "0cda6e3896e299355c1eb4116568b9719b6afe4bd3f3211a685be553af91640b"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/io.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/io.py",
+      "sha256": "837852451ddf7c97896be96744fb1f002c6c3828c9ff649126da306f65ac1441",
+      "adapted_sha256": "e4ec20953bc87e3ba10ecd982e74fb0368d475b35641717bcf102d358d5fbfbd"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/report.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/report.py",
+      "sha256": "35674205eb3ca2ebf673abccdb245d7c99d64a9a47823040bf877795046d8da4",
+      "adapted_sha256": "66126f939c6bbd0f022e7bc3ed9265208549af0400133c8b97076721aa2caee5"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/susie.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/susie.py",
+      "sha256": "3ede432271414abf9cc4bbd4c705ca81c551ae637f17f077aea1056011182c7b",
+      "adapted_sha256": "48c95df69789a0bc347b37c17e88a9ea7b8e3e9a42da185482f84f7fd7cb6de9"
+    },
+    {
+      "path": "fine_mapping/fine_mapping_core/susie_inf.py",
+      "original_path": "skills/fine-mapping/fine_mapping_core/susie_inf.py",
+      "sha256": "6f9b0810aa66358b62fe71d88cdd1e39b46e246dcd7512522c0dab0247ed67f0",
+      "adapted_sha256": "63e71077e4be848bd27a329264d07b2318999af148692b2b0f751a1903477b1c"
+    },
+    {
+      "path": "recombinator.py",
+      "original_path": "GENOMEBOOK/PYTHON/04-recombinator.py",
+      "sha256": "5ab654a2e0f734d7c4ef6554ef58c11274cbe1f4cd07c182c169a26ad8562efa",
+      "adapted_sha256": "a135e7e94d57451101009688855438f76ee3076b612bc5fde3f0522c8a79d925"
+    }
+  ]
+}

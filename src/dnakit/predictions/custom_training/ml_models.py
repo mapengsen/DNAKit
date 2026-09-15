@@ -8,6 +8,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
@@ -115,12 +117,12 @@ _MODELS = (
 )
 
 
-def available_machine_learning_models() -> tuple[MachineLearningModel, ...]:
+def available_machine_learning_models(*, verbose: bool = True) -> tuple[MachineLearningModel, ...]:
     """List algorithm capabilities without importing optional dependencies."""
     return _MODELS
 
 
-def get_machine_learning_model(name: str) -> MachineLearningModel:
+def get_machine_learning_model(name: str, *, verbose: bool = True) -> MachineLearningModel:
     """Resolve a supported algorithm family."""
     canonical = str(name).strip().lower().replace("-", "_")
     for model in _MODELS:
@@ -199,7 +201,7 @@ def require_ml_module(name: str) -> Any:
         raise BackendUnavailableError(
             f"Machine-learning dependency {name!r} is not installed.",
             code="MISSING_MACHINE_LEARNING_DEPENDENCY",
-            hint=f'Install with: python -m pip install "dnakit[{extra}]"',
+            hint=dependency_hint(extra),
         ) from exc
 
 
@@ -262,3 +264,5 @@ __all__ = [
     "available_machine_learning_models",
     "get_machine_learning_model",
 ]
+
+_register_public_verbose(globals())

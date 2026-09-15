@@ -6,6 +6,7 @@ import random
 from dataclasses import dataclass
 from typing import Literal, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import ConfigurationError
 from dnakit.ops._common import require_sequence
@@ -39,6 +40,7 @@ def mutate(
     seed: int | None = None,
     rng: random.Random | None = None,
     allowed_bases: str = "ACGT",
+    verbose: bool = True,
 ) -> MutationResult:
     """Apply one specified substitution or one seeded random SNV.
 
@@ -149,3 +151,5 @@ def mutate(
 
 
 __all__ = ["MutationResult", "RandomSource", "RandomState", "mutate"]
+
+_register_public_verbose(globals())

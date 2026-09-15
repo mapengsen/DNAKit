@@ -1,5 +1,6 @@
 """Custom training and official pretrained property-prediction APIs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.predictions.api import (
     predict_enformer_benchmark,
     predict_pair_properties,
@@ -131,3 +132,5 @@ __all__ = [
     "split_property_data",
     "train_custom_property_model",
 ]
+
+_register_public_verbose(globals())

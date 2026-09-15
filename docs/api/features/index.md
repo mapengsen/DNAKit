@@ -1,8 +1,10 @@
 # DNAKit 功能模块索引
 
-> 更新日期：2026-09-09。按当前工作区公开 API 核对。完整层级见[功能树总览](function_tree.md)；本页同时列出功能页与公开 API 扩展的详情入口。条目按能力归类，跨分类链接不重复计数。
+> 更新日期：2026-09-13。按当前工作区公开 API 核对。完整层级见[功能树总览](function_tree.md)；本页同时列出功能页与公开 API 扩展的详情入口。条目按能力归类，跨分类链接不重复计数。
 
 ## 1) 数据准备
+
+本轮新增：[基因、序列与下载](../native/sequences.md)（41 个函数）、[ENCODE 数据管理](../native/encode.md)（20）、[物种与微生物组](../native/organisms.md)（49）、[文献与研究检索](../native/literature.md)（17）。完整参数和返回值均已逐项列出。
 
 - [核心数据对象](01_core_objects.md)（8 项）
 - [文件读写](02_io_data.md)（4 类；大文件能力作为 IO-001 的可选模式）
@@ -14,6 +16,8 @@
 - [合法性检查](03_validation.md)（统一检查入口）
 
 ## 2) 数据处理
+
+新增的序列统计、VCF 处理、酶切与组装接口见[序列计算、VCF、克隆与遗传模拟](../native/analysis.md)。该页也从分析栏目链接，函数不重复计数。
 
 - [DNA 序列标准化](03_standardization.md)（STD-001 字符标准化）
 - [Gap 与 AGP 标准化 API](../index.md#standardization)（连续大写 N 段转 Gap、AGP 组装与来源记录）
@@ -39,6 +43,8 @@
 
 ## 3) 数据分析
 
+本轮新增：[变异与 GWAS](../native/variants.md)（80）、[疾病与表型](../native/phenotypes.md)（45）、[表达与调控](../native/regulation.md)（65）、[通路互作与结构](../native/pathways.md)（64）、[靶点与药物证据](../native/targets.md)（62）、[模型预测](../native/models.md)（14）、[序列计算与遗传模拟](../native/analysis.md)（15）。
+
 - **DNA 描述符、表征与指纹**
   - [DNA 描述符](05_all_descriptors.md)
   - [序列表征](08_fingerprints.md)
@@ -56,7 +62,6 @@
 - [换算](18_optics_concentration.md)
 - [性质预测：深度学习与机器学习](23_deep_learning_property_prediction.md)（自定义分类/回归、37 类机器学习算法、模型重新加载，以及 54 个官方直接推理功能）
 - [自定义训练 API](../index.md#deep-learning-property-prediction)（全量微调、线性探测、机器学习、模型目录与可选 LLM 字段分析）
-- [深度学习任务 Checkpoint 下载](25_deep_learning_checkpoint_download.md)（27 个任务权重的下载与本地放置）
 - [可选生物信息功能](24_optional_bioinformatics.md)（变异注释、dN/dS 和 Golden Gate）
 - [基因名称与区间注释](26_gene_annotation.md)（基因组 DNA 的参考比对、已有基因注释映射、重叠区间与缓存复用）
 - [MSA、系统发育与概率 motif](27_bioinformatics.md)（多序列比对、BLAST/HMMER、NJ/UPGMA、树比较/共识、PWM/PSSM）
@@ -79,10 +84,12 @@
 
 ## 6) 工程化与扩展
 
+新增[接口发现、工作流与报告](../native/execution.md)（12 个函数）。全部 **484 个新增函数**见[完整索引](../native/index.md)，使用方式见[调用示例](../native/usage.md)。
+
 - [后端、性能与可复现性](14_engineering.md)（后端、批处理、有界线程、缓存、工作流与来源记录）
 - [CLI 命令](../index.md#cli)（数据处理、分析、工作流、自定义性质训练/预测与基因注释）
-- [Agent 与 MCP 工具](../../agent_tools.md)（ENG-013；服务配置、六个 MCP 入口、Schema、工具调用与执行授权）
-- [通用大模型调用](../../agent_tools.md#custom-llm)（独立 Python API；同步/异步、自定义提示词、文本/JSON、本地文件、服务商预设与扩展参数）
+- [大模型工具 → MCP](../../llm_tools/mcp.md)（ENG-013；服务配置、八个 MCP 入口、Schema、工具调用与执行授权）
+- [大模型工具 → Python API](../../llm_tools/python_api.md)（无需安装 MCP；一句话驱动工具调用、通用大模型调用、同步/异步、自定义提示词、文本/JSON、本地文件、服务商预设与扩展参数）
 - [Python DAG 与区间查询](27_bioinformatics.md)（依赖检查、失败传播与区间交/并/差）
 - Galaxy 包装器（`galaxy/dnakit`）：convert、deduplicate、split、report，需 Galaxy 环境。
 

@@ -22,6 +22,7 @@ from dnakit.download import (
     build_index,
     dataset,
     download_file,
+    download_url,
     encode_files,
     expression,
     reads,
@@ -35,9 +36,10 @@ from dnakit.download import (
 from dnakit.download import (
     ucsc_files as download_ucsc_files,
 )
-from dnakit.exceptions import DownloadError
-from dnakit.search import QueryResult
+from dnakit.exceptions import ConfigurationError, DownloadError
+from dnakit.search import QueryProgress, QueryResult
 from dnakit.search._shared import adapter_provenance
+from dnakit.tools import default_tool_registry
 
 sequence_module = importlib.import_module("dnakit.download.sequence")
 
@@ -59,6 +61,196 @@ class _FakeResponse:
 
     def geturl(self) -> str:
         return self._url
+
+
+@pytest.mark.parametrize(
+    "url,filename,expected_name",
+    [
+        ("https://example.test/data.fa.gz", None, "data.fa.gz"),
+        ("https://example.test/my%20data.fa?version=2", None, "my data.fa"),
+        ("https://example.test/%E5%BA%8F%E5%88%97.fa", None, "序列.fa"),
+        ("https://example.test/?id=123", "chosen.fa", "chosen.fa"),
+    ],
+)
+def test_download_url_saves_to_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    url: str,
+    filename: str | None,
+    expected_name: str,
+) -> None:
+    payload = b">seq\nACGT\n"
+    calls: list[Any] = []
+
+    def fake_urlopen(request: Any, *, timeout: float) -> _FakeResponse:
+        calls.append((request, timeout))
+        return _FakeResponse(payload, request.full_url)
+
+    monkeypatch.setattr(download_files, "urlopen", fake_urlopen)
+    output = tmp_path / "new" / "downloads"
+    events: list[DownloadProgress] = []
+    checksum = hashlib.sha256(payload).hexdigest()
+    result = download_url(
+        url,
+        output,
+        filename=filename,
+        expected_sha256=checksum,
+        config=DownloadConfig(chunk_size=2, timeout=12),
+        headers={"Accept": "application/octet-stream"},
+        progress=events.append,
+    )
+
+    target = output / expected_name
+    assert target.read_bytes() == payload
+    assert result.path == str(target.resolve())
+    assert result.byte_size == len(payload)
+    assert result.sha256 == checksum
+    assert result.checksum_verified is True
+    assert list(output.iterdir()) == [target]
+    assert calls[0][0].full_url == url
+    assert calls[0][0].headers["Accept"] == "application/octet-stream"
+    assert calls[0][1] == 12
+    assert events[-1].bytes_completed == len(payload)
+    assert events[-1].target == str(target.resolve())
+
+
+@pytest.mark.parametrize(
+    "url,filename",
+    [
+        ("https://example.test/", None),
+        ("https://example.test/directory/", None),
+        ("https://example.test/directory/.", None),
+        ("https://example.test/%2e%2e", None),
+        ("https://example.test/..%2foutside.fa", None),
+        ("https://example.test/%5coutside.fa", None),
+        ("https://example.test/data.fa", "../outside.fa"),
+        ("https://example.test/data.fa", "/outside.fa"),
+        ("https://example.test/data.fa", "..\\outside.fa"),
+        ("https://example.test/data.fa", "C:outside.fa"),
+    ],
+)
+def test_download_url_rejects_missing_or_unsafe_names_before_downloading(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    url: str,
+    filename: str | None,
+) -> None:
+    monkeypatch.setattr(
+        download_files,
+        "urlopen",
+        lambda *_args, **_kwargs: pytest.fail("Invalid filename must not make a request"),
+    )
+    output = tmp_path / "downloads"
+    with pytest.raises(ConfigurationError, match="INVALID_DOWNLOAD_FILENAME"):
+        download_url(url, output, filename=filename, verbose=False)
+    assert not output.exists()
+
+
+def test_download_url_preserves_existing_file_until_verified_replacement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    target = tmp_path / "data.fa"
+    target.write_bytes(b"previous complete file")
+    calls: list[Any] = []
+    payload = b"new file"
+
+    def fake_urlopen(request: Any, *, timeout: float) -> _FakeResponse:
+        calls.append(request)
+        return _FakeResponse(payload, request.full_url)
+
+    monkeypatch.setattr(download_files, "urlopen", fake_urlopen)
+    url = "https://example.test/data.fa"
+    with pytest.raises(FileExistsError):
+        download_url(url, tmp_path, verbose=False)
+    assert not calls
+
+    config = DownloadConfig(overwrite=True, show_progress=False)
+    with pytest.raises(DownloadError, match="CHECKSUM_MISMATCH"):
+        download_url(url, tmp_path, config=config, expected_md5="0" * 32)
+    assert target.read_bytes() == b"previous complete file"
+    assert list(tmp_path.iterdir()) == [target]
+
+    result = download_url(
+        url,
+        tmp_path,
+        config=config,
+        expected_md5=hashlib.md5(payload, usedforsecurity=False).hexdigest(),
+    )
+    assert target.read_bytes() == payload
+    assert result.checksum_verified is True
+    assert list(tmp_path.iterdir()) == [target]
+
+
+def test_download_url_rejects_file_as_output_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "existing.txt"
+    output.write_bytes(b"keep")
+    monkeypatch.setattr(
+        download_files,
+        "urlopen",
+        lambda *_args, **_kwargs: pytest.fail("Invalid output directory must not make a request"),
+    )
+    with pytest.raises(NotADirectoryError):
+        download_url("https://example.test/data.fa", output, verbose=False)
+    assert output.read_bytes() == b"keep"
+
+
+@pytest.mark.parametrize("show_progress,verbose", [(True, True), (False, True), (True, False)])
+def test_download_url_progress_is_not_duplicated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    show_progress: bool,
+    verbose: bool,
+) -> None:
+    monkeypatch.setattr(
+        download_files,
+        "urlopen",
+        lambda request, *, timeout: _FakeResponse(b"ACGT", request.full_url),
+    )
+    download_url(
+        "https://example.test/data.fa",
+        tmp_path,
+        config=DownloadConfig(show_progress=show_progress),
+        verbose=verbose,
+    )
+    output = capsys.readouterr()
+    assert output.out == ""
+    if show_progress and verbose:
+        assert output.err.count("Starting download:") == 1
+        assert output.err.count("Download complete:") == 1
+        assert "Downloading 1/1" in output.err
+    else:
+        assert output.err == ""
+
+
+def test_download_url_is_discoverable_and_callable_by_agent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    registry = default_tool_registry()
+    tool = registry.search("download_url")[0]
+    assert tool.name == "dnakit.download.download_url"
+    assert tool.agent_compatible is True
+    assert tool.call_plan.input_schema["required"] == ["url", "output_dir"]
+    monkeypatch.setattr(
+        download_files,
+        "urlopen",
+        lambda request, *, timeout: _FakeResponse(b"ACGT", request.full_url),
+    )
+    result = registry.execute(
+        tool.name,
+        {
+            "url": "https://example.test/data.fa",
+            "output_dir": str(tmp_path),
+            "config": {"show_progress": False},
+        },
+        allow_side_effects=True,
+    )
+    assert isinstance(result, dict)
+    assert result["path"] == str((tmp_path / "data.fa").resolve())
+    assert Path(result["path"]).read_bytes() == b"ACGT"
+    assert result["byte_size"] == 4
 
 
 def test_download_file_is_atomic_and_checks_md5(
@@ -90,7 +282,9 @@ def test_download_file_is_atomic_and_checks_md5(
     assert calls[0].headers["User-agent"].startswith("DNAKit/")
 
 
-def test_checksum_failure_leaves_no_target(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_checksum_failure_leaves_no_target(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     payload = b"wrong"
     monkeypatch.setattr(
         download_files,
@@ -106,9 +300,20 @@ def test_checksum_failure_leaves_no_target(tmp_path: Path, monkeypatch: pytest.M
     assert error.value.code == "CHECKSUM_MISMATCH"
     assert not target.exists()
     assert list(tmp_path.glob("*.part")) == []
+    output = capsys.readouterr().err
+    assert "Download failed or interrupted:" in output
+    assert "Download complete:" not in output
 
 
-def test_dataset_writes_integrity_manifest(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize("show_progress", [True, False])
+@pytest.mark.parametrize("verbose", [True, False])
+def test_dataset_writes_integrity_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    show_progress: bool,
+    verbose: bool,
+) -> None:
     payloads = {"a.txt": b"a", "b.txt": b"bb"}
 
     def fake_urlopen(request: Any, *, timeout: float) -> _FakeResponse:
@@ -116,6 +321,7 @@ def test_dataset_writes_integrity_manifest(tmp_path: Path, monkeypatch: pytest.M
         return _FakeResponse(payloads[name], request.full_url)
 
     monkeypatch.setattr(download_files, "urlopen", fake_urlopen)
+    config = DownloadConfig(show_progress=show_progress)
     result = dataset(
         (
             RemoteFile("https://example.test/a.txt"),
@@ -123,12 +329,88 @@ def test_dataset_writes_integrity_manifest(tmp_path: Path, monkeypatch: pytest.M
         ),
         tmp_path / "dataset",
         kind="test_data",
+        config=config,
+        verbose=verbose,
     )
 
+    assert config.show_progress is show_progress
     manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
     assert result.downloaded_bytes == 3
     assert len(manifest["files"]) == 2
     assert manifest["files"][1]["sha256"] == hashlib.sha256(b"bb").hexdigest()
+    output = capsys.readouterr()
+    assert output.out == ""
+    if show_progress and verbose:
+        assert output.err.count("Starting download:") == 1
+        assert output.err.count("Download complete:") == 1
+        assert "Downloading 2/2" in output.err
+        assert ".dnakit-dataset-" not in output.err
+    else:
+        assert output.err == ""
+
+
+@pytest.mark.parametrize("show_progress", [True, False])
+def test_file_progress_without_content_length(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    show_progress: bool,
+) -> None:
+    response = _FakeResponse(b"ACGT", "https://example.test/seq.fa")
+    response.headers.clear()
+    monkeypatch.setattr(download_files, "urlopen", lambda *_args, **_kwargs: response)
+    result = download_file(
+        RemoteFile("https://example.test/seq.fa"),
+        tmp_path / "seq.fa",
+        config=DownloadConfig(show_progress=show_progress),
+    )
+    assert Path(result.path).read_bytes() == b"ACGT"
+    output = capsys.readouterr()
+    assert output.out == ""
+    if show_progress:
+        assert "Starting download:" in output.err
+        assert "Download complete:" in output.err
+        assert "100%" in output.err
+    else:
+        assert output.err == ""
+
+
+def test_download_config_rejects_non_boolean_progress() -> None:
+    with pytest.raises(ConfigurationError, match="show_progress"):
+        DownloadConfig(show_progress="false")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("show_progress", [True, False])
+def test_sequence_query_progress(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    show_progress: bool,
+) -> None:
+    query = QueryResult(
+        "sequence",
+        "Ensembl",
+        "https://example.test/sequence",
+        ({"id": "region1", "seq": "ACGT"},),
+        adapter_provenance("Ensembl REST", citation_url="https://rest.ensembl.org/"),
+    )
+
+    def search(*_args: Any, **kwargs: Any) -> QueryResult:
+        if kwargs["progress"] is not None:
+            kwargs["progress"](QueryProgress(1, 1, "1:0-4"))
+        return query
+
+    monkeypatch.setattr(sequence_module, "search_sequence", search)
+    sequence(
+        "human", "1:0-4", tmp_path / "seq.fa", config=DownloadConfig(show_progress=show_progress)
+    )
+    output = capsys.readouterr()
+    assert output.out == ""
+    if show_progress:
+        assert "Fetching sequences" in output.err
+        assert "Download complete:" in output.err
+    else:
+        assert output.err == ""
 
 
 def test_ncbi_annotation_package_uses_selected_formats(
@@ -257,7 +539,7 @@ def test_overwrite_dataset_rolls_back_when_later_download_fails(
     def fake_urlopen(request: Any, *, timeout: float) -> _FakeResponse:
         nonlocal call_count
         call_count += 1
-        if call_count == 2:
+        if request.full_url.endswith("/b.txt"):
             raise URLError("network failed")
         return _FakeResponse(b"new-a", request.full_url)
 

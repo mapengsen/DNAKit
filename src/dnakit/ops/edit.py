@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from itertools import pairwise
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Gap, Interval, Topology
 from dnakit.exceptions import ConfigurationError, CoordinateError, UnsupportedGapOperationError
 from dnakit.ops._common import (
@@ -123,9 +124,7 @@ def _require_ungapped_fragment(fragment: DNASequence, *, operation: str) -> DNAS
 
 
 def insert(
-    sequence: DNASequence,
-    position: int,
-    fragment: DNASequence | str,
+    sequence: DNASequence, position: int, fragment: DNASequence | str, *, verbose: bool = True
 ) -> EditResult:
     """Insert a normalized fragment at a zero-based coordinate boundary."""
 
@@ -160,7 +159,7 @@ def insert(
     )
 
 
-def delete(sequence: DNASequence, start: int, end: int) -> EditResult:
+def delete(sequence: DNASequence, start: int, end: int, *, verbose: bool = True) -> EditResult:
     """Delete a gap-free zero-based, half-open interval."""
 
     source = require_sequence(sequence)
@@ -182,6 +181,8 @@ def substitute(
     start: int,
     end: int,
     fragment: DNASequence | str,
+    *,
+    verbose: bool = True,
 ) -> EditResult:
     """Replace a gap-free zero-based, half-open interval with a fragment."""
 
@@ -218,7 +219,9 @@ def substitute(
     )
 
 
-def trim(sequence: DNASequence, *, left: int = 0, right: int = 0) -> EditResult:
+def trim(
+    sequence: DNASequence, *, left: int = 0, right: int = 0, verbose: bool = True
+) -> EditResult:
     """Remove exact coordinate lengths from both ends.
 
     Known gaps may be shortened by trimming.  Unknown gaps are rejected because
@@ -283,11 +286,7 @@ def _slice_parts(sequence: DNASequence, start: int, end: int) -> list[str | Gap]
 
 
 def subsequence(
-    sequence: DNASequence,
-    start: int,
-    end: int,
-    *,
-    allow_gaps: bool = False,
+    sequence: DNASequence, start: int, end: int, *, allow_gaps: bool = False, verbose: bool = True
 ) -> DNASequence:
     """Extract a zero-based, half-open interval, optionally across an origin.
 
@@ -333,11 +332,7 @@ def subsequence(
 
 
 def circular_subsequence(
-    sequence: DNASequence,
-    start: int,
-    end: int,
-    *,
-    allow_gaps: bool = False,
+    sequence: DNASequence, start: int, end: int, *, allow_gaps: bool = False, verbose: bool = True
 ) -> DNASequence:
     """Extract from a circular sequence, including an optional origin wrap."""
 
@@ -355,6 +350,7 @@ def mask(
     intervals: Iterable[tuple[int, int]],
     *,
     symbol: str = "N",
+    verbose: bool = True,
 ) -> EditResult:
     """Replace one or more gap-free intervals with a one-character IUPAC mask."""
 
@@ -441,3 +437,5 @@ __all__ = [
     "substitute",
     "trim",
 ]
+
+_register_public_verbose(globals())

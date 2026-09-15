@@ -12,6 +12,9 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Any, Protocol
 
+from dnakit._dependency_hints import model_dependency_hint
+from dnakit._verbosity import progress_enabled
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 from .models import DNAEmbeddingModel, RepresentationConfig
@@ -30,7 +33,7 @@ def _missing_dependency(spec: DNAEmbeddingModel, package: str) -> BackendUnavail
         f"The {spec.display_name} representation backend is not installed.",
         code="MISSING_NEURAL_DEPENDENCY",
         context={"model": spec.name, "dependency": requirement},
-        hint=f"Install the required backend: {requirement}",
+        hint=model_dependency_hint(spec.name, requirement),
     )
 
 
@@ -42,9 +45,9 @@ def _require_module(name: str, spec: DNAEmbeddingModel) -> Any:
 
 
 def _progress(values: Sequence[str], *, enabled: bool, description: str) -> Iterable[str]:
-    if not enabled:
+    if not progress_enabled(enabled):
         return values
-    from rich.progress import track
+    from dnakit._progress import track
 
     return track(values, description=description)
 
@@ -83,6 +86,16 @@ def _resolve_torch_device(torch: Any, requested: str) -> Any:
             "Requested CUDA device is unavailable.",
             code="INVALID_REPRESENTATION_DEVICE",
             context={"device": requested},
+        )
+    if (
+        device.type == "cuda"
+        and device.index is not None
+        and device.index >= torch.cuda.device_count()
+    ):
+        raise ConfigurationError(
+            "Requested CUDA device index is unavailable.",
+            code="INVALID_REPRESENTATION_DEVICE",
+            context={"device": requested, "device_count": torch.cuda.device_count()},
         )
     if device.type == "mps" and (
         not hasattr(torch.backends, "mps") or not bool(torch.backends.mps.is_available())
@@ -550,10 +563,7 @@ class _JanusDNABackend:
             raise BackendUnavailableError(
                 "JanusDNA source code is required to load its official checkpoint.",
                 code="MISSING_NEURAL_DEPENDENCY",
-                hint=(
-                    "Clone https://github.com/Qihao-Duan/JanusDNA and pass "
-                    "model_source_path in RepresentationConfig."
-                ),
+                hint=model_dependency_hint(spec.name, spec.required_package),
             ) from exc
         payload = json.loads((checkpoint / "model_config.json").read_text(encoding="utf-8"))
         model_config = configuration_module.JanusDNAConfig(
@@ -908,6 +918,8 @@ def create_representation_backend(
     spec: DNAEmbeddingModel,
     checkpoint: str | Path,
     config: RepresentationConfig,
+    *,
+    verbose: bool = True,
 ) -> RepresentationBackend:
     """Create one lazy backend for a locally resolved official checkpoint."""
 
@@ -926,3 +938,5 @@ def create_representation_backend(
 
 
 __all__ = ["RepresentationBackend", "create_representation_backend"]
+
+_register_public_verbose(globals())

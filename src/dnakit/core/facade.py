@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 from itertools import islice
 from typing import TYPE_CHECKING, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.collection import DNASet
 from dnakit.core.coordinates import CompoundLocation, Interval, Location, UnresolvedLocation
@@ -361,7 +362,9 @@ class DNA:
 SingleDNAInput: TypeAlias = DNA | DNASequence | DNARecord
 
 
-def resolve_single_dna(value: object) -> tuple[DNASequence, DNARecord | None]:
+def resolve_single_dna(
+    value: object, *, verbose: bool = True
+) -> tuple[DNASequence, DNARecord | None]:
     """Resolve one facade/record/sequence without exposing constructor choices."""
 
     if isinstance(value, DNA):
@@ -717,3 +720,5 @@ def _materialize_annotations(
 
 
 __all__ = ["DNA", "FeatureInput", "SingleDNAInput", "resolve_single_dna"]
+
+_register_public_verbose(globals())

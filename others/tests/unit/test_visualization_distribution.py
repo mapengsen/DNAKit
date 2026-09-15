@@ -69,6 +69,11 @@ def test_histogram_matches_numpy_on_many_samples() -> None:
     assert plot.metadata["counts"] == tuple(counts.tolist())
     assert plot.metadata["bin_edges"] == pytest.approx(edges.tolist())
     assert sum(cast(tuple[float, ...], plot.metadata["proportions"])) == pytest.approx(1.0)
+    nodes = list(ET.fromstring(plot.svg).iter())
+    ticks = [node for node in nodes if node.get("class") == "bin-tick"]
+    assert len(ticks) < 13  # Large labels need more space than the default tick budget.
+    assert ticks[-1].text == f"{edges[-1]:.5g}"
+    assert len([node for node in nodes if node.get("class") == "distribution-bar"]) == 37
 
 
 @pytest.mark.parametrize("values", [[], [None, " "], ["oops"], [float("nan")], [float("inf")]])
@@ -86,6 +91,9 @@ def test_configuration_and_coverage_errors() -> None:
         DistributionPlotConfig(bar_width=0)
     with pytest.raises(ConfigurationError):
         DistributionPlotConfig(categories=("a", "a"))
+    for colors in ([], "red", ["url(https://example.com/color)"]):
+        with pytest.raises(ConfigurationError):
+            DistributionPlotConfig(bar_colors=colors)
     with pytest.raises(ConfigurationError):
         plot_distribution([1, 2], task="regression", config=DistributionPlotConfig(max_values=1))
     with pytest.raises(InputFormatError, match="cover every"):
@@ -149,6 +157,41 @@ def test_style_xml_escaping_and_many_categories() -> None:
     assert not [node for node in nodes if node.get("class") == "plot-title"]
 
 
+def test_default_bars_are_distinct_narrower_and_readable() -> None:
+    plot = plot_distribution(
+        ["0"] * 86 + ["1"] * 14,
+        task="classification",
+        config=DistributionPlotConfig(show_values=True),
+    )
+    nodes = list(ET.fromstring(plot.svg).iter())
+    bars = [node for node in nodes if node.get("class") == "distribution-bar"]
+    assert bars[0].get("fill") != bars[1].get("fill")
+    slot_width = float(bars[1].attrib["x"]) - float(bars[0].attrib["x"])
+    assert float(bars[0].attrib["width"]) / slot_width == pytest.approx(0.55)
+    for node in nodes:
+        if node.get("class") in {"category-tick", "bar-value"}:
+            assert float(node.attrib["font-size"]) >= 20
+    assert plot.metadata["proportions"] == (0.86, 0.14)
+
+
+def test_default_palette_extends_without_repetition() -> None:
+    plot = plot_distribution(list(map(str, range(1000))), task="classification")
+    colors = [
+        node.attrib["fill"]
+        for node in ET.fromstring(plot.svg).iter()
+        if node.get("class") == "distribution-bar"
+    ]
+    assert len(set(colors)) == 1000
+
+
+def test_custom_palette_repeats_and_is_immutable() -> None:
+    colors = ["#123456", "orange"]
+    config = DistributionPlotConfig(bar_colors=colors, bar_width=0.8)
+    colors[0] = "red"
+    plot = plot_distribution(["0", "1", "2"], task="classification", config=config)
+    assert plot.metadata["bar_colors"] == ("#123456", "orange", "#123456")
+
+
 def test_cli_multiple_outputs_and_overwrite(tmp_path: Path) -> None:
     source = tmp_path / "data.csv"
     source.write_text("a,b\n0,1\n1,2\n1,3\n")
@@ -172,12 +215,21 @@ def test_cli_multiple_outputs_and_overwrite(tmp_path: Path) -> None:
     result = runner.invoke(app, args)
     assert result.exit_code == 0, result.output
     assert first.is_file() and second.is_file()
-    ET.parse(first)
+    bars = [node for node in ET.parse(first).iter() if node.get("class") == "distribution-bar"]
+    assert len({node.get("fill") for node in bars}) == 2
     original = first.read_bytes()
     result = runner.invoke(app, args)
     assert result.exit_code == 2
     assert first.read_bytes() == original
     assert runner.invoke(app, [*args, "--overwrite"]).exit_code == 0
+    assert runner.invoke(app, [*args, "--overwrite", "--color", "red"]).exit_code == 0
+    bars = [node for node in ET.parse(first).iter() if node.get("class") == "distribution-bar"]
+    assert {node.get("fill") for node in bars} == {"red"}
+    palette_args = [*args, "--overwrite", "--bar-color", "green", "--bar-color", "orange"]
+    assert runner.invoke(app, palette_args).exit_code == 0
+    bars = [node for node in ET.parse(first).iter() if node.get("class") == "distribution-bar"]
+    assert [node.get("fill") for node in bars] == ["green", "orange"]
+    assert runner.invoke(app, [*palette_args, "--color", "red"]).exit_code == 2
 
 
 def test_cli_reports_bad_column_before_writing(tmp_path: Path) -> None:

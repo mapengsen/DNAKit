@@ -1,10 +1,12 @@
 # OPS-004 Sequence Editing
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Insert, delete or replace DNA fragments at specified positions to obtain edited sequences and record coordinate changes.
 
 - **Function:** Insert, delete or replace bases at the specified position, return the edited sequence, operation records and coordinate changes, and process the affected features synchronously.
 - **API:** `dnakit.ops.insert(dna[required], position[required], fragment[required])`, `dnakit.ops.delete(dna[required], start[required], end[required])`, `dnakit.ops.substitute(dna[required], start[required], end[required], fragment[required])`.
-- **Input:** Regular user leaflet record `DNA` and position/interval; insertion or replacement also requires new DNA fragment. All three functions return a new `DNA`.
+- **Input:** A single-record `DNA` and a position/interval; insertion or replacement also requires new DNA fragment. All three functions return a new `DNA`.
 - **Sample code:**
 
 ```python

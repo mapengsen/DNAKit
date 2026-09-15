@@ -13,6 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._checkpoint_status import checkpoint_status
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import progress_enabled
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.download import DownloadConfig, DownloadProgress, RemoteFile, download_file
 from dnakit.exceptions import BackendUnavailableError, DownloadError
 
@@ -45,7 +49,7 @@ class CheckpointInfo:
         }
 
 
-def default_checkpoint_root() -> Path:
+def default_checkpoint_root(*, verbose: bool = True) -> Path:
     """Return ``./ckpt`` using the working directory at call time."""
 
     return (Path.cwd() / "ckpt").resolve()
@@ -92,8 +96,11 @@ def _checkpoint_ready(spec: DNAEmbeddingModel, target: Path) -> bool:
         return (target / "evo2_7b.pt").is_file()
     if not (target / "config.json").is_file():
         return False
-    if _indexed_weights_are_complete(target):
-        return True
+    if any(
+        (target / name).is_file()
+        for name in ("model.safetensors.index.json", "pytorch_model.bin.index.json")
+    ):
+        return _indexed_weights_are_complete(target)
     weight_patterns = ("*.safetensors", "*.bin", "*.pt", "*.ckpt")
     return any(any(target.glob(pattern)) for pattern in weight_patterns)
 
@@ -128,7 +135,7 @@ def _missing_huggingface_dependency() -> BackendUnavailableError:
     return BackendUnavailableError(
         "Checkpoint download requires huggingface-hub.",
         code="MISSING_NEURAL_DEPENDENCY",
-        hint='Install the neural extra with: python -m pip install "dnakit[neural]"',
+        hint=dependency_hint("neural"),
     )
 
 
@@ -259,8 +266,8 @@ def _download_janusdna(
     else:
         progress_ui: Any | None = None
         callback = None
-        if show_progress:
-            from rich.progress import Progress
+        if progress_enabled(show_progress):
+            from dnakit._progress import Progress
 
             progress_ui = Progress()
             progress_ui.start()
@@ -301,6 +308,7 @@ def ensure_model_checkpoint(
     checkpoint_dir: str | os.PathLike[str] | None = None,
     hf_token: str | None = None,
     show_progress: bool = True,
+    verbose: bool = True,
 ) -> CheckpointInfo:
     """Return a local checkpoint, downloading it to ``./ckpt`` only when absent.
 
@@ -315,6 +323,7 @@ def ensure_model_checkpoint(
     if _checkpoint_ready(spec, target):
         if not (target / _MANIFEST_NAME).is_file():
             _write_manifest(target, spec)
+        checkpoint_status("Using local checkpoint", target, spec.checkpoint_url)
         return CheckpointInfo(
             spec.name,
             str(target),
@@ -324,6 +333,7 @@ def ensure_model_checkpoint(
             spec.gated,
         )
 
+    checkpoint_status("Starting checkpoint download", target, spec.checkpoint_url)
     if spec.checkpoint_kind == "huggingface":
         _download_huggingface(
             spec,
@@ -343,6 +353,7 @@ def ensure_model_checkpoint(
             context={"model": spec.name, "path": str(target)},
         )
     _write_manifest(target, spec)
+    checkpoint_status("Checkpoint download complete", target, spec.checkpoint_url)
     return CheckpointInfo(
         spec.name,
         str(target),
@@ -354,3 +365,5 @@ def ensure_model_checkpoint(
 
 
 __all__ = ["CheckpointInfo", "default_checkpoint_root", "ensure_model_checkpoint"]
+
+_register_public_verbose(globals())

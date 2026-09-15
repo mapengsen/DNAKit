@@ -1,0 +1,757 @@
+{
+  "source": "https://github.com/mims-harvard/ToolUniverse",
+  "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7",
+  "license": "Apache-2.0",
+  "attribution": "ToolUniverse contributors, mims-harvard",
+  "scope": "Only adapters referenced by bundled skills and their implementation dependencies; no ToolUniverse orchestrator.",
+  "files": [
+    {
+      "path": "alliance_genome_tool.py",
+      "sha256": "02272fbfcfb6565d9823bebbffdfa65514de982b2caf6f84a39366139f9fe97d",
+      "adapted_sha256": "c832d50e2101f713b2cd90e9a0a0ba070d136722ad7bd9b395ab174d730a55e2"
+    },
+    {
+      "path": "alphafold_tool.py",
+      "sha256": "3f8286890e8fa84c7596d16d2a0dea86bfbc907877d545d8f6e31811ce75e82d",
+      "adapted_sha256": "93fa9a9ea55f7df7c32dabbaf214f782f48298547953add0809adf7e0bc2143f"
+    },
+    {
+      "path": "alphagenome_tool.py",
+      "sha256": "2f1a4a49d72f31dd5506fa18bbb339b70661c239f3431969629f7259651bb95f",
+      "adapted_sha256": "3b254622f31ac2d258352d1ae264f2c86caf126848ef4d24b305f8e4c6eed525"
+    },
+    {
+      "path": "alphamissense_tool.py",
+      "sha256": "5da1f0d0cb0fef88c139f15b5abea09d8a03634ff261003de3bf7f385977abc6",
+      "adapted_sha256": "a7572b8a0697c8ad5bdf075987fe9b767dfc8f44b860f602fd8ec33b61ae267d"
+    },
+    {
+      "path": "arxiv_tool.py",
+      "sha256": "a3edb13d9988b6244497549a6bb682f7b2d1e051456dd16b8a4eac1c656eebf7",
+      "adapted_sha256": "9371bfbfddde8c376f49d08442dc71f7ed318b9dbdd9fac839568fc1b9f82e7a"
+    },
+    {
+      "path": "base_rest_tool.py",
+      "sha256": "86057b508fdb705e832fb00e5cc864b64ed8dbbd3eabfbfaf40c14e56282b5c9",
+      "adapted_sha256": "dac4515515d499390ee50e29a853ee1c1cb82fefbef94b88873f70ed5a50ee5e"
+    },
+    {
+      "path": "base_tool.py",
+      "sha256": "de3b4f312ed9ce4c804563dfa03c7040746e601376b7e4b3166292e723753bb7",
+      "adapted_sha256": "0bdd7c167a3e432182d0eb33078b1f6a834af2585330aa5354113dd1712031bf"
+    },
+    {
+      "path": "biogrid_tool.py",
+      "sha256": "f53b64d814c7a2823ab368b1919e6129a987ff63561c6d77106719bf986e2c88",
+      "adapted_sha256": "08e146c2fc13b299b28a6522b1b1c2d4fd6e6202951e0a62dfbc8dcd9920622d"
+    },
+    {
+      "path": "biorxiv_tool.py",
+      "sha256": "cdf5d49e45bb04297f3d57855906ae018a19c88b961ecb12c8ea32f1be846f90",
+      "adapted_sha256": "9f9a81a4f6f8462ae417c7d590656a1c3c4dd5787d952d4304e2e556a2103e6b"
+    },
+    {
+      "path": "blast_tool.py",
+      "sha256": "b2e3a4388e178cb8e175083e56fd3a25cdf13437cd14f3da044639ae0f36db22",
+      "adapted_sha256": "1ce3852d42ff91425ac89d8776d619e07dd7d5d94c21c416ae738ceb8d87879e"
+    },
+    {
+      "path": "bvbrc_tool.py",
+      "sha256": "d17d42a87990b09685c6554e5004ea7a5773bfd23d3b310e1807dffe4abd0135",
+      "adapted_sha256": "08dbe7903e538765b2dcc9297f085ea0c31f5aa3f1a8fedb1bc476dfbbef4e48"
+    },
+    {
+      "path": "cache/memory_cache.py",
+      "sha256": "66a38917e5c42f0f4a7b06ea8a524dd37f1be99f03e3135037b3337b223c978c",
+      "adapted_sha256": "f9fed915ad109e1e3968369a2207ce02747ad7cee32f81a26e1fa98a81cf585d"
+    },
+    {
+      "path": "cadd_tool.py",
+      "sha256": "f49793a59a6f43fd9ef7bf4ba1b1b8831e5a67ff7b1e5b8977979ba504f7a306",
+      "adapted_sha256": "e2877b4a7816158623298f3dfc17dbd1621fb67c8c114695247ba001b215fe58"
+    },
+    {
+      "path": "cbioportal_tool.py",
+      "sha256": "9598cdca6f431404c369b33a2c8b18c7f14e2e78e4a36df4a56c86363da467b9",
+      "adapted_sha256": "b4e02b7b0f7d1e2b067077322e5b5accdb53fbfa803ba1b996efb4968d160513"
+    },
+    {
+      "path": "cellxgene_census_tool.py",
+      "sha256": "fdc6336a228fd5864b05ea3b92daa8ca640ef521db9f90169a860037a5411493",
+      "adapted_sha256": "78f1933e4e7bcf42648e31e8c5e490a3e7594f653a78196aa3167939921b0d42"
+    },
+    {
+      "path": "chem_tool.py",
+      "sha256": "47ef7a94295bac1cf135efa2a1e9367c5181599e7631e5c004f23bf9b762cfc9",
+      "adapted_sha256": "b18050c31ec38b7f97c320537e42b841789fdcf35bd9485067f724aae37fce50"
+    },
+    {
+      "path": "chipatlas_tool.py",
+      "sha256": "8fe669120019bde85d94656d110dbf5c71b98584bb69d1b63aec7c9062027fda",
+      "adapted_sha256": "8d140a5821f96545afdc6ca483f74536554d0e0aa2c548bd40eb2f4a5ced23c4"
+    },
+    {
+      "path": "civic_tool.py",
+      "sha256": "eacaf5e9a7e80432ece52508aef1e7c4c8e1e1d20fe5fe04e7402bfa6b5810df",
+      "adapted_sha256": "0ca39e9d6a311a57a6eeef604782bdabdcd532bbef5e5183b444587b8bbfaed6"
+    },
+    {
+      "path": "clingen_dosage_tool.py",
+      "sha256": "622bf5c18f419ab3f846b7322414095ad1def2b2c4979a95fbacacedfc51302c",
+      "adapted_sha256": "6f7f5dd997ecef044d24a3ba8be654268f21e783521f96907a6f065bd916456b"
+    },
+    {
+      "path": "clingen_tool.py",
+      "sha256": "e765d937d25ef7d7096034f9c780557f25d6d6a6d7eb2668812698d8d6a2a7c4",
+      "adapted_sha256": "85f17c2d956090b73880f19a060912c8599193cecfb50ab7b123baaf1dc7a5a2"
+    },
+    {
+      "path": "clinvar_tool.py",
+      "sha256": "d009f655f94b3db6d765b8d23e78ce950cce4b94eb18f1e4bff8c1aa958c8800",
+      "adapted_sha256": "130d6679ec4a79bdecea17ec564060aef7623cf2fcaf218ccc83d0a1edf64821"
+    },
+    {
+      "path": "cosmic_tool.py",
+      "sha256": "2effd3bf88714cda8471e853027ebf70cbcf9373d965ce246d5909e1103cb1a7",
+      "adapted_sha256": "210c9c45a3bdf91952440323b54d5d4ab6ff5d910a0038bf45e94364159662ff"
+    },
+    {
+      "path": "crossref_tool.py",
+      "sha256": "3a33a936a2d18d9e17534d87f5bb4a88d70e0146db4429d0e9d2238b365e9a12",
+      "adapted_sha256": "3b315b29e31503e1cbc2238b9ac5a43bf207aa0514da43d201389f7e22e09359"
+    },
+    {
+      "path": "ctd_tool.py",
+      "sha256": "c55d578d7dd1af0197458854884bcd4c5d8f0314c477a89c371f96085aa8477b",
+      "adapted_sha256": "69175b3a09e3048e9336e9dcec2b9d88345d7c1a2b2170ae68fc0637cdbfeebe"
+    },
+    {
+      "path": "ctg_tool.py",
+      "sha256": "65a226e8c9d97c73d7127e0ad377d9a7dc9aecf70eeeecefa54b5bdd2b8d5ff6",
+      "adapted_sha256": "5f5ce8754af77bbc76523faa598e3c989638a4234b83c3ff17b5ba944a737569"
+    },
+    {
+      "path": "data/fda_drugs_with_brand_generic_names_for_tool.py",
+      "sha256": "0609dbd00b3d94943c349492a9391a09a5d7ea71f3ab83869985f556339b79d9",
+      "adapted_sha256": "9148cb8a2cf52e61c5041e860c8221203d7080c6cc9b0d05a814efbce5d33aca"
+    },
+    {
+      "path": "data/mcpautoloadertool_defaults.json",
+      "sha256": "f7fa066770f2ca355a235e91e9984ab5424e18907a19116fac14e0344b207f2e"
+    },
+    {
+      "path": "data/toolfinderkeyword_defaults.json",
+      "sha256": "c98096fccb6b3db8bcc3e6e7cbdba10bf784dc610b80bbda1e87d3cad4860c91"
+    },
+    {
+      "path": "dataset_tool.py",
+      "sha256": "08a2b4d166e656ed2190e06c4f81afe3851ea346e8db08a0c4ae56041ae27e72",
+      "adapted_sha256": "ee74cc2cbd8dc65090ffdda31ae88fe3bab38ea3ea77cde5ce9104119bda1e80"
+    },
+    {
+      "path": "dbsnp_tool.py",
+      "sha256": "8441732fdf464e2ff4b2c17c397a23badb38ad1ad4b2bf2ac3bb91ad74b9899d",
+      "adapted_sha256": "c7e98d1a004f7e21b7db89011315f845e4b6020e45c05a5b33ca83374550de40"
+    },
+    {
+      "path": "depmap_tool.py",
+      "sha256": "70b1b01bba4a76a72708326111496687246bdffa969d32f5060fb50bc112f681",
+      "adapted_sha256": "2c4ab483ce1a62e8bb12ce00ab4c054cfa0da942427ce300b653b01f7c7610b6"
+    },
+    {
+      "path": "dgidb_tool.py",
+      "sha256": "a709c3c2df93ba9a6ddf21b29b7f02301b9fb8c3cf2e384bc212553d71f15d47",
+      "adapted_sha256": "5b0c469a5df1de25423b6a97e3829610b7c7259be961ac9e7e474c759ee0ee4d"
+    },
+    {
+      "path": "disgenet_tool.py",
+      "sha256": "e250355676c90430e37a32edfc52db1aa6bf925cceeb1151a17f973b47637a69",
+      "adapted_sha256": "44678cc69b3b071de63f438711547635ff2780772a10aad5d4676e554719033f"
+    },
+    {
+      "path": "dn_ds_tool.py",
+      "sha256": "ab9d7c13afb441033f5a3cb4d81d4ddce0731e9457732f97fd46be50fe1b422d",
+      "adapted_sha256": "36301476404ddc0c160debd1e9ef1745e6be594e058dd04aed2f8ab04614f634"
+    },
+    {
+      "path": "dna_tools.py",
+      "sha256": "3c4e57e2e57c3e71e3644d2b41572beb7661d8c527784c6c486f2a85bddb8e51",
+      "adapted_sha256": "235b6068e7c4d46cf7e8f62a5f57093a0ba2e560a23aebdfb10360a49a59977c"
+    },
+    {
+      "path": "dynamut2_tool.py",
+      "sha256": "16afeffd252f9a0471e4556a7eb705576b3eb854050e347caae832910da4868e",
+      "adapted_sha256": "b2901b94e85f6ec3c62c72f6e573c0734fb9c78bd1c864736c6c6dac3790c337"
+    },
+    {
+      "path": "efo_tool.py",
+      "sha256": "c61875f9d8fb55d9b83f6105e4b5e186ea68e03b8c421efb7405b15b230b627a",
+      "adapted_sha256": "4453f2f1c299f88ac93ac8cad130d60c4ccb26ebd2275dda175e63852334a0d0"
+    },
+    {
+      "path": "ena_portal_tool.py",
+      "sha256": "bae57312a7b4fe56288486d50b6e397c80e0fc20918bccd956c2ba117e72cb2e",
+      "adapted_sha256": "fcda81103f7878950635e6f21d82326a44ec71f9fbb6e3e07773b0bb2391725e"
+    },
+    {
+      "path": "encode_tool.py",
+      "sha256": "33f8aa4ed18d97d4984ff88f875bb96887d9536c1352df746a199999d9c53421",
+      "adapted_sha256": "a2ee1c3f84bc8e59056c333c71289ab512977f1fe0224b81fb0c4d0410750f49"
+    },
+    {
+      "path": "enrichr_ext_tool.py",
+      "sha256": "5c9b0c86f1b56a04dc29ec3d3c8b3b5ec6a7e7530de60407ae2acac3cb59606e",
+      "adapted_sha256": "e85dc2eb22715d22ab61277213b00d27b8dae71564571cc4574d25fb8bbe1f14"
+    },
+    {
+      "path": "enrichr_tool.py",
+      "sha256": "8791cf3033186c5dca6f5222d0d062c04091957bbce261a789fb14f3a3fc4ad9",
+      "adapted_sha256": "630358902071927ae98d13d8871283712ae18b0919d99b5dc578347320bf6675"
+    },
+    {
+      "path": "ensembl_compara_tool.py",
+      "sha256": "ae7e7a8ef900eced2cb0977bea83e425c9d75d0d76d698e3397a800b11e6d600",
+      "adapted_sha256": "40b6b756748401a59fa398d896f63b7f1ea2529126d1e33aa737a16c39a05a58"
+    },
+    {
+      "path": "ensembl_sequence_tool.py",
+      "sha256": "8cfe7c0cd7c58e1e16634e5e880c1e753d2f248f2427c9d331f952b9a93caccf",
+      "adapted_sha256": "06388ec36085da3e1874486534f6516f4bfa929c54d1bdbe39436cca861f2be9"
+    },
+    {
+      "path": "ensembl_tool.py",
+      "sha256": "b2f8b637df0356001c511adc9eeb361f023cce6f6737457e9fa205baf142a984",
+      "adapted_sha256": "1519918984a547a00f33b4137a1693b94d47fe669b17bc02391c87c512f4bd29"
+    },
+    {
+      "path": "ensembl_variation_ext_tool.py",
+      "sha256": "84c4d8948225657873ebbe30ea6482fdab4fe3d0831abef671ee28868dce5143",
+      "adapted_sha256": "b0a684420a23c65840016496357e9726448d679a6579441a3c582ddbefcb91bc"
+    },
+    {
+      "path": "ensembl_vep_tool.py",
+      "sha256": "a2fa754319ab851d6c950620b40f497b100ce168c3201cb444a6fb307a6b3fba",
+      "adapted_sha256": "c2e2884c515d6142291c8b549e6938612a0fee05dbdc95d01faec2f62d4410d6"
+    },
+    {
+      "path": "epigenomics_tool.py",
+      "sha256": "086fcedcf9a7cd3c97505081adfe95004e35cce2115c0e7fab7ae5f46bf0509b",
+      "adapted_sha256": "d43d86eb45d9bd131794b240c810b6cb5671e62445413a2ed01133df91f9373c"
+    },
+    {
+      "path": "esm2_variant_effect_tool.py",
+      "sha256": "02d6a970afc880ca977acc9845dd9da4c53620d2201c3c77e52fd7cab74dc006",
+      "adapted_sha256": "04ae9beb840f05afbd2455b281a12aa07606439dce92ead3d9d693a4a9afc617"
+    },
+    {
+      "path": "esm_tool.py",
+      "sha256": "8d8bdcad19cc7edf04dc3d65c668d9ed5011bccf61c2a52c4f62cdcdabafe0bb",
+      "adapted_sha256": "0ecf74779ab7841ace18ae0be724ce4c794d4b7aab8c60981b1042a61d824d7e"
+    },
+    {
+      "path": "europe_pmc_tool.py",
+      "sha256": "805d9338d5601a4830afb73aa189b0c512e4aef4675a45de139117cd3ad30f73",
+      "adapted_sha256": "2fdacad82ba4a74e26df5498e371b69a06bb3df90eeebdc02014d1935f06f09c"
+    },
+    {
+      "path": "eve_tool.py",
+      "sha256": "e2d2c701dc8051adb1cf4df8f33f5e2f9fbdcc68d5a05d35bb5ee25f6e054643",
+      "adapted_sha256": "32ef282b6391fac3edbb0dfe45f8ec696251930e3ab788d794a7b3e9fede11e8"
+    },
+    {
+      "path": "evo2_variant_effect_tool.py",
+      "sha256": "b0b6fc4b402e4964486ccc7eb944e4835c61eb4a551bcf2188ee12fb8dd593a5",
+      "adapted_sha256": "31b4f2a9b1a265ad655a9d303124eb44b9d632562d40db21ce5f7d4d31c8df59"
+    },
+    {
+      "path": "exceptions.py",
+      "sha256": "c3c5c3535b7df41b6fb634e458f8fc78bc8e568c919d96ce6029b5d75e182eb3",
+      "adapted_sha256": "0c231198ba8efc2eac903e7d2f5c169b9c8a173cde2e9b7401197c25a46b18ab"
+    },
+    {
+      "path": "executed_notebook_tool.py",
+      "sha256": "e75179dc5f18dc8ccd72406d420e798a2d61335ec55fabdfe4e976e2efb0071e",
+      "adapted_sha256": "974e09fe7da7725b2be2009ee2e5ab68945827d7a9566cdaa526497aceebb9bd"
+    },
+    {
+      "path": "expression_atlas_tool.py",
+      "sha256": "b7b4b5ce8f6e591de6e1d0630180526d922c0aba857681094dded66570daa273",
+      "adapted_sha256": "9664a512310b5753ed840c528f4d705062f3cb228c0c292157bb1d38f3ef8566"
+    },
+    {
+      "path": "favor_tool.py",
+      "sha256": "c83408f1233ec0d194ebdfbd34563e5ce0e0d1024831e5a9a39f8641fe361cc9",
+      "adapted_sha256": "61f72b1dde53477c7e14898bc0bee3e61b5a97224fd9dd2e45269b79c29e84ea"
+    },
+    {
+      "path": "file_download_tool.py",
+      "sha256": "9b0013c396c4c40eba4198b21168e7b8f94f1810a212e9fce778056d0b203563",
+      "adapted_sha256": "34105c22937ab72f9d6c9d5ebc6f6236409b6a87090731520b4466e189ac4f57"
+    },
+    {
+      "path": "finngen_tool.py",
+      "sha256": "ca5012a37a22887a0896dcc3cb94a5e2868dbff318c0f5f46dd88e8ace667ffb",
+      "adapted_sha256": "7cb934b57cad1e516ef3c2b2fe27911eb23e64965b64829f4ddef04d1828b4e7"
+    },
+    {
+      "path": "fourdn_tool.py",
+      "sha256": "ab36f53d6e57870188fccea5ff35c13ebe9afde16db4bd13e3042ed375768860",
+      "adapted_sha256": "948936a4e4267826ddf83965a60b4219ba019b6df74d8b98b7f95bc943ce4142"
+    },
+    {
+      "path": "gbif_tool.py",
+      "sha256": "4c98774dc999e9335aca2e4d4218038d8cd04b62831a0cc526b8404ecd940724",
+      "adapted_sha256": "a62dc81ac841a10542c9027428c2a0f56073c105ba80829aaf5d7ccd2101d107"
+    },
+    {
+      "path": "gdc_tool.py",
+      "sha256": "1387f3febbd4b4e485f707502ed31b67db282e42460d84a43431c9569f7f39ae",
+      "adapted_sha256": "2f81a8b9b55f934ab36fb1a520b2bc27e7b8c63fc531cd4b67be9e34a2a0e6e4"
+    },
+    {
+      "path": "gencc_tool.py",
+      "sha256": "a1564acc0bd386c23834c4391218b18188481165eab08989060f9b99284afe4e",
+      "adapted_sha256": "ca9f0b0819ca67e2f2894616b60260588312d13d62561b79bd9cad182d234a17"
+    },
+    {
+      "path": "gene_ontology_tool.py",
+      "sha256": "c1dec9312b56d35f306d0e2942f5bbebacccdf52f37acd8ba108c8da929d14db",
+      "adapted_sha256": "b87e89437aa06a723ff3d4f8efebd11fa3d4040fea7105d9ebee6ed94cc4f10b"
+    },
+    {
+      "path": "genomics_gene_search_tool.py",
+      "sha256": "028598324a359b6314b08f9245fda4c9ca19e6ebf5609d189a9a9d2e33d2d063",
+      "adapted_sha256": "13ee9204022475acf38834da33f15de39335dcf71ad833075edbfcd85c30dc13"
+    },
+    {
+      "path": "gnomad_tool.py",
+      "sha256": "ec7dc48aac86b7629b383b28704d6ebab853b13630ba68c1efce2ba160adc694",
+      "adapted_sha256": "1121ae850bb31ed0773f1fa5b4814bddf3ea7f4f09f9e9df4d8cf4c7cee17022"
+    },
+    {
+      "path": "graphql_tool.py",
+      "sha256": "95967735b09f6a7cc998494224df5b3029026517a75a7b51faa71913c9ced1e9",
+      "adapted_sha256": "5d55b2b14e671a0a30c689ddeafd007fb1a2d3525903aee3f74084e3855cb077"
+    },
+    {
+      "path": "gtdb_tool.py",
+      "sha256": "537240b13c874dcb2df936dbd1d2f47287404d397f10d32104aa84578aeb18c2",
+      "adapted_sha256": "2e74865d9874347b223eec874cf67b775e51d5d254d678baea27dfee5a6c02ba"
+    },
+    {
+      "path": "gtex_tool.py",
+      "sha256": "9d8feda1c949a1496b2eb0e41cbc7e1d867e48f95ae46f61dba5f389049651b1",
+      "adapted_sha256": "e8c8dd6aea84cdc0dd2eec81dcac1bd9abc4d4770ac54fe5176939c9b2cfbd52"
+    },
+    {
+      "path": "gtex_v2_tool.py",
+      "sha256": "ffa73001130db2cd66d62204717c2e2f8e1dcb04468debdf3b3163c71a2ce7c0",
+      "adapted_sha256": "d2df958d6fbcffca525af0b655c6359e7da41d8163a8e7c1f0aefeb92ae46372"
+    },
+    {
+      "path": "gwas_tool.py",
+      "sha256": "6c2515da0ef6b2cfe42e9f737dbc8d6841653c91ac5bd9de4ffea587c2f77adb",
+      "adapted_sha256": "da203961c90f7cfe878b04428d96f0083694c4b820aa1fcc9ff4496a6b98c98f"
+    },
+    {
+      "path": "harmonizome_tool.py",
+      "sha256": "d659130b51f6dd03dab79d991cfb7b116db8bbb256438039d4d0e1d9bef9a1e4",
+      "adapted_sha256": "d4f6220e4e31b31c8a2d1d65b9040e452b46ebaecbdcd10b9699e3e155809a7e"
+    },
+    {
+      "path": "hgnc_tool.py",
+      "sha256": "12ca582b2596cf0c98ff26336c9992a4e59ad418f9909225d9d4ca59e9f07f29",
+      "adapted_sha256": "6e810214c85d256964ea30cf2a15f12890d9b07919b4dc580d6df88ea4e520fa"
+    },
+    {
+      "path": "hpa_tool.py",
+      "sha256": "49679238c0b08011072401ab5325946e538faacada253032b817367035a7c293",
+      "adapted_sha256": "feac3ac5ed3187fae77ce45ed002bef50a845f4c03f9c1f4c835c5d7a09dedaa"
+    },
+    {
+      "path": "hpo_tool.py",
+      "sha256": "de6c568ef2709531c36e883ea65e2f8c75a584784b2eb12a2546c35d367465c1",
+      "adapted_sha256": "2cfd513cc96ebd19024d1364e94912c5e4f0e20bc2aca2dd0f6720a0cbd21005"
+    },
+    {
+      "path": "http_utils.py",
+      "sha256": "496a6648c44132af0a5293b06177f0b0e2fef1540a8a800b15f7c72b30c947c1",
+      "adapted_sha256": "16cdd8cdaf685aa3b7046f41fd9f3ee77ac3077cf588e14a0da2bd76eb50736e"
+    },
+    {
+      "path": "huggingface_inference_tool.py",
+      "sha256": "2e08915d82ae95b75b794dfd87d70d1fa24055919f37279a3891bf5b61b29e9e",
+      "adapted_sha256": "0cfbf7b75447718a063290a2606b7c874a9d1b9464a22d4b46d4cc8a02fa2b96"
+    },
+    {
+      "path": "humanbase_tool.py",
+      "sha256": "ff4e1aa4bc9488f95dd08759ca13f85c73f024ac3cae98fddfff784566b6e942",
+      "adapted_sha256": "958bfde02df55c09a88218e71c0a22a5c255f139dcb873e7fb2090f724283f1a"
+    },
+    {
+      "path": "iedb_tool.py",
+      "sha256": "7a81cf747d4a923629bde8041d0e22aa65d81659b0527c98a79036578c5db60b",
+      "adapted_sha256": "4b26d603d4de47f9fa515f4b10390f8ff70b67da2bbb25f30070269154bcbcba"
+    },
+    {
+      "path": "igsr_tool.py",
+      "sha256": "491c332c573914c4084835c59350b2f774cac827ef8f278669241a6a2f93fa92",
+      "adapted_sha256": "93c061d71759cfafe7cbe5d35baba5c9ee81d8dcce99b4f9fdc9b2118ec9cba7"
+    },
+    {
+      "path": "imgt_tool.py",
+      "sha256": "8468f483e74fc1d07dce52c08c7e8292c496d5e00967cf0b7aa691491178f7b9",
+      "adapted_sha256": "5cf72369e04276286c1fa34c344460706681dc172262c6a7fe55adb1d4b6f7bc"
+    },
+    {
+      "path": "immport_tool.py",
+      "sha256": "786f69473dded8cface96fa798ccc86a85e7fced0f0f7d36378bc6dc6e3b5692",
+      "adapted_sha256": "a638810584bd396fee7bcceff7dfb3f2b9f879ee05c3952fe9b653aa1054559f"
+    },
+    {
+      "path": "intact_tool.py",
+      "sha256": "e740a53a834cb4d7329e064320be654bee5ebab3d1c13962a71cbe04356d8ee6",
+      "adapted_sha256": "da7115d5c983bfa737ec070190df0607f6188935e7d36adba1fe7bbb0540acc5"
+    },
+    {
+      "path": "interpro_entry_tool.py",
+      "sha256": "3e6356294389cf350e433d26cf0c6a2c1f06c6bccd299916dac8a4a7facf342a",
+      "adapted_sha256": "de608db6112e0ca9f9b1d1a73eeb873a259e168ebdda2364c08741d036dba13b"
+    },
+    {
+      "path": "interpro_tool.py",
+      "sha256": "5e2ef7f6e63309142e6baf2628b6adf922a7abc87201068063bbed8754e1cdd9",
+      "adapted_sha256": "b537e2745867bccc3681a26d3d26b44521f60aa36f978e82eb3fdb9c6bf715dc"
+    },
+    {
+      "path": "jaspar_tool.py",
+      "sha256": "c00d083ca402248569910c377fd2dc458a9259eb824df2c60aa29b91c811f731",
+      "adapted_sha256": "ae2c4f7ddc751c76034b5d9e6a4e4a17a93edea8a1fef21609ef30bbed56a1fa"
+    },
+    {
+      "path": "kegg_ext_tool.py",
+      "sha256": "fb2562db89329ed7d73755430ec7e2173c98a1e16803a66df1b638320d14a1da",
+      "adapted_sha256": "3ddb1cc9b9b23ac7aadde7afceb26016c15963219b5743cd4dc7d66cf800509e"
+    },
+    {
+      "path": "kegg_tool.py",
+      "sha256": "cdf27de282110a7bf21b12f1cbb7d46e94597129f6b49152270b4d0378660f4e",
+      "adapted_sha256": "579221d39e92e4f071a0e6d9b9250559303e7b9c67314ddb0c38d11e0c256596"
+    },
+    {
+      "path": "ldlink_tool.py",
+      "sha256": "7d64990396d0fd5f55307ea2c64ffaa2bb1317fa53fe017abab1ab237b7ba89c",
+      "adapted_sha256": "39ecd9af0d9274e06f9343fb51cf495517ba4dd1e3d40b5651736ec09cc4f1a7"
+    },
+    {
+      "path": "marrvel_tool.py",
+      "sha256": "e7079e5530fe95b17a68e43075679f0f12e9e75f451991896e89eb4fd65075c2",
+      "adapted_sha256": "a59b0baf68099164f9d0abca02993026bdda3e6d6b9b9dee961b2526355ae089"
+    },
+    {
+      "path": "mavedb_tool.py",
+      "sha256": "b8de89d17ae15a5a17c138dda61b65ff67bfb494cbcd52a77737c3bc96f223f0",
+      "adapted_sha256": "a24f83a06d14b438a88ddf35251baed6743b5e06507844e97d8a9d583b6cc400"
+    },
+    {
+      "path": "mcp_client_tool.py",
+      "sha256": "f553c891ce8d69adbdf181fa8571c5f44f3961e71cfbd34ceb422ef9d07c54bf",
+      "adapted_sha256": "b97551db50df4d683eb4136216b16e67c0d056aebd38947e9e3978fbca4a5784"
+    },
+    {
+      "path": "metabolite_tool.py",
+      "sha256": "a071a3ec50587f9c14f68a97093bd23ea6e0549fb9673e3e0027854f9b82c600",
+      "adapted_sha256": "58ab4505bd10c2006904de86e396116a0c25f042a125856866c5de6355e549dd"
+    },
+    {
+      "path": "mgnify_expanded_tool.py",
+      "sha256": "aa2368621779916dde2519cf95b40bcdada73efa6fcbdc7137142a3df9dbbf61",
+      "adapted_sha256": "163031028449c01037408986d9943ac3f9d4c42b8c1b16f2d3d2415325ff06b3"
+    },
+    {
+      "path": "mgnify_tool.py",
+      "sha256": "e6eb51e046cce72c8e9d70bb532fac2407784f914ed792e4f01c5fec271a1886",
+      "adapted_sha256": "98bdac383afbc0434f613a3edbd2125cd396ab6b3d815be85626f3e0e07e96ce"
+    },
+    {
+      "path": "monarch_v3_tool.py",
+      "sha256": "ea1a4aa809dca1ed5c064cd88bec78277f4ffbfa35bd08c08cf86ac40afb8bd9",
+      "adapted_sha256": "01c12b6dc867d47cd3f83291f5215663d535b6412eb4300500cb8cf56c89a3f7"
+    },
+    {
+      "path": "mygene_tool.py",
+      "sha256": "9080fab63fda72cb66886f89c6af2dbd6baa6abb8e542e719d6ab92dd8cc48e8",
+      "adapted_sha256": "9ab236984552d2994e3bd7164844eaa433a7c7b2d984ed5481909db055e8cbe8"
+    },
+    {
+      "path": "ncbi_datasets_tool.py",
+      "sha256": "8e10d3656dd78d956ec06ee6c173384a2bbe3d6b8a9cc95e410612ae741b3ba2",
+      "adapted_sha256": "0d0c43eed5b02402356350b139f19244e9778f0fd9b15ba60383d5f987d5fe52"
+    },
+    {
+      "path": "ncbi_eutils_tool.py",
+      "sha256": "02c1651b5c3c732f5769acf3a83418f7cae65f362ed5fae616068fcfe40422cf",
+      "adapted_sha256": "464f0b986eda9b532ae703fdba3363ba1786d5ae25c11bf18c727eec310408aa"
+    },
+    {
+      "path": "ncbi_nucleotide_tool.py",
+      "sha256": "6391fd376b0c804c1ddb57c55742d1606467103c48e37831d32f6d4bdee17a45",
+      "adapted_sha256": "eb34654032291b62ce3cebe045227b8017cf6b5ee28dd85a63c7b1c6fb4d5fc2"
+    },
+    {
+      "path": "ncbi_sra_tool.py",
+      "sha256": "08882cc411b2b69c7ad1ed458e0401596c2f57f8966ff9a9ca6602cd0f83da31",
+      "adapted_sha256": "fabb32f42333cc2f01a7384dc97cdffdff2333c7a86986ec90d4ef50709aa4ad"
+    },
+    {
+      "path": "nvidia_nim_tool.py",
+      "sha256": "7751befa42c33dd54dfc7d842f1e6a2e4ec83dac6ba579e25c830e78c9700c46",
+      "adapted_sha256": "864a4639624deee9200b2f241b85bd70cea2245a40cee25b7554e78476a9ae84"
+    },
+    {
+      "path": "ols_tool.py",
+      "sha256": "a170583dda8764a6a3f610b03f3d4b41de69bed627b5b739bf75d2c4b945095c",
+      "adapted_sha256": "d29ec9ae7f9a8c11075c11e3177a508e38e18802b418d546ec36e64c2bb8195d"
+    },
+    {
+      "path": "omim_tool.py",
+      "sha256": "3334fd600bf219f653aab3f701638698a29e07e296e71c8c606346e78f93583a",
+      "adapted_sha256": "7a02862c315c9b33f539810f0ea93bfd34fff13f8821dd6b5f8100392bf7bc8b"
+    },
+    {
+      "path": "oncokb_tool.py",
+      "sha256": "88fd78a520f8de0281c2d6e37e5e7b62d4908415eabeaf752f22020a8e62846c",
+      "adapted_sha256": "7a6a8bad5a69590510f9aba3c7527c4506d56d857ef03e33ff38eaa2cf5df35b"
+    },
+    {
+      "path": "openalex_tool.py",
+      "sha256": "9bf5a2c9dded9f65acb12d18c75c1a35cc44f49d92a2e2deafd1cdcd5b59e308",
+      "adapted_sha256": "f0fd155195696c92127d7f530992ac296dbd67ec6184f279c9829eb816d31e54"
+    },
+    {
+      "path": "openfda_adv_tool.py",
+      "sha256": "3eb0a3ccbbbffee60a73eaddd4073e735609ae0a1aaea3c994cd4e1b2e4d4dcf",
+      "adapted_sha256": "de7d2d1781695d34cca56e046af33eef60e583eff33e434040270bf8cd12889d"
+    },
+    {
+      "path": "openfda_tool.py",
+      "sha256": "023b9921ef9637da66883030125c0bbe6c38e53a0bc2d339a00afdc159fb7939",
+      "adapted_sha256": "494543f299ce97fabd3e4c6acfaf648439b0bb57428d44b544fc3ca6c20259b4"
+    },
+    {
+      "path": "orphanet_tool.py",
+      "sha256": "9e63a4652607665ec9b52c518f31b44159f6fe4c6ba21f400ec5520135450b13",
+      "adapted_sha256": "209c0365915a030b3c688ebb194d73f2a5f3ce0be2d3d481a4259374d4764d6b"
+    },
+    {
+      "path": "panther_tool.py",
+      "sha256": "8fb392be7b3b04b6179ef8535310dd7e7f1a39ecdc2445104f8e150b4ecfeaa6",
+      "adapted_sha256": "c7fb5382d2a5cd9819e770b9841254f1a23cd5ea65cdb323f126529de939bdac"
+    },
+    {
+      "path": "pdbe_sifts_tool.py",
+      "sha256": "eb3c6341f8cd085027f47eeb15b26c961134123837705159c49c1a674aa0aa29",
+      "adapted_sha256": "1e0d4e3ad96c395f489df138c6c58f0fe5f0e24ea5d33050f5b742cd0ae55de4"
+    },
+    {
+      "path": "pfam_tool.py",
+      "sha256": "8f2305a7c4cf6338e486446409b637e9655f6ce1037be9f55a9e7dd9b56ce2f2",
+      "adapted_sha256": "931f147e9b02857aa3e6904c4251fa12e873fa491d78705bb39c2fa7ecd91c2c"
+    },
+    {
+      "path": "pheweb_phewas_tool.py",
+      "sha256": "b63b204ff6d95a2f1749206e4678e31bc0fcd06d28f5edd581ddc88b71fb7b39",
+      "adapted_sha256": "55ba82c5525d5db3f013e534bcd7864aa0a4379a369c5fb119cde6d77edd81c0"
+    },
+    {
+      "path": "plant_reactome_tool.py",
+      "sha256": "99b3c31595bb4211db0e922b8dff7d1c2b006da721a28fc05aff97e65cab1bfa",
+      "adapted_sha256": "616d944ec92c53b081eb6cc9b344c6d56fcc4fb0c7d3c58626379ec168dbc615"
+    },
+    {
+      "path": "progenetix_tool.py",
+      "sha256": "85fe92e850be9b20ae2f71f21ea9e22fb674a20b521eee1a502dd3e79a675471",
+      "adapted_sha256": "6f55b63496e070cb4e6206a3239634783de3b5e9b8868dfb7a8626aa8d90fb19"
+    },
+    {
+      "path": "proteins_api_tool.py",
+      "sha256": "74094badbdf5cb234ae7d5b461e65065b7a4e842c7bfbcd58e0731ab34499d50",
+      "adapted_sha256": "941977fb2958c63ad8842bc06143869c59bd8db42edaab44005f573e834a7708"
+    },
+    {
+      "path": "pubchem_tool.py",
+      "sha256": "b5f4bce82e5f61b65022cd594eef12b43ea7665c70ad182e60475bbbf5e8d158",
+      "adapted_sha256": "303ab57a9531d312364e3e23992b6b602c2716de023356028461bb5947da8a5a"
+    },
+    {
+      "path": "pubmed_tool.py",
+      "sha256": "94e2cd88b1341c47cfc10392fbe86d602d05757954cc05fb1a71657f4fa9ec56",
+      "adapted_sha256": "66d9139dd8167ae91fc46965e54607da74cbf7ec6fd70e4a3f5504bd00997575"
+    },
+    {
+      "path": "quickgo_tool.py",
+      "sha256": "92f1844c49fdff7d8fa50c35210430ba9f0a40f731cb823bc1932568494dccbd",
+      "adapted_sha256": "332f3a48df3bcd8144384b08f3decbffa991fa441d29916dd7c05f9462e6168c"
+    },
+    {
+      "path": "rcsb_data_tool.py",
+      "sha256": "152921b3200e0f9ac425ecaca7ec4cb334edbbc147ffeead07ea2929bf276760",
+      "adapted_sha256": "0ecd0a7608c30cd11c5032515848c971dafd4b8c3424d5458c0c2595225befbc"
+    },
+    {
+      "path": "reactome_analysis_tool.py",
+      "sha256": "edd329e29caccfdf28df41fbe79d6dc126b561845070dd03b2f1bfdc8395ee58",
+      "adapted_sha256": "bf70ddb7db83c6591fb7bb4553524a0a84e1b588fcaf92937cb5911a56c22e23"
+    },
+    {
+      "path": "reactome_content_tool.py",
+      "sha256": "7bba645f56510624a5e2d27040591e73a1cfc5171f7ba99c844493d28e475b45",
+      "adapted_sha256": "87352caa481e7166eec3372c640e6b35590741b23bb2b7d92a5a460e004278fb"
+    },
+    {
+      "path": "reactome_tool.py",
+      "sha256": "8f19bb66c334f2e591553c4889dafeb0006c3cffdccb43a62e17b0be066cd681",
+      "adapted_sha256": "2685e72db493d9d3eafde11bb5eb0b7efd5323e76c3b5d8af22a6432936fa51e"
+    },
+    {
+      "path": "regulomedb_tool.py",
+      "sha256": "17dfc7d890bf957bca0a23b28fcbc2ec92d8cb7d886b2a02b750199b9e6cd9d7",
+      "adapted_sha256": "99a834f616e91ca1c212904a6b3e6d4c54c421f93f3c31b375daf9b1d358ff35"
+    },
+    {
+      "path": "remap_tool.py",
+      "sha256": "aaeddf67a5dff97efaa4276fcfa2fcd1342e7f8b97d119937736ee04876221b3",
+      "adapted_sha256": "2e65927fcc0cd2b0800ee0070142be37fd850d570569316242a2db52f411098a"
+    },
+    {
+      "path": "restful_tool.py",
+      "sha256": "0124607c0ff44bb40ea0472eebf62fa14ab970a482adaa68265ffa0b0ae529ed",
+      "adapted_sha256": "210ac8f1b305064d1b7f739302acbbb03a6ce45050c21f13db2103f4b318a84d"
+    },
+    {
+      "path": "rgd_strain_tool.py",
+      "sha256": "86cfee5bfda145db12f9f12b6a30b0a72c7f11d0ce703c597fdeda7f1691b715",
+      "adapted_sha256": "8626aade38839b4cac72b07de676b02bf31a9b3145a6c4b5c6bfe6b36516cb42"
+    },
+    {
+      "path": "rgd_tool.py",
+      "sha256": "ccbde943f408626d680322328814ac5408c2dd3695e6daec6b176f77ba8d40d8",
+      "adapted_sha256": "14e69f50cc2d49cf4aa08cd2ccd56d7b729dcff61fa109c84e6acc5683a952a7"
+    },
+    {
+      "path": "scientific_calculator_tools.py",
+      "sha256": "7b032be6820c678fcc425e21a5c9921ea0039b7cbb6dfa1251ebcda118ecc10d",
+      "adapted_sha256": "3ab5e483e0ee78b2175f1789130a80a72db34573cc538be210b13290560bfe5b"
+    },
+    {
+      "path": "screen_tool.py",
+      "sha256": "398501489fdf5b590916148f8e0109ef5246abce68b2a991f729e2785f3e3cb3",
+      "adapted_sha256": "1f429d6080745f6e105e2f7949c29137f9c66ed977cd14d4c79ac8cdb44c8816"
+    },
+    {
+      "path": "semantic_scholar_tool.py",
+      "sha256": "0ee0dc72a738c3942dd96f47228c0e7a3738961d8dfb51d0f43be202452694e8",
+      "adapted_sha256": "fc28c6c82624b16fdb1c8a3f52416b4f62bd31106bc197a2e50e2973f2dfe2cd"
+    },
+    {
+      "path": "sequence_analyze_tool.py",
+      "sha256": "18081040c70e5f52fab53a248412ddccb571112b5fb8cf2bc32d4a4a8511aeaa",
+      "adapted_sha256": "b142c64e70238ecca621691f15aaa43d2a6ae3a9545c90f94438d5a32a3c8118"
+    },
+    {
+      "path": "sgd_tool.py",
+      "sha256": "7289a96ea602bca823e00826549d3dfd952d2ef0425e2e2c4362359180120c84",
+      "adapted_sha256": "909f53b02b1ed61fe58fc2de967dec957a6501a1211074d3142211541ce7f851"
+    },
+    {
+      "path": "spliceai_tool.py",
+      "sha256": "ac0cf282af75c3d5a6f1502d1dd6d6610cfee6ffa6f8a17590229e77f6f3afcf",
+      "adapted_sha256": "c92f273d618a7b7a734266d5728166c37144f1ed0c565e626d9b2184c61ac5ec"
+    },
+    {
+      "path": "sra_tool.py",
+      "sha256": "a1c77756695a92b285cc3c18be4ffa0a78745fab92680362cdefd6fe3797a19d",
+      "adapted_sha256": "a22b1cdf06d445f15ee7ef54ea81f8cbb8ce3e9d9d8766de325c7b71898f6b03"
+    },
+    {
+      "path": "string_ext_tool.py",
+      "sha256": "62d4b98920fc5b3095fbf3dbb8b0195522b39a4ca7f525a560e6e4f02c16d0f7",
+      "adapted_sha256": "0674db732e42352cfbfe496c0e5155c2319183d9e30c80d888baf921c5bba9cb"
+    },
+    {
+      "path": "string_tool.py",
+      "sha256": "e5a96d0b924a3157c93edaafda92fadc847f65289412cdcdebbe9363ba90ef4e",
+      "adapted_sha256": "1d811356f712eaab0f354344fbdba39de6c63590d7613315ad56eaecb2c040e1"
+    },
+    {
+      "path": "structure_annotation_tool.py",
+      "sha256": "8d9ac606396687b74db123ddff42aaa5e8c1dfd909f56880f7d5b099aa8ad66a",
+      "adapted_sha256": "a96104a5ba9f2aa2d3ed3d7bcf03bc08edbb2720d9813d6c751ca9224f3ee4fc"
+    },
+    {
+      "path": "tark_tool.py",
+      "sha256": "3d278ac279972c66a0e0f8f1c1e82eda4c8add26a24cccd6673d7e966b9e1472",
+      "adapted_sha256": "ce972a105e261acf30a7a2a00955dfeddcf945fdec8548c2bc3fc8ca623b2270"
+    },
+    {
+      "path": "tool_discovery_tools.py",
+      "sha256": "96e32881eadf0b3a8b193d0dec8ad889605ac17b2e51509d071a0322e43f2313",
+      "adapted_sha256": "716a465d851c912a30535744b0e2fb6b5563de5a67f0b1334f5a7486a488a2e7"
+    },
+    {
+      "path": "unibind_tool.py",
+      "sha256": "39e12e435316335fcca7dc42066b7e8c9ae2332347349d60b192ae4226869a08",
+      "adapted_sha256": "4d09fcdf2682157386b21aa2ccce1ccab448ba169728ebaeb4c3896495c4b4ed"
+    },
+    {
+      "path": "uniprot_tool.py",
+      "sha256": "62f543d37d89403e20fcaa37d9c68132a00cf7fc51172d7c8b2f587eafcc96c6",
+      "adapted_sha256": "f2719eaebee690617562a8bab8369c0cdf883e931f86a5c5f46f8bf0b18d4bcc"
+    },
+    {
+      "path": "usda_plants_tool.py",
+      "sha256": "e8ffc67855041bf0c7524a6dc0a2587c8ac8e150f4251e1e3c0e39fd6d4ee230",
+      "adapted_sha256": "50e5e7faeaf417c169d8b6c183d43e6b5e1fcbb91403500de05d2a6301f9fae1"
+    },
+    {
+      "path": "utils.py",
+      "sha256": "424c08b95c873c2dd0b2f90461a48beb539fa71287ad8fcd1a3798c96bab7756",
+      "adapted_sha256": "a7057eae695ce780641cac77eaa49857052ee991ddb29eb0487157cf0165877a"
+    },
+    {
+      "path": "variant_fraction_tool.py",
+      "sha256": "cac651f8d928a55a288d3c6be5e2b9b3868c05fe892d94eedfb8ec0a06dc9124",
+      "adapted_sha256": "a45aa0880ed798ca778ec4291f7eb370f067189d76e0f75382de7aa2193590d2"
+    },
+    {
+      "path": "vcf_stats_tool.py",
+      "sha256": "5821046a1aadfdef645eb7bba5ce7735b1e293555831ceb1da0ed4de807dc725",
+      "adapted_sha256": "1d7e4b785ea385a0de1943bfd3da1542e531f0b914e5e41de5d7886786a162f4"
+    },
+    {
+      "path": "web_search_tool.py",
+      "sha256": "a816ad5fceed26a45ca40b65743c6de56712db2a1bbf779987f86d9f39ec8f2a",
+      "adapted_sha256": "4b56259e8688794e6179bcc0bebb9d6c7379bcc8bc5312217dc9dabbe82eb57e"
+    },
+    {
+      "path": "wikipathways_tool.py",
+      "sha256": "4d036ace0a6387cd27a9e1092f18ea02bfecbb2006062dccf35e1f6136eb4c89",
+      "adapted_sha256": "70a667d6f652b72a9d640f76ecde894a0d6bbf72385fddbf4cb05f1e3f1101bb"
+    },
+    {
+      "path": "wormbase_tool.py",
+      "sha256": "ca2d14278c59eddcf4ff641c5a20c1935cef61b7c9f73821ddf1bde971374614",
+      "adapted_sha256": "7c6c5ce61b8ce06a784093dda5df67edbb35554d9000fad19de3a1e0006b0070"
+    },
+    {
+      "path": "xenbase_tool.py",
+      "sha256": "dee9fdeda6e29b227ea665f819e9b676571f4be8fb7d473446881a7e9bf2cb0d",
+      "adapted_sha256": "1a35bb897b5dbaf3029ba62638ba0c7591655ca65ebdf3351057bd66fba7a2ea"
+    },
+    {
+      "path": "xml_tool.py",
+      "sha256": "a41131c5d43f59da3cf8182dc6211670af2418581ff8d02482575ab4047436d0",
+      "adapted_sha256": "dabcfb734b4bcaa038f40f7077da22b565954f9de34cb062302f11d8008e8a85"
+    }
+  ]
+}

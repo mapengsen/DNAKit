@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import MetricResult
 from dnakit.exceptions import ConfigurationError
 
@@ -85,9 +86,7 @@ def _normalize(value: float, rule: ScoreRule) -> tuple[float, bool]:
 
 
 def evaluate_scorecard(
-    values: Mapping[str, object],
-    *,
-    config: ScorecardConfig,
+    values: Mapping[str, object], *, config: ScorecardConfig, verbose: bool = True
 ) -> EvaluationReport:
     """Normalize and aggregate named inputs while retaining every contribution."""
 
@@ -209,3 +208,5 @@ def evaluate_scorecard(
 
 
 __all__ = ["ScoreInput", "evaluate_scorecard"]
+
+_register_public_verbose(globals())

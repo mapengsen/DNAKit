@@ -2,18 +2,9 @@
 
 from __future__ import annotations
 
-import asyncio
-import importlib
-import inspect
 import json
-import tempfile
 from collections.abc import Mapping
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from importlib.metadata import PackageNotFoundError, version
-from pathlib import Path
-from types import ModuleType
-from typing import Any
 
 from dnakit.core import (
     BackendInfo,
@@ -28,7 +19,6 @@ from dnakit.core import (
 )
 from dnakit.exceptions import (
     BackendExecutionError,
-    BackendUnavailableError,
     ConfigurationError,
 )
 
@@ -143,62 +133,6 @@ _FUNCTIONS = {
 }
 
 
-def _tooluniverse_module() -> ModuleType:
-    try:
-        return importlib.import_module("tooluniverse")
-    except (ImportError, ModuleNotFoundError) as exc:
-        raise BackendUnavailableError(
-            "Optional scientific functions require ToolUniverse.",
-            code="TOOLUNIVERSE_UNAVAILABLE",
-            hint=(
-                'Install the optional backend with: python -m pip install "dnakit[external-tools]"'
-            ),
-        ) from exc
-    except Exception as exc:
-        raise BackendUnavailableError(
-            "ToolUniverse could not be imported in this environment.",
-            code="TOOLUNIVERSE_IMPORT_FAILED",
-            context={"error_type": type(exc).__name__},
-            hint=(
-                "Reinstall the optional backend with: "
-                'python -m pip install "dnakit[external-tools]"'
-            ),
-        ) from exc
-
-
-def _backend_version(module: ModuleType) -> str:
-    try:
-        return version("tooluniverse")
-    except PackageNotFoundError:
-        candidate = getattr(module, "__version__", "unknown")
-        return candidate if isinstance(candidate, str) and candidate.strip() else "unknown"
-
-
-def _invoke(universe: Any, call: Mapping[str, object]) -> object:
-    def execute() -> object:
-        return universe.run(dict(call), verbose=False)
-
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        result = execute()
-    else:
-        # ToolUniverse changes ``run`` into an async call when it sees a running
-        # event loop.  These DNAKit APIs are synchronous, so execute in an
-        # isolated worker and preserve the same public return type.
-        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="dnakit-provider") as pool:
-            result = pool.submit(execute).result()
-    if inspect.isawaitable(result):
-        close = getattr(result, "close", None)
-        if callable(close):
-            close()
-        raise BackendExecutionError(
-            "Scientific provider returned an unexpected asynchronous result.",
-            code="PROVIDER_ASYNC_RESULT",
-        )
-    return result
-
-
 def _unwrap_result(result: object, *, tool_name: str) -> tuple[object, dict[str, object]]:
     metadata: dict[str, object] = {}
     if isinstance(result, Mapping):
@@ -263,78 +197,28 @@ def _run_scientific_function(
             code="UNKNOWN_SCIENTIFIC_FUNCTION",
             context={"operation": operation},
         )
-    module = _tooluniverse_module()
-    tooluniverse_class = getattr(module, "ToolUniverse", None)
-    if not callable(tooluniverse_class):
-        raise BackendUnavailableError(
-            "Installed ToolUniverse does not expose ToolUniverse().",
-            code="TOOLUNIVERSE_API_UNAVAILABLE",
-        )
-    backend_version = _backend_version(module)
-    temporary_workspace: tempfile.TemporaryDirectory[str] | None = None
-    try:
-        constructor_parameters: Mapping[str, inspect.Parameter]
-        try:
-            constructor_parameters = inspect.signature(tooluniverse_class).parameters
-        except (TypeError, ValueError):
-            constructor_parameters = {}
-        constructor_arguments: dict[str, object] = {}
-        if "log_level" in constructor_parameters:
-            constructor_arguments["log_level"] = "ERROR"
-        if "load_workspace" in constructor_parameters:
-            constructor_arguments["load_workspace"] = False
-        elif "workspace" in constructor_parameters:
-            temporary_workspace = tempfile.TemporaryDirectory(
-                prefix=".dnakit-tooluniverse-",
-                ignore_cleanup_errors=True,
-            )
-            profile = {
-                "name": "dnakit-isolated",
-                "tools": {"include_tools": [spec.tool_name]},
-                "cache": {"enabled": False, "persist": False},
-                "sources": [],
-            }
-            Path(temporary_workspace.name, "profile.yaml").write_text(
-                json.dumps(profile, separators=(",", ":")),
-                encoding="utf-8",
-            )
-            constructor_arguments["workspace"] = temporary_workspace.name
-        universe = tooluniverse_class(**constructor_arguments)
-        universe.load_tools(include_tools=[spec.tool_name], quiet=True)
-        raw_result = _invoke(
-            universe,
-            {"name": spec.tool_name, "arguments": dict(arguments)},
-        )
-        data, upstream_metadata = _unwrap_result(raw_result, tool_name=spec.tool_name)
-        _validate_result_size(data, upstream_metadata)
-    except (BackendExecutionError, BackendUnavailableError):
-        raise
-    except Exception as exc:
-        raise BackendExecutionError(
-            "Optional scientific function execution failed.",
-            code="SCIENTIFIC_FUNCTION_EXECUTION_FAILED",
-            context={"operation": operation, "error_type": type(exc).__name__},
-        ) from exc
-    finally:
-        if temporary_workspace is not None:
-            temporary_workspace.cleanup()
+    from dnakit import __version__ as backend_version
+    from dnakit import databases
 
+    raw_result = databases.call(spec.tool_name, arguments, max_result_bytes=_MAX_RESULT_BYTES)
+    data, upstream_metadata = _unwrap_result(raw_result, tool_name=spec.tool_name)
+    _validate_result_size(data, upstream_metadata)
     audit_parameters = dict(parameters or {})
-    package_location = getattr(module, "__file__", None)
+    definition = databases.describe(spec.tool_name)
     backend = BackendInfo(
-        "ToolUniverse",
+        "DNAKit",
         version=backend_version,
-        package_location=(
-            package_location
-            if isinstance(package_location, str) and package_location.strip()
-            else None
-        ),
+        package_location=databases.__file__,
         license_expression="Apache-2.0",
         capabilities=(operation,),
-        metadata={"tool_name": spec.tool_name},
+        metadata={
+            "tool_name": spec.tool_name,
+            "implementation": definition["module"],
+            "upstream_revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7",
+        },
     )
     provenance = Provenance(
-        dependency_versions={"tooluniverse": backend_version},
+        dependency_versions={"dnakit": backend_version},
         implementation=ImplementationInfo(
             label=ImplementationLabel.ADAPTER,
             execution_mode=(ExecutionMode.EXTERNAL if spec.remote else ExecutionMode.INTERNAL),
@@ -361,7 +245,7 @@ def _run_scientific_function(
         return ProviderResult(
             operation,
             spec.provider,
-            "ToolUniverse",
+            "DNAKit",
             data,
             provenance,
             parameters=audit_parameters,

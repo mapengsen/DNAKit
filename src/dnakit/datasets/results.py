@@ -160,6 +160,8 @@ class SplitResult:
     similarity_k: int | None = None
     max_pairwise_records: int | None = None
     assignment_strategy: str | None = None
+    n_splits: int | None = None
+    fold_id: int | None = None
 
     def __post_init__(self) -> None:
         names = tuple(subset.name for subset in self.subsets)
@@ -173,6 +175,19 @@ class SplitResult:
             raise ConfigurationError("SplitResult assignments do not match subset counts.")
         if not isinstance(self.shuffle, bool):
             raise ConfigurationError("SplitResult shuffle must be a boolean.")
+        if self.method == "kfold":
+            if (
+                isinstance(self.n_splits, bool)
+                or not isinstance(self.n_splits, int)
+                or self.n_splits < 2
+                or isinstance(self.fold_id, bool)
+                or not isinstance(self.fold_id, int)
+                or not 0 <= self.fold_id < self.n_splits
+                or set(names) != {"train", "valid"}
+            ):
+                raise ConfigurationError("SplitResult has invalid K-fold parameters or subsets.")
+        elif self.n_splits is not None or self.fold_id is not None:
+            raise ConfigurationError("SplitResult fold parameters require method='kfold'.")
         for field_name in ("similarity_k", "max_pairwise_records"):
             value = getattr(self, field_name)
             if value is not None and (
@@ -210,6 +225,8 @@ class SplitResult:
             "similarity_k": self.similarity_k,
             "max_pairwise_records": self.max_pairwise_records,
             "assignment_strategy": self.assignment_strategy,
+            "n_splits": self.n_splits,
+            "fold_id": self.fold_id,
             "subsets": {subset.name: subset.records.ids for subset in self.subsets},
             "assignments": self.assignments,
         }

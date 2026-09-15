@@ -1,4 +1,4 @@
-"""Reproducible random, stable-hash, stratified, group, and similarity splits."""
+"""Reproducible random, stable-hash, K-fold, stratified, group, and similarity splits."""
 
 from __future__ import annotations
 
@@ -7,12 +7,20 @@ import math
 import random
 from collections import deque
 from collections.abc import Hashable, Iterable, Mapping, Sequence
+from itertools import islice
 from typing import cast
 
+from dnakit._dependency_hints import dependency_hint
+from dnakit._parallel import ordered_map
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet, Topology
 from dnakit.core._json import FrozenDict
 from dnakit.descriptors import kmer_statistics
-from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
+from dnakit.exceptions import (
+    BackendUnavailableError,
+    ConfigurationError,
+    UnsupportedGapOperationError,
+)
 
 from ._metadata import metadata_value_key
 from .config import SplitConfig
@@ -114,6 +122,33 @@ def _stable_hash_digest(seed: int, record_id: str) -> bytes:
         b"dnakit.split.hash.v1\0" + str(seed).encode("ascii") + b"\0" + record_id.encode("utf-8")
     )
     return hashlib.sha256(payload).digest()
+
+
+def _assign_kfold(size: int, config: SplitConfig) -> dict[int, str]:
+    """Select one validation fold from the same seeded sklearn KFold partition."""
+
+    assert config.n_splits is not None and config.fold_id is not None
+    if config.n_splits > size:
+        raise ConfigurationError(
+            "n_splits cannot exceed the number of input records.",
+            code="KFOLD_SIZE_LIMIT",
+            context={"n_splits": config.n_splits, "record_count": size},
+        )
+    try:
+        from sklearn.model_selection import KFold  # type: ignore[import-untyped]
+    except ImportError as exc:
+        raise BackendUnavailableError(
+            "K-fold splitting requires scikit-learn.",
+            code="MISSING_KFOLD_DEPENDENCY",
+            hint=dependency_hint("bio-analysis"),
+        ) from exc
+    splitter = KFold(
+        n_splits=config.n_splits,
+        shuffle=config.shuffle,
+        random_state=config.seed if config.shuffle else None,
+    )
+    train, valid = next(islice(splitter.split(range(size)), config.fold_id, None))
+    return {**dict.fromkeys(map(int, train), "train"), **dict.fromkeys(map(int, valid), "valid")}
 
 
 def _assign_hashed_individuals(
@@ -294,6 +329,17 @@ def _jaccard(left: frozenset[str], right: frozenset[str]) -> float:
     return len(left & right) / len(union) if union else 1.0
 
 
+def _fingerprint_job(payload: tuple[DNARecord, SplitConfig]) -> frozenset[str]:
+    record, config = payload
+    statistics = kmer_statistics(
+        record.sequence,
+        config.similarity_k,
+        ambiguity_policy=config.similarity_ambiguity_policy,
+        cross_gaps=False,
+    )
+    return frozenset(statistics.counts)
+
+
 def _similarity_units(
     records: tuple[DNARecord, ...], config: SplitConfig
 ) -> tuple[tuple[tuple[int, ...], ...], int]:
@@ -319,13 +365,14 @@ def _similarity_units(
                 context={"input_index": index, "record_id": record.id},
                 hint="Choose similarity_gap_policy='split' to treat fragments independently.",
             )
-        statistics = kmer_statistics(
-            record.sequence,
-            config.similarity_k,
-            ambiguity_policy=config.similarity_ambiguity_policy,
-            cross_gaps=False,
+    total_symbols = sum(record.sequence.symbol_length for record in records)
+    fingerprints = list(
+        ordered_map(
+            _fingerprint_job,
+            ((record, config) for record in records),
+            workers=1 if total_symbols < 8 * 1024**2 else None,
         )
-        fingerprints.append(frozenset(statistics.counts))
+    )
     components = _UnionFind(len(records))
     comparisons = 0
     for left in range(len(records)):
@@ -339,8 +386,20 @@ def _similarity_units(
     return tuple(tuple(indices) for indices in grouped.values()), comparisons
 
 
-def split(records: Iterable[DNARecord], *, config: SplitConfig) -> SplitResult:
-    """Split records reproducibly while keeping declared atomic groups intact."""
+def split(
+    records: Iterable[DNARecord], *, config: SplitConfig, verbose: bool = True
+) -> SplitResult:
+    """Split records by named ratios or select one fixed K-fold train/valid pair.
+
+    For K-fold use SplitConfig(method="kfold", n_splits=10, fold_id=0, seed=42).
+    Hold the input order, n_splits, shuffle and seed fixed while iterating fold_id
+    from 0 to n_splits - 1. Each call returns train and valid, matching sklearn's
+    KFold; records inside each subset retain input order, even if preserve_order
+    is False. shuffle=False uses consecutive validation blocks and ignores seed.
+    To keep an independent test set, first split train/test with method="random"
+    or "hash", then pass only that train subset to K-fold. This API partitions
+    data; it does not train models. K-fold requires the bio-analysis or ml extra.
+    """
 
     if not isinstance(config, SplitConfig):
         raise ConfigurationError(
@@ -356,7 +415,9 @@ def split(records: Iterable[DNARecord], *, config: SplitConfig) -> SplitResult:
     generator = random.Random(config.seed)
     component_count: int | None = None
     comparisons = 0
-    if config.method == "random":
+    if config.method == "kfold":
+        assignment = _assign_kfold(len(materialized), config)
+    elif config.method == "random":
         assignment = _assign_individuals(
             tuple(range(len(materialized))),
             ratios,
@@ -440,11 +501,16 @@ def split(records: Iterable[DNARecord], *, config: SplitConfig) -> SplitResult:
         assignment_strategy={
             "random": "global_largest_remainder_individual",
             "hash": "sha256_record_id_rank_v1_largest_remainder",
+            "kfold": "sklearn_kfold",
             "stratified": "global_quota_round_robin_stratified",
             "group": "atomic_unit_greedy_target_error",
             "similarity": "connected_component_atomic_unit_greedy_target_error",
         }[config.method],
+        n_splits=config.n_splits,
+        fold_id=config.fold_id,
     )
 
 
 __all__ = ["split"]
+
+_register_public_verbose(globals())

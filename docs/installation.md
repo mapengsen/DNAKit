@@ -51,8 +51,8 @@ python -m pip install "dnakit[external-tools]"
 python -m pip install "dnakit[neural,neural-enformer]"
 ```
 
-27 个任务 checkpoint 不随安装包分发，请根据[统一下载说明](api/features/25_deep_learning_checkpoint_download.md)下载。文件默认放在 `./ckpt/enformer-benchmarks/`，也可在调用时使用 `checkpoint_dir` 或
-`checkpoint_path` 指定。其他模型的依赖和边界见[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)。
+27 个任务 checkpoint 不随安装包分发，预测时会自动下载当前任务缺失的权重，已有文件直接复用。默认缓存目录为 `./ckpt/enformer-benchmarks/`，也可在调用时使用 `checkpoint_dir` 或
+`checkpoint_path` 指定。缓存规则见[权重缓存与自动下载](api/features/23_deep_learning_property_prediction.md#checkpoint-cache)，其他模型的依赖和边界见该页对应说明。
 
 ## Agent 与 MCP
 
@@ -62,7 +62,7 @@ python -m pip install "dnakit[neural,neural-enformer]"
 python -m pip install "dnakit[agent]"
 ```
 
-安装后使用 `dnakit-mcp` 启动本地 MCP 服务，具体配置见 [Agent 与 MCP 工具](agent_tools.md)。
+安装后使用 `dnakit-mcp` 启动本地 MCP 服务，具体配置见 [大模型工具 → MCP](llm_tools/mcp.md)。
 
 # 仓库地址
 

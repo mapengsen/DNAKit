@@ -1,5 +1,7 @@
 # OPS-003 subsequence extraction
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Extracts a specified fragment from a DNA sequence.
 
 - **Function:** Intercept DNA fragments according to the start and end coordinates and retain the source range. It also supports interception of circular sequences across origins for extracting genes, functional regions or specified windows.

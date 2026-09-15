@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import math
 from collections.abc import Iterable
+from typing import Any
 
+from dnakit._parallel import ordered_map
 from dnakit.alignment import AlignmentConfig, align_pairwise
 from dnakit.core import DNARecord, Gap, Topology
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
@@ -159,6 +161,28 @@ def pair_similarity(
     return fingerprint_similarity(left_fingerprint, right_fingerprint, metric="tanimoto").value
 
 
+def _pair_job(payload: Any) -> tuple[int, int, float]:
+    left, right, first, second, options = payload
+    return left, right, pair_similarity(first, second, **options)
+
+
+def _kmer_set_job(payload: Any) -> frozenset[str]:
+    from dnakit.similarity.vector import _kmer_counts
+
+    record, k, canonical, method = payload
+    if method == "fingerprint":
+        fingerprint = kmer_fingerprint(record, k=k, canonical=canonical, mode="binary")
+        assert isinstance(fingerprint.values, tuple)
+        return frozenset(
+            feature
+            for feature, value in zip(fingerprint.feature_names, fingerprint.values, strict=True)
+            if value != 0
+        )
+    return frozenset(
+        _kmer_counts(record.sequence.symbols, k=k, canonical=canonical, overlapping=True)
+    )
+
+
 def similarity_matrix(
     records: tuple[DNARecord, ...],
     *,
@@ -171,17 +195,40 @@ def similarity_matrix(
         [1.0 if left == right else 0.0 for right in range(len(records))]
         for left in range(len(records))
     ]
-    for left in range(len(records)):
-        for right in range(left + 1, len(records)):
-            value = pair_similarity(
-                records[left],
-                records[right],
-                method=method,
-                k=k,
-                canonical=canonical,
-                max_alignment_cells=max_alignment_cells,
+    if method in {"kmer", "fingerprint"} and len(records) > 1:
+        # Compute each sequence's words once, instead of once for every partner.
+        for index, record in enumerate(records):
+            if record.sequence.symbol_length < k:
+                pair_similarity(
+                    records[0],
+                    records[max(1, index)],
+                    method=method,
+                    k=k,
+                    canonical=canonical,
+                    max_alignment_cells=max_alignment_cells,
+                )
+        total = sum(record.sequence.symbol_length for record in records)
+        words = list(
+            ordered_map(
+                _kmer_set_job,
+                ((record, k, canonical, method) for record in records),
+                workers=1 if total < 8 * 1024**2 else None,
             )
-            rows[left][right] = rows[right][left] = value
+        )
+        for left in range(len(records)):
+            for right in range(left + 1, len(records)):
+                intersection = len(words[left] & words[right])
+                union = len(words[left]) + len(words[right]) - intersection
+                rows[left][right] = rows[right][left] = intersection / union if union else 1.0
+        return tuple(tuple(row) for row in rows)
+    options = dict(method=method, k=k, canonical=canonical, max_alignment_cells=max_alignment_cells)
+    jobs = (
+        (left, right, records[left], records[right], options)
+        for left in range(len(records))
+        for right in range(left + 1, len(records))
+    )
+    for left, right, value in ordered_map(_pair_job, jobs):
+        rows[left][right] = rows[right][left] = value
     return tuple(tuple(row) for row in rows)
 
 

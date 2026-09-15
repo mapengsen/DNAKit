@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.descriptors._shared import (
@@ -25,7 +26,7 @@ from dnakit.descriptors.results import (
 )
 
 
-def length_features(value: SequenceInput) -> LengthResult:
+def length_features(value: SequenceInput, *, verbose: bool = True) -> LengthResult:
     """Return lengths without guessing the span of an unknown-length gap."""
 
     sequence, sequence_id = sequence_and_id(value)
@@ -50,6 +51,7 @@ def base_composition(
     value: SequenceInput,
     *,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
+    verbose: bool = True,
 ) -> CompositionResult:
     """Count A/C/G/T; ignored ambiguity is excluded from the fraction denominator."""
 
@@ -84,6 +86,7 @@ def gc_at_content(
     value: SequenceInput,
     *,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
+    verbose: bool = True,
 ) -> ContentResult:
     """Calculate GC and AT fractions over the A/C/G/T denominator."""
 
@@ -112,6 +115,7 @@ def base_skew(
     value: SequenceInput,
     *,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
+    verbose: bool = True,
 ) -> SkewResult:
     """Calculate GC and AT skew; a zero formula denominator produces None."""
 
@@ -143,6 +147,7 @@ def cpg_features(
     *,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> CpGResult:
     """Calculate CpG statistics without crossing gaps or ambiguity by default.
 
@@ -191,3 +196,5 @@ def cpg_features(
 
 
 __all__ = ["base_composition", "base_skew", "cpg_features", "gc_at_content", "length_features"]
+
+_register_public_verbose(globals())

@@ -6,6 +6,7 @@ import math
 from collections.abc import Iterable
 from itertools import islice
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import ConfigurationError
 from dnakit.thermodynamics._shared import canonical_linear_symbols
@@ -71,6 +72,7 @@ def analyze_dot_bracket(
     dot_bracket: str,
     *,
     three_prime_window: int = 5,
+    verbose: bool = True,
 ) -> SecondaryStructureSummary:
     """Parse dot-parens-plus or extended bracket notation into structure metrics."""
 
@@ -225,6 +227,7 @@ def pair_probability_metrics(
     probability_matrix: Iterable[Iterable[float]],
     *,
     accessibility_window_size: int = 4,
+    verbose: bool = True,
 ) -> PairProbabilityResult:
     """Validate a dense NUPACK-style matrix and derive per-base accessibility."""
 
@@ -333,8 +336,7 @@ def pair_probability_metrics(
 
 
 def ensemble_defect_from_probabilities(
-    target: SecondaryStructureSummary,
-    probabilities: PairProbabilityResult,
+    target: SecondaryStructureSummary, probabilities: PairProbabilityResult, *, verbose: bool = True
 ) -> float:
     """Return the normalized expected number of incorrectly paired nucleotides."""
 
@@ -374,6 +376,7 @@ def target_structure_probability(
     ensemble_free_energy_kcal_per_mol: float,
     *,
     temperature_celsius: float = 37.0,
+    verbose: bool = True,
 ) -> float:
     """Calculate P(target) from target and ensemble standard free energies."""
 
@@ -408,3 +411,5 @@ __all__ = [
     "pair_probability_metrics",
     "target_structure_probability",
 ]
+
+_register_public_verbose(globals())

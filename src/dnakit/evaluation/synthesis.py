@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import math
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import IssueSeverity, Topology
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.descriptors import gc_at_content, homopolymer_runs, window_descriptors
@@ -179,9 +180,7 @@ def _risk_entry(item: object, index: int, config: SynthesisRiskConfig) -> Evalua
 
 
 def evaluate_synthesis_risk(
-    value: EvaluationInput,
-    *,
-    config: SynthesisRiskConfig | None = None,
+    value: EvaluationInput, *, config: SynthesisRiskConfig | None = None, verbose: bool = True
 ) -> EvaluationReport:
     """Screen transparent GC, run, repeat, and inverted-repeat proxy rules."""
 
@@ -247,3 +246,5 @@ def evaluate_synthesis_risk(
 
 
 __all__ = ["evaluate_synthesis_risk"]
+
+_register_public_verbose(globals())

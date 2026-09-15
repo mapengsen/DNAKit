@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
@@ -37,9 +38,7 @@ def _validate_splits(
 
 
 def detect_leakage(
-    splits: Mapping[str, DNA | DNASet],
-    *,
-    config: LeakageConfig | None = None,
+    splits: Mapping[str, DNA | DNASet], *, config: LeakageConfig | None = None, verbose: bool = True
 ) -> LeakageReport:
     """Exhaustively compare every cross-split pair under hard record/pair/event limits."""
 
@@ -137,6 +136,7 @@ def evaluate_split_quality(
     label_key: str | None = None,
     group_keys: Sequence[str] = (),
     leakage_report: LeakageReport | None = None,
+    verbose: bool = True,
 ) -> SplitQualityResult:
     """Evaluate ratio error, label total variation, group leakage, and pair leakage."""
 
@@ -242,3 +242,5 @@ def evaluate_split_quality(
 
 
 __all__ = ["detect_leakage", "evaluate_split_quality"]
+
+_register_public_verbose(globals())

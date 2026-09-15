@@ -1,0 +1,20 @@
+{
+  "public_functions": 484,
+  "generated_markdown_pages": 28,
+  "rendered_html": {
+    "zh": {
+      "detail_anchors": 484,
+      "working_function_links": 484,
+      "group_pages": 12
+    },
+    "en": {
+      "detail_anchors": 484,
+      "working_function_links": 484,
+      "group_pages": 12
+    }
+  },
+  "python_examples_syntax_checked": 916,
+  "offline_examples_executed": 8,
+  "strict_bilingual_build": "passed",
+  "live_provider_workflows": "not_run_for_this_documentation_change"
+}

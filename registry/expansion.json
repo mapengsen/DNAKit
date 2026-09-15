@@ -1,0 +1,4163 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-12",
+  "scope": "DNA sequence, genome/variant/regulatory analysis, DNA-focused experimental design/figures, and necessary workflow support. Pure RNA/protein-only work and metaphorical DNA are excluded.",
+  "candidates": [
+    {
+      "source": "agentic-science",
+      "path": "skills/chip-atlas-diff-analysis/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/chip-atlas-peak-enrichment/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/chip-atlas-target-genes/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/genetic-variant-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/gwas-to-function-twas/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-transcriptome-wide-association",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/mendelian-randomization-twosamplemr/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-mendelian-randomization",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/multi-omics-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multi-omics-integration",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/pcr-primer-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-primer-design-primer-basics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/polygenic-risk-score-prs-catalog/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-polygenic-risk",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "agentic-science",
+      "path": "skills/pooled-crispr-screens/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-crispr-screen-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-borzoi/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "borzoi",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-etetoolkit/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-tree-manipulation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-nf-core-sarek/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "nfcore-sarek-wrapper",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-pysam/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "pysam",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-qiime2-amplicon/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-qiime2-workflow",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-scikit-bio/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "scikit-bio",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/bioinformatics/alterlab-tiledbvcf/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tiledbvcf",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-clinpgx/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-pharmacogenomics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-clinvar/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-clinvar-lookup",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-gene-db/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gene-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-gnomad/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-gnomad-frequencies",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-gtex/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gtex-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/databases/alterlab-gwas/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gwas-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/domain-specific/alterlab-geniml/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "geniml",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "alterlab",
+      "path": "skills/domain-specific/alterlab-gtars/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "aws-hcls",
+      "path": "skills/genomic-variant-interpretation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-acmg-classification",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "aws-hcls",
+      "path": "skills/multi-omics-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multi-omics-integration",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "aws-hcls",
+      "path": "skills/multi-omics-pipeline/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multi-omics-integration",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "aws-hcls",
+      "path": "skills/ngs-quality-control/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-quality-reports",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "aws-hcls",
+      "path": "skills/variant-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-fastq-to-variants",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/atac-seq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-atacseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/blast-search/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-blast-searches",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/chip-seq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-chipseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/metagenomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-metagenomics-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/query-clinvar/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-clinvar-lookup",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/query-ensembl/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ensembl-rest",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/query-genomic-intelligence/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "genomic-intelligence",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw",
+      "path": "container/skills/sequence-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-sequence-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/core-bioinformatics/alignment-and-mapping/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/epigenomics-and-regulation/atac-seq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-atacseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/epigenomics-and-regulation/chip-seq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-chipseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/epigenomics-and-regulation/hi-c-3d-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-hic-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/epigenomics-and-regulation/methylation-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-methylation-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/genomics-and-variation/comparative-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-comparative-genomics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/genomics-and-variation/genome-assembly/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-genome-assembly-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/genomics-and-variation/long-read-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-longread-sv-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/genomics-and-variation/phasing-imputation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phasing-imputation-genotype-imputation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/genomics-and-variation/variant-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-fastq-to-variants",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/metagenomics-and-microbiome/metagenomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-metagenomics-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/metagenomics-and-microbiome/microbiome-amplicon/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-microbiome-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/metagenomics-and-microbiome/pathogen-epi-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-outbreak-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/metagenomics-and-microbiome/phylogenetics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylogenomics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/multi-omics-and-systems/causal-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-causal-genomics-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioclaw-hub",
+      "path": "skills/single-cell-and-spatial/multiome-scatac/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-multiome-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "bioskills",
+      "path": "alternative-splicing/splice-variant-prediction/SKILL.md",
+      "decision": "include",
+      "category": "variants",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/circos-plots/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/genome-tracks/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/lollipop-protein-maps/SKILL.md",
+      "decision": "include",
+      "category": "variants",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/manhattan-qq-locuszoom/SKILL.md",
+      "decision": "include",
+      "category": "gwas",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/oncoprint-mutation-matrices/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "data-visualization/sequence-logos/SKILL.md",
+      "decision": "include",
+      "category": "sequence",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "experimental-design/batch-design/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "experimental-design/multiple-testing/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "experimental-design/power-analysis/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "experimental-design/randomization-blocking/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "experimental-design/sample-size/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "expression-matrix/gene-id-mapping/SKILL.md",
+      "decision": "include",
+      "category": "annotation",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "multi-omics-integration/data-harmonization/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "multi-omics-integration/mixomics-analysis/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "multi-omics-integration/mofa-integration/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "single-cell/lineage-tracing/SKILL.md",
+      "decision": "include",
+      "category": "crispr",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "systems-biology/gene-essentiality/SKILL.md",
+      "decision": "include",
+      "category": "annotation",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "bioskills",
+      "path": "systems-biology/metabolic-reconstruction/SKILL.md",
+      "decision": "include",
+      "category": "annotation",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "clawbio",
+      "path": "skills/fastreer/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-modern-tree-inference",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/bedtools/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/bioinformatics-methods-results-writer/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/crispresso/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-crispresso-editing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/ncbi-edirect/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-entrez-search",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/pod5/SKILL.md",
+      "decision": "include",
+      "category": "sequencing",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review.",
+      "excluded_resources": {
+        "bin": {
+          "symlink_target": "../../venvs/pod5/bin",
+          "reason": "omitted the developer-local virtualenv symlink bin; use the separately installed pod5 command"
+        }
+      },
+      "text_replacements": [
+        {
+          "old": "Binary: `bin/pod5` — relative to this skill directory.",
+          "new": "Install the POD5 CLI separately using the upstream `environment.yaml` or the official POD5 installation instructions. The `pod5` executable must be available on PATH.",
+          "reason": "replaced the repository-local virtualenv requirement with an explicitly installed POD5 CLI"
+        },
+        {
+          "old": "readlink -f \"$(dirname <path-to-this-SKILL.md>)/bin/pod5\"",
+          "new": "command -v pod5",
+          "count": 2,
+          "reason": "resolved the separately installed CLI through PATH"
+        },
+        {
+          "old": "Substitute `<path-to-this-SKILL.md>` with the absolute path you used to read this file.\nUse the printed output literally as the first token in every command.",
+          "new": "If the command prints no path, install and activate the POD5 environment before continuing. Use the printed output literally as the first token in every command.",
+          "reason": "added a missing-runtime check for portable installation"
+        }
+      ],
+      "runtime": {
+        "commands": [
+          "pod5"
+        ]
+      }
+    },
+    {
+      "source": "damlab",
+      "path": "skills/samtools/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "samtools-bam-processing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "damlab",
+      "path": "skills/seqkit/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "seq-wrangler",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/alphagenome_atlas_website_links/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/alphagenome_single_variant_analysis/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/alphagenome_variant_impact_score/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/clinvar_database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-clinvar-lookup",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/dbsnp_database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-dbsnp-queries",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/encode_ccres_database/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/ensembl_database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ensembl-rest",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/gnomad_database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-gnomad-frequencies",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/gtex_database/SKILL.md",
+      "decision": "include",
+      "category": "gwas",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/jaspar_database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "jaspar-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/ncbi_sequence_fetch/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-entrez-fetch",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/ucsc_conservation_and_tfbs/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "deepmind",
+      "path": "skills/unibind_database/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/accessibility-aggregation/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/batch-analysis/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/cite-encode/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/clinvar-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-clinvar-lookup",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/compare-biosamples/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/data-provenance/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/download-encode/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "encode-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/ensembl-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ensembl-rest",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/epigenome-profiling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-epigenomics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/functional-screen-analysis/SKILL.md",
+      "decision": "include",
+      "category": "crispr",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/gnomad-variants/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-gnomad-frequencies",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/gtex-expression/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gtex-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/gwas-catalog/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gwas-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/hic-aggregation/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/histone-aggregation/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/integrative-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multi-omics-integration",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/jaspar-motifs/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "jaspar-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/liftover-coordinates/SKILL.md",
+      "decision": "include",
+      "category": "intervals",
+      "reason": "Full chain-file/CrossMap execution, unmapped-region accounting and reciprocal validation; complements the retained coordinate-format conversion and reference-build diagnostics."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/methylation-aggregation/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/motif-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-motif-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/multi-omics-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multi-omics-integration",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/peak-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-peak-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-atacseq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-atacseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-chipseq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-chipseq-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-cutandrun/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-cut-and-run-tag",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-dnaseseq/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-guide/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-hic/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-hic-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/pipeline-wgbs/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-methylation-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/quality-assessment/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/regulatory-elements/SKILL.md",
+      "decision": "include",
+      "category": "epigenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/search-encode/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "encode-database",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/setup/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review.",
+      "name_override": "encode-toolkit-setup",
+      "role": "workflow_dependency"
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/single-cell-encode/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-multiome-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/track-experiments/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/ucsc-browser/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "ucsc-genome-browser",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "encode-toolkit",
+      "path": "skills/variant-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-regulatory-variant-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "feynman",
+      "path": "skills/borzoi/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "feynman",
+      "path": "skills/evo2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "evo2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/classify-cnv/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-germline-cnv-interpretation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/classify-sequence-variant/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-acmg-classification",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/draft-counseling-summary/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/draw-pedigree/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/filter-variant-callset/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-variant-prioritization",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/find-variant-literature/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/interpret-negative-or-vus/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/prepare-rare-disease-case/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/rank-disease-candidates/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-rare-disease-diagnosis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "genetic-counseling",
+      "path": "plugins/rare-disease-genetic-counseling/skills/review-variant-table/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-debug-analysis/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-merge-results/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-monitor-analyses/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-project-report/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-query-data/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-run-pipeline/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-submit-data/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "isabl",
+      "path": "skills/isabl-write-app/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/biopython/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-sequence-analysis",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/bioservices/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bioservices-multi-database",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/depmap/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "depmap-crispr-essentiality",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/etetoolkit/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-tree-manipulation",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/gget/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gget-genomic-databases",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/phylogenetics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-modern-tree-inference",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/polars-bio/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "kdense",
+      "path": "skills/scikit-bio/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "scikit-bio",
+      "reason": "Task duplicate; no copy is distributed, so no alternative per-skill license is inferred. Retained implementation has its own verified permission."
+    },
+    {
+      "source": "misha",
+      "path": "agent-guides/skills/importing-tracks/SKILL.md",
+      "decision": "include",
+      "category": "intervals",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "myriad",
+      "path": "skills/optimize-hifi-diploid-assembly/SKILL.md",
+      "decision": "include",
+      "category": "assembly",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "myriad",
+      "path": "skills/score-variant-aware-crispr-offtargets/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-off-target-prediction",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "ngs-tertiary",
+      "path": ".claude/skills/ngs-interactive/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "ngs-tertiary-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "ngs-tertiary",
+      "path": ".claude/skills/ngs-quick/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "ngs-tertiary-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "ngs-tertiary",
+      "path": ".claude/skills/ngs-tertiary-analysis/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-functional-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-assembly-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-genome-assembly-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-binning-qc/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-fasta-database-curator/SKILL.md",
+      "decision": "include",
+      "category": "sequence",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-foundation-housekeeping/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-interdomain-hgt/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-phylogenomics/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-prefect-dask-nextflow/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-protein-clustering-pangenome/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-pangenome-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-viromics/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bio-workflow-methods-docwriter/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/bioinformatics-project/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "omics",
+      "path": "skills/public-db-lookup/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-sequence-retrieval",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "omics",
+      "path": "skills/tracking-taxonomy-updates/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/alternative-splicing-splice-variant-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-splice-variant-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-colocalization-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-colocalization-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-effector-gene-prioritization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-effector-gene-prioritization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-fine-mapping/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-fine-mapping",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-genetic-correlation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-genetic-correlation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-genomic-sem/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-genomic-sem",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-heritability-partitioning/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-heritability-partitioning",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-mediation-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-mediation-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-mendelian-randomization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-mendelian-randomization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-pleiotropy-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-pleiotropy-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-proteome-mr-drug-target/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-proteome-mr-drug-target",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/causal-genomics-transcriptome-wide-association/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-transcriptome-wide-association",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-allele-specific-binding/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-allele-specific-binding",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-chip-deep-learning/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-chip-deep-learning",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-chipseq-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-qc",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-chipseq-visualization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-visualization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-chromatin-state-segmentation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-chromatin-state-segmentation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-cut-and-run-tag/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-cut-and-run-tag",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-differential-binding/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-differential-binding",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-motif-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-motif-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-peak-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-peak-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-peak-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-peak-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-spike-in-normalization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-spike-in-normalization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/chip-seq-super-enhancers/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-chipseq-super-enhancers",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/claw-metagenomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-metagenomics-pipeline",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-ancestral-reconstruction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-ancestral-reconstruction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-comparative-annotation-projection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-comparative-annotation-projection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-gene-family-evolution/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-gene-family-evolution",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-gene-tree-species-tree-reconciliation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-gene-tree-species-tree-reconciliation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-genome-distance-and-species-delineation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-hgt-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-hgt-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-introgression-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-introgression-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-ortholog-inference/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-ortholog-inference",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-pangenome-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-pangenome-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-positive-selection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-positive-selection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-synteny-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-synteny-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-whole-genome-alignment/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-whole-genome-alignment",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/comparative-genomics-whole-genome-duplication/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-whole-genome-duplication",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-allele-specific-copy-number/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-allele-specific-copy-number",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-cnv-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-cnv-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-cnv-visualization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-cnv-visualization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-cnvkit-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-cnvkit-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-copy-ratio-segmentation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-copy-ratio-segmentation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-focal-amplification-ecdna/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-focal-amplification-ecdna",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-gatk-cnv/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-gatk-cnv",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-germline-cnv-interpretation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-germline-cnv-interpretation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-hrd-scoring/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-hrd-scoring",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-recurrent-cnv/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-recurrent-cnv",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/copy-number-subclonal-copy-number/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-copy-number-subclonal-copy-number",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-bagel-essentiality/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-bagel-essentiality",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-base-editing-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-base-editing-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-batch-correction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-batch-correction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-combinatorial-screens/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-combinatorial-screens",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-copy-number-correction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-copy-number-correction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-crispresso-editing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-crispresso-editing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-drugz-chemogenomic/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-drugz-chemogenomic",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-hit-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-hit-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-in-vivo-screens/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-in-vivo-screens",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-jacks-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-jacks-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-library-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-library-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-mageck-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-mageck-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-perturb-seq-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-perturb-seq-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-prime-editing-screens/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-prime-editing-screens",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/crispr-screens-screen-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-crispr-screens-screen-qc",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-biodiversity-metrics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-biodiversity-metrics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-community-ecology/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-community-ecology",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-conservation-genetics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-conservation-genetics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-edna-metabarcoding/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-edna-metabarcoding",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-landscape-genomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-landscape-genomics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/ecological-genomics-species-delimitation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ecological-genomics-species-delimitation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epidemiological-genomics-amr-surveillance/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-amr-surveillance",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epidemiological-genomics-pathogen-typing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-pathogen-typing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epidemiological-genomics-phylodynamics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-phylodynamics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epidemiological-genomics-transmission-inference/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-transmission-inference",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epidemiological-genomics-variant-surveillance/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-variant-surveillance",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/epigenomics-methylgpt-agent/SKILL.md",
+      "decision": "quality_review",
+      "category": "models",
+      "reason": "Guide invokes a repository-specific Python executable that is absent from the skill and pinned repository; a scientific runtime has not been established."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/experimental-design-batch-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-experimental-design-batch-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/experimental-design-multiple-testing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-experimental-design-multiple-testing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/experimental-design-power-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-experimental-design-power-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/experimental-design-randomization-blocking/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-experimental-design-randomization-blocking",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/experimental-design-sample-size/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-experimental-design-sample-size",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/expression-matrix-gene-id-mapping/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-expression-matrix-gene-id-mapping",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gene-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gene-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gene-panel-design-agent/SKILL.md",
+      "decision": "quality_review",
+      "category": "crispr",
+      "reason": "Guide invokes a repository-specific Python executable that is absent from the skill and pinned repository; a scientific runtime has not been established."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gene-regulatory-networks-multiomics-grn/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-gene-regulatory-networks-multiomics-grn",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gene-regulatory-networks-scenic-regulons/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-gene-regulatory-networks-scenic-regulons",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-annotation-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-annotation-qc",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-annotation-transfer/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-annotation-transfer",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-eukaryotic-gene-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-eukaryotic-gene-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-functional-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-functional-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-ncrna-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-ncrna-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-prokaryotic-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-prokaryotic-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-annotation-repeat-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-repeat-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-assembly-polishing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-assembly-polishing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-assembly-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-assembly-qc",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-contamination-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-contamination-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-genome-profiling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-genome-profiling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-hifi-assembly/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-hifi-assembly",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-long-read-assembly/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-long-read-assembly",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-metagenome-assembly/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-metagenome-assembly",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-scaffolding/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-scaffolding",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-assembly-short-read-assembly/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-short-read-assembly",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-engineering-base-editing-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-base-editing-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-engineering-grna-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-grna-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-engineering-hdr-template-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-hdr-template-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-engineering-off-target-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-off-target-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-engineering-prime-editing-design/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-engineering-prime-editing-design",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-bed-file-basics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-bed-file-basics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-bedgraph-handling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-bedgraph-handling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-bigwig-tracks/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-bigwig-tracks",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-coverage-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-coverage-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-gtf-gff-handling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-gtf-gff-handling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-interval-arithmetic/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-overlap-significance/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-overlap-significance",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/genome-intervals-proximity-operations/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-proximity-operations",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/geo-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-geo-data",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gtex-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gtex-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gwas-lookup/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-gwas-snp-interpretation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/gwas-prs/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-polygenic-risk",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-compartment-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-compartment-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-contact-pairs/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-contact-pairs",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-hic-data-io/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-hic-data-io",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-hic-differential/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-hic-differential",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-hic-visualization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-hic-visualization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-hichip-plac-loops/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-hichip-plac-loops",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-loop-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-loop-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-matrix-operations/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-matrix-operations",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/hi-c-analysis-tad-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-hi-c-analysis-tad-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/immunoinformatics-epitope-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-immunoinformatics-epitope-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/immunoinformatics-immunogenicity-scoring/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-immunoinformatics-immunogenicity-scoring",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/immunoinformatics-mhc-binding-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-immunoinformatics-mhc-binding-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/immunoinformatics-neoantigen-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-immunoinformatics-neoantigen-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/jaspar-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "jaspar-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/lab-automation-benchling-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "benchling-integration",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-cfdna-preprocessing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-cfdna-preprocessing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-ctdna-mutation-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ctdna-mutation-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-fragment-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-fragment-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-longitudinal-monitoring/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-longitudinal-monitoring",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-methylation-based-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-based-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/liquid-biopsy-tumor-fraction-estimation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tumor-fraction-estimation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/long-read-sequencing-clair3-variants/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-long-read-sequencing-clair3-variants",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/long-read-sequencing-nanopore-methylation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-long-read-sequencing-nanopore-methylation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-abundance-estimation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-abundance",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-amr-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-amr-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-functional-profiling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-functional-profiling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-kraken-classification/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-kraken",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-metagenome-visualization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-visualization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-metaphlan-profiling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-metaphlan",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/metagenomics-strain-tracking/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-strain-tracking",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/methylation-analysis-bismark-alignment/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-bismark-alignment",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/methylation-analysis-differential-cpg-testing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-differential-cpg",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/methylation-analysis-dmr-detection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-dmr-detection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/methylation-analysis-methylation-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/methylation-analysis-methylkit-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-methylation-methylkit",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-amplicon-processing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-amplicon-processing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-differential-abundance/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-differential-abundance",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-diversity-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-diversity-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-functional-prediction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-functional-prediction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-qiime2-workflow/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-qiime2-workflow",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/microbiome-taxonomy-assignment/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-taxonomy-assignment",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/multi-omics-integration-data-harmonization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-multi-omics-data-harmonization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/multi-omics-integration-mixomics-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-multi-omics-mixomics-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/multi-omics-integration-mofa-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-multi-omics-mofa-integration",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/phasing-imputation-genotype-imputation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phasing-imputation-genotype-imputation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/phasing-imputation-haplotype-phasing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phasing-imputation-haplotype-phasing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/phasing-imputation-imputation-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phasing-imputation-imputation-qc",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/phasing-imputation-reference-panels/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phasing-imputation-reference-panels",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-association-testing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-association-testing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-linkage-disequilibrium/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-linkage-disequilibrium",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-plink-basics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-plink-basics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-population-structure/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-population-structure",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-scikit-allel-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-scikit-allel-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/population-genetics-selection-statistics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-population-genetics-selection-statistics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/primer-design-primer-basics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-primer-design-primer-basics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/primer-design-primer-validation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-primer-design-primer-validation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/primer-design-qpcr-primers/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-primer-design-qpcr-primers",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-alignment-bowtie2-alignment/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bowtie2-alignment",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-alignment-bwa-alignment/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-adapter-trimming/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-adapter-trimming",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-contamination-screening/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-contamination-screening",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-fastp-workflow/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-fastp-workflow",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-quality-filtering/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-quality-filtering",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-quality-reports/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-quality-reports",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/read-qc-umi-processing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-umi-processing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/restriction-analysis-enzyme-selection/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-restriction-enzyme-selection",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/restriction-analysis-fragment-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-restriction-fragment-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/restriction-analysis-restriction-mapping/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-restriction-mapping",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/restriction-analysis-restriction-sites/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-restriction-sites",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-batch-processing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-batch-processing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-compressed-files/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-compressed-files",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-fastq-quality/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-fastq-quality",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-filter-sequences/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-filter-sequences",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-format-conversion/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-format-conversion",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-paired-end-fastq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-paired-end-fastq",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-read-sequences/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-sequences",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-sequence-statistics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-sequence-statistics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-io-write-sequences/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-write-sequences",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-codon-usage/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-codon-usage",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-motif-search/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-motif-search",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-reverse-complement/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-reverse-complement",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-seq-objects/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-seq-objects",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-sequence-properties/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-sequence-properties",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-sequence-slicing/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-sequence-slicing",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/sequence-manipulation-transcription-translation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-transcription-translation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/systems-biology-gene-essentiality/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-systems-biology-gene-essentiality",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/systems-biology-metabolic-reconstruction/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-systems-biology-metabolic-reconstruction",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tcr-bcr-analysis-immcantation-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tcr-bcr-analysis-immcantation-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tcr-bcr-analysis-mixcr-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tcr-bcr-analysis-mixcr-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tcr-bcr-analysis-repertoire-visualization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tcr-bcr-analysis-repertoire-visualization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tcr-bcr-analysis-scirpy-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tcr-bcr-analysis-scirpy-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tcr-bcr-analysis-vdjtools-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-tcr-bcr-analysis-vdjtools-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-cancer-variant-interpretation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-cancer-variant-interpretation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-crispr-screen-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-crispr-screen-pipeline",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-epigenomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-epigenomics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-gwas-drug-discovery/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-gwas-drug-discovery",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-gwas-finemapping/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-fine-mapping",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-gwas-snp-interpretation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-gwas-snp-interpretation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-gwas-trait-to-gene/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-gwas-trait-to-gene",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-immune-repertoire-analysis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-immune-repertoire-analysis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-multiomic-disease-characterization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-multiomic-disease-characterization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-phylogenetics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-modern-tree-inference",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-rare-disease-diagnosis/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-rare-disease-diagnosis",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/tooluniverse-sequence-retrieval/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tooluniverse-sequence-retrieval",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-consensus-sequences/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-consensus-sequences",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-deepvariant/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-calling-deepvariant",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-filtering-best-practices/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-calling-filtering-best-practices",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-gatk-variant-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-gatk-variant-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-joint-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-calling-joint-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-structural-variant-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-calling-structural-variant-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-variant-annotation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-annotation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-variant-calling/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-calling",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-variant-normalization/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-normalization",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-vcf-basics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-vcf-basics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-vcf-manipulation/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-vcf-manipulation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "protocols/variant-calling-vcf-statistics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-vcf-statistics",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/benchling-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "benchling-integration",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/cbioportal-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "cbioportal-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/clinpgx-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "clinpgx",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/clinvar-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-clinvar-lookup",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/cosmic-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "cosmic-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/dnanexus-integration/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "dnanexus-integration",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/ena-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "ena-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/ensembl-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-ensembl-rest",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/etetoolkit/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-tree-manipulation",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/gene-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gene-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/geniml/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "geniml",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/geo-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-geo-data",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/gnomad-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-clinical-databases-gnomad-frequencies",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/gtars/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/gtex-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gtex-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/gwas-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "gwas-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/jaspar-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "jaspar-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/monarch-database/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "monarch-database",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/polars-bio/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-intervals-interval-arithmetic",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/pysam/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "pysam",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/scikit-bio/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "scikit-bio",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "operon",
+      "path": "src-tauri/protocols/tiledbvcf/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "tiledbvcf",
+      "reason": "Reviewed duplicate/mirror of a retained original-source workflow; preserve the original source instead of duplicating or relying on an aggregator license."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/aamb/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/abricate/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-amr-surveillance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/alphagem/SKILL.md",
+      "decision": "include",
+      "category": "annotation",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/ancombc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-differential-abundance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/antismash/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/anvio/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bakta/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-prokaryotic-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/barrnap/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-ncrna-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/basalt/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bbmap/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bigscape/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/binchicken/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/biobakery-databases/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/biosurfdb/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bowtie2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bowtie2-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bracken/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-kraken",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/busco/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "busco-assessor",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bwa-mem2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/bwa/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/caduceus/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/cami/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/checkm2/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/checkv/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/comebin/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/concoct/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/coverm/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-abundance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/cutadapt/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-adapter-trimming",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/dastool/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "basalt",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/dbcan/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/deeparg/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-amr-detection",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/deepurify/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/defensefinder/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/disinfinder/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/dnabert2/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/dom-biosurfactant/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/dram/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/drep/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/eggnog-mapper/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-functional-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/element-cycling/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/erast/SKILL.md",
+      "decision": "include",
+      "category": "sequence",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/evo2/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/fastani/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/fastp/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-fastp-workflow",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/fastqc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-quality-reports",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/fasttree/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-modern-tree-inference",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/fegenie/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/gapseq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-systems-biology-metabolic-reconstruction",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/genomad/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/genome-language-model/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/gtdb/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/gtdbtk/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/gunc/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/hadeg/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/humann/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-functional-profiling",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/insilicoseq/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/instrain/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-strain-tracking",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/integronfinder/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/iqtree/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-modern-tree-inference",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/isescan/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/kaiju/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-kraken",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/kneaddata/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-contamination-controls",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/kraken2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-kraken",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/lefse/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-differential-abundance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/lexicmap/SKILL.md",
+      "decision": "include",
+      "category": "sequence",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/lorbin/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/lucaphylo/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "unicore",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/maaslin2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-differential-abundance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mag-qc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-contamination-detection",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/maxbin2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mebs/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/megahit/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-metagenome-assembly",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metabat2/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metabinner/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "basalt",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metabolic/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metabuli/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-kraken",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metaeuk/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-eukaryotic-gene-prediction",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metaflye/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-long-read-assembly",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metagenomics-workflow/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-metagenomics-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metamdbg/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-long-read-assembly",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metaphlan/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-metaphlan",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metaspades/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-metagenome-assembly",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/metawrap/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "basalt",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mgnify/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/microbial-mining/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/microeco/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-diversity-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/minimap2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-long-read-sequencing-long-read-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mlst/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-pathogen-typing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mob-suite/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mobileelementfinder/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/mobileog/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/motus/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-metaphlan",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/multiqc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "multiqc-reporter",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/nextflow/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflow-management-nextflow-pipelines",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/nucleotide-transformer/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/omg/SKILL.md",
+      "decision": "include",
+      "category": "models",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/padloc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "defensefinder",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/phylign/SKILL.md",
+      "decision": "include",
+      "category": "sequence",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/phylogenomics/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylogenomics",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/phylophlan/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-phylo-species-trees",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/phyloseq/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-diversity-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/pilon/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-assembly-polishing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/plasmaag/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/plasmidfinder/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "mob-suite",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/pmlst/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "mob-suite",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/pointfinder/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-amr-surveillance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/prodigal/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-prokaryotic-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/progenomes/SKILL.md",
+      "decision": "include",
+      "category": "databases",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/prokka/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-annotation-prokaryotic-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/qsap/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/quast/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-assembly-qc",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/racon/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-genome-assembly-assembly-polishing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/resfinder/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-amr-surveillance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/rgi/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-amr-detection",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/samtools/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "samtools-bam-processing",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/semibin2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/singlem/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/skani/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/snakemake/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflow-management-snakemake-workflows",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/spacedust/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/sra-ena/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-sra-data",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/staramr/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-epidemiological-genomics-amr-surveillance",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/strobealign/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-alignment-bwa-alignment",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/sylph/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-metaphlan",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/taxvamb/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/trimmomatic/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-read-qc-quality-filtering",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/unicore/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/vamb/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "metabat2",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/vcontact/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/virsorter2/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "genomad",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "pku-metagenomics",
+      "path": "skills/virulencefinder/SKILL.md",
+      "decision": "include",
+      "category": "metagenomics",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-qpcr",
+      "path": "SKILL.md",
+      "decision": "include",
+      "category": "crispr",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review.",
+      "strip_leading_whitespace": true
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/bioinfo-pitfalls/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/grapevine-adna/SKILL.md",
+      "decision": "include",
+      "category": "population",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/grapevine-chip/SKILL.md",
+      "decision": "quality_review",
+      "category": "crispr",
+      "reason": "Compatibility stub refers to grapeancestry/chip outside this repository; complete canonical workflow not supplied."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/plant-omics-db/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/vitis-pangenome/SKILL.md",
+      "decision": "include",
+      "category": "comparative",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/vitis-popgen/SKILL.md",
+      "decision": "include",
+      "category": "population",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "plant-skills",
+      "path": "skills/vitis-te/SKILL.md",
+      "decision": "include",
+      "category": "annotation",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "polyploid-cloning",
+      "path": "SKILL.md",
+      "decision": "include",
+      "category": "crispr",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review.",
+      "name_override": "polyploid-gene-family-cloning"
+    },
+    {
+      "source": "postgwas",
+      "path": "skills/pgwas-coloc/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-colocalization-analysis",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "postgwas",
+      "path": "skills/pgwas-mr/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-causal-genomics-mendelian-randomization",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "research-suite",
+      "path": "skills/genomics-study-design/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "research-suite",
+      "path": "skills/genotype-imputation-benchmarking/SKILL.md",
+      "decision": "include",
+      "category": "population",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "sciagent",
+      "path": "skills/lab-automation/benchling-integration/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "tooluniverse",
+      "path": "skills/tooluniverse-multi-omics-integration/SKILL.md",
+      "decision": "include",
+      "category": "workflows",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "tooluniverse",
+      "path": "skills/tooluniverse-multiomic-disease-characterization/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "tooluniverse",
+      "path": "skills/tooluniverse-protein-lof-mechanism/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "tooluniverse",
+      "path": "skills/tooluniverse-protein-sae-variant-interpretation/SKILL.md",
+      "decision": "include",
+      "category": "clinical",
+      "reason": "Distinct DNA-related task or input/output contract in the second-round review."
+    },
+    {
+      "source": "yulia",
+      "path": "skills/card-amr-profiler/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-metagenomics-amr-detection",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "yulia",
+      "path": "skills/ensembl-vep-variant-annotator/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-variant-annotation",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "yulia",
+      "path": "skills/gatk4-somatic-variant-caller/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflows-somatic-variant-pipeline",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "yulia",
+      "path": "skills/nextflow-dsl2-generator/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-workflow-management-nextflow-pipelines",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    },
+    {
+      "source": "yulia",
+      "path": "skills/qiime2-16s-microbiome/SKILL.md",
+      "decision": "duplicate",
+      "canonical_id": "bio-microbiome-qiime2-workflow",
+      "reason": "Same reviewed task, inputs and workflow stage as the retained implementation; keep provenance only."
+    }
+  ]
+}

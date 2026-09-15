@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 
@@ -17,6 +18,7 @@ from .results import (
 CANONICAL_BASES = frozenset("ACGT")
 IUPAC_AMBIGUITY = frozenset("RYSWKMBDHVN")
 IUPAC_BASES = CANONICAL_BASES | IUPAC_AMBIGUITY
+_AMBIGUITY = re.compile("[RYSWKMBDHVN]")
 IUPAC_EXPANSION: Mapping[str, frozenset[str]] = {
     "R": frozenset("AG"),
     "Y": frozenset("CT"),
@@ -54,26 +56,27 @@ def ambiguity_report(
                 else:
                     gap_total += part.length
             continue
-        for part_offset, symbol in enumerate(part):
-            if symbol in IUPAC_AMBIGUITY:
-                positions[symbol].append(symbol_offset)
-                occurrences.append(
-                    SymbolOccurrence(
+        for match in _AMBIGUITY.finditer(part):
+            part_offset, symbol = match.start(), match.group()
+            offset = symbol_offset + part_offset
+            positions[symbol].append(offset)
+            occurrences.append(
+                SymbolOccurrence(
+                    symbol=symbol,
+                    symbol_offset=offset,
+                    part_index=part_index,
+                    part_offset=part_offset,
+                )
+            )
+            if base_priors is not None:
+                resolutions.append(
+                    ProbabilityResolution(
                         symbol=symbol,
-                        symbol_offset=symbol_offset,
-                        part_index=part_index,
-                        part_offset=part_offset,
+                        symbol_offset=offset,
+                        probabilities=_probabilities(symbol, base_priors),
                     )
                 )
-                if base_priors is not None:
-                    resolutions.append(
-                        ProbabilityResolution(
-                            symbol=symbol,
-                            symbol_offset=symbol_offset,
-                            probabilities=_probabilities(symbol, base_priors),
-                        )
-                    )
-            symbol_offset += 1
+        symbol_offset += len(part)
 
     total = sum(len(item) for item in positions.values())
     denominator = symbol_offset + gap_total if denominator_known else None

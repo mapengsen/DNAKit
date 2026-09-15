@@ -4,7 +4,9 @@
 
 This transfers existing reference annotations. It does not perform de novo gene prediction, name novel genes, or annotate spliced cDNA/transcripts. Missing gene names remain null; stable IDs or locus tags remain available.
 
-## Command line
+## Installation and command line
+
+DNAKit and the external minimap2 executable are required. Importing the module does not download references or run external programs.
 
 Install the working copy:
 
@@ -18,7 +20,7 @@ Install the external mapper:
 conda install -c conda-forge -c bioconda minimap2
 ```
 
-Annotate a single-record genomic FASTA using an automatically selected assembly:
+Supply only a species to select and cache the default assembly automatically. `query.fasta` should contain one genomic DNA sequence:
 
 ```bash
 python -m dnakit.cli annotate-genes \
@@ -65,27 +67,30 @@ with read("query.fasta", format="fasta") as source:
 
 result = annotate_genes(
     record.sequence.symbols,
-    species="Homo sapiens",
+    species="Homo sapiens",  # NCBI TaxIDs such as 9606 are also accepted
     assembly=None,
     sequence_id=record.id,
     config=GeneAnnotationConfig(cache_dir=".dnakit/gene_annotation", threads=4),
 )
 print(result.reference["assembly"])
-print(result.to_dict())
+for gene in result.gene_records:
+    print(gene.to_dict())
+for segment in result.segments:
+    print(segment.to_dict())
 ```
 
-Assembly requests accept versioned GCA_/GCF_ accessions, existing fixed aliases, or unambiguous species-scoped assembly names. Explicit old accessions are not replaced with a newer version. Multiple matches (including paired GenBank/RefSeq assemblies sharing a name) require an exact accession. Missing references or gene annotations produce actionable errors.
+`assembly` accepts versioned `GCA_/GCF_` accessions, existing fixed aliases, or unambiguous species-scoped assembly names. Explicit old accessions are not replaced with a newer version. Multiple matches (including paired GenBank/RefSeq assemblies sharing a name) require an exact accession. Missing references or gene annotations produce actionable errors.
 
 ## Results
 
-- `reference`: actual assembly, annotation metadata, file checksums, selection method, and species-validation status.
-- `gene_records`: overlapping gene instances, names/IDs, strand, reference intervals, and projected query parts. A missing `gene_name` is null; `display_name` falls back to locus tag/ID.
+- `reference`: actual assembly accession and name, annotation metadata, file SHA256 checksums, source, and selection method. Automatic downloads validate the species/assembly relationship; strains may match their parent species.
+- `gene_records`: overlapping gene instances, names/IDs, strand, reference intervals, and projected query parts. A missing `gene_name` is `null`; `display_name` falls back to locus tag/ID. `mapping_id` preserves mapping identity at repeated loci.
 - `segments`: a disjoint partition of the whole query into `gene`, `intergenic`, and `unknown`. A segment can refer to several overlapping genes.
 - `alignments`: mapping coordinates, strand, MAPQ, identity and acceptance status.
 
-Python `Interval` objects are **0-based half-open**. JSON from `to_dict()` and the CLI is **1-based closed** throughout. A gene record's start/end is an envelope; `parts` describes the confidently mapped bases and may have holes. Reverse strands and indels are projected using CIGAR blocks. Circular origin-spanning genes are supported when the reference is explicitly marked circular in GFF3.
+Python `Interval` objects are **0-based half-open**. JSON from `to_dict()` and the CLI is **1-based closed** throughout. For example, input positions 1–12000 are `Interval(0, 12000)` internally. `gene_records.start/end` is an envelope in the input; `parts` describes the confidently mapped bases and may have holes. Reverse strands and indels are projected using CIGAR blocks. Circular origin-spanning genes are supported when the reference is explicitly marked circular in GFF3.
 
-For example, genes A:1–12000, B:18001–45000 and C:43000–52000 produce three gene records and these segments:
+For example, genes A:1–12000, B:18001–45000 and C:43000–52000 produce three `gene_records` and the following `segments`:
 
 ```text
 1–12000      gene         A
@@ -95,19 +100,23 @@ For example, genes A:1–12000, B:18001–45000 and C:43000–52000 produce thre
 45001–52000  gene         C
 ```
 
-## Reproducibility and scope
+## Default assembly and reliability
 
-Identical species/assembly requests reuse a pinned reference without querying NCBI. SHA256 protects the cached FASTA, GFF3 and minimap2 index; indexes are keyed by reference content, preset and mapper version. Use a new cache directory to refresh reference/annotation selection. `--no-download` permits only pinned references or local file pairs.
+When `assembly` is omitted, DNAKit queries current RefSeq reference assemblies for the species and its strains. Missing references, multiple candidates, species mismatches, or absent GFF3 gene annotations produce explicit errors; an arbitrary alternative assembly is never selected. Supply local files for species or assemblies not yet catalogued.
 
-Downloaded assemblies are checked against the requested taxonomy (including strain-to-species ancestry). Offline local species are caller-declared (`species_validated=false`). Local assembly declarations, sequence IDs and bounds are checked when available; callers remain responsible for providing a matching pair. GFF3 needs gene-level features, not only transcripts/CDS. Contig identifiers must match exactly; chromosome aliases are not guessed.
+Identical species/assembly requests reuse a pinned reference without querying NCBI. SHA256 protects the cached FASTA, GFF3 and minimap2 index; indexes are keyed by reference content, preset and mapper version. Use a new `cache_dir` to refresh reference/annotation selection. `--no-download` permits only pinned references or local file pairs.
 
-The default preset is `asm5` for long accurate genomic DNA. Defaults accept primary mappings with MAPQ ≥20, identity ≥0.90 and ≥100 aligned bases; MAPQ=255 is unknown. These are configurable filters, not calibrated accuracy guarantees.
+Downloaded assemblies are checked against the requested taxonomy (including strain-to-species ancestry). Offline local species are caller-declared (`species_validated=false`). Local assembly declarations, sequence IDs and bounds are checked when available; callers remain responsible for providing a matching pair. GFF3 needs gene-level rows such as gene, pseudogene, or immune gene segments, not only transcripts/CDS. Contig identifiers must match exactly; `chr1` and accession aliases are not guessed.
+
+The default minimap2 preset is `asm5` for long, accurate genomic DNA; adjust `preset` for your data. Defaults accept primary mappings with MAPQ ≥20, identity ≥0.90 and ≥100 aligned bases; MAPQ=255 is unknown. These are configurable filters, not calibrated accuracy guarantees.
 
 `intergenic` means reliably mapped bases outside genes in the selected annotation. Unmapped/low-confidence regions, insertions, overlapping trusted primary mappings and contigs missing annotation coverage information are `unknown`. Absence of annotation is not evidence of biological absence of a gene.
 
-Downloading a large reference and building a single-part index can require substantial storage/RAM. Configuration bounds reference/query length, downloads, GFF records, index/alignment size, and external process duration. Imports perform no downloads or external execution.
+Downloading a large reference and building a single-part index can require substantial storage/RAM. Configuration bounds reference/query length, downloads, GFF records, index/alignment size, and external process duration. A single-batch index avoids unreliable MAPQ from multi-batch indexing.
 
-Run coordinate, reference resolution, cache and CLI tests; installing minimap2 also enables the real-process test:
+## Validation and sources
+
+Run coordinate, default assembly resolution, cache integrity and CLI tests; installing minimap2 also enables the real-process test:
 
 ```bash
 PYTHONPATH=src python -m pytest -q others/tests/unit/test_gene_annotation.py

@@ -6,6 +6,7 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 from .files import dataset
@@ -24,6 +25,7 @@ def variants(
     include_checksum_files: bool = True,
     config: DownloadConfig | None = None,
     progress: Callable[[DownloadProgress], None] | None = None,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download current public ClinVar VCF, XML, or variant-summary TSV."""
 
@@ -122,6 +124,7 @@ def expression(
     platform: str | None = None,
     config: DownloadConfig | None = None,
     progress: Callable[[DownloadProgress], None] | None = None,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download a standard GEO SOFT, MINiML, or common Series RAW archive."""
 
@@ -164,3 +167,5 @@ def expression(
 
 
 __all__ = ["expression", "variants"]
+
+_register_public_verbose(globals())

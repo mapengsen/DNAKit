@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
+from os import PathLike
+from pathlib import Path
 from typing import TypeAlias, overload
 
+from dnakit._processing.dispatch import register as _register_inputs
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASequence
+from dnakit.exceptions import ConfigurationError
+from dnakit.io import ReadConfig, WriteConfig, WriteResult
 from dnakit.ops.circular import (
     CircularOperationResult,
 )
@@ -129,6 +135,7 @@ def insert(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -141,6 +148,7 @@ def insert(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -153,6 +161,7 @@ def insert(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> EditResult: ...
 
 
@@ -164,6 +173,7 @@ def insert(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | EditResult | RecordOperationResult:
     """Insert into a sequence or annotated record using one public name."""
 
@@ -190,6 +200,7 @@ def delete(
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -201,6 +212,7 @@ def delete(
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -212,6 +224,7 @@ def delete(
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> EditResult: ...
 
 
@@ -222,6 +235,7 @@ def delete(
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | EditResult | RecordOperationResult:
     """Delete from a sequence or annotated record using one public name."""
 
@@ -248,6 +262,7 @@ def substitute(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -261,6 +276,7 @@ def substitute(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -274,6 +290,7 @@ def substitute(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> EditResult: ...
 
 
@@ -286,6 +303,7 @@ def substitute(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | EditResult | RecordOperationResult:
     """Substitute sequence or record content using one public name."""
 
@@ -313,6 +331,7 @@ def mask(
     symbol: str = "N",
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -324,6 +343,7 @@ def mask(
     symbol: str = "N",
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -335,6 +355,7 @@ def mask(
     symbol: str = "N",
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> EditResult: ...
 
 
@@ -345,6 +366,7 @@ def mask(
     symbol: str = "N",
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | EditResult | RecordOperationResult:
     """Mask a sequence or annotated record using one public name."""
 
@@ -369,6 +391,7 @@ def trim(
     right: int = 0,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -380,6 +403,7 @@ def trim(
     right: int = 0,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -391,6 +415,7 @@ def trim(
     right: int = 0,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> EditResult: ...
 
 
@@ -401,6 +426,7 @@ def trim(
     right: int = 0,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | EditResult | RecordOperationResult:
     """Trim a sequence or annotated record using one public name."""
 
@@ -419,9 +445,41 @@ def trim(
 
 @overload
 def reverse_complement(
+    value: PathLike[str],
+    output_path: str | PathLike[str] | None = None,
+    *,
+    feature_policy: FeatureOverlapPolicy = "preserve",
+    read_config: ReadConfig | None = None,
+    write_config: WriteConfig | None = None,
+    sequence_column: str | None = None,
+    show_progress: bool = True,
+    workers: int = -1,
+    verbose: bool = True,
+) -> WriteResult: ...
+
+
+@overload
+def reverse_complement(
+    value: str,
+    output_path: str | PathLike[str] | None = None,
+    *,
+    feature_policy: FeatureOverlapPolicy = "preserve",
+    read_config: ReadConfig | None = None,
+    write_config: WriteConfig | None = None,
+    sequence_column: str | None = None,
+    show_progress: bool = True,
+    workers: int = -1,
+    verbose: bool = True,
+) -> str | WriteResult: ...
+
+
+@overload
+def reverse_complement(
     value: DNASequence,
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
+    workers: int = -1,
+    verbose: bool = True,
 ) -> DNASequence: ...
 
 
@@ -430,6 +488,8 @@ def reverse_complement(
     value: DNA,
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
+    workers: int = -1,
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -438,21 +498,66 @@ def reverse_complement(
     value: DNARecord,
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
+    workers: int = -1,
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
 def reverse_complement(
-    value: OperationInput,
+    value: OperationInput | str | PathLike[str],
+    output_path: str | PathLike[str] | None = None,
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
-) -> DNA | DNASequence | RecordOperationResult:
-    """Reverse-complement sequence or record content using one public name."""
+    read_config: ReadConfig | None = None,
+    write_config: WriteConfig | None = None,
+    sequence_column: str | None = None,
+    show_progress: bool = True,
+    workers: int = -1,
+    verbose: bool = True,
+) -> DNA | DNASequence | RecordOperationResult | str | WriteResult:
+    """Reverse-complement DNA text, objects, or a sequence file.
 
-    record = _record_input(value)
-    if record is not None:
-        result = reverse_complement_record(record, feature_policy=feature_policy)
-        return _public_record_result(value, result)
-    return _reverse_complement_sequence(_sequence_input(value))
+    DNA text returns uppercase text. Paths infer FASTA/FNA, TXT, CSV, and other
+    DNAKit I/O formats, streaming to a sibling ``*_reverse_complement`` file
+    unless ``output_path`` is supplied, and return a ``WriteResult``.
+    Strings containing a dot or path separator are paths; use ``Path`` for
+    extensionless filenames. TXT defaults to one sequence per non-empty line;
+    CSV uses ``sequence_column='sequence'``. Existing DNA object returns persist.
+    """
+    from dnakit._parallel import resolve_workers, worker_scope
+
+    resolve_workers(workers)
+    if not isinstance(show_progress, bool):
+        raise ConfigurationError("show_progress must be boolean.")
+    if isinstance(value, PathLike) or (
+        isinstance(value, str) and any(marker in value for marker in ("/", "\\", "."))
+    ):
+        from ._file_direction import reverse_complement_file
+
+        return reverse_complement_file(
+            Path(value),
+            Path(output_path) if output_path is not None else None,
+            feature_policy=feature_policy,
+            read_config=read_config,
+            write_config=write_config,
+            sequence_column=sequence_column,
+            show_progress=show_progress,
+            workers=workers,
+        )
+    if any(
+        option is not None for option in (output_path, read_config, write_config, sequence_column)
+    ):
+        raise ConfigurationError("File options require a file path as input.")
+    with worker_scope(workers):
+        if isinstance(value, str):
+            sequence = DNASequence("".join(value.split()).upper(), alphabet="iupac")
+            return _reverse_complement_sequence(sequence).to_string()
+
+        record = _record_input(value)
+        if record is not None:
+            result = reverse_complement_record(record, feature_policy=feature_policy)
+            return _public_record_result(value, result)
+        return _reverse_complement_sequence(_sequence_input(value))
 
 
 @overload
@@ -461,15 +566,13 @@ def rotate(
     offset: int,
     *,
     feature_policy: FeatureOverlapPolicy = "split",
+    verbose: bool = True,
 ) -> CircularOperationResult: ...
 
 
 @overload
 def rotate(
-    value: DNA,
-    offset: int,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    value: DNA, offset: int, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> DNA: ...
 
 
@@ -479,6 +582,7 @@ def rotate(
     offset: int,
     *,
     feature_policy: FeatureOverlapPolicy = "split",
+    verbose: bool = True,
 ) -> RecordOperationResult: ...
 
 
@@ -487,6 +591,7 @@ def rotate(
     offset: int,
     *,
     feature_policy: FeatureOverlapPolicy = "split",
+    verbose: bool = True,
 ) -> DNA | CircularOperationResult | RecordOperationResult:
     """Rotate a circular sequence or record using one public name."""
 
@@ -499,32 +604,24 @@ def rotate(
 
 @overload
 def canonical_origin(
-    value: DNASequence,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    value: DNASequence, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> CircularOperationResult: ...
 
 
 @overload
 def canonical_origin(
-    value: DNA,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    value: DNA, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> DNA: ...
 
 
 @overload
 def canonical_origin(
-    value: DNARecord,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    value: DNARecord, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> RecordOperationResult: ...
 
 
 def canonical_origin(
-    value: OperationInput,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    value: OperationInput, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> DNA | CircularOperationResult | RecordOperationResult:
     """Canonicalize a circular sequence or record using one public name."""
 
@@ -534,6 +631,47 @@ def canonical_origin(
         return _public_record_result(value, result)
     return _canonical_origin_sequence(_sequence_input(value))
 
+
+_register_inputs(
+    globals(),
+    (
+        "reverse",
+        "complement",
+        "subsequence",
+        "circular_subsequence",
+        "mutate",
+        "evolution_generate",
+        "indel_generate",
+        "rearrange_generate",
+        "kmer_shuffle",
+    ),
+    mode="sequence",
+)
+_register_inputs(
+    globals(),
+    (
+        "insert",
+        "delete",
+        "substitute",
+        "mask",
+        "trim",
+        "rotate",
+        "canonical_origin",
+        "insert_record",
+        "delete_record",
+        "substitute_record",
+        "mask_record",
+        "trim_record",
+        "rotate_record",
+        "canonical_origin_record",
+        "reverse_complement_record",
+    ),
+    mode="record",
+)
+_register_inputs(globals(), ("transcribe",), mode="text")
+_register_inputs(globals(), ("translate",), mode="text_native")
+_register_inputs(globals(), ("concat", "concat_overlap"), mode="concat")
+_register_inputs(globals(), ("crossover",), mode="pair")
 
 __all__ = [
     "DEFAULT_EVOLUTION_AUGMENTATIONS",
@@ -586,3 +724,5 @@ __all__ = [
     "trim",
     "trim_record",
 ]
+
+_register_public_verbose(globals())

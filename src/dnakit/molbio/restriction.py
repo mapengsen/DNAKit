@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from itertools import pairwise
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNAAlphabet, DNASequence, Issue, IssueSeverity, Topology
 from dnakit.exceptions import ConfigurationError
 from dnakit.patterns import RestrictionEnzyme, scan_restriction_sites
@@ -128,6 +129,7 @@ def classify_restriction_end(
     side: EndSide = "right",
     five_prime_phosphorylated: bool = True,
     cut_span: int | None = None,
+    verbose: bool = True,
 ) -> EndTypeResult:
     """Classify one blunt, 5-prime, or 3-prime end.
 
@@ -213,6 +215,7 @@ def digest_restriction(
     max_fragments: int = 100_000,
     max_enzymes: int = 10_000,
     max_sequence_length: int = 10_000_000,
+    verbose: bool = True,
 ) -> RestrictionDigestResult:
     """Simulate complete simultaneous digestion by an audited enzyme panel."""
 
@@ -420,7 +423,9 @@ def digest_restriction(
     )
 
 
-def as_ligation_fragment(fragment: DigestFragment | LigationFragment) -> LigationFragment:
+def as_ligation_fragment(
+    fragment: DigestFragment | LigationFragment, *, verbose: bool = True
+) -> LigationFragment:
     if isinstance(fragment, LigationFragment):
         return fragment
     if isinstance(fragment, DigestFragment):
@@ -436,6 +441,7 @@ def check_end_compatibility(
     *,
     allow_blunt: bool = False,
     require_phosphorylation: bool = True,
+    verbose: bool = True,
 ) -> LigationCompatibilityResult:
     """Check a right-facing end against a left-facing end."""
 
@@ -487,6 +493,7 @@ def ligate_fragments(
     require_phosphorylation: bool = True,
     max_fragments: int = 10_000,
     max_product_length: int = 100_000_000,
+    verbose: bool = True,
 ) -> LigationResult:
     """Ligate an explicitly ordered list of pre-cut fragments."""
 
@@ -571,3 +578,5 @@ __all__ = [
     "digest_restriction",
     "ligate_fragments",
 ]
+
+_register_public_verbose(globals())

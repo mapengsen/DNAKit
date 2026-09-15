@@ -1,5 +1,7 @@
 # OPS-005 sequence generation
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Generate new DNA sequences through mutations, insertions, deletions, fragment rearrangements, random shuffling, or sequence recombination.
 
 ## 1. OPS-005.1 mutation generation

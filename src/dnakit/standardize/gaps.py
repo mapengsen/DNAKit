@@ -10,6 +10,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, freeze_mapping, to_json_compatible
 from dnakit.core.coordinates import Interval
 from dnakit.core.enums import (
@@ -210,9 +211,7 @@ class GapNormalizationResult:
 
 
 def normalize_gaps(
-    value: GapNormalizable,
-    *,
-    config: GapNormalizationConfig | None = None,
+    value: GapNormalizable, *, config: GapNormalizationConfig | None = None, verbose: bool = True
 ) -> GapNormalizationResult:
     """Convert qualifying N-runs to known gaps without mutating the source object.
 
@@ -614,6 +613,7 @@ def sequence_from_agp(
     object_id: str | None = None,
     record_id: str | None = None,
     config: AGPAssemblyConfig | None = None,
+    verbose: bool = True,
 ) -> AGPAssemblyResult:
     """Build one linear record from AGP rows without inferring missing semantics.
 
@@ -1058,3 +1058,5 @@ __all__ = [
     "normalize_gaps",
     "sequence_from_agp",
 ]
+
+_register_public_verbose(globals())

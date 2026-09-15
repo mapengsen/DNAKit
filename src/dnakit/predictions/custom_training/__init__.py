@@ -1,5 +1,7 @@
 """User-defined DNA sequence property training and inference."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .data import (
     DataReader,
     PropertyData,
@@ -79,3 +81,5 @@ __all__ = [
     "split_property_data",
     "train_custom_property_model",
 ]
+
+_register_public_verbose(globals())

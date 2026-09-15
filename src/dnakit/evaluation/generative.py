@@ -7,6 +7,7 @@ from collections import Counter
 from collections.abc import Iterable, Mapping
 from typing import TypeVar, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.core._json import FrozenDict
 from dnakit.descriptors import kmer_statistics
@@ -36,7 +37,7 @@ def _tracked(
 ) -> Iterable[_T]:
     if not enabled:
         return items
-    from rich.progress import track
+    from dnakit._progress import track
 
     return cast(Iterable[_T], track(items, description=description, total=len(items)))
 
@@ -126,6 +127,7 @@ def evaluate_fragment_similarity(
     reference: EvaluationInput,
     *,
     config: FragmentSimilarityConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Compare exact DNA k-mer count distributions with cosine similarity."""
 
@@ -246,6 +248,7 @@ def evaluate_snn(
     reference: EvaluationInput,
     *,
     config: SNNConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Average each generated sequence's nearest-reference Tanimoto similarity."""
 
@@ -379,3 +382,5 @@ def evaluate_snn(
 
 
 __all__ = ["evaluate_fragment_similarity", "evaluate_snn"]
+
+_register_public_verbose(globals())

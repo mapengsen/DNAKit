@@ -11,9 +11,13 @@ import shutil
 import tempfile
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import closing, contextmanager, suppress
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
 
+from dnakit._checkpoint_status import checkpoint_status
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASequence
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import (
@@ -22,6 +26,7 @@ from dnakit.exceptions import (
     ConfigurationError,
     InputFormatError,
 )
+from dnakit.io import TableSchema, export_table
 from dnakit.representations import (
     RepresentationBackend,
     RepresentationConfig,
@@ -60,7 +65,7 @@ def _numpy() -> Any:
         raise BackendUnavailableError(
             "Custom property training requires NumPy.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("training"),
         ) from exc
     return np
 
@@ -72,7 +77,7 @@ def _torch() -> Any:
         raise BackendUnavailableError(
             "Custom property training requires PyTorch.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("training"),
         ) from exc
     return torch
 
@@ -173,6 +178,7 @@ def _resolve_checkpoint(config: CustomPropertyTrainingConfig) -> str:
                 code="MODEL_CHECKPOINT_NOT_FOUND",
                 context={"path": str(path)},
             )
+        checkpoint_status("Using local checkpoint", path)
         return str(path)
     return ensure_model_checkpoint(
         config.model,
@@ -588,6 +594,7 @@ def train_custom_property_model(
     data_reader: DataReader | None = None,
     representation_backend: RepresentationBackend | None = None,
     training_encoder: TrainableSequenceEncoder | None = None,
+    verbose: bool = True,
 ) -> CustomPropertyTrainingResult:
     """Train and evaluate a user-defined sequence property model from one file.
 
@@ -601,6 +608,11 @@ def train_custom_property_model(
     ``machine_learning`` selects a supervised estimator through ``config.model``
     and uses ``model_params`` instead of neural optimizer/epoch settings. Inputs
     can be sequence features, frozen embeddings, or explicit numeric columns.
+    For full K-fold validation on an existing training file, set config.cv_folds
+    (e.g. 10). All folds are evaluated, then the saved ML model is refitted on all
+    source rows; split ratios are ignored in this mode. Pass independent test
+    data only to predict_custom_properties afterwards. Fold assignments, OOF
+    predictions and validation metrics are saved under config.output_dir.
     """
 
     if not isinstance(config, CustomPropertyTrainingConfig):
@@ -895,6 +907,25 @@ def _mapping_from_payload(value: object, *, include_labels: bool) -> DataMapping
         ) from exc
 
 
+def _prediction_output(
+    result: CustomPropertyPredictionResult,
+    output_path: Path | None,
+    *,
+    overwrite: bool,
+) -> CustomPropertyPredictionResult:
+    if output_path is None:
+        return result
+    # Persist locally, returning a small path/count/schema result to the Agent.
+    exported = export_table(
+        result.predictions,
+        output_path,
+        format=cast(Any, output_path.suffix.lower().lstrip(".")),
+        schema=TableSchema(columns=tuple(result.predictions[0])),
+        overwrite=overwrite,
+    )
+    return replace(result, output_file=FrozenDict(exported.to_dict()))
+
+
 def predict_custom_properties(
     source: str | Path,
     *,
@@ -910,11 +941,20 @@ def predict_custom_properties(
     allow_remote_code: bool = False,
     show_progress: bool = True,
     trust_model: bool = False,
+    output_path: str | Path | None = None,
+    overwrite: bool = False,
+    verbose: bool = True,
 ) -> CustomPropertyPredictionResult:
     """Run inference; ML joblib artifacts require explicit ``trust_model=True``.
 
     Only enable this for artifacts whose source you trust: joblib deserialization
     can execute Python code. Neural artifacts do not use this option.
+
+    Set output_path to a .csv, .tsv, .json or .parquet file to save predicted labels
+    locally. The result's to_dict() then returns only an output summary (path,
+    row count and columns), avoiding all predictions in the Agent/LLM. CSV can go
+    directly to visualization.plot_csv_distributions. Without output_path the
+    original in-memory predictions and probabilities are returned.
     """
 
     if isinstance(batch_size, bool) or not isinstance(batch_size, int) or batch_size < 1:
@@ -922,6 +962,19 @@ def predict_custom_properties(
             "batch_size must be a positive integer.", code="INVALID_CUSTOM_PROPERTY_CONFIG"
         )
     root = Path(model_dir).expanduser().resolve()
+    destination = Path(output_path).expanduser().resolve() if output_path is not None else None
+    if destination is not None:
+        if destination.suffix.lower() not in {".csv", ".tsv", ".json", ".parquet"}:
+            raise ConfigurationError(
+                "Unsupported prediction output format.", code="INVALID_TABLE_FORMAT"
+            )
+        if destination in {Path(source).expanduser().resolve(), root, root / "model.json"}:
+            raise ConfigurationError(
+                "Prediction output must be separate from the input and saved model directory.",
+                code="UNSAFE_CUSTOM_OUTPUT_PATH",
+            )
+        if destination.exists() and not overwrite:
+            raise FileExistsError(f"Prediction output already exists: {destination}")
     manifest = _read_manifest(root)
     is_ml = manifest.get("finetune_method") == "machine_learning"
     if is_ml and trust_model is not True:
@@ -929,6 +982,15 @@ def predict_custom_properties(
             "ML artifacts use joblib; set trust_model=True only for a trusted model source.",
             code="UNTRUSTED_MACHINE_LEARNING_ARTIFACT",
         )
+    artifact = root / ("estimator.joblib" if is_ml else "head.npz")
+    if not artifact.is_file():
+        raise InputFormatError(
+            "The trained property model artifact is missing; "
+            "restore the training output directory.",
+            code="INVALID_CUSTOM_MODEL_ARTIFACT",
+            context={"path": str(artifact)},
+        )
+    checkpoint_status("Using local checkpoint", artifact)
     saved_features = manifest.get("features", {})
     if is_ml and not isinstance(saved_features, Mapping):
         raise InputFormatError(
@@ -970,7 +1032,7 @@ def predict_custom_properties(
     if is_ml:
         from .ml_training import predict_machine_learning_property
 
-        return predict_machine_learning_property(
+        prediction = predict_machine_learning_property(
             root,
             manifest,
             data,
@@ -982,6 +1044,7 @@ def predict_custom_properties(
             allow_remote_code=allow_remote_code,
             show_progress=show_progress,
         )
+        return _prediction_output(prediction, destination, overwrite=overwrite)
     torch = _torch()
     method = str(manifest.get("finetune_method"))
     model_name = str(manifest.get("model_name"))
@@ -1024,6 +1087,7 @@ def predict_custom_properties(
         representations = representation_result.representations
         runtime_device = _resolve_device(torch, device)
     elif method == "full":
+        checkpoint_status("Using local checkpoint", root / "backbone")
         encoder = TransformersSequenceEncoder(
             get_embedding_model(model_name),
             root / "backbone",
@@ -1070,13 +1134,16 @@ def predict_custom_properties(
         schema=schema,
         threshold=selected_threshold,
     )
-    return CustomPropertyPredictionResult(
+    prediction = CustomPropertyPredictionResult(
         str(root),
         data.record_ids,
         schema.label_names,
         tuple(FrozenDict(row) for row in prediction_rows),
         tuple(FrozenDict(row) for row in probability_rows),
     )
+    return _prediction_output(prediction, destination, overwrite=overwrite)
 
 
 __all__ = ["predict_custom_properties", "train_custom_property_model"]
+
+_register_public_verbose(globals())

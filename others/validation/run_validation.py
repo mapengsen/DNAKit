@@ -65,7 +65,7 @@ def _license(distribution: str) -> str | None:
     except importlib.metadata.PackageNotFoundError:
         return None
     license_expression: str | None = metadata["License-Expression"]
-    legacy_license: str | None = metadata["License"]
+    legacy_license: str | None = metadata.get("License")
     return license_expression or legacy_license
 
 

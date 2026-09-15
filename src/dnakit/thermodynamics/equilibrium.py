@@ -8,6 +8,7 @@ from contextlib import suppress
 from itertools import islice, pairwise
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import ConfigurationError
 
@@ -49,6 +50,7 @@ def binding_equilibrium(
     complement: DNASequence | None = None,
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
+    verbose: bool = True,
 ) -> BindingEquilibriumResult:
     """Calculate Ka, Kd and exact two-state duplex fraction from mass balance."""
 
@@ -116,6 +118,7 @@ def theoretical_melting_curve(
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
     progress: MeltingCurveProgress | None = None,
+    verbose: bool = True,
 ) -> TheoreticalMeltingCurveResult:
     """Evaluate the ideal two-state duplex fraction at bounded temperatures."""
 
@@ -216,6 +219,7 @@ def terminal_stability(
     window_size: int = 5,
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
+    verbose: bool = True,
 ) -> TerminalStabilityResult:
     """Compare nearest-neighbor stability of equal 5-prime and 3-prime windows."""
 
@@ -267,6 +271,7 @@ def cosolvent_tm_correction(
     dmso_percent: float = 0.0,
     dmso_factor_celsius_per_percent: float = 0.6,
     formamide_molar: float = 0.0,
+    verbose: bool = True,
 ) -> CosolventCorrectionResult:
     """Apply explicit Primer3 empirical DMSO and formamide Tm corrections."""
 
@@ -338,3 +343,5 @@ __all__ = [
     "terminal_stability",
     "theoretical_melting_curve",
 ]
+
+_register_public_verbose(globals())

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.enums import IssueSeverity
 from dnakit.core.issues import Issue
 from dnakit.exceptions import ConfigurationError
@@ -69,9 +70,7 @@ def _scale(values: tuple[tuple[float, ...], ...], config: HeatmapConfig) -> tupl
 
 
 def plot_similarity_matrix(
-    result: SimilarityMatrixResult,
-    *,
-    config: HeatmapConfig | None = None,
+    result: SimilarityMatrixResult, *, config: HeatmapConfig | None = None, verbose: bool = True
 ) -> SVGArtifact:
     """Render a matrix on a title-free square canvas without mirroring it."""
 
@@ -266,3 +265,5 @@ def plot_similarity_matrix(
 
 
 __all__ = ["plot_similarity_matrix"]
+
+_register_public_verbose(globals())

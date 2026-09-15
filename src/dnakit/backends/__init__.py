@@ -1,5 +1,6 @@
 """Lazy optional-backend registration without import-time probing."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import (
     EXTERNAL_CLI_ADAPTERS,
     BoundedCommandResult,
@@ -78,3 +79,5 @@ __all__ = [
     "backend_registry",
     "execute_bounded_command",
 ]
+
+_register_public_verbose(globals())

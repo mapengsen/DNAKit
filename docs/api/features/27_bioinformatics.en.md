@@ -8,7 +8,7 @@ DNAKit implements domain logic itself. NumPy/SciPy supply arrays, linear algebra
 
 | Extra | Purpose | Packages |
 | --- | --- | --- |
-| `bio-analysis` | Native encodings, evaluation, statistics; general feature analysis | NumPy, SciPy, scikit-learn |
+| `bio-analysis` | Native encodings, evaluation, statistics; general feature selection, dimensionality reduction, and clustering | NumPy, SciPy, scikit-learn |
 | `bio-formats` | Alignment, tree, motif, BLAST/HMMER, ABI, SnapGene/GenBank codecs | Biopython |
 | `bio-reads` | FASTA indexing and random BAM access | pysam/htslib |
 | `bio-plots` | Trees, dotplots, chromatograms, gels | Matplotlib |
@@ -38,7 +38,7 @@ Import submodules explicitly. Dependencies load when needed; APIs do not install
 | `alignment` | `read_alignment`, `write_alignment` | Biopython single-alignment FASTA/Clustal/Stockholm/PHYLIP codecs |
 | `alignment` | `align_sequences` | MAFFT `--auto`, MUSCLE **5**, Clustal Omega; restore IDs and verify sequence content |
 | `alignment` | `build_blast_database`, `local_blast` | Local nucleotide database and BLAST XML output |
-| `alignment` | `parse_search_results` | Streaming Bio.SearchIO QueryResult objects for BLAST and protein HMMER2/3 formats |
+| `alignment` | `parse_search_results` | Streaming Bio.SearchIO QueryResult objects for BLAST XML/tab and protein HMMER2/3 formats |
 | `alignment` | `build_profile`, `search_profile`, `parse_nhmmer_table` | hmmbuild, nucleotide nhmmer / protein hmmsearch; native nhmmer table parser |
 | `phylogeny` | `TreeNode`, `build_tree` | Native neighbor joining and size-weighted UPGMA |
 | `phylogeny` | `read_tree`, `write_tree`, `plot_tree` | Newick/Nexus/phyloXML/NeXML codecs and tree plots |
@@ -85,7 +85,7 @@ with IndexedReference("reference.fa") as reference:  # Existing .fai required.
     sequence = reference.fetch(Region("chr1", 100, 180, "-"))
 ```
 
-FASTA→FASTQ requires explicit `default_quality`. Repair never invents bases or qualities, handles four-line FASTQ only and cannot guarantee unambiguous resynchronization. Pairing bounds pending read payload with `max_pending`; seen-ID sets still grow with total records.
+FASTA→FASTQ requires explicit `default_quality` and does not infer quality. Repair recovers only valid four-line records and cannot guarantee unambiguous resynchronization of damaged files; use strict reading for multiline files. Pairing bounds pending read payload with `max_pending`; seen-ID sets still grow with total records.
 
 Python coordinates are **0-based half-open**. BAM consensus is reference-forward regardless of `Region.strand`. It excludes secondary, supplementary, duplicate, QC-failed and low-quality reads; ties and insufficient depth produce N. Indels are retained in alignment/VCF data, not inserted into consensus.
 
@@ -102,11 +102,11 @@ stages = dna_seq_workflow(
 vcf = stages["variants"].artifacts["variants.vcf.gz"]
 ```
 
-Variant calling requires an indexed reference and sorted indexed BAM. The RNA workflow processes one sample; inference across biological replicates is separate. ChIP begins with prepared BAMs and composes with mapping/BAM APIs. There is no assembly-browser GUI.
+The reference FASTA must already have a `.fai`; variant calling requires sorted, indexed BAM. The RNA workflow processes one sample; inference across biological replicates is separate. ChIP begins with prepared BAMs and composes with mapping/BAM APIs. There is no assembly-browser GUI.
 
 ## Native DNA encodings and general feature analysis
 
-`encoding.encode_dna({id: sequence}, descriptor, parameters=..., property_tables=..., labels=..., training_ids=...)` returns `EncodingResult(ids, names, values, descriptor, parameters, schema_version)`. The read-only matrix is samples×features. Schema `dnakit.dna-encoding.v1` accepts canonical A/C/G/T and rejects unknown parameters.
+`encoding.encode_dna({id: sequence}, descriptor, parameters=..., property_tables=..., labels=..., training_ids=...)` returns `EncodingResult(ids, names, values, descriptor, parameters, schema_version)`. `values` is a read-only samples×features array. Schema `dnakit.dna-encoding.v1` accepts canonical A/C/G/T and rejects unknown parameters.
 
 | Family | Parameters and convention |
 | --- | --- |
@@ -125,9 +125,9 @@ Variant calling requires an indexed reference and sorted indexed BAM. The RNA wo
 | PSTNPss / PSTNPds | Explicit binary-training-set positional triplet frequency differences; ds folds T→A and G→C |
 | KNN | `neighbors=3`; positive fraction among Hamming-nearest training samples, ties ordered by ID |
 
-All names are in `encoding.DNA_ENCODINGS`. Positional encodings require equal lengths. `property_tables` maps property names to all 16 dinucleotide or 64 trinucleotide values, standardized using the population SD over the complete alphabet. No unattributed property tables are bundled. NMBroto/Moran/Geary use dinucleotide tables. Short inputs, constant profiles and undefined denominators raise errors.
+All names are in `encoding.DNA_ENCODINGS`. Positional encodings require equal lengths. Physicochemical tables have the form `{property_name: {word: finite_value}}`, must cover all 16 dinucleotides or 64 trinucleotides, and are standardized using population SD over the complete word alphabet. No unattributed property tables are bundled. `NMBroto`, Moran, and Geary use dinucleotide tables. Short inputs, constant profiles and undefined denominators raise errors.
 
-Pseudo type-I uses lagged mean squared differences across properties; SC uses per-property lagged product means. Subsequence weights are `delta ** span_length`, divided by total weight when normalized. MMI uses consistent marginals from same-length windows; pair/triplet cells sum to total MI/co-information. These explicit conventions **do not promise numerical identity with iFeatureOmega's similarly named vectors**. PSTNP/KNN read training labels only and exclude each training sample from its own reference set.
+Pseudo type-I uses lagged mean squared differences across properties; SC uses per-property lagged product means. Subsequence weights are `delta ** span_length`, divided by total weight when normalized. MMI uses consistent marginals from same-length windows; pair/triplet cells sum to total MI/co-information. These explicit conventions **do not promise numerical identity with iFeatureOmega's similarly named vectors**. PSTNP/KNN read only the labels in `training_ids`, exclude each sample itself, and never use test labels.
 
 ```python
 from dnakit.bioinformatics.encoding import encode_dna
@@ -135,11 +135,12 @@ from dnakit.bioinformatics.features import analyze_features
 
 encoded = encode_dna({"a": "AACGTG", "b": "CCGTAT", "c": "ATGCAA"}, "RCKmer", parameters={"k": 2})
 fitted = analyze_features(encoded.values, feature_names=encoded.names, method="pca", components=2)
+# Keep the same column order; transform held-out data without refitting training scaling.
 held_out = encode_dna({"test": "GCTAAC"}, "RCKmer", parameters={"k": 2})
 values = fitted.transform(held_out.values, feature_names=held_out.names)
 ```
 
-`features.analyze_features` supports standard/minmax/L1/L2/none scaling; PCA, t-SNE, supervised LDA, Latent Dirichlet Allocation, chi2, F-classification/regression, MI, Information Gain (training quantile bins, `parameters={"bins": 10}`), Pearson, variance and none. Supervised methods require labels; chi2/topic models require nonnegative data. t-SNE has no held-out transform. Reuse the fitted training pipeline without refitting on held-out samples.
+`features.analyze_features` supports standard/minmax/L1/L2/none scaling; PCA, t-SNE, supervised LDA, Latent Dirichlet Allocation, chi2, F-classification/regression, MI, Information Gain (training quantile bins, `parameters={"bins": 10}`), Pearson, variance and none. Supervised methods require `labels`; chi2/topic models require nonnegative data. t-SNE has no held-out transform. Reuse the fitted training pipeline without refitting on held-out samples.
 
 `cluster_features` supports kmeans, minibatch_kmeans, gmm, spectral, affinity_propagation, mean_shift, dbscan, agglomerative and birch, returning fitted sklearn estimators. Native `mcl` applies stochastic-matrix expansion/inflation to symmetric nonnegative affinities and returns index groups, raising on nonconvergence. Clustering does not automatically scale inputs.
 
@@ -152,13 +153,13 @@ values = fitted.transform(held_out.values, feature_names=held_out.names)
 | `clipped_manifold_metrics` | Salvy et al. median-clipped density with leave-one-out normalization and beta-binomial calibrated coverage; closed balls and equal sample counts |
 | `authenticity` | Fraction where generated-to-nearest-training distance exceeds that training point's nearest-other-training distance, in [0,1] |
 | `pareto_ranks` | Explicit per-column `maximize`; zero-based nondomination ranks, duplicates share ranks |
-| `hypervolume` | Explicit directions and worse reference point; native exact recursion, at most five dimensions/1000 points with work limit |
+| `hypervolume` | Explicit directions and a worse `reference_point`; native exact recursion, at most five dimensions/1000 points with work limit |
 | `property_hit_rate` | Inclusive `lower/upper` bounds, joint/per-property rates and Boolean mask |
 | `property_kl` | KL(generated∥reference), shared histogram edges, explicit pseudocount, natural logarithms |
 | `conformity_score` | Cross-fitted isotropic Gaussian KDE and validation-density empirical scores |
 | `sequence_properties` | Named scalar Python predictors → stable IDs/property names/matrix for the metrics above |
 
-Authenticity requires the **generator's training set**, not a held-out reference. Fix embedding model, scaling and k before comparing methods. Conventional PRDC and clipped metrics differ; KID is not FID. Histogram property KL differs from seqme's KDE estimate. Conformity returns the value, fold SE and fold scores; it is not a posterior class probability. Predictor callbacks may wrap existing DNAKit models; evaluation never fits them on generated samples.
+`authenticity` requires the **generator’s training set**; other reference sets are usually independent reference/validation sets. Fix embedding model, scaling and k before comparing methods. Conventional PRDC and clipped metrics differ; KID is not FID. Histogram property KL differs from seqme's KDE estimate. Conformity returns `value`, `standard_error`, and fold scores. It measures distributional consistency, not posterior class probability.
 
 ## Statistics, compositions and count inference
 
@@ -175,15 +176,15 @@ Authenticity requires the **generator's training set**, not a held-out reference
 | `counts` | `differential_expression` | Unshrunk native NB2 GLMs, size factors, explicit contrasts, Wald/BH |
 | `counts` | `adjust_pvalues` | One-dimensional Benjamini–Hochberg correction |
 
-Permutation p-values use `(extreme+1)/(permutations+1)`; zero permutations return None. No restricted/repeated-measures permutations. PERMDISP currently requires Euclidean distances. Composition transforms and ANCOM-BC require explicit zero handling; ANCOM accepts an explicit pseudocount. UniFrac requires a biologically rooted tree and nonnegative branches.
+Permutation p-values use `(extreme+1)/(permutations+1)`; `permutations=0` returns `None`. No restricted/repeated-measures permutations. PERMDISP currently requires Euclidean distances. Composition transforms and ANCOM-BC require explicit zero handling; ANCOM accepts an explicit pseudocount. UniFrac requires a biologically rooted tree and nonnegative branches.
 
 ANCOM-BC takes samples×taxa and a full-rank numeric design including an explicit intercept; at least ten taxa are required. It returns feature×covariate **natural-log** effects, SE, Wald, p/q, sampling bias and EM iteration counts. BH correction is per covariate. This is not ANCOM-BC2 and excludes structural-zero detection, global tests and bias-variance adjustment. Degenerate variance/nonconvergence raise errors.
 
-NB2 takes integer samples×genes counts, a numeric design and explicit contrast, with at least two residual degrees of freedom and actual biological replicates. Default size factors are median ratios over genes positive in every sample; dispersion defaults to within-design residual moments. Explicit size factors/dispersions are accepted. Results include log2 fold changes, log2 SE, Wald p/q, dispersions and convergence flags; all-zero genes and failed fits have NaN inference. **DESeq2/edgeR empirical-Bayes trends, effect shrinkage and outlier strategies are not implemented.**
+NB2 takes integer samples×genes counts, a numeric design and explicit contrast, with at least two residual degrees of freedom and actual biological replicates. Default size factors are median ratios over genes positive in every sample; dispersion defaults to within-design residual moments. Explicit `size_factors` and `dispersions` are also accepted. Results include log2 fold changes, log2 SE, Wald p/q, dispersions and convergence flags; all-zero genes and failed fits have NaN inference. **DESeq2/edgeR empirical-Bayes trends, effect shrinkage and outlier strategies are not implemented.**
 
 ## Specifications, motifs and cloning
 
-`optimization.specification(kind, region=None, weight=1, **parameters)` creates a native rule. Custom `Specification(name, evaluator)` accepts `(sequence, circular) -> SpecEvaluation`, separating nonnegative violation, utility to maximize, failure locations and messages.
+`optimization.specification(kind, region=None, weight=1, **parameters)` creates a native rule. Custom `Specification(name, evaluator)` accepts `(sequence, circular) -> SpecEvaluation`. `SpecEvaluation` separately represents nonnegative `violation`, `utility` to maximize, failure locations, and messages.
 
 | kind | Parameters |
 | --- | --- |
@@ -199,7 +200,7 @@ NB2 takes integer samples×genes counts, a numeric design and explicit contrast,
 | `tm` | `minimum, maximum`, optional existing thermodynamic `conditions` |
 | `cai`, `codon_usage`, `harmonize` | All-64 `usage`; harmonize also per-codon `relative_adaptiveness` |
 
-Structural rules are explicit exact-complement models, not full thermodynamic energy calculations. `blast_match_specification(database, minimum_identity=0.8, minimum_length=20)` uses specialized BLAST HSP detection with sequence caching. No HSPs does not prove no homology. `avoid_matches` is native exact k-mer matching; no Bowtie genomic-constraint wrapper is provided.
+Structural rules are explicit exact-complement models, not full thermodynamic energy calculations. `blast_match_specification(database, minimum_identity=0.8, minimum_length=20)` uses specialized BLAST HSP detection with sequence caching. An empty search does not prove that no homology exists. `avoid_matches` is native exact k-mer matching; no Bowtie genomic-constraint wrapper is provided.
 
 ```python
 from dnakit.bioinformatics.optimization import optimize_sequence, specification
@@ -212,7 +213,7 @@ print(result.sequence, result.constraints_satisfied, result.edits)
 # result.write_report("new_report.json")  # Fresh file, failure spans and search counts.
 ```
 
-Hard constraints precede weighted objectives. Search uses greedy single-base substitutions or whole synonymous-codon replacements with `preserve_translation=True`. Length is fixed; length constraints do not insert/delete bases. Circular windows/patterns cross the origin with end coordinates potentially beyond length. Search exhaustion is not proof of infeasibility; satisfied constraints do not establish a global optimum.
+Hard constraints precede weighted objectives. Search uses greedy single-base substitutions or whole synonymous-codon replacements with `preserve_translation=True`. Length is fixed; `length` only checks it and does not insert/delete bases. Circular windows/patterns cross the origin and allow `end > length`. `search_exhausted` is not proof of infeasibility; `constraints_satisfied` does not establish a global optimum.
 
 GenBank qualifiers `dnakit_constraint` and `dnakit_objective` accept JSON such as `{"kind":"gc","minimum":0.4,"maximum":0.6}` through `specifications_from_record`. Only exact forward/simple features convert automatically; reverse, fuzzy and compound features require explicit Python declarations.
 
@@ -227,7 +228,7 @@ GenBank qualifiers `dnakit_constraint` and `dnakit_objective` accept JSON such a
 | `cloning` | `read_constructs` | Strict SnapGene/GenBank codecs or explicit pydna permissive parsing |
 | `cloning` | `simulate_gel` | Qualitative log-length migration image, returned as a Matplotlib Axes |
 
-Duplex offset places the Crick 3′ end relative to the Watson 5′ end. Paired regions must be complementary; nicks, internal gaps and mismatches are unsupported. Gel rendering does not model dye/buffer dynamics or calibrated migration. Sanger consensus filters low-quality/weak mappings and reports N for ties/uncovered sites, without inserting indels. Trace-sample and base coordinates remain distinct.
+Duplex `offset` places the Crick 3′ end relative to the Watson 5′ end. Paired regions must be complementary; nicks, internal gaps and mismatches are unsupported. Gel rendering does not model dye/buffer dynamics or calibrated migration. Sanger consensus counts only quality-passing alignments meeting identity and coverage thresholds and reports N for ties/uncovered sites, without inserting indels. Trace-sample and base coordinates remain distinct.
 
 ## Python workflows and validation
 

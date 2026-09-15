@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASet
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import ConfigurationError, InputFormatError
@@ -110,6 +111,7 @@ def build_sketch_index(
     canonical: bool = True,
     seed: int = 0,
     max_records: int = 100_000,
+    verbose: bool = True,
 ) -> SketchIndex:
     """Build a bounded, deterministic bottom-k index in input order."""
 
@@ -167,6 +169,7 @@ def nearest_neighbors(
     *,
     top_k: int = 10,
     min_similarity: float = 0.0,
+    verbose: bool = True,
 ) -> NearestNeighborResult:
     """Return stable top-k Jaccard hits from an in-memory sketch index."""
 
@@ -231,6 +234,7 @@ def save_sketch_index(
     path: str | os.PathLike[str],
     *,
     overwrite: bool = False,
+    verbose: bool = True,
 ) -> str:
     """Atomically persist a self-checksummed index and return its SHA-256."""
 
@@ -292,7 +296,7 @@ def _sketch_from_payload(payload: object) -> SketchResult:
         raise InputFormatError("Invalid sketch index entry.", code="INVALID_SKETCH_INDEX") from exc
 
 
-def load_sketch_index(path: str | os.PathLike[str]) -> SketchIndex:
+def load_sketch_index(path: str | os.PathLike[str], *, verbose: bool = True) -> SketchIndex:
     """Load and verify a DNAKit sketch index."""
 
     target = Path(path).expanduser().absolute()
@@ -363,3 +367,5 @@ __all__ = [
     "nearest_neighbors",
     "save_sketch_index",
 ]
+
+_register_public_verbose(globals())

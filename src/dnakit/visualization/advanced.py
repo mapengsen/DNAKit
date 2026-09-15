@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.alignment import AlignmentResult
 from dnakit.core import (
     CompoundLocation,
@@ -101,6 +102,7 @@ def plot_linear_map(
     max_features: int = 10_000,
     title: str = "Linear DNA map",
     theme: SVGTheme | None = None,
+    verbose: bool = True,
 ) -> SVGArtifact:
     """Draw a resolved linear coordinate axis and feature intervals on a square canvas."""
 
@@ -159,6 +161,7 @@ def plot_circular_map(
     max_features: int = 10_000,
     title: str = "Circular DNA map",
     theme: SVGTheme | None = None,
+    verbose: bool = True,
 ) -> SVGArtifact:
     """Draw a resolved circular molecule and angular feature arcs on a square canvas."""
 
@@ -259,6 +262,7 @@ def plot_alignment(
     columns_per_line: int = 80,
     max_columns: int = 20_000,
     theme: SVGTheme | None = None,
+    verbose: bool = True,
 ) -> SVGArtifact:
     """Render aligned strings in fixed-width blocks on a square canvas."""
 
@@ -316,3 +320,5 @@ __all__ = [
     "plot_circular_map",
     "plot_linear_map",
 ]
+
+_register_public_verbose(globals())

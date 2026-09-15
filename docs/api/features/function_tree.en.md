@@ -1,8 +1,33 @@
 # DNAKit function tree
 
-> Updated: 2026-09-09. Checked against public exports in the current workspace's `src/dnakit`, model/encoding catalogs, CLI, Agent catalog, and feature guides, including uncommitted implementations. The six functional areas are followed by an expanded bioinformatics Python API tree. IDs follow feature guides or requirement tracking and are not consecutive feature counts. This overview groups user capabilities rather than enumerating configuration classes, result types, compatibility aliases, or low-level helpers. Listed capabilities have interfaces and implementations; this does not imply all optional dependencies are installed or all external backends have been tested locally.
+> Updated: 2026-09-13. Checked against public exports in the current workspace's `src/dnakit`, model/encoding catalogs, CLI, Agent catalog, and feature guides, including uncommitted implementations. The six functional areas are followed by an expanded bioinformatics Python API tree. IDs follow feature guides or requirement tracking and are not consecutive feature counts. This overview groups user capabilities rather than enumerating configuration classes, result types, compatibility aliases, or low-level helpers. Listed capabilities have interfaces and implementations; this does not imply all optional dependencies are installed or all external backends have been tested locally.
 
-Details: [Feature module index](index.md) · [Agent/MCP tools and general-purpose LLM calls](../../agent_tools.md) · [Custom property training and prediction](23_deep_learning_property_prediction.md) · [Gene names and intervals](26_gene_annotation.md) · [Bioinformatics API](27_bioinformatics.md) · [Complete API reference](../index.md).
+Details: [Feature module index](index.md) · LLM tools: [MCP](../../llm_tools/mcp.md) / [Python API](../../llm_tools/python_api.md) · [Custom property training and prediction](23_deep_learning_property_prediction.md) · [Gene names and intervals](26_gene_annotation.md) · [Bioinformatics API](27_bioinformatics.md) · [Complete API reference](../index.md).
+
+## Added public API branches (2026-09-13) {#native-apis}
+
+This migration adds **484 public functions**, each documented with signatures, parameters and returns: 455 database, 20 ENCODE, 6 workflow and 3 sequence query/download functions. The purpose groups below count each function once, not independent scientific algorithms.
+
+| Purpose branch and reference | Functions |
+| --- | ---: |
+| [Genes, sequences, sequencing data and downloads](../native/sequences.md) | 41 |
+| [Genetic variants, GWAS and variant scores](../native/variants.md) | 80 |
+| [Diseases, phenotypes and ontologies](../native/phenotypes.md) | 45 |
+| [Expression, regulation and cancer data](../native/regulation.md) | 65 |
+| [Model organisms, taxonomy and microbiomes](../native/organisms.md) | 49 |
+| [Pathways, interactions, proteins and structures](../native/pathways.md) | 64 |
+| [Targets, drugs and association evidence](../native/targets.md) | 62 |
+| [Literature, preprints and study discovery](../native/literature.md) | 17 |
+| [Prediction with trained models](../native/models.md) | 14 |
+| [Sequence analysis, VCF, cloning and inheritance](../native/analysis.md) | 15 |
+| [ENCODE queries, downloads and data management](../native/encode.md) | 20 |
+| [API discovery, workflows and reports](../native/execution.md) | 12 |
+| **[484 / 484](../native/index.md)** | **484** |
+
+[Complete index and calling examples](../native/usage.md)
+
+## Core feature tree
+
 
 ```
 DNAKit feature overview (quick start tutorial + standalone tools and API extensions)
@@ -55,7 +80,7 @@ DNAKit feature overview (quick start tutorial + standalone tools and API extensi
 │   │   ├── 19. DBD-019 Conservative Data
 │   │   ├── 20. DBD-020 Multi-species comparison
 │   │   ├── 21. DBD-021 coordinate conversion file
-│   │   ├── General file download, verification, and provenance manifests: download_file
+│   │   ├── General URL/file downloads, checksums, and manifests: download_url / download_file / dataset
 │   │   └── External index construction: build_index (makeblastdb / BWA / Bowtie2 / minimap2 / samtools faidx, dict)
 │   ├── (4) Data query
 │   │   ├── 1. Basic queries: genes, sequences, accessions, assemblies, taxonomy, projects, samples, literature, database versions
@@ -137,7 +162,7 @@ DNAKit feature overview (quick start tutorial + standalone tools and API extensi
 │       ├── Codon optimization, rule-constrained optimization, and mutation libraries
 │       └── Extended constraint optimization, duplex cloning, and Sanger validation: bioinformatics tree below
 ├── 3. Data analysis
-│   ├──  (1) DNA descriptor + characterization + fingerprint
+│   ├──  (1) DNA descriptors + representations + fingerprints
 │   │   ├── DNA descriptor
 │   │   │   ├── 1. STD-005 Fuzzy base statistics
 │   │   │   ├── 2. DESC-001 length characteristics
@@ -154,7 +179,7 @@ DNAKit feature overview (quick start tutorial + standalone tools and API extensi
 │   │   │   ├── 13. DESC-012 Codon Statistics
 │   │   │   ├── 14. All descriptors: all_descriptors (240 output fields in a fixed schema)
 │   │   │   └── Descriptor schema discovery and provenance-aware dinucleotide property table loading
-│   │   ├── DNA characterization
+│   │   ├── DNA representations
 │   │   │   ├── 1. FP-001 integer encoding
 │   │   │   ├── 2. FP-002 One-hot encoding
 │   │   │   ├── 3. FP-003 k-mer features
@@ -220,7 +245,7 @@ DNAKit feature overview (quick start tutorial + standalone tools and API extensi
 │   │   ├── 1. ΔH, ΔS, ΔG and Tm of perfectly complementary duplexes
 │   │   ├── 2. Unify double-strand stability results
 │   │   ├── 3. Contribution of adjacent base pairs to steps
-│   │   ├── 4. Conditions and Na⁺/K⁺ unit price salt
+│   │   ├── 4. Conditions and Na⁺/K⁺ monovalent salt
 │   │   ├── 5. Ka, Kd and duplex ratio
 │   │   ├── 6. Theoretical melting curve
 │   │   ├── 7. 5′/3′ end stability
@@ -296,16 +321,13 @@ DNAKit feature overview (quick start tutorial + standalone tools and API extensi
 │   │       ├── Coding/intergenic regions, human/worm, Drosophila enhancers, and mouse enhancers
 │   │       ├── Human Cohn/Ensembl enhancers and human regulatory-element types
 │   │       └── Human non-TATA promoters and human open-chromatin regions
-│   ├── (9) Deep-learning task checkpoint download
-│   │   ├── Eighteen NT Revised and nine Genomic Benchmarks task weights
-│   │   └── Default/custom directories, exact paths, loading validation, and prediction output
-│   ├── (10) Optional bioinformatics functions
+│   ├── (9) Optional bioinformatics functions
 │   │   ├── 1. Ensembl VEP and variant identifier recoding
 │   │   ├── 2. ClinVar, dbSNP, and gnomAD annotation
 │   │   ├── 3. Nei–Gojobori dN/dS
 │   │   ├── 4. Golden Gate design and reaction assembly
 │   │   └── MSA, phylogeny, NGS, statistics, and molecular design: bioinformatics tree below
-│   └── (11) Gene names and intervals
+│   └── (10) Gene names and intervals
 │       ├── Genomic DNA + species → annotate_genes / GeneAnnotationConfig
 │       ├── Default RefSeq assembly resolution, explicit assembly, or local FASTA + GFF3
 │       ├── minimap2 reference alignment and existing annotation mapping (not de novo prediction)

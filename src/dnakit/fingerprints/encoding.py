@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.exceptions import (
@@ -121,6 +122,7 @@ def integer_encode(
     ambiguity_policy: IntegerAmbiguityPolicy | str = IntegerAmbiguityPolicy.IUPAC,
     gap_policy: GapEncodingPolicy | str = GapEncodingPolicy.ERROR,
     max_output_length: int = DEFAULT_MAX_OUTPUT_LENGTH,
+    verbose: bool = True,
 ) -> IntegerEncodingResult:
     """Encode DNA symbols with a versioned integer codebook.
 
@@ -243,6 +245,7 @@ def one_hot_encode(
     gap_policy: GapEncodingPolicy | str = GapEncodingPolicy.ERROR,
     base_order: Sequence[str] = CANONICAL_BASE_ORDER,
     max_output_length: int = DEFAULT_MAX_OUTPUT_LENGTH,
+    verbose: bool = True,
 ) -> OneHotEncodingResult:
     """Encode DNA as immutable A/C/G/T rows without requiring NumPy.
 
@@ -349,3 +352,5 @@ __all__ = [
     "integer_encode",
     "one_hot_encode",
 ]
+
+_register_public_verbose(globals())

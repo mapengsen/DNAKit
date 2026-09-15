@@ -7,6 +7,8 @@ from collections import defaultdict
 from collections.abc import Iterable
 from typing import overload
 
+from dnakit._parallel import ordered_map
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.collection import DNASet
 from dnakit.core.enums import DNAAlphabet, IssueSeverity
 from dnakit.core.facade import DNA
@@ -14,10 +16,10 @@ from dnakit.core.gap import Gap
 from dnakit.core.issues import Issue
 from dnakit.core.provenance import Provenance
 from dnakit.core.record import DNARecord
-from dnakit.core.sequence import DNASequence
+from dnakit.core.sequence import _INVALID_IUPAC, _INVALID_STRICT, DNASequence
 from dnakit.exceptions import ConfigurationError
 
-from ._shared import CANONICAL_BASES, IUPAC_BASES, ambiguity_report
+from ._shared import ambiguity_report
 from .config import DatasetValidationConfig, ValidationConfig
 from .results import (
     DatasetValidationReport,
@@ -32,6 +34,7 @@ def validate(  # type: ignore[overload-overlap]
     value: DNA,
     *,
     config: ValidationConfig | DatasetValidationConfig | None = None,
+    verbose: bool = True,
 ) -> ValidationReport | DatasetValidationReport: ...
 
 
@@ -40,6 +43,7 @@ def validate(
     value: DNASequence | DNARecord,
     *,
     config: ValidationConfig | DatasetValidationConfig | None = None,
+    verbose: bool = True,
 ) -> ValidationReport: ...
 
 
@@ -48,6 +52,7 @@ def validate(
     value: DNASet | Iterable[DNARecord],
     *,
     config: ValidationConfig | DatasetValidationConfig | None = None,
+    verbose: bool = True,
 ) -> DatasetValidationReport: ...
 
 
@@ -55,6 +60,7 @@ def validate(
     value: DNA | DNASequence | DNARecord | DNASet | Iterable[DNARecord],
     *,
     config: ValidationConfig | DatasetValidationConfig | None = None,
+    verbose: bool = True,
 ) -> ValidationReport | DatasetValidationReport:
     """Validate one sequence/record or a record collection with one entry point.
 
@@ -124,7 +130,7 @@ def _validate_one(
 
     issues: list[Issue] = []
     alphabet = resolved.alphabet or dna.alphabet
-    allowed = CANONICAL_BASES if alphabet is DNAAlphabet.STRICT else IUPAC_BASES
+    invalid_pattern = _INVALID_STRICT if alphabet is DNAAlphabet.STRICT else _INVALID_IUPAC
     invalid_positions: dict[str, list[int]] = defaultdict(list)
     symbol_offset = 0
     unknown_gap_count = 0
@@ -145,10 +151,9 @@ def _validate_one(
             if part.length is None:
                 unknown_gap_count += 1
             continue
-        for symbol in part:
-            if symbol not in allowed:
-                invalid_positions[symbol].append(symbol_offset)
-            symbol_offset += 1
+        for match in invalid_pattern.finditer(part):
+            invalid_positions[match.group()].append(symbol_offset + match.start())
+        symbol_offset += len(part)
 
     for symbol, positions in sorted(invalid_positions.items()):
         issues.append(
@@ -268,6 +273,11 @@ def _validate_one(
     )
 
 
+def _validation_job(payload: tuple[DNARecord, ValidationConfig]) -> tuple[str, ValidationReport]:
+    record, config = payload
+    return record.id, _validate_one(record, config=config)
+
+
 def _validate_collection(
     records: DNASet | Iterable[DNARecord],
     *,
@@ -280,13 +290,16 @@ def _validate_collection(
     invalid_indices: list[int] = []
     count = 0
 
-    for index, record in enumerate(records):
-        if not isinstance(record, DNARecord):
-            raise TypeError(
-                f"records item {index} has type {type(record).__name__}; expected DNARecord."
-            )
-        seen_indices[record.id].append(index)
-        report = _validate_one(record, config=resolved.record)
+    def jobs() -> Iterable[tuple[DNARecord, ValidationConfig]]:
+        for index, record in enumerate(records):
+            if not isinstance(record, DNARecord):
+                raise TypeError(
+                    f"records item {index} has type {type(record).__name__}; expected DNARecord."
+                )
+            yield record, resolved.record
+
+    for index, (identifier, report) in enumerate(ordered_map(_validation_job, jobs())):
+        seen_indices[identifier].append(index)
         if not report.is_valid:
             invalid_indices.append(index)
         if resolved.collect_record_reports:
@@ -350,6 +363,7 @@ def validate_set(
     records: DNA | DNASet | Iterable[DNARecord],
     *,
     config: DatasetValidationConfig | None = None,
+    verbose: bool = True,
 ) -> DatasetValidationReport:
     """Backward-compatible alias for ``validate(records, config=config)``."""
     return _validate_collection(records, config=_resolve_dataset_config(config))
@@ -485,3 +499,6 @@ def _issue(
     details: dict[str, object],
 ) -> Issue:
     return Issue(code=code, severity=severity, message=message, details=details)
+
+
+_register_public_verbose(globals(), ("validate", "validate_set"))

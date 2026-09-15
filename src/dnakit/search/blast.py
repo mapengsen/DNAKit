@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Provenance
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import ConfigurationError, QueryError
@@ -140,6 +141,7 @@ def submit_blast(
     megablast: bool = True,
     config: SearchConfig | None = None,
     api_url: str = DEFAULT_NCBI_BLAST_URL,
+    verbose: bool = True,
 ) -> BlastJob:
     """Submit one bounded BLAST query; no implicit polling or sleeping occurs."""
 
@@ -221,6 +223,7 @@ def blast_status(
     *,
     config: SearchConfig | None = None,
     api_url: str = DEFAULT_NCBI_BLAST_URL,
+    verbose: bool = True,
 ) -> BlastStatus:
     """Check one RID without automatic retrying."""
 
@@ -337,6 +340,7 @@ def blast_results(
     *,
     config: SearchConfig | None = None,
     api_url: str = DEFAULT_NCBI_BLAST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Retrieve ready BLAST JSON2 results and normalize the best HSP per hit."""
 
@@ -402,6 +406,7 @@ def wait_for_blast(
     progress: Callable[[BlastProgress], None] | None = None,
     config: SearchConfig | None = None,
     api_url: str = DEFAULT_NCBI_BLAST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Poll at NCBI-compliant intervals until a submitted BLAST job is ready."""
 
@@ -464,6 +469,7 @@ def identify(
     *,
     wait: bool = False,
     config: SearchConfig | None = None,
+    verbose: bool = True,
     **kwargs: object,
 ) -> BlastJob | QueryResult:
     """Submit an NCBI nucleotide search for likely sequence source identification.
@@ -493,6 +499,7 @@ def novelty(
     *,
     wait: bool = False,
     config: SearchConfig | None = None,
+    verbose: bool = True,
     **kwargs: object,
 ) -> BlastJob | QueryResult:
     """Submit or run the same BLAST search used for remote novelty inspection."""
@@ -512,3 +519,5 @@ __all__ = [
     "submit_blast",
     "wait_for_blast",
 ]
+
+_register_public_verbose(globals())

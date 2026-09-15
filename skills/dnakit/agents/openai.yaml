@@ -1,0 +1,4 @@
+interface:
+  display_name: "DNAKit"
+  short_description: "Find and run curated DNA and genomics workflows"
+  default_prompt: "Use $dnakit to find an appropriate DNA or genomics workflow and carry out my analysis."

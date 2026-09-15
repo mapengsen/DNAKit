@@ -1,5 +1,6 @@
 """Lightweight immutable value objects shared across DNAKit."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.backend_info import BackendInfo
 from dnakit.core.collection import DNASet, IDFactory
 from dnakit.core.coordinates import (
@@ -79,3 +80,5 @@ __all__ = [
     "import_location",
     "reverse_strand_location",
 ]
+
+_register_public_verbose(globals())

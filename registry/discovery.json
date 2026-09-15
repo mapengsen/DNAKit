@@ -1,0 +1,3390 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-12",
+  "scope": [
+    "DNA sequence processing and molecular design",
+    "Genome assembly, alignment, annotation and variants",
+    "Population genetics, GWAS and inherited-disease research",
+    "Epigenomics, regulatory DNA and DNA language models",
+    "Microbial/viral genomes, plasmids and mobile genetic elements",
+    "Plant, ancient DNA, mitochondrial and long-read workflows",
+    "Necessary support for retained DNA analysis workflows"
+  ],
+  "limits": [
+    "Publicly discoverable and accessible sources only; private, unindexed, removed and future skills are not exhausted.",
+    "SKILL.md path counts include mirrors, examples, legacy and non-DNA content; they are not unique workflow counts.",
+    "Repository search is a lead inventory, not a claim that every returned repository contains an AI skill. No keyword or repository name alone establishes functional equivalence.",
+    "Initial and supplemental web lookups are also cached; only queries with preserved exact query strings are enumerated here.",
+    "No LLM selection benchmark, full pipeline validation, or validation of all scientific assertions was performed."
+  ],
+  "recorded_web_queries": [
+    {
+      "query": "\"DNA\" \"agent skills\" genomics GitHub -writing -story -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-2.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"epigenomics\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-2.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"CRISPR\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-2.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"metagenomics\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-2.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"AlphaGenome\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-3.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"nucleotide transformer\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-3.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"Evo2\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-3.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"Borzoi\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-3.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"mitochondrial\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-4.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"ancient DNA\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-4.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"plasmid\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-4.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"DNA storage\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-4.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"methylation\" github",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-5.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"pangenome\" github",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-5.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"long read\" github",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-5.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"GWAS\" github",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-5.txt"
+    },
+    {
+      "query": "site:github.com genomics skills in:name",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-6.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"DNA\" \"license: MIT\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-6.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"Oxford Nanopore\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-6.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"synthetic biology\" -site:reddit.com",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-6.txt"
+    },
+    {
+      "query": "\"genomics\" \"SKILL.md\" \"plant\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-7.txt"
+    },
+    {
+      "query": "\"genetics\" \"SKILL.md\" \"license\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-7.txt"
+    },
+    {
+      "query": "\"DNA\" \"SKILL.md\" \"origami\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-7.txt"
+    },
+    {
+      "query": "\"SKILL.md\" \"STR\" \"genome\"",
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/web-7.txt"
+    }
+  ],
+  "github_repository_queries": [
+    {
+      "query": "genomics skills in:name,description",
+      "page": 1,
+      "reported_total": 100,
+      "returned": 100,
+      "repositories": [
+        "BioTender-max/awesome-bio-agent-skills",
+        "GoekeLab/awesome-genomic-skills",
+        "awslabs/hcls-agent-skills",
+        "Genomics-CRT/Data-Science-For-Life-Science",
+        "YuliaNuzhnenko/bioinformatics-agent-skills",
+        "KalarisLabs/Myriad",
+        "gilleswainrib-ext-boop/bioinfo-skills",
+        "stjudecab/CAB-aiSkills",
+        "htlin222/ngs-tertiary-analysis-skills",
+        "juanesarango/isabl-mcp",
+        "ankurgenomics/genomics-skills",
+        "Ynzuses/research-skills-suite",
+        "ClawBio/ClawBench",
+        "maratgaliev/claude-skill-genomic-pipelines",
+        "mohmhm1/analyze-genome",
+        "Omicsio/gene2ai-openclaw-skill",
+        "MAGIC-AI4Med/ClinGeX",
+        "Oscar857-dotcom/Bioinfor_internships",
+        "hubayirp/agentic-science",
+        "dgallitelli/aws-healthomics-skill",
+        "SaradaPriyaMns/Genomics-ProjectsPortfolio",
+        "manuelcorpas/24-AGENTIC-PGX-BENCHMARK",
+        "DrNagendra619/Computational-Biology-Projects-Portfolio",
+        "Pratikrishi97/sciagent-skills",
+        "camgenomicmedicine/GMO7-Jupyter",
+        "SSahoo-09/unix-shell-bioinformatics-practice",
+        "madsondeluna/madsondeluna.github.io",
+        "jscheiber78-droid/skillgenome",
+        "Jason-0409-G/vivarium",
+        "dromlakhani/nhs-genomic-test-finder",
+        "asanteibinabo-anita/Bioinformatics-Learner-Journey",
+        "abdulmashuod/sars-cov2-variant-analysis",
+        "soumyami24/Genova",
+        "newking9088/ISC-5425-Introduction-to-BioInformatics",
+        "iva100/Artificial-intelligence-Machine-learning",
+        "ericmjl/2026-festival-of-genomics-workshop",
+        "masaomi/GenomicsChain_SkillSets",
+        "a-epstein/learning-genomics",
+        "kango2/genomics-skills",
+        "Xuzhen-Li/bioinfo-agent-skills",
+        "RyanGawryluk/BIOL362",
+        "Jihong-Tang/Cancer-genomics-analysis",
+        "c-lonergan/genomics_skills_test",
+        "oakbioinformatics/fhir_genomics_skills",
+        "ThomasBrazier/genomics-data-skills",
+        "Negin-nouri/genomics-fellowship-2026",
+        "ChevyLiang/Geng-BEVA-agent-skills",
+        "sheikhahmadi1980/Computational-Genomics-Portfolio",
+        "pittlab-genomics/Melvin_Alexa_Skill",
+        "lekshmipriyaranil-creator/genomics-learning",
+        "SampurnaM/genomics_learning_SM",
+        "RameshBabuAsh/BharatGenomicsDL",
+        "dzhao2019/CancerGenomicsPipelines",
+        "nszeny/BS831-Genomics-2026",
+        "Keefe2/ahmad-portfolio",
+        "Pxavier263/-Bioinformatics-for-Biologists-Analysing-and-Interpreting-Genomics-Datasets",
+        "mannyhBU/tidyverse-basic-genomics-metadata-analysis",
+        "AtharvaBandekar/DeepLearning_Genomics_CTCF",
+        "manseebhossain1/Tidyverse-Basic-Genomics-Metadata-Analysis",
+        "kav-n/bioinformatics-portfolio",
+        "goldenheifer/Code-Cumbria-Data-Project",
+        "rhondene/Claude-Skills-forBioinformatics",
+        "lzr098/sensory-genomics-skill",
+        "AmiraKamarudin/Figures-and-Plots-Room",
+        "prachetaghosh1-hi/SkillIndia-NGS-Training",
+        "nermyne24/HackBio-data_visualisation",
+        "Raphael-Doe/Python-biology",
+        "lzr098/GPA-Filter",
+        "NikhilGarge/personalized-medicine-selector",
+        "Jiawang1209/GeneFam-Pipeline-skills",
+        "anjali-genomics/Data-Analytics-Portfolio",
+        "pittlab-genomics/Pronunciation_Quiz_Alexa_Skill",
+        "pittlab-genomics/Pronunciation_Quiz_Intent_Handler",
+        "janjanecka/r-data-files",
+        "ohan-Bioinfo/mohanad-portfolio",
+        "alisanelson/portfolio",
+        "Oasiful-Islam-0/Biotechnology-Journey",
+        "weeboo-sys/cancer-gene-expression-explorer",
+        "pittlab-genomics/Melvin_Alexa_Intent_Handler",
+        "Skillwager/agent-skill-profiles",
+        "gazollavolpiano/gazollavolpiano.github.io",
+        "PratikshaPisar13/Pratiksha",
+        "sush-rgb/sushmita-portfolio",
+        "sush-rgb/sushmita_sinha",
+        "ayana-bioinfo/ayana-bioinfo",
+        "valgri1/valgri1",
+        "Peekabot/genome-map-agents",
+        "MMeowhite/BioinfoHandbook",
+        "Mili-0299/WGS-Variant-Interpretation-OCA-Case-Study",
+        "VAlzorriz/Blocknome",
+        "bhawnasaini651-bit/bhawna-bioinfo",
+        "bodlahh23/Python-Sequence-Skew-Analyzer",
+        "Mandrita04/Genomic_Sequence_Analysis_Toolkit_HPV16",
+        "Akanksha-1810/Influenza-A-Evolution-Analysis",
+        "GenomicCoder/ngs-linux-basics",
+        "avahal/metagenomics_tube_stations",
+        "K-nie/Sequencing-Informatics-for-Genomic-Analysis",
+        "VanshKapoor-55biotechdata/Patient-Genomic-Data-Screening-Dashboard-MS-Excel-",
+        "TuhinBanerjee31/NeuroPro",
+        "andersst91/UF_PSS_Workshop2020"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/0.json"
+    },
+    {
+      "query": "bioinformatics skills in:name,description",
+      "page": 1,
+      "reported_total": 446,
+      "returned": 100,
+      "repositories": [
+        "GPTomics/bioSkills",
+        "ClawBio/ClawBio",
+        "LeonChaoX/qinyan-academic-skills",
+        "vsbuffalo/bds-files",
+        "jaechang-hits/SciAgent-Skills",
+        "Ming-Lian/Bioinformatics-skills",
+        "GoekeLab/awesome-genomic-skills",
+        "openbiox/bioinformatics-100-days",
+        "AlterLab-IEU/AlterLab-Academic-Skills",
+        "variomeanalytics/bioinformatics-agent-skills",
+        "sagirimo/BioDSH",
+        "zongtingwei/Bioclaw_Skills_Hub",
+        "zwbao/bioinformatics-god-skill",
+        "Delphine-L/claude_global",
+        "FridrichMethod/awesome-skills",
+        "Jack123-Wang/AI_Bioinformatic",
+        "laderast/bash_for_dnanexus",
+        "YuliaNuzhnenko/bioinformatics-agent-skills",
+        "bbeckley-hub/bbeckley-hub-bbeckley-hub",
+        "Aryia-Behroziuan/Robot-learning",
+        "Bioconductor/ai-agent-skills",
+        "wolf5996/agentic-skills",
+        "Bioinformatics-Research-Network/Bioinformed-Skill-App",
+        "erinyoung/AMD-Mountain-Region-Bioinformatics-Code-Club",
+        "BioinfoApplication-XMU/Part-I.-Bioinformatics-data-Skills",
+        "ShenChen-bioUtopia/Bioinformatics-data-skills",
+        "KalarisLabs/Myriad",
+        "waldronlab/ai-agent-skills",
+        "WCSCourses/Human_Gut_Microbiome_Metagenomics_2026",
+        "Pavel-Kravchenko/Bioinformatics",
+        "qiyuan0414/bioinfo-bench",
+        "ELReedHerbarium/TargetCaptureWorkshop",
+        "HullUni-bioinformatics/genomisc-training",
+        "fanxin199/immunology-PhD_using_skills",
+        "cheatthegod/BioHermes",
+        "gilleswainrib-ext-boop/bioinfo-skills",
+        "stjudecab/CAB-aiSkills",
+        "Bioinformatics-Research-Network/Python-Programming-I",
+        "YuhuiWang1/bioresearch-ai-workflow",
+        "cccsean/sci-feasibility-report-skill",
+        "ThorntonLab/ComputerSkills4GradStudents",
+        "syntheticgio/AIBioSkills",
+        "maratgaliev/claude-skill-genomic-pipelines",
+        "Rooneyxu/bioinformatics-plotting-standards",
+        "biocompt/Code4Bio",
+        "mskcc/IrisAI",
+        "nmpegetis/MSc_in_Bioinformatics",
+        "Bioinformatics-Research-Network/R-Programming-II",
+        "Bioinformatics-Research-Network/R-Programming-I",
+        "Team-yPark/skills",
+        "alejorojas2/PLPA504V_Bioinf_skills",
+        "jarxunlai/My-skills",
+        "DrKoduru/DrKoduru-Research",
+        "Zhaozilongxa/openclaw-scientific-skill",
+        "Louis-MG/bioinformatic-skills",
+        "cerbero/ScalaMerge",
+        "swallow-design/bioinformatics-god-plus",
+        "ucdavis-bioinformatics-training/2021-June-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2021-March-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2024-July-Introduction-to-R-for-Bioinformatics",
+        "SaradaPriyaMns/Python-ProjectsPortfolio",
+        "fjag/crible",
+        "AlexanderLabWHOI/cs-sea-catg",
+        "EEOB-BioData/BCB546_Spring2023",
+        "russellxie/Hon_Lab_Bioinfo_Class",
+        "truong128/OmicsAgent",
+        "vlln/bio-skills",
+        "NatureGeorge/BIOI-ST",
+        "coltonrobbins73/Rosalind",
+        "conchoecia/Bioinformatics-tutorials",
+        "lhelseth/zmays-snps",
+        "BioTender-max/awesome-ai4bio-skills",
+        "HKultalahti/Bioinformatics_portfolio",
+        "nekrut/galaxy-claude-skills",
+        "yyw-informatics/kb-skills-bioinformatics",
+        "RimanB/bioinformatics-data-skills",
+        "BryonyCore/Bioinformatics-data-skills",
+        "annchideraokafor-jpg/300-Days-Bioinformatics-Challenge",
+        "natzhl/bioinformatics-training-projects",
+        "pmoris/computational-skills",
+        "Bishop-Laboratory/RA-Eval",
+        "SitaoZ/Translation-Of-Bioinformatics-Data-Skills",
+        "Abhishek-MSBI/Abhishek-MSBI.github.io",
+        "ssoriano22/AWS_Skills_Practice",
+        "Maxim-Firsov/bioinformatics-portfolio",
+        "swamyshogan/Bioinformatics-Badges",
+        "AstroReality-Li/bioinformatics-analysis-preflight",
+        "asanteibinabo-anita/Bioinformatics-Learner-Journey",
+        "SSahoo-09/unix-shell-bioinformatics-practice",
+        "adityatiwari-git/portfolio-v2",
+        "Djinho/-Core-Bioinformatics-Workflows",
+        "ylwu-510/simplify-bioinformatics-code",
+        "bbbranjan/talk-to-your-pipeline",
+        "steverozen/quarto-bioinfo",
+        "paschalugwu/Bioinformatics-Jobs-2024-Report",
+        "egegokce/hello-world",
+        "Chen-Po/claude-md-strict-research",
+        "SaradaPriyaMns/Genomics-ProjectsPortfolio",
+        "ZombieShawn1221/bioinfoarticle2notion_skills",
+        "amenamahdami/Amena_Mahdami_Portfolio.github.io"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/1.json"
+    },
+    {
+      "query": "DNA skill in:name,description",
+      "page": 1,
+      "reported_total": 371,
+      "returned": 100,
+      "repositories": [
+        "alchaincyf/nuwa-skill",
+        "larashero3-dotcom/writing-dna-skill",
+        "leezythu/maoxuan-skill",
+        "alchaincyf/steve-jobs-skill",
+        "ItsssssJack/power-design",
+        "T8mars/minimax-h3-prompt-skill-T8",
+        "ilang-ai/Imprint",
+        "liangjfblue/writer-dna",
+        "artemnovitckii/content-skills",
+        "Crystalzhou666/xie-shengzi",
+        "irenerachel/style-pack-skill",
+        "yisyeasy-crypto/academic-writing-dna-skill",
+        "dvdxfv/skill-writing-dna",
+        "opitaru-sys/deck-dna",
+        "sherjy/wudao-hero-skill",
+        "mengge1023/Allen-Zhang-skills",
+        "MaydayV/wechat-article-skill",
+        "dakjdakd/PPT-Design-DNA",
+        "dacnay816y62-hub/fantasy-character-visual-dna-skill",
+        "happydog-intj/luban-skill",
+        "ahao31196/ahao-writing-dna-distiller",
+        "kylvia/mimeng-skill",
+        "shannhk/writing-style-extractor",
+        "Erickuby/Social-Media-Autoposting-With-Claude-Code",
+        "aievolutionpl/agent-design-taste",
+        "laderast/bash_for_dnanexus",
+        "stoicneko/hymy-skill",
+        "anneheartrecord/duanyongping-perspective",
+        "lucianwhy/fengshu-skill",
+        "alphaparkinc/genpark-smith-waterman-local-sequence-aligner-skill",
+        "Alpha-Park/genpark-smith-waterman-local-sequence-aligner-skill",
+        "B-FASB/cz-skill",
+        "Orpheus-K/symbiopulse",
+        "ruxpincn/tim-perspective",
+        "heywanrong/tim-cook-skill",
+        "victor-aguilars/persona-architect",
+        "eulucasduty/mente-designer",
+        "tiantangcao1980-web/DesignDNA-Skills",
+        "Sudiddii/build-DNA",
+        "sugerhighboy/snapgene-cli-maps",
+        "tonightisverytired/agent_dna_momery",
+        "chunyun1998-sudo/justin-sun-writing-dna",
+        "dungnotnull/Genealogy-Family-History-Research-Advisor-agent-skill",
+        "YuhuiWang1/bioresearch-ai-workflow",
+        "yangbuyiya/trump-perspective-skill",
+        "blossoms6/andrew-ng-perspective",
+        "chunyun1998-sudo/xhs-justinsun-pipeline",
+        "yanliudesign/design-dna-skill",
+        "Venkat-023/CareerDNA",
+        "scrofied/rap-clone-skill",
+        "iamnigellee/PPT-style-wow",
+        "wxryyds666/-skill",
+        "Enterprise-DNA-OS/ai-learning-path-generator",
+        "luigiluft/ditto",
+        "moonstachain/wechat-writer",
+        "inematds/power-design",
+        "AIPMAndy/DNASkill",
+        "T-Zevin/cfDNA-skills",
+        "xiaocheny214/claude-skill-voice-dna",
+        "Harini-Nagireddy/CareerDNA",
+        "SoraKevin/Distiller-DNA-by-Sora",
+        "karosu3510/design-dna",
+        "voropaev130-max/claude-marketing-skills",
+        "mjcreations123/design-dna",
+        "wangdiming/-.SKILL",
+        "YeJe-cpu/saul-goodman-skill",
+        "CochraneK/mao-skill",
+        "RahmatHadinata23758051/SKILL-Design-Intelligence",
+        "Minearm-RPM/libai-perspective-skill",
+        "qingshanliuci/shen-changsheng-skill",
+        "VaporAviator/vaporaviator-lab-style",
+        "GodModeAI2025/Redestil",
+        "zwbao/lu-qi-skill",
+        "yangbuyiya/distill-any-skill",
+        "likeahuman-ai/branding-pitch",
+        "haosuo/Marx-Engels-Thinking-OS",
+        "guimaraesabrina/beca_dna_git_fork_pull_request",
+        "janzofx/agent-dna-auditor",
+        "deepz717/SkillDNA",
+        "alkorgli-B/skill-dna",
+        "caesar926/skill-dna",
+        "johnfreeman13592-lab/skill-dna-compiler",
+        "Excel-DNA/Skills",
+        "Hantao23/dna-storage-paper-reading-skill",
+        "ponomr/voice-dna-builder",
+        "Lucineer/dogmind-arena",
+        "brunoV/bot-basicbot-pluggable-module-seqtools",
+        "912349707-gif/cinema-dna-hyperreal-scene",
+        "1second1/personal-research-skills",
+        "912349707-gif/cinema-dna-action-props",
+        "likitha-am/Career_DNA",
+        "BitCrowder/design-dna-compiler",
+        "kjmagnan1s/voice-dna-builder",
+        "KongYue/jesus-skill",
+        "mturac/codebase-dna-guardian",
+        "NullLabTests/dna-rna-protein-analog",
+        "yiningz308-prog/style-dna-remix",
+        "0xiftenG/duanyongping-skill",
+        "daxueren666/blogger-dna",
+        "Kritika11052005/CareerDNA"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/2.json"
+    },
+    {
+      "query": "crispr skill in:name,description",
+      "page": 1,
+      "reported_total": 3,
+      "returned": 3,
+      "repositories": [
+        "geeekyvishal/CRISPR-Roadmaps",
+        "Dddddong-higher/acr_skill",
+        "Raphael-Doe/Python-biology"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/3.json"
+    },
+    {
+      "query": "epigenomics skill in:name,description",
+      "page": 1,
+      "reported_total": 4,
+      "returned": 4,
+      "repositories": [
+        "gilleswainrib-ext-boop/bioinfo-skills",
+        "hubayirp/agentic-science",
+        "dxpython/Bioinformatics-Research-Skill",
+        "MMeowhite/BioinfoHandbook"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/4.json"
+    },
+    {
+      "query": "variant skill in:name,description",
+      "page": 1,
+      "reported_total": 341,
+      "returned": 100,
+      "repositories": [
+        "prompt-security/clawsec",
+        "KayLerch/alexa-utterance-generator",
+        "adewale/skill-eval-harness",
+        "YuqingNicole/variant-design-skill",
+        "Mdshobu/Liberty-House-Club-Whitepaper",
+        "SymbolicLight-AGI/contractual-skill",
+        "KayLerch/alexa-skills-kit-tellask-java",
+        "dlazy-ai/ai-product-video",
+        "eugenelim/llm-wiki-kit",
+        "ron2015schmitt/PCBLayoutReviewForOrCADCadence",
+        "alphaparkinc/genpark-interactive-component-vibe-code-synthesizer-skill",
+        "mikefutia/claude-higgsfield-figma",
+        "unicorn-marketers/red-team",
+        "elangan1997-cmyk/sku-variant-studio-skill",
+        "alphaparkinc/genpark-viral-social-ad-variant-generator-skill",
+        "alphaparkinc/genpark-programmatic-landing-page-cro-variant-synthesizer-skill",
+        "alphaparkinc/genpark-ai-social-ad-creative-multi-variant-generator-skill",
+        "alphaparkinc/genpark-high-converting-social-ad-copy-variant-synthesizer-skill",
+        "peiqingzhang/art_inspired_design_system_for_AI",
+        "C-Jeril/framer-motion-skills",
+        "Spark-To-Paper-Skills/paper-wiki",
+        "HKU-BAL/Clair-skills",
+        "ZhangYiqun018/skill-manager-client",
+        "hi-talent-in/helloworld",
+        "chenxihuang1028-a11y/variant-analysis",
+        "logandoo/vibeweaver",
+        "silouone/skills",
+        "htlin222/ngs-tertiary-analysis-skills",
+        "zeuikli/output-compress",
+        "dungnotnull/Rugby-Strategy-Advisor-agent-skill",
+        "ChristianHartmann/skills",
+        "ankurgenomics/genomics-skills",
+        "jihkyuo/skills",
+        "JuribaDev/yalla-skills",
+        "jjunsss/LOOP-STATION",
+        "Anvil-Code/description-optimizer",
+        "NORTHTEKDevs/aurora3d",
+        "sauravvarma/garage",
+        "ironystock/banana-claws",
+        "Variant-Systems/skills",
+        "daassh/visual-variants",
+        "NathanSkene/claude-genome-skill",
+        "muwenbo/genetic-counseling-skills",
+        "ctaxnagomi/agent-kd-skill",
+        "oitan/design-html-shotgun",
+        "takaaaaaan/ship-ask",
+        "sivi/skills",
+        "shaugupt/grill-me-cursor",
+        "geekjourneyx/video-post",
+        "jake17007/uplift",
+        "cyrilvoyant/PV_ELM_pred",
+        "cobibean/compicker",
+        "jsr993/component-spec-kit",
+        "webto-id/variant-skill",
+        "CancerDAO/cancer-buddy-organize-local-skill",
+        "lyfar/genomic-variant-research",
+        "divyendrajadoun/amazing-openclaw-variants",
+        "jovaneyck/skill-creator-for-github-copilot-cli",
+        "cemuchay/wordle-variant",
+        "chengyixu/variant-design-languages",
+        "C0ldSmi1e/uninstall-claw-skill",
+        "xunx911/skills-manager",
+        "Bloomed-Health/cancer-predisposition-variant-analyst",
+        "23jmo/jmoui",
+        "abdulmashuod/sars-cov2-variant-analysis",
+        "connerkward/lookdev-auto-skill",
+        "luoyif/music-meter-transform-skill",
+        "ldsAS/dev-ai-skills",
+        "gaspanik/figma-component-audit-skill",
+        "arielaizn/website-craft-skills",
+        "CruiseSL/codex-coding-guidelines-skill",
+        "ADRX-SL/email-sequence-skill",
+        "ChocoData-com/scrape-amazon-product-skill",
+        "BrinShadewater/Webp-Me-Daddy-Skill",
+        "Steven-ZN/Apple-26-ai-skill",
+        "Mamdouh66/drafts",
+        "watchi666/impeccable-local",
+        "lucamago/magogmazios-reroll-planner",
+        "JasminK11/claude-5-why-skill",
+        "chinchang/ui-buddy",
+        "ne11nn/comparison-lab",
+        "runflow-io/runflow-ad-creative",
+        "yysxjz/idea-spark-agentic",
+        "durmazoguzhan/svg-logo-maker",
+        "chchchadzilla/slop-cop",
+        "ARTHUR-BBU/ai-video-asset-manager",
+        "lainshao/pick-one",
+        "brandonckhoo/growth-experiment",
+        "ai-orchestrators/voice-humaniser",
+        "ShoppingResult/shoppingscraper-cli",
+        "taleilon/Ayla-Saas-Admin-UI-UX-Pro",
+        "Djinho/-Core-Bioinformatics-Workflows",
+        "gustavohsouza/claude-the-price-hunter",
+        "aicontentskills/tiktok-reel-hook-generator",
+        "TerrArx/ev-genAI",
+        "bmanske505/Mondrian-Static",
+        "BStok/AutoOutreach-AI",
+        "chengyixu/variant-skill",
+        "milocosmopolitan/variant-ops",
+        "cheese-industries/skillalytics-scraper"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/5.json"
+    },
+    {
+      "query": "genome agent skills in:readme stars:>2",
+      "page": 1,
+      "reported_total": 484,
+      "returned": 100,
+      "repositories": [
+        "punkpeye/awesome-mcp-servers",
+        "vuejs/awesome-vue",
+        "fffaraz/awesome-cpp",
+        "sickn33/agentic-awesome-skills",
+        "K-Dense-AI/scientific-agent-skills",
+        "academic/awesome-datascience",
+        "aiming-lab/AutoResearchClaw",
+        "BehiSecc/awesome-claude-skills",
+        "advaitpaliwal/feynman",
+        "EvoMap/evolver",
+        "igorbarinov/awesome-data-engineering",
+        "anbeime/skill",
+        "dennybritz/deeplearning-papernotes",
+        "Astrosp/Awesome-OSINT-List",
+        "oracle-devrel/oracle-ai-developer-hub",
+        "seandavi/awesome-single-cell",
+        "cirosantilli/china-dictatorship",
+        "FreedomIntelligence/OpenClaw-Medical-Skills",
+        "rohitg00/awesome-claude-code-toolkit",
+        "protontypes/open-sustainable-technology",
+        "52CV/CVPR-2021-Papers",
+        "nusquama/n8nworkflows.xyz",
+        "Bitterbot-AI/bitterbot-desktop",
+        "Divide-By-0/ideas-for-projects-people-would-use",
+        "AI-in-Health/MedLLMsPracticalGuide",
+        "jim-schwoebel/awesome_ai_agents",
+        "ai4s-research/awesome-ai-for-science",
+        "Thinklab-SJTU/Awesome-LLM4AD",
+        "uhub/awesome-matlab",
+        "xiaobai1217/Awesome-Video-Datasets",
+        "ai4s-research/open-science",
+        "kaushikb11/awesome-llm-agents",
+        "NPC-Worldwide/npcpy",
+        "wangzheallen/awesome-human-pose-estimation",
+        "gokayfem/awesome-vlm-architectures",
+        "AgenticHealthAI/Awesome-AI-Agents-for-Healthcare",
+        "Jenqyang/Awesome-AI-Agents",
+        "GPTomics/bioSkills",
+        "sib-swiss/training-collection",
+        "lxfater/Awesome-GPTs",
+        "ClawBio/ClawBio",
+        "EdinburghNLP/awesome-hallucination-detection",
+        "brycewang-stanford/Awesome-Journal-Skills",
+        "abubakarsiddik31/claude-skills-collection",
+        "wu-yc/LabClaw",
+        "taishi-i/awesome-japanese-nlp-resources",
+        "eselkin/awesome-computational-neuroscience",
+        "DirtyHarryLYL/LLM-in-Vision",
+        "superiorlu/AITreasureBox",
+        "uhub/awesome-swift",
+        "Yangyi-Chen/Multimodal-AND-Large-Language-Models",
+        "zli12321/Vision-Language-Models-Overview",
+        "mikeroyal/Machine-Learning-Guide",
+        "yuzhimanhua/Awesome-Scientific-Language-Models",
+        "azzamsa/awesome-lisp-companies",
+        "ruvnet/metaharness",
+        "genomoncology/biomcp",
+        "yinizhilian/ICLR2025-Papers-with-Code",
+        "ZLKong/Awesome-Collection-Token-Reduction",
+        "openbiox/awosome-bioinformatics",
+        "AutoJunjie/awesome-agent-harness",
+        "exon-research/genomi",
+        "imteekay/machine-learning-research",
+        "zezhishao/DailyArXiv",
+        "evanzd/ICLR2021-OpenReviewData",
+        "PKU-YuanGroup/OpenAI4S",
+        "Runchuan-BU/BioClaw",
+        "SHI-Yu-Zhe/awesome-agi-cocosci",
+        "HKU-BAL/Clair3",
+        "getagentseal/agentseal",
+        "HICAI-ZJU/Scientific-LLM-Survey",
+        "cirosantilli/china-dictatroship-7",
+        "haoranD/Awesome-Human-Activity-Recognition",
+        "Marsilea-viz/marsilea",
+        "Yuxing-Wang-THU/SurveyBrainBody",
+        "jmschrei/tangermeme",
+        "cirosantilli/cirosantilli",
+        "PipedreamHQ/awesome-mcp-servers",
+        "kellyvv/OpenHer",
+        "hoilc/scoop-lemon",
+        "dmitryvinn/awesome-dev-advocacy",
+        "junchenzhi/Awesome-LLM-Ensemble",
+        "KorroAi/mue-x",
+        "LightChen233/Awesome-AI4Research",
+        "JianYang-Lab/gsMap",
+        "weiwei966/awesome-ai-harness",
+        "EvoMap/awesome-agent-evolution",
+        "andrew/ultimate-awesome",
+        "mRFWq7LwNPZjaVv5v6eo/cihna-dictattorshrip-8",
+        "adrianco/retort",
+        "panbinibn/OpenPacketFix_",
+        "createmomo/Open-Source-Language-Model-Pocket",
+        "artwist-polyakov/polyakov-claude-skills",
+        "SalvatoreRa/ML-news-of-the-week",
+        "worldbench/awesome-embodied-data-pyramid",
+        "BioTender-max/awesome-bio-agent-skills",
+        "K-Dense-AI/scientific-agents",
+        "wu-yc/Awesome-Agentic-Labs",
+        "InternScience/scp",
+        "pachterlab/paperpush"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/6.json"
+    },
+    {
+      "query": "bioinformatics skills in:name,description",
+      "page": 2,
+      "reported_total": 446,
+      "returned": 100,
+      "repositories": [
+        "madhubioinformatics/OmicsAgent",
+        "barah123/Claude-Biomedical-Research-Skills",
+        "newking9088/ISC-5425-Introduction-to-BioInformatics",
+        "ReemaSingh/Gen2EpiGUI",
+        "vincenzodomina/awesome-claw-health",
+        "madsondeluna/madsondeluna.github.io",
+        "colette-osiris/bridging-the-skill-gap-proposal-",
+        "SiYangming/bioskills",
+        "adithya-nairmolbio/Repurposing-drugs-for-PAM",
+        "mkbcit/lecture_ComBio",
+        "ucdavis-bioinformatics-training/2025-December-Fundamentals-of-Scientific-Computing",
+        "MOISECHRIST/PyTorch_Tutorial",
+        "iva100/Artificial-intelligence-Machine-learning",
+        "agenticbioinformatics/skills",
+        "NyxScheppen/bio-agent",
+        "11010tianyi/skills",
+        "Davidfrank1999/bioinformatics",
+        "anjali8805/Bioinformatics",
+        "meyer-elias/bioinformatics",
+        "rgogs/bioinformatics",
+        "mpg-age-bioinformatics/skills",
+        "mbrahmane1/githubtest",
+        "changningliu-lab/training",
+        "micahpf/zmays-snps",
+        "James-Bradley/zmays-snps",
+        "archelliusanami/Bioinformatics-journey",
+        "raoadi04/zmays-snps",
+        "yjkimmdphd/zmays_snps",
+        "gzahn/BINF_Practice_Data",
+        "FleurGaBru/zmays-snps",
+        "Xerses7/bioinformatics-mcp-skills",
+        "EmilieRichards/zmays-snps",
+        "manalali01001-ops/Bioinformatics_Projects",
+        "gevensen95/BioinformaticsApp",
+        "cemfl/ngs_assignment",
+        "Shayne-Plourde/BioinformaticsSkills",
+        "Kirstenleighh/748-Report",
+        "a-epstein/learning-genomics",
+        "Maryyyyyyy/Bioinformatics-learning",
+        "gzahn/git_collaboration_practice",
+        "swiss-made/zmays-snps",
+        "manuelcorpas/bioinf-skills-bench",
+        "kzobeck/BioinformaticsExperience",
+        "cristianochagas/zmays-snps",
+        "dorakarkut1/Rosalind_exercises-Bioinformatics-Stronghold",
+        "slebedeva/claude_bioinformatics_skills",
+        "CraigStolar1/seqs",
+        "maosong327/myTest",
+        "springcute/bioinformatics_data_skills",
+        "kghumrawi/CSE466-2020",
+        "lishengting/PaperInt",
+        "LIOSTO/LEE",
+        "aklein507/FinalProject",
+        "DamLabResources/damlab-skills",
+        "petemeng/bioinformatics-skills",
+        "HandelHu/zmays_snps",
+        "KochInstitute-Bioinformatics/bioinformatics-claude-skills",
+        "coala-info/coala-repo",
+        "pranavs22/Rosalind-Solutions",
+        "SpicyChicken6/bioinfo-skills",
+        "hpobio-lab/tutorials",
+        "Xuzhen-Li/bioinfo-agent-skills",
+        "likit/cmu-workshop-2016",
+        "Gergana02/Bioinformatics-projects",
+        "safamohammed88/Safa-Mohammed-",
+        "joelnitta/bioinfo_skills_2021-07-12",
+        "OscarJK19/bioinformatics_group_assignment",
+        "Data-Skills/2018-workshop",
+        "fss2/zmays-snps",
+        "matiascarletti/bioinformatics_skills",
+        "xingyuguo-coder/Practice",
+        "guoqunfei/Bioinformatics-skills",
+        "khjia/bioinformatics-skills",
+        "Tr0im0n/Bioinformatics_Skills",
+        "afae-77/SkillsOmix-Suite",
+        "fsnibs10/Bio_skill",
+        "MeminKokturk/Bioinformatic-practise",
+        "wangtong/bioinformatics-skills",
+        "andrewquitadamo/bioinformatics-skills",
+        "rereremin/bioinformatics_skills",
+        "jaebird-07/bioinformatics-skills",
+        "ehan792/Bioinformatics-Drills",
+        "Sammyshreaks/zmays-snps",
+        "Eniolami/zmays-snp",
+        "siwen1102/guideRNAcounting",
+        "Etsuna56/BioinformaticsProjects",
+        "WhyLIM/BioinfoTech",
+        "vimalinx/bio-agent",
+        "okeyoallan/Road-map",
+        "danieldavilaaleman/Bioinformatics_road",
+        "hienle215/BioinformaticsWork",
+        "paymantohidifar/bioinfx-data-skills-book",
+        "umahkhan/claude-bioinformatics-skills",
+        "Sudipta-145/Bioinformatics_Project",
+        "zeinmursal/Bioinformatics-Projects",
+        "dev-frog/Bioinformatics_Data_Skills",
+        "jannovergara/fundamental-skills-bioinformatics",
+        "S1mon111/bioinformatics-codex-skills",
+        "mhaliz/bioinformatics_data_skills",
+        "Joris131/bioinformatics_data_skills"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-0.json"
+    },
+    {
+      "query": "bioinformatics skills in:name,description",
+      "page": 3,
+      "reported_total": 446,
+      "returned": 100,
+      "repositories": [
+        "YueZhang2019/Bioinformatics-Data-Skills",
+        "mcap91/bioinfo-agent-toolkit",
+        "yangliunk1987/Bioinformatics-Data-Skills",
+        "windysky/Bioinformatics_ClaudeSkills",
+        "shivamaery/bioinformatics-data-skills",
+        "kureusswig/zmays_snps",
+        "seymayldz/bioinformatics-data-skills",
+        "crystalpang/bioinformatics_data_skills",
+        "msgarfield/Bioinformatics_Data_Skills",
+        "LouisKwok-PICB/windows-bioinformatics-skills",
+        "swiss-made/Bioinformatics_Data_Skills",
+        "ltorio/Torio_668_bioinformatics_project",
+        "kostrouc/Bioinformatics_Fundamentals",
+        "zhangyao1994/Advanced-data-analysis-and-visualization-with-R",
+        "Abrar-Abir/clawbio2.0",
+        "Greacy-x/Hello-world-",
+        "WhyLIM/Notes-Course",
+        "CarterGibbs1/CS321-001-s22-team-04",
+        "davneet721/Snakemake_Testing",
+        "AytanaSales/bioinformatics-portfolio",
+        "kishore-bioinfo/bioinformatics-python",
+        "Crummy-26/Portfolio_Bioinformatics",
+        "jiangcongxin/nc-bioinformatics-figure-skills",
+        "nimranisar13/bioinformatics-journey-2026",
+        "ElijahChang929/Bioinformatics-Skills-Learning-Notes",
+        "rhondene/Claude-Skills-forBioinformatics",
+        "sadeeqtheanatomist/BIOINFORMATICS-COLLABORATIVE-PROJECT_GROUP-EIGHTEEN-MEMBERS",
+        "ZJXUyexiancai/Biologe-DataAnalysis-Algorth",
+        "jose-cantu/bioinformatics-projects",
+        "LingjunM/bds-zh-cn",
+        "kristifourie/bioinformatics-practice",
+        "mg878/Intro_to_bioinformatics_SARSCOV2",
+        "Manso002/zmays-snps",
+        "Linxira-OS/linxira-bio-sdk",
+        "cdrummeriv/zmays-snps",
+        "SkinMicrobe/BioZeus",
+        "zhoy0409-debug/scholarflow-skills",
+        "Abdi120/aali-bds-files",
+        "yj-w-03/Python-basic-skills",
+        "PatrickObando/Beginner-Bioinformatics-Programming",
+        "daniellaeme/My-Chem-Bioinformatics-Toolkit",
+        "gunescan/Bioinformatics-data-skills-final-exam",
+        "davidmagnotti/Biocode",
+        "Alex4Xu/zmays-snps",
+        "r4ain1/bioinformatics-support-visualization",
+        "ekinazbazdar/bioinformatics-data-skills-midterm-exam",
+        "hbunyamin/coursera-fundamentals-skills-in-bioinformatics",
+        "ai2lifescience/BioAgent",
+        "ekinazbazdar/bioinformatics-data-skills-final-exam",
+        "gunescan/-Bioinformatics-data-skills-final-exam-",
+        "zhjpeng/SU-BinSK",
+        "zaibahasankhan/zaibahasankhan",
+        "WElArfaoui/biomedical-research-skills",
+        "adripsn44-cloud/BioGenesis",
+        "sushma-paudel-sp/bioinformatics-practice-Rosalind",
+        "Jarielle/Rosalind-Problems",
+        "shagun9525-code/Python-practice-",
+        "Paddu2006/ai-career-tool",
+        "anaisaoki/Bioinformatics-668",
+        "ARYA-RAY-0/rosalind-bioinformatics-portfolio",
+        "SarojGo/bggn213",
+        "safaa3yasi/Safaa_Portfolio",
+        "sheikhahmadi1980/Computational-Genomics-Portfolio",
+        "melissajudithB/Unix-in-Bioinformatics",
+        "thamidulislam180524-bit/bioinformatics-learning",
+        "Lander-Aelbrecht/Bioinformatics-Portfolio",
+        "yukaiquan/obsidian-biounix",
+        "inkyunp/bi-analysis-image-builder",
+        "wntjr3364/biostack",
+        "tangmoogmoogtang-dotcom/bio-framework",
+        "uri0l/bioinformatics-dna-sequence-analysis",
+        "Walter-Odur/Advanced_Antigravity_Skills_For_Bioinformatics_Research",
+        "newmanreb/stp_tutorials",
+        "ChisomUdeagbala/R_programming_for_bioinformatics-analysis",
+        "AnaliseMedina/Bioinformatics_Portfolio",
+        "riteshkayande/riteshkayande",
+        "bioinfolearning/rosalind",
+        "pakeezahbatool/my-first-portfolio",
+        "Arittra95/BioShooter-Bioinformatics-Quiz-Shooter",
+        "MubasherMohammed/opencode-BioInfo",
+        "Jerriward007/personal-portfolio-python",
+        "kru99/Bioinformatic-Coursework",
+        "nyatsorke/python-learning",
+        "AugustusKH/BasicProgramming_for_BioInfo",
+        "kav-n/bioinformatics-portfolio",
+        "liranmao/awesome-CNS-skills",
+        "AqsaH999/python-bioinformatics",
+        "Smurf316/Bioinformatics-Portfolio",
+        "Yo-larbs/Bioinformatics_and_data_science_showcase",
+        "KCU-Bioinformatics/Biosciences-Wiki",
+        "Madhumitha2008-1908/FUTURE_FS_01",
+        "lovelee138/rosalind-solutions",
+        "kktejashvee/Data-Types",
+        "dwightxu/bioinformatic_data_skill_practice",
+        "engkinandatama/bioinformatics-showcase-portfolio",
+        "VENKATESH-282/bioinformatics-fasta-parser",
+        "salim0mans/Bioinformatics-Problems",
+        "ethanlewisbaird/BAIRD_reproducibility_skills",
+        "Shadowwalker10/Understanding-Bioinformatics",
+        "azzned9-crypto/clinical-data-analysis"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-1.json"
+    },
+    {
+      "query": "bioinformatics skills in:name,description",
+      "page": 4,
+      "reported_total": 446,
+      "returned": 100,
+      "repositories": [
+        "sam0per/Bioinformatics_pipeline_development_task",
+        "PreetMangat/Rosalind_solutions",
+        "Li-Chia-ching/Plant-qPCR-Agent-Skill",
+        "BioinfoXP/bioinformatics-paper-writing",
+        "happykhan/biowasm-compile-skill",
+        "pclo/summer2022",
+        "aardrasnair/aardra-portfolio",
+        "Negin-nouri/genomics-fellowship-2026",
+        "oocarain/Learn_BioData",
+        "nebulia37/BioinfoClaw",
+        "CHENyiru3/Bioinfo-skills",
+        "idf-io/bioinformatics-at-the-dkfz",
+        "AminaHanan246/bioinfo_tasks",
+        "MalcolmCharangwa/CLI-bioinformatics",
+        "DataQUEEN99/AI-Data-Science-Bioinformatics-Projects",
+        "merlab-uw/Tutorials",
+        "Keefe2/ahmad-portfolio",
+        "SaloGastaldi/scientific-data-engineering-biotech",
+        "adripsn44-cloud/BioGenesis-Agent",
+        "skenchill/skenchill",
+        "jusseppy-aguilar/python-village-fundamentals",
+        "okeyoallan/bioinformatics-internship",
+        "s-sethupathy/sethupathy_tasks",
+        "GanQiao1990/r-bioinformatics",
+        "shounakkadam27/bioinformatics-python-projects",
+        "keerthana-kol/SQL-practice-and-Bioinformatics",
+        "hammomo/Proteome-Analysis-Pipeline",
+        "AYUSHBEINGCREATIVE/rosalind-solutions",
+        "LLG00/bioinfo-scripts",
+        "Shaw2711/Sai-Shasank--Portfolio",
+        "AlisterTian/my-skill-collection",
+        "angelahitos-rgb/Bioinformatics-and-bioestadistics-master-s-project",
+        "Pxavier263/-Bioinformatics-for-Biologists-Analysing-and-Interpreting-Genomics-Datasets",
+        "ucdavis-bioinformatics-training/2024-October-Introduction-to-R-for-Bioinformatics",
+        "HeeLeeOss/bioinformatics-from-zero",
+        "ucdavis-bioinformatics-training/2026-June-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2025-April-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2022-April-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2023-February-Introduction-to-R-for-Bioinformatics",
+        "asanteibinabo-anita/plant-gene-expression-stress-analysis",
+        "ucdavis-bioinformatics-training/2022-October-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2023-Oct-Introduction-to-R-for-Bioinformatics",
+        "Deka-nam/The_Microbial_code",
+        "ucdavis-bioinformatics-training/2021-Oct-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2026-March-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2025-November-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2024-March-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2023-June-Introduction-to-R-for-Bioinformatics",
+        "ucdavis-bioinformatics-training/2025-July-Introduction-to-R-for-Bioinformatics",
+        "akshaya-biotech/Bioinformacademy",
+        "mahmoud-amara/taysonamara",
+        "nekrut/gxy-sketches",
+        "sdshinghal/phd_prep",
+        "wangjinglin0905-gif/audit-medical-manuscript-revision-skill",
+        "lekshmipriyaranil-creator/genomics-learning",
+        "gazollavolpiano/gazollavolpiano.github.io",
+        "tbiuliwo/paper-reading",
+        "dzhao2019/CancerGenomicsPipelines",
+        "Ethan-Development/Genes-Evo",
+        "TheSpiritual-Scientist/Hackbio-Internship-2021",
+        "AdventureBear/oasis-peak-clinic",
+        "Bidya122/RNAseqProjects",
+        "NicholasRaharjo/Applied_Bioinformatics_AT4_Part_1-",
+        "kamrankhanm94-cell/gpcr-convergent-evolution",
+        "Computational-Bioinformatics/03_lab",
+        "Rouslane-A/RNAseq_Arabidopsis_thaliana",
+        "Abbas-biotech/Code-Alpha-bioinformatics-internship",
+        "oharark/Basic_Python_Calc",
+        "RuvaMateta/RuvaMateta.github.io",
+        "Crummy-26/python-prerequistes",
+        "raymondotoo/Bioinformatics-Learn-Infinite",
+        "VenusPower0/HackBio-Internship-Coding-For-Bio-Python-R",
+        "withzaku/Sikandar-Zulqarnain-Portfolio",
+        "arjunsinhharer-bioinformatics/Flow-Cytometry",
+        "AtharvaBandekar/Gut_Microbiome_Paper_Reproduction",
+        "rebjoh/zmays-snps",
+        "Oluwakamiyeabolade/Comprehensive-Sequence-Analysis-of-the-Human-TNF-Gene",
+        "ohan-Bioinfo/mohanad-portfolio",
+        "EmanF-star/Python-Learning-journey-for-biologists",
+        "UserLEmanuel/Variant-Analyzer",
+        "Akanksha-1810/Influenza-A-Evolution-Analysis",
+        "ActualAyan/Lattice",
+        "luckychandralk98-boop/hbb-gene-analysis",
+        "Toluwalase-Taiwo/HackBio_Biocoding_Internship",
+        "lramirezh-create/lramirezh-create",
+        "johney-thaliath/portfolio",
+        "ZachGerstner/2026_100days_DSandBioinfo",
+        "JFarooq02/JFarooq02",
+        "fefaaoli/easyseq",
+        "KIKW12/covid-variants-analysis",
+        "Nnadichioma/hackbio_project",
+        "anushkabento/Projects_AN",
+        "Bit-2310/cancer-rna-seq-analysis",
+        "aasthashahcodes/bulk-rna-seq",
+        "RameshBabuAsh/BharatGenomicsDL",
+        "rythouser/hello-world",
+        "AnupamPatil899/Hybrid-Graph-RAG-Personal-AI-Assistant",
+        "Nourine-Sabry/BioinformHER-Mini-Project-Solution_Basic_Sequence_Analysis",
+        "aslihanbilikci/PhD---Portfolio",
+        "isaaccrusoe/-Exploring-the-Power-of-Bioinformatics-in-Understanding-Viral-Evolution"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-2.json"
+    },
+    {
+      "query": "bioinformatics skills in:name,description",
+      "page": 5,
+      "reported_total": 446,
+      "returned": 46,
+      "repositories": [
+        "Jonathano3/Example_bulk-RNA-seq",
+        "weeboo-sys/cancer-gene-expression-explorer",
+        "Wahid-25/DNApt",
+        "Jay-1853/hello-world",
+        "Asimahafeez/interactive-scatter-plot-explorer",
+        "Nathangofa/Micro-Byotech",
+        "kkShrihari/statistics",
+        "fmjorge-99/DNAssembler",
+        "sush-rgb/sushmita-portfolio",
+        "sdarshan8088/Biogred-Elearning_Platform",
+        "AlekhyaHub/dna-sequence-analyzer",
+        "cheahhl814/nextflow-pipelines",
+        "PratikshaPisar13/Pratiksha",
+        "sush-rgb/sushmita_sinha",
+        "ManinderpreetPuri/Artificial-Intelligence-In-Bioinfromatics-Project1",
+        "Sulamander-Sooge/insulin-conservation-across-primates",
+        "Ash-D97/My-rosalind-solutions",
+        "ayana-bioinfo/ayana-bioinfo",
+        "juliocesarcaol/CrashCourse",
+        "bhawnasaini651-bit/bhawna-bioinfo",
+        "bodlahh23/Python-Sequence-Skew-Analyzer",
+        "Chisom-Ojiaku/Hackbio-cancer-internship",
+        "s-sethupathy/pupil-bio--assesement",
+        "AnouarMejait/Anouar",
+        "s-sethupathy/sethupathy_reports",
+        "s-sethupathy/pupil-bio-assessment",
+        "valgri1/valgri1",
+        "induparvathisujith/Portfolio",
+        "Emmanueladewuyi/Hackbio-Bio-coding-Internship-",
+        "Mandrita04/Genomic_Sequence_Analysis_Toolkit_HPV16",
+        "MDaniels-AI-Projects/MDaniels-AI-Projects",
+        "MMeowhite/BioinfoHandbook",
+        "ojas-bathla/COVID-19-Data-Analysis",
+        "mehedihasan1bilioun/solololo",
+        "sadanapriti/sadanapriti.github.io",
+        "Ishtiaque-h/bio-prog",
+        "sikkibist/ai-engineering-log",
+        "TinotendaHlatywayo/Hlatywayo-Tinotenda-portfolio",
+        "GenomicCoder/ngs-linux-basics",
+        "CCU-Bioinformatics-Lab/exam-grader-skill",
+        "nylamorrison/NylasDataLab",
+        "Zessi-C/biofigure-self-evolve",
+        "EorgeKit/Python-miniproject-Eorgekit",
+        "VanshKapoor-55biotechdata/Patient-Genomic-Data-Screening-Dashboard-MS-Excel-",
+        "OlabodeKayodem/AI_and_Omics_Research_Internship_2025",
+        "nambili-samuel/about-me"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-3.json"
+    },
+    {
+      "query": "genetic skills in:name,description",
+      "page": 1,
+      "reported_total": 90,
+      "returned": 90,
+      "repositories": [
+        "Aryia-Behroziuan/References",
+        "Aryia-Behroziuan/Other-sources",
+        "Crazzy-Rabbit/Script-in-PopGenetics",
+        "reddyprasade/Machine-Learning-Interview-Preparation",
+        "Aryia-Behroziuan/Robot-learning",
+        "PerlineDemange/GeneticNurtureNonCog",
+        "x7dl8p/Open-Skills",
+        "Drise13/PetsOptimizer",
+        "Ephesian-kingpost533/hermes-agent-self-evolution",
+        "cameronehrlich/genex",
+        "Prova932/10-facts-about-autism-that-everyone-should-know",
+        "rartzi/ClaudeSkills-Optimizer-GEFA",
+        "muwenbo/genetic-counseling-skills",
+        "pawel-szajna/si-genetic",
+        "rohan598/skillset-recommendation-internship",
+        "Golden2002/population-genetics-skill",
+        "muwenbo/noxia-skills",
+        "CretaFlorin/Jumping-Agent-with-Genetic-Algorithm-and-Neural-Network",
+        "guzsoares/knapsack-problem",
+        "BerserkAzazel/Heart-Disease-Prediction-using-ANN-and-Genetic-Algorithm",
+        "kartoFlane/ProjectScheduling",
+        "lyfar/genomic-variant-research",
+        "FabioSmuu/artificial.js",
+        "PedroYutaroUEA/dawkins_weasel_program",
+        "organicoder42/openclawresearch",
+        "MPKellyy/codon-analysis-tool",
+        "hadhood12/hadixsaab.github.io",
+        "katherinepaiz/Identity-Access-Management-Practice-Lead",
+        "LizDaCruz/GeneticSequence",
+        "sethbuening/VEX-HighStakes-GeneticAlgorithm",
+        "hydra-genetics/hydra-genetics-skills",
+        "CooKingThe1st/GA_SSL_STEP",
+        "PixelRetroGames/GeneticMoshpit",
+        "pawellogin7/GeneticLogicGames",
+        "vuho60-byte/biobirddna-genetics",
+        "jbigalet/POE-skill-tree-optimizer",
+        "alimeisterx/genetic-mtfp",
+        "1stfrom/POPGEN",
+        "DuXC/genetic-epidemiology-manuscript",
+        "cmu-impactlab/GA-Skill-Evolution",
+        "Jaedki/repurposing-research-program",
+        "woxihuanhekele314-create/dog-breed-genetic-guess-report-generator",
+        "EyalMaoz/Pinch_Rehabilitation_Level_Genearator_Based_On_Genetic_Algorithm_Implementation",
+        "woxihuanhekele314-create/dog-breed-genetic-guess-report-generator-chineseversion",
+        "kellyhzhong/Genetic-Impact-on-Skill-Development",
+        "Jishnu-Raghavan-G/JUIT-Summer-Training-2026-Molecular-Biology-and-Genetic-Engineering-Techniques",
+        "DadiTejaswini/human-genetics-blood-science-website",
+        "Varshu-05/Simulation-Based-on-Genetic-Algorithm",
+        "Bkbharath-10/Simulation-Based-on-Genetic-Algorithm",
+        "LoheshM/Simulation-Based-on-Genetic-Algorithm",
+        "joberger95/binaitic",
+        "Samveelkhan22/Basics-of-Python",
+        "AdkPete/Portfolio",
+        "niveshdandyan/self-improving-agent-architect",
+        "artificial-js/artificial.js",
+        "Ankit52790/TravelSafari",
+        "Shivay00001/main-researcher-system",
+        "Tanuj311/Flappy-Bird-Ai",
+        "luckychandralk98-boop/hbb-gene-analysis",
+        "YaelDinar/Volunteers_For_Emergency-repo",
+        "pegagao/medbid-writer",
+        "amine204-204/flappybird-AI",
+        "imrultamim2020-prog/Portfolio",
+        "yousef-mohamed32/Smart-Resume-Job-Matcher",
+        "sachinsonii/Neural_Ninja",
+        "npwheaton/TeamForm",
+        "ReconditeArcher/CardGame",
+        "terravic/alphagenome-variant-visualization-skill",
+        "BilalAhmed-1998/Clash-Free-Schedule",
+        "minhhai134/schedule-app",
+        "Udayatk/Elective-Recommender-System",
+        "DataQUEEN99/AI-Data-Science-Bioinformatics-Projects",
+        "ianmoranidm/Pet-DNA-Dashboard",
+        "Attested-paper51/symbolic-regression-island-gp",
+        "Domikohlh/gene_to_care_agent_skill",
+        "RuvaMateta/RuvaMateta.github.io",
+        "CiaranFlanagan/Submerged",
+        "TylerKenji/Evolving-AI-Combat-Simulation",
+        "TyGoldman20/gops_math_modeling",
+        "mehedihasan1bilioun/solololo",
+        "nagasriramnani/Multi-Modal-Diabetes-Risk-Prediction-Project",
+        "Krushali1511/DNA-Art",
+        "elhamgholami/AI_Projects",
+        "GaiaGhirardi/NTR_GxE",
+        "UserLEmanuel/Variant-Analyzer",
+        "Bonviniv/Evolving-Game-AI-Space-Invaders-Controller-Using-Feed-Forward-Neural-Networks",
+        "OmarDiaa5/inrc2-workforce-scheduling",
+        "Imayres/deap-projects",
+        "andersst91/UF_PSS_Workshop2020",
+        "SPRING2022-MASTER-COMPUTER-SCIENCE/COMP-596-Top-Algorithmic-Art"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-4.json"
+    },
+    {
+      "query": "sequencing skills in:name,description",
+      "page": 1,
+      "reported_total": 58,
+      "returned": 58,
+      "repositories": [
+        "SOYJUN/FTP-implement-based-on-UDP",
+        "Mdshobu/Liberty-House-Club-Whitepaper",
+        "NoemieJaquier/sequencing-blending",
+        "acl21/sac_n_gmm",
+        "PeterOla/agentic-workflow-orchestra",
+        "RicoMitra/SkillOps-OS",
+        "Richchen-maker/dev-dispatcher",
+        "yashdotin/Sequentia",
+        "Dhruvbam/Design-and-Analysis-of-Algorithms",
+        "RomarioSales/Single-cell-RNA-sequencing-analysis",
+        "Yuxuan-Lee/sanger-sequencing-qc-skill",
+        "Yatir-Solan/Single-cell-RNA-sequencing-analysis",
+        "45ck/project-management-skills",
+        "Oscar857-dotcom/Bionformatics_Internship",
+        "alekhomenok/product-marketing-skills",
+        "jakemorgan-research/openclaw-canvas-a2ui-skill",
+        "bendusy/long-task-orchestration",
+        "pathak-prashant/cash-framework",
+        "leekylee-works/sp404mk2tutorial",
+        "MichaelDoesMarketing/Sequencing",
+        "nicholscrawford/SkillSequencing",
+        "Mariam000v/HackBio2025internship_Single-Cell-Sequencing",
+        "Zhubiao112/submitting-ncbi-sequencing-data-skill",
+        "whoismonty09/Number-Sequencing-Game-JAVA-",
+        "K-nie/Sequencing-Informatics-for-Genomic-Analysis",
+        "ubcd-ibfg/fastq-qc-skill",
+        "esun237/simon_game",
+        "jason-rowe/claude-skills",
+        "bastien-gallay/bfw",
+        "EllisEmpire/DNA",
+        "HurleySk/claude-gantt-skill",
+        "akashmondal-coder/Simon-Says-Game",
+        "Hua-CM/amplicon-classify",
+        "CompleteTech-LLC/agentic-services-orchestrator-skill",
+        "gabros20/digital-product-skill",
+        "jah-Barsaiyan261124/numbersequence-game",
+        "manypicom/outreach-tactics",
+        "automatewithsaurabh/SaaS-GTM-Navigator",
+        "fmjorge-99/DNAssembler",
+        "TCRInvestigator/plasmidsaurus-qc-skill",
+        "proconsul-skills/product-tree-extraction",
+        "Mili-0299/WGS-Variant-Interpretation-OCA-Case-Study",
+        "yxyanglab/fastp-json-qc-reporter",
+        "suman1406/Simon_Says_Game",
+        "citizenlee/full-circle-labs-skill",
+        "CoAxLab/SymbSeq",
+        "nszeny/BS831-Genomics-2026",
+        "mehfuzh/investors-outreach-8raise",
+        "omkarkakkad/FIX-MY-DAY",
+        "MMeowhite/BioinfoHandbook",
+        "Robson16/beat-mix",
+        "GenomicCoder/ngs-linux-basics",
+        "babujayalakshmi78-oss/Traffic-Light-Controller-",
+        "avahal/metagenomics_tube_stations",
+        "Sharebird/sharebird-repositioning-decision-skill",
+        "H-SM/Drum_machine",
+        "cultivarium/full-circle-labs-skill",
+        "Ducky671/Picking-back-up-Python-with-WSPT-"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-5.json"
+    },
+    {
+      "query": "methylation skills in:name,description",
+      "page": 1,
+      "reported_total": 0,
+      "returned": 0,
+      "repositories": [],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-6.json"
+    },
+    {
+      "query": "phylogenetics skills in:name,description",
+      "page": 1,
+      "reported_total": 13,
+      "returned": 13,
+      "repositories": [
+        "alphaparkinc/genpark-neighbor-joining-phylogenetic-tree-skill",
+        "Alpha-Park/genpark-neighbor-joining-phylogenetic-tree-skill",
+        "ELReedHerbarium/TargetCaptureWorkshop",
+        "Hongda-Zhao/bio-gene-to-reference-tree",
+        "mkbcit/lecture_ComBio",
+        "abdulmashuod/sars-cov2-variant-analysis",
+        "BernardoGG/Y3_Computer_skills_Bayesian_phylogenetics",
+        "xiayh0107/ggtree-air",
+        "Jigyasa3/SkillPill_PhylogeneticComparativeMethods",
+        "Sulamander-Sooge/insulin-conservation-across-primates",
+        "bhawnasaini651-bit/bhawna-bioinfo",
+        "Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline",
+        "KIKW12/covid-variants-analysis"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-7.json"
+    },
+    {
+      "query": "metagenomics skills in:name,description",
+      "page": 1,
+      "reported_total": 5,
+      "returned": 5,
+      "repositories": [
+        "WCSCourses/Human_Gut_Microbiome_Metagenomics_2026",
+        "PKU-EMBL/Metagenomics-Skills",
+        "Pavel-Kravchenko/Bioinformatics",
+        "PengPPPP/MetaGLens-skills",
+        "avahal/metagenomics_tube_stations"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-8.json"
+    },
+    {
+      "query": "\"DNA\" \"agent\" \"skill\" in:description",
+      "page": 1,
+      "reported_total": 35,
+      "returned": 35,
+      "repositories": [
+        "larashero3-dotcom/writing-dna-skill",
+        "irenerachel/style-pack-skill",
+        "kylvia/mimeng-skill",
+        "aievolutionpl/agent-design-taste",
+        "Orpheus-K/symbiopulse",
+        "victor-aguilars/persona-architect",
+        "scrofied/rap-clone-skill",
+        "VaporAviator/vaporaviator-lab-style",
+        "RahmatHadinata23758051/SKILL-Design-Intelligence",
+        "haosuo/Marx-Engels-Thinking-OS",
+        "janzofx/agent-dna-auditor",
+        "Lucineer/dogmind-arena",
+        "Wike-CHI/lei-jun-perspective",
+        "daxueren666/blogger-dna",
+        "wsssnmsg/madugong-perspective-skill",
+        "Hasnaincodeunzip1/-Neural-Scrutiny-Engine",
+        "Kinprove/dna-research-recipes",
+        "liuzl/persona",
+        "ryan-eth/ultimate-karpathy",
+        "Alixocracy/voiceprint-fb79e12e",
+        "ruinosus/dna",
+        "JinnWorks/jinn-skills",
+        "tehdarklea/ai-agent-skills-index",
+        "ZKbuildingHyperSolid/motion-dna",
+        "OpenSealAI/agent-skills",
+        "Suksan01/Ghost-Writer",
+        "rusanovproject-dotcom/style-dna",
+        "hackeryisus/design-system-forge",
+        "ronghliang-byte/jack-ma-perspective",
+        "ops120/ai-zhubo-skill",
+        "Daniel421-luo/graham-perspective-skill",
+        "Dvsx/ui-adviser",
+        "ooohjh/UI-me-too",
+        "oiio2to/oria-design-skill",
+        "Lpx-0128/Degree-To-DUIT-DTD-"
+      ],
+      "local_evidence": "temp/dna-skills-discovery-2026-09-12/github-search/extended-9.json"
+    }
+  ],
+  "lead_indexes": [
+    "agent-source.md",
+    "https://skillsmp.com/",
+    "https://github.com/BioTender-max/awesome-bio-agent-skills",
+    "https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills",
+    "https://github.com/BioTender-max/awesome-ai4bio-skills",
+    "https://github.com/GoekeLab/awesome-genomic-skills"
+  ],
+  "summary": {
+    "pinned_upstream_repositories": 77,
+    "new_repositories_since_baseline": 67,
+    "enumerated_definition_paths": 7114,
+    "baseline_skill_count": 393,
+    "added_skills": 143,
+    "removed_skills": [],
+    "final_skill_count": 536,
+    "imported_source_count": 22,
+    "bundled_resource_files": 3854,
+    "selection": {
+      "out_of_scope": 2153,
+      "selected": 535,
+      "duplicate": 519,
+      "reference_only": 3849,
+      "invalid_metadata": 42,
+      "license_review": 13,
+      "quality_review": 3
+    }
+  },
+  "added_skills": [
+    {
+      "id": "accessibility-aggregation",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/accessibility-aggregation"
+    },
+    {
+      "id": "alphagem",
+      "source": "pku-metagenomics",
+      "category": "annotation",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/alphagem"
+    },
+    {
+      "id": "alphagenome-atlas-website-links",
+      "source": "deepmind",
+      "category": "models",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/alphagenome_atlas_website_links"
+    },
+    {
+      "id": "alphagenome-single-variant-analysis",
+      "source": "deepmind",
+      "category": "models",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/alphagenome_single_variant_analysis"
+    },
+    {
+      "id": "alphagenome-variant-impact-score",
+      "source": "deepmind",
+      "category": "models",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/alphagenome_variant_impact_score"
+    },
+    {
+      "id": "antismash",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/antismash"
+    },
+    {
+      "id": "anvio",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/anvio"
+    },
+    {
+      "id": "basalt",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/basalt"
+    },
+    {
+      "id": "batch-analysis",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/batch-analysis"
+    },
+    {
+      "id": "benchling-integration",
+      "source": "sciagent",
+      "category": "workflows",
+      "license": "CC-BY-4.0",
+      "upstream_url": "https://github.com/jaechang-hits/SciAgent-Skills/tree/fe505cae14d20b6c33be2e49666425be98f005bb/skills/lab-automation/benchling-integration"
+    },
+    {
+      "id": "bigscape",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/bigscape"
+    },
+    {
+      "id": "binchicken",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/binchicken"
+    },
+    {
+      "id": "bio-binning-qc",
+      "source": "omics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-binning-qc"
+    },
+    {
+      "id": "bio-data-visualization-circos-plots",
+      "source": "bioskills",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/circos-plots"
+    },
+    {
+      "id": "bio-data-visualization-genome-tracks",
+      "source": "bioskills",
+      "category": "epigenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/genome-tracks"
+    },
+    {
+      "id": "bio-data-visualization-lollipop-protein-maps",
+      "source": "bioskills",
+      "category": "variants",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/lollipop-protein-maps"
+    },
+    {
+      "id": "bio-data-visualization-manhattan-qq-locuszoom",
+      "source": "bioskills",
+      "category": "gwas",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/manhattan-qq-locuszoom"
+    },
+    {
+      "id": "bio-data-visualization-oncoprint-mutation-matrices",
+      "source": "bioskills",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/oncoprint-mutation-matrices"
+    },
+    {
+      "id": "bio-data-visualization-sequence-logos",
+      "source": "bioskills",
+      "category": "sequence",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/sequence-logos"
+    },
+    {
+      "id": "bio-experimental-design-batch-design",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/batch-design"
+    },
+    {
+      "id": "bio-experimental-design-multiple-testing",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing"
+    },
+    {
+      "id": "bio-experimental-design-power-analysis",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis"
+    },
+    {
+      "id": "bio-experimental-design-randomization-blocking",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/randomization-blocking"
+    },
+    {
+      "id": "bio-experimental-design-sample-size",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/sample-size"
+    },
+    {
+      "id": "bio-expression-matrix-gene-id-mapping",
+      "source": "bioskills",
+      "category": "annotation",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/expression-matrix/gene-id-mapping"
+    },
+    {
+      "id": "bio-fasta-database-curator",
+      "source": "omics",
+      "category": "sequence",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-fasta-database-curator"
+    },
+    {
+      "id": "bio-foundation-housekeeping",
+      "source": "omics",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-foundation-housekeeping"
+    },
+    {
+      "id": "bio-interdomain-hgt",
+      "source": "omics",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-interdomain-hgt"
+    },
+    {
+      "id": "bio-multi-omics-data-harmonization",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/multi-omics-integration/data-harmonization"
+    },
+    {
+      "id": "bio-multi-omics-mixomics-analysis",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/multi-omics-integration/mixomics-analysis"
+    },
+    {
+      "id": "bio-multi-omics-mofa-integration",
+      "source": "bioskills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/multi-omics-integration/mofa-integration"
+    },
+    {
+      "id": "bio-phylogenomics",
+      "source": "omics",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-phylogenomics"
+    },
+    {
+      "id": "bio-prefect-dask-nextflow",
+      "source": "omics",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-prefect-dask-nextflow"
+    },
+    {
+      "id": "bio-single-cell-lineage-tracing",
+      "source": "bioskills",
+      "category": "crispr",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/lineage-tracing"
+    },
+    {
+      "id": "bio-splice-variant-prediction",
+      "source": "bioskills",
+      "category": "variants",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splice-variant-prediction"
+    },
+    {
+      "id": "bio-systems-biology-gene-essentiality",
+      "source": "bioskills",
+      "category": "annotation",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/systems-biology/gene-essentiality"
+    },
+    {
+      "id": "bio-systems-biology-metabolic-reconstruction",
+      "source": "bioskills",
+      "category": "annotation",
+      "license": "MIT",
+      "upstream_url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/systems-biology/metabolic-reconstruction"
+    },
+    {
+      "id": "bio-viromics",
+      "source": "omics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-viromics"
+    },
+    {
+      "id": "bio-workflow-methods-docwriter",
+      "source": "omics",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bio-workflow-methods-docwriter"
+    },
+    {
+      "id": "biobakery-databases",
+      "source": "pku-metagenomics",
+      "category": "databases",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/biobakery-databases"
+    },
+    {
+      "id": "bioinfo-pitfalls",
+      "source": "plant-skills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/bioinfo-pitfalls"
+    },
+    {
+      "id": "bioinformatics-methods-results-writer",
+      "source": "damlab",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/DamLabResources/damlab-skills/tree/4ad096e3b9b0116271d10bdb746641b60a1b2211/skills/bioinformatics-methods-results-writer"
+    },
+    {
+      "id": "bioinformatics-project",
+      "source": "omics",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/bioinformatics-project"
+    },
+    {
+      "id": "biosurfdb",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/biosurfdb"
+    },
+    {
+      "id": "borzoi",
+      "source": "feynman",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/companion-inc/feynman/tree/dfdcb7cf2c73183cff7b10aa8ea8ce370c8b152c/skills/borzoi"
+    },
+    {
+      "id": "caduceus",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/caduceus"
+    },
+    {
+      "id": "cami",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/cami"
+    },
+    {
+      "id": "checkm2",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/checkm2"
+    },
+    {
+      "id": "checkv",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/checkv"
+    },
+    {
+      "id": "chip-atlas-diff-analysis",
+      "source": "agentic-science",
+      "category": "epigenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/hubayirp/agentic-science/tree/213588a92bb74e705d795ba106e0119975877e8c/skills/chip-atlas-diff-analysis"
+    },
+    {
+      "id": "chip-atlas-peak-enrichment",
+      "source": "agentic-science",
+      "category": "epigenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/hubayirp/agentic-science/tree/213588a92bb74e705d795ba106e0119975877e8c/skills/chip-atlas-peak-enrichment"
+    },
+    {
+      "id": "chip-atlas-target-genes",
+      "source": "agentic-science",
+      "category": "epigenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/hubayirp/agentic-science/tree/213588a92bb74e705d795ba106e0119975877e8c/skills/chip-atlas-target-genes"
+    },
+    {
+      "id": "cite-encode",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/cite-encode"
+    },
+    {
+      "id": "compare-biosamples",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/compare-biosamples"
+    },
+    {
+      "id": "data-provenance",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/data-provenance"
+    },
+    {
+      "id": "dbcan",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/dbcan"
+    },
+    {
+      "id": "deepurify",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/deepurify"
+    },
+    {
+      "id": "defensefinder",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/defensefinder"
+    },
+    {
+      "id": "disinfinder",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/disinfinder"
+    },
+    {
+      "id": "dnabert2",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/dnabert2"
+    },
+    {
+      "id": "dom-biosurfactant",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/dom-biosurfactant"
+    },
+    {
+      "id": "draft-counseling-summary",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/draft-counseling-summary"
+    },
+    {
+      "id": "dram",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/dram"
+    },
+    {
+      "id": "draw-pedigree",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/draw-pedigree"
+    },
+    {
+      "id": "element-cycling",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/element-cycling"
+    },
+    {
+      "id": "encode-ccres-database",
+      "source": "deepmind",
+      "category": "databases",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/encode_ccres_database"
+    },
+    {
+      "id": "encode-toolkit-setup",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/setup"
+    },
+    {
+      "id": "erast",
+      "source": "pku-metagenomics",
+      "category": "sequence",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/erast"
+    },
+    {
+      "id": "evo2",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/evo2"
+    },
+    {
+      "id": "fegenie",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/fegenie"
+    },
+    {
+      "id": "find-variant-literature",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/find-variant-literature"
+    },
+    {
+      "id": "functional-screen-analysis",
+      "source": "encode-toolkit",
+      "category": "crispr",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/functional-screen-analysis"
+    },
+    {
+      "id": "genomad",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/genomad"
+    },
+    {
+      "id": "genome-language-model",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/genome-language-model"
+    },
+    {
+      "id": "genomics-study-design",
+      "source": "research-suite",
+      "category": "workflows",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/Ynzuses/research-skills-suite/tree/a5cb708252a58bcfb771d46d39f5e38d64b8b2f6/skills/genomics-study-design"
+    },
+    {
+      "id": "genotype-imputation-benchmarking",
+      "source": "research-suite",
+      "category": "population",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/Ynzuses/research-skills-suite/tree/a5cb708252a58bcfb771d46d39f5e38d64b8b2f6/skills/genotype-imputation-benchmarking"
+    },
+    {
+      "id": "grapevine-adna",
+      "source": "plant-skills",
+      "category": "population",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/grapevine-adna"
+    },
+    {
+      "id": "gtdb",
+      "source": "pku-metagenomics",
+      "category": "databases",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/gtdb"
+    },
+    {
+      "id": "gtex-database",
+      "source": "deepmind",
+      "category": "gwas",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/gtex_database"
+    },
+    {
+      "id": "gunc",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/gunc"
+    },
+    {
+      "id": "hadeg",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/hadeg"
+    },
+    {
+      "id": "hic-aggregation",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/hic-aggregation"
+    },
+    {
+      "id": "histone-aggregation",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/histone-aggregation"
+    },
+    {
+      "id": "importing-tracks",
+      "source": "misha",
+      "category": "intervals",
+      "license": "MIT",
+      "upstream_url": "https://github.com/tanaylab/misha/tree/b13d4e2593d1883acd43efb30f9bf1132891fc3b/agent-guides/skills/importing-tracks"
+    },
+    {
+      "id": "insilicoseq",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/insilicoseq"
+    },
+    {
+      "id": "integronfinder",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/integronfinder"
+    },
+    {
+      "id": "interpret-negative-or-vus",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/interpret-negative-or-vus"
+    },
+    {
+      "id": "isabl-debug-analysis",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-debug-analysis"
+    },
+    {
+      "id": "isabl-merge-results",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-merge-results"
+    },
+    {
+      "id": "isabl-monitor-analyses",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-monitor-analyses"
+    },
+    {
+      "id": "isabl-project-report",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-project-report"
+    },
+    {
+      "id": "isabl-query-data",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-query-data"
+    },
+    {
+      "id": "isabl-run-pipeline",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-run-pipeline"
+    },
+    {
+      "id": "isabl-submit-data",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-submit-data"
+    },
+    {
+      "id": "isabl-write-app",
+      "source": "isabl",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/juanesarango/isabl-mcp/tree/85b3e298d9cfdf02cb82ebfdc780649a6811fd2e/skills/isabl-write-app"
+    },
+    {
+      "id": "isescan",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/isescan"
+    },
+    {
+      "id": "lexicmap",
+      "source": "pku-metagenomics",
+      "category": "sequence",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/lexicmap"
+    },
+    {
+      "id": "liftover-coordinates",
+      "source": "encode-toolkit",
+      "category": "intervals",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/liftover-coordinates"
+    },
+    {
+      "id": "lorbin",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/lorbin"
+    },
+    {
+      "id": "mebs",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/mebs"
+    },
+    {
+      "id": "metabat2",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/metabat2"
+    },
+    {
+      "id": "metabolic",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/metabolic"
+    },
+    {
+      "id": "methylation-aggregation",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/methylation-aggregation"
+    },
+    {
+      "id": "mgnify",
+      "source": "pku-metagenomics",
+      "category": "databases",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/mgnify"
+    },
+    {
+      "id": "microbial-mining",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/microbial-mining"
+    },
+    {
+      "id": "mob-suite",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/mob-suite"
+    },
+    {
+      "id": "mobileelementfinder",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/mobileelementfinder"
+    },
+    {
+      "id": "mobileog",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/mobileog"
+    },
+    {
+      "id": "ngs-tertiary-analysis",
+      "source": "ngs-tertiary",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/htlin222/ngs-tertiary-analysis-skills/tree/d483c21fddd14a034e7f2f038f237ad7bcd05b1a/.claude/skills/ngs-tertiary-analysis"
+    },
+    {
+      "id": "nucleotide-transformer",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/nucleotide-transformer"
+    },
+    {
+      "id": "omg",
+      "source": "pku-metagenomics",
+      "category": "models",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/omg"
+    },
+    {
+      "id": "optimize-hifi-diploid-assembly",
+      "source": "myriad",
+      "category": "assembly",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/KalarisLabs/Myriad/tree/5efbc5e9940fd37608f1d75cccac2befebad1215/skills/optimize-hifi-diploid-assembly"
+    },
+    {
+      "id": "phylign",
+      "source": "pku-metagenomics",
+      "category": "sequence",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/phylign"
+    },
+    {
+      "id": "pipeline-dnaseseq",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/pipeline-dnaseseq"
+    },
+    {
+      "id": "pipeline-guide",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/pipeline-guide"
+    },
+    {
+      "id": "plant-genome-guided-primer-design",
+      "source": "plant-qpcr",
+      "category": "crispr",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/Li-Chia-ching/Plant-qPCR-Agent-Skill/tree/23acf68cc4cefe67f8f3b5f5057b0eabf0ac9a4e/"
+    },
+    {
+      "id": "plant-omics-db",
+      "source": "plant-skills",
+      "category": "workflows",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/plant-omics-db"
+    },
+    {
+      "id": "plasmaag",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/plasmaag"
+    },
+    {
+      "id": "pod5",
+      "source": "damlab",
+      "category": "sequencing",
+      "license": "MIT",
+      "upstream_url": "https://github.com/DamLabResources/damlab-skills/tree/4ad096e3b9b0116271d10bdb746641b60a1b2211/skills/pod5"
+    },
+    {
+      "id": "polyploid-gene-family-cloning",
+      "source": "polyploid-cloning",
+      "category": "crispr",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline/tree/ecce861e5215e25cc180f1381d73a8751c5257bd/"
+    },
+    {
+      "id": "prepare-rare-disease-case",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/prepare-rare-disease-case"
+    },
+    {
+      "id": "progenomes",
+      "source": "pku-metagenomics",
+      "category": "databases",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/progenomes"
+    },
+    {
+      "id": "qsap",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/qsap"
+    },
+    {
+      "id": "quality-assessment",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/quality-assessment"
+    },
+    {
+      "id": "regulatory-elements",
+      "source": "encode-toolkit",
+      "category": "epigenomics",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/regulatory-elements"
+    },
+    {
+      "id": "review-variant-table",
+      "source": "genetic-counseling",
+      "category": "clinical",
+      "license": "MIT",
+      "upstream_url": "https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/review-variant-table"
+    },
+    {
+      "id": "singlem",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/singlem"
+    },
+    {
+      "id": "spacedust",
+      "source": "pku-metagenomics",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/spacedust"
+    },
+    {
+      "id": "taxvamb",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/taxvamb"
+    },
+    {
+      "id": "tooluniverse-multi-omics-integration",
+      "source": "tooluniverse",
+      "category": "workflows",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/mims-harvard/ToolUniverse/tree/7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7/skills/tooluniverse-multi-omics-integration"
+    },
+    {
+      "id": "tooluniverse-multiomic-disease-characterization",
+      "source": "tooluniverse",
+      "category": "clinical",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/mims-harvard/ToolUniverse/tree/7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7/skills/tooluniverse-multiomic-disease-characterization"
+    },
+    {
+      "id": "tooluniverse-protein-lof-mechanism",
+      "source": "tooluniverse",
+      "category": "clinical",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/mims-harvard/ToolUniverse/tree/7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7/skills/tooluniverse-protein-lof-mechanism"
+    },
+    {
+      "id": "tooluniverse-protein-sae-variant-interpretation",
+      "source": "tooluniverse",
+      "category": "clinical",
+      "license": "Apache-2.0",
+      "upstream_url": "https://github.com/mims-harvard/ToolUniverse/tree/7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7/skills/tooluniverse-protein-sae-variant-interpretation"
+    },
+    {
+      "id": "track-experiments",
+      "source": "encode-toolkit",
+      "category": "workflows",
+      "license": "AGPL-3.0-only",
+      "upstream_url": "https://github.com/ammawla/encode-toolkit/tree/b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b/skills/track-experiments"
+    },
+    {
+      "id": "tracking-taxonomy-updates",
+      "source": "omics",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/fmschulz/omics-skills/tree/7a4eb5bace3f874c3be2ec697e9d2e695c374637/skills/tracking-taxonomy-updates"
+    },
+    {
+      "id": "ucsc-conservation-and-tfbs",
+      "source": "deepmind",
+      "category": "epigenomics",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/ucsc_conservation_and_tfbs"
+    },
+    {
+      "id": "unibind-database",
+      "source": "deepmind",
+      "category": "databases",
+      "license": "Apache-2.0 AND CC-BY-4.0",
+      "upstream_url": "https://github.com/google-deepmind/science-skills/tree/28b8482603a420708c8896f6fe5e06c276d9933d/skills/unibind_database"
+    },
+    {
+      "id": "unicore",
+      "source": "pku-metagenomics",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/unicore"
+    },
+    {
+      "id": "vcontact",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/vcontact"
+    },
+    {
+      "id": "virulencefinder",
+      "source": "pku-metagenomics",
+      "category": "metagenomics",
+      "license": "MIT",
+      "upstream_url": "https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/virulencefinder"
+    },
+    {
+      "id": "vitis-pangenome",
+      "source": "plant-skills",
+      "category": "comparative",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/vitis-pangenome"
+    },
+    {
+      "id": "vitis-popgen",
+      "source": "plant-skills",
+      "category": "population",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/vitis-popgen"
+    },
+    {
+      "id": "vitis-te",
+      "source": "plant-skills",
+      "category": "annotation",
+      "license": "MIT",
+      "upstream_url": "https://github.com/Xuzhen-Li/bioinfo-agent-skills/tree/6dea4bee7aade611d22f2f1958612328bc61ec83/skills/vitis-te"
+    }
+  ],
+  "sources": [
+    {
+      "id": "bioskills",
+      "repository": "GPTomics/bioSkills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a",
+      "content_license": "MIT",
+      "policy": "Original-source DNA/genomics workflows; MIT notice retained.",
+      "handling": "curated-import",
+      "definition_paths": 562,
+      "retained_skills": 329,
+      "decisions": {
+        "selected": 329,
+        "out_of_scope": 231,
+        "duplicate": 2
+      }
+    },
+    {
+      "id": "sciagent",
+      "repository": "jaechang-hits/SciAgent-Skills",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb",
+      "content_license": "CC-BY-4.0",
+      "policy": "Original content CC-BY-4.0; README identifies frontmatter licenses as underlying tool licenses. Retain referenced third-party notices.",
+      "handling": "curated-import",
+      "definition_paths": 208,
+      "retained_skills": 21,
+      "decisions": {
+        "out_of_scope": 159,
+        "duplicate": 28,
+        "selected": 21
+      }
+    },
+    {
+      "id": "clawbio",
+      "repository": "ClawBio/ClawBio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d",
+      "content_license": "MIT",
+      "policy": "Individual skill license overrides apply; proprietary skills excluded; GPL skill deferred for separate review.",
+      "handling": "curated-import",
+      "definition_paths": 99,
+      "retained_skills": 20,
+      "decisions": {
+        "out_of_scope": 47,
+        "selected": 20,
+        "duplicate": 29,
+        "invalid_metadata": 1,
+        "license_review": 2
+      }
+    },
+    {
+      "id": "kdense",
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34",
+      "content_license": "MIT",
+      "policy": "Only skills explicitly licensed MIT enter this snapshot; other individual terms require a separate review.",
+      "handling": "curated-import",
+      "definition_paths": 165,
+      "retained_skills": 8,
+      "decisions": {
+        "out_of_scope": 147,
+        "duplicate": 10,
+        "selected": 8
+      }
+    },
+    {
+      "id": "omicsclaw",
+      "repository": "TianGzlab/OmicsClaw",
+      "revision": "6fbd79f262e3fd3552efe9f675574ffb165019ab",
+      "content_license": "Apache-2.0",
+      "policy": "Root Apache and individual MIT scope needs clarification; record candidates without copying.",
+      "handling": "curated-import",
+      "definition_paths": 124,
+      "retained_skills": 0,
+      "decisions": {
+        "invalid_metadata": 28,
+        "out_of_scope": 86,
+        "license_review": 10
+      }
+    },
+    {
+      "id": "bionemo",
+      "repository": "NVIDIA-BioNeMo/bionemo-agent-toolkit",
+      "revision": "0e67a612e4045f007e38fa77adc8f3ebfc5616b6",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "policy": "Retain Apache and CC-BY licenses plus NOTICE, with distinct code/content scopes and individual AND declarations.",
+      "handling": "curated-import",
+      "definition_paths": 62,
+      "retained_skills": 3,
+      "decisions": {
+        "out_of_scope": 56,
+        "selected": 3,
+        "duplicate": 3
+      }
+    },
+    {
+      "id": "biotender",
+      "repository": "BioTender-max/awesome-bio-agent-skills",
+      "revision": "8cbdd18837aa6296c4e77616a03b323bd69b57b1",
+      "content_license": "CC0-1.0",
+      "policy": "Discovery index only: aggregator license does not relicense original third-party skills; prefer original sources.",
+      "handling": "reference-only",
+      "definition_paths": 1705,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1705
+      }
+    },
+    {
+      "id": "openclaw-medical",
+      "repository": "FreedomIntelligence/OpenClaw-Medical-Skills",
+      "revision": "b1f9b6e3306f8d870e23b2023057bf730090036f",
+      "content_license": null,
+      "policy": "Discovery index only: root LICENSE absent at snapshot; a README badge is insufficient to relicense third-party content.",
+      "handling": "reference-only",
+      "definition_paths": 896,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 896
+      }
+    },
+    {
+      "id": "pipette",
+      "repository": "variomeanalytics/bioinformatics-agent-skills",
+      "revision": "b3d959475e9b3c5a830368ff9a44319ce97e2549",
+      "content_license": "MIT",
+      "policy": "Service/reference only: this repository contains no SKILL.md, and redistribution of the remote SkillGraph content is not established.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "tooluniverse",
+      "repository": "mims-harvard/ToolUniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7",
+      "content_license": "Apache-2.0",
+      "policy": "Root Apache-2.0; conflicting individual declarations deferred. ToolUniverse runtime remains a separate dependency.",
+      "handling": "curated-import",
+      "definition_paths": 465,
+      "retained_skills": 35,
+      "decisions": {
+        "out_of_scope": 415,
+        "invalid_metadata": 1,
+        "duplicate": 13,
+        "selected": 35,
+        "license_review": 1
+      }
+    },
+    {
+      "id": "alterlab",
+      "repository": "AlterLab-IEU/AlterLab-Academic-Skills",
+      "revision": "4a5b75358026b33d3e53101bf551331e12113bee",
+      "content_license": "MIT",
+      "policy": "Reference/deduplication only. NOTICE and THIRD_PARTY_NOTICES distinguish K-Dense derivatives and four CC-BY-NC skills; do not infer MIT for every folder or ignore individual declarations.",
+      "handling": "curated-import",
+      "definition_paths": 240,
+      "retained_skills": 0,
+      "decisions": {
+        "out_of_scope": 225,
+        "duplicate": 15
+      }
+    },
+    {
+      "id": "arcinstitute-sragent",
+      "repository": "ArcInstitute/SRAgent",
+      "revision": "67b60c24a49385d3eed8e5121be58d13c82839cd",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "biotender-max-awesome-ai4bio-skills",
+      "repository": "BioTender-max/awesome-ai4bio-skills",
+      "revision": "2d04b66d5831fb6274e1f34c6b8b5a7da80a47f3",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "bioconductor-ai-agent-skills",
+      "repository": "Bioconductor/ai-agent-skills",
+      "revision": "f87f5a70e228d98b62ab6f85628bd7fb9ba52147",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 15,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 15
+      }
+    },
+    {
+      "id": "bloomed-health-cancer-predisposition-variant-analyst",
+      "repository": "Bloomed-Health/cancer-predisposition-variant-analyst",
+      "revision": "0cace7c9dfe9c7a49f6fac28896495f9f1ffe8e0",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "chevyliang-geng-beva-agent-skills",
+      "repository": "ChevyLiang/Geng-BEVA-agent-skills",
+      "revision": "3a26ad93a33c82c860cd7c65adbe7ff55a1055fa",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "damlab",
+      "repository": "DamLabResources/damlab-skills",
+      "revision": "4ad096e3b9b0116271d10bdb746641b60a1b2211",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 16,
+      "retained_skills": 2,
+      "decisions": {
+        "duplicate": 5,
+        "out_of_scope": 9,
+        "selected": 2
+      }
+    },
+    {
+      "id": "dddddong-higher-acr-skill",
+      "repository": "Dddddong-higher/acr_skill",
+      "revision": "53f3710178f8a2c7184dc49313409b979df400f7",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "goekelab-awesome-genomic-skills",
+      "repository": "GoekeLab/awesome-genomic-skills",
+      "revision": "c11b8d6b6fa0676229e8728d89ce78db3fa9d6aa",
+      "content_license": null,
+      "policy": "Discovery/reference source; individual content terms require review before copying.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "golden2002-population-genetics-skill",
+      "repository": "Golden2002/population-genetics-skill",
+      "revision": "c8fec68b6522f22befb5eaaf467750394209f722",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "hku-bal-clair-skills",
+      "repository": "HKU-BAL/Clair-skills",
+      "revision": "c95b825f246d7484e0385c05aaffb42cecbaaf6e",
+      "content_license": null,
+      "policy": "No applicable license for the skill repository found; the separate Clair caller licenses do not establish permission to redistribute this guide.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "jason-0409-g-vivarium",
+      "repository": "Jason-0409-G/vivarium",
+      "revision": "a915249440e52879bac4013630533d78505e87d1",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 6,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 6
+      }
+    },
+    {
+      "id": "jiaqili1024-s2f-agent",
+      "repository": "JiaqiLi1024/s2f-agent",
+      "revision": "6d2d70dea2ae051bd17d88b4be09fdbfb96310ad",
+      "content_license": null,
+      "policy": "DNA model workflows found, but no applicable content redistribution license found. Licenses of referenced model implementations do not license this skill collection.",
+      "handling": "reference-only",
+      "definition_paths": 17,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 17
+      }
+    },
+    {
+      "id": "jiawang1209-genefam-pipeline-skills",
+      "repository": "Jiawang1209/GeneFam-Pipeline-skills",
+      "revision": "aa87c4fae5f5e2844f401700186164e90a514f40",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "jimliu-science-skills",
+      "repository": "JimLiu/science-skills",
+      "revision": "fb309c32ee9a54dad169fa845638057d1cfac77f",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 29,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 29
+      }
+    },
+    {
+      "id": "myriad",
+      "repository": "KalarisLabs/Myriad",
+      "revision": "5efbc5e9940fd37608f1d75cccac2befebad1215",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "policy": "LICENSE.md assigns procedural skill implementations to Apache-2.0 and explanatory/data materials to CC-BY-4.0. Preserve both full licenses, NOTICE.md, authorship and citation; do not describe the task graph as 10,000 installed skills.",
+      "handling": "curated-import",
+      "definition_paths": 3,
+      "retained_skills": 1,
+      "decisions": {
+        "out_of_scope": 1,
+        "selected": 1,
+        "duplicate": 1
+      }
+    },
+    {
+      "id": "kinprove-dna-research-recipes",
+      "repository": "Kinprove/dna-research-recipes",
+      "revision": "277bb68d89142ca51be52d2391713215e6180cbc",
+      "content_license": "FSL-1.1-MIT",
+      "policy": "Reference only: current FSL competing-use restriction and unfinished third-party data notice; the future MIT grant is not yet effective for the 2026 snapshot.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "plant-qpcr",
+      "repository": "Li-Chia-ching/Plant-qPCR-Agent-Skill",
+      "revision": "23acf68cc4cefe67f8f3b5f5057b0eabf0ac9a4e",
+      "content_license": "Apache-2.0",
+      "policy": "Apache-2.0 notice retained. Import only the reviewed DNA-related scope and retain individual notices.",
+      "handling": "curated-import",
+      "definition_paths": 1,
+      "retained_skills": 1,
+      "decisions": {
+        "selected": 1
+      }
+    },
+    {
+      "id": "polyploid-cloning",
+      "repository": "Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline",
+      "revision": "ecce861e5215e25cc180f1381d73a8751c5257bd",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 1,
+      "retained_skills": 1,
+      "decisions": {
+        "selected": 1
+      }
+    },
+    {
+      "id": "linxira-os-linxira-bio-sdk",
+      "repository": "Linxira-OS/linxira-bio-sdk",
+      "revision": "dcfd512a9a33272c05a5101aa2724abd62658924",
+      "content_license": "AGPL-3.0-only",
+      "policy": "AGPL source collection; review scientific overlap and complete source requirements before importing.",
+      "handling": "reference-only",
+      "definition_paths": 35,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 35
+      }
+    },
+    {
+      "id": "nathanskene-claude-genome-skill",
+      "repository": "NathanSkene/claude-genome-skill",
+      "revision": "ffac2ebe4d085830422fe73a580d4e8e099e7e92",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "omicsio-gene2ai-openclaw-skill",
+      "repository": "Omicsio/gene2ai-openclaw-skill",
+      "revision": "a972ea8f7f4e35c7e0f2db9dd23d46d6f83f3726",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "pku-metagenomics",
+      "repository": "PKU-EMBL/Metagenomics-Skills",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 163,
+      "retained_skills": 53,
+      "decisions": {
+        "duplicate": 77,
+        "selected": 53,
+        "out_of_scope": 33
+      }
+    },
+    {
+      "id": "pavel-kravchenko-bioinformatics",
+      "repository": "Pavel-Kravchenko/Bioinformatics",
+      "revision": "1dc244624720bb43ad7bd17f3c3c49784ce8c65c",
+      "content_license": null,
+      "policy": "No applicable redistribution license found at the pinned revision; retain metadata and original-source links only.",
+      "handling": "reference-only",
+      "definition_paths": 213,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 213
+      }
+    },
+    {
+      "id": "pengpppp-metaglens-skills",
+      "repository": "PengPPPP/MetaGLens-skills",
+      "revision": "f4e7f615723fc38d99ba06fe56cf057bb26c9e79",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 9,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 9
+      }
+    },
+    {
+      "id": "pratikrishi97-sciagent-skills",
+      "repository": "Pratikrishi97/sciagent-skills",
+      "revision": "c9e6dd5ad2389af5c7933385bd8f6a65adc9be25",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 40,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 40
+      }
+    },
+    {
+      "id": "bioclaw",
+      "repository": "Runchuan-BU/BioClaw",
+      "revision": "50a7d9b1dfa536cfe7e047d63be1de368b47a814",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 52,
+      "retained_skills": 0,
+      "decisions": {
+        "out_of_scope": 32,
+        "invalid_metadata": 12,
+        "duplicate": 8
+      }
+    },
+    {
+      "id": "siyangming-bioskills",
+      "repository": "SiYangming/bioskills",
+      "revision": "4d8327be29c11b1056bc8f68cfaa20f055a479e9",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "skillwager-agent-skill-profiles",
+      "repository": "Skillwager/agent-skill-profiles",
+      "revision": "660a444ebc249a1e51e675d9e8da0a71cd581cf8",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "plant-skills",
+      "repository": "Xuzhen-Li/bioinfo-agent-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 8,
+      "retained_skills": 6,
+      "decisions": {
+        "selected": 6,
+        "out_of_scope": 1,
+        "quality_review": 1
+      }
+    },
+    {
+      "id": "research-suite",
+      "repository": "Ynzuses/research-skills-suite",
+      "revision": "a5cb708252a58bcfb771d46d39f5e38d64b8b2f6",
+      "content_license": "Apache-2.0",
+      "policy": "Apache-2.0 notice retained. Import only the reviewed DNA-related scope and retain individual notices.",
+      "handling": "curated-import",
+      "definition_paths": 8,
+      "retained_skills": 2,
+      "decisions": {
+        "out_of_scope": 6,
+        "selected": 2
+      }
+    },
+    {
+      "id": "yulia",
+      "repository": "YuliaNuzhnenko/bioinformatics-agent-skills",
+      "revision": "9b9dbfe1802ef721a76c1e04efd305242042d1ca",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 12,
+      "retained_skills": 0,
+      "decisions": {
+        "out_of_scope": 7,
+        "duplicate": 5
+      }
+    },
+    {
+      "id": "agenticbioinformatics-skills",
+      "repository": "agenticbioinformatics/skills",
+      "revision": "45b5e0c21d3a8d90ff870f994240627495f0dabc",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 4,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 4
+      }
+    },
+    {
+      "id": "encode-toolkit",
+      "repository": "ammawla/encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b",
+      "content_license": "AGPL-3.0-only",
+      "policy": "Independent skill source files remain AGPL-3.0-only, as declared in pyproject.toml; complete editable skill sources, copyright, license and citation supplied. The separate ENCODE MCP runtime is not bundled or linked into DNAKit.",
+      "handling": "curated-import",
+      "definition_paths": 94,
+      "retained_skills": 16,
+      "decisions": {
+        "out_of_scope": 57,
+        "selected": 16,
+        "duplicate": 21
+      }
+    },
+    {
+      "id": "ankurgenomics-genomics-skills",
+      "repository": "ankurgenomics/genomics-skills",
+      "revision": "c6f1adfc45fb2791c0051ea74fcf4b3a96c5de01",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 8,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 8
+      }
+    },
+    {
+      "id": "anthropics-life-sciences",
+      "repository": "anthropics/life-sciences",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 6,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 6
+      }
+    },
+    {
+      "id": "aws-samples-sample-kiro-power-life-sciences",
+      "repository": "aws-samples/sample-kiro-power-life-sciences",
+      "revision": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "aws-hcls",
+      "repository": "awslabs/hcls-agent-skills",
+      "revision": "0cdbb370b2c53ea9af86eab186232751cbb2a2c0",
+      "content_license": "MIT-0",
+      "policy": "Amazon MIT-0 license retained; evaluate exact workflow overlap before importing.",
+      "handling": "curated-import",
+      "definition_paths": 41,
+      "retained_skills": 0,
+      "decisions": {
+        "out_of_scope": 36,
+        "duplicate": 5
+      }
+    },
+    {
+      "id": "brycewang-stanford-auto-research-skills",
+      "repository": "brycewang-stanford/Auto-Research-Skills",
+      "revision": "1c277adf6833b1b7ac184ac5653f7b6b3c81d5c3",
+      "content_license": null,
+      "policy": "Discovery/reference source; individual content terms require review before copying.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "cameronehrlich-genex",
+      "repository": "cameronehrlich/genex",
+      "revision": "ade282ff21f418987ba166af2066e29e2f1116cf",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "feynman",
+      "repository": "companion-inc/feynman",
+      "revision": "dfdcb7cf2c73183cff7b10aa8ea8ce370c8b152c",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 48,
+      "retained_skills": 1,
+      "decisions": {
+        "out_of_scope": 46,
+        "selected": 1,
+        "duplicate": 1
+      }
+    },
+    {
+      "id": "cultivarium-full-circle-labs-skill",
+      "repository": "cultivarium/full-circle-labs-skill",
+      "revision": "72eac4aea8810d9e424c95376cab24408cedae54",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "omics",
+      "repository": "fmschulz/omics-skills",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 34,
+      "retained_skills": 10,
+      "decisions": {
+        "out_of_scope": 20,
+        "duplicate": 4,
+        "selected": 10
+      }
+    },
+    {
+      "id": "gilleswainrib-ext-boop-bioinfo-skills",
+      "repository": "gilleswainrib-ext-boop/bioinfo-skills",
+      "revision": "b632655f93a38df2c70f4d3fc42fc4d24b8fc7cd",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "deepmind",
+      "repository": "google-deepmind/science-skills",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "policy": "README separately licenses software Apache-2.0 and other materials CC-BY-4.0. Retain both full licenses, attribution and SKILL_LICENSES.md; third-party APIs/data have separate terms.",
+      "handling": "curated-import",
+      "definition_paths": 40,
+      "retained_skills": 7,
+      "decisions": {
+        "out_of_scope": 27,
+        "selected": 7,
+        "duplicate": 6
+      }
+    },
+    {
+      "id": "hantao23-dna-storage-paper-reading-skill",
+      "repository": "hantao23/dna-storage-paper-reading-skill",
+      "revision": "070636bc2cb283d93eafa020ee8e739555656ecc",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "ngs-tertiary",
+      "repository": "htlin222/ngs-tertiary-analysis-skills",
+      "revision": "d483c21fddd14a034e7f2f038f237ad7bcd05b1a",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 3,
+      "retained_skills": 1,
+      "decisions": {
+        "duplicate": 2,
+        "selected": 1
+      }
+    },
+    {
+      "id": "agentic-science",
+      "repository": "hubayirp/agentic-science",
+      "revision": "213588a92bb74e705d795ba106e0119975877e8c",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 39,
+      "retained_skills": 3,
+      "decisions": {
+        "out_of_scope": 29,
+        "selected": 3,
+        "duplicate": 7
+      }
+    },
+    {
+      "id": "hydra-genetics-hydra-genetics-skills",
+      "repository": "hydra-genetics/hydra-genetics-skills",
+      "revision": "a2c7acec765f3ed995eed68147e6cdd31abf9813",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 3,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 3
+      }
+    },
+    {
+      "id": "jarxunlai-my-skills",
+      "repository": "jarxunlai/My-skills",
+      "revision": "23fd1af77f8791f851c76bd6c7394d38d15763fe",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 16,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 16
+      }
+    },
+    {
+      "id": "isabl",
+      "repository": "juanesarango/isabl-mcp",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 8,
+      "retained_skills": 8,
+      "decisions": {
+        "selected": 8
+      }
+    },
+    {
+      "id": "lyfar-genomic-variant-research",
+      "repository": "lyfar/genomic-variant-research",
+      "revision": "1a0e4f7f9161e6922a03539be14e42f945e47784",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 1,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 1
+      }
+    },
+    {
+      "id": "maratgaliev-claude-skill-genomic-pipelines",
+      "repository": "maratgaliev/claude-skill-genomic-pipelines",
+      "revision": "b1fd8c09bdd257efe7962ecd3f771147ac35f74d",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "masaomi-genomicschain-skillsets",
+      "repository": "masaomi/GenomicsChain_SkillSets",
+      "revision": "983bd50d61f97a92005fc4b9d900b95ab100d0f7",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 5,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 5
+      }
+    },
+    {
+      "id": "mcap91-bioinfo-agent-toolkit",
+      "repository": "mcap91/bioinfo-agent-toolkit",
+      "revision": "ac16a7f57f67d586cda5158129b90a3ac72e8f6b",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 10,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 10
+      }
+    },
+    {
+      "id": "genetic-counseling",
+      "repository": "muwenbo/genetic-counseling-skills",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 10,
+      "retained_skills": 6,
+      "decisions": {
+        "duplicate": 4,
+        "selected": 6
+      }
+    },
+    {
+      "id": "muwenbo-noxia-skills",
+      "repository": "muwenbo/noxia-skills",
+      "revision": "8941b532a5c0cf3f81f94d3db2bae56752f85104",
+      "content_license": null,
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "definition_paths": 6,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 6
+      }
+    },
+    {
+      "id": "nekrut-galaxy-claude-skills",
+      "repository": "nekrut/galaxy-claude-skills",
+      "revision": "0f833c2f11fa624d9fd87c6d139dac404d6dd4ff",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 0,
+      "retained_skills": 0,
+      "decisions": {}
+    },
+    {
+      "id": "openai-plugins",
+      "repository": "openai/plugins",
+      "revision": "1dc195897af4161d039b80d8471ec0a10c9bbc89",
+      "content_license": null,
+      "policy": "Reviewed the life-science-research subtree only. No applicable license declaration was found there or at the root; licenses in unrelated plugin subtrees do not cover these 50 skills.",
+      "handling": "reference-only",
+      "definition_paths": 536,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 536
+      }
+    },
+    {
+      "id": "stjudecab-cab-aiskills",
+      "repository": "stjudecab/CAB-aiSkills",
+      "revision": "04520240060c10e8937dcd945a01fc6ebbdc731e",
+      "content_license": "CC-BY-NC-SA-4.0",
+      "policy": "Reference only in this public general-use distribution: content has NonCommercial and ShareAlike conditions; it is not MIT and is not prohibited from all redistribution.",
+      "handling": "reference-only",
+      "definition_paths": 12,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 12
+      }
+    },
+    {
+      "id": "operon",
+      "repository": "swaruplab/operon",
+      "revision": "77f5361af5a2433e38ecfc652c454c49baec4ac3",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 690,
+      "retained_skills": 0,
+      "decisions": {
+        "out_of_scope": 433,
+        "duplicate": 255,
+        "quality_review": 2
+      }
+    },
+    {
+      "id": "misha",
+      "repository": "tanaylab/misha",
+      "revision": "b13d4e2593d1883acd43efb30f9bf1132891fc3b",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 1,
+      "retained_skills": 1,
+      "decisions": {
+        "selected": 1
+      }
+    },
+    {
+      "id": "waldronlab-ai-agent-skills",
+      "repository": "waldronlab/ai-agent-skills",
+      "revision": "01739035bb9522328ee84b64d7c3de4298ce1d17",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 10,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 10
+      }
+    },
+    {
+      "id": "wu-yc-labclaw",
+      "repository": "wu-yc/LabClaw",
+      "revision": "df378022e8b0764e5ee07df3e3a03e2fa7c7dd65",
+      "content_license": null,
+      "policy": "Discovery mirror: no repository-level license at this revision. Resolve K-Dense, ToolUniverse and other original sources instead of relicensing copied skills.",
+      "handling": "reference-only",
+      "definition_paths": 240,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 240
+      }
+    },
+    {
+      "id": "zamushwani2-biomedical-ai-skills",
+      "repository": "zamushwani2/biomedical-ai-skills",
+      "revision": "71c9884f8b1a2931d1b68d3ac3eafb9337da8d6d",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "definition_paths": 16,
+      "retained_skills": 0,
+      "decisions": {
+        "reference_only": 16
+      }
+    },
+    {
+      "id": "postgwas",
+      "repository": "zoebischuribe-cloud/postgwas-skills",
+      "revision": "cc7ad3dbb68bb7c7b13e3ffde8366824f0a56a4f",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 2,
+      "retained_skills": 0,
+      "decisions": {
+        "duplicate": 2
+      }
+    },
+    {
+      "id": "bioclaw-hub",
+      "repository": "zongtingwei/Bioclaw_Skills_Hub",
+      "revision": "d056daa153685cc59d24e9c432e4804d9cd122fe",
+      "content_license": "MIT",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "definition_paths": 66,
+      "retained_skills": 0,
+      "decisions": {
+        "duplicate": 16,
+        "out_of_scope": 50
+      }
+    }
+  ],
+  "review_files": [
+    "sources.json",
+    "expansion.json",
+    "decisions.json",
+    "catalog.json",
+    "validation.json"
+  ]
+}

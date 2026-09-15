@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from itertools import product
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import (
     Citation,
     DNASequence,
@@ -282,6 +283,7 @@ def all_descriptors(
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.IGNORE,
     conditions: ThermodynamicConditions | None = None,
     dinucleotide_property_table: DinucleotidePropertyTable | None = None,
+    verbose: bool = True,
 ) -> AllDescriptorsResult:
     """Calculate all 240 fields in ``descriptor_schema_v1``.
 
@@ -915,3 +917,5 @@ def all_descriptors(
 
 
 __all__ = ["all_descriptors"]
+
+_register_public_verbose(globals())

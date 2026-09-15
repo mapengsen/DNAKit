@@ -6,7 +6,12 @@ copyright: Support by Pengsen Ma (Hunan University, Yuelushan Laboratory), https
 docs_dir: docs
 site_dir: site
 strict: true
+hooks:
+  - others/hooks/mcp_setup.py
+watch:
+  - setup.md
 not_in_nav: |
+  /agent_tools*.md
   /quickstart.md
   /tutorials/*
   /examples/index.md
@@ -62,7 +67,13 @@ plugins:
                     - (3) Downloads: api/features/15_download.md
                     - (4) Data Queries: api/features/22_database_query.md
                     - (5) Validation: api/features/03_validation.md
+                    - (6) Database and sequencing extensions:
+                        - Genes, sequences and downloads: api/native/sequences.md
+                        - ENCODE data management: api/native/encode.md
+                        - Organisms and microbiomes: api/native/organisms.md
+                        - Literature and study discovery: api/native/literature.md
                 - 2. Data Processing:
+                    - Unified Input and Output: api/features/00_processing_inputs.md
                     - (1) DNA Sequence Standardization: api/features/03_standardization.md
                     - (2) Intra-sequence Operations:
                         - OPS-001 Sequence Direction Completion: api/features/04_ops_001_sequence_direction.md
@@ -93,19 +104,34 @@ plugins:
                     - (6) 3D Structure and Mechanics: api/features/21_structure3d.md
                     - (7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
                     - (8) Deep-learning Property Prediction: api/features/23_deep_learning_property_prediction.md
-                    - (9) Deep-learning Checkpoint Download: api/features/25_deep_learning_checkpoint_download.md
-                    - (10) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
-                    - (11) Gene Names and Intervals: api/features/26_gene_annotation.md
-                    - (12) Bioinformatics Python APIs: api/features/27_bioinformatics.md
+                    - (9) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
+                    - (10) Gene Names and Intervals: api/features/26_gene_annotation.md
+                    - (11) Bioinformatics Python APIs: api/features/27_bioinformatics.md
+                    - (12) Database analysis and prediction APIs:
+                        - Variants and GWAS: api/native/variants.md
+                        - Diseases and phenotypes: api/native/phenotypes.md
+                        - Expression and regulation: api/native/regulation.md
+                        - Pathways, interactions and structures: api/native/pathways.md
+                        - Targets and drug evidence: api/native/targets.md
+                        - Trained models: api/native/models.md
+                        - Sequence analysis and inheritance: api/native/analysis.md
                 - 4. Data Evaluation:
                     - (1) Common Evaluation Metrics: api/features/12_evaluation.md
                     - (2) Similarity Calculation: api/features/09_similarity_alignment.md
                     - (3) Sequence Distance and Alignment: api/features/09_alignment.md
                 - 5. Visualization: api/features/13_visualization.md
-                - 6. Engineering and Extensions: api/features/14_engineering.md
+                - 6. Engineering and Extensions:
+                    - Backends, performance and reproducibility: api/features/14_engineering.md
+                    - API discovery, workflows and reports: api/native/execution.md
             - API Reference:
                 - API Overview: api/index.md
-            - Agent and MCP Tools: agent_tools.md
+                - All 484 added functions: api/native/index.md
+                - Calling conventions and examples: api/native/usage.md
+            - LLM Tools:
+                - (1) MCP: llm_tools/mcp.md
+                - (2) Python API: llm_tools/python_api.md
+                - (3) Skills: llm_tools/skills.md
+                - (4) Native Skill APIs: llm_tools/native_skills.md
             - Changelog: changelog.md
             - FAQ: faq.md
             - WeChat Community: wechat.md
@@ -136,6 +162,9 @@ extra_css:
 
 extra:
   generator: false
+  collapsible_nav:
+    - 大模型工具
+    - LLM Tools
 
 nav:
   - 首页: index.md
@@ -149,7 +178,13 @@ nav:
           - （3）下载: api/features/15_download.md
           - （4）数据查询: api/features/22_database_query.md
           - （5）合法性检查: api/features/03_validation.md
+          - （6）数据库与测序扩展:
+              - 基因、序列与下载: api/native/sequences.md
+              - ENCODE 数据管理: api/native/encode.md
+              - 物种与微生物组: api/native/organisms.md
+              - 文献与研究检索: api/native/literature.md
       - 2. 数据处理:
+          - 统一输入与输出: api/features/00_processing_inputs.md
           - （1）DNA序列标准化: api/features/03_standardization.md
           - （2）序列内操作:
               - OPS-001 序列补全: api/features/04_ops_001_sequence_direction.md
@@ -180,19 +215,34 @@ nav:
           - （6）三维结构与力学性质: api/features/21_structure3d.md
           - （7）换算: api/features/18_optics_concentration.md
           - （8）深度学习性质预测: api/features/23_deep_learning_property_prediction.md
-          - （9）深度学习任务 Checkpoint 下载: api/features/25_deep_learning_checkpoint_download.md
-          - （10）可选生物信息功能: api/features/24_optional_bioinformatics.md
-          - （11）基因名称与区间注释: api/features/26_gene_annotation.md
-          - （12）生物信息学 Python API: api/features/27_bioinformatics.md
+          - （9）可选生物信息功能: api/features/24_optional_bioinformatics.md
+          - （10）基因名称与区间注释: api/features/26_gene_annotation.md
+          - （11）生物信息学 Python API: api/features/27_bioinformatics.md
+          - （12）数据库分析与预测接口:
+              - 遗传变异与 GWAS: api/native/variants.md
+              - 疾病与表型: api/native/phenotypes.md
+              - 表达与调控: api/native/regulation.md
+              - 通路、互作与结构: api/native/pathways.md
+              - 靶点与药物证据: api/native/targets.md
+              - 已训练模型: api/native/models.md
+              - 序列计算与遗传模拟: api/native/analysis.md
       - 4. 数据评价:
           - （1）常用评价指标: api/features/12_evaluation.md
           - （2）相似度计算: api/features/09_similarity_alignment.md
           - （3）序列距离与比对: api/features/09_alignment.md
       - 5. 可视化: api/features/13_visualization.md
-      - 6. 工程化与扩展: api/features/14_engineering.md
+      - 6. 工程化与扩展:
+          - 后端、性能与复现: api/features/14_engineering.md
+          - 接口发现、工作流与报告: api/native/execution.md
   - API 参考:
       - API 总览: api/index.md
-  - Agent 与 MCP 工具: agent_tools.md
+      - 新增 484 个函数完整索引: api/native/index.md
+      - 调用约定与完整示例: api/native/usage.md
+  - 大模型工具:
+      - （1）MCP: llm_tools/mcp.md
+      - （2）Python API: llm_tools/python_api.md
+      - （3）Skills: llm_tools/skills.md
+      - （4）Skill 统一接口: llm_tools/native_skills.md
   - 更新日志: changelog.md
   - FAQ: faq.md
   - 微信社区: wechat.md

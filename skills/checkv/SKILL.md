@@ -1,0 +1,62 @@
+---
+name: checkv
+description: >
+  Quality assessment of metagenome-assembled viral genomes. Use this skill when working with checkv: installing, choosing
+  parameters, running commands, interpreting outputs, or troubleshooting.
+  Upstream: https://bitbucket.org/berkeleylab/checkv. For routing across mining tasks use microbial-mining.
+  For stage order use metagenomics-workflow.
+license: MIT
+category: analysis-tools
+tags: ['virus', 'qc', 'genome-mining']
+upstream: https://bitbucket.org/berkeleylab/checkv
+stage: mining
+---
+
+## DNAKit execution
+
+Use `dnakit skills doctor checkv` to inspect scientific dependencies. Read [DNAKIT.md](DNAKIT.md) for this skill's DNAKit functions and bundled script entrypoints. Keep the workflow, input checks and reporting requirements below.
+
+
+# CheckV
+
+Upstream: [CheckV](https://bitbucket.org/berkeleylab/checkv)
+
+## Citation
+
+Nayfach, S. *et al.* CheckV assesses the quality and completeness of metagenome-assembled viral genomes. *Nat. Biotechnol.* **39**, 578–585 (2021). https://doi.org/10.1038/s41587-020-00774-7
+
+See also [docs/references.md](references/upstream-docs/references.md).
+
+## Analytical thinking
+
+Prokaryotic CheckM/CheckM2 marker logic does **not** transfer to viruses. CheckV
+estimates viral genome completeness/contamination using viral-specific AAI
+databases and contig QC, guiding which viral MAGs/contigs to trust.
+
+Use after `genomad` / `virsorter2` (or similar) nomination. Always report CheckV
+DB version. Completeness tiers in the paper (e.g. high-/medium-quality viral
+genomes) should be stated explicitly in Methods — do not call every viral hit a
+“complete phage genome.”
+
+Host prediction / taxonomy are separate tools; CheckV is quality-centric.
+
+## How to run
+
+```bash
+checkv end_to_end viral_contigs.fa temp/checkv -t 16 -d $CHECKVDB
+```
+
+## Key parameters
+
+| Item | Notes |
+|------|-------|
+| `$CHECKVDB` | Required — pin release |
+| Input | Putative viral sequences from VirSorter2/geNomad |
+| Output tiers | Use CheckV quality categories in Results filters |
+
+## Related skills
+
+`virsorter2` · `genomad` · `mag-qc` · `microbial-mining` · `tool-selection`
+`vcontact`
+
+<!-- DNAKit documentation-link portability edit, 2026-09-12: bundled repository docs locally; see UPSTREAM.md. -->

@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-12",
+  "python": "3.12.3",
+  "scope": "Offline subprocess fixtures after installing complete selected folders outside the source layout. No LLM, API, large dataset, or full-pipeline validation.",
+  "records": [
+    {
+      "id": "genomic-coordinates",
+      "upstream_revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34",
+      "resource_manifest_sha256": "95ac8d99a00a78ffba06174fd578189036dca514b47adfeaf346fdaaba0631ee",
+      "execution": "smoke_passed",
+      "cases": [
+        {
+          "case": "bed-gff-999-1000",
+          "expected": [
+            1000,
+            1000,
+            1
+          ],
+          "actual": {
+            "contig": "chr1",
+            "input": "999-1000",
+            "output": "1000-1000",
+            "length": 1,
+            "status": "ok",
+            "detail": "",
+            "start": 1000,
+            "end": 1000,
+            "from": "bed",
+            "to": "gff"
+          }
+        },
+        {
+          "case": "gff-bed-1000-1000",
+          "expected": [
+            999,
+            1000,
+            1
+          ],
+          "actual": {
+            "contig": "chr1",
+            "input": "1000-1000",
+            "output": "999-1000",
+            "length": 1,
+            "status": "ok",
+            "detail": "",
+            "start": 999,
+            "end": 1000,
+            "from": "gff",
+            "to": "bed"
+          }
+        },
+        {
+          "case": "bed-gff-0-10",
+          "expected": [
+            1,
+            10,
+            10
+          ],
+          "actual": {
+            "contig": "chr1",
+            "input": "0-10",
+            "output": "1-10",
+            "length": 10,
+            "status": "ok",
+            "detail": "",
+            "start": 1,
+            "end": 10,
+            "from": "bed",
+            "to": "gff"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sample-qc-triage",
+      "upstream_revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d",
+      "resource_manifest_sha256": "5f45f700db980d2e855ecb6f88656f87fad63c5ca61f64f716af0768970648a3",
+      "execution": "smoke_passed",
+      "cases": [
+        {
+          "case": "two-synthetic-samples",
+          "sample_count": 2,
+          "flagged_count": 1,
+          "expected_flag": "contamination",
+          "note": "Operational QC threshold fixture, not a clinical evaluation."
+        }
+      ]
+    },
+    {
+      "id": "bio-fasta-database-curator",
+      "upstream_revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637",
+      "resource_manifest_sha256": "09e4d3eb49113a8ba88402b8fd5674a2d448d50156eb3d183a8f1b3dc8e79abc",
+      "execution": "smoke_passed",
+      "cases": [
+        {
+          "case": "four-record-fasta-id-and-sequence-deduplication",
+          "input_records": 4,
+          "retained_records": 2,
+          "removed_by_id": 1,
+          "removed_by_sequence": 1,
+          "mapping_and_report": "verified"
+        },
+        {
+          "case": "existing-output-preserved",
+          "result": "refused overwrite"
+        },
+        {
+          "case": "empty-sequence-rejected",
+          "result": "no output created"
+        }
+      ]
+    }
+  ]
+}

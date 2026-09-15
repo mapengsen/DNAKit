@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import importlib
+import os
 from collections.abc import Callable, Mapping
+from dataclasses import replace
 from typing import Protocol, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DNAKitError
 
 from .catalog import CATEGORY_LABELS
+from .embeddings import EmbeddingConfig, ToolSearchMode
 from .registry import AgentToolRegistry, default_tool_registry
 from .serialization import serialize_for_agent
 
@@ -76,7 +80,7 @@ def _error_payload(tool_name: str | None, error: Exception) -> dict[str, object]
     }
 
 
-def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
+def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = True) -> MCPServer:
     """Create a compact MCP server without importing optional model backends."""
 
     resolved_registry = default_tool_registry() if registry is None else registry
@@ -91,6 +95,12 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
             "Use search_dnakit_tools to find a capability, describe_dnakit_tool to inspect "
             "its JSON schema, then call_dnakit_tool with the full tool name. File-writing, "
             "model-download, and external-process tools require allow_side_effects=true."
+            " Search defaults to keyword matching. Semantic and hybrid modes require "
+            "server-side embedding configuration. Search/describe never execute the candidates."
+            " For DNA workflow guidance, use search_dnakit_skills, then read_dnakit_skill."
+            " Read each skill's DNAKIT.md for native database/ENCODE functions and bundled"
+            " workflow entrypoints. Actual scientific libraries, tools, data and models keep"
+            " their declared requirements; discovering a skill does not install those dependencies."
         ),
     )
 
@@ -174,13 +184,17 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
         name="search_dnakit_tools",
         description=(
             "Search DNAKit public functions by capability, function name, or category. "
-            "Use English scientific terms when possible."
+            "Defaults to keyword matching; use English scientific terms for that mode. "
+            "Semantic/hybrid search sends query and tool descriptions to a configured "
+            "embedding API and caches tool vectors locally. "
+            "Returns candidates without executing them. "
+            f"Cloud embedding search configured: {resolved_registry.embedding_config is not None}."
         ),
         annotations={
-            "readOnlyHint": True,
+            "readOnlyHint": resolved_registry.embedding_config is None,
             "destructiveHint": False,
             "idempotentHint": True,
-            "openWorldHint": False,
+            "openWorldHint": resolved_registry.embedding_config is not None,
         },
     )
     def search_tools(
@@ -188,6 +202,7 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
         category: str | None = None,
         limit: int = 20,
         include_python_only: bool = False,
+        mode: ToolSearchMode = "keyword",
     ) -> dict[str, object]:
         try:
             matches = resolved_registry.search(
@@ -195,6 +210,7 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
                 category=category,
                 limit=limit,
                 include_python_only=include_python_only,
+                mode=mode,
             )
             return {
                 "ok": True,
@@ -252,13 +268,83 @@ def create_server(registry: AgentToolRegistry | None = None) -> MCPServer:
         except Exception as exc:
             return _error_payload(tool_name, exc)
 
+    @server.tool(
+        name="search_dnakit_skills",
+        description=(
+            "Search the bundled DNA workflow skills using English or supported Chinese task "
+            "keywords. Returns bounded summaries, provenance, and validation status; no "
+            "network, model API, installation, or workflow execution."
+        ),
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    def search_workflow_skills(
+        query: str, category: str | None = None, source: str | None = None, limit: int = 10
+    ) -> dict[str, object]:
+        from dnakit.skills import search_skills
+
+        try:
+            return {
+                "ok": True,
+                **search_skills(query, category=category, source=source, limit=limit),
+            }
+        except Exception as exc:
+            return _error_payload(None, exc)
+
+    @server.tool(
+        name="read_dnakit_skill",
+        description=(
+            "Read a selected DNA skill's SKILL.md or a listed supporting resource. "
+            "Output is paginated by character offset and checksum-verified. "
+            "Reading workflow instructions does not execute or install them."
+        ),
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    def read_workflow_skill(
+        skill_id: str, resource: str = "SKILL.md", offset: int = 0, limit: int = 24000
+    ) -> dict[str, object]:
+        from dnakit.skills import read_skill_file
+
+        try:
+            return {
+                "ok": True,
+                **read_skill_file(skill_id, resource=resource, offset=offset, limit=limit),
+            }
+        except Exception as exc:
+            return _error_payload(None, exc)
+
     return server
 
 
-def main() -> None:
+def main(*, verbose: bool = True) -> None:
     """Run the local stdio MCP server used by Agent clients."""
 
-    create_server().run(show_banner=False)
+    base_url = os.environ.get("DNAKIT_EMBEDDING_BASE_URL")
+    model = os.environ.get("DNAKIT_EMBEDDING_MODEL")
+    if base_url is not None or model is not None:
+        if not base_url or not model:
+            raise ConfigurationError(
+                "Set both DNAKIT_EMBEDDING_BASE_URL and DNAKIT_EMBEDDING_MODEL.",
+                code="INVALID_EMBEDDING_CONFIG",
+            )
+        embedding_config = EmbeddingConfig(model=model, base_url=base_url)
+        cache_dir = os.environ.get("DNAKIT_EMBEDDING_CACHE_DIR")
+        if cache_dir is not None:
+            embedding_config = replace(embedding_config, cache_dir=cache_dir)
+        registry = AgentToolRegistry(embedding_config=embedding_config)
+        server = create_server(registry)
+    else:
+        server = create_server()
+    server.run(show_banner=False)
 
 
 if __name__ == "__main__":
@@ -266,3 +352,5 @@ if __name__ == "__main__":
 
 
 __all__ = ["MCPServer", "create_server", "main"]
+
+_register_public_verbose(globals())

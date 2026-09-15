@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._dependency_hints import dependency_hint
 from dnakit.exceptions import ConfigurationError
 
 
@@ -28,6 +29,7 @@ class RepresentationResult:
             raise ConfigurationError(
                 "RepresentationResult requires NumPy.",
                 code="MISSING_NEURAL_DEPENDENCY",
+                hint=dependency_hint("neural"),
             ) from exc
         matrix = np.asarray(self.representations, dtype=np.float32)
         if matrix.ndim != 2:

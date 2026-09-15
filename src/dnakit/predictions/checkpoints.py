@@ -3,16 +3,23 @@
 from __future__ import annotations
 
 import importlib
+import os
+import tempfile
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._checkpoint_status import checkpoint_status
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import progress_enabled
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.download import DownloadConfig, RemoteFile, download_file
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DownloadError
 from dnakit.representations import default_checkpoint_root, ensure_model_checkpoint
+from dnakit.representations.checkpoints import _indexed_weights_are_complete
 
 from .enformer_benchmarks import (
-    ENFORMER_BENCHMARK_CHECKPOINTS_URL,
     EnformerBenchmarkTask,
     get_enformer_benchmark_task,
     is_enformer_benchmark_task,
@@ -58,16 +65,14 @@ class PredictionCheckpointInfo:
         }
 
 
-def default_prediction_checkpoint_root() -> Path:
+def default_prediction_checkpoint_root(*, verbose: bool = True) -> Path:
     """Return the shared user-visible ``./ckpt`` directory."""
 
     return default_checkpoint_root()
 
 
 def enformer_benchmark_checkpoint_path(
-    task: str,
-    *,
-    checkpoint_dir: str | Path | None = None,
+    task: str, *, checkpoint_dir: str | Path | None = None, verbose: bool = True
 ) -> Path:
     """Return the canonical local path for one of the 27 Enformer checkpoints."""
 
@@ -96,44 +101,89 @@ def _benchmark_candidates(root: Path, spec: EnformerBenchmarkTask) -> tuple[Path
     )
 
 
-def _missing_benchmark_checkpoint(path: Path, spec: EnformerBenchmarkTask) -> ConfigurationError:
-    return ConfigurationError(
-        "The selected Enformer task checkpoint is not installed.",
-        code="MODEL_CHECKPOINT_NOT_FOUND",
-        context={
-            "task": spec.name,
-            "family": spec.family,
-            "checkpoint_filename": spec.checkpoint_filename,
-            "download_url": ENFORMER_BENCHMARK_CHECKPOINTS_URL,
-            "expected_path": str(path),
-        },
-        hint=(
-            f"Download {spec.checkpoint_filename} from {ENFORMER_BENCHMARK_CHECKPOINTS_URL} "
-            f"and place it at {path}, or pass checkpoint_path to its exact local file."
-        ),
-    )
+def _benchmark_file_ready(path: Path) -> bool:
+    return path.is_file() and path.stat().st_size > 0
+
+
+def _download_benchmark_checkpoint(path: Path, spec: EnformerBenchmarkTask) -> None:
+    try:
+        gdown = importlib.import_module("gdown")
+    except ImportError as exc:
+        raise BackendUnavailableError(
+            "Enformer task checkpoint download requires gdown.",
+            code="MISSING_NEURAL_DEPENDENCY",
+            hint=dependency_hint("neural,neural-enformer"),
+        ) from exc
+    checkpoint_status("Starting checkpoint download", path, spec.checkpoint_url)
+    temporary: Path | None = None
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Supply a stream so gdown cannot leave its own untracked partial files.
+        with tempfile.NamedTemporaryFile(
+            mode="w+b",
+            prefix=f".{path.name}.",
+            suffix=".part",
+            dir=path.parent,
+            delete=False,
+        ) as output:
+            temporary = Path(output.name)
+            result = gdown.download(
+                id=spec.checkpoint_file_id,
+                output=output,
+                quiet=not progress_enabled(),
+                use_cookies=False,
+            )
+        # These checkpoints use torch's ZIP serialization (required by mmap).
+        # Checking the archive directory rejects HTML, empty and truncated files
+        # without deserializing tensors or reading the entire checkpoint.
+        if result is None or not zipfile.is_zipfile(temporary):
+            raise ValueError("Download is not a complete PyTorch checkpoint archive")
+        os.replace(temporary, path)
+    except Exception as exc:
+        checkpoint_status("Checkpoint download failed", path, spec.checkpoint_url)
+        raise DownloadError(
+            "Could not download the Enformer task checkpoint.",
+            code="MODEL_CHECKPOINT_DOWNLOAD_FAILED",
+            context={
+                "task": spec.name,
+                "download_url": spec.checkpoint_url,
+                "expected_path": str(path),
+            },
+            hint=(
+                f"Check network access and Google Drive sharing/quota, or download "
+                f"{spec.checkpoint_url} manually to {path}."
+            ),
+        ) from exc
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    checkpoint_status("Checkpoint download complete", path, spec.checkpoint_url)
+
+
+def _resolve_benchmark_file(
+    path: Path, spec: EnformerBenchmarkTask, *, explicit: bool = False
+) -> PredictionCheckpointInfo:
+    ready = _benchmark_file_ready(path)
+    if ready:
+        checkpoint_status("Using local checkpoint", path, None if explicit else spec.checkpoint_url)
+    else:
+        _download_benchmark_checkpoint(path, spec)
+    source = "explicit" if ready and explicit else spec.checkpoint_url
+    return PredictionCheckpointInfo((str(path),), not ready, (source,))
 
 
 def _enformer_benchmark_checkpoint(
     config: PropertyPredictionConfig,
 ) -> PredictionCheckpointInfo:
     spec = get_enformer_benchmark_task(config.task)
+    candidates = _benchmark_candidates(_root(config), spec)
     if config.checkpoint_dir is None:
-        path = enformer_benchmark_checkpoint_path(config.task)
-    else:
-        root = Path(config.checkpoint_dir).expanduser().resolve()
-        candidates = _benchmark_candidates(root, spec)
-        path = next(
-            (candidate.resolve() for candidate in candidates if candidate.is_file()),
-            candidates[0].resolve(),
-        )
-    if not path.is_file():
-        raise _missing_benchmark_checkpoint(path, spec)
-    return PredictionCheckpointInfo(
-        (str(path),),
-        False,
-        (ENFORMER_BENCHMARK_CHECKPOINTS_URL,),
+        candidates = (candidates[1], candidates[0], candidates[2])
+    path = next(
+        (candidate.resolve() for candidate in candidates if _benchmark_file_ready(candidate)),
+        candidates[0].resolve(),
     )
+    return _resolve_benchmark_file(path, spec)
 
 
 def _require_huggingface_hub() -> Any:
@@ -143,7 +193,7 @@ def _require_huggingface_hub() -> Any:
         raise BackendUnavailableError(
             "Prediction checkpoint download requires huggingface-hub.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the neural extra with: python -m pip install "dnakit[neural]"',
+            hint=dependency_hint("neural"),
         ) from exc
 
 
@@ -188,10 +238,12 @@ def _snapshot(
 
 
 def _has_weights(path: Path) -> bool:
-    return any(
-        any(path.glob(pattern))
-        for pattern in ("*.bin", "*.pt", "*.safetensors", "*.safetensors.index.json")
-    )
+    if any(
+        (path / name).is_file()
+        for name in ("model.safetensors.index.json", "pytorch_model.bin.index.json")
+    ):
+        return _indexed_weights_are_complete(path)
+    return any(any(path.glob(pattern)) for pattern in ("*.bin", "*.pt", "*.safetensors"))
 
 
 def _segmentnt_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpointInfo:
@@ -202,6 +254,9 @@ def _segmentnt_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpo
         and _has_weights(target)
     )
     if not ready:
+        checkpoint_status(
+            "Starting checkpoint download", target, "https://huggingface.co/InstaDeepAI/segment_nt"
+        )
         _snapshot(
             "InstaDeepAI/segment_nt",
             target,
@@ -217,6 +272,11 @@ def _segmentnt_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpo
             "SegmentNT checkpoint download did not produce the required files.",
             code="INCOMPLETE_MODEL_CHECKPOINT",
         )
+    checkpoint_status(
+        "Using local checkpoint" if ready else "Checkpoint download complete",
+        target,
+        "https://huggingface.co/InstaDeepAI/segment_nt",
+    )
     return PredictionCheckpointInfo(
         (str(target),),
         not ready,
@@ -231,6 +291,9 @@ def _evo2_exon_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpo
     base_ready = (base / "evo2_7b_base.pt").is_file()
     head_ready = (head / "config.json").is_file() and _has_weights(head)
     if not base_ready:
+        checkpoint_status(
+            "Starting checkpoint download", base, "https://huggingface.co/arcinstitute/evo2_7b_base"
+        )
         _snapshot(
             "arcinstitute/evo2_7b_base",
             base,
@@ -239,6 +302,11 @@ def _evo2_exon_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpo
             allow_patterns=("config.json", "evo2_7b_base.pt"),
         )
     if not head_ready:
+        checkpoint_status(
+            "Starting checkpoint download",
+            head,
+            "https://huggingface.co/schmojo/evo2-exon-classifier",
+        )
         _snapshot(
             "schmojo/evo2-exon-classifier",
             head,
@@ -252,6 +320,16 @@ def _evo2_exon_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpo
             "Evo 2 exon-classifier checkpoint download is incomplete.",
             code="INCOMPLETE_MODEL_CHECKPOINT",
         )
+    checkpoint_status(
+        "Using local checkpoint" if base_ready else "Checkpoint download complete",
+        base,
+        "https://huggingface.co/arcinstitute/evo2_7b_base",
+    )
+    checkpoint_status(
+        "Using local checkpoint" if head_ready else "Checkpoint download complete",
+        head,
+        "https://huggingface.co/schmojo/evo2-exon-classifier",
+    )
     return PredictionCheckpointInfo(
         (str(base), str(head)),
         not (base_ready and head_ready),
@@ -311,13 +389,11 @@ def _explicit_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpoi
                 (
                     candidate.resolve()
                     for candidate in _benchmark_candidates(path, spec)
-                    if candidate.is_file()
+                    if _benchmark_file_ready(candidate)
                 ),
                 path / spec.checkpoint_filename,
             )
-        if not path.is_file():
-            raise _missing_benchmark_checkpoint(path, spec)
-        return PredictionCheckpointInfo((str(path),), False, ("explicit",))
+        return _resolve_benchmark_file(path, spec, explicit=True)
     if not path.is_dir():
         raise ConfigurationError(
             "checkpoint_path must be an existing checkpoint directory.",
@@ -335,6 +411,8 @@ def _explicit_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpoi
                 code="MODEL_CHECKPOINT_NOT_FOUND",
                 context={"path": str(path)},
             )
+        checkpoint_status("Using local checkpoint", base)
+        checkpoint_status("Using local checkpoint", head)
         return PredictionCheckpointInfo(
             (str(base), str(head)),
             False,
@@ -342,11 +420,12 @@ def _explicit_checkpoint(config: PropertyPredictionConfig) -> PredictionCheckpoi
         )
     if config.model == "enformer":
         _enformer_metadata(path)
+    checkpoint_status("Using local checkpoint", path)
     return PredictionCheckpointInfo((str(path),), False, ("explicit",))
 
 
 def ensure_prediction_checkpoint(
-    config: PropertyPredictionConfig,
+    config: PropertyPredictionConfig, *, verbose: bool = True
 ) -> PredictionCheckpointInfo:
     """Resolve and, when needed, download checkpoints for one direct task."""
 
@@ -375,3 +454,5 @@ __all__ = [
     "enformer_benchmark_checkpoint_path",
     "ensure_prediction_checkpoint",
 ]
+
+_register_public_verbose(globals())

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections import Counter
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Gap, IssueSeverity
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.descriptors import (
@@ -57,6 +58,7 @@ def evaluate_validity(
     *,
     config: ValidationConfig | None = None,
     limits: EvaluationLimits | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Evaluate object-level alphabet, length, gap, and optional record constraints."""
 
@@ -155,9 +157,7 @@ def _ambiguity_entry(
 
 
 def evaluate_ambiguity(
-    value: EvaluationInput,
-    *,
-    config: AmbiguityEvaluationConfig | None = None,
+    value: EvaluationInput, *, config: AmbiguityEvaluationConfig | None = None, verbose: bool = True
 ) -> EvaluationReport:
     """Report ambiguity symbols, positions, weighted impact, and explicit denominator."""
 
@@ -249,6 +249,7 @@ def evaluate_complexity(
     value: EvaluationInput,
     *,
     config: ComplexityEvaluationConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Combine normalized entropy, vocabulary, repeat, and homopolymer components."""
 
@@ -288,9 +289,7 @@ def evaluate_complexity(
 
 
 def evaluate_quality(
-    value: EvaluationInput,
-    *,
-    config: QualityEvaluationConfig | None = None,
+    value: EvaluationInput, *, config: QualityEvaluationConfig | None = None, verbose: bool = True
 ) -> EvaluationReport:
     """Combine validity, ambiguity, complexity, length, and record completeness."""
 
@@ -401,3 +400,5 @@ __all__ = [
     "evaluate_quality",
     "evaluate_validity",
 ]
+
+_register_public_verbose(globals())

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASequence, Strand, Topology
 from dnakit.core._json import FrozenDict
 from dnakit.core.facade import resolve_single_dna
@@ -138,6 +139,7 @@ def approximate_search(
     max_targets: int = DEFAULT_MAX_APPROXIMATE_TARGETS,
     max_matches: int = DEFAULT_MAX_APPROXIMATE_MATCHES,
     max_cells: int = DEFAULT_MAX_APPROXIMATE_CELLS,
+    verbose: bool = True,
 ) -> ApproximateSearchResult:
     """Find bounded-cost query alignments ending at each target coordinate."""
 
@@ -256,3 +258,5 @@ __all__ = [
     "DEFAULT_MAX_APPROXIMATE_TARGETS",
     "approximate_search",
 ]
+
+_register_public_verbose(globals())

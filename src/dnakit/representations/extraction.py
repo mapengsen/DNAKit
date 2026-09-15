@@ -5,6 +5,10 @@ from __future__ import annotations
 from collections.abc import Iterable
 from pathlib import Path
 
+from dnakit._backend_errors import backend_failure
+from dnakit._checkpoint_status import checkpoint_status
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -87,7 +91,7 @@ def _require_numpy() -> object:
         raise BackendUnavailableError(
             "Representation extraction requires NumPy.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the neural extra with: python -m pip install "dnakit[neural]"',
+            hint=dependency_hint("neural"),
         ) from exc
     return np
 
@@ -97,6 +101,7 @@ def extract_representations(
     *,
     config: RepresentationConfig | None = None,
     backend: RepresentationBackend | None = None,
+    verbose: bool = True,
 ) -> RepresentationResult:
     """Extract one fixed-size representation per DNA record.
 
@@ -146,6 +151,7 @@ def extract_representations(
                     code="MODEL_CHECKPOINT_NOT_FOUND",
                     context={"path": str(path)},
                 )
+            checkpoint_status("Using local checkpoint", path)
             checkpoint_path = str(path)
         try:
             selected_backend = create_representation_backend(
@@ -154,16 +160,16 @@ def extract_representations(
                 resolved,
             )
         except (
-            BackendExecutionError,
             BackendUnavailableError,
             ConfigurationError,
             SequenceError,
         ):
             raise
         except Exception as exc:
-            raise BackendExecutionError(
+            raise backend_failure(
                 "Could not initialize the representation backend.",
                 code="MODEL_LOAD_FAILED",
+                error=exc,
                 context={"model": resolved.model, "error_type": type(exc).__name__},
             ) from exc
     elif not hasattr(selected_backend, "extract"):
@@ -174,12 +180,13 @@ def extract_representations(
 
     try:
         raw_matrix = selected_backend.extract(sequences, show_progress=resolved.show_progress)
-    except (BackendExecutionError, BackendUnavailableError, ConfigurationError, SequenceError):
+    except (BackendUnavailableError, ConfigurationError, SequenceError):
         raise
     except Exception as exc:
-        raise BackendExecutionError(
+        raise backend_failure(
             "The representation backend failed while encoding DNA sequences.",
             code="REPRESENTATION_EXTRACTION_FAILED",
+            error=exc,
             context={"model": resolved.model, "error_type": type(exc).__name__},
         ) from exc
 
@@ -218,3 +225,5 @@ def extract_representations(
 
 
 __all__ = ["extract_representations"]
+
+_register_public_verbose(globals())

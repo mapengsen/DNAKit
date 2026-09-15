@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from itertools import product
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.descriptors import canonical_kmer, kmer_statistics
 from dnakit.exceptions import ConfigurationError
@@ -70,6 +71,7 @@ def kmer(
     overlapping: bool = True,
     cross_gaps: bool = False,
     max_dimension: int = DEFAULT_MAX_DIMENSION,
+    verbose: bool = True,
 ) -> FingerprintResult:
     """Build a deterministic fixed-schema exact k-mer fingerprint.
 
@@ -168,3 +170,5 @@ kmer_fingerprint = kmer
 
 
 __all__ = ["DEFAULT_MAX_DIMENSION", "kmer", "kmer_fingerprint"]
+
+_register_public_verbose(globals())

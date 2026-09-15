@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from itertools import pairwise
 from typing import Any, Literal, TypeAlias
 
+from dnakit._processing.dispatch import accept_inputs as _accept_inputs
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.coordinates import Interval
 from dnakit.core.facade import DNA, resolve_single_dna
 from dnakit.core.record import DNARecord
@@ -366,7 +368,7 @@ class LengthCurriculum:
 
 
 def make_length_curriculum(
-    lengths: Sequence[int], *, stage_steps: Sequence[int] | None = None
+    lengths: Sequence[int], *, stage_steps: Sequence[int] | None = None, verbose: bool = True
 ) -> LengthCurriculum:
     """Create a validated short-to-long curriculum."""
 
@@ -769,6 +771,7 @@ def iter_sequence_chunks(
     split: str | None = None,
     region_index: int = 0,
     progress: ChunkProgressCallback | None = None,
+    verbose: bool = True,
 ) -> Iterator[SequenceChunk]:
     """Lazily split one sequence or record according to ``config``.
 
@@ -836,6 +839,7 @@ def iter_fasta_chunks(
     bed: ChunkBedSource | None = None,
     read_config: ReadConfig | None = None,
     progress: ChunkProgressCallback | None = None,
+    verbose: bool = True,
 ) -> Iterator[SequenceChunk]:
     """Lazily split FASTA records, optionally restricted and labelled by BED.
 
@@ -905,6 +909,33 @@ def iter_fasta_chunks(
             )
 
 
+def chunk_sequences(
+    value: DNA | DNASequence | DNARecord,
+    *,
+    config: ChunkingConfig | None = None,
+    start: int = 0,
+    end: int | None = None,
+    source_id: str | None = None,
+    split: str | None = None,
+    region_index: int = 0,
+    progress: ChunkProgressCallback | None = None,
+    verbose: bool = True,
+) -> Iterator[SequenceChunk]:
+    """Iterate native sequence chunks, or write chunks when passed a file path."""
+    return iter_sequence_chunks(
+        value,
+        config=config,
+        start=start,
+        end=end,
+        source_id=source_id,
+        split=split,
+        region_index=region_index,
+        progress=progress,
+    )
+
+
+chunk_sequences = _accept_inputs(chunk_sequences, mode="chunks")
+
 __all__ = [
     "ChunkBedSource",
     "ChunkProgress",
@@ -914,7 +945,10 @@ __all__ = [
     "LengthCurriculum",
     "LengthCurriculumStage",
     "SequenceChunk",
+    "chunk_sequences",
     "iter_fasta_chunks",
     "iter_sequence_chunks",
     "make_length_curriculum",
 ]
+
+_register_public_verbose(globals())

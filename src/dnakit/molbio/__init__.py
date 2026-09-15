@@ -1,5 +1,7 @@
 """Deterministic molecular-biology simulation and rule-design APIs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .assembly import AssemblyFragment, simulate_assembly
 from .crispr import scan_crispr_candidates
 from .golden_gate import (
@@ -111,3 +113,5 @@ __all__ = [
     "simulate_assembly",
     "simulate_pcr",
 ]
+
+_register_public_verbose(globals())

@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 from ._shared import threedna_provenance
@@ -41,7 +42,7 @@ def _source(path: str | Path) -> tuple[Path, str]:
         ) from exc
 
 
-def read_3dna_bp_step(path: str | Path) -> ThreeDNAParameterResult:
+def read_3dna_bp_step(path: str | Path, *, verbose: bool = True) -> ThreeDNAParameterResult:
     """Parse the 12 standard rigid-body columns from ``bp_step.par``."""
 
     source, text = _source(path)
@@ -136,7 +137,7 @@ def _count(data: Mapping[str, object], count_key: str, array_key: str) -> int:
     return raw_count
 
 
-def read_dssr_json(path: str | Path) -> DSSRSummaryResult:
+def read_dssr_json(path: str | Path, *, verbose: bool = True) -> DSSRSummaryResult:
     """Parse audited capability counts from an x3dna-dssr ``--json`` result."""
 
     source, text = _source(path)
@@ -172,3 +173,5 @@ def read_dssr_json(path: str | Path) -> DSSRSummaryResult:
 
 
 __all__ = ["read_3dna_bp_step", "read_dssr_json"]
+
+_register_public_verbose(globals())

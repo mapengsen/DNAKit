@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2026 Manuel Corpas
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Scope of this licence
+
+The MIT licence above covers the ClawBio repository: the runner, the CLI, the
+shared tooling, and skill code that does not declare otherwise.
+
+It does **not** automatically cover:
+
+1. **Skills that declare their own `license:`** in their SKILL.md frontmatter.
+   A per-skill declaration overrides this file for that skill's directory.
+   Contributed skill code is expected to be MIT or Apache-2.0 (see
+   CONTRIBUTING.md); anything else is an exception granted case by case and is
+   surfaced in `skills/catalog.json`.
+
+2. **Third-party models, weights, reference data and databases** that a skill
+   downloads or requires at runtime. These carry their own terms, which are
+   frequently non-commercial, and no licence in this repository can grant
+   rights over them. Where a skill depends on such an artefact it declares
+   `model_license:` and/or `data_license:` in its frontmatter. Those fields are
+   the authoritative signal for whether a given use is permitted.
+
+If you are evaluating ClawBio for commercial use, read a skill's `license`,
+`model_license` and `data_license` fields together. The most restrictive of
+the three governs. `skills/catalog.json` carries all three for every skill so
+they can be audited in bulk.

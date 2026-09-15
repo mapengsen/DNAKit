@@ -7,6 +7,7 @@ from collections.abc import Callable, Mapping, Sequence
 from typing import Literal, cast
 from urllib.parse import quote
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, QueryError
 
 from ._http import (
@@ -171,6 +172,7 @@ def sequence(
     progress: Callable[[QueryProgress], None] | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Fetch one or more coordinate sequences using 0-based half-open regions."""
 
@@ -245,6 +247,7 @@ def sequence_by_id(
     mask: Literal["hard", "soft"] | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Fetch genomic, cDNA, CDS, or protein sequence for an Ensembl stable ID."""
 
@@ -284,6 +287,7 @@ def lookup(
     utr: bool = True,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Look up one Ensembl gene/transcript/protein ID and connected features."""
 
@@ -338,6 +342,7 @@ def transcripts(
     expand: bool = True,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query transcripts, exons, translations, and canonical status by ID or symbol."""
 
@@ -397,6 +402,7 @@ def annotation(
     biotype: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query genes, transcripts, repeats, variants, and regulation over a region."""
 
@@ -441,6 +447,7 @@ def nearby(
     limit: int = 20,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Find nearest Ensembl features within a bounded flanking window."""
 
@@ -517,6 +524,7 @@ def variant(
     include_phenotypes: bool = True,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query variant records, population frequencies, or VEP consequences."""
 
@@ -580,6 +588,7 @@ def regulation(
     include_constrained: bool = False,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query Ensembl regulatory features, motifs, and optional constrained elements."""
 
@@ -617,6 +626,7 @@ def homology(
     aligned: bool = False,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query orthologs, paralogs, projections, and gene-tree alignments."""
 
@@ -668,6 +678,7 @@ def id_convert(
     external_db: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Convert Ensembl IDs/symbols through Ensembl external cross-references."""
 
@@ -706,6 +717,7 @@ def map_coordinates(
     strand: Literal[-1, 1] = 1,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Map a 0-based half-open region between two assemblies."""
 
@@ -756,6 +768,7 @@ def comparative_alignment(
     mask: Literal["hard", "soft"] | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Retrieve bounded Ensembl Compara genomic alignment blocks."""
 
@@ -806,6 +819,7 @@ def genome_info(
     expand_sequences: bool = False,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Return Ensembl assembly, genebuild, release, and sequence metadata."""
 
@@ -834,6 +848,7 @@ def chromosome(
     include_synonyms: bool = True,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query chromosome, organelle, plasmid, contig, or scaffold metadata."""
 
@@ -872,3 +887,5 @@ __all__ = [
     "transcripts",
     "variant",
 ]
+
+_register_public_verbose(globals())

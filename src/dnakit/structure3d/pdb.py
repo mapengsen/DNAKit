@@ -7,6 +7,7 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 from .results import Atom3D, DNA3DStructure, Residue3D
@@ -115,7 +116,7 @@ def _structure(
     )
 
 
-def load_pdb_ensemble(path: str | Path) -> tuple[DNA3DStructure, ...]:
+def load_pdb_ensemble(path: str | Path, *, verbose: bool = True) -> tuple[DNA3DStructure, ...]:
     """Load all PDB MODEL records, retaining canonical DNA ATOM records only."""
 
     if not isinstance(path, (str, Path)):
@@ -229,7 +230,7 @@ def load_pdb_ensemble(path: str | Path) -> tuple[DNA3DStructure, ...]:
     )
 
 
-def load_pdb(path: str | Path, *, model_index: int = 1) -> DNA3DStructure:
+def load_pdb(path: str | Path, *, model_index: int = 1, verbose: bool = True) -> DNA3DStructure:
     """Load one selected PDB model."""
 
     if isinstance(model_index, bool) or not isinstance(model_index, int) or model_index <= 0:
@@ -251,3 +252,5 @@ def load_pdb(path: str | Path, *, model_index: int = 1) -> DNA3DStructure:
 
 
 __all__ = ["load_pdb", "load_pdb_ensemble"]
+
+_register_public_verbose(globals())

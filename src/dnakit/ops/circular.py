@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Topology
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
@@ -73,7 +74,7 @@ def _require_circular(sequence: DNASequence, *, operation: str) -> DNASequence:
     return source
 
 
-def rotate(sequence: DNASequence, offset: int) -> CircularOperationResult:
+def rotate(sequence: DNASequence, offset: int, *, verbose: bool = True) -> CircularOperationResult:
     """Left-rotate a circular sequence so ``offset`` becomes coordinate zero.
 
     Offsets are normalized modulo the resolved coordinate span. A rotation may
@@ -152,7 +153,7 @@ def _minimal_rotation_offset(text: str) -> int:
     return min(first, second)
 
 
-def canonical_origin(sequence: DNASequence) -> CircularOperationResult:
+def canonical_origin(sequence: DNASequence, *, verbose: bool = True) -> CircularOperationResult:
     """Choose the lexicographically minimal forward rotation as coordinate zero.
 
     The rule compares normalized DNA symbols using their ordinary code-point
@@ -191,3 +192,5 @@ def canonical_origin(sequence: DNASequence) -> CircularOperationResult:
 
 
 __all__ = ["CircularOperation", "CircularOperationResult", "canonical_origin", "rotate"]
+
+_register_public_verbose(globals())

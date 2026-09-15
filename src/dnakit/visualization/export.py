@@ -13,6 +13,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import BinaryIO, Literal, Protocol, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.provenance import ArtifactRef
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
@@ -138,6 +139,7 @@ def save_svg(
     target: PathLike,
     *,
     config: SaveConfig | None = None,
+    verbose: bool = True,
 ) -> VisualizationSaveResult:
     """Atomically save exact SVG bytes, refusing overwrite by default."""
 
@@ -325,6 +327,7 @@ def save_image(
     *,
     image_type: ImageExportFormat | None = None,
     config: ImageExportConfig | None = None,
+    verbose: bool = True,
 ) -> VisualizationSaveResult:
     """Atomically export an SVG artifact, defaulting to PNG for extensionless targets.
 
@@ -384,6 +387,7 @@ def save_html_report(
     target: PathLike,
     *,
     config: SaveConfig | None = None,
+    verbose: bool = True,
 ) -> VisualizationSaveResult:
     """Atomically persist a self-contained DNAKit HTML report."""
 
@@ -423,3 +427,5 @@ def save_html_report(
 
 
 __all__ = ["ImageExportFormat", "PathLike", "save_html_report", "save_image", "save_svg"]
+
+_register_public_verbose(globals())

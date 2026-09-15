@@ -1,5 +1,52 @@
 # Data query
 
+## Added database APIs
+
+The added `dnakit.databases` namespace has 455 public functions, with another 20 ENCODE query, download and management functions in `dnakit.encode`. Each has its own parameters and returns reference:
+
+- [Genes and sequencing data](../native/sequences.md) · [ENCODE](../native/encode.md)
+- [Variants and GWAS](../native/variants.md) · [Diseases and phenotypes](../native/phenotypes.md)
+- [Expression and regulation](../native/regulation.md) · [Organisms and microbiomes](../native/organisms.md)
+- [Pathways, interactions and structures](../native/pathways.md) · [Targets and drugs](../native/targets.md)
+- [Literature and studies](../native/literature.md) · [Discovery and dispatch](../native/execution.md)
+
+See the [484-function index](../native/index.md) and [calling examples](../native/usage.md). The sections below cover existing `dnakit.search` interfaces and the extended sequence search.
+
+## Search sequences by organism, gene and strain
+
+`dnakit.search.ncbi.entrez(database, term=None, *, organism=None, gene=None, strain=None,
+keywords=None, seq_type=None, source="all", retmax=20, retstart=0, config=None)`
+preserves positional `entrez("nuccore", "query expression")` calls and adds structured
+sequence filters. Filters are ANDed with the parenthesized term. Organism, gene and
+strain are literals; keywords/term accept Entrez expressions. Structured filters
+require `nuccore` or `protein`; strain uses All Fields, so verify the actual record.
+
+```python
+import dnakit
+
+result = dnakit.search.ncbi.entrez(
+    "nuccore", organism="Escherichia coli", strain="K-12",
+    seq_type="complete_genome", retmax=3,
+)
+accessions = dnakit.search.ncbi.accessions(result.metadata["uids"])
+print(result.total_count, accessions)
+print(result.records)
+```
+
+`seq_type` accepts complete_genome, genomic, mrna, ncrna, refseq, or protein.
+Protein requires the protein database. `source="refseq"` combines with molecule
+filters; `source="genbank"` excludes RefSeq without establishing evidence quality.
+Empty results do not automatically broaden the query.
+
+`accessions(uids, *, database="nuccore", config=None)` returns accession.version
+strings in input order, including duplicates, in batches of 200. Empty input
+returns an empty tuple without HTTP; unresolved UIDs raise an error. The existing
+`accession(identifier)` function still retrieves a summary. Results contain
+`records`, `total_count`, `metadata["uids"]` and provider `metadata["warnings"]`.
+Raw sequence files use the [accession download APIs](15_download.md#accession-sequences).
+MCP names are `dnakit.search.entrez` and `dnakit.search.accessions`; new parameters
+are included in their input schemas.
+
 Query public databases such as NCBI, Ensembl, ENA, ENCODE, and UCSC using a unified interface to obtain DNA sequences and related metadata.
 
 <span id="1"></span>**Providers and Entrances**

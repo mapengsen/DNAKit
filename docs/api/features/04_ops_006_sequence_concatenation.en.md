@@ -1,5 +1,7 @@
 # OPS-006 Sequence splicing
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Splice multiple DNA sequences or perform de-overlapping splicing based on precise overlapping regions.
 
 ## 1. Ordinary sequence splicing

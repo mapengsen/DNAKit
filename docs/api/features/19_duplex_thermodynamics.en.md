@@ -95,10 +95,10 @@ print(round(result.total_delta_g_kcal_per_mol, 4))
 -7.4771
 ```
 
-## 4) Conditions and Na⁺/K⁺ unit price salt
+## 4) Conditions and Na⁺/K⁺ monovalent salt
 
 - **Function:** Use structured objects to uniformly record temperature, salt concentration, chain concentration and co-solvent conditions, so that different thermodynamic calculations can be reused and accurately compared in the same experimental environment.
-- **Calculation method:** This object mainly performs value range checking and condition recording; the native nearest neighbor model only uses `[Na⁺]+[K⁺]` as the total unit price salt. The `Mg²⁺`, dNTP, DMSO and formamide fields are only passed to external backends or correction functions that explicitly support them.
+- **Calculation method:** This object mainly performs value range checking and condition recording; the native nearest neighbor model only uses `[Na⁺]+[K⁺]` as the total monovalent salt. The `Mg²⁺`, dNTP, DMSO and formamide fields are only passed to external backends or correction functions that explicitly support them.
 - **API:** `dnakit.thermodynamics.ThermodynamicConditions(temperature_celsius[optional], sodium_molar[optional], potassium_molar[optional], magnesium_molar[optional], dntp_molar[optional], strand_concentration_molar[optional], dmso_percent[optional], dmso_factor_celsius_per_percent[optional], formamide_molar[optional], salt_model[optional])`
 - **Input:** Use `mol/L` for all concentrations; °C for temperatures.
 - **Sample code:**

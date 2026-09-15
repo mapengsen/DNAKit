@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from itertools import islice
 from typing import Literal, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Location, Strand
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import ConfigurationError, SequenceError
@@ -248,6 +249,7 @@ def scan_motif(
     max_scan_length: int = 1_000_000,
     max_pattern_length: int = 1_000,
     max_scan_cells: int = 50_000_000,
+    verbose: bool = True,
 ) -> PatternResult[MotifHit]:
     """Scan literal, IUPAC-compatible, or Python-regex motifs on selected strands.
 
@@ -444,6 +446,7 @@ def scan_pwm(
     max_scan_length: int = 1_000_000,
     max_pwm_length: int = 10_000,
     max_score_cells: int = 50_000_000,
+    verbose: bool = True,
 ) -> PatternResult[MotifHit]:
     """Scan a user-provided PWM with explicit log2-odds threshold and background."""
 
@@ -571,6 +574,7 @@ def scan_promoter_motifs(
     max_scan_length: int = 1_000_000,
     max_scan_cells: int = 50_000_000,
     max_motifs: int = 10_000,
+    verbose: bool = True,
 ) -> PatternResult[MotifHit]:
     """Scan predefined/user consensus motifs without predicting promoter activity."""
 
@@ -667,6 +671,7 @@ def scan_tf_pwm(
     max_scan_length: int = 1_000_000,
     max_pwm_length: int = 10_000,
     max_score_cells: int = 50_000_000,
+    verbose: bool = True,
 ) -> PatternResult[MotifHit]:
     """Scan a user-supplied TF PWM; no binding-strength or database claim is made."""
 
@@ -719,3 +724,5 @@ __all__ = [
     "scan_pwm",
     "scan_tf_pwm",
 ]
+
+_register_public_verbose(globals())

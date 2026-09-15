@@ -7,6 +7,7 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
+from dnakit._dependency_hints import dependency_hint
 from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 from dnakit.representations import DNAEmbeddingModel
 
@@ -41,7 +42,7 @@ def _require(name: str) -> Any:
             "Full custom-property fine-tuning dependencies are not installed.",
             code="MISSING_NEURAL_DEPENDENCY",
             context={"dependency": name},
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("training"),
         ) from exc
 
 

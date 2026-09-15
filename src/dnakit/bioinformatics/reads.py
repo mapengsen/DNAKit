@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, TextIO, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import input_path, positive, require, sequence_text
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
@@ -55,6 +56,7 @@ def read_fastx(
     format: str = "fastq",
     phred_offset: int = 33,
     max_read_length: int = 10_000_000,
+    verbose: bool = True,
 ) -> Iterator[Read]:
     """Stream FASTA or multiline FASTQ; quality '@' and '+' remain quality symbols."""
     if format not in {"fasta", "fastq"} or phred_offset not in {33, 64}:
@@ -125,6 +127,7 @@ def write_fastx(
     format: str = "fastq",
     phred_offset: int = 33,
     default_quality: int | None = None,
+    verbose: bool = True,
 ) -> int:
     """Write fresh FASTA/FASTQ with explicit Phred conversion or synthetic quality."""
     if format not in {"fasta", "fastq"} or phred_offset not in {33, 64}:
@@ -173,6 +176,7 @@ def pair_reads(
     *,
     max_pending: int = 100_000,
     include_orphans: bool = True,
+    verbose: bool = True,
 ) -> Iterator[ReadPair]:
     """Pair interleaved input streams by /1,/2-normalized ID with bounded pending storage.
 
@@ -213,7 +217,7 @@ class RepairResult:
 
 
 def repair_fastq(
-    source: str | Path, destination: str | Path, *, phred_offset: int = 33
+    source: str | Path, destination: str | Path, *, phred_offset: int = 33, verbose: bool = True
 ) -> RepairResult:
     """Recover valid four-line records, dropping corrupt lines without inventing bases/qualities.
 
@@ -268,6 +272,7 @@ def arrange_reads(
     key: str = "id",
     seed: int = 0,
     max_records: int = 1_000_000,
+    verbose: bool = True,
 ) -> tuple[Read, ...]:
     positive(max_records, "max_records")
     values = list(itertools.islice(reads, max_records + 1))
@@ -288,7 +293,9 @@ def arrange_reads(
     return tuple(values)
 
 
-def common_reads(collections: Iterable[Iterable[Read]], *, key: str = "id") -> tuple[Read, ...]:
+def common_reads(
+    collections: Iterable[Iterable[Read]], *, key: str = "id", verbose: bool = True
+) -> tuple[Read, ...]:
     """Set intersection across collections, preserving first-collection records and order."""
     values = [tuple(collection) for collection in collections]
     if not values or key not in {"id", "sequence"}:
@@ -299,7 +306,9 @@ def common_reads(collections: Iterable[Iterable[Read]], *, key: str = "id") -> t
     return tuple(record for record in values[0] if getattr(record, key) in shared)
 
 
-def rename_reads(reads: Iterable[Read], pattern: str, replacement: str) -> Iterator[Read]:
+def rename_reads(
+    reads: Iterable[Read], pattern: str, replacement: str, *, verbose: bool = True
+) -> Iterator[Read]:
     expression = re.compile(pattern)
     for read in reads:
         yield Read(
@@ -307,7 +316,7 @@ def rename_reads(reads: Iterable[Read], pattern: str, replacement: str) -> Itera
         )
 
 
-def sequence_digest(reads: Iterable[Read]) -> str:
+def sequence_digest(reads: Iterable[Read], *, verbose: bool = True) -> str:
     """Order-sensitive SHA256 of length-delimited uppercase sequences, independent of IDs."""
     digest = hashlib.sha256()
     for read in reads:
@@ -339,7 +348,7 @@ class Region:
 
 
 def read_regions(
-    path: str | Path, *, format: str = "bed", feature: str = "exon"
+    path: str | Path, *, format: str = "bed", feature: str = "exon", verbose: bool = True
 ) -> Iterator[Region]:
     """BED intervals or GTF feature rows; GTF's 1-based coordinates are converted once."""
     if format not in {"bed", "gtf"}:
@@ -407,7 +416,7 @@ class IndexedReference:
             yield self.fetch(region)
 
 
-def index_reference(path: str | Path) -> Path:
+def index_reference(path: str | Path, *, verbose: bool = True) -> Path:
     """Explicitly create the standard .fai (and BGZF .gzi when needed) beside the input."""
     source = input_path(path)
     if Path(str(source) + ".fai").exists():
@@ -418,7 +427,7 @@ def index_reference(path: str | Path) -> Path:
     return Path(str(source) + ".fai")
 
 
-def alignment_summary(path: str | Path) -> dict[str, int]:
+def alignment_summary(path: str | Path, *, verbose: bool = True) -> dict[str, int]:
     """Stream SAM/BAM flags; secondary/supplementary records are counted explicitly."""
     pysam = require("pysam", "bio-reads")
     counts: Counter[str] = Counter(
@@ -457,6 +466,7 @@ def coverage_consensus(
     min_base_quality: int = 20,
     min_mapping_quality: int = 20,
     min_depth: int = 1,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Indexed BAM regional A/C/G/T depth and majority consensus; ties/uncovered bases become N.
 
@@ -496,3 +506,22 @@ def coverage_consensus(
         for index, row in enumerate(counts)
     ]
     return {"region": region, "counts": counts, "depth": depth, "consensus": "".join(symbols)}
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "read_fastx",
+        "write_fastx",
+        "pair_reads",
+        "repair_fastq",
+        "arrange_reads",
+        "common_reads",
+        "rename_reads",
+        "sequence_digest",
+        "read_regions",
+        "index_reference",
+        "alignment_summary",
+        "coverage_consensus",
+    ),
+)

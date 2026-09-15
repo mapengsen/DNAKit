@@ -7,6 +7,7 @@ import re
 from collections.abc import Mapping
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Provenance
 from dnakit.exceptions import ConfigurationError, QueryError
 
@@ -56,6 +57,7 @@ def genomes(
     contains: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """List UCSC browser assemblies, optionally filtering their text fields."""
 
@@ -92,6 +94,7 @@ def chromosomes(
     track: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """List chromosome, contig, scaffold, and organelle names and lengths."""
 
@@ -141,6 +144,7 @@ def sequence(
     reverse_complement: bool = False,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Return a bounded UCSC assembly sequence for a 0-based half-open region."""
 
@@ -199,6 +203,7 @@ def tracks(
     leaves_only: bool = True,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """List UCSC track definitions, with an optional client-side text filter."""
 
@@ -248,6 +253,7 @@ def track_data(
     max_items: int = 1_000,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query bounded annotations, repeats, regulation, or signal from one UCSC track."""
 
@@ -323,6 +329,7 @@ def files(
     limit: int = 1_000,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_UCSC_API_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """List UCSC downloadable files, optionally filtering paths with a glob."""
 
@@ -386,3 +393,5 @@ __all__ = [
     "track_data",
     "tracks",
 ]
+
+_register_public_verbose(globals())

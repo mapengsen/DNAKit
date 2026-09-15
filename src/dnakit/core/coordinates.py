@@ -6,6 +6,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.enums import CoordinateSystem, Strand
 from dnakit.exceptions import CoordinateError
 
@@ -191,6 +192,7 @@ def import_location(
     external: ExternalInterval | Sequence[ExternalInterval],
     *,
     sequence_length: int | None = None,
+    verbose: bool = True,
 ) -> Location:
     """Normalize one or more external intervals to internal coordinates."""
 
@@ -229,6 +231,7 @@ def export_location(
     *,
     target_system: CoordinateSystem | str,
     sequence_length: int | None = None,
+    verbose: bool = True,
 ) -> tuple[ExternalInterval, ...]:
     """Export internal coordinates without merging compound-location parts."""
 
@@ -256,7 +259,9 @@ def export_location(
     )
 
 
-def reverse_strand_location(location: Location, *, sequence_length: int) -> Location:
+def reverse_strand_location(
+    location: Location, *, sequence_length: int, verbose: bool = True
+) -> Location:
     """Map an internal location through reverse-complement coordinates."""
 
     _validate_sequence_length(sequence_length)
@@ -293,3 +298,5 @@ __all__ = [
     "import_location",
     "reverse_strand_location",
 ]
+
+_register_public_verbose(globals())

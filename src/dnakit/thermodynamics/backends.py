@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends import execute_bounded_command
 from dnakit.core import (
     BackendInfo,
@@ -56,6 +57,7 @@ def validate_primer3_result(
     max_loop: int | None,
     output_structure: bool,
     error_code: str = "INVALID_PRIMER3_RESULT",
+    verbose: bool = True,
 ) -> Primer3ThermodynamicResult:
     """Validate that an adapter result is bound to the exact resolved request."""
 
@@ -565,6 +567,7 @@ def probe_primer3(
     oligotm_path: str | Path | None = None,
     ntthal_path: str | Path | None = None,
     thermodynamic_parameters_path: str | Path | None = None,
+    verbose: bool = True,
 ) -> BackendInfo:
     """Inspect explicit Primer3 paths without searching, importing, or executing."""
 
@@ -579,6 +582,7 @@ def conditional_capabilities(
     *,
     primer3_ntthal_path: str | Path | None = None,
     primer3_thermodynamic_parameters_path: str | Path | None = None,
+    verbose: bool = True,
 ) -> tuple[ConditionalCapability, ...]:
     """Describe conditional structure capabilities without automatic discovery."""
 
@@ -651,3 +655,5 @@ __all__ = [
     "probe_primer3",
     "validate_primer3_result",
 ]
+
+_register_public_verbose(globals())

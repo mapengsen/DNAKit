@@ -1,5 +1,7 @@
 # clustering
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Sequence groups and representative sequences are obtained by clustering sequences based on sequence identity, k-mer, fingerprint similarity, or DNA base model rep.
 
 ## 1) DATA-007 · Identity clustering
@@ -171,15 +173,15 @@ k-mer clustering, use `DATA-008` on this page.
 
 - `dnakit.representations.extract_representations(records[required], config[optional])`: Extract only rep;
 - `dnakit.datasets.neural_cluster_sequences(records[required], config[optional])`: Execute k-means after extracting rep;
-- Use `dnakit.representations.RepresentationConfig` for characterization configuration; use `dnakit.representations.RepresentationConfig` for clustering configuration
-  `dnakit.datasets.NeuralClusteringConfig`.
+- Use `dnakit.representations.RepresentationConfig` for representations and
+  `dnakit.datasets.NeuralClusteringConfig` for clustering.
 
 Standalone rep API, all 11 models and their checkpoint/dependency boundaries See also
-[The neural network characterization column ](08_fingerprints.md#neural-representations) in the sequence characterization page.
+[neural representations section](08_fingerprints.md#neural-representations) of the sequence representations page.
 
 **Input:** Required `DNARecord` collection; optional model, checkpoint position, mean/cls/max/last
 Pooling, device, dtype, batch size, L2 normalization, PCA dimensionality, number of clusters, and random seeds. explicit
-`Gap` is not supported; the default mapping of IUPAC fuzzy bases is `N`, and can also be set to report an error directly.
+`Gap` is not supported; the default mapping of IUPAC ambiguity symbols is `N`, and can also be set to report an error directly.
 
 **Clustering process:** Each sequence is divided into blocks according to the model context window. The pooling vector of each block is first obtained, and then the blocks are
 Vector averaging; then L2 normalization is performed by default, PCA is optional, and finally a fixed seed is performed

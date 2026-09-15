@@ -12,6 +12,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends import execute_bounded_command
 from dnakit.core._json import FrozenDict
 from dnakit.download.files import _write_manifest
@@ -134,6 +135,7 @@ def annotate_genes(
     annotation_gff: str | os.PathLike[str] | None = None,
     config: GeneAnnotationConfig | None = None,
     progress: Callable[[str], None] | None = None,
+    verbose: bool = True,
 ) -> GeneAnnotationResult:
     """Map genomic DNA and project named genes from a matching GFF3 annotation.
 
@@ -325,3 +327,5 @@ def annotate_genes(
 
 
 __all__ = ["annotate_genes"]
+
+_register_public_verbose(globals())

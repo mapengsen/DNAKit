@@ -6,6 +6,8 @@ import math
 from collections.abc import Sequence
 from typing import Any, cast
 
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, InputFormatError
 
 from .schema import ClassificationMode, TargetSchema, TaskType
@@ -18,7 +20,7 @@ def _numpy() -> Any:
         raise BackendUnavailableError(
             "Custom property training requires NumPy.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("ml"),
         ) from exc
     return np
 
@@ -30,7 +32,7 @@ def _sklearn_metrics() -> Any:
         raise BackendUnavailableError(
             "Custom property metrics require scikit-learn.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("ml"),
         ) from exc
     return metrics
 
@@ -101,6 +103,7 @@ def fit_target_schema(
     task_type: TaskType,
     classification_mode: ClassificationMode,
     train_indices: Sequence[int],
+    verbose: bool = True,
 ) -> TargetSchema:
     """Fit target normalization and class vocabularies using only training rows."""
 
@@ -221,7 +224,9 @@ def fit_target_schema(
     return schema
 
 
-def encode_targets(labels: Sequence[Sequence[object]], *, schema: TargetSchema) -> Any:
+def encode_targets(
+    labels: Sequence[Sequence[object]], *, schema: TargetSchema, verbose: bool = True
+) -> Any:
     """Encode labels according to a fitted target schema."""
 
     np = _numpy()
@@ -293,7 +298,9 @@ def _sigmoid(values: Any) -> Any:
     return 1.0 / (1.0 + np.exp(-values))
 
 
-def prediction_arrays(logits: Any, *, schema: TargetSchema, threshold: float) -> tuple[Any, Any]:
+def prediction_arrays(
+    logits: Any, *, schema: TargetSchema, threshold: float, verbose: bool = True
+) -> tuple[Any, Any]:
     """Convert raw head outputs into encoded predictions and probabilities/values."""
 
     np = _numpy()
@@ -583,6 +590,7 @@ def compute_metrics(
     *,
     schema: TargetSchema,
     threshold: float = 0.5,
+    verbose: bool = True,
 ) -> dict[str, object]:
     """Compute task-appropriate aggregate and per-target metrics."""
 
@@ -631,6 +639,7 @@ def decoded_prediction_rows(
     *,
     schema: TargetSchema,
     threshold: float,
+    verbose: bool = True,
 ) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     """Decode raw outputs into JSON-ready prediction and probability rows."""
 
@@ -676,3 +685,5 @@ __all__ = [
     "fit_target_schema",
     "prediction_arrays",
 ]
+
+_register_public_verbose(globals())

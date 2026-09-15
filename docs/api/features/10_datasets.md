@@ -1,17 +1,21 @@
 # 数据划分
 
+公共处理接口支持[统一的文件与文本输入](00_processing_inputs.md)，具体入口及输出规则见该说明。
+
 按照随机、分层、相似度或元数据约束划分 DNA 数据集，从而得到训练、验证和测试等相互隔离的数据子集。
 
 所有随机或启发式过程都记录 seed、配置、分组和资源上限。
 
 ## 1) DATA-012 · 随机与稳定哈希划分
 
-**作用：** 按目标比例把记录随机分配到 train、valid、test，并结合稳定 ID 与 seed 生成可复现结果，返回各子集和分配清单。
+**作用：** 按目标比例把记录分配到 `train / valid / test` 等命名子集，或用固定 seed 生成 K-fold 划分并选择一折作为 `valid`、其余折作为 `train`。返回各子集和分配清单。
 
 
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="random"` 或 `method="hash"`。
+**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项支持 `method="random"`、`method="hash"` 和 `method="kfold"`。
 
-**输入：** 必填记录和总和为 1 的比例；可选 seed、shuffle 和是否保持子集内原顺序。`hash` 模式要求每条记录具有稳定且唯一的 `record.id`。
+**输入：** 必填记录；比例划分通过 `ratios` 指定总和为 1 的比例，默认 `train=0.8, valid=0.1, test=0.1`。K-fold 通过 `n_splits` 指定折数、`fold_id` 指定验证折。默认 `seed=42`、`shuffle=True`。`hash` 模式要求每条记录具有稳定且唯一的 `record.id`。
+
+`SplitConfig` 和 `dnakit split` 的默认 seed 已由 `0` 调整为 `42`；需要复现此前省略 seed 的比例划分时，请显式传入 `seed=0`。
 
 **示例代码：**
 
@@ -66,6 +70,74 @@ print(first.get("train").ids == second.get("train").ids)
 True
 True
 ```
+
+### 固定 K-fold 划分：train / valid
+
+设置 `method="kfold"`，行为对应 [scikit-learn KFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)：
+
+```python
+KFold(n_splits=10, shuffle=True, random_state=42)
+```
+
+**同一随机种子 → 同一套固定的 K-fold 划分 → 依次选择 K 个验证折。** 保持输入记录及其顺序、`seed`、`shuffle`、`n_splits` 不变，只改变 `fold_id`。例如 10 折使用 `fold_id=0..9`，每个样本恰好作为验证样本一次；不要使用 `seed + fold_id`。每次调用会重建相同的划分并返回所选折。
+
+| `SplitConfig` 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `method` | `"random"` | 使用 `"kfold"` 启用 K-fold；`"random"` / `"hash"` 保留比例划分 |
+| `n_splits` | K-fold 模式下为 `10` | 总折数，可改为 5、10 等；要求 `2 <= n_splits <= 样本数` |
+| `fold_id` | K-fold 模式下为 `0` | 当前验证折，范围为 `0` 到 `n_splits - 1` |
+| `seed` | `42` | 生成整套划分的固定随机种子，K-fold 要求 `0 <= seed < 2**32` |
+| `shuffle` | `True` | 划分前打乱；`False` 时按输入顺序生成连续的验证折，seed 不影响分配 |
+| `ratios` | 比例模式为 `0.8 / 0.1 / 0.1` | K-fold 模式请省略；`train / valid` 目标比例由折数推导 |
+
+K-fold 返回的子集名称固定为 `train` 和 `valid`，每个子集内部保持原始输入顺序，与 scikit-learn 一致；`preserve_order=False` 也不会额外打乱子集。样本数不能整除 K 时，前 `样本数 % K` 个验证折多一个样本，各验证折大小相差至多 1。结果和导出的分配清单记录 `seed`、`shuffle`、`n_splits`、`fold_id` 及每条记录的归属。
+
+此模式需要 scikit-learn；可安装 `python -m pip install -e ".[bio-analysis]"`。已安装 `.[ml]` 或 `.[training]` 的环境也包含所需依赖。普通比例划分不需要这项依赖。
+
+**示例：先留出固定 test，再对 train 做 10-fold。**
+
+```python
+from dnakit import DNARecord, DNASequence
+from dnakit.datasets import SplitConfig, split
+
+records = [DNARecord(DNASequence("ACGT"), f"r{i}") for i in range(100)]
+seed = 42
+n_splits = 10  # 改为 5 即可运行 5 折
+
+# 第一步只做一次，留出固定测试集。
+outer = split(
+    records,
+    config=SplitConfig(method="random", ratios={"train": 0.8, "test": 0.2}, seed=seed),
+)
+training_pool = outer.get("train")
+test = outer.get("test")
+
+# 每轮只改变 fold_id；测试集不传入 K-fold。
+for fold_id in range(n_splits):
+    fold = split(
+        training_pool,
+        config=SplitConfig(
+            method="kfold", n_splits=n_splits, fold_id=fold_id,
+            shuffle=True, seed=seed,
+        ),
+    )
+    train = fold.get("train")
+    valid = fold.get("valid")
+    print(f"fold={fold_id}: train={len(train)}, valid={len(valid)}, test={len(test)}")
+    # 在这里创建并训练一个新的模型，再用 valid 评估。
+```
+
+上述示例的 `fold=0` 到 `fold=9` 均为 `train=72, valid=8, test=20`，验证样本逐折轮换，20 条测试样本保持固定。若已准备好训练数据，直接将其作为 `training_pool` 即可。`n_splits` 控制总折数，`fold_id` 选择某一折；遍历所有折才形成完整 K-fold 流程，`split()` 本身只划分数据，不会自动训练模型或汇总指标。
+
+接入 `train_custom_property_model()` 时，需要在每一轮把当前 `train`、`valid` 和固定 `test` 写成训练接口支持的 split 列值，并用 `DataMapping.split_field` 映射；不能直接把 `fold_0` 等名称当作训练接口的 split 值。相关说明见[自定义模型训练](23_deep_learning_property_prediction.md)。
+
+**CLI：** 输入已留出的训练池，输出当前验证折对应的两个子集和分配清单：
+
+```bash
+dnakit split train.fasta runs/fold_0 --method kfold --n-splits 10 --fold-id 0 --seed 42
+```
+
+运行其余折时保持输入和 seed 不变，修改 `--fold-id` 和输出目录；可用 `--no-shuffle` 关闭打乱。Agent/MCP 的 `dnakit.datasets.split` 使用相同的 `config` 参数；JSON/YAML workflow 的 `split.params` 也接受 `method`、`n_splits`、`fold_id`，随机种子使用 workflow 的全局 `seed`，请设为 `42`。
 
 ## 2) DATA-013 · 分层随机划分
 

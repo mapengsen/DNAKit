@@ -9,6 +9,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import execute_bounded_command
 from dnakit.exceptions import BackendExecutionError, ConfigurationError
 from dnakit.search._shared import adapter_provenance
@@ -106,6 +107,7 @@ def build_index(
     timeout_seconds: float = 3_600.0,
     config: DownloadConfig | None = None,
     progress: Callable[[IndexProgress], None] | None = None,
+    verbose: bool = True,
 ) -> IndexBuildResult:
     """Build BLAST/BWA/Bowtie2/minimap2/samtools indexes using an explicit executable."""
 
@@ -229,3 +231,5 @@ def build_index(
 
 
 __all__ = ["IndexProgress", "build_index"]
+
+_register_public_verbose(globals())

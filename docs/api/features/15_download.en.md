@@ -1,17 +1,93 @@
 # Download
 
-Download reference genomes, sequences, annotations, and other public database files based on species name, database number, or query results.
+Download files, reference genomes, sequences, and annotations from URLs, species names, database identifiers, or query results.
+
+See [genes, sequences and downloads](../native/sequences.md) for the full signatures of the new `dnakit.download.ncbi.sequence`, `dnakit.download.ena.sequence` and database file operations. ENCODE `download_files`, `batch_download` and tracking are in [ENCODE data management](../native/encode.md). Browse all additions in the [484-function index](../native/index.md).
+
+## Download sequences by accession <span id="accession-sequences"></span>
+
+`dnakit.download.ncbi.sequence(accession, output_path, *, database="nuccore", format="fasta",
+seq_start=None, seq_stop=None, strand=1, config=None, search_config=None)` uses NCBI
+EFetch directly. `dnakit.download.ena.sequence(accession, output_path, *, format="fasta",
+config=None, search_config=None)` uses ENA Browser. Neither requires ToolUniverse.
+
+```python
+import dnakit
+
+result = dnakit.download.ncbi.sequence("NC_000913.3", "ecoli_k12.fasta", format="fasta")
+print(result.files[0].path)
+print(result.metadata["resolved_accession"], result.metadata["sequence_length"])
+print(result.manifest_path)
+```
+
+| Provider | Native formats with base DNAKit | Optional conversion with `dnakit[bio-formats]` |
+| --- | --- | --- |
+| NCBI nuccore (DNA/RNA) | fasta, genbank | embl, converted from GenBank with Biopython |
+| NCBI protein | fasta, genbank (GenPept) | EMBL protein output is unsupported |
+| ENA INSDC nucleotide records | fasta, embl | genbank, converted from EMBL with Biopython |
+
+NCBI accepts sequence accessions, including RefSeq NZ_. ENA requires INSDC
+accessions such as U00096.3. Conversion does not imply cross-database identity.
+Use existing `genome_package()` for GCA_/GCF_ assembly accessions.
+
+The returned `DatasetDownloadResult` identifies the sequence file and sibling
+`.manifest.json`: requested/resolved accession, sequence length, redacted URL,
+source/output format, conversion flag and checksums. Responses are checked for
+accession/version, format and sequence length before installation. Hashes record
+local integrity; they are not independent provider signatures. Existing outputs
+are protected unless `DownloadConfig(overwrite=True)` is supplied.
+
+Optional seq_start/seq_stop must be supplied together and are **1-based inclusive**;
+strand=2 requests the reverse complement. These options apply to NCBI nucleotide
+records; proteins use full records. Ensembl coordinate downloads retain their
+0-based half-open convention.
+
+DownloadConfig controls files, overwrite and byte limits. SearchConfig controls
+timeout, response size (20 MB default, 100 MB maximum), and NCBI api_key/email.
+An explicit search_config takes precedence for credentials; otherwise
+DownloadConfig.api_key is used. Credentials are redacted in persisted URLs.
+Use genome packages for larger assemblies. Install optional conversion support
+with `python -m pip install 'dnakit[bio-formats]'`.
+
+MCP names and flat Python aliases are `dnakit.download.ncbi_sequence` and
+`dnakit.download.ena_sequence`. The existing `dnakit.download.sequence` continues
+to retrieve Ensembl coordinate sequences.
+
+### Download progress
+
+Network downloads print a start message, progress bar, and completion path to stderr by default.
+Reference genomes also show extraction progress. If the server omits the file size, the display
+shows downloaded bytes without estimating a percentage. Completion is reported only after the
+download, requested checksums, and output installation succeed. Disable the display with
+`download_genome(..., show_progress=False)`, or `DownloadConfig(show_progress=False)` for network
+download APIs in `dnakit.download` that accept `config`. An explicit `progress` callback (`query_progress` for sequence
+downloads) takes over the display to avoid duplicate progress bars. NCBI packages, ENA, ENCODE,
+UCSC, and generic file downloads share this behavior.
+
+### Download failures and retries
+
+Genome packages, generic HTTPS file downloads and shared remote GET queries make at most three
+attempts for timeouts, interrupted connections and HTTP 408/429/500/502/503/504, with delays of
+0.25 and 0.5 seconds. HTTP 404, invalid parameters, checksum failures and invalid ZIP archives
+are not retried. POST requests are not automatically repeated.
+
+Retries restart the staged transfer; persistent HTTP Range resume after process exit is not
+implemented. When `Content-Length` is supplied, the received byte count must match. Genome
+packages also require a matching assembly accession and FASTA checksum. Files are installed
+only after complete download and validation. Overwrite conflicts retain `FileExistsError`, and directory permission failures retain their filesystem exceptions;
+and failed transfers do not replace complete existing outputs. Exhausted transient failures
+set `context["attempts"]` to 3 and guidance to retry after recovery.
 
 <span id="common-genome-names"></span>**Common species names**
 
-This section lists items that can be copied directly to `download_genome(query, ...)` or
-Common NCBI species names in `dnakit download-genome` commands.
+This section lists common NCBI species names that can be copied directly into
+`download_genome(query, ...)` or a `dnakit download-genome` command.
 
 - **API**: `dnakit.references.download_genome(query[required], output_dir[required], overwrite[optional], keep_package[optional], timeout[optional], api_key[optional], api_base_url[optional], chunk_size[optional], max_download_bytes[optional], progress[optional])`, `dnakit download-genome query[required] output_dir[required] --overwrite[optional] --keep-package[optional] --api-key[optional] --progress/--no-progress[optional]`.
 
-<span id="1"></span>**People and commonly used model animals**
+<span id="1"></span>**Humans and common model animals**
 
-| Chinese name | `query` that can be copied directly | Current reference assembly accession |
+| Common name | `query` that can be copied directly | Current reference assembly accession |
 | -------- | -------------------------- | -------------------------- |
 | Human | `Homo sapiens` | `GCF_000001405.40` |
 | Mouse | `Mus musculus` | `GCF_000001635.27` |
@@ -29,7 +105,7 @@ Common NCBI species names in `dnakit download-genome` commands.
 
 <span id="2"></span>**Common crops and plants**
 
-| Chinese name | `query` that can be copied directly | Current reference assembly accession |
+| Common name | `query` that can be copied directly | Current reference assembly accession |
 | -------------------------- | ------------------------------- | ----------------------- |
 | Arabidopsis | `Arabidopsis thaliana` | `GCF_000001735.4` |
 | Rice | `Oryza sativa Japonica Group` | `GCF_034140825.1` |
@@ -45,7 +121,7 @@ Common NCBI species names in `dnakit download-genome` commands.
 
 <span id="3"></span>**Other commonly used model creatures**
 
-| Chinese name | `query` that can be copied directly | Current reference assembly accession |
+| Common name | `query` that can be copied directly | Current reference assembly accession |
 | --------------------- | ---------------------------------- | ----------------------- |
 | Drosophila | `Drosophila melanogaster` | `GCF_000001215.4` |
 | Caenorhabditis elegans | `Caenorhabditis elegans` | `GCF_000002985.6` |
@@ -58,6 +134,7 @@ Common NCBI species names in `dnakit download-genome` commands.
 - **Function:** Download the complete reference genome FASTA by assembly accession or common species name, and save the assembly report, source URL and verification information for establishing traceable local reference sequences.
 - **API:** `dnakit.references.resolve_genome_assembly(query[required], timeout[optional], api_key[optional], api_base_url[optional])`, `dnakit.references.download_genome(query[required], output_dir[required], overwrite[optional], keep_package[optional], timeout[optional], api_key[optional], api_base_url[optional], chunk_size[optional], max_download_bytes[optional], progress[optional])`.
 - **Input:** NCBI versioned accession, fixed alias (such as `hg38`), or species name; requires local output directory.
+- **Agent arguments:** `query` is an assembly identifier or taxon name, not tool-search keywords. For human hg38, pass `query="hg38"`, not `"human hg38 reference genome FASTA"`. The tool schema includes this constraint. The downloader's `api_key` is an NCBI key, not a DeepSeek key.
 - **Sample code:**
 
 ```python
@@ -566,3 +643,32 @@ print(result.manifest_path)
 ```text
 downloads/ucsc_chain/ucsc_files_manifest.json
 ```
+
+## 22) `DBD-022` Download from a URL
+
+`download_url(url, output_dir)` needs only a direct HTTPS file URL and a destination directory.
+Missing directories are created automatically. The default filename comes from the last URL
+path component, with percent escapes decoded and query parameters excluded.
+
+```python
+from dnakit.download import download_url
+
+result = download_url(
+    "https://example.org/files/data.fa.gz",  # Replace with your direct file URL
+    "downloads/my_data",
+)
+print(result.path)       # Absolute path to the downloaded file
+print(result.byte_size)  # File size in bytes
+```
+
+Pass `filename="reference.fa.gz"` to choose a different name; this parameter is required if
+the URL has no filename. Existing files raise `FileExistsError` by default. To replace one,
+pass `config=DownloadConfig(overwrite=True)` and import `DownloadConfig` from `dnakit.download`.
+`DownloadConfig` also controls the timeout, file size limit, and progress display.
+Use `expected_md5` / `expected_sha256` to verify the contents, or `headers` for request headers.
+
+Any file type is supported and response bytes are saved unchanged, so `.gz` files stay compressed.
+This function accepts direct file URLs; it does not resolve web or sharing pages or extract archives.
+Agents and MCP can call `dnakit.download.download_url` with the same two required arguments,
+`url` and `output_dir`. For multiple files with a provenance manifest, use
+`dataset([RemoteFile(url1), RemoteFile(url2)], output_dir)`.

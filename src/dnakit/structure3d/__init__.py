@@ -1,5 +1,7 @@
 """Explicit-coordinate DNA geometry and standard 3DNA/DSSR result parsing."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .geometry import StructureProgress, analyze_ensemble_flexibility, analyze_structure
 from .pdb import load_pdb, load_pdb_ensemble
 from .results import (
@@ -45,3 +47,5 @@ __all__ = [
     "read_3dna_bp_step",
     "read_dssr_json",
 ]
+
+_register_public_verbose(globals())

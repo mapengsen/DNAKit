@@ -1,5 +1,6 @@
 """Streaming DNA record input and output."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.io.annotations import (
     AGPComponent,
     AGPDocument,
@@ -29,6 +30,7 @@ from dnakit.io.indexed import (
     load_fasta_index,
     load_fastq_index,
 )
+from dnakit.io.inputs import read_inputs
 from dnakit.io.metadata import (
     MetadataValidationIssue,
     MetadataValidationReport,
@@ -98,6 +100,7 @@ __all__ = [
     "read_agp",
     "read_bed",
     "read_gff3",
+    "read_inputs",
     "read_one",
     "read_set",
     "read_table",
@@ -110,3 +113,5 @@ __all__ = [
     "write_bed",
     "write_gff3",
 ]
+
+_register_public_verbose(globals())

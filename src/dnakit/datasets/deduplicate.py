@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable
 from typing import TypeAlias
 
+from dnakit._parallel import ordered_map
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASequence, DNASet, Gap, Topology
 from dnakit.core._json import JSONValue
 from dnakit.exceptions import ConfigurationError
@@ -193,11 +195,16 @@ def _circular_transforms(
     return tuple(orientations), tuple(offsets)
 
 
+def _key_job(payload: tuple[DNASequence, DedupEquivalence]) -> EquivalenceKey:
+    return _equivalence_key(*payload)
+
+
 def deduplicate(
     records: Iterable[DNARecord],
     *,
     equivalence: DedupEquivalence = "exact",
     config: DeduplicationConfig | None = None,
+    verbose: bool = True,
 ) -> DeduplicationResult:
     """Deduplicate normalized records while preserving a complete group audit."""
 
@@ -220,8 +227,15 @@ def deduplicate(
         )
     materialized = _materialize(records)
     grouped: dict[Hashable, list[int]] = {}
-    for index, record in enumerate(materialized):
-        grouped.setdefault(_equivalence_key(record.sequence, equivalence), []).append(index)
+    jobs = ((record.sequence, equivalence) for record in materialized)
+    # Exact/RC keys use cheap C string kernels. IPC would copy every base twice.
+    keys = (
+        map(_key_job, jobs)
+        if equivalence in {"exact", "reverse_complement"}
+        else ordered_map(_key_job, jobs)
+    )
+    for index, key in enumerate(keys):
+        grouped.setdefault(key, []).append(index)
 
     output: list[DNARecord] = []
     audit_groups: list[DedupGroup] = []
@@ -301,3 +315,5 @@ def deduplicate(
 
 
 __all__ = ["deduplicate"]
+
+_register_public_verbose(globals())

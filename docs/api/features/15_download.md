@@ -1,6 +1,74 @@
 # 下载
 
-根据物种名称、数据库编号或查询结果下载参考基因组、序列、注释和其他公共数据库文件。
+根据链接、物种名称、数据库编号或查询结果下载文件、参考基因组、序列和注释。
+
+本轮新增接口的完整参数见[基因、序列与下载](../native/sequences.md)，包括 `dnakit.download.ncbi.sequence`、`dnakit.download.ena.sequence` 和数据库文件获取入口。ENCODE 的 `download_files`、`batch_download` 及文件追踪见[ENCODE 数据管理](../native/encode.md)。[484 个新增函数完整索引](../native/index.md)可按函数名查找。
+
+## 按 accession 下载序列 <span id="accession-sequences"></span>
+
+`dnakit.download.ncbi.sequence(accession, output_path, *, database="nuccore", format="fasta",
+seq_start=None, seq_stop=None, strand=1, config=None, search_config=None)`
+直接访问 NCBI EFetch；`dnakit.download.ena.sequence(accession, output_path, *, format="fasta",
+config=None, search_config=None)` 访问 ENA Browser。这两个接口无需 ToolUniverse。
+
+```python
+import dnakit
+
+result = dnakit.download.ncbi.sequence(
+    "NC_000913.3", "ecoli_k12.fasta", format="fasta",
+)
+print(result.files[0].path)
+print(result.metadata["resolved_accession"], result.metadata["sequence_length"])
+print(result.manifest_path)
+```
+
+| 提供方 | 基础包直接获取 | 需要 `dnakit[bio-formats]` 的格式转换 |
+| --- | --- | --- |
+| NCBI `nuccore`（DNA/RNA） | `fasta`、`genbank` | `embl`：通过 Biopython 转换 GenBank |
+| NCBI `protein` | `fasta`、`genbank`（GenPept） | 不支持 EMBL 蛋白输出 |
+| ENA INSDC 核酸记录 | `fasta`、`embl` | `genbank`：通过 Biopython 转换 EMBL |
+
+NCBI 支持 RefSeq（包括 `NZ_`）和 INSDC 序列 accession；ENA 需要 INSDC accession，例如
+`U00096.3`。格式转换不代表 accession 已转成另一个数据库的编号。`GCA_/GCF_` 是组装编号，
+请用已有的 `genome_package()`。
+
+返回 `DatasetDownloadResult`，保存序列和相邻的 `.manifest.json`，记录请求及解析出的
+accession、序列长度、来源 URL、下载/输出格式、转换标记和校验值。正式写入前校验记录的
+accession/version、格式和序列长度；异常响应不会作为序列文件保存。这里的校验值用于本地完整性
+记录，并非提供方独立签名。已有文件默认受保护；需要覆盖时传入 `DownloadConfig(overwrite=True)`。
+
+可选 `seq_start/seq_stop` 是 **1-based 闭区间**，必须同时指定；`strand=2` 获取反向互补序列，
+只适用于 NCBI 核酸序列。蛋白下载目前获取完整记录。此处与 Ensembl 坐标下载的 0-based 半开区间不同。
+
+`DownloadConfig` 管理保存、覆盖和文件大小上限；`SearchConfig` 管理请求超时、响应大小
+（默认 20 MB、最高 100 MB）及 NCBI `api_key/email`。显式提供 `search_config` 时以它的
+凭据为准，否则使用 `DownloadConfig.api_key`；持久化 URL 会隐藏密钥和邮箱。
+较大的组装请使用分包下载。`format="embl"` 的可选依赖可通过
+`python -m pip install 'dnakit[bio-formats]'` 一次安装，数据本身仍从上游数据库获取。
+
+MCP 对应名称为 `dnakit.download.ncbi_sequence` 和 `dnakit.download.ena_sequence`；
+Python 也支持这两个扁平别名。原有 `dnakit.download.sequence` 继续用于 Ensembl 坐标序列。
+
+### 下载进度
+
+下载默认向终端标准错误流显示开始提示、进度条和完成路径。参考基因组还显示解压进度；
+服务器未提供文件大小时显示已下载字节数，不估算百分比。只有下载、校验和文件写入成功后才提示完成。
+`download_genome(..., show_progress=False)` 可关闭显示；`dnakit.download` 中接受 `config` 的网络下载接口
+使用 `DownloadConfig(show_progress=False)`。显式传入 `progress`（序列下载为 `query_progress`）回调时，
+由回调负责显示，避免重复进度条。NCBI 数据包、ENA、ENCODE、UCSC 和通用文件下载共享这一行为。
+
+### 下载失败与重试
+
+基因组包下载、通用 HTTPS 文件下载及共享远程 GET 查询遇到超时、连接中断或 HTTP
+408/429/500/502/503/504 时，最多尝试 3 次，重试前分别等待 0.25、0.5 秒。
+404、参数错误、校验和不匹配和无效 ZIP 不自动重试；POST 查询也不自动重发。
+每次失败的下载从暂存文件重新开始，尚不支持程序退出后的 HTTP Range 断点续传。
+
+服务器提供 `Content-Length` 时会核对实际字节数；基因组包还核对 FASTA 校验和及
+报告中的 assembly accession，不能把其他版本误报为当前请求成功。
+只有完整下载和校验通过后才安装正式文件。覆盖冲突保留 `FileExistsError`，目录权限错误保留
+相应文件系统异常；损坏输入不会替换已有完整结果。瞬时故障重试耗尽后，异常的
+`context["attempts"]` 为 3，并提示检查网络后重新运行。
 
 <span id="common-genome-names"></span>**常见物种名称**
 
@@ -58,6 +126,7 @@
 - **作用：** 按组装 accession 或常见物种名称下载完整参考基因组 FASTA，同时保存组装报告、来源 URL 和校验信息，用于建立可追溯的本地参考序列。
 - **API：** `dnakit.references.resolve_genome_assembly(query[必须], timeout[可选], api_key[可选], api_base_url[可选])`、`dnakit.references.download_genome(query[必须], output_dir[必须], overwrite[可选], keep_package[可选], timeout[可选], api_key[可选], api_base_url[可选], chunk_size[可选], max_download_bytes[可选], progress[可选])`。
 - **输入：** NCBI 版本化 accession、固定别名（如 `hg38`）或物种名；需要本地输出目录。
+- **Agent 参数：** `query` 是组装标识或物种名，不是工具搜索词。请求下载人类 hg38 时使用 `query="hg38"`，不要传入 `"human hg38 reference genome FASTA"`。工具 Schema 包含此约束；下载接口的 `api_key` 指 NCBI 密钥，不是 DeepSeek 密钥。
 - **示例代码：**
 
 ```python
@@ -566,3 +635,30 @@ print(result.manifest_path)
 ```text
 downloads/ucsc_chain/ucsc_files_manifest.json
 ```
+
+## 22) `DBD-022` 通用链接下载
+
+`download_url(url, output_dir)` 只需提供 HTTPS 文件直链和目标文件夹，目录不存在时会自动创建。
+默认使用链接路径末尾的文件名，自动解码 URL 转义字符，不把 `?` 后的查询参数放入文件名。
+
+```python
+from dnakit.download import download_url
+
+result = download_url(
+    "https://example.org/files/data.fa.gz",  # 替换为需要下载的文件直链
+    "downloads/my_data",
+)
+print(result.path)       # 下载文件的绝对路径
+print(result.byte_size)  # 文件字节数
+```
+
+可选参数 `filename="reference.fa.gz"` 可以指定保存名称；链接没有文件名时必须提供该参数。
+默认同名文件已存在就抛出 `FileExistsError`；需要覆盖时使用
+`config=DownloadConfig(overwrite=True)`（从 `dnakit.download` 导入 `DownloadConfig`）。
+超时、单文件大小上限和进度显示也通过 `DownloadConfig` 设置。
+可传入 `expected_md5` / `expected_sha256` 验证下载内容，或用 `headers` 提供请求头。
+
+此接口不限文件类型，按响应原样保存；例如 `.gz` 下载后仍是压缩文件。
+它接收文件直链，不解析网页或网盘分享页面，不自动解压。
+Agent/MCP 可通过 `dnakit.download.download_url` 调用，必填参数同样只有 `url` 和 `output_dir`。
+需要批量下载并生成来源清单时，可以使用 `dataset([RemoteFile(url1), RemoteFile(url2)], output_dir)`。

@@ -13,6 +13,7 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, freeze_mapping, to_json_compatible
 from dnakit.datasets import DeduplicationConfig, SplitConfig
 from dnakit.exceptions import ConfigurationError, InputFormatError
@@ -130,6 +131,8 @@ _STEP_PARAMETERS: Mapping[str, frozenset[str]] = {
             "similarity_ambiguity_policy",
             "similarity_gap_policy",
             "max_pairwise_records",
+            "n_splits",
+            "fold_id",
         }
     ),
     "write": frozenset(
@@ -830,7 +833,7 @@ def _resolve_output_dir(config_path: Path, raw: str) -> Path:
     return resolved
 
 
-def load_workflow(path: str | os.PathLike[str]) -> LoadedWorkflow:
+def load_workflow(path: str | os.PathLike[str], *, verbose: bool = True) -> LoadedWorkflow:
     """Load JSON/YAML without evaluating commands, Python, tags, or templates."""
 
     try:
@@ -896,3 +899,5 @@ __all__ = [
     "WorkflowStep",
     "load_workflow",
 ]
+
+_register_public_verbose(globals())

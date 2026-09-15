@@ -10,11 +10,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import matrix, positive, require
 from dnakit.exceptions import ConfigurationError
 
 
-def adjust_pvalues(values: Any) -> Any:
+def adjust_pvalues(values: Any, *, verbose: bool = True) -> Any:
     """Benjamini-Hochberg FDR correction of a finite one-dimensional p-value array."""
     np = require("numpy", "bio-analysis")
     p = np.asarray(values, dtype=float)
@@ -125,7 +126,12 @@ def _sampling_bias(
 
 
 def ancom_bc(
-    counts: Any, design: Any, *, tolerance: float = 1e-5, max_iterations: int = 1000
+    counts: Any,
+    design: Any,
+    *,
+    tolerance: float = 1e-5,
+    max_iterations: int = 1000,
+    verbose: bool = True,
 ) -> AbundanceResult:
     """Original ANCOM-BC log-linear model with three-component EM bias correction.
 
@@ -192,6 +198,7 @@ def differential_expression(
     size_factors: Any = None,
     dispersions: Any = None,
     max_iterations: int = 1000,
+    verbose: bool = True,
 ) -> DifferentialExpressionResult:
     """Unshrunk NB2 GLMs with library offsets, Wald contrasts and BH correction.
 
@@ -293,3 +300,6 @@ def differential_expression(
     return DifferentialExpressionResult(
         effect, se, statistic, p, q, dispersion, factors, coefficients, converged
     )
+
+
+_register_public_verbose(globals(), ("adjust_pvalues", "ancom_bc", "differential_expression"))

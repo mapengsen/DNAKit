@@ -6,6 +6,7 @@ import math
 from collections import Counter
 from collections.abc import Iterable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.gap import Gap
 from dnakit.descriptors._shared import (
     DescriptorAmbiguityPolicy,
@@ -29,6 +30,7 @@ def shannon_entropy(
     log_base: float = 2.0,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> EntropyResult:
     """Calculate Shannon entropy for canonical bases or valid k-mers.
 
@@ -99,3 +101,5 @@ def shannon_entropy(
 
 
 __all__ = ["shannon_entropy"]
+
+_register_public_verbose(globals())

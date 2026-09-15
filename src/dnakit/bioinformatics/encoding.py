@@ -13,6 +13,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import positive, require, sequence_text
 from dnakit.exceptions import ConfigurationError
 
@@ -373,6 +374,7 @@ def encode_dna(
     training_ids: Iterable[str] | None = None,
     max_output_cells: int = 5_000_000,
     max_input_bases: int = 1_000_000,
+    verbose: bool = True,
 ) -> EncodingResult:
     """Compute native DNA features. Positional encodings require equal lengths.
 
@@ -521,3 +523,6 @@ def encode_dna(
         raise ConfigurationError("Encoding produced non-finite values.")
     array.setflags(write=False)
     return EncodingResult(tuple(texts), names or (), array, descriptor, options)
+
+
+_register_public_verbose(globals(), ("encode_dna",))

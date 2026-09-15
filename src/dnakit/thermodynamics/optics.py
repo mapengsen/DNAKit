@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from itertools import islice
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import ConfigurationError
 
@@ -82,6 +83,7 @@ def optical_properties(
     ),
     hypochromicity_fraction: float | None = None,
     modifications: Iterable[OpticalModification] = (),
+    verbose: bool = True,
 ) -> OpticalPropertiesResult:
     """Calculate epsilon260, molecular weight, nmol/OD and mass/OD.
 
@@ -242,6 +244,7 @@ def concentration_from_a260(
     dilution_factor: float = 1.0,
     label_corrections: Iterable[LabelAbsorbanceCorrection] = (),
     volume_liter: float | None = None,
+    verbose: bool = True,
 ) -> A260ConcentrationResult:
     """Apply dye correction and Beer-Lambert law to an A260 measurement."""
 
@@ -309,6 +312,7 @@ def convert_oligo_quantity(
     mass_concentration_g_per_l: float | None = None,
     amount_mol: float | None = None,
     mass_g: float | None = None,
+    verbose: bool = True,
 ) -> OligoQuantityResult:
     """Convert exactly one concentration or amount input into all four forms."""
 
@@ -383,3 +387,5 @@ __all__ = [
     "convert_oligo_quantity",
     "optical_properties",
 ]
+
+_register_public_verbose(globals())

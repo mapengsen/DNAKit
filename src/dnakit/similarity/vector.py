@@ -7,6 +7,7 @@ from collections import Counter
 from collections.abc import Mapping, Sequence
 from typing import Literal, TypeAlias, TypeGuard
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 from dnakit.fingerprints import BitFingerprintResult, FingerprintResult
@@ -372,6 +373,7 @@ def fingerprint_similarity(
     metric: VectorMetric = "tanimoto",
     weights: WeightInput | None = None,
     zero_vector_policy: ZeroVectorPolicy = "identity",
+    verbose: bool = True,
 ) -> SimilarityResult:
     """Compare versioned fingerprints or homogeneous numeric vectors.
 
@@ -526,6 +528,7 @@ def kmer_vector_similarity(
     metric: KmerMetric = "jaccard",
     mode: KmerMode = "set",
     zero_vector_policy: ZeroVectorPolicy = "identity",
+    verbose: bool = True,
 ) -> SimilarityResult:
     """Compare named exact k-mer vectors, including versioned fingerprints."""
 
@@ -595,6 +598,7 @@ def kmer_similarity(
     canonical: bool = False,
     overlapping: bool = True,
     zero_vector_policy: ZeroVectorPolicy = "identity",
+    verbose: bool = True,
 ) -> SimilarityResult:
     """Compare exact literal-IUPAC k-mer sets or count multisets."""
 
@@ -660,3 +664,5 @@ def kmer_similarity(
 
 
 __all__ = ["fingerprint_similarity", "kmer_similarity", "kmer_vector_similarity"]
+
+_register_public_verbose(globals())

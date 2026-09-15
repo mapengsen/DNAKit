@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Literal, TypeAlias, overload
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASet
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
@@ -40,17 +41,13 @@ def _materialize_values(values: MetadataValues) -> tuple[object, ...]:
 
 @overload
 def exclude_by_metadata(
-    dataset: DNA,
-    field: MetadataExclusionField,
-    values: MetadataValues,
+    dataset: DNA, field: MetadataExclusionField, values: MetadataValues, *, verbose: bool = True
 ) -> DNA: ...
 
 
 @overload
 def exclude_by_metadata(
-    dataset: DNASet,
-    field: MetadataExclusionField,
-    values: MetadataValues,
+    dataset: DNASet, field: MetadataExclusionField, values: MetadataValues, *, verbose: bool = True
 ) -> DNASet: ...
 
 
@@ -58,6 +55,8 @@ def exclude_by_metadata(
     dataset: MetadataDataset,
     field: MetadataExclusionField,
     values: MetadataValues,
+    *,
+    verbose: bool = True,
 ) -> DNA | DNASet:
     """Return a copy without records whose chromosome or species matches.
 
@@ -99,28 +98,38 @@ def exclude_by_metadata(
 
 
 @overload
-def exclude_chromosomes(dataset: DNA, chromosomes: MetadataValues) -> DNA: ...
+def exclude_chromosomes(
+    dataset: DNA, chromosomes: MetadataValues, *, verbose: bool = True
+) -> DNA: ...
 
 
 @overload
-def exclude_chromosomes(dataset: DNASet, chromosomes: MetadataValues) -> DNASet: ...
+def exclude_chromosomes(
+    dataset: DNASet, chromosomes: MetadataValues, *, verbose: bool = True
+) -> DNASet: ...
 
 
-def exclude_chromosomes(dataset: MetadataDataset, chromosomes: MetadataValues) -> DNA | DNASet:
+def exclude_chromosomes(
+    dataset: MetadataDataset, chromosomes: MetadataValues, *, verbose: bool = True
+) -> DNA | DNASet:
     """Return a copy without records from the selected chromosome value(s)."""
 
     return exclude_by_metadata(dataset, "chromosome", chromosomes)
 
 
 @overload
-def exclude_species(dataset: DNA, species: MetadataValues) -> DNA: ...
+def exclude_species(dataset: DNA, species: MetadataValues, *, verbose: bool = True) -> DNA: ...
 
 
 @overload
-def exclude_species(dataset: DNASet, species: MetadataValues) -> DNASet: ...
+def exclude_species(
+    dataset: DNASet, species: MetadataValues, *, verbose: bool = True
+) -> DNASet: ...
 
 
-def exclude_species(dataset: MetadataDataset, species: MetadataValues) -> DNA | DNASet:
+def exclude_species(
+    dataset: MetadataDataset, species: MetadataValues, *, verbose: bool = True
+) -> DNA | DNASet:
     """Return a copy without records from the selected species value(s)."""
 
     return exclude_by_metadata(dataset, "species", species)
@@ -133,3 +142,5 @@ __all__ = [
     "exclude_chromosomes",
     "exclude_species",
 ]
+
+_register_public_verbose(globals())

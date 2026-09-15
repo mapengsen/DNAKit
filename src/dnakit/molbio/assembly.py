@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from itertools import pairwise
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNAAlphabet, DNASequence, Issue, IssueSeverity, Topology
 from dnakit.exceptions import ConfigurationError
 
@@ -96,6 +97,7 @@ def simulate_assembly(
     cycles: int = 1,
     max_fragments: int = 1_000,
     max_product_length: int = 100_000_000,
+    verbose: bool = True,
 ) -> AssemblyResult:
     """Simulate ordered Gibson/LCR overlaps or pre-digested GG/BioBrick ligation.
 
@@ -277,3 +279,5 @@ def simulate_assembly(
 
 
 __all__ = ["AssemblyFragment", "simulate_assembly"]
+
+_register_public_verbose(globals())

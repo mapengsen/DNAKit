@@ -1,5 +1,7 @@
 # Remove duplicates
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Deduplication is performed on the DNA sequence to obtain the DNA sequence after deduplication.
 
 ## 1) DATA-001 · Standard deduplication
@@ -89,7 +91,7 @@ print(result.records.ids, result.groups[0].rotation_offsets)
 
 ## 4) DATA-004 · IUPAC-aware deduplication
 
-**Function:** Interpret IUPAC fuzzy characters as a set of bases, determine bit by bit whether two sequences are exactly the same, may be compatible, or clearly conflict, and are used for equivalence checking of data containing fuzzy bases.
+**Function:** Interpret IUPAC ambiguity symbols as a set of bases, determine bit by bit whether two sequences are exactly the same, may be compatible, or clearly conflict, and are used for equivalence checking of data containing ambiguous bases.
 
 **API:** `dnakit.datasets.deduplicate_iupac(records[required], config[optional])`; `config` uses `dnakit.datasets.IUPACDeduplicationConfig`.
 

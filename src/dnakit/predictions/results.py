@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
+from dnakit._dependency_hints import dependency_hint
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
@@ -17,7 +18,7 @@ def _numpy() -> Any:
         raise BackendUnavailableError(
             "Property prediction requires NumPy.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the neural extra with: python -m pip install "dnakit[neural]"',
+            hint=dependency_hint("neural"),
         ) from exc
     return np
 
@@ -33,8 +34,10 @@ class PredictionOutput:
     def __post_init__(self) -> None:
         np = _numpy()
         try:
+            if np.iscomplexobj(self.values):
+                raise ValueError("Complex model outputs are not supported.")
             values = np.asarray(self.values, dtype=np.float32)
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError, OverflowError) as exc:
             raise ConfigurationError(
                 "Prediction values must be numeric.",
                 code="INVALID_PREDICTION_OUTPUT",
@@ -55,6 +58,11 @@ class PredictionOutput:
         if any(not isinstance(name, str) or not name.strip() for name in names):
             raise ConfigurationError(
                 "output_names must contain non-empty strings.",
+                code="INVALID_PREDICTION_OUTPUT",
+            )
+        if len(set(names)) != len(names):
+            raise ConfigurationError(
+                "output_names must be unique to preserve output-column identity.",
                 code="INVALID_PREDICTION_OUTPUT",
             )
         if names and len(names) != int(values.shape[-1]):

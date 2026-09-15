@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNAAlphabet, DNASequence, Gap, Topology
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
 from dnakit.ops._common import coerce_fragment, combine_parts, promote_alphabet
@@ -14,6 +15,7 @@ def concat(
     *,
     linker: DNASequence | str | None = None,
     gap: Gap | None = None,
+    verbose: bool = True,
 ) -> DNASequence:
     """Concatenate at least two linear sequences with an optional separator.
 
@@ -98,6 +100,7 @@ def concat_overlap(
     *,
     min_overlap: int = 1,
     max_overlap: int | None = None,
+    verbose: bool = True,
 ) -> DNASequence:
     """Concatenate two linear sequences while retaining an exact overlap once.
 
@@ -202,3 +205,5 @@ def _infer_text_alphabet(text: str) -> DNAAlphabet:
 
 
 __all__ = ["concat", "concat_overlap"]
+
+_register_public_verbose(globals())

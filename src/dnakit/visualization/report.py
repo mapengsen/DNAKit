@@ -7,6 +7,7 @@ import json
 from collections.abc import Iterable, Mapping
 from itertools import islice
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import ConfigurationError
@@ -331,6 +332,7 @@ def build_html_report(
     max_output_bytes: int = _DEFAULT_MAX_OUTPUT_BYTES,
     max_result_depth: int = _DEFAULT_MAX_RESULT_DEPTH,
     max_result_nodes: int = _DEFAULT_MAX_RESULT_NODES,
+    verbose: bool = True,
 ) -> HTMLReportArtifact:
     """Build a self-contained searchable and expandable local HTML report.
 
@@ -429,3 +431,5 @@ def build_html_report(
 
 
 __all__ = ["build_html_report"]
+
+_register_public_verbose(globals())

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.descriptors._shared import (
@@ -21,7 +22,7 @@ from dnakit.exceptions import ConfigurationError
 _COMPLEMENT = str.maketrans("ACGT", "TGCA")
 
 
-def canonical_kmer(value: str) -> str:
+def canonical_kmer(value: str, *, verbose: bool = True) -> str:
     """Return the lexicographically smaller strand representation."""
 
     if not isinstance(value, str) or not value or any(base not in "ACGT" for base in value):
@@ -41,6 +42,7 @@ def kmer_statistics(
     canonical: bool = False,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> KmerResult:
     """Return sparse count, frequency, and presence data for valid k-mers.
 
@@ -86,3 +88,5 @@ def kmer_statistics(
 
 
 __all__ = ["canonical_kmer", "kmer_statistics"]
+
+_register_public_verbose(globals())

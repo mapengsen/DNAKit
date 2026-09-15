@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.datasets import (
     ClusterConfig,
@@ -37,6 +38,7 @@ def evaluate_uniqueness(
     value: EvaluationInput,
     *,
     config: UniquenessEvaluationConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Compute non-duplicate fraction under one explicitly configured equivalence."""
 
@@ -165,7 +167,7 @@ def _pair_indices(
     )
     if not show_progress:
         return pairs
-    from rich.progress import track
+    from dnakit._progress import track
 
     return track(
         pairs,
@@ -227,9 +229,7 @@ def _evaluate_levenshtein_diversity(
 
 
 def evaluate_diversity(
-    value: EvaluationInput,
-    *,
-    config: DiversityEvaluationConfig | None = None,
+    value: EvaluationInput, *, config: DiversityEvaluationConfig | None = None, verbose: bool = True
 ) -> EvaluationReport:
     """Evaluate diversity with similarity summaries or mean pairwise Levenshtein distance."""
 
@@ -293,9 +293,7 @@ def evaluate_diversity(
 
 
 def evaluate_redundancy(
-    value: EvaluationInput,
-    *,
-    config: DiversityEvaluationConfig | None = None,
+    value: EvaluationInput, *, config: DiversityEvaluationConfig | None = None, verbose: bool = True
 ) -> EvaluationReport:
     """Report exact, similarity-threshold, and cluster-level redundancy."""
 
@@ -349,3 +347,5 @@ def evaluate_redundancy(
 
 
 __all__ = ["evaluate_diversity", "evaluate_redundancy", "evaluate_uniqueness"]
+
+_register_public_verbose(globals())

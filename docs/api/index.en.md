@@ -1,8 +1,47 @@
 # API reference
 
-This page lists the public namespaces that are implemented, importable, and covered by tests in the current source code. All coordinates are 0-based half-open intervals unless explicitly stated in the format conversion section.
+This page provides reference entrypoints for the core public namespaces. The migration's **484 added functions** are individually documented in the [complete index](native/index.md), with signatures, parameters, returns and execution requirements. Core interval APIs generally use 0-based half-open coordinates; database, model and format APIs follow their documented coordinate and assembly conventions.
 
-If you want to view the roles, inputs, examples, outputs and status of each of the 185 functions in the current trace matrix, please enter from the [Function Module Index](features/index.md).
+Use the [function module index](features/index.md) to browse by purpose. The original trace matrix's 185 items are historical capability categories, not the total number of current public functions.
+
+## Added database, ENCODE and workflow APIs {#native-apis}
+
+| Module | Added functions | Reference |
+| --- | ---: | --- |
+| `dnakit.databases` | 455 | [Database functions by purpose](native/index.md) |
+| `dnakit.encode` | 20 | [Experiments, downloads, citations and provenance](native/encode.md) |
+| `dnakit.workflows` | 6 | [Execution and reports](native/execution.md), [inheritance](native/analysis.md#dnakit.workflows.simulate_inheritance) |
+| NCBI / ENA sequence APIs | 3 | [Queries and downloads](native/sequences.md) |
+| **Total** | **484** | [Individual function index](native/index.md) · [Examples](native/usage.md) |
+
+Aliases, parameter extensions to existing functions and CLI/MCP exposures are not counted again. Function counts are not counts of independent scientific algorithms.
+
+## Operation feedback
+
+Public Python operation functions accept the keyword argument `verbose=True`, including text,
+DNA-object, and file inputs. They print start/completion messages to stderr by default and retain
+existing progress displays. `verbose=False` silences DNAKit's operation messages and progress bars
+without changing returned values, saved files, or exceptions.
+
+```python
+from dnakit.ops import reverse_complement
+from dnakit.datasets import SplitConfig, split
+
+text = reverse_complement("AATCGC", verbose=False)
+result = split(
+    ["original.fna", "reverse_complement.fna"],
+    config=SplitConfig(ratios={"train": 0.8, "valid": 0.1, "test": 0.1}, seed=42),
+    output_path="splits",
+    verbose=False,
+)
+```
+
+Split completion messages include subset counts, so a separate `print(dict(result.counts))` is
+unnecessary. Nested calls report only the outer operation. Streams report completion upon exhaustion;
+closing them early reports closure instead. Existing `show_progress=False` behavior remains supported.
+Explicit progress callbacks retain control over their own output. `verbose=False` does not suppress
+user-written `print` calls or exceptions. Constructors, data properties, and private helpers do not
+receive this keyword.
 
 ## Top-level and core objects {#core-objects}
 
@@ -16,7 +55,7 @@ Core results `MetricResult` hold value, unit, method, algorithm version, paramet
 
 ::: dnakit.llm
 
-`call_llm()` and `acall_llm()` send a custom prompt and explicitly supplied text/JSON to a configured compatible endpoint and return `LLMResult`. Use `file_path` to explicitly select one local text file or `read_llm_file()` for an offline preview. They do not implicitly read other files, sample data, or execute model output. See [general-purpose LLM calls](../agent_tools.md#custom-llm) for configuration, privacy boundaries, and examples.
+`call_llm()` and `acall_llm()` send a custom prompt and explicitly supplied text/JSON to a configured compatible endpoint and return `LLMResult`. Use `file_path` to explicitly select one local text file or `read_llm_file()` for an offline preview. They do not implicitly read other files, sample data, or execute model output. See [general-purpose LLM calls](../llm_tools/python_api.md#custom-llm) for configuration, privacy boundaries, and examples.
 
 ## I/O and metadata
 
@@ -148,7 +187,7 @@ The pattern module provides exact/IUPAC/regex/PWM, six reading frame ORFs, start
 
 ::: dnakit.thermodynamics
 
-Internal model reproduces versioned SantaLucia 1998 parameters for linear, no Gap, standard A/C/G/T, complete complement, 2–60 nt, and Na⁺+K⁺ total unit salt salts. `ThermodynamicConditions` will be saved with the results. `duplex_stability()` The default `backend="native"` uses this internal full complementation model; canonical mismatch/dangling heterodimer can be handled when the user provides an adapter with an explicit `ntthal_path` and selects `backend="primer3-cli"`. Modified and user-preset alignments are not supported.
+Internal model reproduces versioned SantaLucia 1998 parameters for linear, no Gap, standard A/C/G/T, complete complement, 2–60 nt, and Na⁺+K⁺ total monovalent salt concentration. `ThermodynamicConditions` will be saved with the results. `duplex_stability()` The default `backend="native"` uses this internal full complementation model; canonical mismatch/dangling heterodimer can be handled when the user provides an adapter with an explicit `ntthal_path` and selects `backend="primer3-cli"`. Modified and user-preset alignments are not supported.
 
 `optical_properties()` Add double-chain average/explicit hypochromicity, nmol/mass per OD260 and explicit modification correction to the original single-chain ε260; `concentration_from_a260()` and `convert_oligo_quantity()` complete Beer–Lambert and unit safe concentration/substance mass/mass conversion. `binding_equilibrium()`, `theoretical_melting_curve()`, `terminal_stability()` and `cosolvent_tm_correction()` provide ideal two-state equilibria, theoretical curves, terminal windows and explicit empirical corrections.
 
@@ -186,7 +225,7 @@ assert mismatch.provenance.implementation.label == "adapter"
 
 PDB native coordinate analysis only reports geometry that is computable from explicit coordinates; standard local 12-argument 3DNA output is read via `read_3dna_bp_step()`. When necessary models are missing, grooves, charges, mechanical modulus, etc. are retained as conditional functions and do not guess values ​​from ordinary sequences.
 
-## Sequence characterization, fingerprinting and preprocessing {#fingerprints}
+## Sequence representations, fingerprints, and preprocessing {#fingerprints}
 
 ::: dnakit.fingerprints
 
@@ -194,7 +233,7 @@ Provides integer/one-hot encoding, normal or Canonical exact k-mer features, Min
 
 The thermodynamic fingerprint uses a fixed 16-dimensional v2 schema: internal Tm/ΔH/ΔS/ΔG plus available/found/Tm/ΔG of hairpin/self-dimer/heterodimer. Structural items are only executed when the caller explicitly passes in the adapter; otherwise, they are processed according to the `zero`, `sentinel` or `error` missing policy, and the available bit prevents the fill value from being misread as a real calculation.
 
-## DNA basic model characterization {#model-representations}
+## DNA foundation-model representations {#model-representations}
 
 ::: dnakit.representations
 
@@ -215,9 +254,9 @@ released trained weights from AlphaGenome, Enformer, SegmentNT, Evo 2, GENERator
 LucaOneTasks. See [Deep-learning property prediction](features/23_deep_learning_property_prediction.md)
 for model/task inputs, dependencies, and output semantics.
 The new `predict_enformer_benchmark()` wrapper runs the 18 NT Revised and nine Genomic
-Benchmarks fully fine-tuned checkpoints from the default location or a caller-supplied
-`checkpoint_dir`/`checkpoint_path`. See [Deep-learning task checkpoint download](features/25_deep_learning_checkpoint_download.md)
-for filenames and placement rules.
+Benchmarks fully fine-tuned checkpoints, downloading missing weights on demand and reusing local files.
+Use the default location or supply `checkpoint_dir`/`checkpoint_path`; see
+[checkpoint reuse and automatic downloads](features/23_deep_learning_property_prediction.md#checkpoint-cache).
 
 ## Optional bioinformatics functions {#optional-bioinformatics}
 

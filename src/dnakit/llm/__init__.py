@@ -1,5 +1,7 @@
 """General-purpose Python LLM calls with custom prompts and text/JSON inputs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .client import acall_llm, call_llm
 from .files import read_llm_file
 from .models import LLMConfig, LLMResult, OutputFormat
@@ -16,3 +18,5 @@ __all__ = [
     "get_llm_provider",
     "read_llm_file",
 ]
+
+_register_public_verbose(globals())

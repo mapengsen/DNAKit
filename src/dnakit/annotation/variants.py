@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.scientific import _run_scientific_function
 from dnakit.core import ProviderResult
 from dnakit.exceptions import ConfigurationError
@@ -75,9 +76,7 @@ def _variant_names(value: str | Sequence[str] | None) -> str | tuple[str, ...] |
 
 
 def annotate_variant_vep(
-    hgvs_notation: str,
-    *,
-    species: str = "human",
+    hgvs_notation: str, *, species: str = "human", verbose: bool = True
 ) -> ProviderResult:
     """Annotate one HGVS expression with the Ensembl VEP consequence service."""
 
@@ -91,11 +90,7 @@ def annotate_variant_vep(
     )
 
 
-def annotate_rsid_vep(
-    rsid: str,
-    *,
-    species: str = "human",
-) -> ProviderResult:
+def annotate_rsid_vep(rsid: str, *, species: str = "human", verbose: bool = True) -> ProviderResult:
     """Annotate one rsID with Ensembl VEP."""
 
     variant_id = _text(rsid, "rsid", maximum=256)
@@ -109,9 +104,7 @@ def annotate_rsid_vep(
 
 
 def recode_variant(
-    variant_id: str,
-    *,
-    species: str = "human",
+    variant_id: str, *, species: str = "human", verbose: bool = True
 ) -> ProviderResult:
     """Convert a variant identifier into equivalent Ensembl notations."""
 
@@ -129,6 +122,7 @@ def search_clinvar_variants(
     variant_name: str | Sequence[str] | None = None,
     clinical_significance: str | None = None,
     limit: int = 20,
+    verbose: bool = True,
 ) -> ProviderResult:
     """Search ClinVar using explicit gene, condition, identifier, or HGVS fields."""
 
@@ -162,7 +156,7 @@ def search_clinvar_variants(
     )
 
 
-def get_clinvar_variant(variant_id: str) -> ProviderResult:
+def get_clinvar_variant(variant_id: str, *, verbose: bool = True) -> ProviderResult:
     """Return summary details for one ClinVar variation identifier."""
 
     arguments = {"variant_id": _text(variant_id, "variant_id", maximum=256)}
@@ -173,7 +167,7 @@ def get_clinvar_variant(variant_id: str) -> ProviderResult:
     )
 
 
-def get_clinvar_significance(variant_id: str) -> ProviderResult:
+def get_clinvar_significance(variant_id: str, *, verbose: bool = True) -> ProviderResult:
     """Return ClinVar clinical-significance assertions for one variation ID."""
 
     arguments = {"variant_id": _text(variant_id, "variant_id", maximum=256)}
@@ -184,14 +178,14 @@ def get_clinvar_significance(variant_id: str) -> ProviderResult:
     )
 
 
-def get_dbsnp_variant(rsid: str) -> ProviderResult:
+def get_dbsnp_variant(rsid: str, *, verbose: bool = True) -> ProviderResult:
     """Return coordinates and alleles for one dbSNP rsID."""
 
     arguments = {"rsid": _text(rsid, "rsid", maximum=256)}
     return _run_scientific_function("get_dbsnp_variant", arguments, parameters=arguments)
 
 
-def get_dbsnp_frequencies(rsid: str) -> ProviderResult:
+def get_dbsnp_frequencies(rsid: str, *, verbose: bool = True) -> ProviderResult:
     """Return population allele-frequency records for one dbSNP rsID."""
 
     arguments = {"rsid": _text(rsid, "rsid", maximum=256)}
@@ -203,9 +197,7 @@ def get_dbsnp_frequencies(rsid: str) -> ProviderResult:
 
 
 def search_gnomad_variants(
-    query: str,
-    *,
-    dataset: str = "gnomad_r4",
+    query: str, *, dataset: str = "gnomad_r4", verbose: bool = True
 ) -> ProviderResult:
     """Search gnomAD variants by rsID or supported free-text identifier."""
 
@@ -218,9 +210,7 @@ def search_gnomad_variants(
 
 
 def get_gnomad_variant(
-    variant_id: str,
-    *,
-    dataset: str = "gnomad_r4",
+    variant_id: str, *, dataset: str = "gnomad_r4", verbose: bool = True
 ) -> ProviderResult:
     """Return aggregate gnomAD metadata and frequencies for one variant."""
 
@@ -232,9 +222,7 @@ def get_gnomad_variant(
 
 
 def get_gnomad_population_frequencies(
-    variant_id: str,
-    *,
-    dataset: str = "gnomad_r4",
+    variant_id: str, *, dataset: str = "gnomad_r4", verbose: bool = True
 ) -> ProviderResult:
     """Return population-stratified gnomAD frequencies for one variant."""
 
@@ -262,3 +250,5 @@ __all__ = [
     "search_clinvar_variants",
     "search_gnomad_variants",
 ]
+
+_register_public_verbose(globals())

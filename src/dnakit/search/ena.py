@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, QueryError
 
 from ._http import (
@@ -71,6 +72,7 @@ def ena_search(
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENA_PORTAL_URL,
     query_type: str | None = None,
+    verbose: bool = True,
 ) -> QueryResult:
     """Run a bounded ENA Portal query and return selected metadata fields."""
 
@@ -152,6 +154,7 @@ def reads(
     offset: int = 0,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENA_PORTAL_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query sequencing Study/Experiment/Run metadata and public file locations."""
 
@@ -184,6 +187,7 @@ def project(
     offset: int = 0,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENA_PORTAL_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search public ENA Study/BioProject records."""
 
@@ -220,6 +224,7 @@ def sample(
     offset: int = 0,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENA_PORTAL_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search public ENA Sample/BioSample metadata."""
 
@@ -243,3 +248,5 @@ __all__ = [
     "reads",
     "sample",
 ]
+
+_register_public_verbose(globals())

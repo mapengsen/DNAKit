@@ -1,5 +1,6 @@
 """Reference-genome resolution and download adapters."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.references.models import DownloadProgress, GenomeAssembly, GenomeDownloadResult
 from dnakit.references.ncbi import (
     DEFAULT_CHUNK_SIZE,
@@ -25,3 +26,5 @@ __all__ = [
     "resolve_genome_assembly",
     "supported_genome_aliases",
 ]
+
+_register_public_verbose(globals())

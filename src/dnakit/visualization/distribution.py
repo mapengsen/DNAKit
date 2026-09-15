@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import colorsys
 import csv
 import math
 import xml.etree.ElementTree as ET
@@ -13,6 +14,7 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.issues import Issue
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
@@ -20,16 +22,37 @@ from ._svg import SVGBuilder, number, validate_xml_text
 from .config import DistributionPlotConfig
 from .results import SVGArtifact
 
-DistributionTask = Literal["classification", "regression"]
+DistributionTask = Literal["classification", "regression", "probability"]
 DistributionValue = str | int | float | None
 
 
+def _bar_colors(count: int, config: DistributionPlotConfig) -> list[str]:
+    if config.bar_colors is not None:
+        return [config.bar_colors[index % len(config.bar_colors)] for index in range(count)]
+    colors = [config.theme.accent]
+    candidates = ("#f28e2b", "#59a14f", "#e15759", "#b07aa1", "#76b7b2", "#edc949")
+    used = {config.theme.accent.lower()}
+    index = 0
+    while len(colors) < count:
+        if index < len(candidates):
+            color = candidates[index]
+        else:
+            # Extend the palette deterministically without repeating RGB colors.
+            rgb = colorsys.hls_to_rgb((index * 0.61803398875) % 1, 0.5 + index % 3 * 0.06, 0.65)
+            color = "#" + "".join(f"{round(channel * 255):02x}" for channel in rgb)
+        if color.lower() not in used:
+            colors.append(color)
+            used.add(color.lower())
+        index += 1
+    return colors
+
+
 def _validate_task(task: str, config: DistributionPlotConfig) -> None:
-    if task not in ("classification", "regression"):
-        raise ConfigurationError("task must be 'classification' or 'regression'.")
+    if task not in ("classification", "regression", "probability"):
+        raise ConfigurationError("task must be 'classification', 'regression' or 'probability'.")
     if task == "classification" and config.bin_edges is not None:
-        raise ConfigurationError("bin_edges only applies to regression.")
-    if task == "regression" and config.categories is not None:
+        raise ConfigurationError("bin_edges only applies to regression or probability.")
+    if task != "classification" and config.categories is not None:
         raise ConfigurationError("categories only applies to classification.")
 
 
@@ -66,6 +89,13 @@ def _clean_values(
                 ) from exc
             if not math.isfinite(numeric):
                 raise InputFormatError(f"Sample {total} is not finite: {value!r}.")
+            if task == "probability" and not 0 <= numeric <= 1:
+                raise InputFormatError(
+                    f"Sample {total} probability must be in [0, 1]; got {numeric}.",
+                    code="INVALID_PROBABILITY",
+                    context={"sample_index": total - 1, "value": numeric},
+                    hint="Select a probability column, or use task='regression' for logits/scores.",
+                )
             numbers.append(numeric)
     if total == missing:
         raise InputFormatError("No valid samples remain after skipping blank values.")
@@ -117,6 +147,7 @@ def _render_distribution(
 ) -> SVGArtifact:
     valid = total - missing
     proportions = [count / valid for count in counts]
+    colors = _bar_colors(len(counts), config)
     metadata: dict[str, object] = {
         "task": task,
         "normalization": "count / valid_count",
@@ -126,6 +157,7 @@ def _render_distribution(
         "labels": labels,
         "counts": counts,
         "proportions": proportions,
+        "bar_colors": colors,
         "bin_edges": edges,
         "bin_closure": "[left, right), final bin [left, right]" if edges else None,
     }
@@ -195,7 +227,7 @@ def _render_distribution(
             bottom - bar_height,
             bar_width,
             bar_height,
-            fill=theme.accent,
+            fill=colors[index],
             class_="distribution-bar",
             data_label=label,
             data_count=count,
@@ -231,7 +263,21 @@ def _render_distribution(
     if edges:
         tick_stride = max(1, math.ceil((len(edges) - 1) / config.max_tick_labels))
         tick_indices = sorted(set(range(0, len(edges), tick_stride)) | {len(edges) - 1})
-        for index in tick_indices:
+        # Reserve the rightmost boundary, then omit labels that would overlap
+        # at the requested font size. Every bin remains drawn and counted.
+        visible_ticks = []
+        next_left = math.inf
+        angle = math.radians(config.label_rotation)
+        for index in reversed(tick_indices):
+            text_width = len(f"{edges[index]:.5g}") * config.tick_font_size * 0.65
+            half_width = (
+                text_width * math.cos(angle) + config.tick_font_size * math.sin(angle) + 12
+            ) / 2
+            x = position(edges[index])
+            if x + half_width <= next_left:
+                visible_ticks.append(index)
+                next_left = x - half_width
+        for index in reversed(visible_ticks):
             x, y = position(edges[index]), bottom + config.tick_font_size + 8
             builder.text(
                 x,
@@ -279,12 +325,16 @@ def plot_distribution(
     *,
     task: DistributionTask,
     config: DistributionPlotConfig | None = None,
+    verbose: bool = True,
 ) -> SVGArtifact:
     """Plot sample proportions; blanks are skipped and other invalid values raise.
 
     Classification uses first-seen label order unless ``categories`` is supplied.
+    Bars use distinct colors, narrower widths and larger text by default;
+    ``DistributionPlotConfig`` controls the palette, width and font sizes.
     Regression uses equal-width bins unless ``bin_edges`` is supplied. Heights
     are proportions, including for unequal bin widths, never probability density.
+    Probability uses the same histogram with explicit [0, 1] value validation.
     """
     resolved = DistributionPlotConfig() if config is None else config
     if not isinstance(resolved, DistributionPlotConfig):
@@ -319,6 +369,7 @@ def plot_csv_distributions(
     config: DistributionPlotConfig | None = None,
     encoding: str = "utf-8-sig",
     delimiter: str = ",",
+    verbose: bool = True,
 ) -> dict[str, SVGArtifact]:
     """Read named CSV columns once, returning a separately normalized plot per column.
 
@@ -375,3 +426,5 @@ def plot_csv_distributions(
 
 
 __all__ = ["DistributionTask", "plot_csv_distributions", "plot_distribution"]
+
+_register_public_verbose(globals())

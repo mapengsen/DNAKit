@@ -1,5 +1,7 @@
 # OPS-010 sequence segmentation
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 **Function:** Cut long DNA into fragments with source coordinates according to a fixed window, overlapping sliding window, random interval or multi-scale strategy, and return them one by one with an iterator for model input, partition analysis and large sequence flow processing.
 
 Split DNA sequences according to fixed length, sliding window, random interval, or multi-scale strategies to generate sequence fragments with coordinates.

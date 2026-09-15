@@ -17,6 +17,7 @@ from itertools import islice
 from pathlib import Path
 from typing import BinaryIO, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import BackendInfo
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -97,6 +98,7 @@ def execute_bounded_command(
     max_output_bytes: int = 1_000_000,
     monitored_output_paths: Iterable[str | Path] = (),
     max_monitored_output_bytes: int = 100_000_000,
+    verbose: bool = True,
 ) -> BoundedCommandResult:
     """Run an explicit executable without a shell under time and output limits.
 
@@ -181,8 +183,12 @@ def execute_bounded_command(
         )
 
     environment = os.environ.copy()
-    environment.update({"LANG": "C", "LC_ALL": "C"})
-    command = (str(executable), *resolved_arguments)
+    environment.update({"LANG": "C", "LC_ALL": "C", "PYTHONDONTWRITEBYTECODE": "1"})
+    # Preserve a virtual environment's Python entrypoint (and other executable
+    # aliases). Resolving the symlink for execution can select a different Python
+    # environment even though it points to the same validated binary.
+    invocation_path = Path(executable_path).expanduser().absolute()
+    command = (str(invocation_path), *resolved_arguments)
     deadline = time.monotonic() + float(timeout_seconds)
     try:
         process = subprocess.Popen(
@@ -464,6 +470,8 @@ def passive_external_probe(
     executable: str,
     capabilities: frozenset[str],
     license_expression: str,
+    *,
+    verbose: bool = True,
 ) -> BackendInfo:
     """Locate an executable without running it or reading sequence data."""
 
@@ -512,3 +520,5 @@ __all__ = [
     "execute_bounded_command",
     "passive_external_probe",
 ]
+
+_register_public_verbose(globals())

@@ -17,13 +17,14 @@
   </a>
 </p>
 
-DNAKit is a reproducible toolkit for DNA sequence analysis. It provides unified objects,
-sequence and annotation I/O, standardization, sequence operations, descriptors, pattern
-scanning, thermodynamics, fingerprints, similarity analysis, dataset preparation,
-comprehensive evaluation, molecular-biology simulation, and visualization. DNA foundation
-models can optionally be used to extract representations for k-means clustering. DNAKit does
-not include task-specific deep-learning predictors for promoter activity, expression levels,
-transcription-factor binding strength, or CRISPR editing efficiency.
+DNAKit is a reproducible analysis toolkit that makes DNA and gene operations convenient. It provides:
+
+1. **Data preparation:** DNA sequence and annotation file I/O, database downloads and queries, and validation.
+2. **Data processing:** sequence standardization and editing, transcription and translation, deduplication and clustering, and dataset splitting.
+3. **Data analysis:** DNA descriptors, representations and fingerprints, sequence and pattern searches, physicochemical and thermodynamic properties, and deep-learning property prediction.
+4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
+5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
+6. **LLM tools:** provide [MCP integration](llm_tools/mcp.md) and a [Python API](llm_tools/python_api.md) for natural-language tool execution and general-purpose LLM calls.
 
 # Support and community
 
@@ -35,7 +36,7 @@ DNAKit does not yet have a published paper or DOI. The current citation informat
 maintained in the repository `README.md` and can be cited as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.3, 2026.
+DNAKit contributors. DNAKit 0.1.4, 2026.
 ```
 
 Citing DNAKit does not replace citations for the algorithms, parameter sets, backends, and

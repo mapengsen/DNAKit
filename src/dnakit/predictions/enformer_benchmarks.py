@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 EnformerBenchmarkFamily = Literal["nt", "gb"]
@@ -12,6 +13,37 @@ EnformerBenchmarkFamily = Literal["nt", "gb"]
 ENFORMER_BENCHMARK_CHECKPOINTS_URL = (
     "https://drive.google.com/drive/folders/1lrZXzkrgAJMqM0wAmnIeZ4DEp0XFNIRI?usp=sharing"
 )
+
+
+_CHECKPOINT_FILE_IDS = {
+    "demo_coding_vs_intergenomic_seqs": "1deBuRxYeh8yFjNSRK5rH58IIirgkdtoa",
+    "demo_human_or_worm": "1woHoMjKG4sZSqFMSwUcLLoe-w4dMc-8o",
+    "drosophila_enhancers_stark": "1ZHfykdEoXFM9s3PVI_j-i3Y9GjathrFd",
+    "dummy_mouse_enhancers_ensembl": "17vi4Q1NiaBaKfY_Kti1uu-Ww9rg5Ywot",
+    "enhancers": "15fkN_7ZftfdHzi0In9_NcskOm2ZvjZdF",
+    "enhancers_types": "129kCJHEpHqXc_TNxaOj0W73S2JUQUmgW",
+    "H2AFZ": "1IX_Yqgqu-OkquLgGeGy46ftC1_kj_CVq",
+    "H3K27ac": "1Mpc3CQ0D7r7QL3JXfG50dfQMdZ1DlSLY",
+    "H3K27me3": "17xIy_3vRu6APrzB9nlqWziaNJ-iGu5hG",
+    "H3K36me3": "1ec35jpkQWiyNpZLFBzUVKqEpjKxuTlk1",
+    "H3K4me1": "1pvpjpqJ8f5DcVg6fPDaN319Nsmf-F77F",
+    "H3K4me2": "171mim8ZVsaha86WRAC3dxxEu46S4olUK",
+    "H3K4me3": "1PfVfHUrhkbhbzcdDu9KUtTPtsZOCrA4p",
+    "H3K9ac": "1F-nXU-rwSXYBAaDslOrrdPlU0LcB7Aem",
+    "H3K9me3": "1whSdl2NwgGQtW3v8Odf30FNUsrdyVtyD",
+    "H4K20me1": "1ONQkaRBA4JOQkzSPXEE9wgknXWnGRy0b",
+    "human_enhancers_cohn": "18yvR0d1QpUkDhZc6VSvaYYdCPMmmJtl1",
+    "human_enhancers_ensembl": "1RQNkzydJZ45i0mHv-sRLy8av0oT_pY9j",
+    "human_ensembl_regulatory": "11D6D_-92Jq5e5vQAEjkkUhjpz0o4LBcF",
+    "human_nontata_promoters": "1YZ2VKQROLY8VkkzfCIAJzjEjfoBFK_50",
+    "human_ocr_ensembl": "1HJ6uN-DeCQfF3F-IyyJehU4bT8b9LW4s",
+    "promoter_all": "1fHy8I5MVzi49gpnABlILXSHdzlKnSTm_",
+    "promoter_no_tata": "1fPmCojazAfQVIqHDxlVueMpcgoEhMIOH",
+    "promoter_tata": "1WzJcLuUh7vnXWpSmpgSRnPVuczqtKj8P",
+    "splice_sites_acceptors": "1DzJtmO9ig-weMAo6WkDU_LDbNVMELP14",
+    "splice_sites_all": "16Jz8vVjOJylEn4IgIU4ohOu9xw9muR-8",
+    "splice_sites_donors": "1NuiRZmf8sH1G02aanVwtC99XYKK7v2bq",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,6 +58,16 @@ class EnformerBenchmarkTask:
     description: str
     num_classes: int
     dataset_name: str
+
+    @property
+    def checkpoint_file_id(self) -> str:
+        """Google Drive file ID for this task only."""
+        return _CHECKPOINT_FILE_IDS[self.checkpoint_task]
+
+    @property
+    def checkpoint_url(self) -> str:
+        """Public download source for this task."""
+        return f"https://drive.google.com/file/d/{self.checkpoint_file_id}/view?usp=drivesdk"
 
 
 def _spec(
@@ -195,7 +237,7 @@ def _normalize_task(task: str) -> str:
     return normalized
 
 
-def get_enformer_benchmark_task(task: str) -> EnformerBenchmarkTask:
+def get_enformer_benchmark_task(task: str, *, verbose: bool = True) -> EnformerBenchmarkTask:
     """Resolve a canonical task, checkpoint filename, or ``nt_``/``gb_`` alias."""
 
     canonical = _normalize_task(task)
@@ -210,7 +252,7 @@ def get_enformer_benchmark_task(task: str) -> EnformerBenchmarkTask:
 
 
 def available_enformer_benchmark_tasks(
-    family: EnformerBenchmarkFamily | None = None,
+    family: EnformerBenchmarkFamily | None = None, *, verbose: bool = True
 ) -> tuple[str, ...]:
     """Return the 27 task names, optionally restricted to ``nt`` or ``gb``."""
 
@@ -222,7 +264,7 @@ def available_enformer_benchmark_tasks(
     return tuple(item.name for item in _TASKS if family is None or item.family == family)
 
 
-def is_enformer_benchmark_task(task: str) -> bool:
+def is_enformer_benchmark_task(task: str, *, verbose: bool = True) -> bool:
     """Return whether a canonical Enformer task uses one of the 27 local checkpoints."""
 
     try:
@@ -240,3 +282,5 @@ __all__ = [
     "get_enformer_benchmark_task",
     "is_enformer_benchmark_task",
 ]
+
+_register_public_verbose(globals())

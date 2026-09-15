@@ -22,7 +22,9 @@ from dnakit.predictions import (
     predict_custom_properties,
     train_custom_property_model,
 )
+from dnakit.predictions.custom_training import ml_training
 from dnakit.predictions.custom_training.ml_models import create_estimator
+from dnakit.tools import serialize_for_agent
 
 
 def _source(tmp_path: Path, task: str, mode: str = "single") -> tuple[Path, DataMapping]:
@@ -87,6 +89,130 @@ def _params(name: str) -> dict[str, object]:
 
 
 _CASES = [(spec.name, task) for spec in available_machine_learning_models() for task in spec.tasks]
+
+
+@pytest.mark.parametrize("task", ["classification", "regression"])
+def test_complete_cv_is_isolated_and_refits_all_training_rows(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    task: Any,
+) -> None:
+    source, mapping = _source(tmp_path, task, mode="binary")
+    mapping = replace(mapping, split_field=None)
+    observed: list[tuple[Any, Any]] = []
+    original_fit = ml_training._fit_estimators
+
+    def fit(values: Any, targets: Any, config: Any) -> Any:
+        observed.append((values.copy(), targets.copy()))
+        return original_fit(values, targets, config)
+
+    monkeypatch.setattr(ml_training, "_fit_estimators", fit)
+    trained = train_custom_property_model(
+        source,
+        config=CustomPropertyTrainingConfig(
+            task_type=task,
+            model="svm" if task == "classification" else "ridge",
+            finetune_method="machine_learning",
+            feature_source="numeric",
+            mapping=mapping,
+            model_params={"kernel": "linear", "probability": True}
+            if task == "classification"
+            else {},
+            cv_folds=10,
+            train_ratio=0.9,
+            validation_ratio=0.1,
+            test_ratio=0.0,
+            workers=1,
+            output_dir=tmp_path / "cv-model",
+            show_progress=False,
+        ),
+    )
+    assert len(observed) == 11
+    assert [len(values) for values, _ in observed] == [81] * 10 + [90]
+    assert trained.split_counts == {"train": 90, "validation": 0, "test": 0}
+    with (tmp_path / "cv-model" / "splits.csv").open() as stream:
+        assignments = list(csv.DictReader(stream))
+    ids = [int(row["validation_fold"]) for row in assignments]
+    assert sorted(int(row["row_index"]) for row in assignments) == list(range(90))
+    assert [ids.count(fold) for fold in range(10)] == [9] * 10
+    all_values = observed[-1][0]
+    for fold in range(10):
+        expected = all_values[[index for index, assigned in enumerate(ids) if assigned != fold]]
+        np.testing.assert_allclose(observed[fold][0], expected)
+        if task == "regression":
+            np.testing.assert_allclose(observed[fold][1].mean(axis=0), 0, atol=1e-6)
+    metrics = trained.metrics["cross_validation"]
+    assert metrics["n_splits"] == 10
+    assert len(metrics["folds"]) == 10
+    assert metrics["refit_record_count"] == 90
+    assert "test" not in trained.metrics
+    oof = (tmp_path / "cv-model" / "oof_predictions.jsonl").read_text().splitlines()
+    assert len(oof) == 90
+    assert len({json.loads(line)["record_id"] for line in oof}) == 90
+    assert not (tmp_path / "cv-model" / "test_predictions.jsonl").exists()
+
+    # Prediction writes through the existing table API, keeping its Agent result small.
+    prediction_path = tmp_path / "predictions.csv"
+    predicted = predict_custom_properties(
+        source,
+        model_dir=trained.output_dir,
+        trust_model=True,
+        output_path=prediction_path,
+    )
+    summary = serialize_for_agent(predicted)
+    assert summary["target_path"] == str(prediction_path)
+    assert summary["row_count"] == 90
+    assert "predictions" not in summary
+    assert len(json.dumps(summary)) < 2_000
+    with prediction_path.open() as stream:
+        rows = list(csv.DictReader(stream))
+    assert len(rows) == len(predicted.predictions) == 90
+    assert rows[0]["record_id"] == predicted.predictions[0]["record_id"]
+    if task == "classification":
+        assert {row["target"] for row in rows} <= {"0", "1"}
+    saved = prediction_path.read_bytes()
+    with pytest.raises(FileExistsError):
+        predict_custom_properties(
+            source, model_dir=trained.output_dir, trust_model=True, output_path=prediction_path
+        )
+    assert prediction_path.read_bytes() == saved
+    with pytest.raises(ConfigurationError, match="UNSAFE_CUSTOM_OUTPUT_PATH"):
+        predict_custom_properties(
+            source,
+            model_dir=trained.output_dir,
+            trust_model=True,
+            output_path=source,
+            overwrite=True,
+        )
+
+
+@pytest.mark.parametrize("folds", [1, True, 1.5, 101])
+def test_cv_config_rejects_invalid_fold_counts(folds: Any) -> None:
+    with pytest.raises(ConfigurationError, match="INVALID_CUSTOM_CV"):
+        CustomPropertyTrainingConfig(
+            task_type="classification",
+            model="svm",
+            finetune_method="machine_learning",
+            cv_folds=folds,
+        )
+
+
+def test_cv_rejects_mapped_splits_without_consuming_test_rows(tmp_path: Path) -> None:
+    source, mapping = _source(tmp_path, "classification", mode="binary")
+    with pytest.raises(InputFormatError, match="INVALID_CUSTOM_CV"):
+        train_custom_property_model(
+            source,
+            config=CustomPropertyTrainingConfig(
+                task_type="classification",
+                model="svm",
+                finetune_method="machine_learning",
+                feature_source="numeric",
+                mapping=mapping,
+                cv_folds=10,
+                output_dir=tmp_path / "invalid-model",
+            ),
+        )
+    assert not (tmp_path / "invalid-model").exists()
 
 
 @pytest.mark.parametrize(("model", "task"), _CASES)
@@ -441,3 +567,45 @@ def test_sequence_features_handle_ambiguity(tmp_path: Path) -> None:
     assert isinstance(names, list)
     assert values[2, names.index("kmer_AC")] == 0.5
     assert values[2, names.index("kmer_CG")] == 0.5
+
+
+def test_missing_saved_embedding_path_uses_on_demand_resolver(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: Any
+) -> None:
+    from dnakit.predictions.custom_training import ml_training
+
+    source, _ = _source(tmp_path, "regression")
+    result = train_custom_property_model(
+        source,
+        config=CustomPropertyTrainingConfig(
+            task_type="regression",
+            model="ridge",
+            finetune_method="machine_learning",
+            feature_source="embedding",
+            mapping=DataMapping(label_fields=("target",), split_field="split", id_field="id"),
+            output_dir=tmp_path / "model",
+        ),
+        representation_backend=_Embedding(),
+        verbose=False,
+    )
+    manifest_path = Path(result.output_dir) / "model.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["features"]["checkpoint_path"] = str(tmp_path / "old-computer" / "weights")
+    manifest_path.write_text(json.dumps(manifest))
+    original = ml_training.machine_learning_features
+    observed = []
+
+    def features(data: Any, config: Any, backend: Any) -> Any:
+        observed.append(config.checkpoint_path)
+        return original(data, config, backend)
+
+    monkeypatch.setattr(ml_training, "machine_learning_features", features)
+    predicted = predict_custom_properties(
+        source,
+        model_dir=result.output_dir,
+        trust_model=True,
+        representation_backend=_Embedding(),
+    )
+    assert len(predicted.predictions) == 90
+    assert observed == [None]  # Allows the normal backbone resolver to download.
+    assert str(Path(result.output_dir) / "estimator.joblib") in capsys.readouterr().err

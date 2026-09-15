@@ -97,7 +97,7 @@ True 2
 
 ## 5) Neural network representation
 
-- **Function:** Use the pre-trained DNA basic model to compress each sequence into a fixed-length floating point vector for clustering, retrieval or downstream machine learning; the meaning of the vector depends on the model, checkpoint and pooling configuration.
+- **Function:** Use the pre-trained DNA foundation model to compress each sequence into a fixed-length floating point vector for clustering, retrieval or downstream machine learning; the meaning of the vector depends on the model, checkpoint and pooling configuration.
 
 The neural network representation is the rep extraction part of `DATA-027`: converting each DNA sequence into a fixed-length float32 vector using a pretrained DNA base model. See [DATA-027 Neural Network Clustering ](10_clustering.md#data-027-neural-clustering) for the process of using rep with k-means.
 

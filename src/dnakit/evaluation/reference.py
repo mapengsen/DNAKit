@@ -5,6 +5,7 @@ from __future__ import annotations
 import heapq
 from collections.abc import Iterable, Mapping
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
@@ -41,7 +42,7 @@ def _tracked_query_items(
     indexed = enumerate(items)
     if not show_progress:
         return indexed
-    from rich.progress import track
+    from dnakit._progress import track
 
     return track(indexed, description=description, total=len(items))
 
@@ -55,6 +56,7 @@ def create_reference_library(
     date: str | None = None,
     filters: Mapping[str, object] | None = None,
     index_parameters: Mapping[str, object] | None = None,
+    verbose: bool = True,
 ) -> ReferenceLibrary:
     """Bind caller-supplied DNA to version and content provenance.
 
@@ -301,6 +303,7 @@ def nearest_reference(
     reference: ReferenceLibrary,
     *,
     config: ReferenceSearchConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Return deterministic top-k references from a bounded exhaustive local scan."""
 
@@ -351,6 +354,7 @@ def evaluate_novelty(
     reference: ReferenceLibrary,
     *,
     config: ReferenceSearchConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Evaluate novelty by nearest similarity or raw nearest Levenshtein distance."""
 
@@ -419,6 +423,7 @@ def evaluate_memorization(
     training_reference: ReferenceLibrary,
     *,
     config: ReferenceSearchConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Flag exact or threshold-near copies of a versioned training reference."""
 
@@ -487,6 +492,7 @@ def evaluate_reference_similarity(
     reference: ReferenceLibrary,
     *,
     config: ReferenceSearchConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Summarize nearest-reference similarity for a query collection."""
 
@@ -550,3 +556,5 @@ __all__ = [
     "evaluate_reference_similarity",
     "nearest_reference",
 ]
+
+_register_public_verbose(globals())

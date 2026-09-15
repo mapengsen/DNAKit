@@ -6,6 +6,7 @@ import heapq
 import math
 from collections.abc import Iterable, Sequence
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet
 from dnakit.exceptions import ConfigurationError
 
@@ -59,9 +60,7 @@ def _choose_representative(
 
 
 def cluster_sequences(
-    records: Iterable[DNARecord],
-    *,
-    config: ClusterConfig | None = None,
+    records: Iterable[DNARecord], *, config: ClusterConfig | None = None, verbose: bool = True
 ) -> ClusteringResult:
     """Cluster by connected components of an exhaustive similarity-threshold graph."""
 
@@ -129,6 +128,7 @@ def hierarchical_cluster(
     records: Iterable[DNARecord],
     *,
     config: HierarchicalClusteringConfig | None = None,
+    verbose: bool = True,
 ) -> HierarchicalClusteringResult:
     """Agglomerate the closest clusters with deterministic linkage tie-breaking."""
 
@@ -231,6 +231,7 @@ def select_representatives(
     max_records: int = 1_000,
     max_pairwise_comparisons: int = 500_000,
     max_alignment_cells: int = 5_000_000,
+    verbose: bool = True,
 ) -> RepresentativeSelectionResult:
     """Select one stable representative per user-supplied cluster label."""
 
@@ -284,3 +285,5 @@ def select_representatives(
 
 
 __all__ = ["cluster_sequences", "hierarchical_cluster", "select_representatives"]
+
+_register_public_verbose(globals())

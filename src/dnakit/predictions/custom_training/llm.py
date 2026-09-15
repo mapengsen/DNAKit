@@ -8,6 +8,7 @@ import urllib.request
 from collections.abc import Mapping
 from typing import Any, Protocol, cast, runtime_checkable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import BackendExecutionError, ConfigurationError
 
@@ -214,9 +215,7 @@ def _optional_text_or_fallback(
 
 
 def mapping_from_llm_proposal(
-    proposal: Mapping[str, object],
-    *,
-    fallback: DataMapping,
+    proposal: Mapping[str, object], *, fallback: DataMapping, verbose: bool = True
 ) -> tuple[DataMapping, tuple[str, ...], tuple[str, ...]]:
     """Validate a model proposal by constructing the strict declarative schema."""
 
@@ -285,3 +284,5 @@ __all__ = [
     "SchemaLLMClient",
     "mapping_from_llm_proposal",
 ]
+
+_register_public_verbose(globals())

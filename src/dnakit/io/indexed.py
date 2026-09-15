@@ -12,6 +12,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Literal, TypeVar, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.core.enums import Topology
 from dnakit.core.record import DNARecord
@@ -26,7 +27,9 @@ _INDEX_SCHEMA = "dnakit.fasta-index.v1"
 _FASTQ_INDEX_SCHEMA = "dnakit.fastq-index.v1"
 
 
-def iter_chunks(values: Iterable[T], *, chunk_size: int) -> Iterator[tuple[T, ...]]:
+def iter_chunks(
+    values: Iterable[T], *, chunk_size: int, verbose: bool = True
+) -> Iterator[tuple[T, ...]]:
     """Yield stable input-order chunks without materializing the input."""
 
     if isinstance(chunk_size, bool) or not isinstance(chunk_size, int):
@@ -351,6 +354,7 @@ def build_fasta_index(
     overwrite: bool = False,
     max_records: int = 10_000_000,
     max_line_length: int = 10_000_000,
+    verbose: bool = True,
 ) -> FastaIndex:
     """Scan and persist an ID index for an uncompressed UTF-8 FASTA file."""
 
@@ -487,6 +491,7 @@ def load_fasta_index(
     source_path: str | os.PathLike[str] | None = None,
     verify_checksum: bool = True,
     max_index_bytes: int = 64 * 1024 * 1024,
+    verbose: bool = True,
 ) -> FastaIndex:
     """Load and optionally checksum-verify a persistent DNAKit FASTA index."""
 
@@ -882,6 +887,7 @@ def build_fastq_index(
     max_line_length: int = 10_000_000,
     max_record_bytes: int = 100_000_000,
     max_source_bytes: int = 1_000_000_000,
+    verbose: bool = True,
 ) -> FastqIndex:
     """Scan and persist an ID index for strict uncompressed four-line FASTQ."""
 
@@ -1016,6 +1022,7 @@ def load_fastq_index(
     verify_checksum: bool = True,
     max_index_bytes: int = 64 * 1024 * 1024,
     max_entries: int = 10_000_000,
+    verbose: bool = True,
 ) -> FastqIndex:
     """Load and checksum-verify a persistent DNAKit FASTQ index."""
 
@@ -1144,3 +1151,5 @@ __all__ = [
     "load_fasta_index",
     "load_fastq_index",
 ]
+
+_register_public_verbose(globals())

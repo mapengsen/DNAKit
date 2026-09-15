@@ -10,6 +10,7 @@ import random
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, replace
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Issue, IssueSeverity
 from dnakit.core._json import FrozenDict, freeze_mapping
 from dnakit.exceptions import ConfigurationError
@@ -221,6 +222,7 @@ def optimize_sequence_rules(
     config: RuleOptimizationConfig,
     *,
     max_sequence_length: int = 1_000_000,
+    verbose: bool = True,
 ) -> RuleOptimizationResult:
     """Greedily lower a documented rule score with deterministic seeded ties."""
 
@@ -465,6 +467,7 @@ def optimize_codons(
     preserve_motifs: Iterable[str] = (),
     max_codons: int = 2_000,
     max_dp_cells: int = 2_000_000,
+    verbose: bool = True,
 ) -> CodonOptimizationResult:
     """Maximize relative codon weights under an optional global GC interval."""
 
@@ -630,6 +633,7 @@ def optimize_protein_codons(
     forbidden_codons: Iterable[str] = (),
     max_amino_acids: int = 2_000,
     max_dp_cells: int = 2_000_000,
+    verbose: bool = True,
 ) -> CodonOptimizationResult:
     """Reverse-translate a protein and optimize it with the same bounded DP."""
 
@@ -767,6 +771,7 @@ def generate_mutation_library(
     max_enumerated_variants: int = 1_000_000,
     max_output_bases: int = 100_000_000,
     max_sequence_length: int = 1_000_000,
+    verbose: bool = True,
 ) -> MutationLibraryResult:
     """Generate bounded single, saturation, or combinatorial substitutions."""
 
@@ -895,3 +900,5 @@ __all__ = [
     "optimize_protein_codons",
     "optimize_sequence_rules",
 ]
+
+_register_public_verbose(globals())

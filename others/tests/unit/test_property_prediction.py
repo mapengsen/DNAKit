@@ -12,7 +12,6 @@ import pytest
 from dnakit.core import DNARecord, DNASequence
 from dnakit.exceptions import BackendExecutionError, ConfigurationError, SequenceError
 from dnakit.predictions import (
-    ENFORMER_BENCHMARK_CHECKPOINTS_URL,
     BiologicalSequence,
     BiologicalSequencePair,
     PredictionOutput,
@@ -100,7 +99,7 @@ def test_enformer_benchmark_task_metadata_and_checkpoint_paths(
     custom = tmp_path / "downloaded"
     custom.mkdir()
     checkpoint = custom / gb_task.checkpoint_filename
-    checkpoint.touch()
+    checkpoint.write_bytes(b"local checkpoint")
     config = PropertyPredictionConfig(
         model="enformer",
         task="human_nontata_promoters",
@@ -109,22 +108,7 @@ def test_enformer_benchmark_task_metadata_and_checkpoint_paths(
     resolved = ensure_prediction_checkpoint(config)
     assert resolved.paths == (str(checkpoint.resolve()),)
     assert resolved.downloaded is False
-    assert resolved.sources == (ENFORMER_BENCHMARK_CHECKPOINTS_URL,)
-
-
-def test_missing_enformer_benchmark_checkpoint_has_actionable_path(tmp_path: Path) -> None:
-    config = PropertyPredictionConfig(
-        model="enformer",
-        task="h2afz",
-        checkpoint_dir=tmp_path,
-    )
-    with pytest.raises(ConfigurationError) as error:
-        ensure_prediction_checkpoint(config)
-    assert error.value.code == "MODEL_CHECKPOINT_NOT_FOUND"
-    assert error.value.context["checkpoint_filename"] == "H2AFZ.ckpt"
-    assert error.value.context["download_url"] == ENFORMER_BENCHMARK_CHECKPOINTS_URL
-    assert ENFORMER_BENCHMARK_CHECKPOINTS_URL in (error.value.hint or "")
-    assert str(tmp_path / "H2AFZ.ckpt") in (error.value.hint or "")
+    assert resolved.sources == (gb_task.checkpoint_url,)
 
 
 def test_enformer_checkpoint_labels_are_sorted_by_stored_index() -> None:

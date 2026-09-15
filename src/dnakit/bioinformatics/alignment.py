@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import (
     ExecutionConfig,
     ToolResult,
@@ -85,7 +86,9 @@ def _biopython_alignment(alignment: MultipleAlignment) -> Any:
     )
 
 
-def read_alignment(path: str | Path, *, format: str = "fasta") -> MultipleAlignment:
+def read_alignment(
+    path: str | Path, *, format: str = "fasta", verbose: bool = True
+) -> MultipleAlignment:
     """Read one alignment using Biopython codecs (FASTA, Clustal, Stockholm, PHYLIP…)."""
     result = require("Bio.AlignIO", "bio-formats").read(str(input_path(path)), format)
     return MultipleAlignment(
@@ -94,7 +97,7 @@ def read_alignment(path: str | Path, *, format: str = "fasta") -> MultipleAlignm
 
 
 def write_alignment(
-    alignment: MultipleAlignment, path: str | Path, *, format: str = "fasta"
+    alignment: MultipleAlignment, path: str | Path, *, format: str = "fasta", verbose: bool = True
 ) -> Path:
     target = Path(path)
     with target.open("x", encoding="utf-8") as handle:
@@ -109,6 +112,7 @@ def align_sequences(
     method: str = "mafft",
     program: str | None = None,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> MultipleAlignment:
     """Run MAFFT --auto, MUSCLE 5, or Clustal Omega; retain input/output/log files."""
     if method not in {"mafft", "muscle", "clustalo"} or len(sequences) < 2:
@@ -160,7 +164,7 @@ def align_sequences(
 
 
 def parse_search_results(
-    path: str | Path, *, format: str = "blast-xml", **parameters: Any
+    path: str | Path, *, format: str = "blast-xml", verbose: bool = True, **parameters: Any
 ) -> Iterator[Any]:
     """Stream Bio.SearchIO QueryResult objects, including BLAST and HMMER formats."""
     yield from require("Bio.SearchIO", "bio-formats").parse(
@@ -174,6 +178,7 @@ def build_blast_database(
     *,
     program: str = "makeblastdb",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     source = input_path(fasta)
     directory = workspace(output_directory)
@@ -202,6 +207,7 @@ def local_blast(
     evalue: float = 1e-5,
     program: str = "blastn",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     import math
 
@@ -244,6 +250,7 @@ def build_profile(
     alphabet: str = "dna",
     program: str = "hmmbuild",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     if alphabet not in {"dna", "rna", "amino"}:
         raise ConfigurationError("Unknown HMM alphabet.")
@@ -269,6 +276,7 @@ def search_profile(
     method: str = "nhmmer",
     program: str | None = None,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """nhmmer for nucleotide profiles; hmmsearch for amino-acid profiles."""
     if method not in {"nhmmer", "hmmsearch"}:
@@ -296,7 +304,7 @@ def search_profile(
     return ToolResult(method, directory, artifacts(directory), log)
 
 
-def parse_nhmmer_table(path: str | Path) -> Iterator[dict[str, Any]]:
+def parse_nhmmer_table(path: str | Path, *, verbose: bool = True) -> Iterator[dict[str, Any]]:
     """Native nhmmer --tblout parser; convert aligned/envelope spans to 0-based half-open.
 
     Reverse-strand spans are ordered low-to-high and carry an explicit strand.
@@ -330,3 +338,19 @@ def parse_nhmmer_table(path: str | Path) -> Iterator[dict[str, Any]]:
                 }
             except (IndexError, ValueError) as exc:
                 raise InputFormatError("Malformed nhmmer table row.") from exc
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "read_alignment",
+        "write_alignment",
+        "align_sequences",
+        "parse_search_results",
+        "build_blast_database",
+        "local_blast",
+        "build_profile",
+        "search_profile",
+        "parse_nhmmer_table",
+    ),
+)

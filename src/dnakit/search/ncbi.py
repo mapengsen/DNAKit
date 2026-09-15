@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, Literal
 from urllib.parse import quote
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, QueryError
 
 from ._http import (
@@ -74,6 +75,7 @@ def taxonomy(
     page_token: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_DATASETS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query NCBI Taxonomy by TaxID, scientific name, common name, or alias.
 
@@ -164,6 +166,7 @@ def assembly(
     page_token: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_DATASETS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query genome assemblies and their statistics from NCBI Datasets."""
 
@@ -235,6 +238,7 @@ def gene(
     page_token: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_DATASETS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query genes by GeneID, RefSeq accession, symbol, alias, or name."""
 
@@ -318,6 +322,7 @@ def ncbi_orthologs(
     page_token: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_DATASETS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query the NCBI ortholog set for one numeric GeneID."""
 
@@ -376,6 +381,7 @@ def virus(
     page_token: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_DATASETS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Query NCBI Virus genome and annotation metadata by taxon or accession."""
 
@@ -477,18 +483,159 @@ def _eutils_parameters(config: SearchConfig) -> list[tuple[str, object]]:
     return parameters
 
 
+def _sequence_query(
+    database: str,
+    term: str | None,
+    organism: str | None,
+    gene: str | None,
+    strain: str | None,
+    keywords: str | None,
+    seq_type: str | None,
+    source: str,
+) -> str:
+    structured = any(x is not None for x in (organism, gene, strain, keywords, seq_type))
+    if source not in {"all", "refseq", "genbank"}:
+        raise ConfigurationError("source must be all, refseq, or genbank.", code="INVALID_QUERY")
+    if (structured or source != "all") and database not in {"nuccore", "protein"}:
+        raise ConfigurationError(
+            "Sequence filters require nuccore or protein.", code="INVALID_QUERY"
+        )
+    clauses: list[str] = []
+    if term is not None:
+        clauses.append(require_text(term, "term"))
+    for value, field, name in (
+        (organism, "Organism", "organism"),
+        (gene, "Gene Name", "gene"),
+        (strain, "All Fields", "strain"),
+    ):
+        if value is not None:
+            literal = require_text(value, name, max_length=256)
+            if any(c in literal for c in ('"', "\n", "\r", "[", "]")):
+                raise ConfigurationError(
+                    f"{name} must be a literal field value.", code="INVALID_QUERY"
+                )
+            clauses.append(f'"{literal}"[{field}]')
+    if keywords is not None:
+        clauses.append(require_text(keywords, "keywords"))
+    filters = {
+        "complete_genome": '"complete genome"[Title]',
+        "genomic": '"biomol genomic"[Properties]',
+        "mrna": '"biomol mrna"[Properties]',
+        "ncrna": '"biomol ncrna"[Properties]',
+        "refseq": "refseq[filter]",
+        "protein": None,
+    }
+    if seq_type is not None:
+        if (
+            seq_type not in filters
+            or (seq_type == "protein" and database != "protein")
+            or (database == "protein" and seq_type not in {"protein", "refseq"})
+        ):
+            raise ConfigurationError(
+                "seq_type is incompatible with database.", code="INVALID_QUERY"
+            )
+        if seq_type == "refseq" and source == "genbank":
+            raise ConfigurationError(
+                "seq_type='refseq' conflicts with source='genbank'.", code="INVALID_QUERY"
+            )
+        type_filter = filters[seq_type]
+        if type_filter:
+            clauses.append(type_filter)
+    if source == "refseq" and seq_type != "refseq":
+        clauses.append("refseq[filter]")
+    elif source == "genbank":
+        clauses.append("all[filter] NOT refseq[filter]")
+    if not clauses:
+        raise ConfigurationError(
+            "Provide term or at least one search criterion.", code="INVALID_QUERY"
+        )
+    return clauses[0] if len(clauses) == 1 else " AND ".join(f"({clause})" for clause in clauses)
+
+
+def accessions(
+    uids: Sequence[str | int],
+    *,
+    database: Literal["nuccore", "protein"] = "nuccore",
+    config: SearchConfig | None = None,
+    api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
+) -> tuple[str, ...]:
+    """Resolve sequence UIDs to accession.version in input order, in batches of 200.
+
+    Empty input returns an empty tuple without network access. Missing UIDs or
+    accession versions raise QueryError instead of silently dropping results.
+    """
+    resolved = resolved_config(config)
+    if database not in {"nuccore", "protein"}:
+        raise ConfigurationError("database must be nuccore or protein.", code="INVALID_QUERY")
+    if isinstance(uids, (str, bytes)) or not isinstance(uids, Sequence):
+        raise ConfigurationError("uids must be a sequence of numeric UIDs.", code="INVALID_QUERY")
+    if len(uids) > resolved.max_records:
+        raise ConfigurationError("uids exceed max_records.", code="QUERY_RECORD_LIMIT")
+    ids = tuple(str(uid) for uid in uids)
+    if any(re.fullmatch(r"[0-9]+", uid) is None for uid in ids):
+        raise ConfigurationError("uids must contain numeric UIDs.", code="INVALID_QUERY")
+    found: dict[str, str] = {}
+    unique = tuple(dict.fromkeys(ids))
+    for offset in range(0, len(unique), 200):
+        batch = unique[offset : offset + 200]
+        url = build_url(
+            api_base_url,
+            "/esummary.fcgi",
+            [
+                ("db", database),
+                ("id", ",".join(batch)),
+                ("retmode", "json"),
+                ("version", "2.0"),
+                *_eutils_parameters(resolved),
+            ],
+        )
+        payload = request_json(url, resolved, provider="NCBI Entrez")
+        summaries = payload.get("result") if isinstance(payload, Mapping) else None
+        for uid in batch:
+            record = summaries.get(uid) if isinstance(summaries, Mapping) else None
+            value = record.get("accessionversion") if isinstance(record, Mapping) else None
+            if (
+                not isinstance(value, str)
+                or re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*\.[0-9]+", value) is None
+            ):
+                raise QueryError(
+                    "NCBI did not resolve a UID to accession.version.",
+                    code="QUERY_RESPONSE_ERROR",
+                    context={"uid": uid},
+                )
+            found[uid] = value
+    return tuple(found[uid] for uid in ids)
+
+
 def entrez(
     database: str,
-    term: str,
+    term: str | None = None,
     *,
+    organism: str | None = None,
+    gene: str | None = None,
+    strain: str | None = None,
+    keywords: str | None = None,
+    seq_type: Literal["complete_genome", "genomic", "mrna", "ncrna", "refseq", "protein"]
+    | None = None,
+    source: Literal["all", "refseq", "genbank"] = "all",
     retmax: int = 20,
     retstart: int = 0,
     sort: str | None = None,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
     query_type: str | None = None,
+    verbose: bool = True,
 ) -> QueryResult:
-    """Run a bounded ESearch followed by ESummary against an Entrez database."""
+    """Search Entrez with a query expression or structured sequence filters.
+
+    Existing positional ``database, term`` calls retain their meaning. Optional
+    filters are ANDed with the parenthesized term and are available for nuccore
+    and protein. Strain uses All Fields: verify the returned organism/strain.
+    ``keywords`` accepts an Entrez expression; other text filters are literals.
+    ``source='genbank'`` excludes RefSeq; it does not establish curation quality.
+    Results contain summaries and ``metadata['uids']``, not raw sequences.
+    """
 
     resolved = resolved_config(config)
     db = require_text(database, "database", max_length=64).casefold()
@@ -498,7 +645,7 @@ def entrez(
             code="INVALID_QUERY",
             context={"database": db, "allowed": sorted(_ENTREZ_DATABASES)},
         )
-    query = require_text(term, "term")
+    query = _sequence_query(db, term, organism, gene, strain, keywords, seq_type, source)
     size = validate_page_size(retmax, resolved, maximum=10_000)
     if isinstance(retstart, bool) or not isinstance(retstart, int) or retstart < 0:
         raise ConfigurationError("retstart must be a non-negative integer.", code="INVALID_QUERY")
@@ -521,6 +668,8 @@ def entrez(
             "NCBI ESearch returned an unexpected response.", code="QUERY_RESPONSE_ERROR"
         )
     search_result = search_payload["esearchresult"]
+    if search_result.get("error") or search_result.get("errorlist") or search_payload.get("error"):
+        raise QueryError("NCBI rejected the Entrez query.", code="QUERY_RESPONSE_ERROR")
     raw_ids = search_result.get("idlist")
     ids = tuple(str(item) for item in raw_ids) if isinstance(raw_ids, list) else ()
     if len(ids) > resolved.max_records:
@@ -572,6 +721,7 @@ def entrez(
             "database": db,
             "uids": ids,
             "summary_url": None if summary_url is None else redact_url(summary_url),
+            "warnings": search_result.get("warninglist", {}),
         },
     )
 
@@ -582,6 +732,7 @@ def accession(
     database: Literal["nuccore", "protein", "assembly", "sra"] = "nuccore",
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Check whether an accession exists and retrieve its current summary/version."""
 
@@ -602,6 +753,7 @@ def project(
     retmax: int = 20,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search BioProject metadata with the Entrez query language."""
 
@@ -621,6 +773,7 @@ def sample(
     retmax: int = 20,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search BioSample metadata with the Entrez query language."""
 
@@ -640,6 +793,7 @@ def clinical_variant(
     retmax: int = 20,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search ClinVar by rsID, HGVS, gene, condition, or Entrez expression."""
 
@@ -659,6 +813,7 @@ def expression(
     retmax: int = 20,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search GEO DataSets/Series metadata through NCBI E-utilities."""
 
@@ -679,6 +834,7 @@ def literature(
     sort: str = "relevance",
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Search linked biological literature in PubMed."""
 
@@ -699,6 +855,7 @@ def database_version(
     *,
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_NCBI_EUTILS_URL,
+    verbose: bool = True,
 ) -> QueryResult:
     """Return Entrez database record counts, indexed fields, and last-update metadata."""
 
@@ -741,6 +898,7 @@ __all__ = [
     "DEFAULT_NCBI_DATASETS_URL",
     "DEFAULT_NCBI_EUTILS_URL",
     "accession",
+    "accessions",
     "assembly",
     "clinical_variant",
     "database_version",
@@ -754,3 +912,5 @@ __all__ = [
     "taxonomy",
     "virus",
 ]
+
+_register_public_verbose(globals())

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections import Counter
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.descriptors import exact_repeat_fraction, gc_at_content
 
@@ -226,6 +227,7 @@ def evaluate_distribution_similarity(
     right: EvaluationInput,
     *,
     config: DistributionEvaluationConfig | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Compare length, GC, k-mer, motif, and repeat distributions without p-values."""
 
@@ -285,3 +287,5 @@ def evaluate_distribution_similarity(
 
 
 __all__ = ["evaluate_distribution_similarity"]
+
+_register_public_verbose(globals())

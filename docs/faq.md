@@ -1,5 +1,30 @@
 # FAQ
 
+## Skills 来自哪里，如何引用与安装？ {#agent-skills-references}
+
+DNAKit 汇总 bioSkills、ToolUniverse、ClawBio、SciAgent、K-Dense、NVIDIA BioNeMo、DeepMind、PKU-EMBL、omics-skills、ENCODE Toolkit 等来源的 DNA／基因组学工作流，按任务阶段与输入条件去重，提供一个统一的 `dnakit` 入口。每个 Skill 使用独立子目录，附带辅助文件、许可证和 `UPSTREAM.md`；兼容性修改会明确记录。
+
+在包含本功能的新版本中，用户可以这样操作：
+
+```bash
+dnakit skills search "变异注释" --limit 5
+dnakit skills install dnakit --agent codex
+dnakit skills install variant-annotation --agent codex
+dnakit skills cite variant-annotation
+```
+
+安装统一入口后，可以直接向 Agent 描述任务，由它检索和读取具体流程。也可以通过 MCP 的 `search_dnakit_skills`、`read_dnakit_skill` 按需读取。安装路径、Claude Code／Cursor 用法、离线示例及依赖说明见 [Skills 教程](llm_tools/skills.md)。当前源码需先执行 `python -m pip install -e "."`；发布包含本功能的版本后才可直接从 PyPI 获取。
+
+数量与来源以 `dnakit skills stats` 和 [`skills/README.md`](https://github.com/mapengsen/DNAKit/blob/main/skills/README.md) 为准。固定上游版本、功能去重记录、许可暂缓原因及论文清单保存在 [`registry/`](https://github.com/mapengsen/DNAKit/tree/main/registry)。少量非 DNA 专用的辅助技能只用于补齐已收录组合流程的依赖。
+
+第三方内容保留各自的 MIT、Apache-2.0、CC-BY-4.0、AGPL-3.0-only 许可及作者署名，不能统一改成 DNAKit 原创内容。无明确适用许可、当前用途受限或缺少关键资源的候选保留审查记录。网络检索范围和具体未收录原因见 [发现记录](https://github.com/mapengsen/DNAKit/blob/main/registry/discovery.md)，许可范围见 [第三方声明](https://github.com/mapengsen/DNAKit/blob/main/THIRD_PARTY_NOTICES.md)。
+
+论文中请分别引用 DNAKit 的整理与集成、所用上游技能，以及实际调用的软件、模型、数据库和方法。收录技能不会自动安装其计算依赖，也不代表其科学分析流程已全部验证。
+
+整个技能目录都已加入 DNAKit 适配：`tooluniverse-*`、`bio-*` 等集合前缀已按命名规则去掉，原名称保留为别名。`virulencefinder`、`alphagenome-atlas-website-links` 等真实软件或模型名称继续保留。
+
+数据库封装使用 `dnakit.databases`，ENCODE 使用 `dnakit.encode`，随技能分发的脚本通过 `dnakit skills run` 或 `dnakit.workflows.run()` 执行。已迁入的封装不需要另外安装 ToolUniverse、ClawBio 或 ENCODE Toolkit。Biopython、samtools、AlphaGenome 等实际科学后端及所需模型权重、数据库和凭据仍按任务准备。每个 Skill 的 `DNAKIT.md` 说明其具体入口和边界；[统一接口教程](llm_tools/native_skills.md)介绍命令和函数。
+
 ## 序列功能搜索采用什么匹配策略？ {#pattern-matching-strategy}
 
 [序列功能搜索](api/features/06_patterns.md)中的 10 类功能都是**确定性的规则算法**：在算法版本、输入序列和参数相同的情况下，结果一定相同。它们不使用机器学习模型、随机抽样或实验数据推断。PWM 分数也是按固定公式计算的匹配分数，不是模型预测概率。

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import (
     BackendExecutionError,
     BackendUnavailableError,
@@ -108,6 +109,7 @@ def evaluate_frechet_distance(
     *,
     config: FrechetDistanceConfig | None = None,
     backend: RepresentationBackend | None = None,
+    verbose: bool = True,
 ) -> EvaluationReport:
     """Compare two DNA collections with a Gaussian Fréchet representation distance.
 
@@ -221,3 +223,5 @@ def evaluate_frechet_distance(
 
 
 __all__ = ["evaluate_frechet_distance"]
+
+_register_public_verbose(globals())

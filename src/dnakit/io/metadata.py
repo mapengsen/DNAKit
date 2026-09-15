@@ -6,6 +6,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, cast, overload
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import JSONValue, to_json_compatible
 from dnakit.core.collection import DNASet
 from dnakit.core.facade import DNA
@@ -78,6 +79,7 @@ def with_metadata(
     values: Mapping[str, object],
     *,
     conflict: ConflictPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -87,6 +89,7 @@ def with_metadata(
     values: Mapping[str, object],
     *,
     conflict: ConflictPolicy = "error",
+    verbose: bool = True,
 ) -> DNARecord: ...
 
 
@@ -95,6 +98,7 @@ def with_metadata(
     values: Mapping[str, object],
     *,
     conflict: ConflictPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | DNARecord:
     """Return a new record after a top-level immutable metadata merge."""
 
@@ -132,6 +136,7 @@ def merge_metadata(
     conflict: ConflictPolicy = "error",
     missing: MissingPolicy = "error",
     extra: ExtraPolicy = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -143,6 +148,7 @@ def merge_metadata(
     conflict: ConflictPolicy = "error",
     missing: MissingPolicy = "error",
     extra: ExtraPolicy = "error",
+    verbose: bool = True,
 ) -> DNASet: ...
 
 
@@ -153,6 +159,7 @@ def merge_metadata(
     conflict: ConflictPolicy = "error",
     missing: MissingPolicy = "error",
     extra: ExtraPolicy = "error",
+    verbose: bool = True,
 ) -> DNA | DNASet:
     """Left-join metadata by exact record ID with explicit missing/extra policies."""
 
@@ -208,6 +215,7 @@ def filter_by_metadata(
     criteria: Mapping[str, object | MetadataPredicate],
     *,
     require_all: bool = True,
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -217,6 +225,7 @@ def filter_by_metadata(
     criteria: Mapping[str, object | MetadataPredicate],
     *,
     require_all: bool = True,
+    verbose: bool = True,
 ) -> DNASet: ...
 
 
@@ -225,6 +234,7 @@ def filter_by_metadata(
     criteria: Mapping[str, object | MetadataPredicate],
     *,
     require_all: bool = True,
+    verbose: bool = True,
 ) -> DNA | DNASet:
     """Filter records by exact values or side-effect-free caller predicates."""
 
@@ -263,6 +273,7 @@ def select_metadata(
     fields: Iterable[str],
     *,
     missing: Literal["error", "ignore"] = "error",
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -272,6 +283,7 @@ def select_metadata(
     fields: Iterable[str],
     *,
     missing: Literal["error", "ignore"] = "error",
+    verbose: bool = True,
 ) -> DNARecord: ...
 
 
@@ -280,6 +292,7 @@ def select_metadata(
     fields: Iterable[str],
     *,
     missing: Literal["error", "ignore"] = "error",
+    verbose: bool = True,
 ) -> DNA | DNARecord:
     """Return a record containing only selected metadata fields."""
 
@@ -395,6 +408,7 @@ def validate_metadata(
     schema: Mapping[str, MetadataType],
     *,
     required: Iterable[str] = (),
+    verbose: bool = True,
 ) -> MetadataValidationReport:
     """Validate top-level metadata presence and stable JSON scalar/container types."""
 
@@ -450,3 +464,5 @@ __all__ = [
     "validate_metadata",
     "with_metadata",
 ]
+
+_register_public_verbose(globals())

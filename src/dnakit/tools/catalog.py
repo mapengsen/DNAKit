@@ -6,7 +6,9 @@ import importlib
 import inspect
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, cast
+
+from dnakit._verbosity import register_public as _register_public_verbose
 
 from .adapters import CallPlan, analyze_callable
 
@@ -22,9 +24,11 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
     "dnakit.config",
     "dnakit.core",
     "dnakit.datasets",
+    "dnakit.databases",
     "dnakit.descriptors",
     "dnakit.download",
     "dnakit.evaluation",
+    "dnakit.encode",
     "dnakit.fingerprints",
     "dnakit.io",
     "dnakit.molbio",
@@ -44,6 +48,8 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
 )
 
 CATEGORY_LABELS: dict[str, tuple[str, str]] = {
+    "encode": ("ENCODE 实验数据", "ENCODE experimental data"),
+    "databases": ("科学数据库接口", "scientific database APIs"),
     "alignment": ("序列比对", "alignment"),
     "annotation": ("基因与变异注释", "gene and variant annotation"),
     "backends": ("计算后端", "computational backends"),
@@ -122,6 +128,7 @@ _EXTERNAL_PROCESS_NAMES = frozenset(
     }
 )
 _NETWORK_PREFIXES = (
+    "dnakit.databases.",
     "dnakit.annotation.",
     "dnakit.comparative.",
     "dnakit.search.",
@@ -194,6 +201,32 @@ def _description(function: Callable[..., object]) -> tuple[str, str]:
 
 
 def _effect(name: str) -> ToolEffect:
+    if name == "dnakit.workflows.write_wes_report":
+        return "filesystem"
+    if name in {"dnakit.workflows.run", "dnakit.workflows.run_support"}:
+        return "external_process"
+    if name.startswith("dnakit.databases."):
+        operation = name.rsplit(".", 1)[-1]
+        if operation in {"search", "describe", "list_operations"}:
+            return "local"
+        if operation in {"call", "execute"}:
+            return "external_process"
+        from dnakit.databases._runtime import definitions
+
+        return cast(ToolEffect, definitions().get(operation, {}).get("effect", "network"))
+    if name.startswith("dnakit.encode."):
+        operation = name.rsplit(".", 1)[-1]
+        if operation in {
+            "search_experiments",
+            "get_experiment",
+            "list_files",
+            "search_files",
+            "get_metadata",
+            "get_facets",
+            "get_file_info",
+        }:
+            return "network"
+        return "filesystem"
     if name in _MODEL_NAMES:
         return "model"
     if name in _EXTERNAL_PROCESS_NAMES:
@@ -240,7 +273,7 @@ def _build_spec(
     )
 
 
-def build_tool_catalog() -> tuple[AgentToolSpec, ...]:
+def build_tool_catalog(*, verbose: bool = True) -> tuple[AgentToolSpec, ...]:
     """Discover functions explicitly exported by stable DNAKit domain modules."""
 
     tools: list[AgentToolSpec] = []
@@ -262,3 +295,5 @@ __all__ = [
     "ToolEffect",
     "build_tool_catalog",
 ]
+
+_register_public_verbose(globals())

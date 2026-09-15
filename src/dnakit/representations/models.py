@@ -6,6 +6,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 CheckpointKind: TypeAlias = Literal["huggingface", "dataverse"]
@@ -251,13 +252,13 @@ _MODEL_ALIASES = {
 }
 
 
-def available_embedding_models() -> tuple[str, ...]:
+def available_embedding_models(*, verbose: bool = True) -> tuple[str, ...]:
     """Return the stable model names accepted by :class:`RepresentationConfig`."""
 
     return tuple(sorted(MODEL_REGISTRY))
 
 
-def get_embedding_model(name: str) -> DNAEmbeddingModel:
+def get_embedding_model(name: str, *, verbose: bool = True) -> DNAEmbeddingModel:
     """Resolve one canonical model name or documented alias."""
 
     if not isinstance(name, str) or not name.strip():
@@ -393,3 +394,5 @@ __all__ = [
     "available_embedding_models",
     "get_embedding_model",
 ]
+
+_register_public_verbose(globals())

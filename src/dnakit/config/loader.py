@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 if TYPE_CHECKING:
     import tomli as toml_reader
 else:
@@ -314,6 +316,7 @@ def load_config(
     environment: Mapping[str, str] | None = None,
     env_prefix: str = "DNAKIT_",
     cli: Mapping[str, object] | None = None,
+    verbose: bool = True,
 ) -> LoadedConfig:
     """Resolve defaults < file < environment < explicit CLI values."""
 
@@ -379,3 +382,5 @@ def load_config(
 
 
 __all__ = ["ConfigLayer", "LoadedConfig", "load_config"]
+
+_register_public_verbose(globals())

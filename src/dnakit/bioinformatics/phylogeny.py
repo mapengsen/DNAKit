@@ -8,6 +8,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import input_path, matrix, require
 from dnakit.bioinformatics.statistics import distance_matrix
 from dnakit.exceptions import ConfigurationError
@@ -39,7 +40,9 @@ class TreeNode:
         )
 
 
-def build_tree(distances: Any, ids: Iterable[str], *, method: str = "nj") -> TreeNode:
+def build_tree(
+    distances: Any, ids: Iterable[str], *, method: str = "nj", verbose: bool = True
+) -> TreeNode:
     """Deterministic neighbor joining or size-weighted UPGMA (native NumPy).
 
     NJ retains negative branch estimates rather than silently altering distances.
@@ -101,7 +104,7 @@ def build_tree(distances: Any, ids: Iterable[str], *, method: str = "nj") -> Tre
     )
 
 
-def read_tree(path: str | Path, *, format: str = "newick") -> TreeNode:
+def read_tree(path: str | Path, *, format: str = "newick", verbose: bool = True) -> TreeNode:
     """Biopython handles Newick, Nexus, phyloXML, NeXML; tree algorithms remain native."""
     parsed = require("Bio.Phylo", "bio-formats").read(str(input_path(path)), format)
 
@@ -118,7 +121,9 @@ def read_tree(path: str | Path, *, format: str = "newick") -> TreeNode:
     return tree
 
 
-def write_tree(tree: TreeNode, path: str | Path, *, format: str = "newick") -> Path:
+def write_tree(
+    tree: TreeNode, path: str | Path, *, format: str = "newick", verbose: bool = True
+) -> Path:
     base = require("Bio.Phylo.BaseTree", "bio-formats")
 
     def convert(node: TreeNode) -> Any:
@@ -141,6 +146,7 @@ def unifrac(
     *,
     weighted: bool = False,
     normalized: bool = True,
+    verbose: bool = True,
 ) -> Any:
     """Native rooted weighted/unweighted UniFrac over descendant branch abundance."""
     np = require("numpy", "bio-analysis")
@@ -182,7 +188,7 @@ def unifrac(
     return result
 
 
-def plot_tree(tree: TreeNode, *, axes: Any = None) -> Any:
+def plot_tree(tree: TreeNode, *, axes: Any = None, verbose: bool = True) -> Any:
     """Draw branch-length phylogram; return a matplotlib Axes without displaying it."""
     plt = require("matplotlib.pyplot", "bio-plots")
     if axes is None:
@@ -218,7 +224,12 @@ def _tip_set(tree: TreeNode) -> frozenset[str]:
 
 
 def robinson_foulds(
-    left: TreeNode, right: TreeNode, *, rooted: bool = False, normalized: bool = False
+    left: TreeNode,
+    right: TreeNode,
+    *,
+    rooted: bool = False,
+    normalized: bool = False,
+    verbose: bool = True,
 ) -> float:
     """RF symmetric difference of nontrivial clades/splits; identical tip sets required.
 
@@ -247,7 +258,9 @@ def robinson_foulds(
     return difference / (len(a) + len(b)) if normalized and a | b else difference
 
 
-def consensus_tree(trees: Iterable[TreeNode], *, threshold: float = 0.5) -> TreeNode:
+def consensus_tree(
+    trees: Iterable[TreeNode], *, threshold: float = 0.5, verbose: bool = True
+) -> TreeNode:
     """Rooted strict-majority consensus, or strict consensus at threshold=1.
 
     All inputs must share taxa and root interpretation. Clades with frequency
@@ -292,7 +305,7 @@ def consensus_tree(trees: Iterable[TreeNode], *, threshold: float = 0.5) -> Tree
     return build(taxa)
 
 
-def prune_tree(tree: TreeNode, retain: Iterable[str]) -> TreeNode:
+def prune_tree(tree: TreeNode, retain: Iterable[str], *, verbose: bool = True) -> TreeNode:
     """Retain named tips, collapsing unary branches while preserving path lengths."""
     selected = frozenset(retain)
     if not selected or not selected <= _tip_set(tree):
@@ -311,3 +324,18 @@ def prune_tree(tree: TreeNode, retain: Iterable[str]) -> TreeNode:
     result = prune(tree)
     assert result is not None
     return replace(result, length=0.0)
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "build_tree",
+        "read_tree",
+        "write_tree",
+        "unifrac",
+        "plot_tree",
+        "robinson_foulds",
+        "consensus_tree",
+        "prune_tree",
+    ),
+)

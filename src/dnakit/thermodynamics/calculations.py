@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import (
     Citation,
     DNASequence,
@@ -132,6 +133,7 @@ def molecular_weight(
     strand: Literal["single", "double"] = "single",
     five_prime_phosphorylated: bool = False,
     max_sequence_length: int = 1_000_000,
+    verbose: bool = True,
 ) -> MolecularWeightResult:
     """Calculate anhydrous unmodified DNA oligonucleotide molecular weight."""
 
@@ -205,9 +207,7 @@ def molecular_weight(
 
 
 def extinction_coefficient_260nm(
-    sequence: DNASequence,
-    *,
-    max_sequence_length: int = 1_000_000,
+    sequence: DNASequence, *, max_sequence_length: int = 1_000_000, verbose: bool = True
 ) -> ExtinctionCoefficientResult:
     """Calculate the theoretical molar extinction coefficient of an ssDNA oligo at 260 nm."""
 
@@ -297,9 +297,7 @@ def extinction_coefficient_260nm(
 
 
 def salt_correction(
-    sequence_length: int,
-    *,
-    conditions: ThermodynamicConditions | None = None,
+    sequence_length: int, *, conditions: ThermodynamicConditions | None = None, verbose: bool = True
 ) -> SaltCorrectionResult:
     """Return the SantaLucia 1998 monovalent entropy correction."""
 
@@ -364,6 +362,7 @@ def stacking_interactions(
     *,
     temperature_celsius: float = 37.0,
     config: NearestNeighborConfig | None = None,
+    verbose: bool = True,
 ) -> StackingResult:
     """Return each canonical nearest-neighbor stacking contribution."""
 
@@ -477,6 +476,7 @@ def nearest_neighbor(
     complement: DNASequence | None = None,
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
+    verbose: bool = True,
 ) -> NearestNeighborResult:
     """Calculate complete Watson-Crick duplex ΔH, ΔS, ΔG, and Tm."""
 
@@ -517,6 +517,7 @@ def melting_temperature(
     method: TmMethod = "nearest_neighbor",
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
+    verbose: bool = True,
 ) -> MeltingTemperatureResult:
     """Calculate Tm using either the bounded Wallace rule or native NN model."""
 
@@ -582,6 +583,7 @@ def duplex_stability(
     adapter: Primer3CLIAdapter | None = None,
     max_loop: int = 30,
     output_structure: bool = False,
+    verbose: bool = True,
 ) -> DuplexStabilityResult:
     """Evaluate duplex stability with a native or explicit Primer3 backend.
 
@@ -723,6 +725,7 @@ def window_tm(
     conditions: ThermodynamicConditions | None = None,
     config: NearestNeighborConfig | None = None,
     max_windows: int = 100_000,
+    verbose: bool = True,
 ) -> WindowTmResult:
     """Calculate a bounded local Tm profile in 0-based half-open coordinates."""
 
@@ -835,3 +838,5 @@ __all__ = [
     "stacking_interactions",
     "window_tm",
 ]
+
+_register_public_verbose(globals())

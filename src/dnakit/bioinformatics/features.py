@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import matrix, positive, require
 from dnakit.bioinformatics.encoding import DNA_ENCODINGS, EncodingResult, encode_dna
 from dnakit.exceptions import ConfigurationError
@@ -54,6 +55,7 @@ def analyze_features(
     selected_features: int = 10,
     seed: int = 0,
     parameters: Mapping[str, Any] | None = None,
+    verbose: bool = True,
 ) -> FeatureAnalysis:
     """Fit scaling followed by reduction or selection on training rows only.
 
@@ -180,6 +182,7 @@ def cluster_features(
     method: str = "kmeans",
     seed: int = 0,
     parameters: Mapping[str, Any] | None = None,
+    verbose: bool = True,
 ) -> Any:
     """Return a fitted sklearn clusterer, or MCL index groups for an affinity matrix.
 
@@ -254,3 +257,6 @@ def cluster_features(
         return getattr(backend, methods[method])(**options).fit(data)
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"Clustering failed: {exc}") from exc
+
+
+_register_public_verbose(globals())

@@ -9,6 +9,8 @@ import tempfile
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
+from dnakit._download_progress import with_download_progress
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import DownloadError
 from dnakit.search import QueryProgress, SearchConfig
 from dnakit.search.ensembl import DEFAULT_ENSEMBL_REST_URL
@@ -23,6 +25,7 @@ def _fasta_identifier(value: object, fallback: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.:-]+", "_", str(raw))[:255]
 
 
+@with_download_progress("output_path", callback_parameter="query_progress")
 def sequence(
     species: str,
     region: str | Sequence[str],
@@ -35,6 +38,7 @@ def sequence(
     config: DownloadConfig | None = None,
     query_progress: Callable[[QueryProgress], None] | None = None,
     ensembl_api_base_url: str = DEFAULT_ENSEMBL_REST_URL,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Fetch one or more 0-based half-open regions and atomically write FASTA."""
 
@@ -131,3 +135,5 @@ def sequence(
 
 
 __all__ = ["sequence"]
+
+_register_public_verbose(globals())

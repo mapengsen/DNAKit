@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from http.client import HTTPException
 from typing import Any, NoReturn, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, freeze_json, to_json_compatible
 from dnakit.exceptions import BackendExecutionError, ConfigurationError, InputFormatError
 
@@ -204,6 +205,7 @@ def call_llm(
     max_file_bytes: int = 64_000,
     output_format: OutputFormat = "text",
     system_prompt: str | None = None,
+    verbose: bool = True,
 ) -> LLMResult:
     """Run one custom prompt on text/JSON data or one explicitly selected text file.
 
@@ -283,6 +285,7 @@ async def acall_llm(
     max_file_bytes: int = 64_000,
     output_format: OutputFormat = "text",
     system_prompt: str | None = None,
+    verbose: bool = True,
 ) -> LLMResult:
     """Read an optional file and call the LLM off the asyncio event loop.
 
@@ -301,3 +304,6 @@ async def acall_llm(
         output_format=output_format,
         system_prompt=system_prompt,
     )
+
+
+_register_public_verbose(globals(), ("call_llm", "acall_llm"))

@@ -1,6 +1,7 @@
 """Stable, lightweight DNAKit public package namespace."""
 
-from dnakit import download, search
+from dnakit import databases, download, encode, search, workflows
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit._version import __version__
 from dnakit.chunking import (
     ChunkingConfig,
@@ -91,8 +92,10 @@ __all__ = [
     "WriteConfig",
     "WriteResult",
     "__version__",
+    "databases",
     "download",
     "download_genome",
+    "encode",
     "iter_fasta_chunks",
     "iter_sequence_chunks",
     "make_length_curriculum",
@@ -104,5 +107,8 @@ __all__ = [
     "search",
     "validate",
     "validate_set",
+    "workflows",
     "write",
 ]
+
+_register_public_verbose(globals())

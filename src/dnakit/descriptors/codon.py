@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.core.sequence import DNASequence
@@ -128,6 +129,7 @@ def codon_statistics(
     genetic_code: int = 1,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> CodonResult:
     """Count in-frame codons using NCBI standard genetic code table 1.
 
@@ -193,3 +195,5 @@ def codon_statistics(
 
 
 __all__ = ["codon_statistics"]
+
+_register_public_verbose(globals())

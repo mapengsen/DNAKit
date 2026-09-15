@@ -1,8 +1,45 @@
 # API 参考
 
-本页列出当前源码中已实现、可导入并有测试覆盖的公开命名空间。所有坐标除格式转换处明确说明外，均为 0-based 半开区间。
+本页提供核心公开命名空间的参考入口。本轮迁移新增的 **484 个函数**已逐项收录在[新增函数完整索引](native/index.md)，包含签名、参数、返回值与执行要求。核心区间 API 通常使用 0-based 半开坐标；数据库、模型和格式接口使用各自明确说明的坐标系与基因组版本。
 
-如果希望按当前追踪矩阵的 185 项功能逐项查看作用、输入、示例、输出和状态，请从[功能模块索引](features/index.md)进入。
+如果希望按用途查看作用、输入、示例、输出和状态，请从[功能模块索引](features/index.md)进入。原有追踪矩阵中的 185 项是历史能力分类，不代表当前全部公开函数的数量。
+
+## 新增数据库、ENCODE 与工作流 API {#native-apis}
+
+| 模块 | 新增函数数 | 文档入口 |
+| --- | ---: | --- |
+| `dnakit.databases` | 455 | [按用途查找全部数据库接口](native/index.md) |
+| `dnakit.encode` | 20 | [实验、文件、下载、引用与来源管理](native/encode.md) |
+| `dnakit.workflows` | 6 | [脚本执行与报告](native/execution.md)、[遗传模拟](native/analysis.md#dnakit.workflows.simulate_inheritance) |
+| NCBI／ENA 序列接口 | 3 | [查询与下载](native/sequences.md) |
+| **合计** | **484** | [逐函数完整索引](native/index.md) · [完整调用示例](native/usage.md) |
+
+计数不重复包含旧名称别名、已有函数的可选参数扩充和 MCP/CLI 暴露。函数数量不等于独立科学算法数量。
+
+## 统一的运行提示
+
+公开 Python 功能函数统一接受关键字参数 `verbose=True`，包括文本、DNA 对象和文件输入。
+默认向标准错误流输出开始与完成提示；已有进度条的功能继续显示进度。
+`verbose=False` 关闭 DNAKit 自身的运行提示和进度条，返回结果、文件保存及异常行为不变。
+
+```python
+from dnakit.ops import reverse_complement
+from dnakit.datasets import SplitConfig, split
+
+text = reverse_complement("AATCGC", verbose=False)
+result = split(
+    ["original.fna", "reverse_complement.fna"],
+    config=SplitConfig(ratios={"train": 0.8, "valid": 0.1, "test": 0.1}, seed=42),
+    output_path="splits",
+    verbose=False,
+)
+```
+
+划分完成提示自动包含各集合的记录数量，无需额外 `print(dict(result.counts))`。
+嵌套调用只显示外层操作的提示；流式读取在迭代结束后提示完成，提前关闭只提示关闭。
+已有 `show_progress=False` 静默用法继续兼容。显式进度回调仍由调用者控制其自身输出；
+`verbose=False` 不会拦截用户自行编写的 `print` 或吞掉异常。
+类构造器、数据属性和私有辅助方法不添加该参数。
 
 ## 顶层与核心对象 {#core-objects}
 
@@ -16,7 +53,7 @@
 
 ::: dnakit.llm
 
-`call_llm()` 和 `acall_llm()` 将自定义提示词及显式传入的文本/JSON 发给配置的兼容接口，返回 `LLMResult`，可在任意 Python 步骤中使用。也可用 `file_path` 明确指定一个本地文本文件，或用 `read_llm_file()` 先在本地预览。不隐式读取其他文件、不自动抽样、不执行模型输出。配置、隐私边界和完整代码见[通用大模型调用](../agent_tools.md#custom-llm)。
+`call_llm()` 和 `acall_llm()` 将自定义提示词及显式传入的文本/JSON 发给配置的兼容接口，返回 `LLMResult`，可在任意 Python 步骤中使用。也可用 `file_path` 明确指定一个本地文本文件，或用 `read_llm_file()` 先在本地预览。不隐式读取其他文件、不自动抽样、不执行模型输出。配置、隐私边界和完整代码见[通用大模型调用](../llm_tools/python_api.md#custom-llm)。
 
 ## I/O 与元数据
 
@@ -214,8 +251,8 @@ checkpoint 自带代码，因此标准后端仍要求显式设置 `allow_remote_
 AlphaGenome、Enformer、SegmentNT、Evo 2、GENERator 和 LucaOneTasks。模型、任务、
 输入类型、依赖与输出解释见[深度学习性质预测](features/23_deep_learning_property_prediction.md)。
 新增的 `predict_enformer_benchmark()` 可调用 NT Revised 18 项与 Genomic Benchmarks
-9 项完整微调 checkpoint；权重可放入默认目录，也可通过 `checkpoint_dir` 或
-`checkpoint_path` 指定。文件清单与放置方法见[深度学习任务 Checkpoint 下载](features/25_deep_learning_checkpoint_download.md)。
+9 项完整微调 checkpoint；缺失时按需自动下载，已有权重直接复用。可通过 `checkpoint_dir` 或
+`checkpoint_path` 指定位置，详见[权重缓存与自动下载](features/23_deep_learning_property_prediction.md#checkpoint-cache)。
 
 ## 可选生物信息功能 {#optional-bioinformatics}
 

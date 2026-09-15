@@ -1,5 +1,6 @@
 """Deterministic native sequence and fingerprint similarity tools."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.similarity.approximate import (
     DEFAULT_MAX_APPROXIMATE_CELLS,
     DEFAULT_MAX_APPROXIMATE_MATCHES,
@@ -123,3 +124,5 @@ __all__ = [
     "sketch_similarity",
     "subsequence_search",
 ]
+
+_register_public_verbose(globals())

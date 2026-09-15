@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.scientific import _run_scientific_function
 from dnakit.core import DNA, DNARecord, DNASequence, ProviderResult
 from dnakit.exceptions import ConfigurationError
@@ -77,6 +78,7 @@ def design_golden_gate(
     parts: Iterable[GoldenGateInput],
     *,
     enzyme: GoldenGateDesignEnzyme = "BsaI",
+    verbose: bool = True,
 ) -> ProviderResult:
     """Assign junction overhangs and construct Golden Gate part sequences."""
 
@@ -99,6 +101,7 @@ def assemble_golden_gate(
     enzyme: GoldenGateAssemblyEnzyme = "BsaI",
     circular: bool = True,
     labels: Sequence[str] | None = None,
+    verbose: bool = True,
 ) -> ProviderResult:
     """Digest and assemble supplied Golden Gate reaction fragments."""
 
@@ -137,3 +140,5 @@ __all__ = [
     "assemble_golden_gate",
     "design_golden_gate",
 ]
+
+_register_public_verbose(globals())

@@ -18,7 +18,11 @@ _SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 
 @dataclass(frozen=True, slots=True)
 class DownloadConfig:
-    """Resource limits and credentials for bounded public downloads."""
+    """Resource limits and credentials for bounded public downloads.
+
+    ``show_progress`` enables default stderr feedback for network downloads.
+    Explicit progress callbacks replace that display.
+    """
 
     timeout: float = 60.0
     chunk_size: int = 1_048_576
@@ -27,8 +31,13 @@ class DownloadConfig:
     max_files: int = 100
     overwrite: bool = False
     api_key: str | None = None
+    show_progress: bool = True
 
     def __post_init__(self) -> None:
+        if not isinstance(self.show_progress, bool):
+            raise ConfigurationError(
+                "DownloadConfig show_progress must be boolean.", code="INVALID_DOWNLOAD_CONFIG"
+            )
         if (
             isinstance(self.timeout, bool)
             or not isinstance(self.timeout, (int, float))

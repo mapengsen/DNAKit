@@ -16,3 +16,6 @@
 *.pdf binary
 *.svg binary
 *.whl binary
+
+# Bundled skill resources use byte-level checksums; preserve upstream bytes on checkout.
+skills/** -text -eol

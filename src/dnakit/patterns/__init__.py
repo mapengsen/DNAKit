@@ -1,5 +1,6 @@
 """Deterministic sequence-pattern annotation APIs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.patterns.coding import scan_codon_sites, scan_orfs
 from dnakit.patterns.crispr import (
     BUILTIN_PAM_RULES,
@@ -79,3 +80,5 @@ __all__ = [
     "scan_restriction_sites",
     "scan_tf_pwm",
 ]
+
+_register_public_verbose(globals())

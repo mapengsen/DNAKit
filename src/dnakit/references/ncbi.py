@@ -10,12 +10,16 @@ import re
 import tempfile
 import zipfile
 from collections.abc import Callable, Iterable, Mapping
+from http.client import HTTPException
 from pathlib import Path, PurePosixPath
 from typing import Any, BinaryIO, TypeAlias, cast
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
+from dnakit._download_progress import with_download_progress
+from dnakit._network_retry import retry_transient
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit._version import __version__
 from dnakit.core import (
     Citation,
@@ -59,7 +63,7 @@ _TAXON_ALIASES: dict[str, str] = {
 ProgressCallback: TypeAlias = Callable[[DownloadProgress], None]
 
 
-def supported_genome_aliases() -> dict[str, str]:
+def supported_genome_aliases(*, verbose: bool = True) -> dict[str, str]:
     """Return the fixed aliases supported without a metadata lookup."""
 
     return dict(_FIXED_ASSEMBLY_ALIASES)
@@ -125,6 +129,7 @@ def _request_headers(api_key: str | None) -> dict[str, str]:
     return headers
 
 
+@retry_transient
 def _request_json(
     url: str,
     *,
@@ -142,7 +147,7 @@ def _request_json(
             code="NCBI_HTTP_ERROR",
             context={"url": url, "status": exc.code},
         ) from exc
-    except (OSError, TimeoutError, URLError) as exc:
+    except (OSError, TimeoutError, URLError, HTTPException) as exc:
         raise DownloadError(
             "Could not reach NCBI Datasets.",
             code="NCBI_NETWORK_ERROR",
@@ -198,11 +203,18 @@ def resolve_genome_assembly(
     timeout: float = DEFAULT_TIMEOUT,
     api_key: str | None = None,
     api_base_url: str = DEFAULT_NCBI_API_BASE_URL,
+    verbose: bool = True,
 ) -> GenomeAssembly:
     """Resolve an accession, fixed alias, or taxon name to one NCBI assembly.
 
     Taxon resolution selects one current RefSeq reference assembly.  If NCBI
     returns multiple candidates, callers must use an explicit accession.
+
+    ``query`` is one identifier, not search keywords or a sentence. For a request
+    mentioning human hg38 reference genome FASTA, pass ``query="hg38"``.
+    Other valid examples are ``"mm39"``, ``"GCF_000001405.40"``, and
+    ``"Homo sapiens"``. A taxon name selects the current reference, so retain
+    the fixed alias or accession when a specific assembly was requested.
     """
 
     if not isinstance(query, str) or not query.strip():
@@ -244,6 +256,10 @@ def resolve_genome_assembly(
             "NCBI Datasets taxon response did not contain reports.",
             code="NCBI_RESPONSE_ERROR",
             context={"query": query},
+            hint=(
+                "query must be one assembly alias (e.g. 'hg38'), GCA_/GCF_ accession, "
+                "or taxon name, not search keywords such as 'human hg38 reference genome FASTA'."
+            ),
         )
     accessions: list[str] = []
     for item in reports:
@@ -307,6 +323,7 @@ def _content_length(response: Any) -> int | None:
     return parsed if parsed >= 0 else None
 
 
+@retry_transient
 def _download_package(
     url: str,
     target: Path,
@@ -362,6 +379,12 @@ def _download_package(
                                 total_bytes=total_bytes,
                             )
                         )
+            if total_bytes is not None and completed != total_bytes:
+                raise DownloadError(
+                    "Downloaded genome package does not match Content-Length.",
+                    code="DOWNLOAD_LENGTH_MISMATCH",
+                    context={"expected_bytes": total_bytes, "actual_bytes": completed},
+                )
             if completed < 1:
                 raise DownloadError(
                     "NCBI returned an empty genome package.",
@@ -377,7 +400,7 @@ def _download_package(
             code="NCBI_HTTP_ERROR",
             context={"url": url, "status": exc.code},
         ) from exc
-    except (OSError, TimeoutError, URLError) as exc:
+    except (OSError, TimeoutError, URLError, HTTPException) as exc:
         raise DownloadError(
             "The NCBI genome package could not be downloaded.",
             code="NCBI_NETWORK_ERROR",
@@ -504,7 +527,7 @@ def _extract_report_details(text: str, accession: str) -> tuple[str | None, str 
         organism = payload.get("organism")
         if isinstance(assembly, Mapping):
             reported_accession = assembly.get("accession", reported_accession)
-        if reported_accession is not None and reported_accession != accession:
+        if reported_accession != accession:
             continue
         assembly_name = None
         if isinstance(assembly, Mapping):
@@ -525,7 +548,11 @@ def _extract_report_details(text: str, accession: str) -> tuple[str | None, str 
             if organism_name is None and isinstance(payload.get(key), str):
                 organism_name = payload[key]
         return organism_name, assembly_name
-    return None, None
+    raise DownloadError(
+        "Genome package metadata does not identify the requested assembly.",
+        code="ASSEMBLY_MISMATCH",
+        context={"expected_accession": accession},
+    )
 
 
 def _expected_md5(text: str, member_name: str) -> str:
@@ -591,6 +618,7 @@ def _install_staged(staged_to_target: Iterable[tuple[Path, Path]], *, overwrite:
         backup.unlink(missing_ok=True)
 
 
+@with_download_progress("output_dir")
 def download_genome(
     query: str,
     output_dir: str | os.PathLike[str],
@@ -603,12 +631,23 @@ def download_genome(
     chunk_size: int = DEFAULT_CHUNK_SIZE,
     max_download_bytes: int = DEFAULT_MAX_DOWNLOAD_BYTES,
     progress: ProgressCallback | None = None,
+    show_progress: bool = True,
+    verbose: bool = True,
 ) -> GenomeDownloadResult:
     """Download one NCBI genomic FASTA and its provenance files.
 
     ``query`` may be an explicit GCA_/GCF_ assembly accession, a fixed alias
     such as ``hg38`` or ``mm39``, or a taxon name.  Taxon names are resolved
     to one current RefSeq reference assembly and fail when ambiguous.
+    It is not a search expression: for "download human hg38 reference genome
+    FASTA", pass ``query="hg38"``, not ``"human hg38 reference genome FASTA"``.
+    Keep the requested assembly alias/version rather than substituting a taxon.
+    ``output_dir`` is the destination directory, not a FASTA filename.
+    Omit optional parameters to preserve their defaults, including
+    ``overwrite=False``. ``api_key`` is an optional NCBI key, not an LLM key.
+    Start/completion messages and download/extraction progress appear on stderr
+    by default. Set ``show_progress=False`` to silence them; an explicit
+    ``progress`` callback replaces the built-in display.
     """
 
     _validate_common(
@@ -671,6 +710,7 @@ def download_genome(
                         info
                         for info in infos
                         if PurePosixPath(info.filename).name.endswith("_genomic.fna")
+                        and assembly.accession in PurePosixPath(info.filename).parts
                     ),
                     None,
                 )
@@ -720,6 +760,8 @@ def download_genome(
                     pairs.append((staged_package, package_target))
                 _install_staged(pairs, overwrite=overwrite)
         except DownloadError:
+            raise
+        except (FileExistsError, PermissionError, IsADirectoryError, NotADirectoryError):
             raise
         except (OSError, RuntimeError, zipfile.BadZipFile) as exc:
             raise DownloadError(
@@ -783,3 +825,5 @@ __all__ = [
     "resolve_genome_assembly",
     "supported_genome_aliases",
 ]
+
+_register_public_verbose(globals())

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable, Mapping
+from http.client import HTTPException
 from typing import Any, BinaryIO, cast
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
+from dnakit._network_retry import retry_transient
 from dnakit._version import __version__
 from dnakit.exceptions import ConfigurationError, QueryError
 
@@ -119,6 +121,7 @@ def _read_limited(stream: BinaryIO, *, max_bytes: int) -> bytes:
     return b"".join(chunks)
 
 
+@retry_transient
 def request_json(
     url: str,
     config: SearchConfig,
@@ -151,7 +154,7 @@ def request_json(
         ) from exc
     except QueryError:
         raise
-    except (OSError, TimeoutError, URLError) as exc:
+    except (OSError, TimeoutError, URLError, HTTPException) as exc:
         raise QueryError(
             "Could not reach the remote database.",
             code="QUERY_NETWORK_ERROR",
@@ -174,6 +177,7 @@ def request_json(
     return cast(dict[str, Any] | list[Any], decoded)
 
 
+@retry_transient
 def request_text(
     url: str,
     config: SearchConfig,
@@ -217,7 +221,7 @@ def request_text(
         ) from exc
     except QueryError:
         raise
-    except (OSError, TimeoutError, URLError) as exc:
+    except (OSError, TimeoutError, URLError, HTTPException) as exc:
         raise QueryError(
             "Could not reach the remote database.",
             code="QUERY_NETWORK_ERROR",

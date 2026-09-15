@@ -2,6 +2,8 @@
 
 统一管理 DNAKit 的计算后端、Python API、CLI、配置工作流、批量与并行计算、缓存、版本和复现信息。
 
+新增的[接口发现、工作流与报告](../native/execution.md)逐项说明数据库发现与分发、随包脚本执行、资源定位和 PDF 报告函数。独立位点遗传模拟见[分析接口](../native/analysis.md#dnakit.workflows.simulate_inheritance)。这些接口与原有严格 YAML 工作流分别说明；[完整调用示例](../native/usage.md)涵盖执行、退出码和返回值处理。
+
 ## 1) `ENG-003` Python API
 
 - **作用：** 通过稳定的 Python 对象、函数和结果类型调用 DNAKit 功能，便于在脚本、Notebook、测试和其他软件中组合分析流程。
@@ -197,8 +199,8 @@ print(result["value_dalton"])
 1173.84
 ```
 
-Agent 客户端配置见 [Agent 与 MCP 工具](../../agent_tools.md)。
+Agent 客户端配置见 [大模型工具 → MCP](../../llm_tools/mcp.md)。
 
 <span id="custom-llm"></span>
 
-通用大模型调用（Python API）已移至 [Agent 与 MCP 工具 → 通用大模型调用](../../agent_tools.md#custom-llm)，包括自定义提示词、文件输入、服务商配置和安全边界。
+通用大模型调用的自定义提示词、文件输入、服务商配置和安全边界见 [大模型工具 → Python API](../../llm_tools/python_api.md#custom-llm)；同页还介绍[一句话驱动工具调用](../../llm_tools/python_api.md#agent-tool-calling)，无需安装 MCP。

@@ -69,8 +69,14 @@ class ReadConfig:
     max_json_depth: int = 100
     max_json_nodes: int = 1_000_000
     anonymous_id_prefix: str = "sequence_"
+    text_mode: Literal["lines", "sequence"] = "lines"
+    preserve_extra_columns: bool = False
 
     def __post_init__(self) -> None:
+        if self.text_mode not in {"lines", "sequence"}:
+            raise ConfigurationError("text_mode must be 'lines' or 'sequence'.")
+        if not isinstance(self.preserve_extra_columns, bool):
+            raise ConfigurationError("preserve_extra_columns must be boolean.")
         try:
             alphabet = (
                 self.alphabet
@@ -210,8 +216,33 @@ class WriteConfig:
     feature_policy: FeatureWritePolicy = "error"
     json_indent: int | None = None
     max_output_bytes: int | None = None
+    table_columns: tuple[str, ...] | None = None
+    sequence_column: str = "sequence"
+    id_column: str = "id"
+    description_column: str = "description"
+    metadata_column: str = "metadata"
+    features_column: str = "features"
+    parts_column: str = "parts"
+    letter_annotations_column: str = "letter_annotations"
 
     def __post_init__(self) -> None:
+        if self.table_columns is not None and (
+            not isinstance(self.table_columns, tuple)
+            or not self.table_columns
+            or any(not isinstance(name, str) or not name for name in self.table_columns)
+            or len(set(self.table_columns)) != len(self.table_columns)
+        ):
+            raise ConfigurationError("table_columns must contain unique non-empty names.")
+        _non_empty(self.sequence_column, "sequence_column")
+        _non_empty(self.id_column, "id_column")
+        for name in (
+            "description_column",
+            "metadata_column",
+            "features_column",
+            "parts_column",
+            "letter_annotations_column",
+        ):
+            _non_empty(getattr(self, name), name)
         if self.compression not in {"auto", "none", "gzip"}:
             raise ConfigurationError(
                 "compression must be 'auto', 'none', or 'gzip'.",

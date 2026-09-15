@@ -1,0 +1,396 @@
+{
+  "ch_embl_get_drug_mechanisms": {
+    "aliases": {
+      "drug_chembl_id__exact": "drug_chembl_id"
+    }
+  },
+  "reactome_map_uniprot_to_pathways": {
+    "aliases": {
+      "id": "uniprot_id"
+    }
+  },
+  "ensembl_lookup_gene": {
+    "aliases": {
+      "id": "gene_id"
+    }
+  },
+  "open_targets_get_drug_chemb_id_by_generic_name": {
+    "aliases": {
+      "query": "drugName"
+    }
+  },
+  "ch_embl_search_drugs": {
+    "aliases": {
+      "q": "query"
+    }
+  },
+  "ch_embl_search_targets": {
+    "aliases": {
+      "q": "pref_name__contains"
+    }
+  },
+  "open_targets_get_disease_id_description_by_name": {
+    "aliases": {
+      "query": "diseaseName"
+    }
+  },
+  "ch_embl_get_target_activities": {
+    "aliases": {
+      "chembl_id": "target_chembl_id"
+    }
+  },
+  "hpa_get_rna_expression_in_specific_tissues": {
+    "aliases": {
+      "tissues": "tissue_names",
+      "gene_name": "ensembl_id"
+    },
+    "conversions": {
+      "ensembl_id": "ensembl_gene"
+    }
+  },
+  "my_gene_query_genes": {
+    "aliases": {
+      "q": "query"
+    }
+  },
+  "ch_ipatlas_enrichment_analysis": {
+    "aliases": {
+      "gene": "gene_list",
+      "cell_type": "cell_type_class"
+    }
+  },
+  "kegg_find_genes": {
+    "aliases": {
+      "query": "keyword"
+    }
+  },
+  "intact_get_interaction_network": {
+    "aliases": {
+      "gene": "gene_symbol"
+    }
+  },
+  "inter_pro_get_protein_domains": {
+    "aliases": {
+      "accession": "protein_id"
+    }
+  },
+  "hpo_get_diseases_by_phenotype": {
+    "aliases": {
+      "hp_id": "term_id"
+    }
+  },
+  "gnomad_get_sv_by_region": {
+    "aliases": {
+      "end": "stop"
+    }
+  },
+  "gnomad_get_sv_detail": {
+    "aliases": {
+      "sv_id": "variant_id"
+    }
+  },
+  "ensembl_get_sv_detail": {
+    "aliases": {
+      "sv_id": "id"
+    }
+  },
+  "clin_gen_dosage_by_gene": {
+    "aliases": {
+      "gene_symbol": "gene"
+    }
+  },
+  "gtex_get_median_gene_expression": {
+    "aliases": {
+      "gene": "gene_symbol"
+    }
+  },
+  "my_variant_query_variants": {
+    "aliases": {
+      "variant_id": "query"
+    }
+  },
+  "clin_var_search_variants": {
+    "aliases": {
+      "variant": "variant_name"
+    }
+  },
+  "gnomad_search_variants": {
+    "aliases": {
+      "variant": "query"
+    }
+  },
+  "open_targets_get_variant_credible_sets": {
+    "aliases": {
+      "variant_id": "variantId"
+    }
+  },
+  "europe_pmc_search_articles": {
+    "aliases": {
+      "pageSize": "limit"
+    },
+    "parameters": {
+      "source": {
+        "type": "string"
+      }
+    },
+    "handler": "literature_source"
+  },
+  "string_get_network": {
+    "aliases": {
+      "protein_ids": "identifiers"
+    },
+    "parameters": {
+      "protein_ids": {
+        "type": [
+          "array",
+          "string"
+        ],
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "conversions": {
+      "identifiers": "join_cr"
+    }
+  },
+  "string_get_interaction_partners": {
+    "aliases": {
+      "protein_ids": "identifiers"
+    },
+    "parameters": {
+      "protein_ids": {
+        "type": [
+          "array",
+          "string"
+        ],
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "conversions": {
+      "identifiers": "join_cr"
+    }
+  },
+  "hpa_get_cancer_prognostics_by_gene": {
+    "aliases": {
+      "gene_name": "ensembl_id"
+    },
+    "conversions": {
+      "ensembl_id": "ensembl_gene"
+    }
+  },
+  "open_targets_get_associated_drugs_by_target_ensembl_id": {
+    "parameters": {
+      "size": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "handler": "page_size"
+  },
+  "open_targets_get_associated_drugs_by_disease_efo_id": {
+    "parameters": {
+      "size": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "handler": "page_size"
+  },
+  "open_targets_search_gwas_studies_by_disease": {
+    "parameters": {
+      "size": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "handler": "page_size"
+  },
+  "intact_search_interactions": {
+    "parameters": {
+      "species": {
+        "type": "string"
+      }
+    },
+    "handler": "species_filter"
+  },
+  "ar_xiv_search_papers": {
+    "parameters": {
+      "category": {
+        "type": "string"
+      }
+    },
+    "handler": "arxiv_category"
+  },
+  "gwas_get_variants_for_trait": {
+    "parameters": {
+      "p_value_threshold": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "handler": "p_value_filter"
+  },
+  "gtex_get_single_tissue_eqtls": {
+    "aliases": {
+      "gene_symbol": "gencode_id"
+    },
+    "parameters": {
+      "gene_symbol": {
+        "type": "string"
+      }
+    },
+    "conversions": {
+      "gencode_id": "as_list"
+    }
+  },
+  "ensembl_vep_region": {
+    "parameters": {
+      "allele": {
+        "type": "string"
+      }
+    },
+    "optional": [
+      "allele"
+    ],
+    "handler": "vep_region"
+  },
+  "ensembl_get_structural_variants": {
+    "parameters": {
+      "chrom": {
+        "type": "string"
+      },
+      "start": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "end": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "optional": [
+      "region"
+    ],
+    "handler": "region_coordinates"
+  },
+  "cellx_gene_get_expression_data": {
+    "parameters": {
+      "gene": {
+        "type": "string"
+      },
+      "tissue": {
+        "type": "string"
+      }
+    },
+    "handler": "census_filters"
+  },
+  "pdbe_get_uniprot_mappings": {
+    "parameters": {
+      "uniprot_id": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "optional": [
+      "pdb_id"
+    ]
+  },
+  "bio_rxiv_list_recent_preprints": {
+    "parameters": {
+      "query": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "optional": [
+      "start_date",
+      "end_date"
+    ]
+  },
+  "med_rxiv_get_preprint": {
+    "parameters": {
+      "query": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "optional": [
+      "doi"
+    ]
+  },
+  "encode_search_experiments": {
+    "parameters": {
+      "biosample": {
+        "type": "string"
+      }
+    },
+    "optional": []
+  },
+  "cellx_gene_get_cell_metadata": {
+    "parameters": {
+      "gene": {
+        "type": "string"
+      },
+      "tissue": {
+        "type": "string"
+      },
+      "max_cells": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000
+      }
+    },
+    "optional": [
+      "obs_value_filter"
+    ]
+  },
+  "ch_ipatlas_get_peak_data": {
+    "parameters": {
+      "gene": {
+        "type": "string"
+      },
+      "experiment_type": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000
+      },
+      "peak_file": {
+        "type": "string"
+      },
+      "flank_bp": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "max_file_bytes": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "optional": [
+      "experiment_id"
+    ]
+  }
+}

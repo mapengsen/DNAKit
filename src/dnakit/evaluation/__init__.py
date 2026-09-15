@@ -1,5 +1,6 @@
 """Transparent, deterministic DNA sequence and dataset evaluation APIs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.evaluation.collection import (
     evaluate_diversity,
     evaluate_redundancy,
@@ -79,3 +80,5 @@ __all__ = [
     "evaluate_validity",
     "nearest_reference",
 ]
+
+_register_public_verbose(globals())

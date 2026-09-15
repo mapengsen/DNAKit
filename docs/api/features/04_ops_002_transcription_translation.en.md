@@ -1,5 +1,7 @@
 # OPS-002 Transcription and Translation
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Transcribe DNA sequences into RNA or translate into protein sequences according to the specified reading frame and code table.
 
 ## 1) OPS-002.1 Transcription

@@ -1,5 +1,6 @@
 """Dependency-free, deterministic SVG visualizations for DNAKit results."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.visualization.advanced import (
     plot_alignment,
     plot_circular_map,
@@ -58,3 +59,5 @@ __all__ = [
     "save_image",
     "save_svg",
 ]
+
+_register_public_verbose(globals())

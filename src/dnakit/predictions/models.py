@@ -7,6 +7,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, SequenceError
 
 from .enformer_benchmarks import (
@@ -348,13 +349,15 @@ def _canonical_model(name: str) -> str:
     return canonical
 
 
-def available_prediction_models() -> tuple[str, ...]:
+def available_prediction_models(*, verbose: bool = True) -> tuple[str, ...]:
     """Return model families with at least one official direct prediction task."""
 
     return tuple(sorted(MODEL_REGISTRY))
 
 
-def available_prediction_tasks(model: str | None = None) -> tuple[str, ...]:
+def available_prediction_tasks(
+    model: str | None = None, *, verbose: bool = True
+) -> tuple[str, ...]:
     """Return canonical task names, optionally limited to one model family."""
 
     if model is None:
@@ -363,13 +366,13 @@ def available_prediction_tasks(model: str | None = None) -> tuple[str, ...]:
     return tuple(sorted(name for family, name in TASK_REGISTRY if family == canonical))
 
 
-def get_prediction_model(name: str) -> DirectPredictionModel:
+def get_prediction_model(name: str, *, verbose: bool = True) -> DirectPredictionModel:
     """Resolve one canonical model name or documented alias."""
 
     return MODEL_REGISTRY[_canonical_model(name)]
 
 
-def get_prediction_task(model: str, task: str) -> DirectPredictionTask:
+def get_prediction_task(model: str, task: str, *, verbose: bool = True) -> DirectPredictionTask:
     """Resolve a task under a direct-prediction model family."""
 
     canonical_model = _canonical_model(model)
@@ -440,11 +443,16 @@ class BiologicalSequence:
                 code="INVALID_PREDICTION_INPUT",
             )
         object.__setattr__(self, "id", _identifier(self.id, "id"))
-        object.__setattr__(
-            self,
-            "sequence",
-            _sequence(self.sequence, self.sequence_type, "sequence"),
-        )
+        try:
+            normalized = _sequence(self.sequence, self.sequence_type, "sequence")
+        except SequenceError as exc:
+            raise SequenceError(
+                f"Record {self.id!r}: {exc.message}",
+                code=exc.code,
+                context={**exc.context, "record_id": self.id},
+                hint=exc.hint,
+            ) from exc
+        object.__setattr__(self, "sequence", normalized)
 
 
 @dataclass(frozen=True, slots=True)
@@ -711,3 +719,5 @@ __all__ = [
     "get_prediction_model",
     "get_prediction_task",
 ]
+
+_register_public_verbose(globals())

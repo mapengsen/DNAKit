@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from itertools import pairwise
 from typing import Literal, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Topology
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
 from dnakit.ops._common import require_sequence
@@ -466,6 +467,7 @@ def evolution_generate(
     invert_min: int = 0,
     invert_max: int = 20,
     rc_prob: float = 0.5,
+    verbose: bool = True,
 ) -> EvolutionGenerationResult:
     """Generate one EvoAug-inspired DNA sequence variant.
 
@@ -637,6 +639,7 @@ def indel_generate(
     seed: int | None = None,
     rng: random.Random | None = None,
     pad_indels: bool = False,
+    verbose: bool = True,
 ) -> EvolutionGenerationResult:
     """Generate one explicit random insertion or deletion.
 
@@ -704,6 +707,7 @@ def rearrange_generate(
     segment_count: int = 3,
     seed: int | None = None,
     rng: random.Random | None = None,
+    verbose: bool = True,
 ) -> RearrangementResult:
     """Rearrange random contiguous segments by exchange, inversion, or duplication.
 
@@ -825,6 +829,7 @@ def kmer_shuffle(
     rng: random.Random | None = None,
     ensure_different: bool = True,
     max_attempts: int = 100,
+    verbose: bool = True,
 ) -> KmerShuffleResult:
     """Shuffle a sequence while exactly preserving overlapping k-mer counts.
 
@@ -898,6 +903,7 @@ def crossover(
     position: int | None = None,
     seed: int | None = None,
     rng: random.Random | None = None,
+    verbose: bool = True,
 ) -> CrossoverResult:
     """Create a child by one-point crossover of two equal-length DNA sequences.
 
@@ -989,3 +995,5 @@ __all__ = [
     "kmer_shuffle",
     "rearrange_generate",
 ]
+
+_register_public_verbose(globals())

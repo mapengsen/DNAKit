@@ -1,6 +1,4 @@
-# Install
-
-DNAKit requires Python 3.10 or higher.
+# Installation
 
 ## Install from PyPI
 
@@ -10,11 +8,7 @@ Install `0.1.4`:
 pip install dnakit==0.1.4
 ```
 
-Verify installation:
-
-```bash
-python -c "import dnakit; print(dnakit.__version__)"
-```
+Package page: [pypi.org/project/dnakit](https://pypi.org/project/dnakit/)
 
 ## Other platforms
 
@@ -24,7 +18,7 @@ The project repository has provided the following platform adaptation files:
 - [GNU Guix package definition](https://github.com/mapengsen/DNAKit/tree/main/packaging/guix);
 - [Galaxy Tool Shed wrapper](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit).
 
-These adaptation files are fixedly corresponding to `0.1.1`, and the official installation command needs to be reviewed and released by the corresponding platform before it can be used.
+These adaptation files are pinned to `0.1.1`, and the official installation command needs to be reviewed and released by the corresponding platform before it can be used.
 
 ## Development environment
 
@@ -58,10 +52,10 @@ inference dependencies:
 python -m pip install "dnakit[neural,neural-enformer]"
 ```
 
-The 27 task checkpoints are not distributed in the package. Download the required file using the
-[central download instructions](api/features/25_deep_learning_checkpoint_download.md); place files under `./ckpt/enformer-benchmarks/` by default, or pass
-`checkpoint_dir`/`checkpoint_path`. See [Deep-learning property prediction](api/features/23_deep_learning_property_prediction.md)
-for the other model dependencies and boundaries.
+The 27 task checkpoints are not distributed in the package. Prediction automatically downloads the
+selected task checkpoint if absent and reuses existing files. The default cache is
+`./ckpt/enformer-benchmarks/`; override it with
+`checkpoint_dir` or `checkpoint_path`. See [checkpoint cache rules](api/features/23_deep_learning_property_prediction.md#checkpoint-cache); the same page describes dependencies and limitations for other models.
 
 ## Agents and MCP
 
@@ -71,8 +65,12 @@ Install the MCP server used by Codex, Claude, Cursor, and other MCP-capable Agen
 python -m pip install "dnakit[agent]"
 ```
 
-Run `dnakit-mcp` after installation. See [Agent and MCP tools](agent_tools.md) for configuration.
+Run `dnakit-mcp` after installation. See [LLM tools → MCP](llm_tools/mcp.md) for configuration.
 
-# Warehouse address
+# Repository
 
 [github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
+
+## Optional dependencies for bioinformatics Python APIs
+
+In the current workspace, use `python -m pip install -e ".[bio]"` to install all Python analysis dependencies, or install only `.[bio-analysis]`. Executables such as MAFFT, BLAST, HMMER, BWA, samtools, and bcftools must be installed separately. See [Dependencies and implementation](api/features/27_bioinformatics.md#dependencies).

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import BackendUnavailableError
 
@@ -22,7 +23,7 @@ class ParquetBackendStatus:
         return cast(dict[str, Any], to_json_compatible(self))
 
 
-def parquet_backend_status() -> ParquetBackendStatus:
+def parquet_backend_status(*, verbose: bool = True) -> ParquetBackendStatus:
     """Probe without importing PyArrow or mutating the environment."""
 
     try:
@@ -38,7 +39,7 @@ def parquet_backend_status() -> ParquetBackendStatus:
     return ParquetBackendStatus(available, version=resolved_version)
 
 
-def require_parquet_backend() -> ParquetBackendStatus:
+def require_parquet_backend(*, verbose: bool = True) -> ParquetBackendStatus:
     """Return backend metadata or raise one stable actionable error."""
 
     status = parquet_backend_status()
@@ -54,3 +55,5 @@ def require_parquet_backend() -> ParquetBackendStatus:
 
 
 __all__ = ["ParquetBackendStatus", "parquet_backend_status", "require_parquet_backend"]
+
+_register_public_verbose(globals())

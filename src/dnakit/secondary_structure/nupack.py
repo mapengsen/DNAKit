@@ -10,6 +10,7 @@ from importlib.metadata import PackageNotFoundError, distribution, version
 from itertools import islice
 from typing import Any, Literal, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import (
     BackendInfo,
     Citation,
@@ -49,7 +50,7 @@ _MAX_TUBE_STRANDS = 20
 _MAX_COMPLEX_SIZE = 4
 
 
-def probe_nupack() -> BackendInfo:
+def probe_nupack(*, verbose: bool = True) -> BackendInfo:
     """Passively locate NUPACK without importing, installing, or downloading it."""
 
     available = importlib.util.find_spec("nupack") is not None
@@ -587,3 +588,5 @@ class NupackAdapter:
 
 
 __all__ = ["NupackAdapter", "probe_nupack"]
+
+_register_public_verbose(globals())

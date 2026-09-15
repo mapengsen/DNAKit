@@ -61,8 +61,19 @@ def test_fixed_alias_resolves_without_network() -> None:
     assert result.query == "hg38"
 
 
+def test_taxon_response_without_reports_explains_query_contract(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(ncbi, "_request_json", lambda *args, **kwargs: {})
+    with pytest.raises(DownloadError) as error:
+        resolve_genome_assembly("human hg38 reference genome FASTA", verbose=False)
+    assert error.value.code == "NCBI_RESPONSE_ERROR"
+    assert "'hg38'" in error.value.hint
+    assert "not search keywords" in error.value.hint
+
+
 def test_download_extracts_fasta_and_verifies_md5(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     payload = _package_payload()
     events: list[object] = []
@@ -93,6 +104,38 @@ def test_download_extracts_fasta_and_verifies_md5(
     assert result.package_path is None
     assert any(getattr(event, "phase", None) == "download" for event in events)
     assert any(getattr(event, "phase", None) == "extract" for event in events)
+    assert capsys.readouterr().err == ""  # Explicit callbacks own the display.
+
+
+@pytest.mark.parametrize("show_progress", [True, False])
+@pytest.mark.parametrize("known_size", [True, False])
+@pytest.mark.parametrize("verbose", [True, False])
+def test_genome_console_feedback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    show_progress: bool,
+    known_size: bool,
+    verbose: bool,
+) -> None:
+    payload = _package_payload()
+    monkeypatch.setattr(
+        ncbi,
+        "urlopen",
+        lambda _request, *, timeout: _FakeResponse(
+            payload, content_length=len(payload) if known_size else None
+        ),
+    )
+    result = download_genome("hg38", tmp_path, show_progress=show_progress, verbose=verbose)
+    output = capsys.readouterr()
+    assert output.out == ""
+    if show_progress and verbose:
+        assert output.err.count("Starting download:") == 1
+        assert output.err.count("Download complete:") == 1
+        assert "Extracting FASTA" in output.err
+        assert result.fasta_path in output.err
+    else:
+        assert output.err == ""
 
 
 def test_taxon_resolution_requires_one_current_reference(
@@ -152,7 +195,9 @@ def test_taxon_resolution_rejects_ambiguous_results(monkeypatch: pytest.MonkeyPa
     assert error.value.code == "AMBIGUOUS_GENOME_ASSEMBLY"
 
 
-def test_download_rejects_bad_checksum(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_download_rejects_bad_checksum(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     payload = _package_payload(checksum_override="0" * 32)
     monkeypatch.setattr(
         ncbi,
@@ -167,6 +212,9 @@ def test_download_rejects_bad_checksum(tmp_path: Path, monkeypatch: pytest.Monke
             api_base_url="https://example.test/api",
         )
     assert error.value.code == "CHECKSUM_MISMATCH"
+    output = capsys.readouterr().err
+    assert "Download failed or interrupted:" in output
+    assert "Download complete:" not in output
     reference_dir = tmp_path / "reference"
     if reference_dir.exists():
         assert list(reference_dir.glob("*")) == []

@@ -5,17 +5,22 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Mapping
 from pathlib import Path, PurePosixPath
+from typing import Literal
 from urllib.parse import urlsplit
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, DownloadError
 from dnakit.search import QueryResult, SearchConfig
+from dnakit.search._http import build_url, request_text
 from dnakit.search.ena import DEFAULT_ENA_PORTAL_URL, DEFAULT_READ_FIELDS
 from dnakit.search.ena import reads as search_reads
 
+from ._sequence import format_converter, save_sequence, sequence_accession, sequence_target
 from .files import dataset, resolved_config
 from .models import DatasetDownloadResult, DownloadConfig, DownloadProgress, RemoteFile
 
 _RUN_ACCESSION = re.compile(r"^[SED]RR\d+$", flags=re.IGNORECASE)
+DEFAULT_ENA_BROWSER_URL = "https://www.ebi.ac.uk/ena/browser/api"
 
 
 def _ena_https(value: str) -> str:
@@ -48,6 +53,7 @@ def reads(
     config: DownloadConfig | None = None,
     progress: Callable[[DownloadProgress], None] | None = None,
     ena_api_base_url: str = DEFAULT_ENA_PORTAL_URL,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Download public ENA FASTQ, submitted, or SRA files with advertised MD5 checks."""
 
@@ -128,4 +134,56 @@ def reads(
     )
 
 
-__all__ = ["reads"]
+def sequence(
+    accession: str,
+    output_path: str | Path,
+    *,
+    format: Literal["fasta", "embl", "genbank"] = "fasta",
+    config: DownloadConfig | None = None,
+    search_config: SearchConfig | None = None,
+    api_base_url: str = DEFAULT_ENA_BROWSER_URL,
+    verbose: bool = True,
+) -> DatasetDownloadResult:
+    """Download an INSDC nucleotide accession from ENA with a checksummed manifest.
+
+    FASTA and EMBL are native responses; GenBank conversion requires optional
+    dnakit[bio-formats]. RefSeq accessions (including NZ_) require NCBI instead.
+    No fallback silently changes the requested accession or source database.
+    SearchConfig bounds the response (20 MB default, 100 MB maximum).
+    """
+    resolved = resolved_config(config)
+    identifier = sequence_accession(accession)
+    if "_" in identifier:
+        raise ConfigurationError(
+            "ENA sequence retrieval requires an INSDC accession; use NCBI for RefSeq.",
+            code="INVALID_ACCESSION",
+        )
+    if format not in {"fasta", "embl", "genbank"}:
+        raise ConfigurationError("format must be fasta, embl, or genbank.")
+    source_format = "fasta" if format == "fasta" else "embl"
+    converter = format_converter(source_format, format)
+    target, manifest = sequence_target(output_path, resolved)
+    query_config = search_config or SearchConfig(
+        timeout=min(resolved.timeout, 300),
+        max_response_bytes=min(resolved.max_file_bytes, 20_000_000),
+    )
+    url = build_url(api_base_url, f"/{source_format}/{identifier}")
+    text = request_text(url, query_config, provider="ENA")
+    return save_sequence(
+        text,
+        accession=identifier,
+        database="sequence",
+        provider="ENA",
+        url=url,
+        source_format=source_format,
+        format=format,
+        converter=converter,
+        target=target,
+        manifest=manifest,
+        config=resolved,
+    )
+
+
+__all__ = ["DEFAULT_ENA_BROWSER_URL", "reads", "sequence"]
+
+_register_public_verbose(globals())

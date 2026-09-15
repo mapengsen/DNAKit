@@ -10,6 +10,7 @@ from dataclasses import dataclass, fields, is_dataclass
 from enum import Enum
 from pathlib import PurePath
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA
 from dnakit.exceptions import ConfigurationError
 
@@ -217,9 +218,7 @@ def _convert(value: object, *, budget: _Budget, depth: int) -> object:
 
 
 def serialize_for_agent(
-    value: object,
-    *,
-    limits: AgentSerializationLimits | None = None,
+    value: object, *, limits: AgentSerializationLimits | None = None, verbose: bool = True
 ) -> object:
     """Return a bounded plain JSON value suitable for an MCP tool response."""
 
@@ -250,3 +249,5 @@ def serialize_for_agent(
 
 
 __all__ = ["AgentSerializationLimits", "serialize_for_agent"]
+
+_register_public_verbose(globals())

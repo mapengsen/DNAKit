@@ -8,10 +8,12 @@ from collections import Counter, defaultdict
 from collections.abc import Mapping
 from functools import lru_cache
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 from .adapters import coerce_arguments
 from .catalog import CATEGORY_LABELS, AgentToolSpec, build_tool_catalog
+from .embeddings import EmbeddingConfig, ToolSearchMode, _ToolEmbeddingIndex
 from .serialization import AgentSerializationLimits, serialize_for_agent
 
 _TOKEN = re.compile(r"[\w]+", re.UNICODE)
@@ -26,7 +28,17 @@ class AgentToolRegistry:
         tools: tuple[AgentToolSpec, ...] | None = None,
         *,
         serialization_limits: AgentSerializationLimits | None = None,
+        embedding_config: EmbeddingConfig | None = None,
     ) -> None:
+        if embedding_config is not None and not isinstance(embedding_config, EmbeddingConfig):
+            raise ConfigurationError(
+                "embedding_config must be EmbeddingConfig or None.",
+                code="INVALID_EMBEDDING_CONFIG",
+            )
+        self._embedding_config = embedding_config
+        self._embedding_index = (
+            _ToolEmbeddingIndex(embedding_config) if embedding_config is not None else None
+        )
         discovered = build_tool_catalog() if tools is None else tools
         names = [tool.name for tool in discovered]
         if len(names) != len(set(names)):
@@ -57,6 +69,22 @@ class AgentToolRegistry:
     @property
     def tools(self) -> tuple[AgentToolSpec, ...]:
         return self._tools
+
+    @property
+    def embedding_config(self) -> EmbeddingConfig | None:
+        return self._embedding_config
+
+    def _validate_search_mode(self, mode: ToolSearchMode) -> None:
+        if mode not in ("keyword", "semantic", "hybrid"):
+            raise ConfigurationError(
+                "mode must be keyword, semantic, or hybrid.", code="AGENT_SEARCH_MODE_INVALID"
+            )
+        if mode != "keyword" and self._embedding_index is None:
+            raise ConfigurationError(
+                "Semantic and hybrid search require an embedding configuration.",
+                code="MISSING_EMBEDDING_CONFIG",
+                hint="Use AgentToolRegistry(embedding_config=EmbeddingConfig(...)).",
+            )
 
     def stats(self) -> dict[str, object]:
         """Return aggregate catalog counts without loading optional backends."""
@@ -131,9 +159,18 @@ class AgentToolRegistry:
         category: str | None = None,
         limit: int = 20,
         include_python_only: bool = False,
+        mode: ToolSearchMode = "keyword",
     ) -> tuple[AgentToolSpec, ...]:
-        """Search names, descriptions, and bilingual category labels."""
+        """Return candidates without executing them; keyword search is the default.
 
+        Semantic search uses the configured cloud embeddings and local cosine
+        similarity. Hybrid search combines lexical and semantic rankings with
+        reciprocal rank fusion (k=60), prioritizing exact function names. Filters
+        apply before either search. Blank queries list tools without API calls.
+        Cloud failures propagate; the requested mode never silently changes.
+        """
+
+        self._validate_search_mode(mode)
         if not isinstance(query, str):
             raise ConfigurationError(
                 "Agent tool search query must be a string.",
@@ -155,12 +192,14 @@ class AgentToolRegistry:
         normalized = query.strip().casefold()
         query_tokens = set(_TOKEN.findall(normalized))
         ranked: list[tuple[int, str, AgentToolSpec]] = []
+        documents: list[tuple[str, str]] = []
         for tool in self._tools:
             if category is not None and tool.category != category:
                 continue
             if not include_python_only and not tool.agent_compatible:
                 continue
             labels = CATEGORY_LABELS.get(tool.category, (tool.category, tool.category))
+            documents.append((tool.name, "\n".join((tool.name, tool.description, *labels))))
             short_name = tool.name.rsplit(".", 1)[-1]
             haystack = " ".join(
                 (
@@ -178,7 +217,7 @@ class AgentToolRegistry:
                 score = 0
                 if normalized == tool.name.casefold():
                     score += 1_000
-                if normalized == short_name.casefold():
+                if normalized in {short_name.casefold(), short_name.replace("_", " ").casefold()}:
                     score += 800
                 if normalized in haystack:
                     score += 300
@@ -187,7 +226,25 @@ class AgentToolRegistry:
             if score > 0:
                 ranked.append((score, tool.name, tool))
         ranked.sort(key=lambda item: (-item[0], item[1]))
-        return tuple(item[2] for item in ranked[:limit])
+        if mode == "keyword" or not normalized or not documents:
+            return tuple(item[2] for item in ranked[:limit])
+        assert self._embedding_index is not None
+        semantic_names = self._embedding_index.rank(query.strip(), documents)
+        if mode == "semantic":
+            return tuple(self._by_name[name] for name in semantic_names[:limit])
+        scores: defaultdict[str, float] = defaultdict(float)
+        for names in ([item[1] for item in ranked], semantic_names):
+            for position, name in enumerate(names, start=1):
+                scores[name] += 1.0 / (60 + position)
+        names = sorted(
+            scores,
+            key=lambda name: (
+                normalized not in (name.casefold(), name.rsplit(".", 1)[-1].casefold()),
+                -scores[name],
+                name,
+            ),
+        )
+        return tuple(self._by_name[name] for name in names[:limit])
 
     def execute(
         self,
@@ -250,10 +307,12 @@ class AgentToolRegistry:
 
 
 @lru_cache(maxsize=1)
-def default_tool_registry() -> AgentToolRegistry:
+def default_tool_registry(*, verbose: bool = True) -> AgentToolRegistry:
     """Return the process-wide immutable DNAKit Agent registry."""
 
     return AgentToolRegistry()
 
 
 __all__ = ["AgentToolRegistry", "default_tool_registry"]
+
+_register_public_verbose(globals())

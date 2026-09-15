@@ -13,7 +13,7 @@ python -m pip install "dnakit[external-tools]"
 No function trains or fine-tunes a model. Ensembl, ClinVar, dbSNP, and gnomAD calls require network
 access; dN/dS and Golden Gate run locally. One backend tool
 is loaded per call. Every function returns `ProviderResult`; use `result.data` for the provider
-payload and retain `result.parameters`, `result.metadata`, and `result.provenance` for auditing.
+payload; `result.parameters`, `result.metadata`, and `result.provenance` contain the call parameters, backend version, and source, respectively.
 
 ## 1) VEP annotation from HGVS
 
@@ -195,7 +195,7 @@ print(result.data)
 
 - **Purpose:** Estimate Nei–Gojobori dN, dS, and dN/dS with Jukes–Cantor correction.
 - **API:** `dnakit.comparative.calculate_dn_ds(sequence_a[required], sequence_b[required])`
-- **Input:** Equal-length, codon-aligned, linear canonical DNA values.
+- **Input:** Equal-length, codon-aligned, linear `DNASequence`/`DNARecord`/`DNA` values containing canonical A/C/G/T, with lengths divisible by 3.
 - **Example:**
 
 ```python
@@ -206,7 +206,7 @@ result = calculate_dn_ds(DNASequence("ATGGCTGAA"), DNASequence("ATGGCCGAG"))
 print(result.data["dN"], result.data["dS"], result.data["dN_dS"])
 ```
 
-- **Result:** dN, dS, ratio, site/difference counts, and interpretation; the ratio is `None` when dS is zero.
+- **Result:** `dN`, `dS`, `dN_dS`, site/difference counts, and interpretation; the ratio is `None` when `dS=0`.
 
 ## 13) Golden Gate part design
 
@@ -232,7 +232,7 @@ print(result.data["parts_with_overhangs"])
 
 - **Purpose:** Simulate Type IIS digestion and ligation by matching overhangs.
 - **API:** `dnakit.molbio.assemble_golden_gate(fragments[required], enzyme[optional], circular[optional], labels[optional])`
-- **Input:** At least two canonical DNA values carrying the selected Type IIS sites.
+- **Input:** At least two canonical DNA values carrying the selected Type IIS sites; BsaI, BbsI, Esp3I/BsmBI, and SapI are supported.
 - **Example:**
 
 ```python
@@ -255,7 +255,7 @@ print(result.data["product_sequence"])
 
 ## Boundaries
 
-- Missing optional dependencies raise `BackendUnavailableError` with an installation hint.
-- Remote providers may rate-limit requests, enter maintenance, or update database versions; retain provenance.
+- Missing optional dependencies raise `BackendUnavailableError` with a hint to install `dnakit[external-tools]`.
+- Remote providers may rate-limit requests, enter maintenance, or update database versions; retain `result.provenance`.
 - ClinVar, VEP, dbSNP, and gnomAD results are research annotations, not clinical diagnoses.
-- DNAKit exposes only the allowlisted functions above, not arbitrary ToolUniverse execution.
+- These functions use bundled DNAKit adapters without importing ToolUniverse. Additional APIs are described in the [native skill interface guide](../../llm_tools/native_skills.md).

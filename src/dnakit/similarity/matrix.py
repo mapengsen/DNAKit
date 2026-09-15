@@ -6,6 +6,7 @@ from collections.abc import Iterable, Mapping
 from itertools import islice
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASequence
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
@@ -120,6 +121,7 @@ def similarity_matrix(
     weights: WeightInput | None = None,
     zero_vector_policy: ZeroVectorPolicy = "identity",
     max_items: int = DEFAULT_MAX_MATRIX_ITEMS,
+    verbose: bool = True,
 ) -> SimilarityMatrixResult:
     """Materialize a bounded full pairwise matrix in input order.
 
@@ -252,3 +254,5 @@ pairwise_matrix = similarity_matrix
 
 
 __all__ = ["DEFAULT_MAX_MATRIX_ITEMS", "pairwise_matrix", "similarity_matrix"]
+
+_register_public_verbose(globals())

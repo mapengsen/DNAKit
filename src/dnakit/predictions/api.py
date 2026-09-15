@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from os import PathLike
 
+from dnakit._backend_errors import backend_failure
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -16,6 +18,7 @@ from dnakit.exceptions import (
 
 from .backends import PredictionBackend, create_prediction_backend
 from .checkpoints import PredictionCheckpointInfo, ensure_prediction_checkpoint
+from .enformer_benchmarks import get_enformer_benchmark_task, is_enformer_benchmark_task
 from .models import (
     AmbiguityPolicy,
     BiologicalSequence,
@@ -146,6 +149,7 @@ def predict_properties(
     *,
     config: PropertyPredictionConfig,
     backend: PredictionBackend | None = None,
+    verbose: bool = True,
 ) -> PropertyPredictionResult:
     """Run one official pretrained property task without fitting or fine-tuning.
 
@@ -180,16 +184,16 @@ def predict_properties(
         try:
             selected_backend = create_prediction_backend(checkpoints, config)
         except (
-            BackendExecutionError,
             BackendUnavailableError,
             ConfigurationError,
             SequenceError,
         ):
             raise
         except Exception as exc:
-            raise BackendExecutionError(
+            raise backend_failure(
                 "Could not initialize the property-prediction backend.",
                 code="MODEL_LOAD_FAILED",
+                error=exc,
                 context={
                     "model": config.model,
                     "task": config.task,
@@ -207,16 +211,16 @@ def predict_properties(
             selected_backend.predict(materialized, show_progress=config.show_progress)
         )
     except (
-        BackendExecutionError,
         BackendUnavailableError,
         ConfigurationError,
         SequenceError,
     ):
         raise
     except Exception as exc:
-        raise BackendExecutionError(
+        raise backend_failure(
             "The property-prediction backend failed.",
             code="PROPERTY_PREDICTION_FAILED",
+            error=exc,
             context={
                 "model": config.model,
                 "task": config.task,
@@ -231,6 +235,28 @@ def predict_properties(
             code="INVALID_PREDICTION_OUTPUT",
             context={"expected": len(materialized), "actual": len(raw_outputs)},
         )
+    if config.task_spec.output_kind in {"classification", "segmentation"}:
+        for item, output in zip(materialized, raw_outputs, strict=True):
+            if bool(((output.values < 0) | (output.values > 1)).any()):
+                raise BackendExecutionError(
+                    "Classification/segmentation outputs must be probabilities in [0, 1].",
+                    code="INVALID_PREDICTION_OUTPUT",
+                    context={
+                        "record_id": _input_id(item),
+                        "model": config.model,
+                        "task": config.task,
+                    },
+                    hint="Convert logits to probabilities in the prediction backend.",
+                )
+    if config.model == "enformer" and is_enformer_benchmark_task(config.task):
+        classes = get_enformer_benchmark_task(config.task).num_classes
+        for item, output in zip(materialized, raw_outputs, strict=True):
+            if output.values.shape != (classes,) or abs(float(output.values.sum()) - 1) > 1e-5:
+                raise BackendExecutionError(
+                    "Enformer class probabilities must match the class count and sum to 1.",
+                    code="INVALID_PREDICTION_OUTPUT",
+                    context={"record_id": _input_id(item), "num_classes": classes},
+                )
     records = tuple(
         PredictionRecord(_input_id(item), output)
         for item, output in zip(materialized, raw_outputs, strict=True)
@@ -260,6 +286,7 @@ def predict_sequence_properties(
     *,
     config: PropertyPredictionConfig,
     backend: PredictionBackend | None = None,
+    verbose: bool = True,
 ) -> PropertyPredictionResult:
     """Convenience wrapper for a single-sequence pretrained task."""
 
@@ -279,6 +306,7 @@ def predict_enformer_benchmark(
     max_records: int = 1_000,
     ambiguity_policy: AmbiguityPolicy = "replace_with_n",
     show_progress: bool = True,
+    verbose: bool = True,
 ) -> PropertyPredictionResult:
     """Run one of the 27 fully fine-tuned Enformer NT Revised/GB tasks."""
 
@@ -303,6 +331,7 @@ def predict_pair_properties(
     *,
     config: PropertyPredictionConfig,
     backend: PredictionBackend | None = None,
+    verbose: bool = True,
 ) -> PropertyPredictionResult:
     """Convenience wrapper for a pairwise pretrained task."""
 
@@ -314,6 +343,7 @@ def predict_variant_effects(
     *,
     config: PropertyPredictionConfig,
     backend: PredictionBackend | None = None,
+    verbose: bool = True,
 ) -> PropertyPredictionResult:
     """Convenience wrapper for an official sequence-context variant task."""
 
@@ -327,3 +357,5 @@ __all__ = [
     "predict_sequence_properties",
     "predict_variant_effects",
 ]
+
+_register_public_verbose(globals())

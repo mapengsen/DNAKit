@@ -1,5 +1,7 @@
 """Secondary-structure parsing and explicit NUPACK integration."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .dotbracket import (
     analyze_dot_bracket,
     ensemble_defect_from_probabilities,
@@ -36,3 +38,5 @@ __all__ = [
     "probe_nupack",
     "target_structure_probability",
 ]
+
+_register_public_verbose(globals())

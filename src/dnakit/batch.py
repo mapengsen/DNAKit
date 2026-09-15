@@ -5,9 +5,11 @@ from __future__ import annotations
 import random
 from collections.abc import Callable, Iterable, Iterator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from contextvars import copy_context
 from dataclasses import dataclass, field
 from typing import Any, Generic, Literal, TypeAlias, TypeVar, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord
 from dnakit.core._json import to_json_compatible
 from dnakit.core.provenance import Provenance
@@ -284,6 +286,7 @@ def iter_batch(
     *,
     config: BatchConfig | None = None,
     progress: ProgressCallback | None = None,
+    verbose: bool = True,
 ) -> Iterator[BatchItemResult[T]]:
     """Lazily execute ``operation`` once per record in stable input order."""
 
@@ -376,6 +379,7 @@ def _iter_batch_threaded(
                     exhausted = True
                     break
                 future = executor.submit(
+                    copy_context().run,
                     _thread_item,
                     prepared_record.record,
                     prepared_record.context,
@@ -429,6 +433,7 @@ def run_batch(
     name: str,
     config: BatchConfig | None = None,
     progress: ProgressCallback | None = None,
+    verbose: bool = True,
 ) -> BatchResult[T]:
     """Materialize an ordered serial batch execution."""
 
@@ -450,3 +455,5 @@ __all__ = [
     "iter_batch",
     "run_batch",
 ]
+
+_register_public_verbose(globals())

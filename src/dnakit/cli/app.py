@@ -14,11 +14,14 @@ from typing import TYPE_CHECKING, Annotated, NoReturn, Protocol
 
 import typer
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import BarColumn, DownloadColumn, SpinnerColumn, TaskProgressColumn, TextColumn
 from rich.table import Table
 
+from dnakit._progress import Progress
 from dnakit._version import __version__
+from dnakit.cli.database import app as database_app
 from dnakit.cli.gene_annotation import annotate_genes_command
+from dnakit.cli.skills import app as skills_app
 from dnakit.cli.visualization import plot_distribution_command
 from dnakit.core import DNAAlphabet, DNARecord, DNASequence
 from dnakit.datasets import DeduplicationConfig, SplitConfig, deduplicate, split
@@ -58,6 +61,8 @@ error_console = Console(stderr=True)
 
 app.command("annotate-genes")(annotate_genes_command)
 app.command("plot-distribution")(plot_distribution_command)
+app.add_typer(skills_app, name="skills")
+app.add_typer(database_app, name="database")
 
 
 class _JSONResult(Protocol):
@@ -73,6 +78,7 @@ def _version_callback(value: bool) -> None:
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: Annotated[
         bool,
         typer.Option(
@@ -82,8 +88,22 @@ def main(
             is_eager=True,
         ),
     ] = False,
+    workers: Annotated[
+        int,
+        typer.Option(
+            "--workers", help="CPU workers: -1 for all available CPUs; 1 for serial processing."
+        ),
+    ] = -1,
 ) -> None:
     """Run DNAKit commands."""
+    from dnakit._parallel import worker_scope
+
+    try:
+        scope = worker_scope(workers)
+        scope.__enter__()
+        ctx.call_on_close(lambda: scope.__exit__(None, None, None))
+    except (DNAKitError, ValueError, TypeError) as exc:
+        _abort(exc)
 
 
 @app.command("info")
@@ -131,23 +151,32 @@ def _download_genome_with_progress(
             overwrite=overwrite,
             keep_package=keep_package,
             api_key=api_key,
+            show_progress=False,
         )
     with Progress(
         SpinnerColumn(),
         TextColumn("{task.description}"),
-        TextColumn("{task.completed} bytes"),
+        BarColumn(),
+        TaskProgressColumn(),
+        DownloadColumn(),
         console=error_console,
         transient=True,
     ) as display:
         task = display.add_task("Resolving assembly", total=None)
+        previous_phase: tuple[str, str | None] | None = None
 
         def on_progress(event: DownloadProgress) -> None:
+            nonlocal previous_phase
             if event.phase == "resolve":
                 description = f"Resolving {event.query}"
             elif event.phase == "download":
                 description = f"Downloading {event.accession}"
             else:
                 description = f"Extracting {event.current_file or 'FASTA'}"
+            phase = (event.phase, event.current_file)
+            if phase != previous_phase:
+                display.reset(task, description=description, total=event.total_bytes)
+                previous_phase = phase
             display.update(
                 task,
                 description=description,
@@ -759,15 +788,31 @@ def split_command(
     input_path: Annotated[Path, typer.Argument(help="Input sequence file.")],
     output_dir: Annotated[Path, typer.Argument(help="Directory for named subset files.")],
     ratios: Annotated[
-        str, typer.Option(help="Comma-separated split fractions, for example train=0.8,test=0.2.")
+        str,
+        typer.Option(
+            help="Named fractions for ratio methods, e.g. train=0.8,test=0.2; omit with kfold."
+        ),
     ] = "train=0.8,valid=0.1,test=0.1",
     method: Annotated[
-        str, typer.Option(help="Split method: random, hash, stratified, group, or similarity.")
+        str,
+        typer.Option(help="Split method: random, hash, kfold, stratified, group, or similarity."),
     ] = "random",
     metadata_key: Annotated[
         str | None, typer.Option(help="Metadata key used by stratified or group splitting.")
     ] = None,
-    seed: Annotated[int, typer.Option(help="Deterministic random seed.")] = 0,
+    seed: Annotated[
+        int, typer.Option(help="Deterministic random seed; keep fixed across folds.")
+    ] = 42,
+    n_splits: Annotated[
+        int | None, typer.Option(help="Number of folds for method=kfold (default 10).")
+    ] = None,
+    fold_id: Annotated[
+        int | None,
+        typer.Option(help="Validation fold for method=kfold: 0 to n-splits-1 (default 0)."),
+    ] = None,
+    shuffle: Annotated[
+        bool, typer.Option("--shuffle/--no-shuffle", help="Shuffle before partitioning.")
+    ] = True,
     input_format: Annotated[str | None, typer.Option("--input-format")] = None,
     output_format: Annotated[str, typer.Option("--output-format")] = "fasta",
     overwrite: Annotated[bool, typer.Option("--overwrite")] = False,
@@ -783,6 +828,9 @@ def split_command(
                 ratios=_parse_ratios(ratios),
                 seed=seed,
                 metadata_key=metadata_key,
+                n_splits=n_splits,
+                fold_id=fold_id,
+                shuffle=shuffle,
             ),
         )
         output_dir.mkdir(parents=True, exist_ok=True)

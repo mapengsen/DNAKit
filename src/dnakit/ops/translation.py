@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import ConfigurationError, InvalidAlphabetError, UnsupportedGapOperationError
 from dnakit.ops._common import require_sequence
@@ -126,7 +127,9 @@ def _ungapped_symbols(sequence: DNASequence, *, operation: str) -> str:
     return resolved.symbols
 
 
-def transcribe(sequence: DNASequence, *, strand: StrandPolicy = "forward") -> str:
+def transcribe(
+    sequence: DNASequence, *, strand: StrandPolicy = "forward", verbose: bool = True
+) -> str:
     """Transcribe DNA to RNA on the selected strand.
 
     The return value is uppercase RNA text.  Explicit gaps are rejected rather
@@ -174,6 +177,7 @@ def translate(
     stop_policy: StopPolicy = "include",
     unknown_policy: UnknownCodonPolicy = "x",
     incomplete_policy: IncompleteCodonPolicy = "ignore",
+    verbose: bool = True,
 ) -> str:
     """Translate DNA or RNA using NCBI genetic code table 1.
 
@@ -255,3 +259,5 @@ def translate(
 
 
 __all__ = ["transcribe", "translate"]
+
+_register_public_verbose(globals())

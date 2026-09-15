@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
 
@@ -16,6 +17,8 @@ from dnakit.exceptions import (
 
 STRICT_SYMBOLS = frozenset("ACGT")
 IUPAC_SYMBOLS = frozenset("ACGTRYSWKMBDHVN")
+_INVALID_STRICT = re.compile("[^ACGT]")
+_INVALID_IUPAC = re.compile("[^ACGTRYSWKMBDHVN]")
 _COMPLEMENT = str.maketrans(
     {
         "A": "T",
@@ -151,16 +154,15 @@ class DNASequence:
         resolved_topology = _coerce_topology(topology)
         resolved_strandedness = _coerce_strandedness(strandedness)
 
-        allowed = STRICT_SYMBOLS if resolved_alphabet is DNAAlphabet.STRICT else IUPAC_SYMBOLS
+        invalid_pattern = (
+            _INVALID_STRICT if resolved_alphabet is DNAAlphabet.STRICT else _INVALID_IUPAC
+        )
         for part_index, part in enumerate(resolved_parts):
             if isinstance(part, Gap):
                 continue
-            invalid = next(
-                ((offset, symbol) for offset, symbol in enumerate(part) if symbol not in allowed),
-                None,
-            )
+            invalid = invalid_pattern.search(part)
             if invalid is not None:
-                offset, symbol = invalid
+                offset, symbol = invalid.start(), invalid.group()
                 raise InvalidAlphabetError(
                     f"Symbol {symbol!r} is not valid for the {resolved_alphabet.value} alphabet.",
                     context={
@@ -308,14 +310,15 @@ class DNASequence:
         return self._transform(reverse=True, complement=True)
 
     def _transform(self, *, reverse: bool, complement: bool) -> DNASequence:
+        from dnakit._parallel import transform_text
+
         source: Sequence[str | Gap] = self.parts[::-1] if reverse else self.parts
         transformed: list[str | Gap] = []
         for part in source:
             if isinstance(part, Gap):
                 transformed.append(part)
                 continue
-            text = part[::-1] if reverse else part
-            transformed.append(text.translate(_COMPLEMENT) if complement else text)
+            transformed.append(transform_text(part, reverse=reverse, complement=complement))
         return DNASequence(
             transformed,
             alphabet=self.alphabet,

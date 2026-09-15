@@ -19,7 +19,7 @@ DedupEquivalence: TypeAlias = Literal[
 ]
 RepresentativePolicy: TypeAlias = Literal["first", "last", "best_quality"]
 ConflictPolicy: TypeAlias = Literal["error", "drop_group", "keep_representative", "keep_all"]
-SplitMethod: TypeAlias = Literal["random", "hash", "stratified", "group", "similarity"]
+SplitMethod: TypeAlias = Literal["random", "hash", "kfold", "stratified", "group", "similarity"]
 MissingMetadataPolicy: TypeAlias = Literal["error", "separate"]
 SimilarityAmbiguityPolicy: TypeAlias = Literal["error", "ignore"]
 SimilarityGapPolicy: TypeAlias = Literal["error", "split"]
@@ -78,11 +78,17 @@ def _default_ratios() -> dict[str, float]:
 
 @dataclass(frozen=True, slots=True)
 class SplitConfig:
-    """Control random, stable-hash, stratified, group-aware, or k-mer similarity splitting."""
+    """Control reproducible ratio or K-fold splitting, with a default seed of 42.
+
+    ``method="kfold"`` uses ``n_splits`` (default 10) and a zero-based ``fold_id``
+    (default 0) to return train/valid subsets. Keep the input order, seed, shuffle,
+    and n_splits fixed across folds; only change fold_id. Ratios are derived from
+    n_splits in this mode. Other methods use the supplied named ratios.
+    """
 
     method: SplitMethod = "random"
     ratios: Mapping[str, float] = field(default_factory=_default_ratios)
-    seed: int = 0
+    seed: int = 42
     shuffle: bool = True
     preserve_order: bool = True
     metadata_key: str | None = None
@@ -92,9 +98,11 @@ class SplitConfig:
     similarity_ambiguity_policy: SimilarityAmbiguityPolicy = "error"
     similarity_gap_policy: SimilarityGapPolicy = "error"
     max_pairwise_records: int = 5_000
+    n_splits: int | None = None
+    fold_id: int | None = None
 
     def __post_init__(self) -> None:
-        if self.method not in {"random", "hash", "stratified", "group", "similarity"}:
+        if self.method not in {"random", "hash", "kfold", "stratified", "group", "similarity"}:
             raise ConfigurationError(
                 "Unknown dataset split method.",
                 code="INVALID_SPLIT_METHOD",
@@ -141,6 +149,39 @@ class SplitConfig:
             raise ConfigurationError(
                 "seed must be an integer.",
                 code="INVALID_SPLIT_SEED",
+            )
+        if self.method == "kfold":
+            n_splits = 10 if self.n_splits is None else self.n_splits
+            fold_id = 0 if self.fold_id is None else self.fold_id
+            if isinstance(n_splits, bool) or not isinstance(n_splits, int) or n_splits < 2:
+                raise ConfigurationError(
+                    "n_splits must be an integer >= 2.", code="INVALID_KFOLD_CONFIG"
+                )
+            if (
+                isinstance(fold_id, bool)
+                or not isinstance(fold_id, int)
+                or not 0 <= fold_id < n_splits
+            ):
+                raise ConfigurationError(
+                    "fold_id must be an integer in [0, n_splits).", code="INVALID_KFOLD_CONFIG"
+                )
+            if not 0 <= self.seed < 2**32:
+                raise ConfigurationError(
+                    "K-fold seed must be in [0, 2**32).", code="INVALID_SPLIT_SEED"
+                )
+            fold_ratios = {"train": (n_splits - 1) / n_splits, "valid": 1 / n_splits}
+            if normalized_ratios != _default_ratios() and normalized_ratios != fold_ratios:
+                raise ConfigurationError(
+                    "K-fold derives train/valid ratios from n_splits; omit ratios. "
+                    "To hold out test data, split it off before applying K-fold to train.",
+                    code="INVALID_KFOLD_CONFIG",
+                )
+            normalized_ratios = fold_ratios
+            object.__setattr__(self, "n_splits", n_splits)
+            object.__setattr__(self, "fold_id", fold_id)
+        elif self.n_splits is not None or self.fold_id is not None:
+            raise ConfigurationError(
+                'n_splits and fold_id require method="kfold".', code="INVALID_KFOLD_CONFIG"
             )
         for field_name in ("shuffle", "preserve_order"):
             if not isinstance(getattr(self, field_name), bool):

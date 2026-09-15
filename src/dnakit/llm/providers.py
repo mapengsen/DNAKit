@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 
@@ -41,13 +42,13 @@ _ALIASES = {
 }
 
 
-def available_llm_providers() -> tuple[LLMProvider, ...]:
+def available_llm_providers(*, verbose: bool = True) -> tuple[LLMProvider, ...]:
     """List presets locally, without reading API keys or making requests."""
 
     return _PROVIDERS
 
 
-def get_llm_provider(name: str) -> LLMProvider:
+def get_llm_provider(name: str, *, verbose: bool = True) -> LLMProvider:
     """Resolve a provider name/alias, rejecting unknown names before a request."""
 
     if isinstance(name, str):
@@ -61,3 +62,6 @@ def get_llm_provider(name: str) -> LLMProvider:
         code="INVALID_LLM_CONFIG",
         hint="Choose deepseek, gemini, qwen, kimi, openrouter, openai, or custom.",
     )
+
+
+_register_public_verbose(globals(), ("available_llm_providers", "get_llm_provider"))

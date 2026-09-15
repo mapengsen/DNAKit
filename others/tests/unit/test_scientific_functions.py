@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from importlib.metadata import PackageNotFoundError
-from types import ModuleType
+from typing import Any
 
 import pytest
 
@@ -51,91 +50,52 @@ def _result(
     )
 
 
-def test_backend_loads_only_requested_tool_and_unwraps_result(
+def test_backend_uses_bundled_adapter_and_preserves_provenance(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    events: list[object] = []
+    from dnakit import __version__, databases
 
-    class FakeToolUniverse:
-        def __init__(self, *, workspace: str) -> None:
-            events.append(("init", workspace))
+    events = []
 
-        def load_tools(self, *, include_tools: list[str], quiet: bool) -> None:
-            events.append(("load", tuple(include_tools), quiet))
+    def fake_call(operation: Any, arguments: Any, **options: Any) -> Any:
+        events.append((operation, arguments, options))
+        return {
+            "status": "success",
+            "data": {"dN_dS": 0.5},
+            "metadata": {"engine": "nei_gojobori_1986"},
+        }
 
-        def run(self, call: dict[str, object], *, verbose: bool) -> dict[str, object]:
-            events.append(("run", call, verbose))
-            return {
-                "status": "success",
-                "data": {"dN_dS": 0.5},
-                "metadata": {"engine": "nei_gojobori_1986"},
-            }
-
-    module = ModuleType("tooluniverse")
-    module.ToolUniverse = FakeToolUniverse  # type: ignore[attr-defined]
-    module.__version__ = "1.4.1"  # type: ignore[attr-defined]
-    module.__file__ = "/optional/tooluniverse/__init__.py"
-    monkeypatch.setattr(scientific_backend, "_tooluniverse_module", lambda: module)
-
-    def missing_distribution(_name: str) -> str:
-        raise PackageNotFoundError
-
-    monkeypatch.setattr(scientific_backend, "version", missing_distribution)
-
+    monkeypatch.setattr(databases, "call", fake_call)
     result = scientific_backend._run_scientific_function(
-        "calculate_dn_ds",
-        {"seq1": "ATG", "seq2": "ATA"},
-        parameters={"sequence_length": 3},
+        "calculate_dn_ds", {"seq1": "ATG", "seq2": "ATA"}, parameters={"sequence_length": 3}
     )
-
-    assert events[0][0] == "init"  # type: ignore[index]
-    assert isinstance(events[0][1], str)  # type: ignore[index]
-    assert events[1] == ("load", ("Sequence_dn_ds",), True)
-    assert result.operation == "calculate_dn_ds"
-    assert result.backend == "ToolUniverse"
+    assert events[0][0] == "Sequence_dn_ds"
+    assert events[0][1] == {"seq1": "ATG", "seq2": "ATA"}
+    assert result.backend == "DNAKit"
     assert result.data == {"dN_dS": 0.5}
     assert result.parameters == {"sequence_length": 3}
     assert result.metadata["engine"] == "nei_gojobori_1986"
-    assert result.metadata["backend_tool"] == "Sequence_dn_ds"
     assert result.provenance.backend is not None
-    assert result.provenance.backend.version == "1.4.1"
-    assert result.to_dict()["data"] == {"dN_dS": 0.5}
+    assert result.provenance.backend.version == __version__
+    assert any(c.key == "tooluniverse" for c in result.provenance.implementation.citations)
 
 
-def test_backend_reports_missing_dependency_and_provider_errors(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def missing_module(_name: str) -> ModuleType:
-        raise ModuleNotFoundError("tooluniverse")
+def test_backend_propagates_dependency_and_provider_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+    from dnakit import databases
 
+    def missing(*args: Any, **kwargs: Any) -> Any:
+        raise BackendUnavailableError(
+            "Missing scientific engine", code="DATABASE_DEPENDENCY_UNAVAILABLE"
+        )
+
+    monkeypatch.setattr(databases, "call", missing)
+    with pytest.raises(BackendUnavailableError, match="Missing scientific engine"):
+        scientific_backend._run_scientific_function("get_dbsnp_variant", {"rsid": "rs1"})
     monkeypatch.setattr(
-        "dnakit.backends.scientific.importlib.import_module",
-        missing_module,
+        databases, "call", lambda *args, **kwargs: {"status": "error", "error": "remote job failed"}
     )
-    with pytest.raises(BackendUnavailableError) as missing:
+    with pytest.raises(BackendExecutionError, match="remote job failed"):
         scientific_backend._run_scientific_function("get_dbsnp_variant", {"rsid": "rs1"})
-    assert missing.value.code == "TOOLUNIVERSE_UNAVAILABLE"
-    assert "dnakit[external-tools]" in str(missing.value)
-
-    class FailedToolUniverse:
-        def __init__(self, *, load_workspace: bool) -> None:
-            del load_workspace
-
-        def load_tools(self, *, include_tools: list[str], quiet: bool) -> None:
-            del include_tools, quiet
-
-        def run(self, call: dict[str, object], *, verbose: bool) -> dict[str, object]:
-            del call, verbose
-            return {"status": "error", "error": "remote job failed"}
-
-    module = ModuleType("tooluniverse")
-    module.ToolUniverse = FailedToolUniverse  # type: ignore[attr-defined]
-    module.__version__ = "1.4.1"  # type: ignore[attr-defined]
-    monkeypatch.setattr(scientific_backend, "_tooluniverse_module", lambda: module)
-    with pytest.raises(BackendExecutionError) as failed:
-        scientific_backend._run_scientific_function("get_dbsnp_variant", {"rsid": "rs1"})
-    assert failed.value.code == "SCIENTIFIC_PROVIDER_ERROR"
-    assert "remote job failed" in str(failed.value)
 
 
 def test_variant_annotation_functions_use_explicit_capability_names(

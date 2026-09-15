@@ -1,0 +1,74 @@
+{
+  "source": "ammawla/encode-toolkit",
+  "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b",
+  "attribution": "ammawla/encode-toolkit contributors",
+  "license": "AGPL-3.0-only",
+  "files": [
+    {
+      "path": "__init__.py",
+      "upstream_path": "src/encode_connector/__init__.py",
+      "sha256": "035c6108a53f5c69c191e3edbf53665d6157f80d164dc9bad9841f320698c04f",
+      "adapted_sha256": "9038b786b1bd1c812d75a8f8ebf8df4cffba3c0f119bbc9b496b2591f6d84bd6"
+    },
+    {
+      "path": "client/__init__.py",
+      "upstream_path": "src/encode_connector/client/__init__.py",
+      "sha256": "c3220e41731466852a19dbfcfe1e655bbbdf599e8e86afedb73d9a2cdeccbe8f",
+      "adapted_sha256": "225b4d45c4ac21e7266a66e264d264cf2290ef1faa79ffacb2747ae61f507cbc"
+    },
+    {
+      "path": "client/auth.py",
+      "upstream_path": "src/encode_connector/client/auth.py",
+      "sha256": "4a7419dc792aec1869403eaf059b9d022e8baf6cc2078ed65c459e172ff8c598",
+      "adapted_sha256": "2245141a49c30b3d5db117d97685500f49e371cd8ffb60e69dd4b71eb7d5d049"
+    },
+    {
+      "path": "client/constants.py",
+      "upstream_path": "src/encode_connector/client/constants.py",
+      "sha256": "161a48bfb4e99fe51d82702b5c17ebd3b937c60bee3db7c684baecec491aad6f",
+      "adapted_sha256": "788a91b5eaf70e97fcd861f074a200ea0f94699108980364914c44dc00cb73ca"
+    },
+    {
+      "path": "client/downloader.py",
+      "upstream_path": "src/encode_connector/client/downloader.py",
+      "sha256": "8433cb906b3c30edc9af98312673f1865db5d48e62664a32b5977b9bb11e4c59",
+      "adapted_sha256": "bf78a15aecb97d06b6c110f2dcbccf89b6709a458ea6a2a3ad374e99a803dafc"
+    },
+    {
+      "path": "client/encode_client.py",
+      "upstream_path": "src/encode_connector/client/encode_client.py",
+      "sha256": "3e24867a9216a1ac6bc97d5885c61f2d3b8a849c6b9b87e000299936094052cf",
+      "adapted_sha256": "50dc67a90d6c258ec31b1d9a9f8c4bfd42ff3eb324bd2ae89ee4dc5f0b64a45e"
+    },
+    {
+      "path": "client/models.py",
+      "upstream_path": "src/encode_connector/client/models.py",
+      "sha256": "84dba47128ac9ccd83c3dc66b3eb6bb7bd989a3d47d7fca18b6880c67de37e7d",
+      "adapted_sha256": "c864cc86d0a81204b809b0c44469553f1a713e7b8f048aa000c1835dd2f90e0c"
+    },
+    {
+      "path": "client/tracker.py",
+      "upstream_path": "src/encode_connector/client/tracker.py",
+      "sha256": "f31e8936595ae94229ce05438fc1ce1a7b2c7e340f469f967699a28ab8cb0c8f",
+      "adapted_sha256": "554235f4de67167dad1626b5ecc81436790aec86ba23a8eb4f2212fafcc5c7bf"
+    },
+    {
+      "path": "client/validation.py",
+      "upstream_path": "src/encode_connector/client/validation.py",
+      "sha256": "becb15f6dbbd89341eb3df23c4252f7d236c001b67fe8f00cc628427646a59fd",
+      "adapted_sha256": "af04401532c8c7c5a18d7bcf1098e6c8368b11fe143590669a8777a747d74de8"
+    },
+    {
+      "path": "server/__init__.py",
+      "upstream_path": "src/encode_connector/server/__init__.py",
+      "sha256": "a84d525fb88c3f3ddbc2356ebaf3255cd37583f88707eb0851063e2ed1a000fc",
+      "adapted_sha256": "fa6a4243f926629a2c20705d7d6571b7a0bb0f01fa96fbcff4f791c82926a101"
+    },
+    {
+      "path": "server/main.py",
+      "upstream_path": "src/encode_connector/server/main.py",
+      "sha256": "da86192a70ccfd7c56fb3fcd397c6519d18e99abb0e4db9076eedddfe6806e8c",
+      "adapted_sha256": "2fca91bbc081a85dff5255cd4d63293939a4449021754dd9469241bf2c270d8d"
+    }
+  ]
+}

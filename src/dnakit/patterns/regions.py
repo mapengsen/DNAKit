@@ -7,6 +7,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Interval
 from dnakit.core.gap import Gap
 from dnakit.exceptions import ConfigurationError
@@ -71,6 +72,7 @@ def find_cpg_islands(
     min_region_length: int = 200,
     max_windows: int = 2_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> PatternResult[RegionHit]:
     """Find merged qualifying windows using a configurable classic CpG rule.
 
@@ -219,6 +221,7 @@ def find_low_complexity_regions(
     mask_symbol: str = "N",
     max_windows: int = 2_000_000,
     max_matches: int = 100_000,
+    verbose: bool = True,
 ) -> LowComplexityResult:
     """Mark merged low-Shannon-entropy windows and return a masked sequence.
 
@@ -339,3 +342,5 @@ def find_low_complexity_regions(
 
 
 __all__ = ["find_cpg_islands", "find_low_complexity_regions"]
+
+_register_public_verbose(globals())

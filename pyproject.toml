@@ -7,8 +7,8 @@ name = "dnakit"
 dynamic = ["version"]
 description = "Deterministic tools for DNA sequence analysis"
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE", "DISCLAIMER.md"]
+license = "MIT AND Apache-2.0 AND CC-BY-4.0 AND AGPL-3.0-only"
+license-files = ["LICENSE", "DISCLAIMER.md", "THIRD_PARTY_NOTICES.md", "licenses/skills/*/*"]
 authors = [{ name = "DNAKit contributors" }]
 requires-python = ">=3.10"
 classifiers = [
@@ -29,6 +29,12 @@ dependencies = [
   "rich>=13.7",
   "tomli>=2.0; python_version < '3.11'",
   "typer>=0.12",
+  "requests>=2.32,<3",
+  "jsonschema>=4.23,<5",
+  "graphql-core>=3.2,<4",
+  "pydantic>=2,<3",
+  "httpx>=0.27,<1",
+  "opentelemetry-sdk>=1.30,<2",
 ]
 
 [project.urls]
@@ -39,6 +45,9 @@ Issues = "https://github.com/mapengsen/DNAKit/issues"
 Changelog = "https://mapengsen.github.io/DNAKit/en/changelog/"
 
 [project.optional-dependencies]
+reports = ["reportlab>=4,<5"]
+encode-credentials = ["keyring>=25,<26", "cryptography>=42"]
+
 bio-analysis = ["numpy>=1.26,<3", "scipy>=1.11,<2", "scikit-learn>=1.5,<2"]
 bio-formats = ["biopython>=1.85,<2"]
 bio-reads = ["pysam>=0.22,<0.25"]
@@ -76,12 +85,13 @@ validation = [
   "biopython>=1.85,<2",
 ]
 external-tools = [
-  "tooluniverse>=1.4,<2",
+  "biopython>=1.85,<2",
 ]
 agent = [
   "fastmcp>=3.4.5,<4",
 ]
 neural = [
+  "gdown>=5.2,<6",
   "huggingface-hub>=0.28,<2",
   "numpy>=1.26,<3",
   "scikit-learn>=1.5,<2",
@@ -116,6 +126,7 @@ neural-caduceus = [
   "mamba-ssm>=2.2,<3",
 ]
 neural-enformer = [
+  "gdown>=5.2,<6",
   "enformer-pytorch>=0.8.11,<1",
 ]
 neural-evo2 = [
@@ -138,6 +149,12 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 dnakit = ["py.typed"]
+"dnakit.databases" = ["providers.json"]
+"dnakit.encode._backend" = ["LICENSE", "UPSTREAM.json"]
+"dnakit.workflows.common" = ["LICENSE", "UPSTREAM.json"]
+"dnakit.workflows.prs" = ["LICENSE", "UPSTREAM.json", "*.json", "*.txt", "data/*.txt"]
+"dnakit.workflows.support" = ["LICENSE", "UPSTREAM.json", "**/*.json", "**/*.txt", "**/*.csv", "**/*.tsv", "**/*.vcf", "**/*.md"]
+"dnakit.databases._providers" = ["LICENSE", "UPSTREAM.json", "data/*.json", "data/*.graphql", "data/*.gql"]
 
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers -ra"
@@ -156,15 +173,41 @@ python_version = "3.10"
 files = ["src", "others/tests"]
 strict = true
 warn_unreachable = true
+exclude = [
+  "src/dnakit/databases/_providers/",
+  "src/dnakit/encode/_backend/",
+  "src/dnakit/workflows/(common|prs|support)/",
+]
+
+[[tool.mypy.overrides]]
+# Preserve upstream scientific implementations; check DNAKit's public adapters separately.
+module = [
+  "dnakit.databases._providers.*", "dnakit.encode._backend.*",
+  "dnakit.workflows.common.*", "dnakit.workflows.prs.*", "dnakit.workflows.support.*",
+]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["reportlab.*", "jsonschema", "cellxgene_census", "pandas.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 target-version = "py310"
 line-length = 100
 src = ["src", "others/tests"]
-extend-exclude = ["build", "dist", "dashing_similarity", "site"]
+extend-exclude = ["build", "dist", "dashing_similarity", "site", "src/dnakit/databases/_providers", "src/dnakit/databases/_generated.py", "src/dnakit/encode/_backend", "src/dnakit/encode/__init__.py", "src/dnakit/workflows/common", "src/dnakit/workflows/prs", "src/dnakit/workflows/support"]
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# These maintainers embed source-code patterns and generated documentation verbatim.
+"others/skills/build_native_providers.py" = ["E501"]
+"others/skills/build_support_backends.py" = ["E501"]
+"others/skills/build_workflow_backends.py" = ["E501"]
+"others/skills/prepare_all_adaptations.py" = ["E501"]
+"others/skills/finalize_adaptations.py" = ["E501"]
+"others/skills/workflow_corrections.py" = ["E501"]
 
 [tool.ruff.format]
 docstring-code-format = true

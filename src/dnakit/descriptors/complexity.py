@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections import Counter
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Gap, Topology
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
@@ -30,6 +31,7 @@ def linguistic_complexity(
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
     max_observations: int = 10_000_000,
+    verbose: bool = True,
 ) -> ComplexityResult:
     """Compute observed/possible vocabulary ratios for k=1..max_word_size.
 
@@ -107,6 +109,7 @@ def exact_repeat_fraction(
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
     max_comparisons: int = 5_000_000,
+    verbose: bool = True,
 ) -> ExactRepeatResult:
     """Measure union coverage of maximal exact tandem-repeat runs."""
 
@@ -199,3 +202,5 @@ def exact_repeat_fraction(
 
 
 __all__ = ["exact_repeat_fraction", "linguistic_complexity"]
+
+_register_public_verbose(globals())

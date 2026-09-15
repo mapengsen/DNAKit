@@ -1,8 +1,10 @@
 # DNAKit function module index
 
-> Updated: 2026-09-09. Checked against current workspace public APIs. See the [feature tree overview](function_tree.md) for the complete hierarchy. This index links feature guides and public API extensions; cross-category links do not count as additional capabilities.
+> Updated: 2026-09-13. Checked against current workspace public APIs. See the [feature tree overview](function_tree.md) for the complete hierarchy. This index links feature guides and public API extensions; cross-category links do not count as additional capabilities.
 
 ## 1) Data preparation
+
+Added APIs: [genes, sequences and downloads](../native/sequences.md) (41), [ENCODE](../native/encode.md) (20), [organisms and microbiomes](../native/organisms.md) (49), and [literature and studies](../native/literature.md) (17). Each has individual parameters and returns.
 
 - [Core Data Object](01_core_objects.md) (8 items)
 - [File reading and writing](02_io_data.md) (Category 4; large file capability as optional mode for IO-001)
@@ -14,6 +16,8 @@
 - [Legality check](03_validation.md) (unified check entrance)
 
 ## 2) Data processing
+
+Added sequence statistics, VCF processing, digestion and assembly APIs are in [sequence analysis, VCF, cloning and inheritance](../native/analysis.md). Cross-links from analysis do not count functions again.
 
 - [DNA sequence standardization](03_standardization.md) (STD-001 character standardization)
 - [Gap and AGP APIs](../index.md#standardization) (uppercase N runs to Gaps, AGP assembly, provenance)
@@ -39,10 +43,12 @@
 
 ## 3) Data analysis
 
+Added APIs: [variants and GWAS](../native/variants.md) (80), [diseases and phenotypes](../native/phenotypes.md) (45), [expression and regulation](../native/regulation.md) (65), [pathways, interactions and structures](../native/pathways.md) (64), [targets and drugs](../native/targets.md) (62), [models](../native/models.md) (14), and [sequence analysis and inheritance](../native/analysis.md) (15).
+
 - **DNA Descriptors, Characterizations and Fingerprints**
   - [DNA descriptor](05_all_descriptors.md)
-  - [Sequence characterization](08_fingerprints.md)
-    - [Neural Network Representation](08_fingerprints.md#neural-representations) (DATA-027: 11 DNA basic models rep)
+  - [Sequence representations](08_fingerprints.md)
+    - [Neural Network Representation](08_fingerprints.md#neural-representations) (DATA-027: 11 DNA foundation-model representations)
   - [DNA fingerprint](08_feature_engineering.md)
   - [Advanced fingerprints and preprocessing](../index.md#fingerprints) (motifs, restriction sites, spatial GC, repeats, coding, thermodynamics, multiscale, hybrid, training-set preprocessing)
   - [Traditional DNA encodings and feature engineering](27_bioinformatics.md) (44 encodings, selection, reduction, clustering)
@@ -56,7 +62,6 @@
 - [Conversion](18_optics_concentration.md)
 - [Property prediction: deep learning and machine learning](23_deep_learning_property_prediction.md) (custom classification/regression, 37 machine-learning algorithms, reloaded inference, 54 official direct-inference tasks)
 - [Custom training API](../index.md#deep-learning-property-prediction) (full fine-tuning, linear probing, machine learning, model catalogs, and optional LLM field analysis)
-- [Deep-learning task checkpoint download](25_deep_learning_checkpoint_download.md) (download and local placement for 27 task weights)
 - [Optional bioinformatics functions](24_optional_bioinformatics.md) (variant annotation, dN/dS, and Golden Gate)
 - [Gene names and intervals](26_gene_annotation.md) (genomic DNA reference alignment, existing annotation mapping, overlapping intervals, and cache reuse)
 - [MSA, phylogeny, and probabilistic motifs](27_bioinformatics.md) (multiple alignment, BLAST/HMMER, NJ/UPGMA, tree comparison/consensus, PWM/PSSM)
@@ -79,10 +84,12 @@
 
 ## 6) Engineering and Expansion
 
+Added [discovery, workflow and report APIs](../native/execution.md) cover 12 functions. See the [complete index of 484 added functions](../native/index.md) and [calling examples](../native/usage.md).
+
 - [Backends, performance, and reproducibility](14_engineering.md) (backends, batches, bounded threads, caches, workflows, provenance)
 - [CLI commands](../index.md#cli) (data processing, analysis, workflows, custom property training/prediction, and gene annotation)
-- [Agent and MCP tools](../../agent_tools.md) (ENG-013; server setup, six MCP entry points, schemas, tool execution, and authorization)
-- [General-purpose LLM calls](../../agent_tools.md#custom-llm) (standalone Python API; sync/async, custom prompts, text/JSON, local files, provider presets, and extension parameters)
+- [LLM tools → MCP](../../llm_tools/mcp.md) (ENG-013; server setup, eight MCP entry points, schemas, tool execution, and authorization)
+- [LLM tools → Python API](../../llm_tools/python_api.md) (no MCP installation required; natural-language tool execution, general-purpose LLM calls, sync/async, custom prompts, text/JSON, local files, provider presets, and extension parameters)
 - [Python DAGs and interval queries](27_bioinformatics.md) (dependency checks, failure propagation, interval intersection/union/difference)
 - Galaxy wrappers (`galaxy/dnakit`): convert, deduplicate, split, report; requires Galaxy.
 

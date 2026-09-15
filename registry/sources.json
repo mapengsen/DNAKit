@@ -1,0 +1,884 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-12",
+  "sources": [
+    {
+      "id": "bioskills",
+      "repository": "GPTomics/bioSkills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a",
+      "cache_path": "temp/skill-sources/bioSkills",
+      "content_license": "MIT",
+      "attribution": "GPTomics bioSkills contributors",
+      "policy": "Original-source DNA/genomics workflows; MIT notice retained.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite GPTomics/bioSkills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "sciagent",
+      "repository": "jaechang-hits/SciAgent-Skills",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb",
+      "cache_path": "temp/skill-sources/SciAgent-Skills",
+      "content_license": "CC-BY-4.0",
+      "attribution": "jaechang-hits; credited K-Dense-AI and Biomni contributors",
+      "policy": "Original content CC-BY-4.0; README identifies frontmatter licenses as underlying tool licenses. Retain referenced third-party notices.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite jaechang-hits/SciAgent-Skills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "clawbio",
+      "repository": "ClawBio/ClawBio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d",
+      "cache_path": "temp/skill-sources/ClawBio",
+      "content_license": "MIT",
+      "attribution": "ClawBio contributors",
+      "policy": "Individual skill license overrides apply; proprietary skills excluded; GPL skill deferred for separate review.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite ClawBio/ClawBio at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "kdense",
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34",
+      "cache_path": "temp/skill-sources/scientific-agent-skills",
+      "content_license": "MIT",
+      "attribution": "K-Dense Inc. and contributors",
+      "policy": "Only skills explicitly licensed MIT enter this snapshot; other individual terms require a separate review.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite K-Dense-AI/scientific-agent-skills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "omicsclaw",
+      "repository": "TianGzlab/OmicsClaw",
+      "revision": "6fbd79f262e3fd3552efe9f675574ffb165019ab",
+      "cache_path": "temp/skill-sources/OmicsClaw",
+      "content_license": "Apache-2.0",
+      "attribution": "OmicsClaw contributors",
+      "policy": "Root Apache and individual MIT scope needs clarification; record candidates without copying.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite TianGzlab/OmicsClaw at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "bionemo",
+      "repository": "NVIDIA-BioNeMo/bionemo-agent-toolkit",
+      "revision": "0e67a612e4045f007e38fa77adc8f3ebfc5616b6",
+      "cache_path": "temp/skill-sources/bionemo-agent-toolkit",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "attribution": "NVIDIA Corporation and contributors",
+      "policy": "Retain Apache and CC-BY licenses plus NOTICE, with distinct code/content scopes and individual AND declarations.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite NVIDIA-BioNeMo/bionemo-agent-toolkit at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "biotender",
+      "repository": "BioTender-max/awesome-bio-agent-skills",
+      "revision": "8cbdd18837aa6296c4e77616a03b323bd69b57b1",
+      "cache_path": "temp/skill-sources/awesome-bio-agent-skills",
+      "content_license": "CC0-1.0",
+      "attribution": "BioTender contributors",
+      "policy": "Discovery index only: aggregator license does not relicense original third-party skills; prefer original sources.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite BioTender-max/awesome-bio-agent-skills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "openclaw-medical",
+      "repository": "FreedomIntelligence/OpenClaw-Medical-Skills",
+      "revision": "b1f9b6e3306f8d870e23b2023057bf730090036f",
+      "cache_path": "temp/skill-sources/OpenClaw-Medical-Skills",
+      "content_license": null,
+      "attribution": "FreedomIntelligence contributors",
+      "policy": "Discovery index only: root LICENSE absent at snapshot; a README badge is insufficient to relicense third-party content.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite FreedomIntelligence/OpenClaw-Medical-Skills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "pipette",
+      "repository": "variomeanalytics/bioinformatics-agent-skills",
+      "revision": "b3d959475e9b3c5a830368ff9a44319ce97e2549",
+      "cache_path": "temp/skill-sources/pipette-skillgraph",
+      "content_license": "MIT",
+      "attribution": "Variome Analytics contributors",
+      "policy": "Service/reference only: this repository contains no SKILL.md, and redistribution of the remote SkillGraph content is not established.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite variomeanalytics/bioinformatics-agent-skills at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "tooluniverse",
+      "repository": "mims-harvard/ToolUniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7",
+      "cache_path": "temp/ToolUniverse",
+      "content_license": "Apache-2.0",
+      "attribution": "ToolUniverse contributors, mims-harvard",
+      "policy": "Root Apache-2.0; conflicting individual declarations deferred. ToolUniverse runtime remains a separate dependency.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite mims-harvard/ToolUniverse at the pinned revision and the underlying methods actually used. Consult the upstream README and CITATION.cff, when provided, for the project's preferred paper citation."
+    },
+    {
+      "id": "alterlab",
+      "repository": "AlterLab-IEU/AlterLab-Academic-Skills",
+      "revision": "4a5b75358026b33d3e53101bf551331e12113bee",
+      "cache_path": "temp/skill-sources/AlterLab-IEU--AlterLab-Academic-Skills",
+      "content_license": "MIT",
+      "attribution": "AlterLab-IEU/AlterLab-Academic-Skills contributors",
+      "policy": "Reference/deduplication only. NOTICE and THIRD_PARTY_NOTICES distinguish K-Dense derivatives and four CC-BY-NC skills; do not infer MIT for every folder or ignore individual declarations.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite AlterLab-IEU/AlterLab-Academic-Skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "arcinstitute-sragent",
+      "repository": "ArcInstitute/SRAgent",
+      "revision": "67b60c24a49385d3eed8e5121be58d13c82839cd",
+      "cache_path": "temp/skill-sources/ArcInstitute--SRAgent",
+      "content_license": "MIT",
+      "attribution": "ArcInstitute/SRAgent contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite ArcInstitute/SRAgent at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "biotender-max-awesome-ai4bio-skills",
+      "repository": "BioTender-max/awesome-ai4bio-skills",
+      "revision": "2d04b66d5831fb6274e1f34c6b8b5a7da80a47f3",
+      "cache_path": "temp/skill-sources/BioTender-max--awesome-ai4bio-skills",
+      "content_license": null,
+      "attribution": "BioTender-max/awesome-ai4bio-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite BioTender-max/awesome-ai4bio-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "bioconductor-ai-agent-skills",
+      "repository": "Bioconductor/ai-agent-skills",
+      "revision": "f87f5a70e228d98b62ab6f85628bd7fb9ba52147",
+      "cache_path": "temp/skill-sources/Bioconductor--ai-agent-skills",
+      "content_license": "MIT",
+      "attribution": "Bioconductor/ai-agent-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Bioconductor/ai-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "bloomed-health-cancer-predisposition-variant-analyst",
+      "repository": "Bloomed-Health/cancer-predisposition-variant-analyst",
+      "revision": "0cace7c9dfe9c7a49f6fac28896495f9f1ffe8e0",
+      "cache_path": "temp/skill-sources/Bloomed-Health--cancer-predisposition-variant-analyst",
+      "content_license": null,
+      "attribution": "Bloomed-Health/cancer-predisposition-variant-analyst contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Bloomed-Health/cancer-predisposition-variant-analyst at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "chevyliang-geng-beva-agent-skills",
+      "repository": "ChevyLiang/Geng-BEVA-agent-skills",
+      "revision": "3a26ad93a33c82c860cd7c65adbe7ff55a1055fa",
+      "cache_path": "temp/skill-sources/ChevyLiang--Geng-BEVA-agent-skills",
+      "content_license": null,
+      "attribution": "ChevyLiang/Geng-BEVA-agent-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite ChevyLiang/Geng-BEVA-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "damlab",
+      "repository": "DamLabResources/damlab-skills",
+      "revision": "4ad096e3b9b0116271d10bdb746641b60a1b2211",
+      "cache_path": "temp/skill-sources/DamLabResources--damlab-skills",
+      "content_license": "MIT",
+      "attribution": "DamLabResources/damlab-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite DamLabResources/damlab-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "dddddong-higher-acr-skill",
+      "repository": "Dddddong-higher/acr_skill",
+      "revision": "53f3710178f8a2c7184dc49313409b979df400f7",
+      "cache_path": "temp/skill-sources/Dddddong-higher--acr_skill",
+      "content_license": null,
+      "attribution": "Dddddong-higher/acr_skill contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Dddddong-higher/acr_skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "goekelab-awesome-genomic-skills",
+      "repository": "GoekeLab/awesome-genomic-skills",
+      "revision": "c11b8d6b6fa0676229e8728d89ce78db3fa9d6aa",
+      "cache_path": "temp/skill-sources/GoekeLab--awesome-genomic-skills",
+      "content_license": null,
+      "attribution": "GoekeLab/awesome-genomic-skills contributors",
+      "policy": "Discovery/reference source; individual content terms require review before copying.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite GoekeLab/awesome-genomic-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "golden2002-population-genetics-skill",
+      "repository": "Golden2002/population-genetics-skill",
+      "revision": "c8fec68b6522f22befb5eaaf467750394209f722",
+      "cache_path": "temp/skill-sources/Golden2002--population-genetics-skill",
+      "content_license": "MIT",
+      "attribution": "Golden2002/population-genetics-skill contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Golden2002/population-genetics-skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "hku-bal-clair-skills",
+      "repository": "HKU-BAL/Clair-skills",
+      "revision": "c95b825f246d7484e0385c05aaffb42cecbaaf6e",
+      "cache_path": "temp/skill-sources/HKU-BAL--Clair-skills",
+      "content_license": null,
+      "attribution": "HKU-BAL/Clair-skills contributors",
+      "policy": "No applicable license for the skill repository found; the separate Clair caller licenses do not establish permission to redistribute this guide.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite HKU-BAL/Clair-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "jason-0409-g-vivarium",
+      "repository": "Jason-0409-G/vivarium",
+      "revision": "a915249440e52879bac4013630533d78505e87d1",
+      "cache_path": "temp/skill-sources/Jason-0409-G--vivarium",
+      "content_license": "MIT",
+      "attribution": "Jason-0409-G/vivarium contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Jason-0409-G/vivarium at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "jiaqili1024-s2f-agent",
+      "repository": "JiaqiLi1024/s2f-agent",
+      "revision": "6d2d70dea2ae051bd17d88b4be09fdbfb96310ad",
+      "cache_path": "temp/skill-sources/JiaqiLi1024--s2f-agent",
+      "content_license": null,
+      "attribution": "JiaqiLi1024/s2f-agent contributors",
+      "policy": "DNA model workflows found, but no applicable content redistribution license found. Licenses of referenced model implementations do not license this skill collection.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite JiaqiLi1024/s2f-agent at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "jiawang1209-genefam-pipeline-skills",
+      "repository": "Jiawang1209/GeneFam-Pipeline-skills",
+      "revision": "aa87c4fae5f5e2844f401700186164e90a514f40",
+      "cache_path": "temp/skill-sources/Jiawang1209--GeneFam-Pipeline-skills",
+      "content_license": null,
+      "attribution": "Jiawang1209/GeneFam-Pipeline-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Jiawang1209/GeneFam-Pipeline-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "jimliu-science-skills",
+      "repository": "JimLiu/science-skills",
+      "revision": "fb309c32ee9a54dad169fa845638057d1cfac77f",
+      "cache_path": "temp/skill-sources/JimLiu--science-skills",
+      "content_license": null,
+      "attribution": "JimLiu/science-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite JimLiu/science-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "myriad",
+      "repository": "KalarisLabs/Myriad",
+      "revision": "5efbc5e9940fd37608f1d75cccac2befebad1215",
+      "cache_path": "temp/skill-sources/KalarisLabs--Myriad",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "attribution": "MYRIAD by Srihari Muralikrishnan and Kalaris Labs. https://github.com/KalarisLabs/myriad",
+      "policy": "LICENSE.md assigns procedural skill implementations to Apache-2.0 and explanatory/data materials to CC-BY-4.0. Preserve both full licenses, NOTICE.md, authorship and citation; do not describe the task graph as 10,000 installed skills.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite KalarisLabs/Myriad at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "kinprove-dna-research-recipes",
+      "repository": "Kinprove/dna-research-recipes",
+      "revision": "277bb68d89142ca51be52d2391713215e6180cbc",
+      "cache_path": "temp/skill-sources/Kinprove--dna-research-recipes",
+      "content_license": "FSL-1.1-MIT",
+      "attribution": "Kinprove/dna-research-recipes contributors",
+      "policy": "Reference only: current FSL competing-use restriction and unfinished third-party data notice; the future MIT grant is not yet effective for the 2026 snapshot.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Kinprove/dna-research-recipes at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "plant-qpcr",
+      "repository": "Li-Chia-ching/Plant-qPCR-Agent-Skill",
+      "revision": "23acf68cc4cefe67f8f3b5f5057b0eabf0ac9a4e",
+      "cache_path": "temp/skill-sources/Li-Chia-ching--Plant-qPCR-Agent-Skill",
+      "content_license": "Apache-2.0",
+      "attribution": "Li-Chia-ching/Plant-qPCR-Agent-Skill contributors",
+      "policy": "Apache-2.0 notice retained. Import only the reviewed DNA-related scope and retain individual notices.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite Li-Chia-ching/Plant-qPCR-Agent-Skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "polyploid-cloning",
+      "repository": "Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline",
+      "revision": "ecce861e5215e25cc180f1381d73a8751c5257bd",
+      "cache_path": "temp/skill-sources/Li-Chia-ching--Polyploid-GeneFamily-AI-Pipeline",
+      "content_license": "MIT",
+      "attribution": "Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite Li-Chia-ching/Polyploid-GeneFamily-AI-Pipeline at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "linxira-os-linxira-bio-sdk",
+      "repository": "Linxira-OS/linxira-bio-sdk",
+      "revision": "dcfd512a9a33272c05a5101aa2724abd62658924",
+      "cache_path": "temp/skill-sources/Linxira-OS--linxira-bio-sdk",
+      "content_license": "AGPL-3.0-only",
+      "attribution": "Linxira-OS/linxira-bio-sdk contributors",
+      "policy": "AGPL source collection; review scientific overlap and complete source requirements before importing.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Linxira-OS/linxira-bio-sdk at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "nathanskene-claude-genome-skill",
+      "repository": "NathanSkene/claude-genome-skill",
+      "revision": "ffac2ebe4d085830422fe73a580d4e8e099e7e92",
+      "cache_path": "temp/skill-sources/NathanSkene--claude-genome-skill",
+      "content_license": null,
+      "attribution": "NathanSkene/claude-genome-skill contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite NathanSkene/claude-genome-skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "omicsio-gene2ai-openclaw-skill",
+      "repository": "Omicsio/gene2ai-openclaw-skill",
+      "revision": "a972ea8f7f4e35c7e0f2db9dd23d46d6f83f3726",
+      "cache_path": "temp/skill-sources/Omicsio--gene2ai-openclaw-skill",
+      "content_license": null,
+      "attribution": "Omicsio/gene2ai-openclaw-skill contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Omicsio/gene2ai-openclaw-skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "pku-metagenomics",
+      "repository": "PKU-EMBL/Metagenomics-Skills",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258",
+      "cache_path": "temp/skill-sources/PKU-EMBL--Metagenomics-Skills",
+      "content_license": "MIT",
+      "attribution": "Copyright (c) 2026 PKU-EMBL",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite PKU-EMBL/Metagenomics-Skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.",
+      "portable_docs": {
+        "docs": "references/upstream-docs"
+      }
+    },
+    {
+      "id": "pavel-kravchenko-bioinformatics",
+      "repository": "Pavel-Kravchenko/Bioinformatics",
+      "revision": "1dc244624720bb43ad7bd17f3c3c49784ce8c65c",
+      "cache_path": "temp/skill-sources/Pavel-Kravchenko--Bioinformatics",
+      "content_license": null,
+      "attribution": "Pavel-Kravchenko/Bioinformatics contributors",
+      "policy": "No applicable redistribution license found at the pinned revision; retain metadata and original-source links only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Pavel-Kravchenko/Bioinformatics at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "pengpppp-metaglens-skills",
+      "repository": "PengPPPP/MetaGLens-skills",
+      "revision": "f4e7f615723fc38d99ba06fe56cf057bb26c9e79",
+      "cache_path": "temp/skill-sources/PengPPPP--MetaGLens-skills",
+      "content_license": null,
+      "attribution": "PengPPPP/MetaGLens-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite PengPPPP/MetaGLens-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "pratikrishi97-sciagent-skills",
+      "repository": "Pratikrishi97/sciagent-skills",
+      "revision": "c9e6dd5ad2389af5c7933385bd8f6a65adc9be25",
+      "cache_path": "temp/skill-sources/Pratikrishi97--sciagent-skills",
+      "content_license": "MIT",
+      "attribution": "Pratikrishi97/sciagent-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Pratikrishi97/sciagent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "bioclaw",
+      "repository": "Runchuan-BU/BioClaw",
+      "revision": "50a7d9b1dfa536cfe7e047d63be1de368b47a814",
+      "cache_path": "temp/skill-sources/Runchuan-BU--BioClaw",
+      "content_license": "MIT",
+      "attribution": "Runchuan-BU/BioClaw contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite Runchuan-BU/BioClaw at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "siyangming-bioskills",
+      "repository": "SiYangming/bioskills",
+      "revision": "4d8327be29c11b1056bc8f68cfaa20f055a479e9",
+      "cache_path": "temp/skill-sources/SiYangming--bioskills",
+      "content_license": "MIT",
+      "attribution": "SiYangming/bioskills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite SiYangming/bioskills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "skillwager-agent-skill-profiles",
+      "repository": "Skillwager/agent-skill-profiles",
+      "revision": "660a444ebc249a1e51e675d9e8da0a71cd581cf8",
+      "cache_path": "temp/skill-sources/Skillwager--agent-skill-profiles",
+      "content_license": "MIT",
+      "attribution": "Skillwager/agent-skill-profiles contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite Skillwager/agent-skill-profiles at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "plant-skills",
+      "repository": "Xuzhen-Li/bioinfo-agent-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83",
+      "cache_path": "temp/skill-sources/Xuzhen-Li--bioinfo-agent-skills",
+      "content_license": "MIT",
+      "attribution": "Xuzhen-Li/bioinfo-agent-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite Xuzhen-Li/bioinfo-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "research-suite",
+      "repository": "Ynzuses/research-skills-suite",
+      "revision": "a5cb708252a58bcfb771d46d39f5e38d64b8b2f6",
+      "cache_path": "temp/skill-sources/Ynzuses--research-skills-suite",
+      "content_license": "Apache-2.0",
+      "attribution": "Ynzuses/research-skills-suite contributors",
+      "policy": "Apache-2.0 notice retained. Import only the reviewed DNA-related scope and retain individual notices.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite Ynzuses/research-skills-suite at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "yulia",
+      "repository": "YuliaNuzhnenko/bioinformatics-agent-skills",
+      "revision": "9b9dbfe1802ef721a76c1e04efd305242042d1ca",
+      "cache_path": "temp/skill-sources/YuliaNuzhnenko--bioinformatics-agent-skills",
+      "content_license": "MIT",
+      "attribution": "YuliaNuzhnenko/bioinformatics-agent-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite YuliaNuzhnenko/bioinformatics-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "agenticbioinformatics-skills",
+      "repository": "agenticbioinformatics/skills",
+      "revision": "45b5e0c21d3a8d90ff870f994240627495f0dabc",
+      "cache_path": "temp/skill-sources/agenticbioinformatics--skills",
+      "content_license": "MIT",
+      "attribution": "agenticbioinformatics/skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite agenticbioinformatics/skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "encode-toolkit",
+      "repository": "ammawla/encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b",
+      "cache_path": "temp/skill-sources/ammawla--encode-toolkit",
+      "content_license": "AGPL-3.0-only",
+      "attribution": "ammawla/encode-toolkit contributors",
+      "policy": "Independent skill source files remain AGPL-3.0-only, as declared in pyproject.toml; complete editable skill sources, copyright, license and citation supplied. The separate ENCODE MCP runtime is not bundled or linked into DNAKit.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite ammawla/encode-toolkit at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.",
+      "runtime": {
+        "commands": [
+          "encode-toolkit"
+        ],
+        "manual_checks": [
+          "Configure the separate encode-toolkit MCP server; DNAKit MCP does not provide encode_* tools. Referenced code remains AGPL-3.0-only."
+        ]
+      }
+    },
+    {
+      "id": "ankurgenomics-genomics-skills",
+      "repository": "ankurgenomics/genomics-skills",
+      "revision": "c6f1adfc45fb2791c0051ea74fcf4b3a96c5de01",
+      "cache_path": "temp/skill-sources/ankurgenomics--genomics-skills",
+      "content_license": "MIT",
+      "attribution": "ankurgenomics/genomics-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite ankurgenomics/genomics-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "anthropics-life-sciences",
+      "repository": "anthropics/life-sciences",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "cache_path": "temp/skill-sources/anthropics--life-sciences",
+      "content_license": null,
+      "attribution": "anthropics/life-sciences contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite anthropics/life-sciences at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "aws-samples-sample-kiro-power-life-sciences",
+      "repository": "aws-samples/sample-kiro-power-life-sciences",
+      "revision": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "cache_path": "temp/skill-sources/aws-samples--sample-kiro-power-life-sciences",
+      "content_license": null,
+      "attribution": "aws-samples/sample-kiro-power-life-sciences contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite aws-samples/sample-kiro-power-life-sciences at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "aws-hcls",
+      "repository": "awslabs/hcls-agent-skills",
+      "revision": "0cdbb370b2c53ea9af86eab186232751cbb2a2c0",
+      "cache_path": "temp/skill-sources/awslabs--hcls-agent-skills",
+      "content_license": "MIT-0",
+      "attribution": "awslabs/hcls-agent-skills contributors",
+      "policy": "Amazon MIT-0 license retained; evaluate exact workflow overlap before importing.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite awslabs/hcls-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "brycewang-stanford-auto-research-skills",
+      "repository": "brycewang-stanford/Auto-Research-Skills",
+      "revision": "1c277adf6833b1b7ac184ac5653f7b6b3c81d5c3",
+      "cache_path": "temp/skill-sources/brycewang-stanford--Auto-Research-Skills",
+      "content_license": null,
+      "attribution": "brycewang-stanford/Auto-Research-Skills contributors",
+      "policy": "Discovery/reference source; individual content terms require review before copying.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite brycewang-stanford/Auto-Research-Skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "cameronehrlich-genex",
+      "repository": "cameronehrlich/genex",
+      "revision": "ade282ff21f418987ba166af2066e29e2f1116cf",
+      "cache_path": "temp/skill-sources/cameronehrlich--genex",
+      "content_license": "MIT",
+      "attribution": "cameronehrlich/genex contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite cameronehrlich/genex at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "feynman",
+      "repository": "companion-inc/feynman",
+      "revision": "dfdcb7cf2c73183cff7b10aa8ea8ce370c8b152c",
+      "cache_path": "temp/skill-sources/companion-inc--feynman",
+      "content_license": "MIT",
+      "attribution": "companion-inc/feynman contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite companion-inc/feynman at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "cultivarium-full-circle-labs-skill",
+      "repository": "cultivarium/full-circle-labs-skill",
+      "revision": "72eac4aea8810d9e424c95376cab24408cedae54",
+      "cache_path": "temp/skill-sources/cultivarium--full-circle-labs-skill",
+      "content_license": "MIT",
+      "attribution": "cultivarium/full-circle-labs-skill contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite cultivarium/full-circle-labs-skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "omics",
+      "repository": "fmschulz/omics-skills",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637",
+      "cache_path": "temp/skill-sources/fmschulz--omics-skills",
+      "content_license": "MIT",
+      "attribution": "Copyright (c) 2026 Frederik Schulz",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite fmschulz/omics-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "gilleswainrib-ext-boop-bioinfo-skills",
+      "repository": "gilleswainrib-ext-boop/bioinfo-skills",
+      "revision": "b632655f93a38df2c70f4d3fc42fc4d24b8fc7cd",
+      "cache_path": "temp/skill-sources/gilleswainrib-ext-boop--bioinfo-skills",
+      "content_license": null,
+      "attribution": "gilleswainrib-ext-boop/bioinfo-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite gilleswainrib-ext-boop/bioinfo-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "deepmind",
+      "repository": "google-deepmind/science-skills",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d",
+      "cache_path": "temp/skill-sources/google-deepmind--science-skills",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "attribution": "Copyright 2026 Google LLC",
+      "policy": "README separately licenses software Apache-2.0 and other materials CC-BY-4.0. Retain both full licenses, attribution and SKILL_LICENSES.md; third-party APIs/data have separate terms.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite google-deepmind/science-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.",
+      "extra_notices": [
+        "README.md",
+        "SKILL_LICENSES.md"
+      ]
+    },
+    {
+      "id": "hantao23-dna-storage-paper-reading-skill",
+      "repository": "hantao23/dna-storage-paper-reading-skill",
+      "revision": "070636bc2cb283d93eafa020ee8e739555656ecc",
+      "cache_path": "temp/skill-sources/hantao23--dna-storage-paper-reading-skill",
+      "content_license": null,
+      "attribution": "hantao23/dna-storage-paper-reading-skill contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite hantao23/dna-storage-paper-reading-skill at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "ngs-tertiary",
+      "repository": "htlin222/ngs-tertiary-analysis-skills",
+      "revision": "d483c21fddd14a034e7f2f038f237ad7bcd05b1a",
+      "cache_path": "temp/skill-sources/htlin222--ngs-tertiary-analysis-skills",
+      "content_license": "MIT",
+      "attribution": "htlin222/ngs-tertiary-analysis-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite htlin222/ngs-tertiary-analysis-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.",
+      "runtime": {
+        "commands": [
+          "Rscript"
+        ],
+        "manual_checks": [
+          "Requires the separate pinned ngs-tertiary-analysis-skills R project (00-qc through reporting, R/ and run_pipeline.sh), configured API access and its reference resources. The three entrypoints share one pipeline."
+        ]
+      }
+    },
+    {
+      "id": "agentic-science",
+      "repository": "hubayirp/agentic-science",
+      "revision": "213588a92bb74e705d795ba106e0119975877e8c",
+      "cache_path": "temp/skill-sources/hubayirp--agentic-science",
+      "content_license": "MIT",
+      "attribution": "hubayirp/agentic-science contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite hubayirp/agentic-science at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "hydra-genetics-hydra-genetics-skills",
+      "repository": "hydra-genetics/hydra-genetics-skills",
+      "revision": "a2c7acec765f3ed995eed68147e6cdd31abf9813",
+      "cache_path": "temp/skill-sources/hydra-genetics--hydra-genetics-skills",
+      "content_license": null,
+      "attribution": "hydra-genetics/hydra-genetics-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite hydra-genetics/hydra-genetics-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "jarxunlai-my-skills",
+      "repository": "jarxunlai/My-skills",
+      "revision": "23fd1af77f8791f851c76bd6c7394d38d15763fe",
+      "cache_path": "temp/skill-sources/jarxunlai--My-skills",
+      "content_license": null,
+      "attribution": "jarxunlai/My-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite jarxunlai/My-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "isabl",
+      "repository": "juanesarango/isabl-mcp",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e",
+      "cache_path": "temp/skill-sources/juanesarango--isabl-mcp",
+      "content_license": "MIT",
+      "attribution": "juanesarango/isabl-mcp contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite juanesarango/isabl-mcp at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.",
+      "runtime": {
+        "python_modules": [
+          "isabl_cli"
+        ],
+        "manual_checks": [
+          "Requires a configured Isabl deployment/API and permissions; these are guidance files, not an Isabl server."
+        ]
+      }
+    },
+    {
+      "id": "lyfar-genomic-variant-research",
+      "repository": "lyfar/genomic-variant-research",
+      "revision": "1a0e4f7f9161e6922a03539be14e42f945e47784",
+      "cache_path": "temp/skill-sources/lyfar--genomic-variant-research",
+      "content_license": "MIT",
+      "attribution": "lyfar/genomic-variant-research contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite lyfar/genomic-variant-research at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "maratgaliev-claude-skill-genomic-pipelines",
+      "repository": "maratgaliev/claude-skill-genomic-pipelines",
+      "revision": "b1fd8c09bdd257efe7962ecd3f771147ac35f74d",
+      "cache_path": "temp/skill-sources/maratgaliev--claude-skill-genomic-pipelines",
+      "content_license": null,
+      "attribution": "maratgaliev/claude-skill-genomic-pipelines contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite maratgaliev/claude-skill-genomic-pipelines at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "masaomi-genomicschain-skillsets",
+      "repository": "masaomi/GenomicsChain_SkillSets",
+      "revision": "983bd50d61f97a92005fc4b9d900b95ab100d0f7",
+      "cache_path": "temp/skill-sources/masaomi--GenomicsChain_SkillSets",
+      "content_license": "MIT",
+      "attribution": "masaomi/GenomicsChain_SkillSets contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite masaomi/GenomicsChain_SkillSets at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "mcap91-bioinfo-agent-toolkit",
+      "repository": "mcap91/bioinfo-agent-toolkit",
+      "revision": "ac16a7f57f67d586cda5158129b90a3ac72e8f6b",
+      "cache_path": "temp/skill-sources/mcap91--bioinfo-agent-toolkit",
+      "content_license": "MIT",
+      "attribution": "mcap91/bioinfo-agent-toolkit contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite mcap91/bioinfo-agent-toolkit at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "genetic-counseling",
+      "repository": "muwenbo/genetic-counseling-skills",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4",
+      "cache_path": "temp/skill-sources/muwenbo--genetic-counseling-skills",
+      "content_license": "MIT",
+      "attribution": "muwenbo/genetic-counseling-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite muwenbo/genetic-counseling-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "muwenbo-noxia-skills",
+      "repository": "muwenbo/noxia-skills",
+      "revision": "8941b532a5c0cf3f81f94d3db2bae56752f85104",
+      "cache_path": "temp/skill-sources/muwenbo--noxia-skills",
+      "content_license": null,
+      "attribution": "muwenbo/noxia-skills contributors",
+      "policy": "No applicable redistribution license established, or no portable SKILL.md at this revision; reference only.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite muwenbo/noxia-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "nekrut-galaxy-claude-skills",
+      "repository": "nekrut/galaxy-claude-skills",
+      "revision": "0f833c2f11fa624d9fd87c6d139dac404d6dd4ff",
+      "cache_path": "temp/skill-sources/nekrut--galaxy-claude-skills",
+      "content_license": "MIT",
+      "attribution": "nekrut/galaxy-claude-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite nekrut/galaxy-claude-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "openai-plugins",
+      "repository": "openai/plugins",
+      "revision": "1dc195897af4161d039b80d8471ec0a10c9bbc89",
+      "cache_path": "temp/skill-sources/openai--plugins",
+      "content_license": null,
+      "attribution": "openai/plugins contributors",
+      "policy": "Reviewed the life-science-research subtree only. No applicable license declaration was found there or at the root; licenses in unrelated plugin subtrees do not cover these 50 skills.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite openai/plugins at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "stjudecab-cab-aiskills",
+      "repository": "stjudecab/CAB-aiSkills",
+      "revision": "04520240060c10e8937dcd945a01fc6ebbdc731e",
+      "cache_path": "temp/skill-sources/stjudecab--CAB-aiSkills",
+      "content_license": "CC-BY-NC-SA-4.0",
+      "attribution": "stjudecab/CAB-aiSkills contributors",
+      "policy": "Reference only in this public general-use distribution: content has NonCommercial and ShareAlike conditions; it is not MIT and is not prohibited from all redistribution.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite stjudecab/CAB-aiSkills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "operon",
+      "repository": "swaruplab/operon",
+      "revision": "77f5361af5a2433e38ecfc652c454c49baec4ac3",
+      "cache_path": "temp/skill-sources/swaruplab--operon",
+      "content_license": "MIT",
+      "attribution": "swaruplab/operon contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite swaruplab/operon at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "misha",
+      "repository": "tanaylab/misha",
+      "revision": "b13d4e2593d1883acd43efb30f9bf1132891fc3b",
+      "cache_path": "temp/skill-sources/tanaylab--misha",
+      "content_license": "MIT",
+      "attribution": "tanaylab/misha contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite tanaylab/misha at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "waldronlab-ai-agent-skills",
+      "repository": "waldronlab/ai-agent-skills",
+      "revision": "01739035bb9522328ee84b64d7c3de4298ce1d17",
+      "cache_path": "temp/skill-sources/waldronlab--ai-agent-skills",
+      "content_license": "MIT",
+      "attribution": "waldronlab/ai-agent-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite waldronlab/ai-agent-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "wu-yc-labclaw",
+      "repository": "wu-yc/LabClaw",
+      "revision": "df378022e8b0764e5ee07df3e3a03e2fa7c7dd65",
+      "cache_path": "temp/skill-sources/wu-yc--LabClaw",
+      "content_license": null,
+      "attribution": "wu-yc/LabClaw contributors",
+      "policy": "Discovery mirror: no repository-level license at this revision. Resolve K-Dense, ToolUniverse and other original sources instead of relicensing copied skills.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite wu-yc/LabClaw at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "zamushwani2-biomedical-ai-skills",
+      "repository": "zamushwani2/biomedical-ai-skills",
+      "revision": "71c9884f8b1a2931d1b68d3ac3eafb9337da8d6d",
+      "cache_path": "temp/skill-sources/zamushwani2--biomedical-ai-skills",
+      "content_license": "MIT",
+      "attribution": "zamushwani2/biomedical-ai-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "reference-only",
+      "citation_guidance": "Cite zamushwani2/biomedical-ai-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "postgwas",
+      "repository": "zoebischuribe-cloud/postgwas-skills",
+      "revision": "cc7ad3dbb68bb7c7b13e3ffde8366824f0a56a4f",
+      "cache_path": "temp/skill-sources/zoebischuribe-cloud--postgwas-skills",
+      "content_license": "MIT",
+      "attribution": "zoebischuribe-cloud/postgwas-skills contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite zoebischuribe-cloud/postgwas-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "bioclaw-hub",
+      "repository": "zongtingwei/Bioclaw_Skills_Hub",
+      "revision": "d056daa153685cc59d24e9c432e4804d9cd122fe",
+      "cache_path": "temp/skill-sources/zongtingwei--Bioclaw_Skills_Hub",
+      "content_license": "MIT",
+      "attribution": "zongtingwei/Bioclaw_Skills_Hub contributors",
+      "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
+      "handling": "curated-import",
+      "citation_guidance": "Cite zongtingwei/Bioclaw_Skills_Hub at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    }
+  ]
+}

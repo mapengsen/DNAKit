@@ -4,17 +4,36 @@ include CHANGELOG.md
 include LICENSE
 include DISCLAIMER.md
 include pyproject.toml
+include setup.py
+include setup.md
+include THIRD_PARTY_NOTICES.md
+recursive-include registry *.json *.csv *.md
+recursive-include skills *
+recursive-include licenses/skills *
+recursive-include others/skills *.py
+recursive-include others/skills/adaptations *
 include environment-dev.yml
 include others/__init__.py
 recursive-include src *.py py.typed
+recursive-include src/dnakit/databases *.json *.graphql *.gql LICENSE
 recursive-include others/tests *.py
 recursive-include others/validation *.py *.md *.json
 recursive-include others/examples *.py *.json *.fasta *.yml *.md
 recursive-include docs *.md *.json *.csv
 recursive-include others/overrides *.html
+recursive-include others/hooks *.py
 include mkdocs.yml
 recursive-include others/notebooks *.ipynb
 
 prune dashing_similarity
 prune ckpt
+prune temp
+prune build
+prune dist
 global-exclude __pycache__ *.py[cod] *.so *.a *.o
+global-exclude */__pycache__/*
+
+recursive-include src/dnakit/encode LICENSE *.json
+recursive-include src/dnakit/workflows/common LICENSE *.json
+recursive-include src/dnakit/workflows/prs LICENSE *.json *.txt
+recursive-include src/dnakit/workflows/support LICENSE *.json *.txt *.csv *.tsv *.vcf *.md

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import csv
 import platform
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, to_json_compatible
 from dnakit.exceptions import BackendExecutionError, InputFormatError
 from dnakit.representations import RepresentationBackend
@@ -23,6 +25,112 @@ from .schema import (
 )
 from .splitting import split_property_data
 from .targets import compute_metrics, decoded_prediction_rows, encode_targets, fit_target_schema
+
+
+def _cross_validate(
+    data: PropertyData,
+    values: Any,
+    targets: Any,
+    schema: TargetSchema,
+    config: CustomPropertyTrainingConfig,
+    staging: Path,
+) -> tuple[dict[str, object], list[str]]:
+    """Fit independent fold pipelines, save OOF predictions and compact fold audits."""
+    from .training import _write_predictions
+
+    np = require_ml_module("numpy")
+    selection = require_ml_module("sklearn.model_selection")
+    assert config.cv_folds is not None
+    count = config.cv_folds
+    if count > data.record_count:
+        raise InputFormatError("cv_folds exceeds the training row count.", code="INVALID_CUSTOM_CV")
+    labels = None
+    if config.stratify and schema.mode in {"binary", "multiclass"}:
+        labels = targets
+        _, counts = np.unique(labels, return_counts=True)
+        if int(counts.min()) < count:
+            raise InputFormatError(
+                "Stratified CV needs at least cv_folds training rows in every class.",
+                code="INSUFFICIENT_CV_SAMPLES",
+            )
+        splitter = selection.StratifiedKFold(n_splits=count, shuffle=True, random_state=config.seed)
+    else:
+        splitter = selection.KFold(n_splits=count, shuffle=True, random_state=config.seed)
+    warnings: list[str] = []
+    if config.stratify and schema.mode in {"multilabel", "multioutput"}:
+        warnings.append("Multi-target CV uses KFold without stratification.")
+    oof = np.empty((data.record_count, schema.output_dimension), dtype=np.float64)
+    fold_ids = np.full(data.record_count, -1, dtype=np.int64)
+    folds: list[dict[str, object]] = []
+    for fold, (train, validation) in enumerate(splitter.split(values, labels)):
+        if config.show_progress:
+            print(
+                f"[DNAKit CV] Fold {fold + 1}/{count}: "
+                f"train={len(train)}, validation={len(validation)}",
+                flush=True,
+            )
+        # Only target vocabulary is shared. Scalers, classifiers and any probability
+        # calibration are newly fitted using this fold's training rows alone.
+        fold_schema = fit_target_schema(
+            data.labels,
+            data.label_names,
+            task_type=config.task_type,
+            classification_mode=config.classification_mode,
+            train_indices=tuple(int(i) for i in train),
+        )
+        if schema.task_type == "classification" and fold_schema != schema:
+            raise InputFormatError(
+                "A CV training fold lacks target classes; reduce cv_folds or use stratification.",
+                code="CUSTOM_CV_CLASS_MISMATCH",
+            )
+        fold_targets = encode_targets(data.labels, schema=fold_schema)
+        estimators, notes = _fit_estimators(values[train], fold_targets[train], config)
+        warnings.extend(notes)
+        output = _outputs(estimators, values[validation], fold_schema)
+        if schema.task_type == "regression":
+            # Convert fold-normalized outputs to the final artifact's coordinates
+            # only for reporting. Training target normalization stays fold-local.
+            raw_output = output * np.asarray(fold_schema.regression_scales) + np.asarray(
+                fold_schema.regression_means
+            )
+            oof[validation] = (raw_output - np.asarray(schema.regression_means)) / np.asarray(
+                schema.regression_scales
+            )
+        else:
+            oof[validation] = output
+        fold_ids[validation] = fold
+        folds.append(
+            {
+                "fold": fold,
+                "train_count": len(train),
+                "validation_count": len(validation),
+                "metrics": compute_metrics(
+                    fold_targets[validation], output, schema=fold_schema, threshold=config.threshold
+                ),
+            }
+        )
+    with (staging / "splits.csv").open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(("row_index", "record_id", "validation_fold"))
+        writer.writerows(
+            (index, record_id, int(fold_ids[index]))
+            for index, record_id in enumerate(data.record_ids)
+        )
+    _write_predictions(
+        staging / "oof_predictions.jsonl",
+        data.record_ids,
+        oof,
+        schema=schema,
+        threshold=config.threshold,
+    )
+    return {
+        "n_splits": count,
+        "splitter": type(splitter).__name__,
+        "seed": config.seed,
+        "folds": folds,
+        "out_of_fold": compute_metrics(targets, oof, schema=schema, threshold=config.threshold),
+        "refit_record_count": data.record_count,
+    }, list(dict.fromkeys(warnings))
 
 
 def _fit_estimators(
@@ -148,6 +256,7 @@ def train_machine_learning_property(
     llm_client: SchemaLLMClient | None,
     data_reader: DataReader | None,
     representation_backend: RepresentationBackend | None,
+    verbose: bool = True,
 ) -> CustomPropertyTrainingResult:
     from .training import (
         _ARTIFACT_SCHEMA,
@@ -179,25 +288,36 @@ def train_machine_learning_property(
         missing_label_policy=config.missing_label_policy,
         require_sequences=config.feature_source != "numeric",
     )
-    split = split_property_data(
-        data,
-        train_ratio=config.train_ratio,
-        validation_ratio=config.validation_ratio,
-        test_ratio=config.test_ratio,
-        seed=config.seed,
-        task_type=config.task_type,
-        stratify=config.stratify,
+    if config.cv_folds is not None and inspection.mapping.split_field is not None:
+        raise InputFormatError(
+            "CV expects a training-only source without a mapped split field.",
+            code="INVALID_CUSTOM_CV",
+            hint="Keep independent test data in a separate file; map only training columns.",
+        )
+    split = (
+        split_property_data(
+            data,
+            train_ratio=config.train_ratio,
+            validation_ratio=config.validation_ratio,
+            test_ratio=config.test_ratio,
+            seed=config.seed,
+            task_type=config.task_type,
+            stratify=config.stratify,
+        )
+        if config.cv_folds is None
+        else None
     )
+    train_indices = split.train if split is not None else tuple(range(data.record_count))
     schema = fit_target_schema(
         data.labels,
         data.label_names,
         task_type=config.task_type,
         classification_mode=config.classification_mode,
-        train_indices=split.train,
+        train_indices=train_indices,
     )
     targets = encode_targets(data.labels, schema=schema)
     values, feature_metadata = machine_learning_features(data, config, representation_backend)
-    warnings = [*inspection.warnings, *split.warnings]
+    warnings = [*inspection.warnings, *(split.warnings if split is not None else ())]
     if data.dropped_records:
         warnings.append(f"Dropped {data.dropped_records} records with missing labels.")
     if config.feature_source != "numeric" and len(set(data.sequences)) < data.record_count:
@@ -226,7 +346,11 @@ def train_machine_learning_property(
                 "train": config.train_ratio,
                 "validation": config.validation_ratio,
                 "test": config.test_ratio,
-            },
+            }
+            if split is not None
+            else None,
+            "cv_folds": config.cv_folds,
+            "refit_all_training_rows": split is None,
         },
     }
     artifacts = {
@@ -235,17 +359,35 @@ def train_machine_learning_property(
         "metrics": "metrics.json",
         "data_inspection": "data_inspection.json",
         "splits": "splits.csv",
-        "test_predictions": "test_predictions.jsonl",
     }
+    if split is None:
+        artifacts["oof_predictions"] = "oof_predictions.jsonl"
+    else:
+        artifacts["test_predictions"] = "test_predictions.jsonl"
     with _staged_output(output_dir, overwrite=config.overwrite) as staging:
         # Limit OpenMP/BLAS as well as estimators exposing n_jobs.
         with require_ml_module("threadpoolctl").threadpool_limits(limits=max(1, config.workers)):
+            metrics: dict[str, object] = {}
+            if split is None:
+                cv_metrics, cv_notes = _cross_validate(
+                    data, values, targets, schema, config, staging
+                )
+                metrics["cross_validation"] = cv_metrics
+                warnings.extend(cv_notes)
+                if config.show_progress:
+                    print(
+                        f"[DNAKit CV] Fitting final model on all {data.record_count} training rows",
+                        flush=True,
+                    )
             estimators, notes = _fit_estimators(
-                values[list(split.train)], targets[list(split.train)], config
+                values[list(train_indices)], targets[list(train_indices)], config
             )
             warnings.extend(notes)
-            metrics: dict[str, object] = {}
-            for name, indices in (("validation", split.validation), ("test", split.test)):
+            for name, indices in (
+                (("validation", split.validation), ("test", split.test))
+                if split is not None
+                else ()
+            ):
                 outputs = _outputs(estimators, values[list(indices)], schema)
                 metrics[name] = compute_metrics(
                     targets[list(indices)], outputs, schema=schema, threshold=config.threshold
@@ -261,18 +403,28 @@ def train_machine_learning_property(
         require_ml_module("joblib").dump(
             {"estimators": estimators}, staging / "estimator.joblib", compress=3
         )
+        warnings = list(dict.fromkeys(warnings))
         manifest["warnings"] = warnings
         _write_json(staging / "model.json", manifest)
         _write_json(staging / "metrics.json", metrics)
         _write_json(staging / "data_inspection.json", inspection.to_dict())
-        _write_splits(staging / "splits.csv", data, split)
+        if split is not None:
+            _write_splits(staging / "splits.csv", data, split)
     return CustomPropertyTrainingResult(
         config.model,
         config.task_type,
         "machine_learning",
         str(output_dir),
         schema,
-        FrozenDict(split.counts),
+        FrozenDict(
+            split.counts
+            if split is not None
+            else {
+                "train": data.record_count,
+                "validation": 0,
+                "test": 0,
+            }
+        ),
         FrozenDict(metrics),
         (),
         FrozenDict({name: str(output_dir / filename) for name, filename in artifacts.items()}),
@@ -293,6 +445,7 @@ def predict_machine_learning_property(
     threshold: float | None,
     allow_remote_code: bool,
     show_progress: bool,
+    verbose: bool = True,
 ) -> CustomPropertyPredictionResult:
     features = manifest.get("features")
     if (
@@ -302,6 +455,12 @@ def predict_machine_learning_property(
         raise InputFormatError(
             "Invalid saved feature schema.", code="INVALID_CUSTOM_MODEL_ARTIFACT"
         )
+    saved_checkpoint = features.get("checkpoint_path")
+    checkpoint_path = (
+        saved_checkpoint
+        if isinstance(saved_checkpoint, str) and Path(saved_checkpoint).expanduser().is_dir()
+        else None
+    )
     selected_threshold = manifest.get("threshold", 0.5) if threshold is None else threshold
     try:
         config = CustomPropertyTrainingConfig(
@@ -312,7 +471,7 @@ def predict_machine_learning_property(
             embedding_model=str(features.get("embedding_model", "dnabert2")),
             mapping=data.inspection.mapping,
             kmer_k=cast(int, features.get("kmer_k", 3)),
-            checkpoint_path=cast(Any, features.get("checkpoint_path")),
+            checkpoint_path=checkpoint_path,
             model_source_path=cast(Any, features.get("model_source_path")),
             pooling=cast(Any, features.get("pooling", "mean")),
             max_length=cast(Any, features.get("max_length")),
@@ -364,3 +523,8 @@ def predict_machine_learning_property(
         tuple(FrozenDict(row) for row in predictions),
         tuple(FrozenDict(row) for row in probabilities),
     )
+
+
+_register_public_verbose(
+    globals(), ("train_machine_learning_property", "predict_machine_learning_property")
+)

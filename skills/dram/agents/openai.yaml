@@ -1,0 +1,7 @@
+interface:
+  display_name: "DRAM"
+  short_description: "Distill MAG metabolic potential"
+  default_prompt: "Use $dram for Distill MAG metabolic potential."
+
+policy:
+  allow_implicit_invocation: true

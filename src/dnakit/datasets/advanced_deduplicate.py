@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Literal
 
+from dnakit._parallel import ordered_map
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet, Gap, Topology
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
 
@@ -38,6 +40,8 @@ _IUPAC = {
 
 
 def _compatible(left: str, right: str) -> bool:
+    if left == right:
+        return True
     return len(left) == len(right) and all(
         bool(_IUPAC[left_symbol] & _IUPAC[right_symbol])
         for left_symbol, right_symbol in zip(left, right, strict=True)
@@ -58,10 +62,16 @@ def _representative(
     return max(members, key=lambda index: (quality_score(records[index]), -index))
 
 
+def _compatibility_job(payload: tuple[int, int, str, str]) -> tuple[int, int, bool, bool]:
+    left, right, first, second = payload
+    return left, right, first == second, _compatible(first, second)
+
+
 def deduplicate_iupac(
     records: Iterable[DNARecord],
     *,
     config: IUPACDeduplicationConfig | None = None,
+    verbose: bool = True,
 ) -> IUPACDeduplicationResult:
     """Greedily build stable complete-link groups of pairwise-compatible IUPAC strings."""
 
@@ -91,31 +101,35 @@ def deduplicate_iupac(
     compatible_pairs = 0
     conflict_pairs = 0
     pair_relations: list[IUPACPairRelation] = []
-    for left in range(len(materialized)):
-        left_symbols = materialized[left].sequence.symbols
-        for right in range(left + 1, len(materialized)):
-            right_symbols = materialized[right].sequence.symbols
-            is_compatible = _compatible(left_symbols, right_symbols)
-            compatibility[left][right - left - 1] = is_compatible
-            relation: Literal["identical", "compatible", "conflict"]
-            if left_symbols == right_symbols:
-                identical_pairs += 1
-                relation = "identical"
-            elif is_compatible:
-                compatible_pairs += 1
-                relation = "compatible"
-            else:
-                conflict_pairs += 1
-                relation = "conflict"
-            pair_relations.append(
-                IUPACPairRelation(
-                    left,
-                    right,
-                    materialized[left].id,
-                    materialized[right].id,
-                    relation,
-                )
+    jobs = (
+        (left, right, materialized[left].sequence.symbols, materialized[right].sequence.symbols)
+        for left in range(len(materialized))
+        for right in range(left + 1, len(materialized))
+    )
+    short = max((record.sequence.symbol_length for record in materialized), default=0) <= 4096
+    for left, right, identical, is_compatible in ordered_map(
+        _compatibility_job, jobs, workers=1 if short else None
+    ):
+        compatibility[left][right - left - 1] = is_compatible
+        relation: Literal["identical", "compatible", "conflict"]
+        if identical:
+            identical_pairs += 1
+            relation = "identical"
+        elif is_compatible:
+            compatible_pairs += 1
+            relation = "compatible"
+        else:
+            conflict_pairs += 1
+            relation = "conflict"
+        pair_relations.append(
+            IUPACPairRelation(
+                left,
+                right,
+                materialized[left].id,
+                materialized[right].id,
+                relation,
             )
+        )
 
     def pair_is_compatible(left: int, right: int) -> bool:
         if left > right:
@@ -171,9 +185,7 @@ def deduplicate_iupac(
 
 
 def deduplicate_approximate(
-    records: Iterable[DNARecord],
-    *,
-    config: ClusterConfig,
+    records: Iterable[DNARecord], *, config: ClusterConfig, verbose: bool = True
 ) -> ClusteringResult:
     """Return threshold-graph components and representatives as near-duplicate groups."""
 
@@ -181,3 +193,5 @@ def deduplicate_approximate(
 
 
 __all__ = ["deduplicate_approximate", "deduplicate_iupac"]
+
+_register_public_verbose(globals())

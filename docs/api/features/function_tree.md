@@ -1,8 +1,33 @@
 # DNAKit 功能树
 
-> 更新日期：2026-09-09。按当前工作区 `src/dnakit` 的公开导出、模型/编码目录、CLI、Agent 目录和功能页核对，包含尚未提交的实现。覆盖六大功能模块，并在下方展开生物信息学 Python API。编号沿用功能页或需求追踪编号，不表示连续的功能计数；这里按用户能力归类，不逐一列出配置类、结果类型、兼容别名或底层辅助函数。可选依赖、外部程序和服务要求见对应页面；列入树中表示已有接口与实现，不表示本机已安装或完成所有外部后端的实测。
+> 更新日期：2026-09-13。按当前工作区 `src/dnakit` 的公开导出、模型/编码目录、CLI、Agent 目录和功能页核对，包含尚未提交的实现。覆盖六大功能模块，并在下方展开生物信息学 Python API。编号沿用功能页或需求追踪编号，不表示连续的功能计数；这里按用户能力归类，不逐一列出配置类、结果类型、兼容别名或底层辅助函数。可选依赖、外部程序和服务要求见对应页面；列入树中表示已有接口与实现，不表示本机已安装或完成所有外部后端的实测。
 
-详情入口：[功能模块索引](index.md) · [Agent 与 MCP 工具、通用大模型调用](../../agent_tools.md) · [自定义性质训练与预测](23_deep_learning_property_prediction.md) · [基因名称与区间注释](26_gene_annotation.md) · [生物信息学 API](27_bioinformatics.md) · [完整 API 参考](../index.md)。
+详情入口：[功能模块索引](index.md) · 大模型工具：[MCP](../../llm_tools/mcp.md) / [Python API](../../llm_tools/python_api.md) · [自定义性质训练与预测](23_deep_learning_property_prediction.md) · [基因名称与区间注释](26_gene_annotation.md) · [生物信息学 API](27_bioinformatics.md) · [完整 API 参考](../index.md)。
+
+## 新增公开函数分支 (2026-09-13) {#native-apis}
+
+本轮新增 **484 个公开函数**，下列分类中均已逐项列出签名、参数和返回值。按模块统计为数据库 455、ENCODE 20、工作流 6、序列检索与下载 3。下表按用途分类，每个函数只计一次；函数数不等于独立科学算法数。
+
+| 用途分支与详细文档 | 函数数 |
+| --- | ---: |
+| [基因、序列、测序数据与下载](../native/sequences.md) | 41 |
+| [遗传变异、GWAS 与变异评分](../native/variants.md) | 80 |
+| [疾病、表型与本体](../native/phenotypes.md) | 45 |
+| [表达、表观调控与肿瘤数据](../native/regulation.md) | 65 |
+| [模式生物、物种与微生物组](../native/organisms.md) | 49 |
+| [通路、互作、蛋白与结构](../native/pathways.md) | 64 |
+| [靶点、药物与关联证据](../native/targets.md) | 62 |
+| [文献、预印本与临床研究检索](../native/literature.md) | 17 |
+| [已训练模型的预测接口](../native/models.md) | 14 |
+| [序列计算、VCF、克隆与遗传模拟](../native/analysis.md) | 15 |
+| [ENCODE 查询、下载与数据管理](../native/encode.md) | 20 |
+| [接口发现、工作流与报告](../native/execution.md) | 12 |
+| **[484 / 484](../native/index.md)** | **484** |
+
+[完整索引与调用示例](../native/usage.md)
+
+## 核心功能树
+
 
 ```
 DNAKit 功能总览（快速入门教程 + 独立工具与 API 扩展）
@@ -55,7 +80,7 @@ DNAKit 功能总览（快速入门教程 + 独立工具与 API 扩展）
 │   │   ├── 19. DBD-019 保守性数据
 │   │   ├── 20. DBD-020 多物种比对
 │   │   ├── 21. DBD-021 坐标转换文件
-│   │   ├── 通用文件下载、校验与来源清单：download_file
+│   │   ├── 通用链接/文件下载、校验与来源清单：download_url / download_file / dataset
 │   │   └── 外部索引构建：build_index（makeblastdb / BWA / Bowtie2 / minimap2 / samtools faidx、dict）
 │   ├── （4）数据查询
 │   │   ├── 1. 基础查询：基因、序列、accession、组装、分类、项目、样本、文献与数据库版本
@@ -296,16 +321,13 @@ DNAKit 功能总览（快速入门教程 + 独立工具与 API 扩展）
 │   │       ├── 编码区/基因间区、人类/线虫、果蝇增强子、小鼠增强子
 │   │       ├── 人类 Cohn / Ensembl 增强子、人类调控元件类型
 │   │       └── 人类非 TATA 启动子、人类开放染色质区域
-│   ├── （9）深度学习任务 Checkpoint 下载
-│   │   ├── NT Revised 18 个与 Genomic Benchmarks 9 个任务权重
-│   │   └── 默认/自定义目录、精确文件路径、加载校验与预测输出
-│   ├── （10）可选生物信息功能
+│   ├── （9）可选生物信息功能
 │   │   ├── 1. Ensembl VEP 与变异标识转换
 │   │   ├── 2. ClinVar、dbSNP 与 gnomAD 注释
 │   │   ├── 3. Nei–Gojobori dN/dS
 │   │   ├── 4. Golden Gate 设计与反应组装
 │   │   └── MSA、系统发育、NGS、统计与分子设计：见下方 bioinformatics 扩展
-│   └── （11）基因名称与区间注释
+│   └── （10）基因名称与区间注释
 │       ├── 基因组 DNA + 物种 → annotate_genes / GeneAnnotationConfig
 │       ├── 默认 RefSeq 组装解析、显式组装或本地 FASTA + GFF3
 │       ├── minimap2 参考比对与已有基因注释映射（非从头基因预测）

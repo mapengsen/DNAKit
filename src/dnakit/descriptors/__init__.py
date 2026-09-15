@@ -1,5 +1,6 @@
 """Deterministic, dependency-free DNA sequence descriptors."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.descriptors._dinucleotide import (
     DEFAULT_MAX_DINUCLEOTIDE_TABLE_BYTES,
     DINUCLEOTIDE_PROPERTY_SPECS,
@@ -100,3 +101,5 @@ __all__ = [
     "shannon_entropy",
     "window_descriptors",
 ]
+
+_register_public_verbose(globals())

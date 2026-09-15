@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Any, Literal, TextIO, TypeAlias, cast
 from urllib.parse import quote, unquote_to_bytes
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.core.coordinates import Interval
 from dnakit.core.enums import GapKind, Strand
@@ -193,6 +194,7 @@ def read_gff3(
     max_records: int = 1_000_000,
     max_line_length: int = 1_000_000,
     max_header_lines: int = 10_000,
+    verbose: bool = True,
 ) -> AnnotationDocument:
     """Read GFF3 features using 1-based closed to 0-based half-open conversion."""
 
@@ -386,6 +388,7 @@ def write_gff3(
     *,
     overwrite: bool = False,
     create_parents: bool = False,
+    verbose: bool = True,
 ) -> int:
     """Write deterministic GFF3 with internal coordinate conversion."""
 
@@ -460,6 +463,7 @@ def read_bed(
     max_records: int = 1_000_000,
     max_line_length: int = 1_000_000,
     max_header_lines: int = 10_000,
+    verbose: bool = True,
 ) -> AnnotationDocument:
     """Read the BED3-BED6 subset into immutable features."""
 
@@ -557,6 +561,7 @@ def write_bed(
     *,
     overwrite: bool = False,
     create_parents: bool = False,
+    verbose: bool = True,
 ) -> int:
     """Write the deterministic BED6 subset."""
 
@@ -862,6 +867,7 @@ def read_agp(
     max_records: int = 1_000_000,
     max_line_length: int = 1_000_000,
     max_header_lines: int = 10_000,
+    verbose: bool = True,
 ) -> AGPDocument:
     """Read AGP 2.1 components and explicit gaps with continuity validation."""
 
@@ -1081,6 +1087,7 @@ def write_agp(
     *,
     overwrite: bool = False,
     create_parents: bool = False,
+    verbose: bool = True,
 ) -> int:
     """Write deterministic AGP rows after validating object continuity."""
 
@@ -1177,3 +1184,5 @@ __all__ = [
     "write_bed",
     "write_gff3",
 ]
+
+_register_public_verbose(globals())

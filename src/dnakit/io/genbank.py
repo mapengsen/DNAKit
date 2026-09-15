@@ -11,6 +11,7 @@ import re
 from collections.abc import Iterable, Iterator, Mapping
 from typing import TextIO, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import JSONValue
 from dnakit.core.coordinates import CompoundLocation, Interval, Location, UnresolvedLocation
 from dnakit.core.enums import DNAAlphabet, Strand, Strandedness, Topology
@@ -179,7 +180,9 @@ def _feature_from_parts(
         ) from exc
 
 
-def iter_genbank(handle: TextIO, config: ReadConfig) -> Iterator[DNARecord]:
+def iter_genbank(
+    handle: TextIO, config: ReadConfig, *, verbose: bool = True
+) -> Iterator[DNARecord]:
     """Parse the auditable GenBank subset lazily."""
 
     lines: list[tuple[int, str]] = []
@@ -427,7 +430,9 @@ def _feature_qualifiers(feature: DNAFeature) -> Iterator[tuple[str, object]]:
             yield key, value
 
 
-def write_genbank(handle: TextIO, records: Iterable[DNARecord], config: WriteConfig) -> int:
+def write_genbank(
+    handle: TextIO, records: Iterable[DNARecord], config: WriteConfig, *, verbose: bool = True
+) -> int:
     """Serialize records in the deterministic DNAKit GenBank subset."""
 
     count = 0
@@ -521,3 +526,5 @@ def write_genbank(handle: TextIO, records: Iterable[DNARecord], config: WriteCon
 
 
 __all__ = ["iter_genbank", "write_genbank"]
+
+_register_public_verbose(globals())

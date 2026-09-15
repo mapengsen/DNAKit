@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Literal, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import ConfigurationError, DownloadError
 from dnakit.search import QueryResult
@@ -90,6 +91,7 @@ def metadata(
     *,
     format: MetadataFormat | None = None,
     config: DownloadConfig | None = None,
+    verbose: bool = True,
 ) -> DatasetDownloadResult:
     """Export a ``QueryResult`` as JSON/JSONL/CSV/TSV/XML plus an audit manifest."""
 
@@ -162,3 +164,5 @@ def metadata(
 
 
 __all__ = ["MetadataFormat", "metadata"]
+
+_register_public_verbose(globals())

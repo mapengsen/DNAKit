@@ -6,6 +6,7 @@ import math
 from collections.abc import Iterable
 from dataclasses import dataclass
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.enums import IssueSeverity, Topology
 from dnakit.core.facade import DNA, resolve_single_dna
 from dnakit.core.gap import Gap
@@ -198,6 +199,7 @@ def plot_sequence(
     *,
     highlights: Iterable[Highlight] = (),
     config: SequencePlotConfig | None = None,
+    verbose: bool = True,
 ) -> SVGArtifact:
     """Render symbols, explicit gaps, coordinates, and optional highlights.
 
@@ -467,3 +469,5 @@ def plot_sequence(
 
 
 __all__ = ["Highlight", "plot_sequence"]
+
+_register_public_verbose(globals())

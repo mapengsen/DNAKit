@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-13",
+  "scope": "Full catalog integration and distribution verification; not full scientific validation of every workflow.",
+  "skills": 536,
+  "renamed_skills": 372,
+  "verified_skill_resources": 4391,
+  "upstream_records": "Original sources, revisions, license basis, metadata, citations and upstream file hashes preserved for all 536 records.",
+  "api": {
+    "native_database_operations": 450,
+    "encode_operations": 20,
+    "catalog_tools": 831,
+    "agent_compatible_tools": 828,
+    "initial_mcp_tools": 8
+  },
+  "interfaces": {
+    "checked_calls": 528,
+    "syntax_checked_python_files": 44,
+    "non_python_or_partial_fences": 15,
+    "errors": [],
+    "scope": "static concrete call signatures; no scientific execution implied"
+  },
+  "tests": {
+    "full_suite": {
+      "passed": 2279,
+      "skipped": 60,
+      "warnings": 10,
+      "log": "temp/all-skills-migration/full-final-tests.log"
+    },
+    "format_and_lint": "passed",
+    "new_adapter_typecheck": "passed: 15 files",
+    "documentation": "strict bilingual build passed"
+  },
+  "mcp": {
+    "initial_mcp_tools": 8,
+    "database_http_fixture": "passed",
+    "packaged_workflow_execution": "passed",
+    "scope": "real in-process MCP protocol; fixture gene HTTP response, actual coordinate subprocess"
+  },
+  "distributions": {
+    "artifacts": [
+      {
+        "artifact": "dnakit-0.1.4-py3-none-any.whl",
+        "sha256": "fba68e5750d6d4591649a275f62e523e4a37ee56c52de2f36fbb6129e1fcdaa9",
+        "bytes": 19876594
+      },
+      {
+        "artifact": "dnakit-0.1.4.tar.gz",
+        "sha256": "b2b070164535312d832686fd4885c6d0bc1f0c6a17d1eecd82e64a6cadbf956c",
+        "bytes": 22548826
+      }
+    ],
+    "skills": 536,
+    "verified_resources": 4391,
+    "scope": "wheel and sdist contents; native source, adaptation templates and complete skill hashes"
+  },
+  "installed_wheel": {
+    "status": "passed",
+    "collection_packages_installed": false,
+    "scope": "isolated base wheel: fixture NCBI flow and real FASTA output; installed coordinate, recombinator demo and WGS help; ENCODE fixture; aliases",
+    "cli": {
+      "command": [
+        "skills",
+        "run",
+        "genomic-coordinates",
+        "--script",
+        "scripts/convert_coords.py",
+        "--",
+        "--from",
+        "bed",
+        "--to",
+        "gff",
+        "chr1",
+        "999",
+        "1000",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "result": [
+        {
+          "contig": "chr1",
+          "input": "999-1000",
+          "output": "1000-1000",
+          "length": 1,
+          "status": "ok",
+          "detail": "",
+          "start": 1000,
+          "end": 1000,
+          "from": "bed",
+          "to": "gff"
+        }
+      ]
+    },
+    "dependency_check": "No broken requirements found.",
+    "log": "temp/all-skills-migration/installed-verification-final.log"
+  },
+  "limits": [
+    "Real scientific libraries, executables, models, reference datasets and credentials retain their requirements.",
+    "Unexecuted complete scientific workflows remain not_run in the catalog. Passing interface tests is not a scientific validation claim.",
+    "Project-wide advisory mypy still reports errors outside the new adapter modules; the targeted new-adapter check passes.",
+    "An additional upgrade attempt in a temporary environment on /mnt/d failed with filesystem Errno 5 (Input/output error). A fresh installation of the final wheel in an independent Linux environment passed. See temp/all-skills-migration/final-install.log."
+  ],
+  "publication": "Local review artifacts only; not published to PyPI."
+}

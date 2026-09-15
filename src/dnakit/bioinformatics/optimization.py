@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import positive, sequence_text
 from dnakit.exceptions import ConfigurationError
 from dnakit.ops.translation import translate
@@ -89,7 +90,12 @@ def _rc(sequence: str) -> str:
 
 
 def specification(
-    kind: str, *, region: tuple[int, int] | None = None, weight: float = 1.0, **parameters: Any
+    kind: str,
+    *,
+    region: tuple[int, int] | None = None,
+    weight: float = 1.0,
+    verbose: bool = True,
+    **parameters: Any,
 ) -> Specification:
     """Build a native specification. See API guide for each kind's parameters.
 
@@ -423,6 +429,7 @@ def optimize_sequence(
     max_iterations: int = 100,
     max_evaluations: int = 100_000,
     seed: int = 0,
+    verbose: bool = True,
 ) -> OptimizationResult:
     """Native greedy coordinate search with hard-constraint priority and weighted utilities.
 
@@ -525,7 +532,7 @@ def optimize_sequence(
 
 
 def specifications_from_record(
-    record: Any,
+    record: Any, *, verbose: bool = True
 ) -> tuple[tuple[Specification, ...], tuple[Specification, ...]]:
     """Read JSON dnakit_constraint/dnakit_objective qualifiers from GenBank features.
 
@@ -577,6 +584,7 @@ def blast_match_specification(
     config: Any = None,
     program: str = "blastn",
     weight: float = 1.0,
+    verbose: bool = True,
 ) -> Specification:
     """Reject qualifying local BLAST HSPs against a separately prepared database.
 
@@ -646,3 +654,14 @@ def blast_match_specification(
             )
 
     return Specification("avoid_blast_matches", evaluate, weight)
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "specification",
+        "optimize_sequence",
+        "specifications_from_record",
+        "blast_match_specification",
+    ),
+)

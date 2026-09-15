@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 from dnakit.fingerprints import SketchResult
@@ -39,6 +40,7 @@ def sketch_similarity(
     *,
     metric: SketchMetric = "jaccard",
     min_shared_hashes: int = 0,
+    verbose: bool = True,
 ) -> SketchSimilarityResult:
     """Compare compatible sketches as sets, with explicit empty-set semantics."""
 
@@ -94,3 +96,5 @@ def sketch_similarity(
 
 
 __all__ = ["SketchMetric", "sketch_similarity"]
+
+_register_public_verbose(globals())

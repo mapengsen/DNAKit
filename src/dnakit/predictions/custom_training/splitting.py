@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import BackendUnavailableError, InputFormatError
 
 from .data import PropertyData
@@ -28,7 +30,7 @@ def _numpy() -> Any:
         raise BackendUnavailableError(
             "Custom property splitting requires NumPy.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("ml"),
         ) from exc
     return np
 
@@ -142,7 +144,7 @@ def _stratified_indices(
         raise BackendUnavailableError(
             "Stratified custom-property splitting requires scikit-learn.",
             code="MISSING_NEURAL_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("ml"),
         ) from exc
     np = _numpy()
     indices = np.arange(total)
@@ -179,6 +181,7 @@ def split_property_data(
     seed: int = 42,
     task_type: str = "classification",
     stratify: bool = True,
+    verbose: bool = True,
 ) -> SplitAssignment:
     """Use an existing split field or produce a seeded random 8:1:1 split."""
 
@@ -221,3 +224,5 @@ def split_property_data(
 
 
 __all__ = ["SplitAssignment", "split_property_data"]
+
+_register_public_verbose(globals())

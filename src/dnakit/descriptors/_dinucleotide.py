@@ -222,6 +222,7 @@ def load_dinucleotide_property_table(
     path: str | Path,
     *,
     max_bytes: int = DEFAULT_MAX_DINUCLEOTIDE_TABLE_BYTES,
+    verbose: bool = True,
 ) -> DinucleotidePropertyTable:
     """Load a bounded JSON table supplied and licensed by the caller.
 

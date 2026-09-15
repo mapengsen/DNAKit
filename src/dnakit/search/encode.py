@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, QueryError
 
 from ._http import (
@@ -31,6 +32,7 @@ def encode_search(
     config: SearchConfig | None = None,
     api_base_url: str = DEFAULT_ENCODE_URL,
     query_type: str = "regulation",
+    verbose: bool = True,
 ) -> QueryResult:
     """Search released ENCODE experiments, files, biosamples, or annotations."""
 
@@ -100,3 +102,5 @@ def encode_search(
 
 
 __all__ = ["DEFAULT_ENCODE_URL", "encode_search"]
+
+_register_public_verbose(globals())

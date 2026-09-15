@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import input_path, positive, require, sequence_text
 from dnakit.exceptions import ConfigurationError
 
@@ -156,6 +157,7 @@ def assemble_duplexes(
     circular: bool = False,
     minimum_overlap: int = 25,
     max_assemblies: int = 50,
+    verbose: bool = True,
 ) -> tuple[Duplex, ...]:
     """Specialist pydna overlap-graph assembly for Gibson/homologous recombination.
 
@@ -193,7 +195,9 @@ def assemble_duplexes(
     )
 
 
-def read_sanger(path: str | Path, *, error_probability_cutoff: float = 0.05) -> dict[str, Any]:
+def read_sanger(
+    path: str | Path, *, error_probability_cutoff: float = 0.05, verbose: bool = True
+) -> dict[str, Any]:
     """ABI codec plus native Mott maximum-score trimming and chromatogram channels."""
     if not 0 < error_probability_cutoff < 1:
         raise ConfigurationError("error_probability_cutoff must lie in (0,1).")
@@ -223,7 +227,7 @@ def read_sanger(path: str | Path, *, error_probability_cutoff: float = 0.05) -> 
     }
 
 
-def plot_chromatogram(trace: Mapping[str, Any], *, axes: Any = None) -> Any:
+def plot_chromatogram(trace: Mapping[str, Any], *, axes: Any = None, verbose: bool = True) -> Any:
     """Plot ABI channel intensities and called bases; return an undisplayed Axes."""
     plt = require("matplotlib.pyplot", "bio-plots")
     if axes is None:
@@ -246,6 +250,7 @@ def sanger_consensus(
     min_identity: float = 0.8,
     min_read_coverage: float = 0.8,
     min_depth: int = 1,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Native local mapping of trimmed Sanger calls, both strands, and reference consensus.
 
@@ -317,7 +322,7 @@ def sanger_consensus(
 
 
 def read_constructs(
-    path: str | Path, *, format: str = "snapgene", permissive: bool = False
+    path: str | Path, *, format: str = "snapgene", permissive: bool = False, verbose: bool = True
 ) -> tuple[Any, ...]:
     """SnapGene/GenBank codecs return Bio.SeqRecord; permissive parsing is opt-in.
 
@@ -336,6 +341,7 @@ def simulate_gel(
     axes: Any = None,
     min_bp: int = 100,
     max_bp: int = 10_000,
+    verbose: bool = True,
 ) -> Any:
     """Qualitative log-size band plot; no claim of calibrated electrophoretic migration.
 
@@ -366,3 +372,16 @@ def simulate_gel(
     axes.set_xticks(range(len(resolved)), [str(index + 1) for index in range(len(resolved))])
     axes.set(xlabel="Lane", ylabel="Fragment length (bp)", title="Qualitative linear-dsDNA gel")
     return axes
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "assemble_duplexes",
+        "read_sanger",
+        "plot_chromatogram",
+        "sanger_consensus",
+        "read_constructs",
+        "simulate_gel",
+    ),
+)

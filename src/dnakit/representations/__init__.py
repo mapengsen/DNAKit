@@ -1,5 +1,6 @@
 """DNA foundation-model checkpoint and representation APIs."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.representations.backends import RepresentationBackend
 from dnakit.representations.checkpoints import (
     CheckpointInfo,
@@ -27,3 +28,5 @@ __all__ = [
     "extract_representations",
     "get_embedding_model",
 ]
+
+_register_public_verbose(globals())

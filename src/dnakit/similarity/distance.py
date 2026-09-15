@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 from dnakit.similarity._shared import (
@@ -31,6 +32,7 @@ def hamming_distance(
     right: SequenceInput,
     *,
     max_distance: int | float | None = None,
+    verbose: bool = True,
 ) -> DistanceResult:
     """Count literal symbol differences between two equal-length sequences.
 
@@ -195,6 +197,7 @@ def edit_distance(
     max_distance: int | float | None = None,
     return_path: bool = False,
     max_cells: int = DEFAULT_MAX_EDIT_CELLS,
+    verbose: bool = True,
 ) -> DistanceResult:
     """Compute weighted literal Levenshtein distance by dynamic programming.
 
@@ -277,3 +280,5 @@ __all__ = [
     "hamming_distance",
     "levenshtein_distance",
 ]
+
+_register_public_verbose(globals())

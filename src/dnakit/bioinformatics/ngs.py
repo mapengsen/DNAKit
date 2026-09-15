@@ -10,6 +10,7 @@ import math
 from collections.abc import Iterable
 from pathlib import Path
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import (
     ExecutionConfig,
     ToolResult,
@@ -32,6 +33,7 @@ def map_reads(
     method: str = "bwa",
     program: str | None = None,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """Build private BWA/Bowtie2 index and map single/paired reads to SAM."""
     if method not in {"bwa", "bowtie2"}:
@@ -67,6 +69,7 @@ def prepare_bam(
     mark_duplicates: bool = True,
     program: str = "samtools",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """Name sort -> fixmate -m -> coordinate sort -> optional markdup -> index -> stats.
 
@@ -134,6 +137,7 @@ def call_variants(
     ploidy: int = 2,
     program: str = "bcftools",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """bcftools mpileup -> multiallelic call -> reference normalization -> VCF index.
 
@@ -191,6 +195,7 @@ def assemble_reads(
     program: str = "spades.py",
     memory_gb: int = 8,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """SPAdes short-read or hybrid de novo assembly, with an explicit memory budget."""
     one = input_path(first)
@@ -213,6 +218,7 @@ def quality_control(
     *,
     program: str = "fastqc",
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     sources = tuple(str(input_path(path)) for path in reads)
     if not sources:
@@ -237,6 +243,7 @@ def dna_seq_workflow(
     ploidy: int = 2,
     qc: bool = True,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> dict[str, ToolResult]:
     """QC -> BWA mapping -> sorted indexed BAM -> variant calling; retain every stage."""
     directory = workspace(output_directory)
@@ -273,6 +280,7 @@ def rna_seq_workflow(
     second: str | Path | None = None,
     strandedness: int = 0,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> dict[str, ToolResult]:
     """HISAT2 splice-aware mapping -> BAM -> StringTie assembly -> featureCounts.
 
@@ -345,6 +353,7 @@ def chip_seq_workflow(
     paired_end: bool = False,
     qvalue: float = 0.05,
     config: ExecutionConfig | None = None,
+    verbose: bool = True,
 ) -> ToolResult:
     """MACS3 peak calling from prepared treatment/control BAMs, plus samtools coverage."""
     treatment, control = input_path(treatment), input_path(control)
@@ -377,3 +386,18 @@ def chip_seq_workflow(
     )
     log += run_to_file("samtools", ("coverage", str(treatment)), directory / "coverage.tsv", config)
     return ToolResult("macs3", directory, artifacts(directory), log)
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "map_reads",
+        "prepare_bam",
+        "call_variants",
+        "assemble_reads",
+        "quality_control",
+        "dna_seq_workflow",
+        "rna_seq_workflow",
+        "chip_seq_workflow",
+    ),
+)

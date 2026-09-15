@@ -184,6 +184,49 @@ def _serialized_header(record: DNARecord, *, format: str) -> str:
     return record.id if not record.description else f"{record.id} {record.description}"
 
 
+def iter_text(handle: TextIO, config: ReadConfig) -> Iterator[DNARecord]:
+    """Read non-empty DNA lines, or explicitly join a wrapped single sequence."""
+    chunks: list[str] = []
+    symbols = 0
+    count = 0
+    for line_number, raw in enumerate(handle, start=1):
+        if config.text_mode == "sequence" and line_number > config.max_record_lines:
+            raise _input_error(
+                "DNA text exceeds max_record_lines.",
+                code="SEQUENCE_RECORD_LINE_LIMIT_EXCEEDED",
+                line_number=line_number,
+            )
+        if len(raw.rstrip("\r\n")) > config.max_field_size:
+            raise _input_error(
+                "DNA text line exceeds max_field_size.",
+                code="SEQUENCE_LINE_TOO_LONG",
+                line_number=line_number,
+            )
+        text = "".join(raw.split())
+        if not text:
+            continue
+        if config.text_mode == "sequence":
+            symbols += len(text)
+            if symbols > config.max_sequence_symbols:
+                raise _input_error(
+                    "DNA text exceeds record limits.",
+                    code="SEQUENCE_SYMBOL_LIMIT_EXCEEDED",
+                    line_number=line_number,
+                )
+            chunks.append(text)
+        else:
+            count += 1
+            record_id = f"{config.anonymous_id_prefix}{count}"
+            yield DNARecord(
+                _sequence(text, config, record_id=record_id, line_number=line_number), record_id
+            )
+    if chunks:
+        record_id = f"{config.anonymous_id_prefix}1"
+        yield DNARecord(
+            _sequence("".join(chunks), config, record_id=record_id, line_number=1), record_id
+        )
+
+
 def iter_fasta(handle: TextIO, config: ReadConfig) -> Iterator[DNARecord]:
     """Parse multiline FASTA records without materializing the file."""
 
@@ -507,6 +550,26 @@ def _record_from_mapping(
             strandedness=cast(str | None, strandedness_value),
         )
     features = _features_from_value(features_value, record_index=record_index)
+    if config.preserve_extra_columns:
+        known = {
+            config.sequence_column,
+            config.parts_column,
+            config.id_column,
+            config.description_column,
+            config.metadata_column,
+            config.features_column,
+            config.letter_annotations_column,
+            "alphabet",
+            "topology",
+            "strandedness",
+            "schema_version",
+        }
+        metadata_value = dict(metadata_value)
+        for key, value in row.items():
+            if key not in known:
+                if key in metadata_value and metadata_value[key] != value:
+                    raise InputFormatError(f"Column {key!r} conflicts with its metadata value.")
+                metadata_value[key] = value
     try:
         return DNARecord(
             sequence,
@@ -837,6 +900,17 @@ def _reject_implicit_gap_loss(record: DNARecord, *, format: str) -> None:
         )
 
 
+def write_text(handle: TextIO, records: Iterable[DNARecord], config: WriteConfig) -> int:
+    """Write one DNA sequence per line; text has no headers or annotations."""
+    count = 0
+    for record in records:
+        _reject_implicit_gap_loss(record, format="TXT")
+        _reject_implicit_feature_loss(record, format="TXT", config=config)
+        handle.write(record.sequence.to_string() + "\n")
+        count += 1
+    return count
+
+
 def write_fasta(handle: TextIO, records: Iterable[DNARecord], config: WriteConfig) -> int:
     count = 0
     for record in records:
@@ -845,8 +919,17 @@ def write_fasta(handle: TextIO, records: Iterable[DNARecord], config: WriteConfi
         header = _serialized_header(record, format="FASTA")
         sequence = record.sequence.to_string()
         handle.write(f">{header}\n")
-        for offset in range(0, len(sequence), config.line_width):
-            handle.write(sequence[offset : offset + config.line_width] + "\n")
+        # Batch wrapped lines while bounding temporary memory for chromosomes.
+        block = max(config.line_width, 1024**2 // config.line_width * config.line_width)
+        for start in range(0, len(sequence), block):
+            end = min(len(sequence), start + block)
+            handle.write(
+                "\n".join(
+                    sequence[offset : min(end, offset + config.line_width)]
+                    for offset in range(start, end, config.line_width)
+                )
+                + "\n"
+            )
         count += 1
     return count
 
@@ -903,20 +986,23 @@ def write_delimited(
     *,
     delimiter: str,
 ) -> int:
-    del config
-    fieldnames = [
-        "schema_version",
-        "id",
-        "sequence",
-        "parts",
-        "alphabet",
-        "topology",
-        "strandedness",
-        "description",
-        "features",
-        "metadata",
-        "letter_annotations",
-    ]
+    fieldnames = (
+        list(config.table_columns)
+        if config.table_columns is not None
+        else [
+            "schema_version",
+            "id",
+            "sequence",
+            "parts",
+            "alphabet",
+            "topology",
+            "strandedness",
+            "description",
+            "features",
+            "metadata",
+            "letter_annotations",
+        ]
+    )
     writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter=delimiter, lineterminator="\n")
     writer.writeheader()
     count = 0
@@ -928,7 +1014,33 @@ def write_delimited(
         row["letter_annotations"] = json.dumps(
             row["letter_annotations"], ensure_ascii=False, sort_keys=True
         )
-        writer.writerow(row)
+        aliases = (
+            {
+                config.sequence_column: "sequence",
+                config.id_column: "id",
+                config.description_column: "description",
+                config.metadata_column: "metadata",
+                config.features_column: "features",
+                config.parts_column: "parts",
+                config.letter_annotations_column: "letter_annotations",
+            }
+            if config.table_columns is not None
+            else {column: column for column in fieldnames}
+        )
+        output = {}
+        for column in fieldnames:
+            if column in aliases:
+                output[column] = row[aliases[column]]
+            elif column in record.metadata:
+                value = to_json_compatible(record.metadata[column])
+                output[column] = (
+                    json.dumps(value, ensure_ascii=False)
+                    if isinstance(value, (dict, list))
+                    else value
+                )
+            else:
+                output[column] = row.get(column, "")
+        writer.writerow(output)
         count += 1
     return count
 

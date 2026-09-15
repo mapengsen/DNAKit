@@ -14,11 +14,13 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import islice
 from pathlib import Path
 from typing import Any, Protocol, cast, runtime_checkable
 
+from dnakit._dependency_hints import dependency_hint
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -181,7 +183,7 @@ def _looks_textual(raw: bytes) -> bool:
     return control / len(raw) < 0.01
 
 
-def detect_data_format(path: str | Path) -> str:
+def detect_data_format(path: str | Path, *, verbose: bool = True) -> str:
     """Detect a built-in format from extension, magic bytes, and a bounded probe."""
 
     path = _source_path(path)
@@ -442,7 +444,9 @@ def _read_yaml(path: Path, mapping: DataMapping, *, maximum: int) -> Iterable[Ma
         import yaml
     except ImportError as exc:  # pragma: no cover - PyYAML is a base dependency.
         raise BackendUnavailableError(
-            "YAML input requires PyYAML.", code="MISSING_CUSTOM_DATA_DEPENDENCY"
+            "YAML input requires PyYAML.",
+            code="MISSING_CUSTOM_DATA_DEPENDENCY",
+            hint=dependency_hint(guidance="Install with: python -m pip install PyYAML"),
         ) from exc
     with _open_text(path, encoding=mapping.encoding, max_file_bytes=maximum) as handle:
         try:
@@ -524,7 +528,7 @@ def _read_excel(path: Path, mapping: DataMapping) -> Iterable[Mapping[str, objec
         raise BackendUnavailableError(
             "Excel input requires pandas and openpyxl.",
             code="MISSING_CUSTOM_DATA_DEPENDENCY",
-            hint='Install the training extra with: python -m pip install "dnakit[training]"',
+            hint=dependency_hint("ml"),
         ) from exc
     try:
         frame = pd.read_excel(
@@ -532,6 +536,12 @@ def _read_excel(path: Path, mapping: DataMapping) -> Iterable[Mapping[str, objec
             sheet_name=0 if mapping.sheet_name is None else mapping.sheet_name,
             header=mapping.header_row,
         )
+    except ImportError as exc:
+        raise BackendUnavailableError(
+            "Excel input requires pandas and the matching Excel reader engine.",
+            code="MISSING_CUSTOM_DATA_DEPENDENCY",
+            hint=dependency_hint("ml"),
+        ) from exc
     except Exception as exc:
         raise BackendExecutionError(
             "Could not read the custom-property Excel source.",
@@ -553,7 +563,7 @@ def _read_parquet(path: Path) -> Iterable[Mapping[str, object]]:
         raise BackendUnavailableError(
             "Parquet input requires PyArrow.",
             code="MISSING_CUSTOM_DATA_DEPENDENCY",
-            hint='Install the I/O extra with: python -m pip install "dnakit[io]"',
+            hint=dependency_hint("io"),
         ) from exc
     try:
         return cast(Iterable[Mapping[str, object]], pq.read_table(path).to_pylist())
@@ -897,6 +907,7 @@ def inspect_property_data(
     reader: DataReader | None = None,
     max_records: int = 1_000_000,
     max_file_bytes: int = 1_000_000_000,
+    verbose: bool = True,
 ) -> DataInspection:
     """Inspect a local source and select an explicit, auditable data mapping.
 
@@ -911,6 +922,7 @@ def inspect_property_data(
         format=cast(Any, "auto" if detected in {"custom", "unknown"} else detected)
     )
     samples: tuple[dict[str, object], ...] = ()
+    all_probe_records: tuple[dict[str, object], ...] | None = None
     estimated_records: int | None = None
     sample_warning: list[str] = []
     try:
@@ -945,6 +957,23 @@ def inspect_property_data(
             raise
         sample_warning.append(f"Local preview was unavailable: {exc.code}")
     local = mapping or _local_mapping(samples, detected_format=detected)
+    if mapping is None and local.id_field is not None and all_probe_records is not None:
+        # Names/coordinates are not necessarily unique IDs. Built-in readers
+        # already inspected the full bounded source, so check beyond the preview.
+        observed_ids: set[str] = set()
+        for record in all_probe_records:
+            try:
+                identifier = str(_field(record, local.id_field)).strip()
+            except KeyError:
+                identifier = ""
+            if not identifier or identifier in observed_ids:
+                sample_warning.append(
+                    f"Auto-detected ID column {local.id_field!r} is missing or non-unique; "
+                    "using source-row IDs without dropping records."
+                )
+                local = replace(local, id_field=None)
+                break
+            observed_ids.add(identifier)
     recommendations: tuple[str, ...] = ()
     llm_warnings: tuple[str, ...] = ()
     origin: str = "explicit" if mapping is not None else "local"
@@ -1055,6 +1084,7 @@ def load_property_data(
     require_labels: bool = True,
     missing_label_policy: str = "error",
     require_sequences: bool = True,
+    verbose: bool = True,
 ) -> PropertyData:
     """Load mapped records and validate IDs, sequences, labels, and optional splits."""
 
@@ -1204,6 +1234,7 @@ def load_property_data(
             "Mapped record IDs must be unique.",
             code="DUPLICATE_CUSTOM_RECORD_ID",
             context={"examples": tuple(duplicates[:20])},
+            hint="Map a unique ID column, or set DataMapping.id_field=None for source-row IDs.",
         )
     return PropertyData(
         tuple(record_ids),
@@ -1224,3 +1255,5 @@ __all__ = [
     "inspect_property_data",
     "load_property_data",
 ]
+
+_register_public_verbose(globals())

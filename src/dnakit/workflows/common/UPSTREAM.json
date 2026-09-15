@@ -1,0 +1,92 @@
+{
+  "source": "ClawBio/ClawBio",
+  "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d",
+  "attribution": "ClawBio contributors",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "__init__.py",
+      "upstream_path": "clawbio/common/__init__.py",
+      "sha256": "2f2c68124b68dc91994306eb8836c6e86ddf79946a242f128ef57eddd19d0daa",
+      "adapted_sha256": "95def0fc0578b256699d911515479b05f000a7fa60abaeef521d4aad7816c5da"
+    },
+    {
+      "path": "audit.py",
+      "upstream_path": "clawbio/common/audit.py",
+      "sha256": "3bdc205afedb898eef90ce07162c122f3b2a2cbdbf77f8e2c906b4c73e7d46e1",
+      "adapted_sha256": "4ce33d7c6f080e39feda46d914bbbc749f03a1057680cb93b50b2b4cdf4be222"
+    },
+    {
+      "path": "checksums.py",
+      "upstream_path": "clawbio/common/checksums.py",
+      "sha256": "03768e23de72eb8000567402292249c686f37fa01ef23b93ac41b5b551c5c04a",
+      "adapted_sha256": "09950b832bfa8301fad5532d7492e98ae6d8e902c0e07d507394178a2cbaeb90"
+    },
+    {
+      "path": "html_report.py",
+      "upstream_path": "clawbio/common/html_report.py",
+      "sha256": "a4a23a224969bba940a5efa884aba424bfdb90f0099f0856761a131231cb126c",
+      "adapted_sha256": "4b741d53f4480e80a7c0e7538988330d6a9e23af5aae5e1f2e4876b8f3c60337"
+    },
+    {
+      "path": "parsers.py",
+      "upstream_path": "clawbio/common/parsers.py",
+      "sha256": "669319e3e0e206526ec068acd6da7767f7bc7feeffa84775da54f9d912084e27",
+      "adapted_sha256": "5a3570f80141d4f6829967339a5728d74865df9b43d73b67838b66141f4e50ed"
+    },
+    {
+      "path": "portable_commands.py",
+      "upstream_path": "clawbio/common/portable_commands.py",
+      "sha256": "184125a96cd6c783c2b8e2544e8b78ef39960860b7d34818a2c87adb2e73c503",
+      "adapted_sha256": "2ab9c1f59442a87adb3860542439d4d5fe7da1530cd319d5deca4faebc4c5391"
+    },
+    {
+      "path": "profile.py",
+      "upstream_path": "clawbio/common/profile.py",
+      "sha256": "6d5c036da8a76947f1fcc7d3113010877ec6dac406eaa573995ebc40470c6c6d",
+      "adapted_sha256": "5c1aceedf0e71069b189252924bdc9b402d49a48c649ed5494cd768d28882741"
+    },
+    {
+      "path": "rec_shortener.py",
+      "upstream_path": "clawbio/common/rec_shortener.py",
+      "sha256": "dddbb0eac58e1e5d32902b11825e09951cc2de7225ade79ad218f4ada0ec50bc",
+      "adapted_sha256": "bd80e1fb05f6bb495bfbe01e22aa22de232d7a03e80539bc0a879e771800e928"
+    },
+    {
+      "path": "report.py",
+      "upstream_path": "clawbio/common/report.py",
+      "sha256": "88add2066801a2dc5f30abc515e3303fb7e172e453bd0d13899ef248a87486af",
+      "adapted_sha256": "a2c0f941571039a47def7662e561230e59ef6b25e0d7a9f6c3adbb682a5bfa57"
+    },
+    {
+      "path": "reproducibility.py",
+      "upstream_path": "clawbio/common/reproducibility.py",
+      "sha256": "b3550591c820bbc997a3874b54bc5db40bdd720ec556961876aa9a4882894f9e",
+      "adapted_sha256": "7ca9cc67e0d2273b7e7382df5b6f9d28281c6df7af0ca652906ce3c2d24a3103"
+    },
+    {
+      "path": "sarek.py",
+      "upstream_path": "clawbio/common/sarek.py",
+      "sha256": "d5408da6fd5d608ac98e9b771cbfd27a90278bd319cd6d8e11eccd4a362885b3",
+      "adapted_sha256": "3ed00befc31311bba7124db52b69a71a0acd583dd52a7d7afb356194e2e188c1"
+    },
+    {
+      "path": "scrna_io.py",
+      "upstream_path": "clawbio/common/scrna_io.py",
+      "sha256": "d94931e367b0c882ac1af1b51ae2fc681822cf0ed60c2903ead5525902f1527d",
+      "adapted_sha256": "12b7dea6ba3c5d60543b9362904ba117d1718730c68ea64961a5160e795c4e74"
+    },
+    {
+      "path": "textio.py",
+      "upstream_path": "clawbio/common/textio.py",
+      "sha256": "9f7b14fff75fa3182416663b723e2299145eb3708e0dacec1741451d542e3a69",
+      "adapted_sha256": "dd79fde3891f17e1a83265268ebc9558b90da7596b75ef3e05e1c1ff4bb15771"
+    },
+    {
+      "path": "vcf_qc.py",
+      "upstream_path": "clawbio/common/vcf_qc.py",
+      "sha256": "b744c7775beb6a96e7c2b2b52d6a18029153c191b3a08baff2f01b06fc58b2ce",
+      "adapted_sha256": "c3901b0a8cc9dd2da616c460d27795596218e087d48f868759d161a98c06dfa9"
+    }
+  ]
+}

@@ -58,6 +58,12 @@ pip install dnakit==0.1.4
 如需让支持 MCP 的 Agent 调用 DNAKit，可执行 `pip install "dnakit[agent]"`，然后在 Agent
 中配置 `dnakit-mcp` 命令。
 
+当前源码还包含统一的 DNA／基因组学 Skill 目录。先用 `python -m pip install -e "."`
+安装本仓库，再用 `dnakit skills search "变异注释"` 搜索，或用
+`dnakit skills install dnakit --agent codex` 安装统一入口。
+Claude Code、Cursor、MCP 和引用方式见 [Skills 教程](docs/llm_tools/skills.md)。
+DNAKit 代码保持 MIT；收录技能保留[各自的许可证和作者署名](THIRD_PARTY_NOTICES.md)。
+
 如果需要参与开发，克隆仓库后通过 Conda 创建完整环境：
 
 ```bash

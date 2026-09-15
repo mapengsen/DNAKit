@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, BinaryIO, Literal, TextIO, TypeAlias, cast, overload
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.core.collection import DNASet
 from dnakit.core.enums import ExecutionMode, ImplementationLabel, OriginClass
@@ -29,11 +30,13 @@ from ._formats import (
     iter_fastq,
     iter_json_array,
     iter_json_lines,
+    iter_text,
     write_delimited,
     write_fasta,
     write_fastq,
     write_json_array,
     write_json_lines,
+    write_text,
 )
 from .config import ReadConfig, WriteConfig
 from .genbank import iter_genbank, write_genbank
@@ -47,6 +50,8 @@ WritableRecords: TypeAlias = DNA | DNASequence | DNARecord | Iterable[DNASequenc
 ReadMode: TypeAlias = Literal["stream", "dna"]
 
 _FORMAT_ALIASES = {
+    "txt": "text",
+    "text": "text",
     "fa": "fasta",
     "fasta": "fasta",
     "fna": "fasta",
@@ -74,6 +79,7 @@ _UNSUPPORTED_FORMATS = {
     "fai": "Indexed FASTA access belongs to the advanced indexing adapter.",
 }
 _MEDIA_TYPES = {
+    "text": "text/plain",
     "fasta": "text/x-fasta",
     "fastq": "text/x-fastq",
     "csv": "text/csv",
@@ -95,8 +101,23 @@ class _BoundedTextReader:
         self._source = source
         self._count = 0
 
+        from dnakit._io_progress import read_observer
+
+        self._observer = read_observer.get()
+        self._reported = 0
+
     def _checked(self, value: str) -> str:
         self._count += len(self._encoder.encode(value))
+        if (
+            self._observer is not None
+            and self._source is not None
+            and (not value or self._count - self._reported >= 1024**2)
+        ):
+            self._reported = self._count
+            buffer = getattr(self._raw, "buffer", None)
+            compressed_file = getattr(buffer, "fileobj", None)
+            completed = compressed_file.tell() if compressed_file is not None else self._count
+            self._observer(self._source, completed)
         if self._count > self._limit:
             raise InputFormatError(
                 "Decoded input exceeds max_input_bytes.",
@@ -265,7 +286,7 @@ def _open_read_text(
                     path, "rt", encoding=config.encoding, newline=""
                 )
             else:
-                handle = path.open("r", encoding=config.encoding, newline="")
+                handle = path.open("r", encoding=config.encoding, newline="", buffering=1024**2)
         except OSError as exc:
             raise InputFormatError(
                 "Could not open input path.",
@@ -336,6 +357,8 @@ def _open_read_text(
 
 
 def _reader(handle: TextIO, format: str, config: ReadConfig) -> Iterator[DNARecord]:
+    if format == "text":
+        return iter_text(handle, config)
     if format == "fasta":
         return iter_fasta(handle, config)
     if format == "fastq":
@@ -372,7 +395,7 @@ def _guard_reader(
             code="INPUT_DECODE_FAILED",
             context={"source": source_name, "reason": str(exc)},
         ) from exc
-    except OSError as exc:
+    except (OSError, EOFError) as exc:
         raise InputFormatError(
             "Input stream could not be read or decompressed.",
             code="INPUT_READ_FAILED",
@@ -387,6 +410,7 @@ def read(
     format: str | None = None,
     config: ReadConfig | None = None,
     mode: Literal["stream"] = "stream",
+    verbose: bool = True,
 ) -> RecordSource: ...
 
 
@@ -397,6 +421,7 @@ def read(
     format: str | None = None,
     config: ReadConfig | None = None,
     mode: Literal["dna"],
+    verbose: bool = True,
 ) -> DNA: ...
 
 
@@ -406,6 +431,7 @@ def read(
     format: str | None = None,
     config: ReadConfig | None = None,
     mode: ReadMode = "stream",
+    verbose: bool = True,
 ) -> RecordSource | DNA:
     """Read DNA with one name, choosing a lazy stream or unified DNA object."""
 
@@ -447,6 +473,7 @@ def read_one(
     *,
     format: str | None = None,
     config: ReadConfig | None = None,
+    verbose: bool = True,
 ) -> DNARecord:
     """Read exactly one record, rejecting empty and multi-record inputs."""
 
@@ -475,6 +502,7 @@ def read_set(
     *,
     format: str | None = None,
     config: ReadConfig | None = None,
+    verbose: bool = True,
 ) -> DNASet:
     """Explicitly materialize every input record into a repeatable DNASet."""
 
@@ -517,6 +545,8 @@ def _writer(
     format: str,
     config: WriteConfig,
 ) -> int:
+    if format == "text":
+        return write_text(handle, records, config)
     if format == "fasta":
         return write_fasta(handle, records, config)
     if format == "fastq":
@@ -680,6 +710,14 @@ def _write_path(
                 feature_policy=config.feature_policy,
                 json_indent=config.json_indent,
                 max_output_bytes=config.max_output_bytes,
+                table_columns=config.table_columns,
+                sequence_column=config.sequence_column,
+                id_column=config.id_column,
+                description_column=config.description_column,
+                metadata_column=config.metadata_column,
+                features_column=config.features_column,
+                parts_column=config.parts_column,
+                letter_annotations_column=config.letter_annotations_column,
             )
             count = _write_to_stream(
                 binary_target, records, format, stream_config, compressed=compressed
@@ -703,6 +741,7 @@ def write(
     *,
     format: str | None = None,
     config: WriteConfig | None = None,
+    verbose: bool = True,
 ) -> WriteResult:
     """Serialize records with stable anonymous IDs and safe path replacement."""
 
@@ -757,3 +796,5 @@ __all__ = [
     "read_set",
     "write",
 ]
+
+_register_public_verbose(globals())

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNARecord, DNASequence
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
@@ -42,6 +43,7 @@ def exact_similarity(
     right: SequenceInput,
     *,
     reverse_complement: bool = False,
+    verbose: bool = True,
 ) -> SimilarityResult:
     """Return 1 for literal full-sequence equality, otherwise 0."""
 
@@ -83,6 +85,7 @@ def compare(
     weights: WeightInput | None = None,
     zero_vector_policy: ZeroVectorPolicy = "identity",
     return_path: bool = False,
+    verbose: bool = True,
 ) -> ComparisonResult:
     """Dispatch one explicit native comparison method.
 
@@ -160,3 +163,5 @@ def compare(
 
 
 __all__ = ["compare", "exact_similarity"]
+
+_register_public_verbose(globals())

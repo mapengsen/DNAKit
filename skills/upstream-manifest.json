@@ -1,0 +1,2688 @@
+{
+  "schema_version": 2,
+  "snapshot_date": "2026-09-12",
+  "catalog": "../registry/catalog.json",
+  "decisions": "../registry/decisions.json",
+  "skills": [
+    {
+      "id": "accessibility-aggregation",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "alignment-amplicon-clipping",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-filtering",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-indexing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-io",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-msa-parsing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-msa-statistics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-multiple",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-pairwise",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-sorting",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-trimming",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alignment-validation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "alphagem",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "alphagenome-atlas-website-links",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "alphagenome-single-variant-analysis",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "alphagenome-variant-impact-score",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "amplicon-qc",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "analytical-validation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "analyze-fasta",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "ancestry-risk-profiler",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "antismash",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "anvio",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "article-data-fetcher",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "atac-seq-allele-specific-accessibility",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-atac-peak-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-atac-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-co-accessibility",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-consensus-peakset",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-deep-learning-atac",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-differential-accessibility",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-enhancer-gene-linking",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-footprinting",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-motif-deviation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-nucleosome-positioning",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "atac-seq-single-cell-atac",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "bam-statistics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "basalt",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "batch-analysis",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "batch-downloads",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "batch-processing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "benchling-integration",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "bigscape",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "binchicken",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "binning-qc",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "biobakery-databases",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "bioinfo-pitfalls",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "bioinformatics-methods-results-writer",
+      "source": "damlab",
+      "revision": "4ad096e3b9b0116271d10bdb746641b60a1b2211"
+    },
+    {
+      "id": "bioinformatics-project",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "biomart-queries",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "bioservices-multi-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "biosurfdb",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "blast-searches",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "borzoi",
+      "source": "feynman",
+      "revision": "dfdcb7cf2c73183cff7b10aa8ea8ce370c8b152c"
+    },
+    {
+      "id": "busco-assessor",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "busco-status-interpretation",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "caduceus",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "cami",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "cancer-genomics-tcga",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "cancer-variant-interpretation",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "causal-genomics-colocalization-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-effector-gene-prioritization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-fine-mapping",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-genetic-correlation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-genomic-sem",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-heritability-partitioning",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-mediation-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-mendelian-randomization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-pleiotropy-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-proteome-mr-drug-target",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "causal-genomics-transcriptome-wide-association",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "cbioportal-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "cfdna-preprocessing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "checkm2",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "checkv",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "chip-atlas-diff-analysis",
+      "source": "agentic-science",
+      "revision": "213588a92bb74e705d795ba106e0119975877e8c"
+    },
+    {
+      "id": "chip-atlas-peak-enrichment",
+      "source": "agentic-science",
+      "revision": "213588a92bb74e705d795ba106e0119975877e8c"
+    },
+    {
+      "id": "chip-atlas-target-genes",
+      "source": "agentic-science",
+      "revision": "213588a92bb74e705d795ba106e0119975877e8c"
+    },
+    {
+      "id": "chipseq-allele-specific-binding",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-chip-deep-learning",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-chromatin-state-segmentation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-cut-and-run-tag",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-differential-binding",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-motif-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-peak-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-peak-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-spike-in-normalization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-super-enhancers",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "chipseq-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "cite-encode",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "clinical-databases-acmg-classification",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-clinvar-lookup",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-dbsnp-queries",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-gnomad-frequencies",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-hla-typing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-msi-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-myvariant-queries",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-pharmacogenomics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-polygenic-risk",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-somatic-signatures",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-tumor-mutational-burden",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinical-databases-variant-prioritization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "clinpgx",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "codon-usage",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "comparative-genomics-ancestral-reconstruction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-comparative-annotation-projection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-gene-family-evolution",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-gene-tree-species-tree-reconciliation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-genome-distance-and-species-delineation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-hgt-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-introgression-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-ortholog-inference",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-pangenome-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-positive-selection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-synteny-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-whole-genome-alignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "comparative-genomics-whole-genome-duplication",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "compare-biosamples",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "compressed-files",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "consensus-sequences",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-allele-specific-copy-number",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-cnv-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-cnv-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-cnvkit-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-copy-ratio-segmentation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-focal-amplification-ecdna",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-gatk-cnv",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-germline-cnv-interpretation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-hrd-scoring",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-recurrent-cnv",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "copy-number-subclonal-copy-number",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "cosmic-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "crispr-screen-triage",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "crispr-screens-bagel-essentiality",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-base-editing-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-batch-correction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-combinatorial-screens",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-copy-number-correction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-crispresso-editing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-drugz-chemogenomic",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-hit-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-in-vivo-screens",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-jacks-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-library-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-mageck-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-perturb-seq-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-prime-editing-screens",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "crispr-screens-screen-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ctdna-mutation-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-provenance",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "data-visualization-circos-plots",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-visualization-genome-tracks",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-visualization-lollipop-protein-maps",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-visualization-manhattan-qq-locuszoom",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-visualization-oncoprint-mutation-matrices",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "data-visualization-sequence-logos",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "dbcan",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "deeptools-ngs-analysis",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "deepurify",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "defensefinder",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "depmap-crispr-essentiality",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "disinfinder",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "dnabert2",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "dnakit",
+      "source": "dnakit",
+      "revision": "catalog-2026-09-12"
+    },
+    {
+      "id": "dnanexus-integration",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "dom-biosurfactant",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "draft-counseling-summary",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "dram",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "draw-pedigree",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "duplicate-handling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-biodiversity-metrics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-community-ecology",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-conservation-genetics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-edna-metabarcoding",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-landscape-genomics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ecological-genomics-species-delimitation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "element-cycling",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "ena-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "encode-ccres-database",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "encode-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "encode-toolkit-setup",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "ensembl-rest",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "entrez-fetch",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "entrez-link",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "entrez-search",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epidemiological-genomics-amr-surveillance",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epidemiological-genomics-pathogen-typing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epidemiological-genomics-phylodynamics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epidemiological-genomics-transmission-inference",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epidemiological-genomics-variant-surveillance",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "epigenomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "epigenomics-chromatin",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "eqtl-catalogue-region-fetch",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "equity-scorer",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "erast",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "evo2",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "evo2-nim",
+      "source": "bionemo",
+      "revision": "0e67a612e4045f007e38fa77adc8f3ebfc5616b6"
+    },
+    {
+      "id": "experimental-design-batch-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "experimental-design-multiple-testing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "experimental-design-power-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "experimental-design-randomization-blocking",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "experimental-design-sample-size",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "expression-matrix-gene-id-mapping",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "fasta-database-curator",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "fastq-quality",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "fegenie",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "filter-sequences",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "find-variant-literature",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "folklore-variant-evidence",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "format-conversion",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "foundation-housekeeping",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "fragment-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "functional-genomics-screens",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "functional-screen-analysis",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "gatk-variant-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "gene-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "gene-disease-association",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "gene-regulatory-networks",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "gene-regulatory-networks-multiomics-grn",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "gene-regulatory-networks-scenic-regulons",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "geniml",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "genomad",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "genome-annotation-annotation-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-annotation-transfer",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-eukaryotic-gene-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-functional-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-ncrna-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-prokaryotic-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-annotation-repeat-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-assembly-polishing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-assembly-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-contamination-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-genome-profiling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-hifi-assembly",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-long-read-assembly",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-metagenome-assembly",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-scaffolding",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-assembly-short-read-assembly",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-engineering-base-editing-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-engineering-grna-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-engineering-hdr-template-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-engineering-off-target-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-engineering-prime-editing-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-bed-file-basics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-bedgraph-handling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-bigwig-tracks",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-coverage-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-gtf-gff-handling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-interval-arithmetic",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-overlap-significance",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-intervals-proximity-operations",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "genome-language-model",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "genomic-coordinates",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "genomic-intelligence",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "genomics-study-design",
+      "source": "research-suite",
+      "revision": "a5cb708252a58bcfb771d46d39f5e38d64b8b2f6"
+    },
+    {
+      "id": "genomics-workflow-acceleration",
+      "source": "bionemo",
+      "revision": "0e67a612e4045f007e38fa77adc8f3ebfc5616b6"
+    },
+    {
+      "id": "genotype-imputation-benchmarking",
+      "source": "research-suite",
+      "revision": "a5cb708252a58bcfb771d46d39f5e38d64b8b2f6"
+    },
+    {
+      "id": "geo-data",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "gget-genomic-databases",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "grapevine-adna",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "gtdb",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "gtex-database",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "gunc",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "gwas-catalog-region-fetch",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "gwas-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "gwas-drug-discovery",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "gwas-snp-interpretation",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "gwas-trait-to-gene",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "hadeg",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "hi-c-analysis-compartment-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-contact-pairs",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-hic-data-io",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-hic-differential",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-hic-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-hichip-plac-loops",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-loop-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-matrix-operations",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hi-c-analysis-tad-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "hic-aggregation",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "histone-aggregation",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "hla-immunogenomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "illumina-bridge",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "immune-repertoire-analysis",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "immunoinformatics-epitope-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "immunoinformatics-immunogenicity-scoring",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "immunoinformatics-mhc-binding-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "immunoinformatics-mhc-class-ii-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "immunoinformatics-neoantigen-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "importing-tracks",
+      "source": "misha",
+      "revision": "b13d4e2593d1883acd43efb30f9bf1132891fc3b"
+    },
+    {
+      "id": "insilicoseq",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "integronfinder",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "interdomain-hgt",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "interpret-negative-or-vus",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "isabl-debug-analysis",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-merge-results",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-monitor-analyses",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-project-report",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-query-data",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-run-pipeline",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-submit-data",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isabl-write-app",
+      "source": "isabl",
+      "revision": "85b3e298d9cfdf02cb82ebfdc780649a6811fd2e"
+    },
+    {
+      "id": "isescan",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "jaspar-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "ld-1000g-region-compute",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "lexicmap",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "liftover-coordinates",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "local-blast",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "locuscompare-region-render",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "long-read-sequencing-basecalling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-clair3-variants",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-haplotype-phasing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-long-read-alignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-long-read-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-medaka-polishing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-nanopore-methylation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "long-read-sequencing-structural-variants",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "longitudinal-monitoring",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "lorbin",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "mebs",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "metabat2",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "metabolic",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "metagenomics-abundance",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-amr-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-contamination-controls",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-functional-profiling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-kraken",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-metaphlan",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-strain-tracking",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "metagenomics-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-aggregation",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "methylation-array-preprocessing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-array-qc-filtering",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-based-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-bismark-alignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-cell-type-deconvolution",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-differential-cpg",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-dmr-detection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-epigenetic-clocks",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-ewas-design",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "methylation-methylkit",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "mgnify",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "microbial-genome-characterization",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "microbial-mining",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "microbiome-amplicon-processing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "microbiome-differential-abundance",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "microbiome-diversity-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "microbiome-functional-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "microbiome-qiime2-workflow",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "microbiome-research",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "microbiome-taxonomy-assignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "mob-suite",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "mobileelementfinder",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "mobileog",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "model-organism-genetics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "molecular-cloning",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "monarch-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "motif-search",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "mouse-phenome-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "multi-omics-data-harmonization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "multi-omics-integration",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "multi-omics-mixomics-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "multi-omics-mofa-integration",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "multiomic-disease-characterization",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "multiqc-reporter",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "ncbi-datasets-cli",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "nfcore-sarek-wrapper",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "ngs-tertiary-analysis",
+      "source": "ngs-tertiary",
+      "revision": "d483c21fddd14a034e7f2f038f237ad7bcd05b1a"
+    },
+    {
+      "id": "nucleotide-transformer",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "omg",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "optimize-hifi-diploid-assembly",
+      "source": "myriad",
+      "revision": "5efbc5e9940fd37608f1d75cccac2befebad1215"
+    },
+    {
+      "id": "ortholog-inference",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "paired-end-fastq",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "parabricks",
+      "source": "bionemo",
+      "revision": "0e67a612e4045f007e38fa77adc8f3ebfc5616b6"
+    },
+    {
+      "id": "pathogen-variant-surveillance",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "pathway-disease-genetics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "phasing-imputation-genotype-imputation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phasing-imputation-haplotype-phasing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phasing-imputation-imputation-qc",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phasing-imputation-reference-panels",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phewas",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "phylign",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "phylo-bayesian-inference",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-distance-calculations",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-divergence-dating",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-modern-tree-inference",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-species-trees",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-tree-io",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-tree-manipulation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylo-tree-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "phylogenomics",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "pileup-generation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "pipeline-dnaseseq",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "pipeline-guide",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "plannotate-plasmid-annotation",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "plant-genome-guided-primer-design",
+      "source": "plant-qpcr",
+      "revision": "23acf68cc4cefe67f8f3b5f5057b0eabf0ac9a4e"
+    },
+    {
+      "id": "plant-genomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "plant-omics-db",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "plasmaag",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "pod5",
+      "source": "damlab",
+      "revision": "4ad096e3b9b0116271d10bdb746641b60a1b2211"
+    },
+    {
+      "id": "polyploid-gene-family-cloning",
+      "source": "polyploid-cloning",
+      "revision": "ecce861e5215e25cc180f1381d73a8751c5257bd"
+    },
+    {
+      "id": "population-genetics-1000genomes",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "population-genetics-association-testing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-linkage-disequilibrium",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-plink-basics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-population-structure",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-rare-variant-association",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-scikit-allel-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "population-genetics-selection-statistics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "prefect-dask-nextflow",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "prepare-rare-disease-case",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "primer-design-primer-basics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "primer-design-primer-specificity",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "primer-design-primer-validation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "primer-design-qpcr-primers",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "progenomes",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "protein-lof-mechanism",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "protein-sae-variant-interpretation",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "pysam",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "qsap",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "quality-assessment",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "rare-disease-diagnosis",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "rare-disease-genomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "rare-high-impact-variants",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "read-alignment-bowtie2-alignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-alignment-bwa-alignment",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-adapter-trimming",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-contamination-screening",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-fastp-workflow",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-quality-filtering",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-quality-reports",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-qc-umi-processing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "read-sequences",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "recombinator",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "reference-operations",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "regulatory-elements",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "regulatory-genomics",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "regulatory-variant-analysis",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "regulomedb-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "remap-database",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "restriction-enzyme-selection",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "restriction-fragment-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "restriction-golden-gate-assembly",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "restriction-mapping",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "restriction-sites",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "reverse-complement",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "review-variant-table",
+      "source": "genetic-counseling",
+      "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "sam-bam-basics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "sample-qc-triage",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "samtools-bam-processing",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "scikit-bio",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "seq-objects",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "seq-wrangler",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "sequence-analysis",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "sequence-properties",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "sequence-retrieval",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "sequence-slicing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "sequence-statistics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-clustering",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-data-io",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-lineage-tracing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-multimodal-integration",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-preprocessing",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "singlem",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "spacedust",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "splice-variant-prediction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "sra-data",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "systems-biology-gene-essentiality",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "systems-biology-metabolic-reconstruction",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "taxvamb",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "tcr-bcr-analysis-immcantation-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tcr-bcr-analysis-mixcr-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tcr-bcr-analysis-repertoire-visualization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tcr-bcr-analysis-scirpy-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tcr-bcr-analysis-specificity-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tcr-bcr-analysis-vdjtools-analysis",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tiledbvcf",
+      "source": "kdense",
+      "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
+    },
+    {
+      "id": "track-experiments",
+      "source": "encode-toolkit",
+      "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "tracking-taxonomy-updates",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "transcription-translation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tumor-fraction-estimation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "ucsc-conservation-and-tfbs",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "ucsc-genome-browser",
+      "source": "sciagent",
+      "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "unibind-database",
+      "source": "deepmind",
+      "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
+    },
+    {
+      "id": "unicore",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "variant-analysis",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "variant-annotation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-calling-deepvariant",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-calling-filtering-best-practices",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-calling-joint-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-calling-structural-variant-calling",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-interpretation",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "variant-normalization",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "variant-predictor-dms-validation",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "variant-to-mechanism",
+      "source": "tooluniverse",
+      "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "vcf-basics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "vcf-manipulation",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "vcf-statistics",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "vcontact",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "viromics",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "virulencefinder",
+      "source": "pku-metagenomics",
+      "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "vitis-pangenome",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "vitis-popgen",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "vitis-te",
+      "source": "plant-skills",
+      "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
+    },
+    {
+      "id": "wgs-prs",
+      "source": "clawbio",
+      "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "workflow-management-cwl-workflows",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflow-management-nextflow-pipelines",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflow-management-nf-core-pipelines",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflow-management-snakemake-workflows",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflow-management-wdl-workflows",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflow-methods-docwriter",
+      "source": "omics",
+      "revision": "7a4eb5bace3f874c3be2ec697e9d2e695c374637"
+    },
+    {
+      "id": "workflows-atacseq-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-causal-genomics-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-chipseq-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-cnv-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-crispr-editing-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-crispr-screen-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-edna-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-fastq-to-variants",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-genome-annotation-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-genome-assembly-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-gwas-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-hic-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-liquid-biopsy-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-longread-sv-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-metagenomics-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-methylation-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-microbiome-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-multiome-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-neoantigen-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-outbreak-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-somatic-variant-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "workflows-tcr-pipeline",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "write-sequences",
+      "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    }
+  ]
+}

@@ -9,15 +9,17 @@ from datetime import datetime, timezone
 from itertools import pairwise
 from typing import cast
 
+from dnakit._parallel import ordered_map
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 
 from ._advanced_shared import (
     UnionFind,
+    _pair_job,
     ensure_pair_limit,
     materialize_limited,
-    pair_similarity,
     validate_pairwise_sequences,
 )
 from ._metadata import metadata_value_key
@@ -63,9 +65,7 @@ def _parse_iso(value: object, *, index: int, key: str) -> datetime:
 
 
 def temporal_split(
-    records: Iterable[DNARecord],
-    *,
-    config: TemporalSplitConfig | None = None,
+    records: Iterable[DNARecord], *, config: TemporalSplitConfig | None = None, verbose: bool = True
 ) -> TemporalSplitResult:
     """Assign oldest records first using explicit cutoffs or target chronological ratios."""
 
@@ -171,25 +171,25 @@ def _joint_units(
     if config.similarity_threshold is not None:
         validate_pairwise_sequences(records, operation="joint_split similarity constraint")
         comparisons = ensure_pair_limit(len(records), config.max_pairwise_comparisons)
-        for left in range(len(records)):
-            for right in range(left + 1, len(records)):
-                value = pair_similarity(
-                    records[left],
-                    records[right],
-                    method="kmer",
-                    k=config.similarity_k,
-                    canonical=config.similarity_canonical,
-                    max_alignment_cells=1,
-                )
-                if value >= config.similarity_threshold:
-                    union.union(left, right)
+        options = dict(
+            method="kmer",
+            k=config.similarity_k,
+            canonical=config.similarity_canonical,
+            max_alignment_cells=1,
+        )
+        jobs = (
+            (left, right, records[left], records[right], options)
+            for left in range(len(records))
+            for right in range(left + 1, len(records))
+        )
+        for left, right, value in ordered_map(_pair_job, jobs):
+            if value >= config.similarity_threshold:
+                union.union(left, right)
     return union.groups(), comparisons
 
 
 def joint_split(
-    records: Iterable[DNARecord],
-    *,
-    config: JointSplitConfig,
+    records: Iterable[DNARecord], *, config: JointSplitConfig, verbose: bool = True
 ) -> JointSplitResult:
     """Greedily assign atomic constraint components; never claim global optimality."""
 
@@ -300,3 +300,5 @@ def joint_split(
 
 
 __all__ = ["joint_split", "temporal_split"]
+
+_register_public_verbose(globals())

@@ -1,5 +1,7 @@
 # normalize
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Unify the handling of case, whitespace, `U/T` and illegal characters in DNA sequences, resulting in standardized sequences.
 
 ## 1) STD-001 character standardization

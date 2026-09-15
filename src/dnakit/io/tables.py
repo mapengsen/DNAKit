@@ -17,6 +17,7 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, BinaryIO, Literal, Protocol, TextIO, cast, runtime_checkable
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict, JSONScalar, freeze_mapping, to_json_compatible
 from dnakit.exceptions import (
     BackendExecutionError,
@@ -567,6 +568,7 @@ def export_table(
     max_output_bytes: int = 1_000_000_000,
     null_value: str = r"\N",
     parquet_compression: ParquetCompression = "snappy",
+    verbose: bool = True,
 ) -> TableExportResult:
     """Export one bounded table without inferring or silently widening its schema."""
 
@@ -1078,6 +1080,7 @@ def read_table(
     max_cell_characters: int = 10_000_000,
     max_file_bytes: int = 1_000_000_000,
     max_decoded_bytes: int = 1_000_000_000,
+    verbose: bool = True,
 ) -> TableReadResult:
     """Strictly read one bounded two-dimensional table with an explicit schema."""
 
@@ -1171,6 +1174,7 @@ def export_result(
     *,
     format: TableFormat = "json",
     overwrite: bool = False,
+    verbose: bool = True,
 ) -> TableExportResult:
     """Export one flat result object's scalar fields as a one-row table."""
 
@@ -1235,3 +1239,5 @@ __all__ = [
     "export_table",
     "read_table",
 ]
+
+_register_public_verbose(globals())

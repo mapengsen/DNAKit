@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.scientific import _run_scientific_function
 from dnakit.core import DNA, DNARecord, DNASequence, ProviderResult
 from dnakit.exceptions import ConfigurationError
@@ -23,7 +24,9 @@ def _coding_sequence(value: DNDSInput, name: str) -> str:
     )
 
 
-def calculate_dn_ds(sequence_a: DNDSInput, sequence_b: DNDSInput) -> ProviderResult:
+def calculate_dn_ds(
+    sequence_a: DNDSInput, sequence_b: DNDSInput, *, verbose: bool = True
+) -> ProviderResult:
     """Estimate Nei-Gojobori dN/dS for two codon-aligned coding sequences."""
 
     first = _coding_sequence(sequence_a, "sequence_a")
@@ -48,3 +51,5 @@ def calculate_dn_ds(sequence_a: DNDSInput, sequence_b: DNDSInput) -> ProviderRes
 
 
 __all__ = ["DNDSInput", "calculate_dn_ds"]
+
+_register_public_verbose(globals())

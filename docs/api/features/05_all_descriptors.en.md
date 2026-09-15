@@ -80,7 +80,7 @@ print(dict(result.counts), result.fractions["A"])
 
 - **Function:** Calculate the number and ratio of GC and AT of DNA sequences, which is used to compare sequence composition, evaluate amplification or sequencing preferences, and serve as the basic input for other descriptors.
 - **API:** `dnakit.descriptors.gc_at_content(value[required], ambiguity_policy[optional])`
-- **Input:** Required `DNASequence` or `DNARecord`; optional fuzzy base handling strategy.
+- **Input:** Required `DNASequence` or `DNARecord`; optional ambiguous-base handling policy.
 - **Sample code:**
 
 ```python
@@ -101,7 +101,7 @@ print(result.gc_fraction, result.at_fraction)
 
 - **Function:** Calculate `(G-C)/(G+C)` and `(A-T)/(A+T)` respectively, quantify the degree of asymmetry of complementary bases on the current chain, and be used to observe local or overall composition bias.
 - **API:** `dnakit.descriptors.base_skew(value[required], ambiguity_policy[optional])`
-- **Input:** Required `DNASequence` or `DNARecord`; optional fuzzy base handling strategy.
+- **Input:** Required `DNASequence` or `DNARecord`; optional ambiguous-base handling policy.
 - **Sample code:**
 
 ```python
@@ -164,7 +164,7 @@ print(dict(result.counts), result.denominator)
 
 - **Function:** Calculate Shannon entropy based on the probability distribution of bases or k-mers, quantify the uniformity of distribution, and be used to identify sequences with low information content or single composition.
 - **API:** `dnakit.descriptors.shannon_entropy(value[required], unit[optional], k[optional], log_base[optional], ambiguity_policy[optional], cross_gaps[optional])`
-- **Input:** Required `DNASequence`/`DNARecord`; optional `unit`, `k`, `log_base`, fuzzy base and Gap strategy.
+- **Input:** Required `DNASequence`/`DNARecord`; optional `unit`, `k`, `log_base`, ambiguous-base and Gap policies.
 - **Sample code:**
 
 ```python
@@ -185,7 +185,7 @@ print(result.entropy)
 
 - **Function:** Compare the actual number of types of short sequences of different lengths with the theoretical number of possible types to obtain linguistic complexity, which is used to find sequences with more repetitions or insufficient pattern types.
 - **API:** `dnakit.descriptors.linguistic_complexity(value[required], max_word_size[optional], ambiguity_policy[optional], cross_gaps[optional], max_observations[optional])`
-- **Input:** Required `DNASequence`/`DNARecord`; optional maximum word length, fuzzy bases, Gap and workload cap.
+- **Input:** Required `DNASequence`/`DNARecord`; optional maximum word length, ambiguous bases, Gap and workload cap.
 - **Sample code:**
 
 ```python
@@ -249,7 +249,7 @@ print(result.repeat_fraction, result.runs[0].unit)
 
 - **Function:** Split DNA according to window length and step size, calculate GC, entropy and other descriptors window by window and retain positions, which is used to observe local changes in sequence features along coordinates.
 - **API:** `dnakit.descriptors.window_descriptors(value[required], descriptors[required], window_size[required], step[optional], include_partial[optional], entropy_log_base[optional], ambiguity_policy[optional], cross_gaps[optional])`
-- **Input:** Required sequence, descriptor list, and `window_size`; optional step size, `include_partial`, entropy base, fuzzy bases, and gap policy.
+- **Input:** Required sequence, descriptor list, and `window_size`; optional step size, `include_partial`, entropy base, ambiguous bases, and gap policy.
 - **Sample code:**
 
 ```python

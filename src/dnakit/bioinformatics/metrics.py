@@ -7,12 +7,16 @@ from collections.abc import Callable, Iterable, Mapping
 from itertools import pairwise
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import matrix, positive, require
 from dnakit.exceptions import ConfigurationError
 
 
 def sequence_properties(
-    sequences: Mapping[str, Any], predictors: Mapping[str, Callable[[str], float]]
+    sequences: Mapping[str, Any],
+    predictors: Mapping[str, Callable[[str], float]],
+    *,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Run scalar Python predictors with stable sequence/property order.
 
@@ -37,6 +41,7 @@ def kernel_distance(
     sigma: float = 1.0,
     unbiased: bool = True,
     max_pairs: int = 4_000_000,
+    verbose: bool = True,
 ) -> float:
     """MMD squared (Gaussian kernel) or KID (cubic polynomial kernel).
 
@@ -80,7 +85,12 @@ def kernel_distance(
 
 
 def manifold_metrics(
-    generated: Any, reference: Any, *, neighbors: int = 5, max_pairs: int = 4_000_000
+    generated: Any,
+    reference: Any,
+    *,
+    neighbors: int = 5,
+    max_pairs: int = 4_000_000,
+    verbose: bool = True,
 ) -> dict[str, float]:
     """Euclidean kNN precision/recall and PRDC density/coverage.
 
@@ -110,7 +120,9 @@ def manifold_metrics(
     }
 
 
-def pareto_ranks(values: Any, *, maximize: Iterable[bool], max_pairs: int = 4_000_000) -> Any:
+def pareto_ranks(
+    values: Any, *, maximize: Iterable[bool], max_pairs: int = 4_000_000, verbose: bool = True
+) -> Any:
     """Zero-based nondominated front numbers; preserve input row order and ties."""
     np = require("numpy", "bio-analysis")
     points = matrix(values)
@@ -135,7 +147,9 @@ def pareto_ranks(values: Any, *, maximize: Iterable[bool], max_pairs: int = 4_00
     return ranks
 
 
-def hypervolume(values: Any, reference_point: Any, *, maximize: Iterable[bool]) -> float:
+def hypervolume(
+    values: Any, reference_point: Any, *, maximize: Iterable[bool], verbose: bool = True
+) -> float:
     """Exact dominated volume by recursive axis slicing (up to five objectives)."""
     np = require("numpy", "bio-analysis")
     points = matrix(values)
@@ -174,7 +188,9 @@ def hypervolume(values: Any, reference_point: Any, *, maximize: Iterable[bool]) 
     return volume(np.unique(points, axis=0), reference)
 
 
-def property_hit_rate(values: Any, *, lower: Any, upper: Any) -> dict[str, Any]:
+def property_hit_rate(
+    values: Any, *, lower: Any, upper: Any, verbose: bool = True
+) -> dict[str, Any]:
     """Inclusive property bounds, per-objective fractions, and joint hit rate."""
     np = require("numpy", "bio-analysis")
     points = matrix(values)
@@ -191,7 +207,7 @@ def property_hit_rate(values: Any, *, lower: Any, upper: Any) -> dict[str, Any]:
     }
 
 
-def authenticity(generated: Any, training: Any) -> float:
+def authenticity(generated: Any, training: Any, *, verbose: bool = True) -> float:
     """Fraction whose nearest training neighbor is closer to another training point.
 
     The training set must be the generator's training data, not a held-out
@@ -209,7 +225,12 @@ def authenticity(generated: Any, training: Any) -> float:
 
 
 def clipped_manifold_metrics(
-    generated: Any, reference: Any, *, neighbors: int = 5, max_pairs: int = 4_000_000
+    generated: Any,
+    reference: Any,
+    *,
+    neighbors: int = 5,
+    max_pairs: int = 4_000_000,
+    verbose: bool = True,
 ) -> dict[str, float]:
     """Native Salvy et al. (2025) clipped density and calibrated clipped coverage.
 
@@ -247,7 +268,12 @@ def clipped_manifold_metrics(
 
 
 def property_kl(
-    generated: Any, reference: Any, *, bins: int = 20, pseudocount: float = 1e-8
+    generated: Any,
+    reference: Any,
+    *,
+    bins: int = 20,
+    pseudocount: float = 1e-8,
+    verbose: bool = True,
 ) -> Any:
     """Per-property KL(generated || reference), natural logs and shared histogram edges.
 
@@ -277,6 +303,7 @@ def conformity_score(
     bandwidth: float = 1.0,
     seed: int = 0,
     max_pairs: int = 4_000_000,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Cross-fitted Gaussian-KDE conformity of property vectors.
 
@@ -311,3 +338,20 @@ def conformity_score(
         "standard_error": float(np.std(scores) / math.sqrt(folds)),
         "fold_scores": tuple(scores),
     }
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "sequence_properties",
+        "kernel_distance",
+        "manifold_metrics",
+        "pareto_ranks",
+        "hypervolume",
+        "property_hit_rate",
+        "authenticity",
+        "clipped_manifold_metrics",
+        "property_kl",
+        "conformity_score",
+    ),
+)

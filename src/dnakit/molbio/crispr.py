@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, Issue, IssueSeverity, Strand
 from dnakit.exceptions import ConfigurationError
 from dnakit.patterns import PAMRule, scan_pam_candidates
@@ -28,6 +29,7 @@ def scan_crispr_candidates(
     max_reference_sequences: int = 10_000,
     max_reference_length: int = 10_000_000,
     max_total_comparison_cells: int = 500_000_000,
+    verbose: bool = True,
 ) -> CrisprScanResult:
     """Reuse PAM rules and optionally enumerate ungapped sequence matches.
 
@@ -179,3 +181,5 @@ def scan_crispr_candidates(
 
 
 __all__ = ["scan_crispr_candidates"]
+
+_register_public_verbose(globals())

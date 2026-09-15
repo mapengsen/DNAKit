@@ -1,17 +1,21 @@
 # Data partitioning
 
+Public processing APIs share [file and text input rules](00_processing_inputs.md).
+
 Partition DNA datasets by random, stratified, similarity, or metadata constraints to create isolated data subsets for training, validation, and testing.
 
 All stochastic or heuristic processes log seeds, configurations, groupings, and resource caps.
 
 ## 1) DATA-012 · Random and stable hash partitioning
 
-**Function:** Randomly allocate records to train, valid, and test according to the target proportion, and combine stable ID and seed to generate reproducible results, and return each subset and allocation list.
+**Function:** Partition records into named subsets such as `train / valid / test` by ratios, or generate a fixed K-fold partition and select one fold as `valid` and the rest as `train`. Return the subsets and assignment manifest.
 
 
-**API:** `dnakit.datasets.split(records[required], config[required])`; `config` uses `dnakit.datasets.SplitConfig`, this item is set to `method="random"` or `method="hash"`.
+**API:** `dnakit.datasets.split(records[required], config[required])`; use `dnakit.datasets.SplitConfig` with `method="random"`, `method="hash"`, or `method="kfold"`.
 
-**Input:** Required records and proportion that sum to 1; optional seed, shuffle and whether to maintain the original order within the subset. The `hash` pattern requires a stable and unique `record.id` for each record.
+**Input:** Records are required. Ratio splitting uses fractions summing to 1, defaulting to `train=0.8, valid=0.1, test=0.1`. K-fold uses `n_splits` for the fold count and `fold_id` for the validation fold. Defaults are `seed=42` and `shuffle=True`. Hash splitting requires stable, unique record IDs.
+
+The default seed for `SplitConfig` and `dnakit split` changed from `0` to `42`. Pass `seed=0` explicitly to reproduce earlier ratio splits that omitted the seed.
 
 **Sample code:**
 
@@ -66,6 +70,74 @@ print(first.get("train").ids == second.get("train").ids)
 True
 True
 ```
+
+### Fixed K-fold partitioning: train / valid
+
+Set `method="kfold"` to use [scikit-learn KFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html) semantics:
+
+```python
+KFold(n_splits=10, shuffle=True, random_state=42)
+```
+
+**One random seed → one fixed K-fold partition → K validation folds selected in turn.** Keep the records and their input order, `seed`, `shuffle`, and `n_splits` unchanged; change only `fold_id`. For 10 folds, use `fold_id=0..9`: each sample serves as validation exactly once. Do not use `seed + fold_id`. Each call reconstructs the same partition and returns the selected pair.
+
+| `SplitConfig` argument | Default | Meaning |
+| --- | --- | --- |
+| `method` | `"random"` | Select `"kfold"` for K-fold; `"random"` / `"hash"` retain ratio splitting |
+| `n_splits` | `10` in K-fold mode | Fold count, such as 5 or 10; requires `2 <= n_splits <= sample count` |
+| `fold_id` | `0` in K-fold mode | Validation fold index, from `0` through `n_splits - 1` |
+| `seed` | `42` | Fixed seed for the whole partition; K-fold requires `0 <= seed < 2**32` |
+| `shuffle` | `True` | Shuffle before partitioning; `False` gives consecutive validation blocks and seed has no effect |
+| `ratios` | `0.8 / 0.1 / 0.1` in ratio mode | Omit for K-fold; target train/valid ratios are derived from the fold count |
+
+K-fold always returns subsets named `train` and `valid`. Records within each subset retain input order, matching scikit-learn, even with `preserve_order=False`. If the sample count is not divisible by K, the first `sample count % K` validation folds contain one extra sample; fold sizes differ by at most 1. Results and exported manifests record `seed`, `shuffle`, `n_splits`, `fold_id`, and each record's assignment.
+
+This mode requires scikit-learn: install `python -m pip install -e ".[bio-analysis]"`. Environments with `.[ml]` or `.[training]` already include it. Ratio splitting does not require this dependency.
+
+**Example: hold out a fixed test set, then apply 10-fold splitting to train.**
+
+```python
+from dnakit import DNARecord, DNASequence
+from dnakit.datasets import SplitConfig, split
+
+records = [DNARecord(DNASequence("ACGT"), f"r{i}") for i in range(100)]
+seed = 42
+n_splits = 10  # Change to 5 for five folds.
+
+# Split off the fixed test set once.
+outer = split(
+    records,
+    config=SplitConfig(method="random", ratios={"train": 0.8, "test": 0.2}, seed=seed),
+)
+training_pool = outer.get("train")
+test = outer.get("test")
+
+# Only fold_id changes; never pass the test set into K-fold.
+for fold_id in range(n_splits):
+    fold = split(
+        training_pool,
+        config=SplitConfig(
+            method="kfold", n_splits=n_splits, fold_id=fold_id,
+            shuffle=True, seed=seed,
+        ),
+    )
+    train = fold.get("train")
+    valid = fold.get("valid")
+    print(f"fold={fold_id}: train={len(train)}, valid={len(valid)}, test={len(test)}")
+    # Create and train a fresh model here, then evaluate on valid.
+```
+
+Folds 0 through 9 each contain `train=72, valid=8, test=20`; validation samples rotate while the 20 test samples stay fixed. If you already have training data, use it directly as `training_pool`. `n_splits` sets the total fold count, and `fold_id` selects one fold. Iterate all folds for a complete K-fold procedure; `split()` partitions data and does not train models or aggregate metrics.
+
+To use `train_custom_property_model()`, write the current train/valid subsets and fixed test set using the training API's supported split labels, and map that column with `DataMapping.split_field`. Values such as `fold_0` are not training split labels. See [custom model training](23_deep_learning_property_prediction.en.md).
+
+**CLI:** Pass the existing training pool to export the selected train/valid pair and manifest:
+
+```bash
+dnakit split train.fasta runs/fold_0 --method kfold --n-splits 10 --fold-id 0 --seed 42
+```
+
+Keep the input and seed fixed for subsequent runs, changing `--fold-id` and the output directory. Use `--no-shuffle` to disable shuffling. Agent/MCP calls to `dnakit.datasets.split` accept the same `config`. JSON/YAML workflow `split.params` also accepts `method`, `n_splits`, and `fold_id`; its seed comes from the workflow's global `seed`, which should be set to `42` for this example.
 
 ## 2) DATA-013 · Stratified random division
 

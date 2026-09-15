@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from dataclasses import replace
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASet
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, SequenceError
 from dnakit.representations import RepresentationBackend, extract_representations
@@ -81,6 +82,7 @@ def neural_cluster_sequences(
     *,
     config: NeuralClusteringConfig | None = None,
     backend: RepresentationBackend | None = None,
+    verbose: bool = True,
 ) -> NeuralClusteringResult:
     """Extract model representations and group them with reproducible k-means."""
 
@@ -219,3 +221,5 @@ def neural_cluster_sequences(
 
 
 __all__ = ["neural_cluster_sequences"]
+
+_register_public_verbose(globals())

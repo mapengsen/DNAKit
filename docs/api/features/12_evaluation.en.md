@@ -235,7 +235,7 @@ print(report.metrics["frechet_distance"])
 Non-negative floating-point number; the exact value depends on the model, checkpoint, pooling, normalization, and input sets.
 ```
 
-- **Progress:** Checkpoint download and sequence-by-sequence characterization extraction show progress bars by default; can be turned off with `RepresentationConfig(show_progress=False)`.
+- **Progress:** Checkpoint download and sequence-by-sequence representation extraction show progress bars by default; can be turned off with `RepresentationConfig(show_progress=False)`.
 - **Based on**: [Preuer et al.’s original paper on FCD](https://doi.org/10.1021/acs.jcim.8b00234); [LucaOne’s original paper](https://doi.org/10.1038/s42256-025-01044-4).
 
 ## 6) `EVAL-017` Frag

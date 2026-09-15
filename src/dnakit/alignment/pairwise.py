@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Literal, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.alignment.results import AlignmentColumn, AlignmentResult
 from dnakit.core import (
     Citation,
@@ -388,6 +389,7 @@ def align_pairwise(
     target: SequenceInput,
     *,
     config: AlignmentConfig | None = None,
+    verbose: bool = True,
 ) -> AlignmentResult:
     """Align two sequences with literal-IUPAC equality and deterministic traceback."""
 
@@ -510,3 +512,5 @@ def align_pairwise(
 
 
 __all__ = ["AlignmentConfig", "align_pairwise"]
+
+_register_public_verbose(globals())

@@ -35,7 +35,11 @@ Thumbs.db
 .cache/
 logs/
 outputs/
+/results/
 /ckpt/
+
+# Locally installed Agent skills (canonical sources live in skills/)
+/.agents/skills/
 
 # Local model weights and datasets
 /compared_models/models/
@@ -56,3 +60,4 @@ outputs/
 使用方法.md
 /write_paper/
 /backup/
+/agent-source.md

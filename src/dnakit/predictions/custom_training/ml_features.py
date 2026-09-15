@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence
 from dnakit.exceptions import InputFormatError
 from dnakit.representations import (
@@ -21,6 +22,8 @@ def machine_learning_features(
     data: PropertyData,
     config: CustomPropertyTrainingConfig,
     backend: RepresentationBackend | None,
+    *,
+    verbose: bool = True,
 ) -> tuple[Any, dict[str, object]]:
     """Extract features without fitting preprocessing on held-out rows."""
     np = require_ml_module("numpy")
@@ -106,3 +109,6 @@ def machine_learning_features(
     metadata["names"] = list(names)
     metadata["dimension"] = len(names)
     return values, metadata
+
+
+_register_public_verbose(globals(), ("machine_learning_features",))

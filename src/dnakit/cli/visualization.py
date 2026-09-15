@@ -21,7 +21,7 @@ from dnakit.visualization import (
 def plot_distribution_command(
     input_path: Annotated[Path, typer.Option("--input", exists=True, dir_okay=False)],
     column: Annotated[list[str], typer.Option("--column", help="Repeat for multiple columns.")],
-    task: Annotated[str, typer.Option("--task", help="classification or regression.")],
+    task: Annotated[str, typer.Option("--task", help="classification, regression or probability.")],
     output: Annotated[
         list[Path], typer.Option("--output", help="One filename per column, in the same order.")
     ],
@@ -40,12 +40,17 @@ def plot_distribution_command(
         int, typer.Option("--size", min=320, help="Square SVG canvas size in pixels.")
     ] = 720,
     font_family: Annotated[str, typer.Option("--font-family")] = "sans-serif",
-    font_size: Annotated[int, typer.Option("--font-size", min=1)] = 16,
-    tick_font_size: Annotated[int, typer.Option("--tick-font-size", min=1)] = 12,
-    value_font_size: Annotated[int, typer.Option("--value-font-size", min=1)] = 11,
-    color: Annotated[str, typer.Option("--color")] = "#2563eb",
+    font_size: Annotated[int, typer.Option("--font-size", min=1)] = 24,
+    tick_font_size: Annotated[int, typer.Option("--tick-font-size", min=1)] = 20,
+    value_font_size: Annotated[int, typer.Option("--value-font-size", min=1)] = 20,
+    color: Annotated[
+        str | None, typer.Option("--color", help="Use one color for all bars.")
+    ] = None,
+    bar_color: Annotated[
+        list[str] | None, typer.Option("--bar-color", help="Repeat for a custom bar palette.")
+    ] = None,
     background: Annotated[str, typer.Option("--background")] = "#ffffff",
-    bar_width: Annotated[float, typer.Option("--bar-width", min=0.01, max=1.0)] = 0.9,
+    bar_width: Annotated[float, typer.Option("--bar-width", min=0.01, max=1.0)] = 0.55,
     label_rotation: Annotated[
         int, typer.Option("--label-rotation", help="0, 45, or 90 degrees.")
     ] = 0,
@@ -62,6 +67,8 @@ def plot_distribution_command(
 ) -> None:
     """Plot category proportions or regression histograms from CSV columns."""
     try:
+        if color is not None and bar_color is not None:
+            raise ValueError("Use either --color or --bar-color, not both.")
         if len(column) != len(output):
             raise ValueError("Supply one --output for each --column, in the same order.")
         # Extensionless filenames follow save_image's PNG default.
@@ -96,6 +103,7 @@ def plot_distribution_command(
             tick_font_size=tick_font_size,
             value_font_size=value_font_size,
             bar_width=bar_width,
+            bar_colors=(color,) if color is not None else bar_color,
             label_rotation=label_rotation,
             max_tick_labels=max_tick_labels,
             show_values=show_values,
@@ -103,7 +111,7 @@ def plot_distribution_command(
             x_label=x_label,
             y_label=y_label,
             max_values=max_values,
-            theme=SVGTheme(font_family=font_family, accent=color, background=background),
+            theme=SVGTheme(font_family=font_family, background=background),
         )
         plots = plot_csv_distributions(
             input_path,

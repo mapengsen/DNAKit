@@ -2,6 +2,18 @@
 
 使用统一接口查询 NCBI、Ensembl、ENA、ENCODE 和 UCSC 等公共数据库，从而获取 DNA 序列及相关元数据。
 
+## 新增数据库接口入口
+
+新增的 `dnakit.databases` 提供 455 个公开函数；`dnakit.encode` 提供 20 个独立的实验查询、下载和管理接口。它们的完整参数与返回值已逐项收录：
+
+- [基因、序列与测序数据](../native/sequences.md) · [ENCODE](../native/encode.md)
+- [遗传变异与 GWAS](../native/variants.md) · [疾病、表型与本体](../native/phenotypes.md)
+- [表达与调控](../native/regulation.md) · [物种与微生物组](../native/organisms.md)
+- [通路、互作与结构](../native/pathways.md) · [靶点与药物证据](../native/targets.md)
+- [文献与研究检索](../native/literature.md) · [接口搜索与分发](../native/execution.md)
+
+完整检索入口见[新增 484 个函数索引](../native/index.md)，从搜索函数到实际调用的示例见[调用教程](../native/usage.md)。下方继续介绍原有 `dnakit.search` 的统一查询结果与扩充后的序列检索。
+
 <span id="1"></span>**提供方与入口**
 
 - **作用：** 汇总 DNAKit 可访问的公共数据库，并统一超时、重试、缓存、限速及返回对象，使不同来源的查询结果具有一致的 provenance 和错误处理。
@@ -19,6 +31,41 @@
 | UCSC REST/Downloads | `ucsc_*()`                                                                       | 染色体、序列、CpG/重复/调控/保守性轨道及文件目录             |
 
 这些入口依据 [NCBI Datasets REST API](https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/rest-api/)、[NCBI E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25499/)、[Ensembl REST](https://rest.ensembl.org/)、[ENA Portal API](https://www.ebi.ac.uk/ena/portal/api)、[ENCODE REST API](https://www.encodeproject.org/help/rest-api/) 和 [UCSC REST API](https://genome.ucsc.edu/goldenPath/help/api.html) 实现。
+
+## 按物种、基因和菌株检索序列
+
+`dnakit.search.ncbi.entrez(database, term=None, *, organism=None, gene=None, strain=None,
+keywords=None, seq_type=None, source="all", retmax=20, retstart=0, config=None)`
+保留原来的 `entrez("nuccore", "查询表达式")` 用法，也支持结构化序列条件。
+可选条件与 `term` 通过 AND 组合；`organism/gene/strain` 为字面值，`keywords/term` 支持 Entrez 表达式。
+结构化过滤适用于 `nuccore` 和 `protein`；菌株通过 All Fields 查询，需核对记录中的实际菌株。
+
+```python
+import dnakit
+
+result = dnakit.search.ncbi.entrez(
+    "nuccore", organism="Escherichia coli", strain="K-12",
+    seq_type="complete_genome", retmax=3,
+)
+accessions = dnakit.search.ncbi.accessions(result.metadata["uids"])
+print(result.total_count, accessions)
+for summary in result.records:
+    print(summary)
+```
+
+`seq_type` 支持 `complete_genome/genomic/mrna/ncrna/refseq/protein`；蛋白序列使用
+`database="protein"`。`source="refseq"` 可与分子类型组合；`source="genbank"` 排除 RefSeq，
+不代表实验验证等级。空结果不会自动扩大查询。
+
+`accessions(uids, *, database="nuccore", config=None)` 每批最多解析 200 个 UID，
+按输入顺序返回版本化 accession 元组，保留重复项；空输入返回空元组，不发请求；缺失 UID 报错。
+`accession(identifier)` 仍用于查询一个 accession 的摘要。
+`QueryResult.records` 是摘要，`metadata["uids"]` 是 UID，`total_count` 是总命中数；
+`metadata["warnings"]` 保留 NCBI 的查询提示。这里不返回原始序列，文件下载见
+[按 accession 下载序列](15_download.md#accession-sequences)。
+
+MCP 中的对应名称为 `dnakit.search.entrez` 和 `dnakit.search.accessions`，
+新增参数会出现在工具描述的输入 Schema 中。
 
 ## 1) 基础查询 <span id="2"></span>
 

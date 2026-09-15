@@ -279,16 +279,18 @@ class DistributionPlotConfig:
 
     Explicit bin edges must cover all valid values. Category order, when given,
     must include all observed labels; unobserved categories get zero counts.
+    Bars receive distinct colors by default, starting with ``theme.accent``.
+    ``bar_colors`` overrides this with a repeating palette (one color for uniform bars).
     """
 
     bins: int = 30
     bin_edges: Sequence[float] | None = None
     categories: Sequence[str] | None = None
     size: int = 720
-    font_size: int = 16
-    tick_font_size: int = 12
-    value_font_size: int = 11
-    bar_width: float = 0.9
+    font_size: int = 24
+    tick_font_size: int = 20
+    value_font_size: int = 20
+    bar_width: float = 0.55
     label_rotation: int = 0
     max_tick_labels: int = 12
     show_values: bool = False
@@ -297,7 +299,8 @@ class DistributionPlotConfig:
     y_label: str = "Sample proportion (%)"
     title: str | None = None
     max_values: int = 1_000_000
-    theme: SVGTheme = field(default_factory=SVGTheme)
+    theme: SVGTheme = field(default_factory=lambda: SVGTheme(font_family="sans-serif"))
+    bar_colors: Sequence[str] | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -324,6 +327,13 @@ class DistributionPlotConfig:
             _title(getattr(self, name), name)
         if not isinstance(self.theme, SVGTheme):
             raise ConfigurationError("theme must be SVGTheme.")
+        if self.bar_colors is not None:
+            if isinstance(self.bar_colors, str) or not self.bar_colors:
+                raise ConfigurationError("bar_colors must be a non-empty sequence of colors.")
+            colors = tuple(self.bar_colors)
+            for color in colors:
+                _color(color, "bar_colors")
+            object.__setattr__(self, "bar_colors", colors)
         if self.bin_edges is not None:
             edges = tuple(self.bin_edges)
             if not 2 <= len(edges) <= 1001:

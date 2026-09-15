@@ -6,6 +6,7 @@ import hashlib
 from collections.abc import Mapping
 from typing import Literal
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Gap
 from dnakit.core._json import FrozenDict
 from dnakit.descriptors import kmer_statistics
@@ -57,6 +58,7 @@ def hashed_kmer_fingerprint(
     ambiguity_policy: FingerprintAmbiguityPolicy | str = FingerprintAmbiguityPolicy.ERROR,
     overlapping: bool = True,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> BitFingerprintResult:
     """Hash observed k-mers into a deterministic fixed-length binary vector."""
 
@@ -138,6 +140,7 @@ def panel_fingerprint(
     representation: FingerprintRepresentation | str = FingerprintRepresentation.DENSE,
     max_panel_size: int = DEFAULT_MAX_PANEL_SIZE,
     max_matches_per_pattern: int = 100_000,
+    verbose: bool = True,
 ) -> BitFingerprintResult:
     """Encode the presence of each named exact/IUPAC pattern in a panel."""
 
@@ -227,3 +230,5 @@ __all__ = [
     "hashed_kmer_fingerprint",
     "panel_fingerprint",
 ]
+
+_register_public_verbose(globals())

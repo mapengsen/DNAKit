@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 
@@ -39,13 +40,13 @@ _ALIASES = {
 }
 
 
-def available_schema_llm_providers() -> tuple[SchemaLLMProvider, ...]:
+def available_schema_llm_providers(*, verbose: bool = True) -> tuple[SchemaLLMProvider, ...]:
     """List connection presets without reading keys or making network requests."""
 
     return _PROVIDERS
 
 
-def get_schema_llm_provider(name: str) -> SchemaLLMProvider:
+def get_schema_llm_provider(name: str, *, verbose: bool = True) -> SchemaLLMProvider:
     """Resolve a provider name or alias; model names remain caller-controlled."""
 
     if isinstance(name, str):
@@ -62,3 +63,5 @@ def get_schema_llm_provider(name: str) -> SchemaLLMProvider:
 
 
 __all__ = ["SchemaLLMProvider", "available_schema_llm_providers", "get_schema_llm_provider"]
+
+_register_public_verbose(globals())

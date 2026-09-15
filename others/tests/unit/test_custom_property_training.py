@@ -214,6 +214,30 @@ def test_csv_auto_mapping_and_seeded_default_split(tmp_path: Path) -> None:
     assert data.label_names == ("label",)
 
 
+def test_auto_id_detection_checks_duplicates_beyond_the_preview(tmp_path: Path) -> None:
+    source = tmp_path / "repeated-names.csv"
+    source.write_text(
+        "name,sequence,label\n"
+        + "".join(f"name-{index % 10},ACGTACGT,{index % 2}\n" for index in range(20)),
+        encoding="utf-8",
+    )
+    inspection = inspect_property_data(source)
+    assert inspection.mapping.id_field is None
+    assert any("source-row IDs" in note for note in inspection.warnings)
+    data = load_property_data(source, inspection=inspection)
+    assert data.record_count == 20
+    assert data.record_ids == tuple(f"record_{index + 1}" for index in range(20))
+    with pytest.raises(InputFormatError, match="DUPLICATE_CUSTOM_RECORD_ID"):
+        load_property_data(
+            source,
+            mapping=DataMapping(
+                sequence_field="sequence",
+                label_fields=("label",),
+                id_field="name",
+            ),
+        )
+
+
 def test_nested_json_and_fasta_header_mapping(tmp_path: Path) -> None:
     nested = tmp_path / "nested.json"
     nested.write_text(

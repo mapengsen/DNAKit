@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import to_json_compatible
 from dnakit.core.enums import DNAAlphabet, IssueSeverity
 from dnakit.core.gap import Gap
@@ -38,6 +39,7 @@ def normalize(
     keep_u: bool = False,
     keep_other: bool = False,
     config: NormalizationConfig | None = None,
+    verbose: bool = True,
 ) -> NormalizationResult:
     """Normalize raw DNA while retaining an audit entry for every edit.
 
@@ -563,3 +565,6 @@ def _issue(
     details: dict[str, object],
 ) -> Issue:
     return Issue(code=code, severity=severity, message=message, details=details)
+
+
+_register_public_verbose(globals(), ("normalize",))

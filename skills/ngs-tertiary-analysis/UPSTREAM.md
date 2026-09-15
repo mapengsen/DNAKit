@@ -1,0 +1,27 @@
+# Upstream provenance: ngs-tertiary-analysis
+
+- Source: [htlin222/ngs-tertiary-analysis-skills](https://github.com/htlin222/ngs-tertiary-analysis-skills/tree/d483c21fddd14a034e7f2f038f237ad7bcd05b1a/.claude/skills/ngs-tertiary-analysis)
+- Revision: `d483c21fddd14a034e7f2f038f237ad7bcd05b1a`
+- Original path: `.claude/skills/ngs-tertiary-analysis`
+- Attribution: htlin222/ngs-tertiary-analysis-skills contributors
+- Content license: **MIT**. Repository content license applies; underlying tools/data are not bundled.
+- Snapshot: 2026-09-12
+- DNAKit changes to upstream files: none.
+- DNAKit additions: this file and copies of source notices in `licenses/`.
+
+## Runtime and validation
+
+The original workflow has not been executed during import. Metadata parsing and checksums do not establish scientific correctness. Install the upstream tools, reference data and API credentials specified in SKILL.md. Their licenses remain separate. This bundle does not include those tools, model weights or databases. Resolve original resource paths from this skill directory. Repository-wide dependencies may require the upstream runtime. Use `dnakit skills info ngs-tertiary-analysis --json` for cross-skill dependencies.
+
+## Citation
+
+Cite htlin222/ngs-tertiary-analysis-skills at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices.
+
+htlin222/ngs-tertiary-analysis-skills contributors. ngs-tertiary-analysis. Revision d483c21fddd14a034e7f2f038f237ad7bcd05b1a. https://github.com/htlin222/ngs-tertiary-analysis-skills/tree/d483c21fddd14a034e7f2f038f237ad7bcd05b1a/.claude/skills/ngs-tertiary-analysis
+
+Also cite the actual tools, models, datasets and papers used. Inclusion does not imply upstream endorsement.
+
+
+## DNAKit adaptation — 2026-09-13
+
+Distributed as `ngs-tertiary-analysis`; previous identifier `ngs-tertiary-analysis` remains an alias when different. DNAKit changed discovery links, package calls and execution guidance. Original authorship, licenses, citations and original file hashes are retained. Scientific software/models remain their original implementations. See DNAKIT.md and registry/adaptations.json.

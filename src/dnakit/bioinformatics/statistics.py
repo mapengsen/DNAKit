@@ -7,11 +7,12 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import matrix, positive, require
 from dnakit.exceptions import ConfigurationError
 
 
-def distance_matrix(values: Any) -> Any:
+def distance_matrix(values: Any, *, verbose: bool = True) -> Any:
     np = require("numpy", "bio-analysis")
     data = matrix(values, min_rows=2)
     if (
@@ -76,6 +77,7 @@ def distance_test(
     method: str = "permanova",
     permutations: int = 999,
     seed: int = 0,
+    verbose: bool = True,
 ) -> PermutationResult:
     """One-factor PERMANOVA, ANOSIM, or centroid PERMDISP with label permutations.
 
@@ -137,6 +139,7 @@ def mantel(
     permutations: int = 999,
     seed: int = 0,
     alternative: str = "two-sided",
+    verbose: bool = True,
 ) -> PermutationResult:
     np = require("numpy", "bio-analysis")
     stats = require("scipy.stats", "bio-analysis")
@@ -164,7 +167,9 @@ class OrdinationResult:
     negative_eigenvalues: tuple[float, ...] = ()
 
 
-def pcoa(distances: Any, *, dimensions: int | None = None) -> OrdinationResult:
+def pcoa(
+    distances: Any, *, dimensions: int | None = None, verbose: bool = True
+) -> OrdinationResult:
     """Classical principal coordinates; retain positive axes and report negative eigenvalues."""
     np = require("numpy", "bio-analysis")
     data = distance_matrix(distances)
@@ -192,7 +197,9 @@ def pcoa(distances: Any, *, dimensions: int | None = None) -> OrdinationResult:
     )
 
 
-def ordination(values: Any, *, method: str = "ca", constraints: Any = None) -> OrdinationResult:
+def ordination(
+    values: Any, *, method: str = "ca", constraints: Any = None, verbose: bool = True
+) -> OrdinationResult:
     """CA (row principal coordinates), CCA constrained axes, or centered RDA.
 
     CCA uses chi-square standardized responses projected on weighted centered
@@ -245,7 +252,7 @@ def ordination(values: Any, *, method: str = "ca", constraints: Any = None) -> O
 
 
 def bioenv(
-    distances: Any, environmental: Any, *, max_columns: int = 12
+    distances: Any, environmental: Any, *, max_columns: int = 12, verbose: bool = True
 ) -> tuple[dict[str, Any], ...]:
     """Best standardized environmental-variable subset for each subset size (Spearman)."""
     np = require("numpy", "bio-analysis")
@@ -273,7 +280,12 @@ def bioenv(
 
 
 def composition_transform(
-    values: Any, *, method: str = "clr", reference: int = 0, inverse: bool = False
+    values: Any,
+    *,
+    method: str = "clr",
+    reference: int = 0,
+    inverse: bool = False,
+    verbose: bool = True,
 ) -> Any:
     """CLR/ILR/ALR and inverses; ILR uses an orthonormal Helmert basis.
 
@@ -309,7 +321,12 @@ def composition_transform(
 
 
 def ancom(
-    values: Any, groups: Iterable[Any], *, alpha: float = 0.05, pseudocount: float = 0.0
+    values: Any,
+    groups: Iterable[Any],
+    *,
+    alpha: float = 0.05,
+    pseudocount: float = 0.0,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Native pairwise log-ratio ANCOM W statistics with per-taxon Holm correction.
 
@@ -357,7 +374,7 @@ def ancom(
     return {"W": (adjusted < alpha).sum(axis=1), "pvalues": pvalues, "adjusted_pvalues": adjusted}
 
 
-def alpha_diversity(counts: Any, *, metric: str = "shannon") -> Any:
+def alpha_diversity(counts: Any, *, metric: str = "shannon", verbose: bool = True) -> Any:
     """Per-sample observed richness, Shannon (natural logs), Simpson, or inverse Simpson."""
     np = require("numpy", "bio-analysis")
     values = matrix(counts)
@@ -375,7 +392,7 @@ def alpha_diversity(counts: Any, *, metric: str = "shannon") -> Any:
     raise ConfigurationError("Unknown alpha diversity metric.")
 
 
-def beta_diversity(counts: Any, *, metric: str = "braycurtis") -> Any:
+def beta_diversity(counts: Any, *, metric: str = "braycurtis", verbose: bool = True) -> Any:
     spatial = require("scipy.spatial.distance", "bio-analysis")
     values = matrix(counts, min_rows=2)
     if (values < 0).any() or (values.sum(1) == 0).any():
@@ -385,3 +402,20 @@ def beta_diversity(counts: Any, *, metric: str = "braycurtis") -> Any:
     if metric == "jaccard":
         values = values > 0
     return spatial.squareform(spatial.pdist(values, metric=metric))
+
+
+_register_public_verbose(
+    globals(),
+    (
+        "distance_matrix",
+        "distance_test",
+        "mantel",
+        "pcoa",
+        "ordination",
+        "bioenv",
+        "composition_transform",
+        "ancom",
+        "alpha_diversity",
+        "beta_diversity",
+    ),
+)

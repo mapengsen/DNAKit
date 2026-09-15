@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from itertools import islice
 from typing import Literal, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Location, Strand
 from dnakit.exceptions import ConfigurationError
 from dnakit.patterns._shared import (
@@ -150,6 +151,7 @@ def scan_pam_candidates(
     max_scan_cells: int = 50_000_000,
     max_exclude_motifs: int = 1_000,
     max_filter_cells: int = 50_000_000,
+    verbose: bool = True,
 ) -> PatternResult[GuideCandidate]:
     """Find PAM-adjacent guide candidates without efficiency/off-target prediction."""
 
@@ -335,3 +337,5 @@ __all__ = [
     "PAMRule",
     "scan_pam_candidates",
 ]
+
+_register_public_verbose(globals())

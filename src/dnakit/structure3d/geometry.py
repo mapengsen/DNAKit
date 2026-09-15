@@ -9,6 +9,7 @@ from contextlib import suppress
 from itertools import combinations, pairwise
 from typing import TypeAlias
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 from ._shared import native_structure_provenance
@@ -576,6 +577,7 @@ def analyze_structure(
     sasa_points_per_atom: int = 96,
     volume_grid_spacing_angstrom: float = 0.75,
     progress: StructureProgress | None = None,
+    verbose: bool = True,
 ) -> Structure3DAnalysisResult:
     """Calculate native geometry from one explicit PDB model."""
 
@@ -676,7 +678,7 @@ def analyze_structure(
 
 
 def analyze_ensemble_flexibility(
-    structures: Iterable[DNA3DStructure],
+    structures: Iterable[DNA3DStructure], *, verbose: bool = True
 ) -> EnsembleFlexibilityResult:
     """Calculate translation-centered RMSF for a pre-oriented PDB model ensemble."""
 
@@ -771,3 +773,5 @@ __all__ = [
     "analyze_ensemble_flexibility",
     "analyze_structure",
 ]
+
+_register_public_verbose(globals())

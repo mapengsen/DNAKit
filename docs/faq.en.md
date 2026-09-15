@@ -1,5 +1,30 @@
 # FAQ
 
+## Where do the Skills come from, and how are they cited and installed? {#agent-skills-references}
+
+DNAKit curates DNA/genomics workflows from bioSkills, ToolUniverse, ClawBio, SciAgent, K-Dense, NVIDIA BioNeMo, DeepMind, PKU-EMBL, omics-skills, ENCODE Toolkit, and other original sources. Task/stage and input-condition equivalence rules choose one implementation per duplicate group. Each skill has its own directory with supporting files, original licenses, and `UPSTREAM.md`; portability changes are documented.
+
+With a DNAKit version containing this feature:
+
+```bash
+dnakit skills search "variant annotation" --limit 5
+dnakit skills install dnakit --agent codex
+dnakit skills install variant-annotation --agent codex
+dnakit skills cite variant-annotation
+```
+
+Install the `dnakit` discovery skill to describe tasks in natural language and let the Agent find an appropriate workflow. MCP clients can use `search_dnakit_skills` and `read_dnakit_skill` for selective reading. See the [Skills tutorial](llm_tools/skills.md) for paths, Claude Code/Cursor, offline examples, and dependencies. Install the current checkout with `python -m pip install -e "."`; PyPI installation requires a published release containing this feature.
+
+Use `dnakit skills stats` and [`skills/README.md`](https://github.com/mapengsen/DNAKit/blob/main/skills/README.md) for current counts. Pinned sources, deduplication decisions, license-review exclusions, and a publication inventory are in [`registry/`](https://github.com/mapengsen/DNAKit/tree/main/registry). A small set of supporting skills completes dependencies of the included composite workflows.
+
+Third-party content retains its MIT, Apache-2.0, CC-BY-4.0, or AGPL-3.0-only terms and original authorship. Candidates without established content permissions, with current use restrictions, or missing essential resources remain in the review records. See the [discovery report](https://github.com/mapengsen/DNAKit/blob/main/registry/discovery.md) for search scope and exclusions, and [third-party notices](https://github.com/mapengsen/DNAKit/blob/main/THIRD_PARTY_NOTICES.md) for license scope.
+
+Credit DNAKit's curation and integration separately from the original workflows and cite the actual tools, models, datasets, and methods used. Installing instructions does not install analysis dependencies, and catalog inclusion does not establish scientific validation.
+
+All bundled skills now have DNAKit integration guidance. Collection prefixes are removed where applicable, with previous identifiers retained as aliases. Actual software and model names remain unchanged.
+
+Use `dnakit.databases` for bundled database adapters, `dnakit.encode` for ENCODE, and `dnakit skills run` / `dnakit.workflows.run()` for packaged scripts. The migrated collection adapters do not require ToolUniverse, ClawBio or ENCODE Toolkit installations. Real scientific libraries, programs, model weights, reference data and credentials remain task-specific dependencies. See each skill's `DNAKIT.md` and the [native interface guide](llm_tools/native_skills.md).
+
 ## What matching strategy is used for sequence function search? {#pattern-matching-strategy}
 
 [The 10 types of functions in sequence function search](api/features/06_patterns.md) are all **deterministic rule algorithms**: when the algorithm version, input sequence and parameters are the same, the results must be the same. They do not use machine learning models, random sampling, or inference from experimental data. The PWM score is also a matching score calculated according to a fixed formula, not a model predicted probability.
@@ -111,7 +136,7 @@ The functions in [Physical and Chemical Properties](api/features/07_physicochemi
 | THERMO-014 260 nm extinction coefficient | Sum of adjacent dinucleotide hypochromicity parameters minus internal single base parameter | Warshaw & Tinoco, 1966, [DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X); Cantor, Warshaw & Shapiro, 1970, [DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909). |
 | THERMO-002 Tm (Wallace) | `2 × (A+T) + 4 × (G+C)` Rule of thumb for short oligonucleotides | Wallace et al., 1979, [DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543). The current implementation does not write this DOI into the result provenance, and the FAQ is here to supplement the literature relationship. |
 | THERMO-002 Tm (nearest-neighbor) | Neighbor packing, terminal, symmetry, salt concentration and chain concentration models | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-003 salt concentration correction | SantaLucia unit price salt entropy correction | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| THERMO-003 salt concentration correction | SantaLucia monovalent salt entropy correction | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
 | THERMO-012 local Tm | Sliding window repeatedly calls Wallace or nearest-neighbor Tm | Does not introduce a new scientific model; references inherit the chosen Wallace 1979 or SantaLucia 1998 method. |
 | EVAL-013 Synthesis Risk | Five-component equal weighted average of GC, isobase contiguous, tandem repeats, and inverted repeats | DNAKit internal transparent heuristic rules; no external paper or vendor rule sets, scores are not experimental synthesis success probabilities. |
 | THERMO-004 Thermodynamic Parameters | ΔH, ΔS, ΔG and Tm for a perfectly complementary duplex | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
@@ -130,10 +155,10 @@ These references illustrate the sources of algorithms and parameters and do not 
 
 | Function | Actual calculation basis | References or sources |
 | --- | --- | --- |
-| 1. Perfectly complementary duplex `ΔH/ΔS/ΔG/Tm` | Adjacent stacking, termini, symmetry, monovalent salt and chain concentration formulas | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). This DOI has written native results provenance. |
+| 1. Perfectly complementary duplex `ΔH/ΔS/ΔG/Tm` | Adjacent stacking, termini, symmetry, monovalent salt and chain concentration formulas | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). This DOI is recorded in the provenance of native results. |
 | 2. Unified double-chain stability | `native` follows item 1; `primer3-cli` calls the mismatch/dangling-end structural model of `ntthal` | The native path refers to SantaLucia 1998; the Primer3 path refers to Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 official manual](https://primer3.org/manual.html). `Tm > configured temperature` is a DNAKit result-interpretation rule and does not have a separate paper. |
 | 3. Contribution of adjacent base pairs to steps | Check the adjacent stacking `ΔH/ΔS` table and calculate `ΔG=ΔH−TΔS/1000` | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). No additional references are made to the new model. |
-| 4. Conditions and Na⁺/K⁺ | The condition object is recorded as a numerical checksum; the native model is corrected with `0.368(N−1)ln([Na⁺]+[K⁺])` `ΔS` | The salt correction refers to SantaLucia 1998. Object checksum `Na⁺+K⁺` field merging is a DNAKit implementation rule and does not have a separate paper. |
+| 4. Conditions and Na⁺/K⁺ | The condition object validates and records numeric values; the native model corrects `ΔS` using `0.368(N−1)ln([Na⁺]+[K⁺])` | The salt correction refers to SantaLucia 1998. Object validation and merging the `Na⁺+K⁺` fields is a DNAKit implementation rule and does not have a separate paper. |
 | 5. `Ka`, `Kd` and double-strand ratio | `Ka=exp(−ΔG/RT)`, `Kd=1/Ka`, and then solve the ideal two-state mass conservation equation | `ΔG` cited SantaLucia 1998; the equilibrium constant relationship and quadratic equation are standard thermodynamics and DNAKit transparent algebra implementation, not bound to separate papers or fitted data. |
 | 6. Theoretical melting curve | Repeat items 1 and 5 at each temperature, and do linear interpolation for the intersection point of double-strand ratio 0.5 | Reference inheritance SantaLucia 1998; temperature scan and linear interpolation are DNAKit internal deterministic rules, no new paper. |
 | 7. 5′/3′ end stability | Calculate the nearest neighbor `ΔG` for two equal-length end windows separately and then compare | Energy reference SantaLucia 1998; window truncation and "higher `ΔG` is the less stable end" are DNAKit internal rules. |

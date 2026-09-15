@@ -145,7 +145,7 @@ SUPPORT: tuple[tuple[str, tuple[str, ...], tuple[str, ...], str], ...] = (
             "dnakit.llm.call_llm",
             "dnakit.llm.acall_llm",
         ),
-        ("docs/agent_tools.md",),
+        ("docs/llm_tools/mcp.md", "docs/llm_tools/python_api.md"),
         "已有 Agent 目录/搜索/schema/执行、dnakit-mcp 服务和 LLM 调用能力均在 I 列；"
         "服务商、模型参数及被调用函数不重复累加。",
     ),

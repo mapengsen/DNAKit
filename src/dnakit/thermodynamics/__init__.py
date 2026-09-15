@@ -1,5 +1,7 @@
 """Bounded native thermodynamics and conditional backend discovery."""
 
+from dnakit._verbosity import register_public as _register_public_verbose
+
 from .backends import (
     Primer3CLIAdapter,
     ThermodynamicsBackend,
@@ -110,3 +112,5 @@ __all__ = [
     "validate_primer3_result",
     "window_tm",
 ]
+
+_register_public_verbose(globals())

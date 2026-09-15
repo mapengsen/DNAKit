@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNASequence, DNASet, Strand
 from dnakit.exceptions import ConfigurationError
 from dnakit.similarity._shared import (
@@ -135,6 +136,7 @@ def exact_search(
     merge_strands: bool = True,
     max_targets: int = DEFAULT_MAX_SEARCH_TARGETS,
     max_matches: int = DEFAULT_MAX_SEARCH_MATCHES,
+    verbose: bool = True,
 ) -> SearchResult:
     """Find targets whose complete symbol strings equal the query.
 
@@ -194,6 +196,7 @@ def subsequence_search(
     merge_strands: bool = True,
     max_targets: int = DEFAULT_MAX_SEARCH_TARGETS,
     max_matches: int = DEFAULT_MAX_SEARCH_MATCHES,
+    verbose: bool = True,
 ) -> SearchResult:
     """Find literal query occurrences across one or more targets.
 
@@ -259,6 +262,7 @@ def reverse_complement_search(
     merge_strands: bool = True,
     max_targets: int = DEFAULT_MAX_SEARCH_TARGETS,
     max_matches: int = DEFAULT_MAX_SEARCH_MATCHES,
+    verbose: bool = True,
 ) -> SearchResult:
     """Search both the supplied query and its reverse complement."""
 
@@ -284,3 +288,5 @@ __all__ = [
     "reverse_complement_search",
     "subsequence_search",
 ]
+
+_register_public_verbose(globals())

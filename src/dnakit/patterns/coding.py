@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from itertools import islice
 from typing import cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Strand
 from dnakit.exceptions import ConfigurationError
 from dnakit.ops import translate
@@ -108,6 +109,7 @@ def scan_codon_sites(
     strand: Strand | str = Strand.BOTH,
     max_matches: int = 100_000,
     max_codon_checks: int = 3_000_000,
+    verbose: bool = True,
 ) -> PatternResult[CodonSite]:
     """Locate in-frame start and stop codons in the selected reading frames."""
 
@@ -206,6 +208,7 @@ def scan_orfs(
     strand: Strand | str = Strand.BOTH,
     max_matches: int = 100_000,
     max_codon_checks: int = 3_000_000,
+    verbose: bool = True,
 ) -> PatternResult[ORFHit]:
     """Find start-anchored ORFs on up to six frames.
 
@@ -358,3 +361,5 @@ def scan_orfs(
 
 
 __all__ = ["scan_codon_sites", "scan_orfs"]
+
+_register_public_verbose(globals())

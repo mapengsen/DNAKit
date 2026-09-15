@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core._json import FrozenDict
 from dnakit.core.gap import Gap
 from dnakit.descriptors._shared import (
@@ -23,6 +24,7 @@ def homopolymer_runs(
     min_run_length: int = 2,
     ambiguity_policy: DescriptorAmbiguityPolicy | str = DescriptorAmbiguityPolicy.ERROR,
     cross_gaps: bool = False,
+    verbose: bool = True,
 ) -> HomopolymerResult:
     """Find canonical-base runs in zero-based, half-open symbol coordinates.
 
@@ -103,3 +105,5 @@ def homopolymer_runs(
 
 
 __all__ = ["homopolymer_runs"]
+
+_register_public_verbose(globals())

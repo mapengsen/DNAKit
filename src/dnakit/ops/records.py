@@ -6,6 +6,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, TypeAlias, cast
 
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import (
     CompoundLocation,
     DNAFeature,
@@ -560,6 +561,7 @@ def insert_record(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Insert sequence and synchronize record annotations explicitly."""
 
@@ -589,6 +591,7 @@ def delete_record(
     *,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Delete sequence and map or resolve every affected feature."""
 
@@ -618,6 +621,7 @@ def substitute_record(
     feature_policy: FeatureOverlapPolicy = "preserve",
     replacement_annotations: Mapping[str, Iterable[int | float]] | None = None,
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Substitute sequence and synchronize features and letter annotations."""
 
@@ -647,6 +651,7 @@ def mask_record(
     symbol: str = "N",
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Mask symbols while preserving aligned letter values unless explicitly dropped."""
 
@@ -683,6 +688,7 @@ def trim_record(
     right: int = 0,
     feature_policy: FeatureOverlapPolicy = "preserve",
     letter_annotation_policy: LetterAnnotationPolicy = "error",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Trim record ends and synchronize features in original coordinates."""
 
@@ -748,9 +754,7 @@ def _copy_feature_with_strand(
 
 
 def reverse_complement_record(
-    record: DNARecord,
-    *,
-    feature_policy: FeatureOverlapPolicy = "preserve",
+    record: DNARecord, *, feature_policy: FeatureOverlapPolicy = "preserve", verbose: bool = True
 ) -> RecordOperationResult:
     """Reverse-complement sequence, locations, strands, and letter arrays."""
 
@@ -964,6 +968,7 @@ def rotate_record(
     offset: int,
     *,
     feature_policy: FeatureOverlapPolicy = "split",
+    verbose: bool = True,
 ) -> RecordOperationResult:
     """Rotate a circular record and map origin-spanning feature locations."""
 
@@ -977,9 +982,7 @@ def rotate_record(
 
 
 def canonical_origin_record(
-    record: DNARecord,
-    *,
-    feature_policy: FeatureOverlapPolicy = "split",
+    record: DNARecord, *, feature_policy: FeatureOverlapPolicy = "split", verbose: bool = True
 ) -> RecordOperationResult:
     """Apply the canonical forward lexicographic origin to a record."""
 
@@ -1010,3 +1013,5 @@ __all__ = [
     "substitute_record",
     "trim_record",
 ]
+
+_register_public_verbose(globals())

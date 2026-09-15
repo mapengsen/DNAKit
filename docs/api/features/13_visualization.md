@@ -212,6 +212,12 @@ save_image(artifact, "viz-008-alignment", image_type="png")
 | --- | --- | --- |
 | `classification` | `0`、`1`、`2` 等类别标签，也支持字符串 | 每个类别一根柱；类别数量自动扩展 |
 | `regression` | 连续数值 | 将数值分箱，每个区间一根柱；默认 30 个等宽区间 |
+| `probability` | `[0,1]` 范围内的预测概率 | 使用数值分箱，额外拒绝越界概率；不对原始数值做归一化 |
+
+概率列应显式选择 `task="probability"`，CSV API 和 CLI（`--task probability`）同样支持。
+例如 `plot_distribution([0, 0.5, 1], task="probability", config=DistributionPlotConfig(bin_edges=[0, 0.5, 1]))`
+得到计数 `[1, 2]`。缺失值仍按有效样本数统计；NaN/Inf 和越界值拒绝。
+普通 `regression` 继续允许负数；范围检查无法识别恰好落在 `[0,1]` 内的 logits，因此还需选择正确列。
 
 ### CSV 示例与统计规则
 
@@ -247,9 +253,6 @@ python -m dnakit.cli plot-distribution \
   --category 1 \
   --category 2 \
   --show-values \
-  --font-family sans-serif \
-  --font-size 18 \
-  --color '#2563eb' \
   --dpi 150
 ```
 
@@ -259,7 +262,7 @@ python -m dnakit.cli plot-distribution \
 
 ### 命令行：回归数值分布
 
-作用：对 `score` 列按 30 个等宽区间统计占比，使用橙色小柱保存为 PNG。
+作用：对 `score` 列按 30 个等宽区间统计占比，使用默认多色柱子保存为 PNG。
 
 ```bash
 python -m dnakit.cli plot-distribution \
@@ -268,9 +271,6 @@ python -m dnakit.cli plot-distribution \
   --task regression \
   --output outputs/score_distribution.png \
   --bins 30 \
-  --bar-width 0.95 \
-  --font-size 18 \
-  --color '#ea580c' \
   --dpi 150
 ```
 
@@ -293,13 +293,16 @@ python -m dnakit.cli plot-distribution \
 
 ### Python API 与样式
 
+默认每根柱子使用不同颜色，柱宽为类别槽／分箱宽度的 `55%`；轴标题字号为 `24`，刻度和柱顶占比字号为 `20`，字体为 `sans-serif`。自动配色按显示顺序确定，类别较多时自动扩展；显式指定 `categories` 可固定类别顺序。分类柱状图与回归直方图均使用这些默认值，无需在脚本中重复设置。
+
+自定义配色使用 `DistributionPlotConfig(bar_colors=("#2563eb", "#f28e2b"))`；颜色少于柱子时循环使用。CLI 对应 `--bar-color "#2563eb" --bar-color "#f28e2b"`，与统一单色的 `--color` 互斥。
+
 `plot_csv_distributions(source, columns=..., task=..., config=...)` 返回 `{列名: SVGArtifact}`；已经有列表时，可调用 `plot_distribution(values, task=..., config=...)`。使用既有 `save_image()` 指定文件名和格式。
 
 ```python
 from dnakit.visualization import (
     DistributionPlotConfig,
     ImageExportConfig,
-    SVGTheme,
     plot_csv_distributions,
     save_image,
 )
@@ -311,13 +314,8 @@ plots = plot_csv_distributions(
     config=DistributionPlotConfig(
         categories=("0", "1", "2", "3"),  # 未出现的第 3 类占比为 0%
         size=800,
-        font_size=20,
-        tick_font_size=16,
-        value_font_size=14,
         show_values=True,
-        bar_width=0.8,
         x_label="Class",
-        theme=SVGTheme(font_family="sans-serif", accent="#2563eb"),
     ),
 )
 artifact = plots["label"]
@@ -336,15 +334,16 @@ save_image(
 | `bin_edges` / `--bin-edges` | `None` | 回归自定义边界，覆盖 `bins` |
 | `categories` / 重复 `--category` | `None` | 类别显示顺序及可选的零计数类别 |
 | `size` / `--size` | `720` | 正方形 SVG 画布边长，至少 320 |
-| `font_size` / `--font-size` | `16` | 坐标轴名称字号 |
-| `tick_font_size` / `--tick-font-size` | `12` | 坐标刻度字号 |
-| `value_font_size` / `--value-font-size` | `11` | 柱顶占比字号 |
-| `theme.font_family` / `--font-family` | API `monospace`；CLI `sans-serif` | 字体名称，需系统已安装；中文可使用 `Noto Sans CJK SC` |
-| `theme.accent` / `--color` | `#2563eb` | 柱子颜色 |
+| `font_size` / `--font-size` | `24` | 坐标轴名称字号 |
+| `tick_font_size` / `--tick-font-size` | `20` | 坐标刻度字号 |
+| `value_font_size` / `--value-font-size` | `20` | 柱顶占比字号 |
+| `theme.font_family` / `--font-family` | `sans-serif` | 字体名称，需系统已安装；中文可使用 `Noto Sans CJK SC` |
+| `theme.accent` | `#2563eb` | 自动配色时第一根柱子的颜色，其余柱子自动分配不同颜色 |
+| `bar_colors` / 重复 `--bar-color` | `None`（自动多色） | 自定义颜色序列，按顺序循环；统一单色可用 `bar_colors=("#2563eb",)` 或 CLI `--color "#2563eb"` |
 | `theme.background` / `--background` | `#ffffff` | 背景颜色；API 的 `SVGTheme` 还可设置文字、网格颜色 |
-| `bar_width` / `--bar-width` | `0.9` | 柱宽占类别槽或分箱宽度的比例，`1` 表示无间隙 |
+| `bar_width` / `--bar-width` | `0.55` | 柱宽占类别槽或分箱宽度的比例，`1` 表示无间隙 |
 | `label_rotation` / `--label-rotation` | `0` | 横轴刻度旋转角度，可选 `0`、`45`、`90` |
-| `max_tick_labels` / `--max-tick-labels` | `12` | 控制横轴标签密度；回归额外保留最右边界 |
+| `max_tick_labels` / `--max-tick-labels` | `12` | 控制横轴标签密度；回归根据字号减少重叠刻度，并保留最右边界 |
 | `show_values` / `--show-values` | `False` | 显示柱顶占比；密集直方图建议保持关闭 |
 | `show_grid` / `--grid`、`--no-grid` | `True` | 显示水平网格 |
 | `x_label` / `--x-label` | CSV 列名 | 横轴名称 |

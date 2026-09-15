@@ -1,6 +1,8 @@
-# Engineering and scaling
+# Engineering and extensions
 
 Unified management of DNAKit's computing backend, Python API, CLI, configuration workflow, batch and parallel computing, cache, version and recurrence information.
+
+The added [discovery, workflow and report APIs](../native/execution.md) document dispatch, bundled script execution, resource lookup and PDF rendering. Independent-locus inheritance is in [analysis](../native/analysis.md#dnakit.workflows.simulate_inheritance). These are documented separately from the existing strict YAML workflow. See [complete examples](../native/usage.md) for execution and result handling.
 
 ## 1) `ENG-003` Python API
 
@@ -197,8 +199,8 @@ print(result["value_dalton"])
 1173.84
 ```
 
-See [Agent and MCP tools](../../agent_tools.md) for client configuration.
+See [LLM tools → MCP](../../llm_tools/mcp.md) for client configuration.
 
 <span id="custom-llm"></span>
 
-General-purpose LLM calls (Python API), including custom prompts, file input, provider configuration, and safety boundaries, have moved to [Agent and MCP tools → General-purpose LLM calls](../../agent_tools.md#custom-llm).
+See [LLM tools → Python API](../../llm_tools/python_api.md#custom-llm) for general-purpose LLM calls, including custom prompts, file input, provider configuration, and safety boundaries. The same page covers [natural-language tool execution](../../llm_tools/python_api.md#agent-tool-calling), without installing MCP.
