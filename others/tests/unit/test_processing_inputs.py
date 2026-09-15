@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, get_type_hints
 
 import pytest
 
@@ -14,6 +14,13 @@ from dnakit.chunking import ChunkingConfig, chunk_sequences
 from dnakit.core import DNAFeature, DNARecord, DNASequence, Interval
 from dnakit.exceptions import ConfigurationError, InputFormatError
 from dnakit.io import ReadConfig, WriteConfig, read_inputs, read_set, write
+
+
+def test_processing_wrappers_preserve_resolvable_type_annotations() -> None:
+    hints = get_type_hints(datasets.split)
+    assert hints["config"] is datasets.SplitConfig
+    assert hints["return"] is datasets.SplitResult
+    assert hints["verbose"] is bool
 
 
 def fasta(path: Path, *sequences: str) -> Path:

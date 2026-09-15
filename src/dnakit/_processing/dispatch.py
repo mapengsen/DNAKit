@@ -97,6 +97,9 @@ def accept_inputs(function: Callable[..., Any], *, mode: str = "sequence") -> An
         if name not in original.parameters:
             parameters.append(Parameter(name, Parameter.KEYWORD_ONLY, default=default))
     wrapped.__signature__ = original.replace(parameters=parameters)  # type: ignore[attr-defined]
+    # Python 3.14 wraps copies __annotate__, which may be unset after a prior
+    # decorator assigned __annotations__. Preserve those explicit annotations too.
+    wrapped.__annotations__ = dict(getattr(function, "__annotations__", {}))
     if mode in {"collection", "set", "mapping"}:
         # The native annotation still describes records, while this wrapper
         # also accepts files. Expose that contract to JSON tool adapters.

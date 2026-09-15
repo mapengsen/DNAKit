@@ -189,6 +189,22 @@ def test_agent_result_contains_plain_json_values() -> None:
     assert sequence["topology"] == "linear"
 
 
+def test_wrapped_metadata_filter_accepts_json_records_and_criteria() -> None:
+    result = default_tool_registry().execute(
+        "dnakit.io.filter_by_metadata",
+        {
+            "dataset": [
+                {"id": "keep", "sequence": "ACGT", "metadata": {"group": "selected"}},
+                {"id": "drop", "sequence": "TGCA", "metadata": {"group": "other"}},
+            ],
+            "criteria": {"group": "selected"},
+        },
+    )
+    assert isinstance(result, dict)
+    records = cast(list[dict[str, object]], result["records"])
+    assert [record["id"] for record in records] == ["keep"]
+
+
 def test_serialized_results_can_feed_follow_up_agent_tools() -> None:
     registry = default_tool_registry()
     index = registry.execute(

@@ -84,7 +84,9 @@ def _resolve_hints(target: Callable[..., object] | type[object]) -> dict[str, ob
         return dict(get_type_hints(hint_target, include_extras=True))
     except (NameError, TypeError):
         annotations = getattr(hint_target, "__annotations__", {})
-        globals_mapping = getattr(hint_target, "__globals__", {})
+        # String annotations retain the original function's namespace through
+        # wrappers, including when a recursive alias cannot be fully evaluated.
+        globals_mapping = getattr(inspect.unwrap(hint_target), "__globals__", {})
         resolved: dict[str, object] = {}
         for name, annotation in annotations.items():
             if not isinstance(annotation, str):
