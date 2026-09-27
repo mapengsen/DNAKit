@@ -9,6 +9,7 @@ import pytest
 
 from dnakit.bioinformatics import encoding, features, metrics, motifs, optimization, phylogeny
 from dnakit.bioinformatics import statistics as statistics_api
+from dnakit.core import DNA
 from dnakit.exceptions import ConfigurationError
 
 np = pytest.importorskip("numpy")
@@ -30,6 +31,16 @@ def test_composition_encodings_and_reverse_complement_invariance() -> None:
     np.testing.assert_allclose(anf.values, [[1, 1, 1 / 3, 3 / 4]])
     pairs = encoding.encode_dna({"a": "ACGT"}, "CKSNAP", parameters={"gap": 0})
     assert pairs.values[0, pairs.names.index("gap_0:AC")] == pytest.approx(1 / 3)
+
+
+def test_native_encoding_accepts_dna_batch_with_generated_ids() -> None:
+    result = encoding.encode_dna(DNA(["AACGTG", "CCGTAT"]), "NAC")
+
+    assert result.ids == ("sequence_1", "sequence_2")
+    np.testing.assert_allclose(
+        result.values,
+        [[2 / 6, 1 / 6, 2 / 6, 1 / 6], [1 / 6, 2 / 6, 1 / 6, 2 / 6]],
+    )
 
 
 @pytest.mark.parametrize(
@@ -400,6 +411,24 @@ def test_information_gain_and_predictor_bridge() -> None:
     result = metrics.sequence_properties({"a": "ACGT", "b": "CC"}, {"length": len})
     assert result["ids"] == ("a", "b") and result["names"] == ("length",)
     np.testing.assert_array_equal(result["values"], [[4], [2]])
+
+
+def test_sequence_properties_accepts_dna_batch_and_preserves_record_ids() -> None:
+    sequences = DNA(["ACGT", "GGGG"])
+    result = metrics.sequence_properties(
+        sequences, {"gc": lambda text: sum(symbol in "GC" for symbol in text) / len(text)}
+    )
+
+    assert result["ids"] == ("sequence_1", "sequence_2")
+    assert result["names"] == ("gc",)
+    np.testing.assert_allclose(result["values"], [[0.5], [1.0]])
+
+    duplicated = DNA([{"id": "same", "sequence": "ACGT"}, {"id": "same", "sequence": "GGGG"}])
+    with pytest.raises(ConfigurationError, match="IDs must be unique"):
+        metrics.sequence_properties(duplicated, {"length": len})
+    raw_sequences: object = ["ACGT", "GGGG"]
+    with pytest.raises(ConfigurationError, match="DNA"):
+        metrics.sequence_properties(raw_sequences, {"length": len})  # type: ignore[arg-type]
 
 
 def test_constrained_ordination_explains_fraction_of_total_inertia() -> None:

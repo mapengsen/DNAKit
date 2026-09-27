@@ -49,7 +49,7 @@ DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA �
 Pypi安装当前版本：
 
 ```bash
-pip install dnakit==0.1.4
+pip install dnakit==0.1.5
 ```
 
 如需 VEP、ClinVar、dbSNP、gnomAD、dN/dS 和 Golden Gate
@@ -58,11 +58,17 @@ pip install dnakit==0.1.4
 如需让支持 MCP 的 Agent 调用 DNAKit，可执行 `pip install "dnakit[agent]"`，然后在 Agent
 中配置 `dnakit-mcp` 命令。
 
+当前源码中的内置 `run_agent()` 还支持按需生成工具、优化说明或兼容修复实现、本地文件结果缓存与断点续跑，以及检索用户指定的知识库目录（RAG）。配置和示例见 [Agent 教程](docs/llm_tools/agent.md#agent-actions)；工具生成与优化要求可写源码检出及显式副作用授权。
+
 当前源码还包含统一的 DNA／基因组学 Skill 目录。先用 `python -m pip install -e "."`
 安装本仓库，再用 `dnakit skills search "变异注释"` 搜索，或用
 `dnakit skills install dnakit --agent codex` 安装统一入口。
 Claude Code、Cursor、MCP 和引用方式见 [Skills 教程](docs/llm_tools/skills.md)。
 DNAKit 代码保持 MIT；收录技能保留[各自的许可证和作者署名](THIRD_PARTY_NOTICES.md)。
+
+当前源码还新增了[育种、基因识别、甲基化、DNA 存储与纳米结构接口](docs/api/features/38_genomics_extensions.md)，以及 [外部分析与 MCP 连接](docs/api/features/39_external_genomics.md)。
+从本地安装所需依赖，例如 `python -m pip install -e ".[bio-analysis,genomics-genes,agent]"`。
+各 DNA 方向的原始项目、作者与尚缺能力见[来源 FAQ](docs/faq/genomics_sources.md)。[335 个补充项目审核](docs/faq/user_catalog.md)逐项记录去重结果、新增接口及未接入原因。
 
 如果需要参与开发，克隆仓库后通过 Conda 创建完整环境：
 
@@ -101,9 +107,9 @@ conda activate dnakit-dev
 DNAKit 的项目论文尚未发表。当前版本可引用为：
 
 ```text
-DNAKit contributors. DNAKit 0.1.4, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.5, 2026. https://github.com/mapengsen/DNAKit
 ```
 
 正式论文发表后，此处将更新为论文引用信息。使用具体算法、数据库或可选后端时，还应引用其对应来源。
 
-当前工作区还提供[生物信息学 Python API](docs/api/features/27_bioinformatics.md)：原生 DNA 编码、生成评价、统计和约束优化，以及可选格式编解码与比对/NGS 专业后端。使用 `python -m pip install -e ".[bio]"` 安装。
+当前工作区还提供原生 DNA 编码、生成评价、统计和约束优化，以及可选格式编解码与比对/NGS 专业后端；用法按任务归入[功能教程](docs/api/features/function_tree.md)，依赖与实现约定见[生物信息学说明](docs/faq/bioinformatics.md)。使用 `python -m pip install -e ".[bio]"` 安装。

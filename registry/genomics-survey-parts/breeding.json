@@ -1,0 +1,1727 @@
+{
+  "schema_version": 1,
+  "searched_on": "2026-09-20",
+  "scope": [
+    "育种与农业",
+    "物种进化群体祖源",
+    "DNA鉴定",
+    "古DNA",
+    "环境DNA",
+    "保护遗传",
+    "泛基因组",
+    "多倍体"
+  ],
+  "queries": [
+    {
+      "query": "\"BOLE\" \"script-knowledge\" breeding github",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "genomic breeding agent skills MCP server genomic selection GitHub",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "AlphaMate AlphaSimR rrBLUP genomic selection parental selection official github",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "genomic selection rrBLUP sommer BGLR GAPIT pybrops official GitHub",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "phylogenetic population genetics ancestry MCP server skill GitHub",
+      "domain": "物种进化群体祖源",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "population genetics ancestry RFMix ADMIXTURE PLINK2 tskit msprime official documentation github",
+      "domain": "物种进化群体祖源",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "phylogenetic inference IQ-TREE 3 RAxML NG BEAST 2 official github",
+      "domain": "物种进化群体祖源",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "conservation genetics SLiM genomic simulation official GitHub",
+      "domain": "保护遗传",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "forensic DNA paternity kinship STRait Razor FDSTools EuroForMix pedtools official GitHub",
+      "domain": "DNA鉴定",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "forensic DNA paternity kinship open source pedtools pedprobr Familias official github",
+      "domain": "DNA鉴定",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "food species traceability DNA barcoding OBITools BOLD API official",
+      "domain": "DNA鉴定",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "forensic DNA STRait Razor STRipy HipSTR official GitHub",
+      "domain": "DNA鉴定",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "ancient DNA nf-core eager mapDamage2 Schmutzi official Github",
+      "domain": "古DNA",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "environmental DNA metabarcoding OBITools4 CRABS ecoPCR official Github",
+      "domain": "环境DNA",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "polyploid genotyping updog polyRAD MAPpoly GWASpoly official Github",
+      "domain": "多倍体",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "pangenome graph minigraph cactus pggb vg official Github",
+      "domain": "泛基因组",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "\"DNA\" \"forensic\" \"MCP\" github",
+      "domain": "DNA鉴定",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "\"breeding\" \"SKILL.md\" \"genomic\"",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "\"phylogenetics\" \"MCP\" github server",
+      "domain": "物种进化群体祖源",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "\"ancient DNA\" \"skills\" \"MCP\"",
+      "domain": "古DNA",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "site.aipl.arsusda.gov VanRaden 2008 Efficient methods compute genomic predictions relationship matrix",
+      "domain": "育种公式核验",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "site.rzshrote.github.io/pybrops DenseAdditiveLinearGenomicModel parental selection",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "site.github.com/tayloranthonyanderson/haploqtl \"License\" \"skills\"",
+      "domain": "育种与农业",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    },
+    {
+      "query": "site.github.com/gjin/mapDamage \"license\"",
+      "domain": "古DNA",
+      "notes": "官方项目、论文、作者文档优先；MCP/Skill与普通工具分别标记。"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "bole",
+      "name": "BOLE",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "published_framework_web_service",
+      "homepage": "https://bole.zishuailab.com/",
+      "repository": null,
+      "paper_urls": [
+        "https://doi.org/10.1016/j.jia.2026.07.011",
+        "https://www.chinaagrisci.com/Jwk_zgnykxen/EN/10.1016/j.jia.2026.07.011",
+        "https://www.biorxiv.org/content/10.64898/2026.02.04.703673v1"
+      ],
+      "authors": [
+        "Zishuai Wang",
+        "Chongxiao Liang",
+        "Yanlin Zhang",
+        "Rong Zhou",
+        "Xiaoai Zhang",
+        "Wenkang Wei",
+        "Kui Li"
+      ],
+      "publication_date": "2026-07-10",
+      "license_evidence": [
+        {
+          "url": "https://www.sciencedirect.com/science/article/pii/S2095311926003011",
+          "note": "文章开放获取/Creative Commons不等于代码许可证；本轮未发现公开代码或可调用公开API规范。"
+        }
+      ],
+      "capabilities": [
+        "GWAS",
+        "遗传力估计",
+        "种质评价",
+        "基因组选择",
+        "输入输出契约与分析溯源"
+      ],
+      "local_matches": [
+        "workflows-gwas-pipeline",
+        "causal-genomics-heritability-partitioning",
+        "plant-genomics"
+      ],
+      "gaps": [
+        "专门基因组选择、种质评估、育种工作流编排"
+      ],
+      "integration_recommendation": "FAQ引用其编排理念；新增函数按各实际方法引用VanRaden/Endelman，不声称复制或重现BOLE。BOLE先保留论文/网页入口，公开源码/API未发现不能伪造MCP连接。",
+      "availability": "web_service_source_not_found",
+      "verified_urls": [
+        "https://www.chinaagrisci.com/Jwk_zgnykxen/EN/10.1016/j.jia.2026.07.011",
+        "https://www.biorxiv.org/content/10.64898/2026.02.04.703673v1"
+      ],
+      "validation_status": "paper_verified; service_open_failed",
+      "citation": "Wang Z., Liang C., Zhang Y., Zhou R., Zhang X., Wei W., Li K. (2026). BOLE: A script-knowledge driven multi-agent framework for reproducible llm-assisted genomic breeding. Journal of Integrative Agriculture. doi:10.1016/j.jia.2026.07.011."
+    },
+    {
+      "id": "gigwa-mcp",
+      "name": "Gigwa-MCP",
+      "domains": [
+        "育种与农业",
+        "群体遗传",
+        "种质资源"
+      ],
+      "kind": "MCP+Skills",
+      "homepage": "https://github.com/gkanogiannis/Gigwa-MCP",
+      "repository": "https://github.com/gkanogiannis/Gigwa-MCP",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "gkanogiannis / Gigwa-MCP contributors; separate attribution to Gigwa and underlying methods.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/gkanogiannis/Gigwa-MCP/HEAD/LICENSE",
+          "note": "Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/lic"
+        }
+      ],
+      "capabilities": [
+        "DArTseq导入",
+        "VanRaden关系",
+        "核心种质集",
+        "IBS重复",
+        "Fst/PCA"
+      ],
+      "local_matches": [
+        "plant-genomics",
+        "population-genetics-scikit-allel-analysis"
+      ],
+      "gaps": [
+        "缺少Gigwa MCP连接和种质资源专用技能"
+      ],
+      "integration_recommendation": "导入Apache技能，Gigwa按需部署；以可选MCP运行pip包，不默认远端导入样本",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/gkanogiannis/Gigwa-MCP",
+        "https://raw.githubusercontent.com/gkanogiannis/Gigwa-MCP/HEAD/README.md",
+        "https://raw.githubusercontent.com/gkanogiannis/Gigwa-MCP/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "pybrops",
+      "name": "PyBrOpS",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "Python package",
+      "homepage": "https://github.com/rzshrote/pybrops",
+      "repository": "https://github.com/rzshrote/pybrops",
+      "paper_urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC11457082/"
+      ],
+      "documentation_urls": [],
+      "attribution": "Robert Shrote and PyBrOpS contributors (MIT copyright); full paper author list at linked PMC article.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/rzshrote/pybrops/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) 2019-2023 Robert Shrote\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and"
+        }
+      ],
+      "capabilities": [
+        "多目标亲本/交配优化",
+        "遗传值模型",
+        "育种仿真"
+      ],
+      "local_matches": [
+        "plant-genomics"
+      ],
+      "gaps": [
+        "缺少育种优化Python API"
+      ],
+      "integration_recommendation": "可选Python依赖封装，先调用DenseAdditiveLinearGenomicModel和官方选择协议",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/rzshrote/pybrops",
+        "https://raw.githubusercontent.com/rzshrote/pybrops/HEAD/README.md",
+        "https://raw.githubusercontent.com/rzshrote/pybrops/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "alphasimr",
+      "name": "AlphaSimR",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/gaynorr/AlphaSimR",
+      "repository": "https://github.com/gaynorr/AlphaSimR",
+      "paper_urls": [
+        "https://doi.org/10.1093/g3journal/jkaa017"
+      ],
+      "documentation_urls": [],
+      "attribution": "gaynorr 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/gaynorr/AlphaSimR/HEAD/LICENSE",
+          "note": "YEAR: 2017\nCOPYRIGHT HOLDER: R Chris Gaynor"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/gaynorr/AlphaSimR/HEAD/DESCRIPTION",
+          "note": "License: MIT + file LICENSE"
+        }
+      ],
+      "capabilities": [
+        "育种流程仿真",
+        "RRBLUP",
+        "群体生成与杂交"
+      ],
+      "local_matches": [
+        "plant-genomics"
+      ],
+      "gaps": [
+        "缺少育种仿真后端"
+      ],
+      "integration_recommendation": "Rscript桥接；隔离R环境，先固定示例验证",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/gaynorr/AlphaSimR",
+        "https://raw.githubusercontent.com/gaynorr/AlphaSimR/HEAD/README.md",
+        "https://raw.githubusercontent.com/gaynorr/AlphaSimR/HEAD/LICENSE",
+        "https://raw.githubusercontent.com/gaynorr/AlphaSimR/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "R. Chris Gaynor",
+        "Gregor Gorjanc",
+        "John M. Hickey"
+      ],
+      "citation": "Gaynor, R.C., Gorjanc, G., Hickey, J.M. (2021). AlphaSimR: an R package for breeding program simulations. G3 11(2):jkaa017."
+    },
+    {
+      "id": "alphamate",
+      "name": "AlphaMate",
+      "domains": [
+        "育种与农业",
+        "保护遗传"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/AlphaGenes/AlphaMate",
+      "repository": "https://github.com/AlphaGenes/AlphaMate",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "AlphaGenes 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://github.com/AlphaGenes/AlphaMate",
+          "note": "公开源码/项目页已找到；本轮未确定内容许可证，禁止按开源授权推断可再分发。"
+        }
+      ],
+      "capabilities": [
+        "最优贡献选择",
+        "多样性约束",
+        "配种方案"
+      ],
+      "local_matches": [
+        "ecological-genomics-conservation-genetics"
+      ],
+      "gaps": [
+        "缺少亲本和配种优化器"
+      ],
+      "integration_recommendation": "许可证尚未核实；仅链接文档及可选独立CLI，不复制",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/AlphaGenes/AlphaMate"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "gapit",
+      "name": "GAPIT",
+      "domains": [
+        "育种与农业",
+        "GWAS"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/jiabowang/GAPIT",
+      "repository": "https://github.com/jiabowang/GAPIT",
+      "paper_urls": [
+        "https://doi.org/10.1093/molbev/msag107"
+      ],
+      "documentation_urls": [],
+      "attribution": "jiabowang 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/jiabowang/GAPIT/HEAD/DESCRIPTION",
+          "note": "License: GPL (>= 2)"
+        }
+      ],
+      "capabilities": [
+        "关联分析",
+        "基因组预测",
+        "BLINK/FarmCPU"
+      ],
+      "local_matches": [
+        "workflows-gwas-pipeline"
+      ],
+      "gaps": [
+        "基因组选择API缺口"
+      ],
+      "integration_recommendation": "Rscript可选适配，引用与实际版本一致",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/jiabowang/GAPIT",
+        "https://raw.githubusercontent.com/jiabowang/GAPIT/HEAD/README.md",
+        "https://raw.githubusercontent.com/jiabowang/GAPIT/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "Jiabo Wang",
+        "Zhiwu Zhang"
+      ],
+      "citation": "Wang J., Zhang Z. (2026). GAPIT Version 4: Integration of GWAS into Genomic Prediction. Molecular Biology and Evolution, msag107."
+    },
+    {
+      "id": "sommer",
+      "name": "sommer",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/covaruber/sommer",
+      "repository": "https://github.com/covaruber/sommer",
+      "paper_urls": [
+        "https://doi.org/10.1371/journal.pone.0156744"
+      ],
+      "documentation_urls": [],
+      "attribution": "covaruber 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/covaruber/sommer/HEAD/DESCRIPTION",
+          "note": "License: GPL (>= 2)"
+        }
+      ],
+      "capabilities": [
+        "多性状混合模型",
+        "REML",
+        "空间效应"
+      ],
+      "local_matches": [
+        "causal-genomics-heritability-partitioning"
+      ],
+      "gaps": [
+        "育种多环境多性状混合模型缺口"
+      ],
+      "integration_recommendation": "独立R依赖；不用简单ridge冒充多性状REML",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/covaruber/sommer",
+        "https://raw.githubusercontent.com/covaruber/sommer/HEAD/README.md",
+        "https://raw.githubusercontent.com/covaruber/sommer/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "Giovanny Covarrubias-Pazaran"
+      ],
+      "citation": "Covarrubias-Pazaran (2016). Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLoS ONE. doi:10.1371/journal.pone.0156744."
+    },
+    {
+      "id": "bglr",
+      "name": "BGLR",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/gdlc/BGLR-R",
+      "repository": "https://github.com/gdlc/BGLR-R",
+      "paper_urls": [
+        "https://doi.org/10.1534/genetics.114.164442",
+        "https://doi.org/10.1093/genetics/iyac112"
+      ],
+      "documentation_urls": [],
+      "attribution": "gdlc 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/gdlc/BGLR-R/HEAD/COPYING",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <htt"
+        }
+      ],
+      "capabilities": [
+        "BayesA/B/C",
+        "Bayesian ridge",
+        "多性状预测"
+      ],
+      "local_matches": [
+        "plant-genomics"
+      ],
+      "gaps": [
+        "缺少贝叶斯育种模型函数"
+      ],
+      "integration_recommendation": "GPL独立R运行，记录MCMC诊断与随机种子",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/gdlc/BGLR-R",
+        "https://raw.githubusercontent.com/gdlc/BGLR-R/HEAD/README.md",
+        "https://raw.githubusercontent.com/gdlc/BGLR-R/HEAD/COPYING"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "Paulino Pérez",
+        "Gustavo de los Campos"
+      ],
+      "citation": "Pérez and de los Campos (2014). Genome-wide regression and prediction with the BGLR statistical package. Genetics. doi:10.1534/genetics.114.164442."
+    },
+    {
+      "id": "msprime",
+      "name": "msprime",
+      "domains": [
+        "群体遗传",
+        "祖源",
+        "遗传仿真"
+      ],
+      "kind": "Python package",
+      "homepage": "https://github.com/tskit-dev/msprime",
+      "repository": "https://github.com/tskit-dev/msprime",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://tskit.dev/msprime/docs/stable/api.html"
+      ],
+      "attribution": "tskit-dev 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/tskit-dev/msprime/HEAD/LICENSE",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. {http://fsf.org/}\n Every"
+        }
+      ],
+      "capabilities": [
+        "共祖模拟",
+        "DNA突变",
+        "群体史",
+        "树序列"
+      ],
+      "local_matches": [
+        "population-genetics-scikit-allel-analysis"
+      ],
+      "gaps": [
+        "缺少参数化共祖仿真接口"
+      ],
+      "integration_recommendation": "可选pip依赖；sim_ancestry后sim_mutations，输出trees/VCF",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/tskit-dev/msprime",
+        "https://raw.githubusercontent.com/tskit-dev/msprime/HEAD/README.md",
+        "https://raw.githubusercontent.com/tskit-dev/msprime/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "slim",
+      "name": "SLiM",
+      "domains": [
+        "群体遗传",
+        "保护遗传",
+        "进化仿真"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/MesserLab/SLiM",
+      "repository": "https://github.com/MesserLab/SLiM",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "Benjamin C. Haller (copyright) and MesserLab/SLiM contributors; use version-specific citation from SLiM manual.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/MesserLab/SLiM/HEAD/LICENSE",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n Every"
+        }
+      ],
+      "capabilities": [
+        "前向遗传仿真",
+        "选择",
+        "生态进化",
+        "多物种"
+      ],
+      "local_matches": [
+        "ecological-genomics-conservation-genetics"
+      ],
+      "gaps": [
+        "已有技能；需可控SLiM执行适配"
+      ],
+      "integration_recommendation": "GPL独立程序执行，保存Eidos脚本和种子",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/MesserLab/SLiM",
+        "https://raw.githubusercontent.com/MesserLab/SLiM/HEAD/README.md",
+        "https://raw.githubusercontent.com/MesserLab/SLiM/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "iqtree3",
+      "name": "IQ-TREE 3",
+      "domains": [
+        "系统发育"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/iqtree/iqtree3",
+      "repository": "https://github.com/iqtree/iqtree3",
+      "paper_urls": [
+        "https://doi.org/10.1093/molbev/msag117"
+      ],
+      "documentation_urls": [],
+      "attribution": "iqtree 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/iqtree/iqtree3/HEAD/LICENSE",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 2, June 1991\n\n Copyright (C) 1989, 1991 Free Software Foundation, Inc.,"
+        }
+      ],
+      "capabilities": [
+        "最大似然树",
+        "复杂演化模型",
+        "bootstrap"
+      ],
+      "local_matches": [
+        "phylo-modern-tree-inference"
+      ],
+      "gaps": [
+        "技能为IQ-TREE2；3的版本能力未同步"
+      ],
+      "integration_recommendation": "可选CLI适配，检查版本，输出树和.iqtree引用",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/iqtree/iqtree3",
+        "https://raw.githubusercontent.com/iqtree/iqtree3/HEAD/README.md",
+        "https://raw.githubusercontent.com/iqtree/iqtree3/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "raxml-ng",
+      "name": "RAxML-NG",
+      "domains": [
+        "系统发育"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/amkozlov/raxml-ng",
+      "repository": "https://github.com/amkozlov/raxml-ng",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://codeberg.org/amkozlov/raxml-ng"
+      ],
+      "attribution": "amkozlov 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/amkozlov/raxml-ng/HEAD/LICENSE.txt",
+          "note": "                    GNU AFFERO GENERAL PUBLIC LICENSE\n                       Version 3, 19 November "
+        }
+      ],
+      "capabilities": [
+        "最大似然树",
+        "模型选择",
+        "支持度"
+      ],
+      "local_matches": [
+        "phylo-modern-tree-inference"
+      ],
+      "gaps": [
+        "已有技能；实际后端覆盖待核对"
+      ],
+      "integration_recommendation": "当前主仓迁移Codeberg；AGPL外部执行，记录新主仓",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/amkozlov/raxml-ng",
+        "https://raw.githubusercontent.com/amkozlov/raxml-ng/HEAD/README.md",
+        "https://raw.githubusercontent.com/amkozlov/raxml-ng/HEAD/LICENSE.txt"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "rfmix",
+      "name": "RFMix",
+      "domains": [
+        "祖源"
+      ],
+      "kind": "restricted-source CLI",
+      "homepage": "https://github.com/slowkoni/rfmix",
+      "repository": "https://github.com/slowkoni/rfmix",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "slowkoni 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://github.com/slowkoni/rfmix#license",
+          "note": "仅免费学术研究使用；商业或非合格非营利机构须Stanford单独许可。非通用开源许可证。"
+        }
+      ],
+      "capabilities": [
+        "局部祖源推断"
+      ],
+      "local_matches": [
+        "ancestry-risk-profiler",
+        "population-genetics-population-structure"
+      ],
+      "gaps": [
+        "已有全局祖源不等同局部祖源"
+      ],
+      "integration_recommendation": "仅学术用途限制；不捆绑，用户按许可自行部署后调用",
+      "availability": "restricted_public_source",
+      "verified_urls": [
+        "https://github.com/slowkoni/rfmix",
+        "https://raw.githubusercontent.com/slowkoni/rfmix/HEAD/README.md",
+        "https://github.com/slowkoni/rfmix#license"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "admixtools2",
+      "name": "ADMIXTOOLS 2",
+      "domains": [
+        "祖源",
+        "群体遗传",
+        "古DNA"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/uqrmaie1/admixtools",
+      "repository": "https://github.com/uqrmaie1/admixtools",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "uqrmaie1 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/uqrmaie1/admixtools/HEAD/DESCRIPTION",
+          "note": "License: GPL-3"
+        }
+      ],
+      "capabilities": [
+        "f统计",
+        "qpAdm",
+        "qpGraph"
+      ],
+      "local_matches": [
+        "population-genetics-population-structure"
+      ],
+      "gaps": [
+        "已有方法技能；缺少可选R分析入口"
+      ],
+      "integration_recommendation": "外部Rscript，参考群体与拟合假设显式保存",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/uqrmaie1/admixtools",
+        "https://raw.githubusercontent.com/uqrmaie1/admixtools/HEAD/README.md",
+        "https://raw.githubusercontent.com/uqrmaie1/admixtools/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "forrel",
+      "name": "forrel / pedsuite",
+      "domains": [
+        "DNA鉴定",
+        "亲子鉴定",
+        "家系"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/magnusdv/forrel",
+      "repository": "https://github.com/magnusdv/forrel",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://magnusdv.github.io/pedsuite/"
+      ],
+      "attribution": "Magnus Dehli Vigeland / pedsuite contributors; cite Pedigree Analysis in R (2021), ISBN 9780128244302, as requested by pedsuite.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/magnusdv/forrel/HEAD/LICENSE.md",
+          "note": "GNU General Public License\n==========================\n\n_Version 2, June 1991_  \n_Copyright © 1989, 1991 Free Software Foundation, Inc.,_  \n_51 Frankli"
+        }
+      ],
+      "capabilities": [
+        "亲缘似然比",
+        "家系模拟",
+        "未分型个体预测"
+      ],
+      "local_matches": [
+        "genomics-study-design"
+      ],
+      "gaps": [
+        "专门法医家系推断缺口"
+      ],
+      "integration_recommendation": "可选R包；显式备择家系与群体等位频率，不输出无依据亲子概率",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/magnusdv/forrel",
+        "https://raw.githubusercontent.com/magnusdv/forrel/HEAD/README.md",
+        "https://raw.githubusercontent.com/magnusdv/forrel/HEAD/LICENSE.md"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "fdstools",
+      "name": "FDSTools",
+      "domains": [
+        "DNA鉴定",
+        "法医学"
+      ],
+      "kind": "Python package+CLI",
+      "homepage": "https://github.com/Jerrythafast/FDSTools",
+      "repository": "https://github.com/Jerrythafast/FDSTools",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://www.fdstools.nl/"
+      ],
+      "attribution": "Jerrythafast 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/Jerrythafast/FDSTools/HEAD/LICENSE.txt",
+          "note": "                    GNU GENERAL PUBLIC LICENSE\r\n                       Version 3, 29 June 2007\r\n\r\n C"
+        }
+      ],
+      "capabilities": [
+        "STR序列分型",
+        "PCR stutter建模/校正"
+      ],
+      "local_matches": [
+        "variant-calling"
+      ],
+      "gaps": [
+        "法医STR流程缺口"
+      ],
+      "integration_recommendation": "pip可选依赖+CLI；marker库必须明确",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/Jerrythafast/FDSTools",
+        "https://raw.githubusercontent.com/Jerrythafast/FDSTools/HEAD/README.md",
+        "https://raw.githubusercontent.com/Jerrythafast/FDSTools/HEAD/LICENSE.txt"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "euroformix",
+      "name": "EuroForMix",
+      "domains": [
+        "DNA鉴定",
+        "法医学"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/oyvble/euroformix",
+      "repository": "https://github.com/oyvble/euroformix",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://www.euroformix.com/"
+      ],
+      "attribution": "oyvble 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/oyvble/euroformix/HEAD/LICENSE",
+          "note": "GNU LESSER GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <https://fs"
+        }
+      ],
+      "capabilities": [
+        "混合DNA STR峰高概率模型"
+      ],
+      "local_matches": [
+        "variant-calling"
+      ],
+      "gaps": [
+        "混合DNA解释缺口"
+      ],
+      "integration_recommendation": "独立R包；用户提供验证过的模型和频率，不默认司法结论",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/oyvble/euroformix",
+        "https://raw.githubusercontent.com/oyvble/euroformix/HEAD/README.md",
+        "https://raw.githubusercontent.com/oyvble/euroformix/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "straitrazor",
+      "name": "STRait Razor",
+      "domains": [
+        "DNA鉴定",
+        "法医学"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/Ahhgust/STRaitRazor",
+      "repository": "https://github.com/Ahhgust/STRaitRazor",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "Ahhgust 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://github.com/Ahhgust/STRaitRazor",
+          "note": "公开源码/项目页已找到；本轮未确定内容许可证，禁止按开源授权推断可再分发。"
+        }
+      ],
+      "capabilities": [
+        "FASTQ法医STR等位基因检测"
+      ],
+      "local_matches": [
+        "variant-calling"
+      ],
+      "gaps": [
+        "法医STR检测缺口"
+      ],
+      "integration_recommendation": "独立CLI候选；再核实许可证、平台与参考库",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/Ahhgust/STRaitRazor",
+        "https://raw.githubusercontent.com/Ahhgust/STRaitRazor/HEAD/README.md"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "hipstr",
+      "name": "HipSTR",
+      "domains": [
+        "DNA鉴定",
+        "重复序列",
+        "变异分析"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/HipSTR-Tool/HipSTR",
+      "repository": "https://github.com/HipSTR-Tool/HipSTR",
+      "paper_urls": [
+        "https://www.nature.com/articles/nmeth.4267"
+      ],
+      "documentation_urls": [],
+      "attribution": "Thomas Willems (upstream README author); cite Genome-wide profiling of heritable and de novo STR variations, Nature Methods, doi:10.1038/nmeth.4267.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/HipSTR-Tool/HipSTR/HEAD/LICENSE",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 2, June 1991\n\n Copyright (C) 1989, 1991 Free Software Foundation, Inc., <http://fsf.org/>\n 5"
+        }
+      ],
+      "capabilities": [
+        "短读长STR分型",
+        "定相",
+        "de novo STR"
+      ],
+      "local_matches": [
+        "variant-calling"
+      ],
+      "gaps": [
+        "现有变异调用不保证STR定相"
+      ],
+      "integration_recommendation": "GPL独立CLI，BAM/FASTA/BED预检",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/HipSTR-Tool/HipSTR",
+        "https://raw.githubusercontent.com/HipSTR-Tool/HipSTR/HEAD/README.md",
+        "https://raw.githubusercontent.com/HipSTR-Tool/HipSTR/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "nfcore-eager",
+      "name": "nf-core/eager",
+      "domains": [
+        "古DNA"
+      ],
+      "kind": "Nextflow workflow",
+      "homepage": "https://github.com/nf-core/eager",
+      "repository": "https://github.com/nf-core/eager",
+      "paper_urls": [
+        "https://doi.org/10.7717/peerj.10947"
+      ],
+      "documentation_urls": [],
+      "attribution": "nf-core 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/nf-core/eager/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) The nf-core/eager community\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software"
+        }
+      ],
+      "capabilities": [
+        "古DNA从FASTQ到BAM",
+        "损伤QC",
+        "污染"
+      ],
+      "local_matches": [
+        "grapevine-adna"
+      ],
+      "gaps": [
+        "现有植物技能需要跨物种通用古DNA流程"
+      ],
+      "integration_recommendation": "Nextflow/容器后端；2.x须Nextflow<=22.10.6",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/nf-core/eager",
+        "https://raw.githubusercontent.com/nf-core/eager/HEAD/README.md",
+        "https://raw.githubusercontent.com/nf-core/eager/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "mapdamage",
+      "name": "mapDamage",
+      "domains": [
+        "古DNA"
+      ],
+      "kind": "Python package+CLI",
+      "homepage": "https://github.com/ginolhac/mapDamage",
+      "repository": "https://github.com/ginolhac/mapDamage",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://ginolhac.github.io/mapDamage/"
+      ],
+      "attribution": "ginolhac 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/ginolhac/mapDamage/HEAD/pyproject.toml",
+          "note": "license = { \"text\" = \"MIT\" }"
+        }
+      ],
+      "capabilities": [
+        "末端损伤谱",
+        "贝叶斯损伤参数",
+        "质量重标定"
+      ],
+      "local_matches": [
+        "grapevine-adna"
+      ],
+      "gaps": [
+        "已有技能；缺少独立损伤Python调用"
+      ],
+      "integration_recommendation": "可选CLI；注意R依赖与版本",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/ginolhac/mapDamage",
+        "https://raw.githubusercontent.com/ginolhac/mapDamage/HEAD/pyproject.toml"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "schmutzi",
+      "name": "schmutzi",
+      "domains": [
+        "古DNA"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/grenaud/schmutzi",
+      "repository": "https://github.com/grenaud/schmutzi",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "grenaud 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://github.com/grenaud/schmutzi",
+          "note": "公开源码/项目页已找到；本轮未确定内容许可证，禁止按开源授权推断可再分发。"
+        }
+      ],
+      "capabilities": [
+        "线粒体污染估计和共识序列"
+      ],
+      "local_matches": [
+        "grapevine-adna"
+      ],
+      "gaps": [
+        "完整古DNA污染能力缺口"
+      ],
+      "integration_recommendation": "外部CLI；记录数据库及假设，许可证未核实不复制",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/grenaud/schmutzi",
+        "https://raw.githubusercontent.com/grenaud/schmutzi/HEAD/README.md"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "obitools4",
+      "name": "OBITools4",
+      "domains": [
+        "环境DNA",
+        "DNA鉴定",
+        "食品溯源"
+      ],
+      "kind": "CLI source",
+      "homepage": "https://github.com/metabarcoding/obitools4",
+      "repository": "https://github.com/metabarcoding/obitools4",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://obitools4.metabarcoding.org/"
+      ],
+      "attribution": "metabarcoding 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://github.com/metabarcoding/obitools4",
+          "note": "公开源码/项目页已找到；本轮未确定内容许可证，禁止按开源授权推断可再分发。"
+        }
+      ],
+      "capabilities": [
+        "条形码去重",
+        "序列过滤",
+        "分类归属"
+      ],
+      "local_matches": [
+        "ecological-genomics-edna-metabarcoding",
+        "workflows-edna-pipeline"
+      ],
+      "gaps": [
+        "本地技能指向OBITools3；4的接口不同"
+      ],
+      "integration_recommendation": "版本独立可选CLI，新增4版本技能，不改写3为兼容",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/metabarcoding/obitools4",
+        "https://raw.githubusercontent.com/metabarcoding/obitools4/HEAD/README.md"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "crabs",
+      "name": "CRABS",
+      "domains": [
+        "环境DNA",
+        "DNA鉴定",
+        "食品溯源"
+      ],
+      "kind": "Python package+CLI",
+      "homepage": "https://github.com/gjeunen/reference_database_creator",
+      "repository": "https://github.com/gjeunen/reference_database_creator",
+      "paper_urls": [
+        "https://doi.org/10.1111/1755-0998.13741"
+      ],
+      "documentation_urls": [],
+      "attribution": "gjeunen 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/gjeunen/reference_database_creator/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) 2021 gjeunen\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated"
+        }
+      ],
+      "capabilities": [
+        "宏条形码参考库下载",
+        "清理与in silico PCR"
+      ],
+      "local_matches": [
+        "ecological-genomics-edna-metabarcoding"
+      ],
+      "gaps": [
+        "参考库构建缺口"
+      ],
+      "integration_recommendation": "独立可选工具，保存下载来源与数据库日期",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/gjeunen/reference_database_creator",
+        "https://raw.githubusercontent.com/gjeunen/reference_database_creator/HEAD/README.md",
+        "https://raw.githubusercontent.com/gjeunen/reference_database_creator/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "G.-J. Jeunen",
+        "E. Dowle",
+        "J. Edgecombe",
+        "U. von Ammon",
+        "N. J. Gemmell",
+        "H. Cross"
+      ],
+      "citation": "Jeunen G.-J., Dowle E., Edgecombe J., von Ammon U., Gemmell N.J., Cross H. (2022). crabs—A software program to generate curated reference databases for metabarcoding sequencing data. Molecular Ecology Resources. doi:10.1111/1755-0998.13741."
+    },
+    {
+      "id": "updog",
+      "name": "updog",
+      "domains": [
+        "多倍体",
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/dcgerard/updog",
+      "repository": "https://github.com/dcgerard/updog",
+      "paper_urls": [
+        "https://doi.org/10.1534/genetics.118.301468"
+      ],
+      "documentation_urls": [],
+      "attribution": "dcgerard 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/dcgerard/updog/HEAD/LICENSE.md",
+          "note": "GNU General Public License\n==========================\n\n_Version 3, 29 June 2007_  \n_Copyright © 2007 Free Software Foundation, Inc. &lt;<http://fsf.or"
+        }
+      ],
+      "capabilities": [
+        "复杂测序多倍体基因型",
+        "偏倚过离散模型"
+      ],
+      "local_matches": [
+        "polyploid-gene-family-cloning"
+      ],
+      "gaps": [
+        "克隆技能不等于多倍体基因分型"
+      ],
+      "integration_recommendation": "Rscript适配flexdog/multidog，倍性显式",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/dcgerard/updog",
+        "https://raw.githubusercontent.com/dcgerard/updog/HEAD/README.md",
+        "https://raw.githubusercontent.com/dcgerard/updog/HEAD/LICENSE.md"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "David Gerard",
+        "Luís Felipe Ventorim Ferrão",
+        "Antonio Augusto Franco Garcia",
+        "Matthew Stephens"
+      ],
+      "citation": "Gerard et al. (2018). Genotyping Polyploids from Messy Sequencing Data. Genetics 210:789–807."
+    },
+    {
+      "id": "polyrad",
+      "name": "polyRAD",
+      "domains": [
+        "多倍体",
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/lvclark/polyRAD",
+      "repository": "https://github.com/lvclark/polyRAD",
+      "paper_urls": [
+        "https://doi.org/10.1534/g3.118.200913"
+      ],
+      "documentation_urls": [],
+      "attribution": "lvclark 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/lvclark/polyRAD/HEAD/DESCRIPTION",
+          "note": "License: GPL (>= 2)"
+        }
+      ],
+      "capabilities": [
+        "RAD/GBS概率基因型，异源/同源多倍体"
+      ],
+      "local_matches": [
+        "polyploid-gene-family-cloning"
+      ],
+      "gaps": [
+        "概率基因型调用缺口"
+      ],
+      "integration_recommendation": "R可选适配，保留后验概率不直接硬调用",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/lvclark/polyRAD",
+        "https://raw.githubusercontent.com/lvclark/polyRAD/HEAD/README.md",
+        "https://raw.githubusercontent.com/lvclark/polyRAD/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "Lindsay V. Clark",
+        "Alexander E. Lipka",
+        "Erik J. Sacks"
+      ],
+      "citation": "Clark LV, Lipka AE, Sacks EJ (2019). polyRAD: Genotype calling with uncertainty from sequencing data in polyploids and diploids. G3 9(3):663–673."
+    },
+    {
+      "id": "mappoly",
+      "name": "MAPpoly",
+      "domains": [
+        "多倍体",
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/mmollina/mappoly",
+      "repository": "https://github.com/mmollina/mappoly",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "mmollina 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/mmollina/mappoly/HEAD/DESCRIPTION",
+          "note": "License: GPL-3"
+        }
+      ],
+      "capabilities": [
+        "多倍体连锁图谱",
+        "HMM单倍型"
+      ],
+      "local_matches": [
+        "polyploid-gene-family-cloning"
+      ],
+      "gaps": [
+        "多倍体连锁图谱缺口"
+      ],
+      "integration_recommendation": "独立R后端，HMM倍性支持范围不可外推",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/mmollina/mappoly",
+        "https://raw.githubusercontent.com/mmollina/mappoly/HEAD/README.md",
+        "https://raw.githubusercontent.com/mmollina/mappoly/HEAD/DESCRIPTION"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "gwaspoly",
+      "name": "GWASpoly",
+      "domains": [
+        "多倍体",
+        "育种与农业",
+        "GWAS"
+      ],
+      "kind": "R package",
+      "homepage": "https://github.com/jendelman/GWASpoly",
+      "repository": "https://github.com/jendelman/GWASpoly",
+      "paper_urls": [
+        "https://doi.org/10.3835/plantgenome2015.08.0073"
+      ],
+      "documentation_urls": [],
+      "attribution": "jendelman 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/jendelman/GWASpoly/HEAD/LICENSE",
+          "note": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <htt"
+        }
+      ],
+      "capabilities": [
+        "同源多倍体剂量GWAS",
+        "显隐性模型"
+      ],
+      "local_matches": [
+        "workflows-gwas-pipeline"
+      ],
+      "gaps": [
+        "二倍体GWAS不等于多倍体GWAS"
+      ],
+      "integration_recommendation": "独立R后端，剂量/倍性验证",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/jendelman/GWASpoly",
+        "https://raw.githubusercontent.com/jendelman/GWASpoly/HEAD/README.md",
+        "https://raw.githubusercontent.com/jendelman/GWASpoly/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "pggb",
+      "name": "PGGB",
+      "domains": [
+        "泛基因组"
+      ],
+      "kind": "CLI workflow",
+      "homepage": "https://github.com/pangenome/pggb",
+      "repository": "https://github.com/pangenome/pggb",
+      "paper_urls": [],
+      "documentation_urls": [
+        "https://pggb.readthedocs.io/"
+      ],
+      "attribution": "pangenome 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/pangenome/pggb/HEAD/LICENSE",
+          "note": "The MIT License (MIT)\n\nCopyright (c) 2020 Erik Garrison\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of\nthis software"
+        }
+      ],
+      "capabilities": [
+        "全对全比对构建变异图",
+        "GFA",
+        "VCF"
+      ],
+      "local_matches": [
+        "comparative-genomics-pangenome-analysis",
+        "vitis-pangenome"
+      ],
+      "gaps": [
+        "已有技能；执行依赖复杂"
+      ],
+      "integration_recommendation": "容器/CLI按需集成，不能pip自动安装全套",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/pangenome/pggb",
+        "https://raw.githubusercontent.com/pangenome/pggb/HEAD/README.md",
+        "https://raw.githubusercontent.com/pangenome/pggb/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "minigraph-cactus",
+      "name": "Minigraph-Cactus",
+      "domains": [
+        "泛基因组",
+        "全基因组比对"
+      ],
+      "kind": "CLI workflow",
+      "homepage": "https://github.com/ComparativeGenomicsToolkit/cactus",
+      "repository": "https://github.com/ComparativeGenomicsToolkit/cactus",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41587-023-01793-w"
+      ],
+      "documentation_urls": [],
+      "attribution": "ComparativeGenomicsToolkit 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactus/HEAD/LICENSE.txt",
+          "note": "Copyright (C) 2011 by Benedict Paten (benedictpaten@gmail.com)\n\nPermission is hereby granted, free o"
+        }
+      ],
+      "capabilities": [
+        "组装到图",
+        "多基因组比对",
+        "vg兼容输出"
+      ],
+      "local_matches": [
+        "comparative-genomics-pangenome-analysis",
+        "vitis-pangenome"
+      ],
+      "gaps": [
+        "已有技能；高资源执行与产物验证缺口"
+      ],
+      "integration_recommendation": "可选工作流后端，资源显式；不同子组件单独许可证",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/ComparativeGenomicsToolkit/cactus",
+        "https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactus/HEAD/README.md",
+        "https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactus/HEAD/LICENSE.txt"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "haploqtl",
+      "name": "haploqtl",
+      "domains": [
+        "育种与农业",
+        "局部祖源",
+        "抗病性状"
+      ],
+      "kind": "Python package+Skill",
+      "homepage": "https://github.com/tayloranthonyanderson/haploqtl",
+      "repository": "https://github.com/tayloranthonyanderson/haploqtl",
+      "paper_urls": [
+        "https://doi.org/10.1111/tpj.16495"
+      ],
+      "documentation_urls": [],
+      "attribution": "tayloranthonyanderson 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/tayloranthonyanderson/haploqtl/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) 2026 Taylor A. Anderson\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and"
+        }
+      ],
+      "capabilities": [
+        "局部祖源",
+        "QTL边界",
+        "供体溯源",
+        "候选基因证据核验"
+      ],
+      "local_matches": [
+        "plant-genomics",
+        "population-genetics-population-structure"
+      ],
+      "gaps": [
+        "缺少标记辅助抗病育种工作流"
+      ],
+      "integration_recommendation": "MIT导入qtl-candidate-gene技能；Python>=3.11按需隔离",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/tayloranthonyanderson/haploqtl",
+        "https://raw.githubusercontent.com/tayloranthonyanderson/haploqtl/HEAD/README.md",
+        "https://raw.githubusercontent.com/tayloranthonyanderson/haploqtl/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated",
+      "authors": [
+        "Taylor A. Anderson",
+        "Martha A. Sudermann",
+        "Darlene M. DeJong",
+        "David M. Francis",
+        "Christine D. Smart",
+        "Martha A. Mutschler"
+      ],
+      "citation": "Anderson et al. (2024). Detection of trait donors and QTL boundaries for early blight resistance using local ancestry inference in a library of genomic sequences for tomato. Plant Journal 117(2):404–415."
+    },
+    {
+      "id": "gwas-catalog-mcp",
+      "name": "GWAS Catalog MCP",
+      "domains": [
+        "GWAS",
+        "祖源"
+      ],
+      "kind": "MCP",
+      "homepage": "https://github.com/gwas-catalog/mcp",
+      "repository": "https://github.com/gwas-catalog/mcp",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "gwas-catalog 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/gwas-catalog/mcp/HEAD/LICENSE",
+          "note": "Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/lic"
+        }
+      ],
+      "capabilities": [
+        "关联/性状/研究/祖源元数据查询"
+      ],
+      "local_matches": [
+        "gwas-database"
+      ],
+      "gaps": [
+        "数据库技能不等于官方MCP"
+      ],
+      "integration_recommendation": "Apache按需MCP连接，避免重复基本API",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/gwas-catalog/mcp",
+        "https://raw.githubusercontent.com/gwas-catalog/mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/gwas-catalog/mcp/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "locus",
+      "name": "Locus",
+      "domains": [
+        "祖源",
+        "疾病与医学"
+      ],
+      "kind": "MCP+local application",
+      "homepage": "https://github.com/mattsmcnulty/locus",
+      "repository": "https://github.com/mattsmcnulty/locus",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "Matthew McNulty (MIT copyright) and Locus contributors; underlying models/data have separate citations.",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/mattsmcnulty/locus/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) 2026 Matthew McNulty\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and ass"
+        }
+      ],
+      "capabilities": [
+        "本地DuckDB基因组",
+        "祖源",
+        "PGS",
+        "药物基因组"
+      ],
+      "local_matches": [
+        "ancestry-risk-profiler"
+      ],
+      "gaps": [
+        "个人基因组统一分析服务缺口"
+      ],
+      "integration_recommendation": "可选独立MCP；第三方数据许可证分开，健康功能需专项验证",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/mattsmcnulty/locus",
+        "https://raw.githubusercontent.com/mattsmcnulty/locus/HEAD/README.md",
+        "https://raw.githubusercontent.com/mattsmcnulty/locus/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "biotools-mcp",
+      "name": "BioTools MCP",
+      "domains": [
+        "系统发育",
+        "序列分析",
+        "数据库"
+      ],
+      "kind": "MCP",
+      "homepage": "https://github.com/neuralx-dev/biotools-mcp-server",
+      "repository": "https://github.com/neuralx-dev/biotools-mcp-server",
+      "paper_urls": [],
+      "documentation_urls": [],
+      "attribution": "neuralx-dev 项目及贡献者；论文作者见逐项原始引用",
+      "license_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/neuralx-dev/biotools-mcp-server/HEAD/LICENSE",
+          "note": "MIT License\n\nCopyright (c) 2024 Biotools MCP Server\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and"
+        }
+      ],
+      "capabilities": [
+        "文献",
+        "序列",
+        "树推断与树比较（README声称）"
+      ],
+      "local_matches": [
+        "phylo-tree-io",
+        "blast-searches"
+      ],
+      "gaps": [
+        "大量重复；算法实现尚未审计"
+      ],
+      "integration_recommendation": "低优先级候选，代码审计和已知数值验证后再接入",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://github.com/neuralx-dev/biotools-mcp-server",
+        "https://raw.githubusercontent.com/neuralx-dev/biotools-mcp-server/HEAD/README.md",
+        "https://raw.githubusercontent.com/neuralx-dev/biotools-mcp-server/HEAD/LICENSE"
+      ],
+      "validation_status": "documentation_and_license_review_only; not_runtime_validated"
+    },
+    {
+      "id": "rrblup",
+      "name": "rrBLUP",
+      "domains": [
+        "育种与农业"
+      ],
+      "kind": "R package",
+      "homepage": "https://cran.r-project.org/package=rrBLUP",
+      "repository": null,
+      "paper_urls": [
+        "https://doi.org/10.3835/plantgenome2011.08.0024",
+        "https://doi.org/10.1534/g3.112.004259",
+        "https://doi.org/10.3168/jds.2007-0980"
+      ],
+      "authors": [
+        "Jeffrey B. Endelman"
+      ],
+      "license_evidence": [
+        {
+          "url": "https://cran.r-project.org/web/packages/rrBLUP/rrBLUP.pdf",
+          "note": "CRAN DESCRIPTION: GPL-3; Author Jeffrey Endelman"
+        }
+      ],
+      "capabilities": [
+        "A.mat关系矩阵",
+        "mixed.solve RR-BLUP/GBLUP",
+        "GWAS"
+      ],
+      "local_matches": [
+        "workflows-gwas-pipeline"
+      ],
+      "gaps": [
+        "VanRaden关系矩阵和显式lambda育种预测Python入口"
+      ],
+      "integration_recommendation": "独立依据公开数学方法实现本地NumPy函数；明确与R rrBLUP的REML估计器不同，不复制GPL代码。完整mixed.solve按需R适配。",
+      "availability": "public_source",
+      "verified_urls": [
+        "https://cran.r-project.org/web/packages/rrBLUP/rrBLUP.pdf",
+        "https://jendelman.r-universe.dev/rrBLUP/doc/manual.html",
+        "https://www.aipl.arsusda.gov/publish/jds/2008/91_4414.pdf"
+      ],
+      "validation_status": "official_formula_verified",
+      "citation": "Endelman, J.B. (2011). Ridge regression and other kernels for genomic selection with R package rrBLUP. Plant Genome 4:250–255."
+    },
+    {
+      "id": "bold-api",
+      "name": "BOLD Data Portal API",
+      "domains": [
+        "DNA鉴定",
+        "食品溯源",
+        "物种鉴定",
+        "环境DNA"
+      ],
+      "kind": "REST service",
+      "homepage": "https://www.boldsystems.org/data/api/",
+      "repository": null,
+      "paper_urls": [
+        "https://arxiv.org/abs/2404.05696"
+      ],
+      "license_evidence": [
+        {
+          "url": "https://www.boldsystems.org/data/api/",
+          "note": "服务访问不授予全数据库再分发许可；按条目数据条款处理。"
+        }
+      ],
+      "capabilities": [
+        "条形码检索",
+        "分类/地点筛选",
+        "BCDM记录下载",
+        "在线条形码鉴定"
+      ],
+      "local_matches": [
+        "ecological-genomics-edna-metabarcoding"
+      ],
+      "gaps": [
+        "公开BOLD条形码数据库API入口"
+      ],
+      "integration_recommendation": "先提供只读查询；当前Portal先preprocessor再query token再download，每页1000上限总100万；不要把旧v3 API当当前唯一规范。序列上传须任务明确授权。",
+      "availability": "web_api",
+      "verified_urls": [
+        "https://www.boldsystems.org/data/api/",
+        "https://id.boldsystems.org/",
+        "https://portal.boldsystems.org/api/docs"
+      ],
+      "validation_status": "official_documentation_verified; not_live_api_tested"
+    }
+  ],
+  "priority_gaps": [
+    {
+      "priority": 1,
+      "gap": "VanRaden关系矩阵与显式lambda RR-BLUP预测",
+      "candidates": [
+        "rrblup",
+        "pybrops",
+        "bole"
+      ],
+      "action": "独立NumPy实现2个函数；二倍体剂量，训练集均值填补与中心化，无测试泄漏，审查数值测试。"
+    },
+    {
+      "priority": 1,
+      "gap": "真实种质资源MCP和QTL技能",
+      "candidates": [
+        "gigwa-mcp",
+        "haploqtl"
+      ],
+      "action": "固定上游版本后导入许可明确的SKILL.md目录，隔离运行依赖。"
+    },
+    {
+      "priority": 2,
+      "gap": "法医STR与家系关系推断",
+      "candidates": [
+        "fdstools",
+        "forrel",
+        "euroformix"
+      ],
+      "action": "分别可选CLI/R后端；不能单靠一个普通STR计数函数声称覆盖。"
+    },
+    {
+      "priority": 2,
+      "gap": "多倍体剂量调用/GWAS/连锁",
+      "candidates": [
+        "updog",
+        "polyrad",
+        "mappoly",
+        "gwaspoly"
+      ],
+      "action": "补独立多倍体工作流和外部R接口。"
+    },
+    {
+      "priority": 2,
+      "gap": "古DNA通用流程及eDNA新版工具",
+      "candidates": [
+        "nfcore-eager",
+        "mapdamage",
+        "schmutzi",
+        "obitools4",
+        "crabs"
+      ],
+      "action": "补依赖检查和隔离执行，保留现有物种特定技能。"
+    },
+    {
+      "priority": 3,
+      "gap": "系统发育/泛基因组已有技能与后端同步",
+      "candidates": [
+        "iqtree3",
+        "raxml-ng",
+        "pggb",
+        "minigraph-cactus"
+      ],
+      "action": "更新版本证据与运行入口，不把重复收录计为新增领域。"
+    }
+  ],
+  "limitations": [
+    "有限日期检索快照，不等于互联网全部DNA资源穷尽。",
+    "GitHub API未认证额度已耗尽；使用官方仓库网页、raw文件和原论文核实。",
+    "本地匹配基于registry/catalog.json与sources.json；匹配技能并不证明工具安装或数值验证。",
+    "所有候选默认未运行科学任务；尚无许可证证据的候选不能复制。"
+  ]
+}

@@ -32,14 +32,17 @@ site/
 Thumbs.db
 
 # Local runtime output
+/.dnakit/
+/.dnakit_agent/
 .cache/
 logs/
 outputs/
 /results/
 /ckpt/
 
-# Locally installed Agent skills (canonical sources live in skills/)
-/.agents/skills/
+# Locally installed Agent skills; keep the repo-owned planning skill link
+/.agents/skills/*
+!/.agents/skills/dnakit-plan
 
 # Local model weights and datasets
 /compared_models/models/
@@ -61,3 +64,10 @@ outputs/
 /write_paper/
 /backup/
 /agent-source.md
+
+# Local debugging and reference paper
+/activations_debug.log
+/【2026 】 + GENERator A long-context generative genomic foundation model.pdf
+
+# Local server connection notes
+/可用服务器.md

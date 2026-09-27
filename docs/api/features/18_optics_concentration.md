@@ -12,6 +12,7 @@
 - **计算方法：** 单个核苷酸直接查单碱基 `ε260` 参数；长度至少为 2 时，按 `ε260 = Σ相邻二核苷酸系数 − Σ内部单碱基系数` 确定性计算。
 - **API：** `dnakit.thermodynamics.extinction_coefficient_260nm(sequence[必须], max_sequence_length[可选])`
 - **输入：** 必填线性、单链、canonical `A/C/G/T` 序列；可选序列长度上限。
+- **输出：** 返回 `ExtinctionCoefficientResult`，示例展示 `value_m_inverse_cm_inverse`、`wavelength_nm`、`method`。
 - **示例代码：**
 
 ```python
@@ -34,6 +35,7 @@ print(result.value_m_inverse_cm_inverse, result.wavelength_nm, result.method)
 - **计算方法：** 单链沿用相邻二核苷酸 `ε260` 和无水 DNA 残基分子量公式；双链 `average-base-pair` 按 `13200 × 碱基对数` 计算 `ε260`，`strand-sum-hypochromicity` 按 `(ε1 + ε2) × (1 − h)` 计算，其中 `h` 必须由调用方提供。修饰的 `Δε` 和 `ΔMW` 最后按数量相加。
 - **API：** `dnakit.thermodynamics.optical_properties(sequence[必须], strand_type[可选], complement[可选], duplex_method[可选], hypochromicity_fraction[可选], modifications[可选])`
 - **输入：** 必填 canonical DNA 序列；可选单/双链、显式互补链、双链模型、hypochromicity 分数和修饰项。
+- **输出：** 返回 `OpticalPropertiesResult`，包含 260 nm 消光系数、分子量和计算方法。
 - **示例代码：**
 
 ```python
@@ -70,6 +72,7 @@ print(explicit.extinction_coefficient_260_m_inverse_cm_inverse, explicit.method)
 - **计算方法：** 在 1 cm 参考光程下按 `1 OD260 = A260 × 体积(mL) = 1` 定义，使用 `nmol/OD260 = 10⁶/ε260` 和 `µg/OD260 = 1000 × MW/ε260` 换算。
 - **API：** `dnakit.thermodynamics.optical_properties(sequence[必须], strand_type[可选], complement[可选], duplex_method[可选], hypochromicity_fraction[可选], modifications[可选])`
 - **输入：** 必填 DNA 序列；可选链类型、双链模型和显式修饰。
+- **输出：** 返回 `OpticalPropertiesResult`，示例展示 `one_od260_nmol`、`one_od260_microgram`。
 - **示例代码：**
 
 ```python
@@ -92,6 +95,7 @@ print(round(result.one_od260_nmol, 4), round(result.one_od260_microgram, 4))
 - **计算方法：** 先计算 `A260校正 = A260实测 − Σ(A标记峰值 × 交叉吸收因子)`，再按 Beer–Lambert 定律 `c = A260校正 × 稀释倍数 / (ε260 × 光程)` 得到摩尔浓度；质量浓度为 `c × MW`，提供体积时再计算 `n = cV` 和总质量。
 - **API：** `dnakit.thermodynamics.concentration_from_a260(measured_a260[必须], properties[必须], path_length_cm[可选], dilution_factor[可选], label_corrections[可选], volume_liter[可选])`
 - **输入：** 必填实测 A260 和 `OpticalPropertiesResult`；可选光程、稀释倍数、染料校正和样品体积。
+- **输出：** 返回 `A260ConcentrationResult`，示例展示 `amount_mol`、`mass_microgram`、`corrected_a260`、`molar_concentration_micromolar`。
 - **示例代码：**
 
 ```python
@@ -129,6 +133,7 @@ print(round(result.amount_mol * 1e9, 4), round(result.mass_microgram, 4))
 - **计算方法：** 使用 `m = n × MW`、`n = m/MW`、`c = n/V` 和 `n = cV` 做纯量纲换算；质量浓度与摩尔浓度通过 `MW` 互换，不进行模型估计。
 - **API：** `dnakit.thermodynamics.convert_oligo_quantity(molecular_weight_dalton[必须], volume_liter[可选], molar_concentration_molar[可选], mass_concentration_g_per_l[可选], amount_mol[可选], mass_g[可选])`
 - **输入：** 必填分子量；四种浓度/总量输入中必须且只能提供一种，浓度转总量时还必须提供体积。
+- **输出：** 返回 `OligoQuantityResult`，示例展示 `amount_nmol`、`mass_microgram`、`input_kind`。
 - **示例代码：**
 
 ```python
@@ -156,6 +161,7 @@ molar_concentration_molar
 - **计算方法：** 对每种修饰按 `count × Δε260` 和 `count × ΔMW` 求和后加到未修饰值；染料交叉吸收按 `A标记峰值 × 校正因子` 从实测 A260 中减去。所有修正参数均由调用方提供。
 - **API：** `dnakit.thermodynamics.OpticalModification(name[必须], count[可选], extinction_coefficient_260_delta_m_inverse_cm_inverse[可选], molecular_weight_delta_dalton[可选])`、`dnakit.thermodynamics.LabelAbsorbanceCorrection(name[必须], absorbance_at_label_max[必须], a260_correction_factor[必须])`
 - **输入：** 修饰名称及显式的修正值；`OpticalModification` 传入 `optical_properties()`，`LabelAbsorbanceCorrection` 传入 `concentration_from_a260()`。
+- **输出：** 返回使用显式修饰参数校正后的光学性质结果。
 - **示例代码：**
 
 ```python

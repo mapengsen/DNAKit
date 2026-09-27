@@ -7,7 +7,7 @@ name = "dnakit"
 dynamic = ["version"]
 description = "Deterministic tools for DNA sequence analysis"
 readme = "README.md"
-license = "MIT AND Apache-2.0 AND CC-BY-4.0 AND AGPL-3.0-only"
+license = "MIT AND MIT-0 AND Apache-2.0 AND CC-BY-4.0 AND AGPL-3.0-only"
 license-files = ["LICENSE", "DISCLAIMER.md", "THIRD_PARTY_NOTICES.md", "licenses/skills/*/*"]
 authors = [{ name = "DNAKit contributors" }]
 requires-python = ">=3.10"
@@ -55,6 +55,15 @@ bio-plots = ["matplotlib>=3.8,<4"]
 bio-assembly = ["pydna>=5.5,<6"]
 bio = ["dnakit[bio-analysis,bio-formats,bio-reads,bio-plots,bio-assembly]"]
 bio-validation = ["scikit-bio>=0.7.3,<0.8", "statsmodels>=0.14,<1"]
+genomics-genes = ["pyrodigal>=3.7,<4"]
+genomics = [
+  "numpy>=1.26,<3",
+  "pyrodigal>=3.7,<4",
+  "pysam>=0.22,<0.25",
+  "pyfastani>=0.6.2,<0.7",
+]
+dna-storage = ["Chamaeleo>=1.34,<2"]
+dna-nanotechnology = ["scadnano>=0.21,<1"]
 dev = [
   "build>=1.2",
   "hypothesis>=6.100",
@@ -64,8 +73,10 @@ dev = [
   "pytest-cov>=5.0",
   "ruff>=0.8",
   "scikit-learn>=1.5,<2",
+  "setuptools>=77",
   "twine>=5.0",
   "types-PyYAML>=6.0",
+  "wheel",
 ]
 docs = [
   "mkdocs>=1.6,<2",
@@ -89,6 +100,7 @@ external-tools = [
 ]
 agent = [
   "fastmcp>=3.4.5,<4",
+  "httpx[socks]>=0.27,<1",
 ]
 neural = [
   "gdown>=5.2,<6",
@@ -105,7 +117,7 @@ training = [
   "pandas>=2.2,<4",
   "pyarrow>=19,<26",
   "scikit-learn>=1.5,<2",
-  "torch>=2.5,<3",
+  "torch>=2.6,<3",
   "transformers>=4.49,<5",
   "xlrd>=2.0,<3",
 ]
@@ -150,6 +162,9 @@ where = ["src"]
 [tool.setuptools.package-data]
 dnakit = ["py.typed"]
 "dnakit.databases" = ["providers.json"]
+"dnakit.integrations" = ["*.json"]
+"dnakit.generated" = ["manifest.json"]
+"dnakit.tools" = ["_data/*.json"]
 "dnakit.encode._backend" = ["LICENSE", "UPSTREAM.json"]
 "dnakit.workflows.common" = ["LICENSE", "UPSTREAM.json"]
 "dnakit.workflows.prs" = ["LICENSE", "UPSTREAM.json", "*.json", "*.txt", "data/*.txt"]
@@ -188,7 +203,7 @@ module = [
 follow_imports = "skip"
 
 [[tool.mypy.overrides]]
-module = ["reportlab.*", "jsonschema", "cellxgene_census", "pandas.*"]
+module = ["reportlab.*", "jsonschema", "jsonschema.*", "cellxgene_census", "pandas.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
@@ -202,6 +217,7 @@ select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
 # These maintainers embed source-code patterns and generated documentation verbatim.
+"others/skills/build_genomics_survey.py" = ["E501", "RUF001"]
 "others/skills/build_native_providers.py" = ["E501"]
 "others/skills/build_support_backends.py" = ["E501"]
 "others/skills/build_workflow_backends.py" = ["E501"]

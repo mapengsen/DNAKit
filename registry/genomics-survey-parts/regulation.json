@@ -1,0 +1,1433 @@
+{
+  "survey_date": "2026-09-20",
+  "scope": [
+    "regulation",
+    "gene-function",
+    "crispr",
+    "synthetic",
+    "replication-repair",
+    "functional-assays"
+  ],
+  "queries": [
+    {
+      "query": "DNA promoter enhancer transcription factor prediction MCP server skills GitHub",
+      "domain": "regulation",
+      "notes": "初始检索Skills/MCP及上游工具"
+    },
+    {
+      "query": "gene prediction annotation MCP server skills Pyrodigal AUGUSTUS BRAKER official",
+      "domain": "gene-function",
+      "notes": "初始检索Skills/MCP及上游工具"
+    },
+    {
+      "query": "CRISPR sgRNA off target MCP server skills GitHub",
+      "domain": "crispr",
+      "notes": "初始检索Skills/MCP及上游工具"
+    },
+    {
+      "query": "synthetic biology DNA design MCP server skills GitHub",
+      "domain": "synthetic",
+      "notes": "初始检索Skills/MCP及上游工具"
+    },
+    {
+      "query": "site.github.com genomic promoter enhancer \"MCP\"",
+      "domain": "regulation",
+      "notes": "核对官方实现与可包装入口"
+    },
+    {
+      "query": "site:github.com kipoi tangermeme crested DeepSTARR promoter enhancer prediction",
+      "domain": "regulation",
+      "notes": "核对官方实现与可包装入口"
+    },
+    {
+      "query": "site:pyrodigal.readthedocs.io GeneFinder meta find_genes license",
+      "domain": "gene-function",
+      "notes": "核对官方实现与可包装入口"
+    },
+    {
+      "query": "site:github.com gene annotation Helixer liftoff miniprot license",
+      "domain": "gene-function",
+      "notes": "核对官方实现与可包装入口"
+    },
+    {
+      "query": "site:github.com crispr \"mcp\" \"server\"",
+      "domain": "crispr",
+      "notes": "区分原始实现与智能体封装"
+    },
+    {
+      "query": "site:github.com crispr Cas-OFFinder CRISPRitz inDelphi PrimeDesign CRISPResso2",
+      "domain": "crispr",
+      "notes": "区分原始实现与智能体封装"
+    },
+    {
+      "query": "site:github.com DNA Chisel DnaWeaver pySBOL3 Cello genetic circuit design",
+      "domain": "synthetic",
+      "notes": "区分原始实现与智能体封装"
+    },
+    {
+      "query": "site:github.com \"synthetic biology\" \"SKILL.md\"",
+      "domain": "synthetic",
+      "notes": "区分原始实现与智能体封装"
+    },
+    {
+      "query": "DNA replication fork repair telomere bioinformatics \"MCP\" \"skills\"",
+      "domain": "replication-repair",
+      "notes": "扩展DNA复制修复端粒和高通量功能测定"
+    },
+    {
+      "query": "site:github.com DNAscent OKseqHMM replication fork direction origin",
+      "domain": "replication-repair",
+      "notes": "扩展DNA复制修复端粒和高通量功能测定"
+    },
+    {
+      "query": "site:github.com TelomereHunter telomerecat HRDetect scarHRD DNA repair",
+      "domain": "replication-repair",
+      "notes": "扩展DNA复制修复端粒和高通量功能测定"
+    },
+    {
+      "query": "MPRA MAVE \"skills\" \"MCP\"",
+      "domain": "functional-assays",
+      "notes": "扩展DNA复制修复端粒和高通量功能测定"
+    },
+    {
+      "query": "site:github.com MPRAflow MPRAnalyze mpralm MPRA analysis",
+      "domain": "functional-assays",
+      "notes": "针对性一手项目检索；CRISPR MCP需排除蛋白MCP缩写误命中"
+    },
+    {
+      "query": "site:github.com MAVE-NN MaveDB Enrich2 functional variant assay",
+      "domain": "functional-assays",
+      "notes": "针对性一手项目检索；CRISPR MCP需排除蛋白MCP缩写误命中"
+    },
+    {
+      "query": "site:github.com \"CRISPR\" \"Model Context Protocol\"",
+      "domain": "crispr",
+      "notes": "针对性一手项目检索；CRISPR MCP需排除蛋白MCP缩写误命中"
+    },
+    {
+      "query": "site:github.com \"chorus\" \"genomics\" \"MCP\"",
+      "domain": "regulation",
+      "notes": "针对性一手项目检索；CRISPR MCP需排除蛋白MCP缩写误命中"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "pyrodigal",
+      "name": "Pyrodigal",
+      "domains": [
+        "gene-function"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/althonos/pyrodigal",
+      "repository": "https://github.com/althonos/pyrodigal",
+      "paper_urls": [
+        "https://doi.org/10.21105/joss.04296",
+        "https://doi.org/10.1186/1471-2105-11-119"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/althonos/pyrodigal/main/COPYING",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "原核CDS识别",
+        "宏基因组基因识别",
+        "蛋白翻译"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-annotation-prokaryotic-annotation",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "GeneFinder(meta=True).find_genes(sequence)；优先可选Python适配",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/althonos/pyrodigal/main/README.md",
+        "https://raw.githubusercontent.com/althonos/pyrodigal/main/COPYING"
+      ],
+      "implementation_files": [
+        "src/dnakit/genomics/genes.py",
+        "others/tests/unit/test_genomics_genes.py"
+      ],
+      "official_api_evidence": [
+        "https://pyrodigal.readthedocs.io/en/stable/api/gene_finder.html",
+        "https://pyrodigal.readthedocs.io/en/stable/api/genes.html"
+      ]
+    },
+    {
+      "id": "tangermeme",
+      "name": "tangermeme",
+      "domains": [
+        "regulation",
+        "synthetic"
+      ],
+      "kind": "python-library+skill",
+      "homepage": "https://github.com/jmschrei/tangermeme",
+      "repository": "https://github.com/jmschrei/tangermeme",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.1101/2025.08.08.669296v2"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/jmschrei/tangermeme/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "调控模型ISM和DeepLIFT/SHAP解释",
+        "motif替换效应",
+        "序列设计"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "先导入MIT官方Skill，再按需适配Torch函数；用户显式提供模型",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/jmschrei/tangermeme/main/README.md",
+        "https://raw.githubusercontent.com/jmschrei/tangermeme/main/LICENSE",
+        "https://raw.githubusercontent.com/jmschrei/tangermeme/main/tangermeme/_skills/data/SKILL.md"
+      ],
+      "skill_path": "tangermeme/_skills/data/SKILL.md"
+    },
+    {
+      "id": "memesuite-lite",
+      "name": "memesuite-lite",
+      "domains": [
+        "regulation"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/jmschrei/memesuite-lite",
+      "repository": "https://github.com/jmschrei/memesuite-lite",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.1101/2025.05.27.656386v1"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/jmschrei/memesuite-lite/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "motif统计扫描FIMO",
+        "motif相似性Tomtom"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "motif-search",
+          "evidence": "catalog guidance present; execution=not_run"
+        },
+        {
+          "skill_id": "chipseq-motif-analysis",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "作为现有原生PWM的可选统计后端；API包名memelite，不能用仓库名import",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/jmschrei/memesuite-lite/main/README.md",
+        "https://raw.githubusercontent.com/jmschrei/memesuite-lite/main/LICENSE"
+      ]
+    },
+    {
+      "id": "helixer",
+      "name": "Helixer",
+      "domains": [
+        "gene-function"
+      ],
+      "kind": "model-cli",
+      "homepage": "https://github.com/usadellab/Helixer",
+      "repository": "https://github.com/usadellab/Helixer",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41592-025-02939-1",
+        "https://doi.org/10.1093/bioinformatics/btaa1044"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/usadellab/Helixer/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "真核基因结构",
+        "CDS、UTR、内含子识别"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-annotation-eukaryotic-gene-prediction",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "独立容器CLI适配；四个谱系模型按需下载",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/usadellab/Helixer/main/README.md",
+        "https://raw.githubusercontent.com/usadellab/Helixer/main/LICENSE"
+      ]
+    },
+    {
+      "id": "braker",
+      "name": "BRAKER",
+      "domains": [
+        "gene-function"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/Gaius-Augustus/BRAKER",
+      "repository": "https://github.com/Gaius-Augustus/BRAKER",
+      "paper_urls": [
+        "https://doi.org/10.1093/nar/gki937",
+        "https://doi.org/10.1101/550145",
+        "https://doi.org/10.1093/nargab/lqaa026",
+        "https://doi.org/10.48550/arXiv.2403.19416"
+      ],
+      "license_evidence": {
+        "license": "not-established",
+        "url": "https://raw.githubusercontent.com/Gaius-Augustus/BRAKER/master/README.md",
+        "notes": "读取README，单独许可证未取得；引用保留，暂不复制"
+      },
+      "capabilities": [
+        "真核RNA和蛋白证据辅助基因预测"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-annotation-eukaryotic-gene-prediction",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "已有Skill；需要独立环境和braker.pl真实执行适配，依赖逐项许可证",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Gaius-Augustus/BRAKER/master/README.md"
+      ]
+    },
+    {
+      "id": "miniprot",
+      "name": "miniprot",
+      "domains": [
+        "gene-function"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/lh3/miniprot",
+      "repository": "https://github.com/lh3/miniprot",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btad014"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/lh3/miniprot/master/LICENSE.txt",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "蛋白到基因组剪接比对"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-annotation-annotation-transfer",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "可选miniprot CLI；GFF输出保留相位和坐标",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/lh3/miniprot/master/README.md",
+        "https://raw.githubusercontent.com/lh3/miniprot/master/LICENSE.txt"
+      ]
+    },
+    {
+      "id": "liftoff",
+      "name": "Liftoff",
+      "domains": [
+        "gene-function"
+      ],
+      "kind": "python-cli",
+      "homepage": "https://github.com/agshumate/Liftoff",
+      "repository": "https://github.com/agshumate/Liftoff",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btaa1016"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/agshumate/Liftoff/master/LICENSE.md",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "跨组装基因注释迁移"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-annotation-annotation-transfer",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "可选liftoff CLI，需参考FASTA、目标FASTA与GFF",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/agshumate/Liftoff/master/README.md",
+        "https://raw.githubusercontent.com/agshumate/Liftoff/master/LICENSE.md"
+      ]
+    },
+    {
+      "id": "predmoter",
+      "name": "Predmoter",
+      "domains": [
+        "regulation",
+        "breeding"
+      ],
+      "kind": "model-cli",
+      "homepage": "https://github.com/weberlab-hhu/Predmoter",
+      "repository": "https://github.com/weberlab-hhu/Predmoter",
+      "paper_urls": [
+        "https://doi.org/10.1038/nmeth.2688",
+        "https://doi.org/10.1038/nature01080",
+        "https://doi.org/10.1186/GB-2008-9-9-R137",
+        "https://doi.org/10.1093/bioadv/vbae074"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/weberlab-hhu/Predmoter/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "植物启动子/增强子相关ATAC和H3K4me3信号预测"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "独立模型后端；必须记录植物训练域及权重",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/weberlab-hhu/Predmoter/main/README.md",
+        "https://raw.githubusercontent.com/weberlab-hhu/Predmoter/main/LICENSE"
+      ]
+    },
+    {
+      "id": "crested",
+      "name": "CREsted",
+      "domains": [
+        "regulation",
+        "synthetic"
+      ],
+      "kind": "model-library",
+      "homepage": "https://github.com/aertslab/CREsted",
+      "repository": "https://github.com/aertslab/CREsted",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41592-026-03057-2",
+        "https://doi.org/10.5281/zenodo.15045960"
+      ],
+      "license_evidence": {
+        "license": "Academic Non-commercial Software License",
+        "url": "https://raw.githubusercontent.com/aertslab/CREsted/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "细胞类型调控元件预测",
+        "调控序列设计"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "仅引用与可选外部运行；学术非商业条款，不能随MIT包重分发",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/aertslab/CREsted/main/README.md",
+        "https://raw.githubusercontent.com/aertslab/CREsted/main/LICENSE"
+      ]
+    },
+    {
+      "id": "chrombpnet",
+      "name": "ChromBPNet",
+      "domains": [
+        "regulation"
+      ],
+      "kind": "model-cli",
+      "homepage": "https://github.com/kundajelab/chrombpnet",
+      "repository": "https://github.com/kundajelab/chrombpnet",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.1101/2024.12.25.630221v1",
+        "https://www.biorxiv.org/content/early/2024/12/25/2024.12.25.630221",
+        "https://www.biorxiv.org/content/early/2024/12/25/2024.12.25.630221.full.pdf"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/kundajelab/chrombpnet/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "去偏差碱基分辨率染色质可及性",
+        "序列贡献分数"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "atac-seq-footprinting",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "外部CLI/环境；已有ATAC技能不是可执行ChromBPNet接口",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/kundajelab/chrombpnet/master/README.md",
+        "https://raw.githubusercontent.com/kundajelab/chrombpnet/master/LICENSE"
+      ]
+    },
+    {
+      "id": "deepstarr",
+      "name": "DeepSTARR",
+      "domains": [
+        "regulation",
+        "synthetic"
+      ],
+      "kind": "model-code",
+      "homepage": "https://github.com/bernardo-de-almeida/DeepSTARR",
+      "repository": "https://github.com/bernardo-de-almeida/DeepSTARR",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41588-022-01048-5",
+        "https://doi.org/10.1002/cpmb.105",
+        "https://doi.org/10.1038/s41586-019-1210-7",
+        "http://dx.doi.org/10.1038/nature13994",
+        "https://doi.org/10.5281/zenodo.5502060"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/bernardo-de-almeida/DeepSTARR/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "STARR-seq增强子活性预测",
+        "合成增强子设计"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "引用论文及作者模型；保留果蝇训练域，独立TensorFlow环境",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/bernardo-de-almeida/DeepSTARR/main/README.md",
+        "https://raw.githubusercontent.com/bernardo-de-almeida/DeepSTARR/main/LICENSE"
+      ]
+    },
+    {
+      "id": "chorus",
+      "name": "Chorus",
+      "domains": [
+        "regulation",
+        "gene-function",
+        "synthetic"
+      ],
+      "kind": "python-library+mcp",
+      "homepage": "https://github.com/pinellolab/chorus",
+      "repository": "https://github.com/pinellolab/chorus",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/pinellolab/chorus/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "多模型统一推断",
+        "调控变异效应",
+        "调控序列替换与插入模拟",
+        "ISM"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "新增可选MCP来源；已有Enformer/AlphaGenome后端仅部分重叠；每模型独立权重条款",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pinellolab/chorus/main/README.md",
+        "https://raw.githubusercontent.com/pinellolab/chorus/main/LICENSE"
+      ]
+    },
+    {
+      "id": "genomic-intelligence",
+      "name": "Genomic Intelligence skill",
+      "domains": [
+        "regulation",
+        "gene-function"
+      ],
+      "kind": "skill+mcp+api",
+      "homepage": "https://github.com/K-Dense-AI/scientific-agent-skills",
+      "repository": "https://github.com/K-Dense-AI/scientific-agent-skills",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/main/LICENSE.md",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "启动子",
+        "增强子",
+        "剪接",
+        "基因注释",
+        "表达预测"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genomic-intelligence",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "已有Skill；更新来源核对契约。托管服务按需配置，不重复导入整个来源",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/main/README.md",
+        "https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/main/LICENSE.md"
+      ]
+    },
+    {
+      "id": "simbiology-mcp",
+      "name": "SimBiology MCP",
+      "domains": [
+        "synthetic"
+      ],
+      "kind": "skill+mcp",
+      "homepage": "https://github.com/Sepanta-Yalameha/SIMBIOLOGY-MCP",
+      "repository": "https://github.com/Sepanta-Yalameha/SIMBIOLOGY-MCP",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/Sepanta-Yalameha/SIMBIOLOGY-MCP/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "合成生物学动力学模型",
+        "基因线路仿真"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "新增Skill+MCP来源；MATLAB与SimBiology需用户自备授权",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Sepanta-Yalameha/SIMBIOLOGY-MCP/main/README.md",
+        "https://raw.githubusercontent.com/Sepanta-Yalameha/SIMBIOLOGY-MCP/main/LICENSE"
+      ]
+    },
+    {
+      "id": "dnachisel",
+      "name": "DNA Chisel",
+      "domains": [
+        "synthetic"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/Edinburgh-Genome-Foundry/DnaChisel",
+      "repository": "https://github.com/Edinburgh-Genome-Foundry/DnaChisel",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaChisel/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "约束DNA优化",
+        "密码子优化",
+        "GC与限制酶位点约束"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "codon-usage",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "本地optimization.py已有原生约束引擎；准确对照规格，不能重复宣称全缺失",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaChisel/master/README.rst",
+        "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaChisel/master/LICENSE"
+      ]
+    },
+    {
+      "id": "dnaweaver",
+      "name": "DNA Weaver",
+      "domains": [
+        "synthetic"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/Edinburgh-Genome-Foundry/DnaWeaver",
+      "repository": "https://github.com/Edinburgh-Genome-Foundry/DnaWeaver",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaWeaver/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "DNA组装路径规划",
+        "供应网络成本工期优化"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选供应网络规划后端；本地assemble_duplexes仅分子组装，不是成本规划",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaWeaver/master/README.rst",
+        "https://raw.githubusercontent.com/Edinburgh-Genome-Foundry/DnaWeaver/master/LICENSE"
+      ]
+    },
+    {
+      "id": "pysbol3",
+      "name": "pySBOL3",
+      "domains": [
+        "synthetic"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/SynBioDex/pySBOL3",
+      "repository": "https://github.com/SynBioDex/pySBOL3",
+      "paper_urls": [
+        "https://doi.org/10.1021/acssynbio.2c00249"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/SynBioDex/pySBOL3/main/LICENSE.txt",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "SBOL3设计交换",
+        "元件与组合设计表示"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选sbol3读写与验证，和GenBank/FASTA区分",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/SynBioDex/pySBOL3/main/README.md",
+        "https://raw.githubusercontent.com/SynBioDex/pySBOL3/main/LICENSE.txt"
+      ]
+    },
+    {
+      "id": "cello",
+      "name": "Cello",
+      "domains": [
+        "synthetic"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/CIDARLAB/cello",
+      "repository": "https://github.com/CIDARLAB/cello",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "BSD-2-Clause",
+        "url": "https://raw.githubusercontent.com/CIDARLAB/cello/master/LICENSE.txt",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "逻辑电路到遗传线路",
+        "Verilog到DNA设计"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "独立Java工具链/容器，不把逻辑图误称已验证生物功能",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/CIDARLAB/cello/master/README.md",
+        "https://raw.githubusercontent.com/CIDARLAB/cello/master/LICENSE.txt"
+      ]
+    },
+    {
+      "id": "cas-offinder",
+      "name": "Cas-OFFinder",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/snugel/cas-offinder",
+      "repository": "https://github.com/snugel/cas-offinder",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu048"
+      ],
+      "license_evidence": {
+        "license": "BSD-3-Clause",
+        "url": "https://raw.githubusercontent.com/snugel/cas-offinder/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "全基因组CRISPR脱靶枚举",
+        "错配与PAM搜索"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-library-design",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "可选CLI `cas-offinder input C output`；本地patterns/crispr.py仅PAM候选",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/snugel/cas-offinder/master/README.md",
+        "https://raw.githubusercontent.com/snugel/cas-offinder/master/LICENSE"
+      ]
+    },
+    {
+      "id": "cas-offinder-2",
+      "name": "Cas-OFFinder bulge branch",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/pnucolab/cas-offinder-2",
+      "repository": "https://github.com/pnucolab/cas-offinder-2",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu048"
+      ],
+      "license_evidence": {
+        "license": "BSD-3-Clause",
+        "url": "https://raw.githubusercontent.com/pnucolab/cas-offinder-2/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "DNA/RNA bulge脱靶搜索"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-library-design",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "Cas-OFFinder同族分支，单列能力和版本；统计项目覆盖时勿重复算独立方法",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pnucolab/cas-offinder-2/master/README.md",
+        "https://raw.githubusercontent.com/pnucolab/cas-offinder-2/master/LICENSE"
+      ]
+    },
+    {
+      "id": "crispritz",
+      "name": "CRISPRitz",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/pinellolab/CRISPRitz",
+      "repository": "https://github.com/pinellolab/CRISPRitz",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "Academic Affero/commercial dual terms",
+        "url": "https://raw.githubusercontent.com/pinellolab/CRISPRitz/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "变异感知全基因组脱靶",
+        "bulge搜索"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-library-design",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "引用+用户安装CLI；README许可属于学术/商业双轨",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pinellolab/CRISPRitz/master/README.md",
+        "https://raw.githubusercontent.com/pinellolab/CRISPRitz/master/LICENSE"
+      ]
+    },
+    {
+      "id": "primedesign",
+      "name": "PrimeDesign",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/pinellolab/PrimeDesign",
+      "repository": "https://github.com/pinellolab/PrimeDesign",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "Academic Affero/commercial dual terms",
+        "url": "https://raw.githubusercontent.com/pinellolab/PrimeDesign/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "pegRNA和辅助切口设计"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-prime-editing-screens",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "引用+外部CLI；不能把筛选分析Skill当pegRNA设计实现",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pinellolab/PrimeDesign/master/README.md",
+        "https://raw.githubusercontent.com/pinellolab/PrimeDesign/master/LICENSE"
+      ]
+    },
+    {
+      "id": "crispresso2",
+      "name": "CRISPResso2",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/pinellolab/CRISPResso2",
+      "repository": "https://github.com/pinellolab/CRISPResso2",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "Academic non-commercial EULA",
+        "url": "https://raw.githubusercontent.com/pinellolab/CRISPResso2/master/LICENSE.txt",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "扩增子编辑频率",
+        "碱基编辑/引导编辑结果"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-crispresso-editing",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "已有Skill；可选CLI真实执行并解析结果；非商业学术许可",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pinellolab/CRISPResso2/master/README.md",
+        "https://raw.githubusercontent.com/pinellolab/CRISPResso2/master/LICENSE.txt"
+      ]
+    },
+    {
+      "id": "crisprme",
+      "name": "CRISPRme",
+      "domains": [
+        "crispr",
+        "population"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/pinellolab/CRISPRme",
+      "repository": "https://github.com/pinellolab/CRISPRme",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41588-022-01257-y"
+      ],
+      "license_evidence": {
+        "license": "MGBOA-1.0 academic non-commercial",
+        "url": "https://raw.githubusercontent.com/pinellolab/CRISPRme/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "个体和群体变异感知脱靶分析"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "用户安装/容器适配；变异库、参考版本和MGBOA学术条款需保留",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/pinellolab/CRISPRme/main/README.md",
+        "https://raw.githubusercontent.com/pinellolab/CRISPRme/main/LICENSE"
+      ]
+    },
+    {
+      "id": "crisprscore",
+      "name": "crisprScore",
+      "domains": [
+        "crispr"
+      ],
+      "kind": "r-library",
+      "homepage": "https://github.com/crisprVerse/crisprScore",
+      "repository": "https://github.com/crisprVerse/crisprScore",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.1101/2022.04.21.488824v3",
+        "https://doi.org/10.1101/2022.06.27.497780"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/crisprVerse/crisprScore/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "多算法on/off-target分数",
+        "Lindel编辑结局分数"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "crispr-screens-library-design",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "可选Rscript接口；每评分模型依赖与许可分别检查",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/crisprVerse/crisprScore/master/README.md",
+        "https://raw.githubusercontent.com/crisprVerse/crisprScore/master/LICENSE"
+      ]
+    },
+    {
+      "id": "dnascent",
+      "name": "DNAscent",
+      "domains": [
+        "replication-repair"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/MBoemo/DNAscent",
+      "repository": "https://github.com/MBoemo/DNAscent",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41467-025-63168-w",
+        "https://doi.org/10.1093/nar/gkad093",
+        "https://doi.org/10.1186/s12864-021-07736-6",
+        "https://www.nature.com/articles/s41592-019-0394-y"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/MBoemo/DNAscent/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "BrdU/EdU碱基检测",
+        "复制叉速度和起始/终止",
+        "复制叉停滞和断裂"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "独立容器CLI；Nanopore原始信号与平台模型约束",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/MBoemo/DNAscent/master/README.md",
+        "https://raw.githubusercontent.com/MBoemo/DNAscent/master/LICENSE"
+      ]
+    },
+    {
+      "id": "okseqhmm",
+      "name": "OKseqHMM",
+      "domains": [
+        "replication-repair"
+      ],
+      "kind": "r-workflow",
+      "homepage": "https://github.com/CL-CHEN-Lab/OK-Seq",
+      "repository": "https://github.com/CL-CHEN-Lab/OK-Seq",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.7428883",
+        "https://doi.org/10.1038/ncomms10208",
+        "https://doi.org/10.1038/s41467-020-17858-2",
+        "https://doi.org/10.1093/nar/gkac1239",
+        "https://doi.org/10.1038/s41596-022-00793-5"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/CL-CHEN-Lab/OK-Seq/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "OK-seq复制叉方向",
+        "复制起始/终止区HMM"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "新增领域Skill；可选Rscript执行；可独立新增已引用的RFD统计函数",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/CL-CHEN-Lab/OK-Seq/master/README.md",
+        "https://raw.githubusercontent.com/CL-CHEN-Lab/OK-Seq/master/LICENSE"
+      ]
+    },
+    {
+      "id": "telomerecat",
+      "name": "Telomerecat",
+      "domains": [
+        "replication-repair"
+      ],
+      "kind": "python-cli",
+      "homepage": "https://github.com/cancerit/telomerecat",
+      "repository": "https://github.com/cancerit/telomerecat",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/cancerit/telomerecat/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "WGS端粒平均长度估计"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "独立可选CLI；有历史依赖，需要环境兼容性测试",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/cancerit/telomerecat/master/README.md",
+        "https://raw.githubusercontent.com/cancerit/telomerecat/master/LICENSE"
+      ]
+    },
+    {
+      "id": "telomerehunter2",
+      "name": "TelomereHunter2",
+      "domains": [
+        "replication-repair"
+      ],
+      "kind": "python-cli",
+      "homepage": "https://github.com/ferdinand-popp/telomerehunter2",
+      "repository": "https://github.com/ferdinand-popp/telomerehunter2",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioadv/vbag187",
+        "https://www.biorxiv.org/content/10.1101/2024.08.28.609339v2",
+        "https://doi.org/10.1186/s12859-019-2851-0"
+      ],
+      "license_evidence": {
+        "license": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/ferdinand-popp/telomerehunter2/main/LICENSE.txt",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "端粒reads与变体重复",
+        "肿瘤对照",
+        "单细胞端粒信号"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "优先新增端粒Skill和可选CLI，区分含量与绝对长度",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ferdinand-popp/telomerehunter2/main/README.md",
+        "https://raw.githubusercontent.com/ferdinand-popp/telomerehunter2/main/LICENSE.txt"
+      ]
+    },
+    {
+      "id": "scarhrd",
+      "name": "scarHRD",
+      "domains": [
+        "replication-repair",
+        "medical"
+      ],
+      "kind": "r-library",
+      "homepage": "https://github.com/sztup/scarHRD",
+      "repository": "https://github.com/sztup/scarHRD",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41523-018-0066-6"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/sztup/scarHRD/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "LOH/LST/TAI基因组瘢痕",
+        "同源重组缺陷研究"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选R接口；评分是研究指标，不直接给临床结论",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/sztup/scarHRD/master/README.md",
+        "https://raw.githubusercontent.com/sztup/scarHRD/master/LICENSE"
+      ]
+    },
+    {
+      "id": "mpraflow",
+      "name": "MPRAflow",
+      "domains": [
+        "functional-assays",
+        "regulation"
+      ],
+      "kind": "workflow-cli",
+      "homepage": "https://github.com/shendurelab/MPRAflow",
+      "repository": "https://github.com/shendurelab/MPRAflow",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/shendurelab/MPRAflow/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "MPRA条形码归属",
+        "RNA/DNA计数",
+        "变异调控功能测定"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "functional-screen-analysis",
+          "evidence": "catalog guidance present; execution=not_run"
+        }
+      ],
+      "gaps": [
+        "需要逐项目执行适配或能力契约；已命中的Skill仅证明工作流文档，不证明本地执行"
+      ],
+      "integration_recommendation": "已有Skill引用；新增Nextflow执行契约与中间表校验",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/shendurelab/MPRAflow/master/README.md",
+        "https://raw.githubusercontent.com/shendurelab/MPRAflow/master/LICENSE"
+      ]
+    },
+    {
+      "id": "mavenn",
+      "name": "MAVE-NN",
+      "domains": [
+        "functional-assays",
+        "regulation"
+      ],
+      "kind": "python-library",
+      "homepage": "https://github.com/jbkinney/mavenn",
+      "repository": "https://github.com/jbkinney/mavenn",
+      "paper_urls": [
+        "https://doi.org/10.1186/s13059-022-02661-7"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/jbkinney/mavenn/master/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "DNA序列到表型函数",
+        "MAVE测量非线性与噪声建模"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选TensorFlow模型库；明确训练/验证拆分",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/jbkinney/mavenn/master/README.md",
+        "https://raw.githubusercontent.com/jbkinney/mavenn/master/LICENSE"
+      ]
+    },
+    {
+      "id": "enrich2",
+      "name": "Enrich2",
+      "domains": [
+        "functional-assays"
+      ],
+      "kind": "python-cli",
+      "homepage": "https://github.com/FowlerLab/Enrich2",
+      "repository": "https://github.com/FowlerLab/Enrich2",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.14681278",
+        "https://doi.org/10.1186/s13059-017-1272-5"
+      ],
+      "license_evidence": {
+        "license": "BSD-3-Clause",
+        "url": "https://raw.githubusercontent.com/FowlerLab/Enrich2/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "突变扫描富集分数",
+        "条形码计数与统计不确定性"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选 enrich_cmd 执行；官方现支持Python3",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/FowlerLab/Enrich2/main/README.md",
+        "https://raw.githubusercontent.com/FowlerLab/Enrich2/main/LICENSE"
+      ]
+    },
+    {
+      "id": "mavedb-api",
+      "name": "MaveDB API",
+      "domains": [
+        "functional-assays",
+        "gene-function"
+      ],
+      "kind": "api",
+      "homepage": "https://github.com/VariantEffect/mavedb-api",
+      "repository": "https://github.com/VariantEffect/mavedb-api",
+      "paper_urls": [
+        "https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1845-6"
+      ],
+      "license_evidence": {
+        "license": "AGPL-3.0",
+        "url": "https://raw.githubusercontent.com/VariantEffect/mavedb-api/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "多重变异效应实验分数检索"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "读API适配优先于重分发AGPL服务；每数据集独立来源和许可",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/VariantEffect/mavedb-api/main/README.md",
+        "https://raw.githubusercontent.com/VariantEffect/mavedb-api/main/LICENSE"
+      ]
+    },
+    {
+      "id": "mavedb-link",
+      "name": "MaveDB Link",
+      "domains": [
+        "functional-assays",
+        "gene-function"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/berntpopp/mavedb-link",
+      "repository": "https://github.com/berntpopp/mavedb-link",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.11201736",
+        "https://doi.org/10.1186/s13059-019-1845-6"
+      ],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://github.com/berntpopp/mavedb-link/blob/main/LICENSE",
+        "notes": "Verified original repository license; no upstream server code bundled."
+      },
+      "capabilities": [
+        "MAVE实验分数MCP检索",
+        "实验阈值和证据强度关联"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "新增MCP来源；MIT客户端不覆盖上游数据许可",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/berntpopp/mavedb-link/main/README.md",
+        "https://raw.githubusercontent.com/berntpopp/mavedb-link/main/LICENSE"
+      ]
+    },
+    {
+      "id": "just-dna-agents",
+      "name": "Just DNA Agents",
+      "domains": [
+        "gene-function",
+        "medical"
+      ],
+      "kind": "skill+mcp",
+      "homepage": "https://github.com/dna-seq/just-dna-agents",
+      "repository": "https://github.com/dna-seq/just-dna-agents",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "MIT",
+        "url": "https://raw.githubusercontent.com/dna-seq/just-dna-agents/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "遗传注释模块编译验证",
+        "Ensembl变异解析"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "可选独立运行环境（官方Python>=3.14）；不强加主包运行时",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/dna-seq/just-dna-agents/main/README.md",
+        "https://raw.githubusercontent.com/dna-seq/just-dna-agents/main/LICENSE"
+      ]
+    },
+    {
+      "id": "ensembl-mcp-server",
+      "name": "Ensembl MCP server",
+      "domains": [
+        "gene-function",
+        "population"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/cyanheads/ensembl-mcp-server",
+      "repository": "https://github.com/cyanheads/ensembl-mcp-server",
+      "paper_urls": [],
+      "license_evidence": {
+        "license": "Apache-2.0",
+        "url": "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/main/LICENSE",
+        "notes": "已读取原始许可证文件；模型/数据许可证独立"
+      },
+      "capabilities": [
+        "Ensembl基因序列",
+        "同源基因",
+        "变异后果"
+      ],
+      "local_matches": [],
+      "gaps": [
+        "registry/sources.json未收录此项目为独立来源；需增加来源与执行能力核验"
+      ],
+      "integration_recommendation": "已有Ensembl原生API部分覆盖；可选MCP供互操作，不重复宣称本地无查询能力",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/main/README.md",
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/main/LICENSE"
+      ]
+    }
+  ],
+  "priority_gaps": [
+    {
+      "id": "pyrodigal",
+      "priority": "P0",
+      "action": "实际Pyrodigal调用；CDS/蛋白/0-based坐标与版本输出"
+    },
+    {
+      "id": "tangermeme",
+      "priority": "P0",
+      "action": "导入官方MIT Skill，保留资源及引用"
+    },
+    {
+      "id": "chorus",
+      "priority": "P1",
+      "action": "MCP来源目录与可选配置；禁止混同已有模型后端"
+    },
+    {
+      "id": "mavedb-link",
+      "priority": "P1",
+      "action": "新增MAVE功能证据MCP来源及FAQ"
+    },
+    {
+      "id": "cas-offinder",
+      "priority": "P1",
+      "action": "真实CLI脱靶枚举包装，替代只有PAM候选的能力缺口"
+    },
+    {
+      "id": "telomerehunter2",
+      "priority": "P1",
+      "action": "端粒领域新Skill与可选CLI"
+    },
+    {
+      "id": "okseqhmm",
+      "priority": "P1",
+      "action": "DNA复制叉方向/起始终止领域新Skill及CLI"
+    }
+  ],
+  "limitations": [
+    "检索覆盖不是全DNA工具穷尽证明；用户11领域之外增加复制修复、端粒及MAVE/MPRA。",
+    "39个仓库探测中shenlab/inDelphi-model与amitzeisel/MPRAnalyze地址未核实，因此未作为候选；同名实现必须继续定位作者仓库。",
+    "Cas-OFFinder两个分支属于同一方法族，不能当两项独立算法。",
+    "GitHub API tree探测返回403，未伪造精确Skill路径或上游commit。",
+    "未运行候选的大型模型或外部服务；Pyrodigal另作真实最小执行验证。",
+    "没有找到经一手证据核实的专用复制叉/端粒MCP；这些领域以作者官方CLI/R工具补齐，不能凭名词构造MCP项目。"
+  ],
+  "excluded_false_positives": [
+    {
+      "name": "Design DNA UI skills",
+      "reason": "DNA是界面设计比喻，不是核酸分析。"
+    },
+    {
+      "name": "MCP coat-protein or medical-college mentions",
+      "reason": "不是Model Context Protocol服务。"
+    },
+    {
+      "name": "CRISPR PromptOps thermodynamic architect prompt",
+      "reason": "仅角色提示词，不构成已验证可执行脱靶模型。"
+    }
+  ]
+}

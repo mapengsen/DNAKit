@@ -1,5 +1,13 @@
 # FAQ
 
+Tutorial notes: [Core usage](faq/tutorial_basics.md) · [Models, downloads and integrations](faq/tutorial_integrations.md) · [Bioinformatics](faq/bioinformatics.md) · [API parameters](faq/api/index.md) · [Catalog scope](faq/tutorial_overview.md).
+
+## How can pip install the genomics computing dependencies together? {#pip-genomics}
+
+From this checkout, run `python -m pip install -e ".[genomics]"` for the Python libraries used by genotype PCA, ANI, prokaryotic CDS prediction and BAM statistics. After publication, use `python -m pip install "dnakit[genomics]"`. These APIs do not require separate PLINK, FastANI or corresponding scientific executables.
+
+See the [genomics tutorial](api/features/38_genomics_extensions.md#pip-genomics) for examples and the [43-analysis migration notes](faq/external_analysis_migration.md) for the scope of each external adapter. Reference databases, model weights and remaining professional backends are still task-specific dependencies.
+
 ## Where do the Skills come from, and how are they cited and installed? {#agent-skills-references}
 
 DNAKit curates DNA/genomics workflows from bioSkills, ToolUniverse, ClawBio, SciAgent, K-Dense, NVIDIA BioNeMo, DeepMind, PKU-EMBL, omics-skills, ENCODE Toolkit, and other original sources. Task/stage and input-condition equivalence rules choose one implementation per duplicate group. Each skill has its own directory with supporting files, original licenses, and `UPSTREAM.md`; portability changes are documented.
@@ -23,7 +31,7 @@ Credit DNAKit's curation and integration separately from the original workflows 
 
 All bundled skills now have DNAKit integration guidance. Collection prefixes are removed where applicable, with previous identifiers retained as aliases. Actual software and model names remain unchanged.
 
-Use `dnakit.databases` for bundled database adapters, `dnakit.encode` for ENCODE, and `dnakit skills run` / `dnakit.workflows.run()` for packaged scripts. The migrated collection adapters do not require ToolUniverse, ClawBio or ENCODE Toolkit installations. Real scientific libraries, programs, model weights, reference data and credentials remain task-specific dependencies. See each skill's `DNAKIT.md` and the [native interface guide](llm_tools/native_skills.md).
+Use `dnakit.databases` for bundled database adapters, `dnakit.encode` for ENCODE, and `dnakit skills run` / `dnakit.workflows.run()` for packaged scripts. The migrated collection adapters do not require ToolUniverse, ClawBio or ENCODE Toolkit installations. Real scientific libraries, programs, model weights, reference data and credentials remain task-specific dependencies. See each skill's `DNAKIT.md` and the [native interface guide](llm_tools/skills.md#unified-skill-api).
 
 ## What matching strategy is used for sequence function search? {#pattern-matching-strategy}
 
@@ -113,14 +121,14 @@ Matches must be consecutive and identical, no breaks, mismatches, or indels allo
 
 ## What calculation methods and references are available for Diversity and Novelty? {#diversity-novelty-references}
 
-DNAKit retains its normalized-similarity methods and adds the paper's raw Levenshtein-distance methods:
+DNAKit uses the paper's raw Levenshtein-distance formula for Diversity; Novelty offers two methods:
 
-| Metric | Default method | Second method |
+| Metric | Calculation | Optional method |
 | --- | --- | --- |
-| Diversity | `calculation="similarity"`: distance is `1 - pair_similarity`; `score` is mean nearest-neighbor distance, with mean pair distance and threshold-cluster summaries also reported. | `calculation="levenshtein"`: `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered sequence pairs. |
+| Diversity | `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered sequence pairs. | None |
 | Novelty | `novelty_calculation="similarity"`: each query receives `1 - nearest_reference_similarity`. | `novelty_calculation="levenshtein"`: `meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`. |
 
-The second methods follow Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440, [DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440). Section 2.8, equations (20) and (21), specifies Levenshtein distance. The terminology is inherited from Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022, [PMLR paper page](https://proceedings.mlr.press/v162/jain22a.html).
+The Levenshtein formulas follow Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440, [DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440). Section 2.8, equations (20) and (21), specifies Levenshtein distance. The terminology is inherited from Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022, [PMLR paper page](https://proceedings.mlr.press/v162/jain22a.html).
 
 The article has an [official GitHub repository](https://github.com/powidla/nonB-DNA-structures-generation), with the relevant code in [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb). As of 2026-09-02, the repository declares no open-source license, and its notebook uses fixed 100-bp preprocessing, flattened one-hot/KDTree operations, and chunk-local calculations that do not fully match the published equations. DNAKit therefore does not copy that code: it independently implements the published formulas with its bounded Levenshtein routine, performs no implicit padding or truncation, and does not claim exact reproduction of the notebook values in Table 2.
 
@@ -132,20 +140,20 @@ The functions in [Physical and Chemical Properties](api/features/07_physicochemi
 
 | Function | Basis for calculation | References or sources |
 | --- | --- | --- |
-| THERMO-001 Molecular Weight | Anhydrous DNA residue mass summation, end and 5' phosphate correction | The current implementation records the standard oligonucleotide mass formula and includes a local Biopython numerical comparison, but this comparison cannot replace a primary scientific citation. |
-| THERMO-014 260 nm extinction coefficient | Sum of adjacent dinucleotide hypochromicity parameters minus internal single base parameter | Warshaw & Tinoco, 1966, [DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X); Cantor, Warshaw & Shapiro, 1970, [DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909). |
-| THERMO-002 Tm (Wallace) | `2 × (A+T) + 4 × (G+C)` Rule of thumb for short oligonucleotides | Wallace et al., 1979, [DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543). The current implementation does not write this DOI into the result provenance, and the FAQ is here to supplement the literature relationship. |
-| THERMO-002 Tm (nearest-neighbor) | Neighbor packing, terminal, symmetry, salt concentration and chain concentration models | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-003 salt concentration correction | SantaLucia monovalent salt entropy correction | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-012 local Tm | Sliding window repeatedly calls Wallace or nearest-neighbor Tm | Does not introduce a new scientific model; references inherit the chosen Wallace 1979 or SantaLucia 1998 method. |
-| EVAL-013 Synthesis Risk | Five-component equal weighted average of GC, isobase contiguous, tandem repeats, and inverted repeats | DNAKit internal transparent heuristic rules; no external paper or vendor rule sets, scores are not experimental synthesis success probabilities. |
-| THERMO-004 Thermodynamic Parameters | ΔH, ΔS, ΔG and Tm for a perfectly complementary duplex | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-005 Nearest-neighbor | Same as THERMO-004, but returns stack-by-stack step details | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-006 Duplex stability | Native full complementation path using SantaLucia; optional mismatch/dangling path calling Primer3 | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460); Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596). The stable Boolean criterion `Tm > configured temperature` is a DNAKit result-interpretation rule. |
-| THERMO-007 Base stacking | Query ΔH/ΔS parameters and calculate ΔG by adjacent dinucleotide | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
-| THERMO-008 Hairpin | User-installed Primer3 `ntthal` Thermodynamic Hairpin Structure Prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 Official Manual ](https://primer3.org/manual.html); specific values also depend on the actual Primer3 version and parameter directory. |
-| THERMO-009 Self-dimer | User-installed Primer3 `ntthal` thermodynamic self-dimer prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 official manual ](https://primer3.org/manual.html); specific values also depend on the actual Primer3 version and parameter directory. |
-| THERMO-010 Heterodimer | User-installed Primer3 `ntthal` thermodynamic heterodimer prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 Official Manual ](https://primer3.org/manual.html); exact values also depend on the actual Primer3 version and parameter catalog. |
+| Molecular Weight | Anhydrous DNA residue mass summation, end and 5' phosphate correction | The current implementation records the standard oligonucleotide mass formula and includes a local Biopython numerical comparison, but this comparison cannot replace a primary scientific citation. |
+| 260 nm extinction coefficient | Sum of adjacent dinucleotide hypochromicity parameters minus internal single base parameter | Warshaw & Tinoco, 1966, [DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X); Cantor, Warshaw & Shapiro, 1970, [DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909). |
+| Tm (Wallace) | `2 × (A+T) + 4 × (G+C)` Rule of thumb for short oligonucleotides | Wallace et al., 1979, [DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543). The current implementation does not write this DOI into the result provenance, and the FAQ is here to supplement the literature relationship. |
+| Tm (nearest-neighbor) | Neighbor packing, terminal, symmetry, salt concentration and chain concentration models | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| salt concentration correction | SantaLucia monovalent salt entropy correction | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| local Tm | Sliding window repeatedly calls Wallace or nearest-neighbor Tm | Does not introduce a new scientific model; references inherit the chosen Wallace 1979 or SantaLucia 1998 method. |
+| Synthesis Risk | Five-component equal weighted average of GC, isobase contiguous, tandem repeats, and inverted repeats | DNAKit internal transparent heuristic rules; no external paper or vendor rule sets, scores are not experimental synthesis success probabilities. |
+| Thermodynamic Parameters | ΔH, ΔS, ΔG and Tm for a perfectly complementary duplex | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| Nearest-neighbor | Same as thermodynamic parameters, but returns stack-by-stack step details | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| Duplex stability | Native full complementation path using SantaLucia; optional mismatch/dangling path calling Primer3 | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460); Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596). The stable Boolean criterion `Tm > configured temperature` is a DNAKit result-interpretation rule. |
+| Base stacking | Query ΔH/ΔS parameters and calculate ΔG by adjacent dinucleotide | SantaLucia, 1998, [DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460). |
+| Hairpin | User-installed Primer3 `ntthal` Thermodynamic Hairpin Structure Prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 Official Manual ](https://primer3.org/manual.html); specific values also depend on the actual Primer3 version and parameter directory. |
+| Self-dimer | User-installed Primer3 `ntthal` thermodynamic self-dimer prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 official manual ](https://primer3.org/manual.html); specific values also depend on the actual Primer3 version and parameter directory. |
+| Heterodimer | User-installed Primer3 `ntthal` thermodynamic heterodimer prediction | Untergasser et al., 2012, [DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596) and [Primer3 Official Manual ](https://primer3.org/manual.html); exact values also depend on the actual Primer3 version and parameter catalog. |
 
 These references illustrate the sources of algorithms and parameters and do not imply that any calculated results are equivalent to experimental measurements. Tm, ΔG, and structural results are still affected by salt concentration, chain concentration, temperature, sequence length, chemical modifications, and the actual backend version.
 
@@ -209,7 +217,7 @@ The above citations only indicate the sources of algorithms, parameters or exter
 
 ## What are the references for deep-learning property prediction? {#deep-learning-property-prediction-references}
 
-The following table covers the primary model papers, task datasets, and training protocols used by all 54 functions integrated in [deep-learning property prediction](api/features/23_deep_learning_property_prediction.md). Multiple output heads share one paper, so the same citation is not repeated for every function.
+The following table covers the primary model papers, task datasets, and training protocols used by all 54 functions integrated in deep-learning property prediction. Examples are organized by task: [regulatory tracks](api/features/23_prediction_regulatory_tracks.md), [splicing and genomic regions](api/features/23_prediction_splicing_regions.md), [epigenetic marks and open chromatin](api/features/23_prediction_chromatin_classification.md), [promoters and enhancers](api/features/23_prediction_promoter_enhancer.md), [variant effects](api/features/23_prediction_variant_effects.md), [taxonomy and molecular function](api/features/23_prediction_sequence_classification.md), and [molecular relationships and interactions](api/features/23_prediction_molecular_interactions.md). Multiple output heads share one paper, so the same citation is not repeated for every function.
 
 | Functions | Reference |
 | --- | --- |

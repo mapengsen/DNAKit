@@ -1,16 +1,16 @@
-# OPS-005 sequence generation
-
-Public processing APIs share [file and text input rules](00_processing_inputs.md).
+# sequence generation
 
 Generate new DNA sequences through mutations, insertions, deletions, fragment rearrangements, random shuffling, or sequence recombination.
 
-## 1. OPS-005.1 mutation generation
 
-- **Function:** Independently determine whether a substitution mutation has occurred for each base in the sequence.
+## 1) mutation generation {#1-ops-0051-mutation-generation}
+
+- **Purpose:** Generate base substitutions with a per-base probability.
+- **Method:** Independently select each base with mut_frac, then uniformly choose one of the other three bases.
 - **API:** `dnakit.ops.evolution_generate(sequence[required], augmentations=("mutation",), seed/rng[choose one], mut_frac[optional])`.
-- **Probability:** `mut_frac` represents the probability of mutation of each base, the range is `0.0～1.0`, and the default value is `0.05`. The hit base will be replaced with one of the other three canonical bases with equal probability, so it will definitely change.
-- **Supplementary:** `mutate()` is used for a single single base substitution at a specified position or a random position, and does not receive a probability parameter.
-- **Sample code:**
+- **Input:** A canonical DNASequence; probability in [0,1], default 0.05; provide either seed or rng.
+- **Output:** Returns `EvolutionGenerationResult` with the generated `sequence` and mutation `steps`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -28,20 +28,21 @@ print(result.sequence.symbols)
 print(result.steps[0].length)  # Number of bases actually mutated
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 ACATTCGACCTT
 5
 ```
 
-## 2. OPS-005.2 Insert generation
+## 2) Insert generation {#2-ops-0052-insert-generation}
 
-- **Function:** Independently determine whether to insert random DNA after each base in the sequence.
+- **Purpose:** Insert random DNA segments with a per-position probability.
+- **Method:** Select positions independently with insert_frac and insert random segments of length [insert_min,insert_max] after them.
 - **API:** `dnakit.ops.evolution_generate(sequence[required], augmentations=("insertion",), seed/rng[choose one], insert_frac[optional], insert_min[optional], insert_max[optional])`.
-- **Probability:** `insert_frac` represents the probability of insertion at each base position, the range is `0.0～1.0`, and the default value is `0.05`.
-- **Insertion length:** `insert_min=1, insert_max=1`, only 1 random base will be inserted per hit; when other minimum and maximum values ​​are set, the fragment length will be randomly selected within the closed interval `[insert_min, insert_max]` for each hit.
-- **Sample code:**
+- **Input:** A canonical DNASequence; probability in [0,1], positive insertion lengths and either seed or rng.
+- **Output:** Returns `EvolutionGenerationResult` with the inserted `sequence` and insertion `steps`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -70,21 +71,21 @@ print(single_base.sequence.symbols, single_base.steps[0].length)
 print(segment.sequence.symbols, segment.steps[0].length)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 ACGGTACTGTAACAGT 4
 ACGAGACTTACAAACCGTTACAACCAGGT 17
 ```
 
-If you just want to randomly select a position in the entire sequence and insert a continuous segment once, use `indel_generate(operation="insertion", min_length=..., max_length=...)`.
+## 3) delete generation {#3-ops-0053-delete-generation}
 
-## 3. OPS-005.3 delete generation
-
-- **Function:** Independently determine whether to delete the base for each base in the sequence.
+- **Purpose:** Delete bases with a per-base probability.
+- **Method:** Independently select and remove each base with delete_frac.
 - **API:** `dnakit.ops.evolution_generate(sequence[required], augmentations=("deletion",), seed/rng[choose one], delete_frac[optional])`.
-- **Probability:** `delete_frac` represents the probability of deletion at each base position, the range is `0.0～1.0`, and the default value is `0.05`. After a hit, only one base at the current position is deleted.
-- **Sample code:**
+- **Input:** A canonical DNASequence; probability in [0,1], default 0.05; provide either seed or rng.
+- **Output:** Returns `EvolutionGenerationResult` with the deleted `sequence` and deletion `steps`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -102,44 +103,49 @@ print(result.sequence.symbols)
 print(result.steps[0].length)  # Number of bases actually deleted
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 ACTCGCT
 5
 ```
 
-If you only want to randomly select a contiguous segment in the entire sequence and delete it once, use `indel_generate(operation="deletion", min_length=..., max_length=...)`.
+## 4) Evolutionary algorithm-like operation {#4-ops-0054-evolutionary-algorithm-like-operation}
 
-## 4. OPS-005.4 Evolutionary algorithm-like operation
+- **Purpose:** Combine multiple random sequence transformations.
+- **Method:** Sample operations without replacement and apply inversion, deletion, translocation, insertion, reverse complement and mutation in that order.
+- **API:** `dnakit.ops.evolution_generate(sequence[required], augmentations[optional], max_augmentations[optional], hard_aug[optional], seed[optional], rng[optional], mut_frac[optional], insert_frac[optional], delete_frac[optional], insert_min/insert_max[optional], shift_min/shift_max[optional], invert_min/invert_max[optional], rc_prob[optional])`.
+- **Input:** A canonical DNASequence, candidate operations and seed/rng; selected operations may leave the sequence unchanged.
+- **Output:** Returns `EvolutionGenerationResult` with the generated `sequence` and operation `steps`.
+- **Example code:**
 
-`evolution_generate()` also supports partial reverse complementation, translocation, and entire reverse complementation. Multiple candidate operations are first sampled without replacement, and then executed in a fixed order: local reverse complementation, deletion, translocation, insertion, entire reverse complementation, and mutation. The base-by-base probabilities are for the current sequence when each operation is performed.
+```python
+from dnakit import DNASequence
+from dnakit.ops import evolution_generate
 
-- **Full API:** `dnakit.ops.evolution_generate(sequence[required], augmentations[optional], max_augmentations[optional], hard_aug[optional], seed[optional], rng[optional], mut_frac[optional], insert_frac[optional], delete_frac[optional], insert_min/insert_max[optional], shift_min/shift_max[optional], invert_min/invert_max[optional], rc_prob[optional])`.
-- **Result:** `EvolutionGenerationResult.sequence` is the generated sequence; `steps` saves whether each operation is effective and its actual impact length; the result also saves the random source, random state and `dnakit-evoaug-v3` algorithm version.
-- **Sampling rules:** For `hard_aug=True`, exactly `max_augmentations` operations are selected for each sequence; for `False`, select randomly from 1 to the maximum value. Selecting a certain operation does not guarantee that the base will be hit. For example, if the probability is low and the sequence is short, no change may occur.
+result = evolution_generate(
+    DNASequence("AAGTCC"),
+    augmentations=("reverse_complement",),
+    rc_prob=1.0,
+    seed=19,
+)
+print(result.sequence.symbols)
+```
 
-| Operation name | Function |
-|----------------------|------------------------------------------------|
-| `mutation` | Each base is independently replaced with `mut_frac` probability |
-| `insertion` | After each base, random DNA is inserted independently with `insert_frac` probability |
-| `deletion` | Each base is independently deleted with `delete_frac` probability |
-| `translocation` | Random roll sequence, swap the order of fragments on both sides of the breakpoint |
-| `inversion` | Replace contiguous segments with their reverse complements |
-| `reverse_complement` | Press `rc_prob` to replace the entire sequence with the reverse complement |
+- **Example output:**
 
-## 5. OPS-005.5 Fragment rearrangement <span id="5"></span>
+```text
+GGACTT
+```
 
-`rearrange_generate()` First use random breakpoints to cut the sequence into `segment_count` non-empty segments, and then perform a rearrangement:
+## 5) Fragment rearrangement <span id="5"></span> {#5-ops-0055-fragment-rearrangement}
 
-| `operation` | Function |
-| --------------- | ----------------------------------------------- |
-| `exchange` | Randomly swap the order of fragments and keep the length unchanged |
-| `inversion` | Select a segment and replace it with its reverse complement, keeping the length unchanged |
-| `duplication` | Select a segment and make a copy after it, increasing the length |
-
+- **Purpose:** Randomly exchange, reverse-complement or duplicate segments.
+- **Method:** Split at random breakpoints, then exchange segments, reverse-complement one or duplicate one according to operation.
 - **API:** `dnakit.ops.rearrange_generate(sequence[required], operation[optional], segment_count[optional], seed[optional], rng[optional])`.
-- **Result:** `RearrangementResult` Save `breakpoints`, swap `permutation` or `selected_segment` for easy review of the build process.
+- **Input:** A canonical DNASequence, segment count, operation and seed/rng.
+- **Output:** Returns a `RearrangementResult`; the example shows `sequence`, `breakpoints`, `permutation`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -156,12 +162,21 @@ print(result.sequence.symbols)
 print(result.breakpoints, result.permutation)
 ```
 
-## 6. OPS-005.6 k-mer randomly scrambled <span id="6-k-mer"></span>
+- **Example output:**
 
-`kmer_shuffle()` Instead of directly scrambling bases independently, Euler paths are randomly sampled on the de Bruijn multigraph of the original sequence. Thus the count of overlapping k-mers is maintained exactly; for example, `k=2` maintains the count of doublets, and `k=3` maintains the count of triplets. By default `ensure_different=True`, an attempt will be made to generate a sequence that is different from the original sequence; if the counting structure has only a unique reconstruction result, an explicit error will be thrown.
+```text
+AGTCAC
+(1, 5) (1, 0, 2)
+```
 
+## 6) k-mer randomly scrambled <span id="6-k-mer"></span> {#6-ops-0056-k-mer-randomly-scrambled}
+
+- **Purpose:** Shuffle the sequence while preserving overlapping k-mer counts for the selected k.
+- **Method:** Sample Eulerian paths in a de Bruijn multigraph to preserve overlapping k-mer counts exactly.
 - **API:** `dnakit.ops.kmer_shuffle(sequence[required], k[optional], seed[optional], rng[optional], ensure_different[optional], max_attempts[optional])`.
-- **Results:** `KmerShuffleResult` Saves `k`, raw k-mer count, number of attempts and random state.
+- **Input:** A canonical DNASequence, k and seed/rng; by default a different sequence is required and impossible alternatives raise an error.
+- **Output:** Returns a `KmerShuffleResult`; the example shows `sequence`.
+- **Example code:**
 
 ```python
 from collections import Counter
@@ -178,15 +193,20 @@ assert Counter(
 print(generated)
 ```
 
-This implementation refers to the k-mer-preserving shuffled Euler path method (see [uShuffle paper ](https://pmc.ncbi.nlm.nih.gov/articles/PMC2375906/)); it only guarantees the overlap count of the specified `k`, and does not mean to preserve higher-order k-mers, functionality, expression volume, or experimental properties.
+- **Example output:**
 
-## 7. OPS-005.7 Multiple sequence recombination/crossover<span id="7-crossover"></span>
+```text
+AAGATCGGATCGATC
+```
 
-`crossover()` Receives two DNA sequences of equal length and a single point boundary, and generates the children of "the first sequence prefix + the second sequence suffix". The boundary uses 0-based half-open splitting positions; when `position` is omitted, `seed` or `random.Random` must be passed, and a boundary is randomly selected that preserves the bases on both sides.
+## 7) Multiple sequence recombination/crossover<span id="7-crossover"></span> {#7-ops-0057-multiple-sequence-recombinationcrossover}
 
+- **Purpose:** Join two parent sequences at a single crossover boundary.
+- **Method:** Take the first parent prefix and second parent suffix at the 0-based position boundary.
 - **API:** `dnakit.ops.crossover(first[required], second[required], position[optional], seed[optional], rng[optional])`.
-- **Result:** `CrossoverResult.sequence` is the offspring; `position`, the two parent lengths and the random state are saved in the result.
-- **Example:**
+- **Input:** Two equal-length linear gap-free A/C/G/T sequences; provide seed/rng when position is omitted.
+- **Output:** Returns a `CrossoverResult`; the example shows `sequence`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -198,4 +218,10 @@ result = crossover(first, second, position=4)
 print(result.sequence.symbols)  # AAAATTTT
 ```
 
-The API is currently a one-point intersection of two sequences of equal length; inputs of different lengths, circular shapes, containing gaps, and containing IUPAC ambiguous bases will be rejected.
+- **Example output:**
+
+```text
+AAAATTTT
+```
+
+[FAQ: details](../../faq/tutorial_basics.md#generation-details)

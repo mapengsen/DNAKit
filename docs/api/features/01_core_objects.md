@@ -1,48 +1,14 @@
 # 1. 核心数据对象
 
-普通用户只需要记住一个核心对象：`dnakit.DNA(...)`。输入一条序列或多条序列、ID、拓扑、metadata 和 feature 都使用这个入口，返回类型始终是 `DNA`。
+使用 `dnakit.DNA(...)` 创建一条或多条 DNA 序列。
 
-```python
-import dnakit
-
-# 一条序列
-dna = dnakit.DNA("ACGT")
-
-# 一条序列，并附加信息
-annotated = dnakit.DNA(
-    "ACGT",
-    id="seq-1",
-    topology="circular",
-    metadata={"species": "synthetic"},
-    features=[{"type": "motif", "start": 1, "end": 3}],
-)
-
-# 多条序列，仍然返回 DNA
-dataset = dnakit.DNA(["ACGT", "TTAA"])
-detailed = dnakit.DNA(
-    [
-        {"sequence": "ACGT", "id": "seq-1"},
-        {"sequence": "TTAA", "id": "seq-2", "topology": "circular"},
-    ]
-)
-
-print(type(dna).__name__, type(dataset).__name__)
-print(dataset.ids, dataset[0].symbols)
-```
-
-```text
-DNA DNA
-('sequence_1', 'sequence_2') ACGT
-```
-
-使用规则只有三条：字符串表示一条序列；字符串列表表示多条序列；多条序列需要不同附加信息时，用包含 `sequence` 的字典列表。`data[0]` 和 `data[1:3]` 仍返回 `DNA`。下面的 `DNASequence`、`DNARecord` 和 `DNASet` 是内部明确分层及旧代码兼容对象，普通使用不需要分别构造。
-
-## 1) CORE-001 DNA序列对象
+## 1) DNA序列对象 {#1-core-001-dna}
 
 - **作用：** 保存 DNA 序列值、字母表、线性或环状状态、单链或双链状态以及 Gap 信息，作为描述符、搜索、比对等计算的基础序列对象。
-- **普通 API：** `dnakit.DNA(data[必须], alphabet[可选], topology[可选], strandedness[可选])`。
-- **高级兼容对象：** `dnakit.DNASequence(parts[必须], alphabet[可选], topology[可选], strandedness[可选])`。
+- **计算方法：** 标准化字符串后保存序列、拓扑和链类型；通过同一 DNA 对象访问记录与序列。
+- **API：** `dnakit.DNA(data[必须], alphabet[可选], topology[可选], strandedness[可选])`。
 - **输入：** `DNA` 可直接接收原始字符串并自动标准化；高级 `DNASequence` 只接收已经标准化的序列。
+- **输出：** `DNA(...)` 返回 `DNASequence`，包含序列符号和长度。
 - **示例代码：**
 
 ```python
@@ -62,12 +28,13 @@ ACGT
 1
 ```
 
-## 2) CORE-002 DNA记录对象
+## 2) DNA记录对象 {#2-core-002-dna}
 
 - **作用：** 在一条 DNA 序列上附加 ID、描述、功能区和样本信息，使计算结果能够追溯到具体记录及其来源。
-- **普通 API：** `dnakit.DNA(data[必须], id[可选], description[可选], features[可选], metadata[可选], letter_annotations[可选])`。
-- **高级兼容对象：** `dnakit.DNARecord(sequence[必须], id[必须], ...)`。
+- **计算方法：** 将 ID、描述、区间注释和 metadata 绑定到同一条序列。
+- **API：** `dnakit.DNA(data[必须], id[可选], description[可选], features[可选], metadata[可选], letter_annotations[可选])`。
 - **输入：** 普通入口只需序列；其余信息都是同一调用中的可选参数。未提供 ID 时自动生成 `sequence_1`。
+- **输出：** `DNA(...)` 返回 `DNARecord`，包含 ID、序列、注释和 metadata。
 - **示例代码：**
 
 ```python
@@ -88,12 +55,13 @@ print(record.id, record.symbols, record.metadata["species"])
 seq-1 ACGT human
 ```
 
-## 3) CORE-003 DNA数据集对象
+## 3) DNA数据集对象 {#3-core-003-dna}
 
 - **作用：** 使用同一个 `DNA` 对象按固定顺序管理一条或多条记录，并支持下标和切片选择，作为普通用户统一的数据输入入口。
-- **普通 API：** `dnakit.DNA(data[必须], name[可选], source[可选], version[可选], collection_metadata[可选])`；文件读取使用 `dnakit.read(..., mode="dna")`。
-- **高级兼容对象：** `dnakit.DNASet(...)`、`DNASet.from_records(...)`、`DNASet.from_sequences(...)` 和 `read_set(...)`。
+- **计算方法：** 按输入顺序构建记录集合；整数下标和切片均返回 DNA。
+- **API：** `dnakit.DNA(data[必须], name[可选], source[可选], version[可选], collection_metadata[可选])`；文件读取使用 `dnakit.read(..., mode="dna")`。
 - **输入：** 简单多序列使用字符串列表；每条记录需要不同信息时使用字典列表。
+- **输出：** `DNA(...)` 返回 `DNASet`，包含有序记录和记录 ID。
 - **示例代码：**
 
 ```python
@@ -114,12 +82,13 @@ print(dataset[1].symbols)
 GT
 ```
 
-## 4) CORE-004 特征对象
+## 4) 特征对象 {#4-core-004}
 
 - **作用：** feature 是 `DNA` 中一条序列的附加注释，可标记 ORF、motif、限制酶位点和重复序列，并在编辑、导出和可视化时保留区域含义；它不是另一种 DNA 数据对象。
-- **普通 API：** 在 `dnakit.DNA(..., features=[...])` 中直接传字典；简单区间使用 `type`、`start`、`end`，其余字段可选。
-- **高级兼容对象：** `dnakit.DNAFeature(...)`、`dnakit.Interval(...)`；复合或未解析位置使用 `CompoundLocation`、`UnresolvedLocation`。
+- **计算方法：** 把 feature 字典转换为带类型和 0-based 半开区间的注释。
+- **API：** 在 `dnakit.DNA(..., features=[...])` 中直接传字典；简单区间使用 `type`、`start`、`end`，其余字段可选。
 - **输入：** 普通 feature 字典必填 `type`、`start`、`end`；也可用 `location` 代替 `start/end`。
+- **输出：** 返回包含 `DNAFeature` 的 `DNARecord`；特征提供类型、区间和链方向。
 - **示例代码：**
 
 ```python
@@ -149,11 +118,13 @@ print(feature.type, feature.location, feature.strand.value)
 motif Interval(start=1, end=3) forward
 ```
 
-## 5) CORE-005 Gap对象
+## 5) Gap对象 {#5-core-005-gap}
 
 - **作用：** 明确保存序列中已知或未知长度的缺口，防止缺失区域在坐标计算或序列拼接时被误当成连续碱基。
+- **计算方法：** 用独立 Gap 对象记录已知长度或未知长度，不将其自动替换为普通碱基。
 - **API：** `dnakit.DNA(parts[必须], ...)`、`dnakit.Gap(length[必须], kind[可选], crossable[可选], evidence[可选], metadata[可选])`、`dnakit.GapKind`；`DNASequence.from_fragments(...)` 为高级兼容入口。
 - **输入：** 必填为正整数长度，或用 `None` 表示未知长度；可选 `kind`、`crossable`、`evidence`、`metadata`。
+- **输出：** `Gap` 表示缺口长度；包含它的 `DNASequence` 分别提供符号长度和坐标跨度。
 - **示例代码：**
 
 ```python
@@ -172,11 +143,13 @@ print(seq.coordinate_span)
 504
 ```
 
-## 6) CORE-006 序列类型声明
+## 6) 序列类型声明 {#6-core-006}
 
 - **作用：** 声明序列允许的字符、线性或环状形态，以及单链或双链类型，供输入校验和后续算法选择正确的处理规则。
+- **计算方法：** 用显式字母表、拓扑和链类型约束对象的有效状态。
 - **API：** `dnakit.DNA(data[必须], alphabet[可选], topology[可选], strandedness[可选])`；`DNASequence`、`DNAAlphabet`、`Topology` 和 `Strandedness` 保留为高级类型。
 - **输入：** 必填 DNA 内容；可选 `alphabet="strict"|"iupac"`、`topology="linear"|"circular"`、`strandedness="single"|"double"`。
+- **输出：** 返回带 `alphabet`、`topology` 和 `strandedness` 声明的 `DNASequence`。
 - **示例代码：**
 
 ```python
@@ -197,11 +170,13 @@ print(seq.alphabet.value, seq.topology.value, seq.strandedness.value)
 iupac circular double
 ```
 
-## 7) CORE-007 坐标系统
+## 7) 坐标系统 {#7-core-007}
 
 - **作用：** 把不同文件格式的坐标统一转换为 DNAKit 使用的 0-based 半开区间，避免区间截取和格式转换时出现一位偏差。
+- **计算方法：** 按来源坐标体系换算端点；内部使用包含 start、不包含 end 的区间。
 - **API：** `dnakit.core.ExternalInterval(start[必须], end[必须], system[必须], strand[可选])`、`dnakit.Interval(start[必须], end[必须])`、`dnakit.core.CompoundLocation(parts[必须])`、`dnakit.core.import_location(external[必须], sequence_length[可选])`、`dnakit.core.export_location(location[必须], target_system[必须], sequence_length[可选])`、`dnakit.core.reverse_strand_location(location[必须], sequence_length[必须])`。
 - **输入：** 必填起点、终点、来源或目标坐标体系；可选 `strand`、`sequence_length`。跨环状原点时必须给出序列长度。
+- **输出：** 返回坐标区间对象；转换后提供起点 `start` 和终点 `end`。
 - **示例代码：**
 
 ```python
@@ -220,3 +195,7 @@ print(converted.start, converted.end)
 Interval(start=1, end=8)
 1 8
 ```
+
+[FAQ：补充说明](../../faq/tutorial_basics.md#core-objects)
+
+[FAQ：补充说明](../../faq/tutorial_basics.md#compatibility-01_core_objects)

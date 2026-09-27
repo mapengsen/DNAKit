@@ -73,14 +73,16 @@ def materialize_input(value: EvaluationInput, *, limits: EvaluationLimits) -> tu
             iterator = iter(source)
         except TypeError as exc:
             raise ConfigurationError(
-                "Evaluation input must be a DNASequence, DNARecord, DNASet, or record iterable.",
+                "Evaluation input must be DNA, DNASequence, DNARecord, DNASet, "
+                "or a record iterable.",
                 code="INVALID_EVALUATION_INPUT",
             ) from exc
         collected: list[InputItem] = []
         for index, record in enumerate(iterator):
             if not isinstance(record, DNARecord):
                 raise ConfigurationError(
-                    "Evaluation collections must contain DNARecord objects.",
+                    "Evaluation collections must contain DNARecord objects; "
+                    "wrap raw sequence strings with DNA([...]).",
                     code="INVALID_EVALUATION_RECORD",
                     context={"input_index": index, "type": type(record).__name__},
                 )

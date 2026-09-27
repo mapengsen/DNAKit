@@ -1,20 +1,129 @@
 {
   "public_functions": 484,
-  "generated_markdown_pages": 28,
+  "generated_markdown_pages": 72,
   "rendered_html": {
     "zh": {
       "detail_anchors": 484,
       "working_function_links": 484,
-      "group_pages": 12
+      "numbered_functional_titles": 484,
+      "parameter_detail_panels": 484,
+      "extra_source_schema_panels": 0,
+      "tutorial_pages": 36
     },
     "en": {
       "detail_anchors": 484,
       "working_function_links": 484,
-      "group_pages": 12
+      "numbered_functional_titles": 484,
+      "parameter_detail_panels": 484,
+      "extra_source_schema_panels": 0,
+      "tutorial_pages": 36
     }
   },
-  "python_examples_syntax_checked": 916,
+  "python_examples_syntax_checked": 968,
+  "example_validation_scope": "Generated per-function calls; Python signatures and registered input schemas",
+  "call_examples_signature_schema_checked": 484,
   "offline_examples_executed": 8,
+  "offline_examples": [
+    "dnakit.databases.describe",
+    "dnakit.databases.dna_translate_reading_frames",
+    "dnakit.databases.list_operations",
+    "dnakit.databases.search",
+    "dnakit.databases.sequence_dn_ds",
+    "dnakit.databases.sequence_gc_content",
+    "dnakit.databases.sequence_reverse_complement",
+    "dnakit.workflows.simulate_inheritance"
+  ],
   "strict_bilingual_build": "passed",
-  "live_provider_workflows": "not_run_for_this_documentation_change"
+  "live_provider_workflows": "not_run_for_this_documentation_change",
+  "data_query_categories": {
+    "pages_per_language": 17,
+    "functions": 384,
+    "bilingual_sidebar_and_links": "passed",
+    "numbering_per_page": "passed"
+  },
+  "bioinformatics_reorganization": {
+    "original_handwritten_sections": 60,
+    "task_sections_per_language": 64,
+    "api_class_method_names_preserved": 94,
+    "generated_functions_relocated": 4,
+    "processing_examples_executed": 21,
+    "example_execution_scope": "Self-contained file I/O, sequence processing, design, workflow and plotting examples; external-tool and real-file examples not executed.",
+    "python_route_review": "passed",
+    "strict_bilingual_build": "passed",
+    "html_pages": 185,
+    "internal_links_and_assets_checked": 61731,
+    "broken_links": 0,
+    "generated_python_examples_syntax_checked": 968,
+    "rendered": {
+      "zh": {
+        "generated_function_anchors": 484,
+        "parameter_anchors": 484,
+        "manual_task_anchors": 64
+      },
+      "en": {
+        "generated_function_anchors": 484,
+        "parameter_anchors": 484,
+        "manual_task_anchors": 64
+      }
+    }
+  },
+  "global_tutorial_layout": {
+    "html_pages": 183,
+    "internal_links_and_assets": 62824,
+    "broken_links": 0,
+    "feature_pages_per_language": 52,
+    "numbered_function_sections_per_language": 825,
+    "generated_functions_per_language": 484,
+    "flat_function_headings": "passed",
+    "navigation_pages_per_language": 90,
+    "numbered_navigation_children_per_language": 90,
+    "nested_navigation_depth": 3,
+    "preserved_query_functions": 12,
+    "new_bilingual_examples_signature_checked": 24,
+    "browser_scenarios": 12,
+    "desktop_and_mobile_navigation": "passed",
+    "generator_consistency_check": "passed",
+    "generator_code_review": "passed",
+    "strict_bilingual_build": "passed",
+    "live_query_examples": "not_executed; result structures explicitly labelled"
+  },
+  "property_prediction_split": {
+    "html_pages": 203,
+    "internal_links_and_assets": 69025,
+    "broken_links": 0,
+    "feature_pages_per_language": 60,
+    "numbered_function_sections_per_language": 825,
+    "generated_functions_per_language": 484,
+    "generated_tutorial_pages_per_language": 25,
+    "strict_bilingual_build": "passed",
+    "browser_scenarios": 4,
+    "desktop_and_mobile_navigation": "passed",
+    "subpages_per_language": 9,
+    "relocated_function_sections_per_language": 70,
+    "parameter_sections_preserved": 14,
+    "generated_routes_review": "passed"
+  },
+  "optional_bioinformatics_reorganization": {
+    "relocated_sections_per_language": 104,
+    "preserved_manual_anchors": 14,
+    "relocated_generated_apis": 90,
+    "destination_pages_per_language": 15,
+    "new_task_pages_per_language": 11,
+    "existing_task_pages_per_language": 4,
+    "original_sections_and_examples": "preserved",
+    "parameter_sections_preserved": 90,
+    "navigation_pages_per_language": 121,
+    "html_pages": 245,
+    "internal_links_and_assets": 79283,
+    "broken_links": 0,
+    "feature_pages_per_language": 70,
+    "numbered_function_sections_per_language": 825,
+    "generated_functions_per_language": 484,
+    "generated_tutorial_pages_per_language": 36,
+    "strict_bilingual_build": "passed",
+    "browser_scenarios": 16,
+    "desktop_and_mobile_navigation": "passed",
+    "generated_routes_review": "passed",
+    "generator_consistency_check": "passed"
+  }
 }

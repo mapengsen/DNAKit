@@ -2,9 +2,10 @@
 
 Choose how to use DNAKit with an LLM:
 
+- [Python API](llm_tools/python_api.md): candidate-only discovery, cloud embedding/hybrid search, and general-purpose LLM calls, without installing MCP. Local keyword matching remains the default.
 - [MCP](llm_tools/mcp.md): installation, server setup, client configuration, and the eight tool entry points.
 - [Skills](llm_tools/skills.md): search DNA workflows, install the discovery skill or individual skills, inspect dependencies, and cite sources.
-- [Python API](llm_tools/python_api.md): natural-language tool execution, candidate-only discovery, cloud embedding/hybrid search, and general-purpose LLM calls, without installing MCP. Local keyword matching remains the default.
+- [Agent](llm_tools/agent.md): use `run_agent()` for tool calls, optional Python execution, tool generation, description optimization or compatible repairs, local result caching, resumable work, and knowledge retrieval (RAG).
 
 <span id="custom-llm"></span>
 <span id="llm-file-input"></span>

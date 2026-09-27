@@ -1,0 +1,2960 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-20",
+  "analyses": [
+    {
+      "id": "plink2-pca",
+      "title": "Population PCA",
+      "title_zh": "群体结构主成分",
+      "domains": [
+        "population",
+        "breeding"
+      ],
+      "backend": "plink2",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM file prefix; harmonize allele coding and assembly first.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        }
+      },
+      "parameters": {
+        "components": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "steps": [
+        {
+          "program": "plink2",
+          "arguments": [
+            "--bfile",
+            "{genotypes}",
+            "--pca",
+            "{components}",
+            "--out",
+            "{out}/pca",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "pca.eigenvec",
+            "pca.eigenval"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://www.cog-genomics.org/plink/2.0/strat"
+      ],
+      "installation": "Install PLINK 2 separately; https://www.cog-genomics.org/plink/2.0/",
+      "notes": "Use a QC-filtered, LD-pruned dataset. PCs can reflect batches or close relatives; they are not ancestry labels.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "passed_synthetic_fixture",
+        "review_date": "2026-09-20",
+        "backend_version": "PLINK v2.0.0-a.6.39LM 64-bit Intel (19 Sep 2026)",
+        "scientific_accuracy": "not assessed",
+        "evidence": "registry/genomics-backend-validation.json"
+      },
+      "project_id": "plink2"
+    },
+    {
+      "id": "plink2-king",
+      "title": "KING robust kinship",
+      "title_zh": "样本亲缘系数",
+      "domains": [
+        "population",
+        "forensics",
+        "breeding"
+      ],
+      "backend": "plink2",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM file prefix; harmonize allele coding and assembly first.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "plink2",
+          "arguments": [
+            "--bfile",
+            "{genotypes}",
+            "--make-king-table",
+            "--out",
+            "{out}/kinship",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "kinship.kin0"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://www.cog-genomics.org/plink/2.0/distance"
+      ],
+      "installation": "Install PLINK 2 separately; https://www.cog-genomics.org/plink/2.0/",
+      "notes": "Genetic kinship estimates; this is not a forensic paternity likelihood ratio.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "passed_synthetic_fixture",
+        "review_date": "2026-09-20",
+        "backend_version": "PLINK v2.0.0-a.6.39LM 64-bit Intel (19 Sep 2026)",
+        "scientific_accuracy": "not assessed",
+        "evidence": "registry/genomics-backend-validation.json"
+      },
+      "project_id": "plink2"
+    },
+    {
+      "id": "plink2-ld-prune",
+      "title": "LD pruning",
+      "title_zh": "连锁不平衡剪枝",
+      "domains": [
+        "population",
+        "gwas",
+        "breeding"
+      ],
+      "backend": "plink2",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM file prefix; harmonize allele coding and assembly first.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        }
+      },
+      "parameters": {
+        "window_variants": {
+          "type": "integer",
+          "default": 50,
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "step_variants": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "r2": {
+          "type": "number",
+          "default": 0.2,
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "steps": [
+        {
+          "program": "plink2",
+          "arguments": [
+            "--bfile",
+            "{genotypes}",
+            "--indep-pairwise",
+            "{window_variants}",
+            "{step_variants}",
+            "{r2}",
+            "--out",
+            "{out}/ld",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "ld.prune.in",
+            "ld.prune.out"
+          ],
+          "allow_empty_outputs": [
+            "ld.prune.out"
+          ]
+        }
+      ],
+      "sources": [
+        "https://www.cog-genomics.org/plink/2.0/ld"
+      ],
+      "installation": "Install PLINK 2 separately; https://www.cog-genomics.org/plink/2.0/",
+      "notes": "Window and step are variant counts. Variant identifiers must be unique; output is a keep/exclude list, not rewritten genotypes.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "passed_synthetic_fixture",
+        "review_date": "2026-09-20",
+        "backend_version": "PLINK v2.0.0-a.6.39LM 64-bit Intel (19 Sep 2026)",
+        "scientific_accuracy": "not assessed",
+        "evidence": "registry/genomics-backend-validation.json"
+      },
+      "project_id": "plink2"
+    },
+    {
+      "id": "plink2-gwas",
+      "title": "GWAS with covariates",
+      "title_zh": "带协变量的全基因组关联分析",
+      "domains": [
+        "gwas",
+        "breeding",
+        "clinical"
+      ],
+      "backend": "plink2",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM file prefix; harmonize allele coding and assembly first.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        },
+        "phenotypes": {
+          "type": "file",
+          "description": "PLINK phenotype table"
+        },
+        "covariates": {
+          "type": "file",
+          "description": "PLINK covariate table; IDs must align with phenotype and genotype samples"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "plink2",
+          "arguments": [
+            "--bfile",
+            "{genotypes}",
+            "--no-psam-pheno",
+            "--pheno",
+            "{phenotypes}",
+            "--covar",
+            "{covariates}",
+            "--glm",
+            "hide-covar",
+            "--out",
+            "{out}/gwas",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "gwas.*.glm.*"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://www.cog-genomics.org/plink/2.0/assoc",
+        "https://www.cog-genomics.org/plink/2.0/input"
+      ],
+      "installation": "Install PLINK 2 separately; https://www.cog-genomics.org/plink/2.0/",
+      "notes": "PLINK selects quantitative/binary regression from phenotype coding. Inspect ERRCODE, phenotype encoding, relatedness and population confounding. Only phenotypes in the explicit phenotype file are analyzed; .fam phenotypes are ignored. Non-categorical columns in that file are each analyzed.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "passed_synthetic_fixture",
+        "review_date": "2026-09-20",
+        "backend_version": "PLINK v2.0.0-a.6.39LM 64-bit Intel (19 Sep 2026)",
+        "scientific_accuracy": "not assessed",
+        "evidence": "registry/genomics-backend-validation.json"
+      },
+      "project_id": "plink2"
+    },
+    {
+      "id": "gcta-grm",
+      "title": "GCTA GRM",
+      "title_zh": "基因组关系矩阵文件",
+      "domains": [
+        "population",
+        "breeding"
+      ],
+      "backend": "gcta64",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM file prefix; harmonize allele coding and assembly first.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "gcta64",
+          "arguments": [
+            "--bfile",
+            "{genotypes}",
+            "--make-grm",
+            "--out",
+            "{out}/grm",
+            "--thread-num",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "grm.grm.bin",
+            "grm.grm.N.bin",
+            "grm.grm.id"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://yanglab.westlake.edu.cn/software/gcta/"
+      ],
+      "installation": "Install GCTA gcta64 separately from the official distribution.",
+      "notes": "QC, LD and sample inclusion must be chosen for the intended population; this is the GCTA estimator.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "gcta"
+    },
+    {
+      "id": "gcta-reml",
+      "title": "GCTA GREML heritability",
+      "title_zh": "遗传力估计",
+      "domains": [
+        "breeding",
+        "gwas"
+      ],
+      "backend": "gcta64",
+      "inputs": {
+        "grm": {
+          "type": "prefix",
+          "description": "GCTA GRM prefix",
+          "suffixes": [
+            ".grm.bin",
+            ".grm.N.bin",
+            ".grm.id"
+          ]
+        },
+        "phenotypes": {
+          "type": "file",
+          "description": "GCTA quantitative phenotype table"
+        },
+        "covariates": {
+          "type": "file",
+          "description": "GCTA quantitative covariates with FID/IID"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "gcta64",
+          "arguments": [
+            "--grm",
+            "{grm}",
+            "--pheno",
+            "{phenotypes}",
+            "--qcovar",
+            "{covariates}",
+            "--reml",
+            "--out",
+            "{out}/reml",
+            "--thread-num",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "reml.hsq"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://yanglab.westlake.edu.cn/software/gcta/"
+      ],
+      "installation": "Install GCTA gcta64 separately from the official distribution.",
+      "notes": "Quantitative-trait GREML with quantitative covariates; inspect convergence, standard errors, sample size and ascertainment.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "gcta"
+    },
+    {
+      "id": "minigraph-pangenome",
+      "title": "Reference plus assembly graph",
+      "title_zh": "参考基因组与组装图构建",
+      "domains": [
+        "pangenome",
+        "assembly",
+        "comparative"
+      ],
+      "backend": "minigraph",
+      "inputs": {
+        "reference": {
+          "type": "file",
+          "description": "Reference FASTA, first sequence in graph construction"
+        },
+        "assembly": {
+          "type": "file",
+          "description": "Additional assembly FASTA"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "minigraph",
+          "arguments": [
+            "-cxggs",
+            "-t",
+            "{threads}",
+            "{reference}",
+            "{assembly}"
+          ],
+          "expected_outputs": [
+            "pangenome.gfa"
+          ],
+          "stdout": "pangenome.gfa",
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/lh3/minigraph"
+      ],
+      "installation": "Install minigraph separately.",
+      "notes": "Builds a graph from two assemblies; graph order matters. It is not a full graph-genotyping pipeline.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "minigraph"
+    },
+    {
+      "id": "hifiasm-assembly",
+      "title": "HiFi assembly",
+      "title_zh": "HiFi 单样本组装",
+      "domains": [
+        "assembly",
+        "pangenome"
+      ],
+      "backend": "hifiasm",
+      "inputs": {
+        "reads": {
+          "type": "file",
+          "description": "PacBio HiFi FASTA/FASTQ, optionally compressed"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "hifiasm",
+          "arguments": [
+            "-o",
+            "{out}/assembly",
+            "-t",
+            "{threads}",
+            "{reads}"
+          ],
+          "expected_outputs": [
+            "assembly*.gfa"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/chhylp123/hifiasm"
+      ],
+      "installation": "Install hifiasm separately.",
+      "notes": "Single-sample HiFi default assembly; no parental or Hi-C phasing is implied. Graph paths depend on installed version.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "hifiasm"
+    },
+    {
+      "id": "flye-assembly",
+      "title": "Nanopore repeat-graph assembly",
+      "title_zh": "Nanopore 长读长组装",
+      "domains": [
+        "assembly",
+        "sequencing"
+      ],
+      "backend": "flye",
+      "inputs": {
+        "reads": {
+          "type": "file",
+          "description": "Nanopore raw FASTQ/FASTA"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "flye",
+          "arguments": [
+            "--nano-raw",
+            "{reads}",
+            "--out-dir",
+            "{out}/assembly",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "assembly/assembly.fasta",
+            "assembly/assembly_info.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/mikolmogorov/Flye"
+      ],
+      "installation": "Install Flye and its compiled backends separately.",
+      "notes": "Uses --nano-raw; do not pass HiFi reads to this recipe. Select data and polishing strategy before execution.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "flye"
+    },
+    {
+      "id": "sniffles-sv",
+      "title": "Long-read structural variants",
+      "title_zh": "长读长结构变异检测",
+      "domains": [
+        "variants",
+        "sequencing"
+      ],
+      "backend": "sniffles",
+      "inputs": {
+        "alignment": {
+          "type": "file",
+          "description": "Indexed long-read BAM/CRAM; reference and assembly already established"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "sniffles",
+          "arguments": [
+            "--input",
+            "{alignment}",
+            "--vcf",
+            "{out}/variants.vcf",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "variants.vcf"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/fritzsedlazeck/Sniffles"
+      ],
+      "installation": "Install Sniffles2 separately; its executable is sniffles.",
+      "notes": "Default germline single-sample calling; complex/somatic/cohort use requires separate configurations.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "sniffles2"
+    },
+    {
+      "id": "modkit-pileup",
+      "title": "Modified-base pileup",
+      "title_zh": "修饰碱基覆盖统计",
+      "domains": [
+        "epigenomics",
+        "sequencing"
+      ],
+      "backend": "modkit",
+      "inputs": {
+        "alignment": {
+          "type": "file",
+          "description": "Indexed BAM with MM/ML modified-base tags"
+        },
+        "reference": {
+          "type": "file",
+          "description": "Matching indexed reference FASTA",
+          "required_suffixes": [
+            ".fai"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "modkit",
+          "arguments": [
+            "pileup",
+            "{alignment}",
+            "{out}/methylation.bed",
+            "--ref",
+            "{reference}",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "methylation.bed"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://nanoporetech.github.io/modkit/intro_pileup.html"
+      ],
+      "installation": "Install modkit separately under its Oxford Nanopore Public License; no backend code is bundled.",
+      "notes": "Preserve each modification code and motif. Automatic filtering thresholds are chosen by modkit; use its logs and bedMethyl counts for interpretation.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "modkit"
+    },
+    {
+      "id": "mosdepth-coverage",
+      "title": "BAM sequencing depth",
+      "title_zh": "测序深度统计",
+      "domains": [
+        "sequencing",
+        "clinical"
+      ],
+      "backend": "mosdepth",
+      "inputs": {
+        "alignment": {
+          "type": "file",
+          "description": "Coordinate-sorted indexed BAM"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "mosdepth",
+          "arguments": [
+            "--threads",
+            "{threads}",
+            "{out}/depth",
+            "{alignment}"
+          ],
+          "expected_outputs": [
+            "depth.mosdepth.summary.txt",
+            "depth.mosdepth.global.dist.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/brentp/mosdepth"
+      ],
+      "installation": "Install mosdepth separately.",
+      "notes": "Depth summaries are technical QC; they do not establish copy-number or disease status.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "mosdepth"
+    },
+    {
+      "id": "fastani",
+      "title": "Average nucleotide identity",
+      "title_zh": "微生物平均核苷酸一致性",
+      "domains": [
+        "metagenomics",
+        "taxonomy",
+        "comparative"
+      ],
+      "backend": "fastANI",
+      "inputs": {
+        "query": {
+          "type": "file",
+          "description": "Query assembly FASTA"
+        },
+        "reference": {
+          "type": "file",
+          "description": "Reference assembly FASTA"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "fastANI",
+          "arguments": [
+            "-q",
+            "{query}",
+            "-r",
+            "{reference}",
+            "-o",
+            "{out}/ani.tsv",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "ani.tsv"
+          ],
+          "allow_empty_outputs": [
+            "ani.tsv"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/ParBLiSS/FastANI"
+      ],
+      "installation": "Install FastANI separately.",
+      "notes": "The output can be empty for insufficient shared sequence; no-hit is not 0 percent ANI. Interpret fragmentation and alignment fractions.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "fastani"
+    },
+    {
+      "id": "kraken2-classify",
+      "title": "Taxonomic read classification",
+      "title_zh": "微生物读段分类",
+      "domains": [
+        "metagenomics",
+        "environmental-dna"
+      ],
+      "backend": "kraken2",
+      "inputs": {
+        "reads": {
+          "type": "file",
+          "description": "Single FASTA/FASTQ input; recipe is not paired-end"
+        },
+        "database": {
+          "type": "directory",
+          "description": "Prebuilt local Kraken2 database",
+          "contains": [
+            "hash.k2d",
+            "opts.k2d",
+            "taxo.k2d"
+          ]
+        }
+      },
+      "parameters": {
+        "confidence": {
+          "type": "number",
+          "default": 0.0,
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "steps": [
+        {
+          "program": "kraken2",
+          "arguments": [
+            "--db",
+            "{database}",
+            "--confidence",
+            "{confidence}",
+            "--threads",
+            "{threads}",
+            "--report",
+            "{out}/report.tsv",
+            "--output",
+            "{out}/assignments.tsv",
+            "{reads}"
+          ],
+          "expected_outputs": [
+            "report.tsv",
+            "assignments.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/DerrickWood/kraken2/wiki/Manual"
+      ],
+      "installation": "Install Kraken2 and prepare its database separately.",
+      "notes": "Database contents and contamination affect assignments. This adapter performs classification, not abundance re-estimation or pathogenicity inference.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "kraken2"
+    },
+    {
+      "id": "amrfinder-nucleotide",
+      "title": "AMRFinderPlus nucleotide annotation",
+      "title_zh": "组装序列耐药基因注释",
+      "domains": [
+        "metagenomics",
+        "amr"
+      ],
+      "backend": "amrfinder",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Assembled nucleotide FASTA"
+        },
+        "database": {
+          "type": "directory",
+          "description": "Preinstalled AMRFinderPlus database directory"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "amrfinder",
+          "arguments": [
+            "-n",
+            "{assembly}",
+            "-d",
+            "{database}",
+            "-o",
+            "{out}/amr.tsv",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "amr.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus"
+      ],
+      "installation": "Install NCBI AMRFinderPlus plus HMMER/BLAST and a local database separately.",
+      "notes": "Sequence evidence is not phenotypic susceptibility. Organism-specific point mutation interpretation requires a separate organism-aware analysis.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "amrfinderplus"
+    },
+    {
+      "id": "prokka-annotation",
+      "title": "Prokaryotic annotation",
+      "title_zh": "原核基因组注释",
+      "domains": [
+        "annotation",
+        "metagenomics"
+      ],
+      "backend": "prokka",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Prokaryotic assembly FASTA"
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "prokka",
+          "arguments": [
+            "--outdir",
+            "{out}/annotation",
+            "--prefix",
+            "annotation",
+            "--cpus",
+            "{threads}",
+            "{assembly}"
+          ],
+          "expected_outputs": [
+            "annotation/annotation.gff",
+            "annotation/annotation.faa"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/tseemann/prokka"
+      ],
+      "installation": "Install Prokka and its databases/dependencies separately.",
+      "notes": "Default bacterial annotation; verify taxonomy, genetic code, completeness and reference annotations.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "prokka"
+    },
+    {
+      "id": "barrnap-rrna",
+      "title": "Genomic rRNA annotation",
+      "title_zh": "基因组核糖体 RNA 位点识别",
+      "domains": [
+        "annotation",
+        "metagenomics"
+      ],
+      "backend": "barrnap",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Genome assembly FASTA"
+        }
+      },
+      "parameters": {
+        "kingdom": {
+          "type": "string",
+          "default": "bac",
+          "enum": [
+            "bac",
+            "arc",
+            "euk",
+            "mito"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "program": "barrnap",
+          "arguments": [
+            "--kingdom",
+            "{kingdom}",
+            "--threads",
+            "{threads}",
+            "{assembly}"
+          ],
+          "expected_outputs": [
+            "rrna.gff"
+          ],
+          "stdout": "rrna.gff",
+          "allow_empty_outputs": [
+            "rrna.gff"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/tseemann/barrnap"
+      ],
+      "installation": "Install barrnap and nhmmer separately.",
+      "notes": "Reports rRNA features in genome DNA; no-hit output is valid. Inspect partial predictions.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "barrnap"
+    },
+    {
+      "id": "fimo-motifs",
+      "title": "Motif occurrence scanning",
+      "title_zh": "DNA 模体位点搜索",
+      "domains": [
+        "regulation",
+        "annotation"
+      ],
+      "backend": "fimo",
+      "inputs": {
+        "motifs": {
+          "type": "file",
+          "description": "MEME format motif file"
+        },
+        "sequences": {
+          "type": "file",
+          "description": "DNA FASTA with identifiers and coordinate conventions documented"
+        }
+      },
+      "parameters": {
+        "pvalue": {
+          "type": "number",
+          "default": 0.0001,
+          "minimum": 1e-12,
+          "maximum": 1
+        }
+      },
+      "steps": [
+        {
+          "program": "fimo",
+          "arguments": [
+            "--oc",
+            "{out}/fimo",
+            "--thresh",
+            "{pvalue}",
+            "{motifs}",
+            "{sequences}"
+          ],
+          "expected_outputs": [
+            "fimo/fimo.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://meme-suite.org/meme/doc/fimo.html"
+      ],
+      "installation": "Install MEME Suite separately under its applicable academic/commercial license.",
+      "notes": "Threshold is a site p-value; motif matches alone do not establish TF binding or regulatory activity.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "meme-suite"
+    },
+    {
+      "id": "cas-offinder",
+      "title": "CRISPR off-target enumeration",
+      "title_zh": "CRISPR 脱靶候选枚举",
+      "domains": [
+        "crispr"
+      ],
+      "backend": "cas-offinder",
+      "inputs": {
+        "specification": {
+          "type": "file",
+          "description": "Cas-OFFinder input file: absolute genome path, PAM pattern, guide sequences and mismatch limits"
+        }
+      },
+      "parameters": {
+        "device": {
+          "type": "string",
+          "default": "C",
+          "enum": [
+            "C",
+            "G"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "program": "cas-offinder",
+          "arguments": [
+            "{specification}",
+            "{device}",
+            "{out}/offtargets.tsv"
+          ],
+          "expected_outputs": [
+            "offtargets.tsv"
+          ],
+          "allow_empty_outputs": [
+            "offtargets.tsv"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/pnucolab/cas-offinder-2"
+      ],
+      "installation": "Install Cas-OFFinder and an OpenCL CPU/GPU runtime separately.",
+      "notes": "Genome paths inside the specification must be absolute. Candidate matching is not a calibrated off-target editing probability.",
+      "validation": {
+        "interface": "official_documentation_reviewed",
+        "backend_execution": "not_run",
+        "review_date": "2026-09-20"
+      },
+      "project_id": "cas-offinder"
+    },
+    {
+      "id": "bakta-annotation",
+      "project_id": "bakta",
+      "title": "Bacterial genome annotation with Bakta",
+      "title_zh": "细菌、MAG与质粒标准化注释",
+      "domains": [
+        "annotation",
+        "metagenomics"
+      ],
+      "backend": "bakta",
+      "inputs": {
+        "genome": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "database": {
+          "type": "directory",
+          "description": "Compatible local Bakta database; prepare database and AMRFinderPlus resources before this run.",
+          "contains": [
+            "version.json"
+          ]
+        }
+      },
+      "parameters": {
+        "min_contig_length": {
+          "type": "integer",
+          "default": 200,
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "translation_table": {
+          "type": "integer",
+          "default": 11,
+          "enum": [
+            11,
+            4,
+            25
+          ]
+        }
+      },
+      "steps": [
+        {
+          "program": "bakta",
+          "arguments": [
+            "--db",
+            "{database}",
+            "--output",
+            "{out}/bakta",
+            "--prefix",
+            "annotation",
+            "--threads",
+            "{threads}",
+            "--min-contig-length",
+            "{min_contig_length}",
+            "--translation-table",
+            "{translation_table}",
+            "--skip-plot",
+            "{genome}"
+          ],
+          "expected_outputs": [
+            "bakta/annotation.gff3",
+            "bakta/annotation.tsv",
+            "bakta/annotation.json",
+            "bakta/annotation.fna"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/oschwengers/bakta"
+      ],
+      "citations": [
+        "https://doi.org/10.1099/mgen.0.000685"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/oschwengers/bakta/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install Bakta and its declared scientific dependencies separately from https://github.com/oschwengers/bakta. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Annotation uses the explicitly supplied Bakta database. No database installation/update is performed. Organism-specific metadata and circular replicon assumptions are not inferred.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "busco-proteins",
+      "project_id": "busco",
+      "title": "Protein completeness assessment with BUSCO",
+      "title_zh": "蛋白集完整性评估",
+      "domains": [
+        "annotation",
+        "assembly"
+      ],
+      "backend": "busco",
+      "inputs": {
+        "sequences": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        },
+        "lineage": {
+          "type": "directory",
+          "description": "Locally prepared BUSCO lineage dataset, with all required HMM/reference resources.",
+          "contains": [
+            "dataset.cfg"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "busco",
+          "arguments": [
+            "-i",
+            "{sequences}",
+            "-m",
+            "proteins",
+            "-l",
+            "{lineage}",
+            "--offline",
+            "--opt-out-run-stats",
+            "-o",
+            "assessment",
+            "--out_path",
+            "{out}",
+            "-c",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "assessment/short_summary*.json",
+            "assessment/short_summary*.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://busco.ezlab.org/busco_userguide",
+        "https://busco.ezlab.org/"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/molbev/msab199"
+      ],
+      "license": {
+        "name": "MIT",
+        "url": "https://gitlab.com/ezlab/busco/-/raw/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install BUSCO and its declared scientific dependencies separately from https://busco.ezlab.org/. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "BUSCO 5.6+ is required for opt-out-run-stats. Lineage selection is explicit; no auto-lineage, dataset download or telemetry. Genome mode uses the installed BUSCO lineage-appropriate default predictor; missing scientific dependencies fail explicitly. Completeness is lineage-dependent and is not proof of correct assembly.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "busco-genome",
+      "project_id": "busco",
+      "title": "Genome completeness assessment with BUSCO",
+      "title_zh": "基因组完整性评估",
+      "domains": [
+        "annotation",
+        "assembly"
+      ],
+      "backend": "busco",
+      "inputs": {
+        "sequences": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "lineage": {
+          "type": "directory",
+          "description": "Locally prepared BUSCO lineage dataset, with all required HMM/reference resources.",
+          "contains": [
+            "dataset.cfg"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "busco",
+          "arguments": [
+            "-i",
+            "{sequences}",
+            "-m",
+            "genome",
+            "-l",
+            "{lineage}",
+            "--offline",
+            "--opt-out-run-stats",
+            "-o",
+            "assessment",
+            "--out_path",
+            "{out}",
+            "-c",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "assessment/short_summary*.json",
+            "assessment/short_summary*.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://busco.ezlab.org/busco_userguide",
+        "https://busco.ezlab.org/"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/molbev/msab199"
+      ],
+      "license": {
+        "name": "MIT",
+        "url": "https://gitlab.com/ezlab/busco/-/raw/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install BUSCO and its declared scientific dependencies separately from https://busco.ezlab.org/. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "BUSCO 5.6+ is required for opt-out-run-stats. Lineage selection is explicit; no auto-lineage, dataset download or telemetry. Genome mode uses the installed BUSCO lineage-appropriate default predictor; missing scientific dependencies fail explicitly. Completeness is lineage-dependent and is not proof of correct assembly.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "augustus-genes",
+      "project_id": "augustus",
+      "title": "Species-trained gene prediction with AUGUSTUS",
+      "title_zh": "真核基因结构预测",
+      "domains": [
+        "annotation"
+      ],
+      "backend": "augustus",
+      "inputs": {
+        "genome": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "configuration": {
+          "type": "directory",
+          "description": "Complete installed AUGUSTUS config directory with the explicitly chosen species model."
+        }
+      },
+      "parameters": {
+        "species": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+",
+          "example": "human"
+        }
+      },
+      "steps": [
+        {
+          "program": "augustus",
+          "arguments": [
+            "--species={species}",
+            "--AUGUSTUS_CONFIG_PATH={configuration}",
+            "--gff3=on",
+            "--strand=both",
+            "{genome}"
+          ],
+          "expected_outputs": [
+            "genes.gff3"
+          ],
+          "allow_empty_outputs": [],
+          "stdout": "genes.gff3"
+        }
+      ],
+      "sources": [
+        "https://github.com/Gaius-Augustus/Augustus/blob/master/docs/RUNNING-AUGUSTUS.md",
+        "https://github.com/Gaius-Augustus/Augustus"
+      ],
+      "citations": [],
+      "license": {
+        "name": "Artistic-1.0",
+        "url": "https://raw.githubusercontent.com/Gaius-Augustus/Augustus/master/src/LICENSE.TXT",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install AUGUSTUS and its declared scientific dependencies separately from https://github.com/Gaius-Augustus/Augustus. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Ab initio prediction from the caller-selected pre-trained species model; no automatic training, RNA-seq hints, or evidence-based functional assignment. AUGUSTUS prediction is a single process; threads does not create parallel AUGUSTUS jobs.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "diamond-blastp",
+      "project_id": "diamond",
+      "title": "Protein similarity search with DIAMOND",
+      "title_zh": "蛋白相似性搜索",
+      "domains": [
+        "annotation",
+        "alignment"
+      ],
+      "backend": "diamond",
+      "inputs": {
+        "query": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        },
+        "reference_proteins": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        }
+      },
+      "parameters": {
+        "evalue": {
+          "type": "number",
+          "default": 1e-05,
+          "minimum": 1e-100,
+          "maximum": 1000
+        },
+        "max_target_sequences": {
+          "type": "integer",
+          "default": 25,
+          "minimum": 1,
+          "maximum": 10000
+        }
+      },
+      "steps": [
+        {
+          "program": "diamond",
+          "arguments": [
+            "makedb",
+            "--in",
+            "{reference_proteins}",
+            "--db",
+            "{out}/reference",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "reference.dmnd"
+          ],
+          "allow_empty_outputs": []
+        },
+        {
+          "program": "diamond",
+          "arguments": [
+            "blastp",
+            "--query",
+            "{query}",
+            "--db",
+            "{out}/reference.dmnd",
+            "--out",
+            "{out}/hits.tsv",
+            "--outfmt",
+            "6",
+            "--evalue",
+            "{evalue}",
+            "--max-target-seqs",
+            "{max_target_sequences}",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "hits.tsv"
+          ],
+          "allow_empty_outputs": [
+            "hits.tsv"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/bbuchfink/diamond/wiki/3.-Command-line-options",
+        "https://github.com/bbuchfink/diamond"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/s41592-021-01101-x"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/bbuchfink/diamond/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install DIAMOND and its declared scientific dependencies separately from https://github.com/bbuchfink/diamond. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Builds a DIAMOND database solely from the supplied reference proteins in the output directory. Standard 12-column BLAST tabular output; no hits is a valid empty TSV. Similarity alone does not establish orthology or gene function.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "v2.2.8"
+      }
+    },
+    {
+      "id": "diamond-blastx",
+      "project_id": "diamond",
+      "title": "Translated DNA similarity search with DIAMOND",
+      "title_zh": "翻译核酸相似性搜索",
+      "domains": [
+        "annotation",
+        "alignment"
+      ],
+      "backend": "diamond",
+      "inputs": {
+        "query": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "reference_proteins": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        }
+      },
+      "parameters": {
+        "evalue": {
+          "type": "number",
+          "default": 1e-05,
+          "minimum": 1e-100,
+          "maximum": 1000
+        },
+        "max_target_sequences": {
+          "type": "integer",
+          "default": 25,
+          "minimum": 1,
+          "maximum": 10000
+        }
+      },
+      "steps": [
+        {
+          "program": "diamond",
+          "arguments": [
+            "makedb",
+            "--in",
+            "{reference_proteins}",
+            "--db",
+            "{out}/reference",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "reference.dmnd"
+          ],
+          "allow_empty_outputs": []
+        },
+        {
+          "program": "diamond",
+          "arguments": [
+            "blastx",
+            "--query",
+            "{query}",
+            "--db",
+            "{out}/reference.dmnd",
+            "--out",
+            "{out}/hits.tsv",
+            "--outfmt",
+            "6",
+            "--evalue",
+            "{evalue}",
+            "--max-target-seqs",
+            "{max_target_sequences}",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "hits.tsv"
+          ],
+          "allow_empty_outputs": [
+            "hits.tsv"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/bbuchfink/diamond/wiki/3.-Command-line-options",
+        "https://github.com/bbuchfink/diamond"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/s41592-021-01101-x"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/bbuchfink/diamond/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install DIAMOND and its declared scientific dependencies separately from https://github.com/bbuchfink/diamond. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Builds a DIAMOND database solely from the supplied reference proteins in the output directory. Standard 12-column BLAST tabular output; no hits is a valid empty TSV. Similarity alone does not establish orthology or gene function.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "v2.2.8"
+      }
+    },
+    {
+      "id": "eggnog-proteins",
+      "project_id": "eggnog-mapper",
+      "title": "Protein functional annotation with eggNOG-mapper",
+      "title_zh": "直系同源支持的蛋白功能注释",
+      "domains": [
+        "annotation"
+      ],
+      "backend": "emapper.py",
+      "inputs": {
+        "proteins": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        },
+        "database": {
+          "type": "directory",
+          "description": "Pre-downloaded eggNOG-mapper data directory, matched to the installed mapper version."
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "emapper.py",
+          "arguments": [
+            "-i",
+            "{proteins}",
+            "--itype",
+            "proteins",
+            "-m",
+            "diamond",
+            "--data_dir",
+            "{database}",
+            "--output_dir",
+            "{out}",
+            "-o",
+            "annotation",
+            "--cpu",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "annotation.emapper.annotations",
+            "annotation.emapper.seed_orthologs"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/eggnogdb/eggnog-mapper/blob/main/USAGE.md",
+        "https://github.com/eggnogdb/eggnog-mapper"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/molbev/msab293",
+        "https://doi.org/10.1093/nar/gkaf1249"
+      ],
+      "license": {
+        "name": "AGPL-3.0",
+        "url": "https://raw.githubusercontent.com/eggnogdb/eggnog-mapper/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install eggNOG-mapper and its declared scientific dependencies separately from https://github.com/eggnogdb/eggnog-mapper. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Supplied data must match the installed major/minor mapper version: v3 uses eggNOG 7 and is incompatible with v2 eggNOG 5 data. No download helper is invoked. Review taxonomic scope and source orthologs before interpreting transferred terms.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "miniprot-align",
+      "project_id": "miniprot",
+      "title": "Protein-to-genome alignment with miniprot",
+      "title_zh": "含剪接和移码的蛋白到基因组比对",
+      "domains": [
+        "annotation",
+        "alignment"
+      ],
+      "backend": "miniprot",
+      "inputs": {
+        "genome": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "proteins": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "miniprot",
+          "arguments": [
+            "--gff",
+            "-t",
+            "{threads}",
+            "{genome}",
+            "{proteins}"
+          ],
+          "expected_outputs": [
+            "alignment.gff3"
+          ],
+          "allow_empty_outputs": [],
+          "stdout": "alignment.gff3"
+        }
+      ],
+      "sources": [
+        "https://github.com/lh3/miniprot"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/bioinformatics/btad014"
+      ],
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/lh3/miniprot/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install miniprot and its declared scientific dependencies separately from https://github.com/lh3/miniprot. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "GFF3 includes miniprot PAF/comment information. Protein evidence mapping is not a de novo genome-wide gene set or experimental splice validation. Coordinates in the backend GFF3 follow its 1-based inclusive convention. miniprot includes an aligned terminal stop codon in GFF CDS coordinates; the embedded PAF alignment excludes that stop codon.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "0.18-r281"
+      }
+    },
+    {
+      "id": "liftoff-annotation",
+      "project_id": "liftoff",
+      "title": "Reference gene annotation transfer with Liftoff",
+      "title_zh": "组装之间的基因注释迁移",
+      "domains": [
+        "annotation",
+        "comparative"
+      ],
+      "backend": "liftoff",
+      "inputs": {
+        "target": {
+          "type": "file",
+          "description": "Target FASTA; existing .fai avoids implicit indexing beside the input.",
+          "required_suffixes": [
+            ".fai"
+          ]
+        },
+        "reference": {
+          "type": "file",
+          "description": "Reference FASTA matching the supplied feature database; pre-indexed.",
+          "required_suffixes": [
+            ".fai"
+          ]
+        },
+        "annotation_database": {
+          "type": "file",
+          "description": "Existing gffutils/Liftoff feature database. Prepare it beforehand; -g would create a database beside the original GFF."
+        }
+      },
+      "parameters": {
+        "coverage": {
+          "type": "number",
+          "default": 0.5,
+          "minimum": 0.01,
+          "maximum": 1
+        },
+        "identity": {
+          "type": "number",
+          "default": 0.5,
+          "minimum": 0.01,
+          "maximum": 1
+        }
+      },
+      "steps": [
+        {
+          "program": "liftoff",
+          "arguments": [
+            "{target}",
+            "{reference}",
+            "-db",
+            "{annotation_database}",
+            "-o",
+            "{out}/lifted.gff3",
+            "-u",
+            "{out}/unmapped.txt",
+            "-dir",
+            "{out}/intermediate",
+            "-p",
+            "{threads}",
+            "-a",
+            "{coverage}",
+            "-s",
+            "{identity}"
+          ],
+          "expected_outputs": [
+            "lifted.gff3",
+            "unmapped.txt"
+          ],
+          "allow_empty_outputs": [
+            "unmapped.txt"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/agshumate/Liftoff/blob/master/liftoff/extract_features.py",
+        "https://github.com/agshumate/Liftoff"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/bioinformatics/btaa1016"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/agshumate/Liftoff/master/LICENSE.md",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install Liftoff and its declared scientific dependencies separately from https://github.com/agshumate/Liftoff. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Uses a prebuilt annotation database and pre-indexed FASTAs to avoid creating files beside user inputs. Default Liftoff may retain partial/low-identity features with flags; inspect attributes and unmapped output. It does not infer a new reference annotation.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "checkm2-predict",
+      "project_id": "checkm2",
+      "title": "Genome completeness and contamination with CheckM2",
+      "title_zh": "MAG完整性与污染度预测",
+      "domains": [
+        "metagenomics",
+        "assembly"
+      ],
+      "backend": "checkm2",
+      "inputs": {
+        "bins": {
+          "type": "directory",
+          "description": "Directory containing assembly FASTAs with the selected extension."
+        },
+        "database": {
+          "type": "file",
+          "description": "Compatible local CheckM2 DIAMOND database .dmnd file; models/software installed separately."
+        }
+      },
+      "parameters": {
+        "extension": {
+          "type": "string",
+          "default": "fna",
+          "pattern": "[A-Za-z0-9.]+"
+        }
+      },
+      "steps": [
+        {
+          "program": "checkm2",
+          "arguments": [
+            "predict",
+            "--input",
+            "{bins}",
+            "--output-directory",
+            "{out}/checkm2",
+            "--database_path",
+            "{database}",
+            "--extension",
+            "{extension}",
+            "--threads",
+            "{threads}",
+            "--lowmem",
+            "--remove_intermediates"
+          ],
+          "expected_outputs": [
+            "checkm2/quality_report.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/chklovski/CheckM2/blob/master/checkm2/main.py",
+        "https://github.com/chklovski/CheckM2"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/s41592-023-01940-w"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/chklovski/CheckM2/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install CheckM2 and its declared scientific dependencies separately from https://github.com/chklovski/CheckM2. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Model-based completeness and contamination estimates; supply an assembly-bin directory and the CheckM2-version-compatible DIAMOND database. No database command is run.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "quast-assembly",
+      "project_id": "quast",
+      "title": "Reference-based assembly evaluation with QUAST",
+      "title_zh": "参考支持的组装质量评估",
+      "domains": [
+        "assembly"
+      ],
+      "backend": "quast.py",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "reference": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        }
+      },
+      "parameters": {
+        "min_contig": {
+          "type": "integer",
+          "default": 500,
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      },
+      "steps": [
+        {
+          "program": "quast.py",
+          "arguments": [
+            "{assembly}",
+            "--reference",
+            "{reference}",
+            "--output-dir",
+            "{out}/quast",
+            "--threads",
+            "{threads}",
+            "--min-contig",
+            "{min_contig}",
+            "--no-icarus",
+            "--no-html",
+            "--no-plots"
+          ],
+          "expected_outputs": [
+            "quast/report.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://quast.sourceforge.net/docs/manual.html",
+        "https://github.com/ablab/quast"
+      ],
+      "citations": [
+        "https://doi.org/10.1093/bioinformatics/btt086"
+      ],
+      "license": {
+        "name": "GPL-2.0",
+        "url": "https://raw.githubusercontent.com/ablab/quast/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install QUAST and its declared scientific dependencies separately from https://github.com/ablab/quast. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Reference-supported assessment; reference divergence and structural polymorphism can appear as misassemblies. Requires a complete QUAST installation including its aligner; gene finding/BUSCO and reference discovery are not enabled.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "vsearch-dereplicate",
+      "project_id": "vsearch",
+      "title": "Nucleotide sequence dereplication with VSEARCH",
+      "title_zh": "核酸序列去重复",
+      "domains": [
+        "sequence",
+        "metagenomics"
+      ],
+      "backend": "vsearch",
+      "inputs": {
+        "sequences": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        }
+      },
+      "parameters": {
+        "min_length": {
+          "type": "integer",
+          "default": 32,
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      },
+      "steps": [
+        {
+          "program": "vsearch",
+          "arguments": [
+            "--derep_fulllength",
+            "{sequences}",
+            "--output",
+            "{out}/dereplicated.fasta",
+            "--uc",
+            "{out}/clusters.uc",
+            "--sizeout",
+            "--minseqlength",
+            "{min_length}",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "dereplicated.fasta",
+            "clusters.uc"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/torognes/vsearch"
+      ],
+      "citations": [
+        "https://doi.org/10.7717/peerj.2584"
+      ],
+      "license": {
+        "name": "BSD-2-Clause OR GPL-3.0",
+        "url": "https://raw.githubusercontent.com/torognes/vsearch/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install VSEARCH and its declared scientific dependencies separately from https://github.com/torognes/vsearch. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Exact full-length sequence dereplication with abundance annotations. Reads shorter than min_length are excluded; this is not error-model denoising or an ASV inference method.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "v2.32.0"
+      }
+    },
+    {
+      "id": "vsearch-cluster",
+      "project_id": "vsearch",
+      "title": "Nucleotide sequence clustering with VSEARCH",
+      "title_zh": "核酸相似性聚类",
+      "domains": [
+        "sequence",
+        "metagenomics"
+      ],
+      "backend": "vsearch",
+      "inputs": {
+        "sequences": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        }
+      },
+      "parameters": {
+        "identity": {
+          "type": "number",
+          "default": 0.97,
+          "minimum": 0.1,
+          "maximum": 1
+        },
+        "min_length": {
+          "type": "integer",
+          "default": 32,
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      },
+      "steps": [
+        {
+          "program": "vsearch",
+          "arguments": [
+            "--cluster_fast",
+            "{sequences}",
+            "--id",
+            "{identity}",
+            "--centroids",
+            "{out}/centroids.fasta",
+            "--uc",
+            "{out}/clusters.uc",
+            "--minseqlength",
+            "{min_length}",
+            "--threads",
+            "{threads}"
+          ],
+          "expected_outputs": [
+            "centroids.fasta",
+            "clusters.uc"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/torognes/vsearch"
+      ],
+      "citations": [
+        "https://doi.org/10.7717/peerj.2584"
+      ],
+      "license": {
+        "name": "BSD-2-Clause OR GPL-3.0",
+        "url": "https://raw.githubusercontent.com/torognes/vsearch/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install VSEARCH and its declared scientific dependencies separately from https://github.com/torognes/vsearch. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Greedy length-sorted clustering at the chosen sequence-identity threshold, using default plus strand. Clusters are operational units, not validated species or exact sequence variants.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "v2.32.0"
+      }
+    },
+    {
+      "id": "mmseqs-protein-search",
+      "project_id": "mmseqs2",
+      "title": "Protein similarity search with MMseqs2",
+      "title_zh": "蛋白序列快速搜索",
+      "domains": [
+        "annotation",
+        "alignment"
+      ],
+      "backend": "mmseqs",
+      "inputs": {
+        "query": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        },
+        "reference": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        }
+      },
+      "parameters": {
+        "evalue": {
+          "type": "number",
+          "default": 1e-05,
+          "minimum": 1e-100,
+          "maximum": 1000
+        },
+        "memory_megabytes": {
+          "type": "integer",
+          "default": 4096,
+          "minimum": 128,
+          "maximum": 32768
+        }
+      },
+      "steps": [
+        {
+          "program": "mmseqs",
+          "arguments": [
+            "easy-search",
+            "{query}",
+            "{reference}",
+            "{out}/hits.tsv",
+            "{out}/tmp",
+            "--search-type",
+            "1",
+            "--threads",
+            "{threads}",
+            "-e",
+            "{evalue}",
+            "--split-memory-limit",
+            "{memory_megabytes}M",
+            "--remove-tmp-files",
+            "1",
+            "--createdb-mode",
+            "0"
+          ],
+          "expected_outputs": [
+            "hits.tsv"
+          ],
+          "allow_empty_outputs": [
+            "hits.tsv"
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/soedinglab/MMseqs2"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/nbt.3988"
+      ],
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/soedinglab/MMseqs2/master/LICENSE.md",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install MMseqs2 and its declared scientific dependencies separately from https://github.com/soedinglab/MMseqs2. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Protein-to-protein easy-search with local FASTA reference. Output is standard BLAST-style tabular alignment; no hits is valid. MMseqs2 memory limit applies to database splitting and is not a hard operating-system RAM quota. Temporary sequence databases explicitly copy data (--createdb-mode 0) so artifacts do not retain symlinks to caller inputs. The 4096 MB split-memory default covers MMseqs prefilter overhead; it is not a whole-process memory quota.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "18-8cc5c"
+      }
+    },
+    {
+      "id": "mmseqs-protein-cluster",
+      "project_id": "mmseqs2",
+      "title": "Protein sequence clustering with MMseqs2",
+      "title_zh": "蛋白序列聚类",
+      "domains": [
+        "annotation",
+        "comparative"
+      ],
+      "backend": "mmseqs",
+      "inputs": {
+        "proteins": {
+          "type": "file",
+          "description": "Protein FASTA with stable sequence identifiers."
+        }
+      },
+      "parameters": {
+        "identity": {
+          "type": "number",
+          "default": 0.5,
+          "minimum": 0.1,
+          "maximum": 1
+        },
+        "coverage": {
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0.01,
+          "maximum": 1
+        },
+        "memory_megabytes": {
+          "type": "integer",
+          "default": 4096,
+          "minimum": 128,
+          "maximum": 32768
+        }
+      },
+      "steps": [
+        {
+          "program": "mmseqs",
+          "arguments": [
+            "easy-cluster",
+            "{proteins}",
+            "{out}/clusters",
+            "{out}/tmp",
+            "--min-seq-id",
+            "{identity}",
+            "-c",
+            "{coverage}",
+            "--cov-mode",
+            "1",
+            "--threads",
+            "{threads}",
+            "--split-memory-limit",
+            "{memory_megabytes}M",
+            "--remove-tmp-files",
+            "1",
+            "--createdb-mode",
+            "0"
+          ],
+          "expected_outputs": [
+            "clusters_cluster.tsv",
+            "clusters_rep_seq.fasta",
+            "clusters_all_seqs.fasta"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/soedinglab/MMseqs2"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/nbt.3988"
+      ],
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/soedinglab/MMseqs2/master/LICENSE.md",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install MMseqs2 and its declared scientific dependencies separately from https://github.com/soedinglab/MMseqs2. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Protein clustering at explicit identity/coverage; coverage mode 1 measures target coverage. Clusters are not automatically orthogroups. Database splitting limits are not an OS RAM quota. Temporary sequence databases explicitly copy data (--createdb-mode 0) so artifacts do not retain symlinks to caller inputs. The 4096 MB split-memory default covers MMseqs prefilter overhead; it is not a whole-process memory quota.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "18-8cc5c"
+      }
+    },
+    {
+      "id": "abricate-screen",
+      "project_id": "abricate",
+      "title": "Assembly gene screening with ABRicate",
+      "title_zh": "组装序列耐药与毒力标记筛查",
+      "domains": [
+        "metagenomics",
+        "annotation"
+      ],
+      "backend": "abricate",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "database_root": {
+          "type": "directory",
+          "description": "Existing ABRicate data directory containing the selected, pre-indexed database."
+        }
+      },
+      "parameters": {
+        "database_name": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+",
+          "example": "ncbi"
+        },
+        "identity_percent": {
+          "type": "number",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
+        },
+        "coverage_percent": {
+          "type": "number",
+          "default": 80,
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "steps": [
+        {
+          "program": "abricate",
+          "arguments": [
+            "--datadir",
+            "{database_root}",
+            "--db",
+            "{database_name}",
+            "--minid",
+            "{identity_percent}",
+            "--mincov",
+            "{coverage_percent}",
+            "--threads",
+            "{threads}",
+            "{assembly}"
+          ],
+          "expected_outputs": [
+            "hits.tsv"
+          ],
+          "allow_empty_outputs": [],
+          "stdout": "hits.tsv"
+        }
+      ],
+      "sources": [
+        "https://github.com/tseemann/abricate/blob/master/bin/abricate",
+        "https://github.com/tseemann/abricate"
+      ],
+      "citations": [],
+      "license": {
+        "name": "GPL-2.0",
+        "url": "https://raw.githubusercontent.com/tseemann/abricate/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install ABRicate and its declared scientific dependencies separately from https://github.com/tseemann/abricate. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Screens only the explicitly selected local database. No setupdb/get_db command runs. Results are sequence matches rather than antimicrobial susceptibility predictions; cite the database and its version.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "mlst-typing",
+      "project_id": "mlst",
+      "title": "Multilocus sequence typing with MLST",
+      "title_zh": "PubMLST方案多位点序列分型",
+      "domains": [
+        "metagenomics",
+        "traceability"
+      ],
+      "backend": "mlst",
+      "inputs": {
+        "assembly": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "schemes": {
+          "type": "directory",
+          "description": "Prepared PubMLST scheme directory."
+        },
+        "blast_database": {
+          "type": "prefix",
+          "description": "Prebuilt nucleotide BLAST database prefix for the schemes; this recipe requires the core v4/v5 index files.",
+          "suffixes": [
+            ".nhr",
+            ".nin",
+            ".nsq"
+          ]
+        }
+      },
+      "parameters": {},
+      "steps": [
+        {
+          "program": "mlst",
+          "arguments": [
+            "--datadir",
+            "{schemes}",
+            "--blastdb",
+            "{blast_database}",
+            "--threads",
+            "{threads}",
+            "--outfile",
+            "{out}/mlst.tsv",
+            "--json",
+            "{out}/mlst.json",
+            "{assembly}"
+          ],
+          "expected_outputs": [
+            "mlst.tsv",
+            "mlst.json"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/tseemann/mlst/blob/master/bin/mlst",
+        "https://github.com/tseemann/mlst"
+      ],
+      "citations": [],
+      "license": {
+        "name": "GPL-2.0",
+        "url": "https://raw.githubusercontent.com/tseemann/mlst/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install mlst and its declared scientific dependencies separately from https://github.com/tseemann/mlst. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Auto-detects the best matching installed scheme. Unassigned or incomplete ST is a reportable result. MLST is a sequence typing aid, not unique-source identification; no PubMLST update is run.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "genomad-mobile-elements",
+      "project_id": "genomad",
+      "title": "Virus and plasmid detection with geNomad",
+      "title_zh": "病毒和质粒等移动元件识别",
+      "domains": [
+        "viral-genomics",
+        "metagenomics"
+      ],
+      "backend": "genomad",
+      "inputs": {
+        "sequences": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "database": {
+          "type": "directory",
+          "description": "Locally prepared compatible geNomad marker database; complete package must include the sequence model."
+        }
+      },
+      "parameters": {
+        "splits": {
+          "type": "integer",
+          "default": 8,
+          "minimum": 1,
+          "maximum": 1024
+        }
+      },
+      "steps": [
+        {
+          "program": "genomad",
+          "arguments": [
+            "end-to-end",
+            "--cleanup",
+            "--splits",
+            "{splits}",
+            "--threads",
+            "{threads}",
+            "{sequences}",
+            "{out}/genomad",
+            "{database}"
+          ],
+          "expected_outputs": [
+            "genomad/*_summary/*_virus_summary.tsv",
+            "genomad/*_summary/*_plasmid_summary.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/apcamargo/genomad/blob/main/genomad/cli.py",
+        "https://github.com/apcamargo/genomad"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/s41587-023-01953-y"
+      ],
+      "license": {
+        "name": "LBL academic/internal research non-commercial license",
+        "url": "https://raw.githubusercontent.com/apcamargo/genomad/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install geNomad and its declared scientific dependencies separately from https://github.com/apcamargo/genomad. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "geNomad and its databases/models retain separate licensing terms. No model/database download runs. These are computational classifications; assess scores, marker evidence and contamination before interpretation.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "repeatmasker-library",
+      "project_id": "repeatmasker",
+      "title": "Custom-library repeat masking with RepeatMasker",
+      "title_zh": "指定重复序列库的核酸屏蔽",
+      "domains": [
+        "repeats",
+        "annotation"
+      ],
+      "backend": "RepeatMasker",
+      "inputs": {
+        "genome": {
+          "type": "file",
+          "description": "Nucleotide FASTA with stable sequence identifiers; caller supplies the biological input."
+        },
+        "repeat_library": {
+          "type": "file",
+          "description": "Caller-supplied repeat consensus nucleotide FASTA library; cite its provenance."
+        }
+      },
+      "parameters": {
+        "parallel_batches": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 256
+        }
+      },
+      "steps": [
+        {
+          "program": "RepeatMasker",
+          "arguments": [
+            "-lib",
+            "{repeat_library}",
+            "-pa",
+            "{parallel_batches}",
+            "-dir",
+            "{out}",
+            "-xsmall",
+            "{genome}"
+          ],
+          "expected_outputs": [
+            "*.out",
+            "*.masked"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/Dfam-consortium/RepeatMasker/blob/master/RepeatMasker",
+        "https://github.com/Dfam-consortium/RepeatMasker"
+      ],
+      "citations": [],
+      "license": {
+        "name": "OSL-2.1",
+        "url": "https://raw.githubusercontent.com/Dfam-consortium/RepeatMasker/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install RepeatMasker and its declared scientific dependencies separately from https://github.com/Dfam-consortium/RepeatMasker. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "RepeatMasker must be fully configured with a local search engine. Uses only the specified custom library plus the installed low-complexity machinery; no Dfam/Repbase download. Lowercase masking is annotation, not deletion or validation of transposition activity. RepeatMasker -pa counts parallel batches, not CPU threads: RMBlast/ABBlast use 4 cores per batch and nhmmer uses 2. Set parallel_batches explicitly; generic threads does not control this backend.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "mageck-test",
+      "project_id": "mageck",
+      "title": "CRISPR screen enrichment testing with MAGeCK",
+      "title_zh": "CRISPR筛选基因效应排序",
+      "domains": [
+        "crispr",
+        "functional-assays"
+      ],
+      "backend": "mageck",
+      "inputs": {
+        "counts": {
+          "type": "file",
+          "description": "MAGeCK tab-delimited sgRNA/Gene count table with named sample columns."
+        }
+      },
+      "parameters": {
+        "treatment": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+(?:,[A-Za-z0-9_.-]+)*",
+          "example": "sample1,sample2"
+        },
+        "control": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+(?:,[A-Za-z0-9_.-]+)*",
+          "example": "sample1,sample2"
+        }
+      },
+      "steps": [
+        {
+          "program": "mageck",
+          "arguments": [
+            "test",
+            "-k",
+            "{counts}",
+            "-t",
+            "{treatment}",
+            "-c",
+            "{control}",
+            "-n",
+            "{out}/screen",
+            "--norm-method",
+            "median"
+          ],
+          "expected_outputs": [
+            "screen.gene_summary.txt",
+            "screen.sgrna_summary.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://sourceforge.net/p/mageck/wiki/usage/",
+        "https://sourceforge.net/p/mageck/wiki/Home/"
+      ],
+      "citations": [
+        "https://doi.org/10.1186/s13059-014-0554-4"
+      ],
+      "license": {
+        "name": "BSD-3-Clause",
+        "url": "https://raw.githubusercontent.com/davidliwei/mageck/master/COPYING",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install MAGeCK and its declared scientific dependencies separately from https://sourceforge.net/p/mageck/wiki/Home/. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Unpaired two-condition RRA analysis with median normalization. Caller must choose disjoint treatment/control labels, replicates, normalization suitability and QC. Not an automatic causal gene-function claim; this recipe does not request PDF/R plotting.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "mageck-count",
+      "project_id": "mageck",
+      "title": "CRISPR guide read counting with MAGeCK",
+      "title_zh": "CRISPR筛选sgRNA读数统计",
+      "domains": [
+        "crispr",
+        "functional-assays"
+      ],
+      "backend": "mageck",
+      "inputs": {
+        "reads": {
+          "type": "file",
+          "description": "Single-end FASTQ for one sample; configure sample preparation before counting."
+        },
+        "library": {
+          "type": "file",
+          "description": "MAGeCK sgRNA library table with guide ID, sequence and target gene."
+        }
+      },
+      "parameters": {
+        "sample_label": {
+          "type": "string",
+          "default": "sample",
+          "pattern": "[A-Za-z0-9_.-]+"
+        }
+      },
+      "steps": [
+        {
+          "program": "mageck",
+          "arguments": [
+            "count",
+            "-l",
+            "{library}",
+            "--fastq",
+            "{reads}",
+            "--sample-label",
+            "{sample_label}",
+            "-n",
+            "{out}/counts"
+          ],
+          "expected_outputs": [
+            "counts.count.txt",
+            "counts.countsummary.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://sourceforge.net/p/mageck/wiki/usage/",
+        "https://sourceforge.net/p/mageck/wiki/Home/"
+      ],
+      "citations": [
+        "https://doi.org/10.1186/s13059-014-0554-4"
+      ],
+      "license": {
+        "name": "BSD-3-Clause",
+        "url": "https://raw.githubusercontent.com/davidliwei/mageck/master/COPYING",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install MAGeCK and its declared scientific dependencies separately from https://sourceforge.net/p/mageck/wiki/Home/. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Counts one explicitly supplied sample against a prepared guide library. This is count generation; differential screening requires an experimental design and the separate test recipe.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "crispresso2-amplicon",
+      "project_id": "crispresso2",
+      "title": "Amplicon editing outcome analysis with CRISPResso2",
+      "title_zh": "单扩增子编辑结果定量",
+      "domains": [
+        "crispr",
+        "functional-assays"
+      ],
+      "backend": "CRISPResso",
+      "inputs": {
+        "reads": {
+          "type": "file",
+          "description": "Single-end amplicon FASTQ."
+        }
+      },
+      "parameters": {
+        "amplicon": {
+          "type": "string",
+          "pattern": "[ACGT]{20,4096}",
+          "example": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT"
+        },
+        "guide": {
+          "type": "string",
+          "pattern": "[ACGT]{10,100}",
+          "example": "ACGTACGTACGTACGTACGT"
+        }
+      },
+      "steps": [
+        {
+          "program": "CRISPResso",
+          "arguments": [
+            "--fastq_r1",
+            "{reads}",
+            "--amplicon_seq",
+            "{amplicon}",
+            "--guide_seq",
+            "{guide}",
+            "--name",
+            "amplicon",
+            "--output_folder",
+            "{out}",
+            "--n_processes",
+            "{threads}",
+            "--suppress_report",
+            "--suppress_plots"
+          ],
+          "expected_outputs": [
+            "CRISPResso_on_amplicon/CRISPResso_quantification_of_editing_frequency.txt",
+            "CRISPResso_on_amplicon/CRISPResso2_info.json"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://docs.crispresso.com/latest/core/tool.html",
+        "https://github.com/pinellolab/CRISPResso2"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/s41587-019-0032-3"
+      ],
+      "license": {
+        "name": "Academic non-commercial EULA; commercial license separately",
+        "url": "https://raw.githubusercontent.com/pinellolab/CRISPResso2/master/LICENSE.txt",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install CRISPResso2 and its declared scientific dependencies separately from https://github.com/pinellolab/CRISPResso2. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Single reference amplicon and guide, default CRISPResso2 quantification window. Caller must verify guide orientation, nuclease cut site/window and amplicon design. No automatic nuclease choice, off-target prediction, HDR or base-editing model is claimed.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    },
+    {
+      "id": "drugz-unpaired",
+      "project_id": "drugz",
+      "title": "Unpaired chemical-genetic screen analysis with DrugZ",
+      "title_zh": "非配对CRISPR药物交互筛选",
+      "domains": [
+        "crispr",
+        "functional-assays"
+      ],
+      "backend": "drugz.py",
+      "inputs": {
+        "counts": {
+          "type": "file",
+          "description": "Tab-delimited sgRNA/Gene counts with explicit control and drug-treated sample columns."
+        }
+      },
+      "parameters": {
+        "control": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+(?:,[A-Za-z0-9_.-]+)*",
+          "example": "sample1,sample2"
+        },
+        "treatment": {
+          "type": "string",
+          "pattern": "[A-Za-z0-9_.-]+(?:,[A-Za-z0-9_.-]+)*",
+          "example": "sample1,sample2"
+        },
+        "half_window_size": {
+          "type": "integer",
+          "default": 500,
+          "minimum": 2,
+          "maximum": 10000
+        }
+      },
+      "steps": [
+        {
+          "program": "drugz.py",
+          "arguments": [
+            "-i",
+            "{counts}",
+            "-o",
+            "{out}/drugz.tsv",
+            "-c",
+            "{control}",
+            "-x",
+            "{treatment}",
+            "-unpaired",
+            "--half_window_size",
+            "{half_window_size}"
+          ],
+          "expected_outputs": [
+            "drugz.tsv"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/hart-lab/drugz/blob/master/drugz.py",
+        "https://github.com/hart-lab/drugz"
+      ],
+      "citations": [],
+      "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/hart-lab/drugz/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install DrugZ and its declared scientific dependencies separately from https://github.com/hart-lab/drugz. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Explicit unpaired mode compares mean treatment and mean control. Choose a variance window appropriate for the number of guides and inspect replicate/QC assumptions; this is research screening evidence.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "passed_synthetic_smoke",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "backend_version": "1.1.0.2 build 116 (source header)"
+      }
+    },
+    {
+      "id": "gemma-lmm",
+      "project_id": "gemma",
+      "title": "Linear mixed-model association with GEMMA",
+      "title_zh": "亲缘校正的混合模型关联检验",
+      "domains": [
+        "gwas",
+        "breeding"
+      ],
+      "backend": "gemma",
+      "inputs": {
+        "genotypes": {
+          "type": "prefix",
+          "description": "PLINK BED/BIM/FAM prefix; phenotype values in FAM and consistent sample order.",
+          "suffixes": [
+            ".bed",
+            ".bim",
+            ".fam"
+          ]
+        },
+        "kinship": {
+          "type": "file",
+          "description": "GEMMA-compatible dense relatedness matrix, matching genotype sample order."
+        },
+        "covariates": {
+          "type": "file",
+          "description": "GEMMA numeric covariate table in matching order; must include an intercept column of ones."
+        }
+      },
+      "parameters": {
+        "phenotype_column": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "steps": [
+        {
+          "program": "gemma",
+          "arguments": [
+            "-bfile",
+            "{genotypes}",
+            "-k",
+            "{kinship}",
+            "-c",
+            "{covariates}",
+            "-lmm",
+            "4",
+            "-n",
+            "{phenotype_column}",
+            "-o",
+            "association",
+            "-outdir",
+            "{out}"
+          ],
+          "expected_outputs": [
+            "association.assoc.txt",
+            "association.log.txt"
+          ],
+          "allow_empty_outputs": []
+        }
+      ],
+      "sources": [
+        "https://github.com/genetics-statistics/GEMMA/blob/master/doc/manual.tex",
+        "https://github.com/genetics-statistics/GEMMA"
+      ],
+      "citations": [
+        "https://doi.org/10.1038/ng.2310"
+      ],
+      "license": {
+        "name": "GPL-3.0",
+        "url": "https://raw.githubusercontent.com/genetics-statistics/GEMMA/master/LICENSE",
+        "scope": "External backend only; no backend code, model weights or reference data are bundled."
+      },
+      "installation": "Install GEMMA and its declared scientific dependencies separately from https://github.com/genetics-statistics/GEMMA. Any databases/weights must be prepared locally before invoking this adapter.",
+      "notes": "Runs Wald, likelihood-ratio and score tests for a quantitative phenotype. Relatedness/covariate sample order and phenotype coding must be verified. GEMMA threading depends on its installed BLAS/OpenMP configuration; the generic threads option does not override that configuration.",
+      "validation": {
+        "interface": "official_cli_and_output_contract_reviewed",
+        "backend_execution": "not_run",
+        "scientific_accuracy": "not assessed",
+        "review_date": "2026-09-20",
+        "evidence": "registry/user-catalog-analysis-review.json",
+        "contract_tests": "passed; actual subprocess/argv/artifact tests use synthetic contract executables, not scientific tools",
+        "not_run_reason": "Compatible separately installed backend and caller-supplied scientific database/model/resources were not provisioned in this bounded validation."
+      }
+    }
+  ]
+}

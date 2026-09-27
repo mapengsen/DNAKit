@@ -1,19 +1,19 @@
 # clustering
 
-Public processing APIs share [file and text input rules](00_processing_inputs.md).
-
 Sequence groups and representative sequences are obtained by clustering sequences based on sequence identity, k-mer, fingerprint similarity, or DNA base model rep.
 
-## 1) DATA-007 · Identity clustering
+## 1) Identity clustering {#1-data-007-identity-clustering}
 
-**Function:** Calculate the pairwise similarity of sequences and group them according to the connected components of the threshold graph, and return cluster labels, members and representative records, which are used to organize similar sequences and observe data structures.
+- **Purpose:** Calculate the pairwise similarity of sequences and group them according to the connected components of the threshold graph, and return cluster labels, members and representative records, which are used to organize similar sequences and observe data structures.
+- **Method:** Compute pairwise identity, connect records meeting the threshold and take graph components as clusters.
 
 
-**API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="identity"`.
+- **API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="identity"`.
 
-**Input:** Required record set; optional identity threshold, representation policy, and comparison resource limit.
+- **Input:** Required record set; optional identity threshold, representation policy, and comparison resource limit.
+- **Output:** Returns `ClusteringResult` with `clusters`, `labels`, and representative records.
 
-**Sample code:**
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -30,22 +30,24 @@ result = cluster_sequences(
 print(result.labels)
 ```
 
-**Example results:**
+- **Example output:**
 
 ```text
 (0, 0, 1)
 ```
 
-## 2) DATA-008 · k-mer clustering
+## 2) k-mer clustering {#2-data-008-k-mer-clustering}
 
-**Function:** Establish groups based on k-mer Jaccard, Containment or Cosine similarity between sequences and return cluster members and labels, suitable for constitutive clustering without base-level alignment.
+- **Purpose:** Establish groups based on k-mer Jaccard, Containment or Cosine similarity between sequences and return cluster members and labels, suitable for constitutive clustering without base-level alignment.
+- **Method:** Compute k-mer similarities, build a threshold graph and group its connected components.
 
 
-**API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="kmer"`.
+- **API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="kmer"`.
 
-**Input:** Required record set; optional k, canonical, threshold, representative strategy and pairwise comparison upper limit.
+- **Input:** Required record set; optional k, canonical, threshold, representative strategy and pairwise comparison upper limit.
+- **Output:** Returns `ClusteringResult` with `clusters`, `labels`, and representative records.
 
-**Sample code:**
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -62,22 +64,24 @@ result = cluster_sequences(
 print(result.labels)
 ```
 
-**Example results:**
+- **Example output:**
 
 ```text
 (0, 0, 1)
 ```
 
-## 3) DATA-009 · Fingerprint clustering
+## 3) Fingerprint clustering {#3-data-009-fingerprint-clustering}
 
-**Function:** Group sequences using Tanimoto/Jaccard similarity of fixed schema DNA fingerprints, returning cluster labels and members for clustering by local patterns or Panel features.
+- **Purpose:** Group sequences using Tanimoto/Jaccard similarity of fixed schema DNA fingerprints, returning cluster labels and members for clustering by local patterns or Panel features.
+- **Method:** Compare compatible fingerprints, build a threshold graph and group connected components.
 
 
-**API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="fingerprint"`.
+- **API:** `dnakit.datasets.cluster_sequences(records[required], config[optional])`; `config` uses `dnakit.datasets.ClusterConfig`, this item is set to `method="fingerprint"`.
 
-**Input:** Required set of records; optional thresholds, representative policies, and resource caps.
+- **Input:** Required set of records; optional thresholds, representative policies, and resource caps.
+- **Output:** Returns `ClusteringResult` with `clusters`, `labels`, and representative records.
 
-**Sample code:**
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -94,22 +98,24 @@ result = cluster_sequences(
 print(result.labels, result.method)
 ```
 
-**Example results:**
+- **Example output:**
 
 ```text
 (0, 0, 1) fingerprint
 ```
 
-## 4) DATA-010 · Hierarchical clustering
+## 4) Hierarchical clustering {#4-data-010-hierarchical-clustering}
 
-**Function:** Gradually merge the nearest clusters based on the pre-calculated sequence distance, and return linkage, hierarchical relationships and segmentation labels, which are used to draw dendrograms and observe groupings at different distance scales.
+- **Purpose:** Gradually merge the nearest clusters based on the pre-calculated sequence distance, and return linkage, hierarchical relationships and segmentation labels, which are used to draw dendrograms and observe groupings at different distance scales.
+- **Method:** Start from singleton clusters and iteratively merge the closest pair using single/complete/average linkage.
 
 
-**API:** `dnakit.datasets.hierarchical_cluster(records[required], config[optional])`; `config` uses `dnakit.datasets.HierarchicalClusteringConfig`.
+- **API:** `dnakit.datasets.hierarchical_cluster(records[required], config[optional])`; `config` uses `dnakit.datasets.HierarchicalClusteringConfig`.
 
-**Input:** Required record collection; optional identity/edit/k-mer/fingerprint methods and single/complete/average linkage.
+- **Input:** Required record collection; optional identity/edit/k-mer/fingerprint methods and single/complete/average linkage.
+- **Output:** Returns a `HierarchicalClusteringResult`; the example shows `linkage`.
 
-**Sample code:**
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -126,22 +132,24 @@ result = hierarchical_cluster(
 print(len(result.linkage), result.linkage[-1].member_count)
 ```
 
-**Example results:**
+- **Example output:**
 
 ```text
 2 3
 ```
 
-## 5) DATA-011 · Representative sequence selection
+## 5) Representative sequence selection {#5-data-011-representative-sequence-selection}
 
-**Function:** Select a representative sequence from each cluster according to clear strategies such as first, longest, medoid, etc., and retain member mapping for compressed data sets and subsequent manual inspection.
+- **Purpose:** Select a representative sequence from each cluster according to clear strategies such as first, longest, medoid, etc., and retain member mapping for compressed data sets and subsequent manual inspection.
+- **Method:** Group records by labels and select one representative using order, length or medoid distances.
 
 
-**API:** `dnakit.datasets.select_representatives(records[required], labels[required], policy[optional], medoid_method[optional], k[optional], canonical[optional], max_records[optional], max_pairwise_comparisons[optional], max_alignment_cells[optional])`.
+- **API:** `dnakit.datasets.select_representatives(records[required], labels[required], policy[optional], medoid_method[optional], k[optional], canonical[optional], max_records[optional], max_pairwise_comparisons[optional], max_alignment_cells[optional])`.
 
-**Input:** Required records and equal-length labels; optional selection strategy, medoid method, and resource cap.
+- **Input:** Required records and equal-length labels; optional selection strategy, medoid method, and resource cap.
+- **Output:** Returns a `RepresentativeSelectionResult`; the example shows `representative_ids`.
 
-**Sample code:**
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -156,39 +164,20 @@ result = select_representatives(records, [7, 7, 2], policy="shortest")
 print(result.representative_ids)
 ```
 
-**Example results:**
+- **Example output:**
 
 ```text
 ('other', 'short')
 ```
 
-## 6) DATA-027 · Neural Network Clustering {#data-027-neural-clustering}
+## 6) Neural Network Clustering {#data-027-neural-clustering}
 
-**Function:** Extract a fixed-length rep for each sequence using the selected DNA base model, then perform normalization, optional PCA, and k-means with a fixed seed on the vector, returning the label, center, score, and center nearest representative sequence for grouping by model representation.
-
-What is used here is **k-means**, not k-mer similarity clustering. If you need not load the neural network
-k-mer clustering, use `DATA-008` on this page.
-
-**API:**
-
-- `dnakit.representations.extract_representations(records[required], config[optional])`: Extract only rep;
-- `dnakit.datasets.neural_cluster_sequences(records[required], config[optional])`: Execute k-means after extracting rep;
-- Use `dnakit.representations.RepresentationConfig` for representations and
-  `dnakit.datasets.NeuralClusteringConfig` for clustering.
-
-Standalone rep API, all 11 models and their checkpoint/dependency boundaries See also
-[neural representations section](08_fingerprints.md#neural-representations) of the sequence representations page.
-
-**Input:** Required `DNARecord` collection; optional model, checkpoint position, mean/cls/max/last
-Pooling, device, dtype, batch size, L2 normalization, PCA dimensionality, number of clusters, and random seeds. explicit
-`Gap` is not supported; the default mapping of IUPAC ambiguity symbols is `N`, and can also be set to report an error directly.
-
-**Clustering process:** Each sequence is divided into blocks according to the model context window. The pooling vector of each block is first obtained, and then the blocks are
-Vector averaging; then L2 normalization is performed by default, PCA is optional, and finally a fixed seed is performed
-`k-means++`/Lloyd clustering. Each group of representative sequences takes the input record closest to the cluster center; the center is located
-Space after normalization and optional PCA.
-
-**Sample code:**
+- **Purpose:** Extract a fixed-length rep for each sequence using the selected DNA base model, then perform normalization, optional PCA, and k-means with a fixed seed on the vector, returning the label, center, score, and center nearest representative sequence for grouping by model representation.
+- **Method:** Pool model vectors, apply L2 normalization and optional PCA, then run seeded k-means++/Lloyd clustering. Select the record nearest each center as its representative.
+- **API:** `dnakit.datasets.neural_cluster_sequences(records, config=NeuralClusteringConfig(...))`.
+- **Input:** Nonempty DNA records without explicit gaps, the cluster count, seed and model configuration. Default LucaOne requires its dependencies and `allow_remote_code=True`; IUPAC symbols map to `N` by default.
+- **Output:** Returns a `NeuralClusteringResult`; the example shows `labels`, `representatives`, `checkpoint_path`.
+- **Example code:**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -217,55 +206,140 @@ print(result.representatives.ids)
 print(result.checkpoint_path)
 ```
 
-The default model is `lucaone`, corresponding to checkpoint
-`LucaGroup/LucaOne-gene-step36.8M`. The first time you call it, it will be downloaded by default to the directory where the command is run.
-`ckpt/lucaone-gene-step36-8m/`; If the complete checkpoint already exists, it will be directly reused without repeated downloading.
-Each directory will hold a list of `.dnakit-checkpoint.json` sources. Available `checkpoint_dir` to modify the cache
-root directory, or use `checkpoint_path` to point to an existing checkpoint directory and skip downloading entirely. Download and
-Sequence-by-sequence extraction displays a progress bar by default.
+- **Example output:** Four cluster labels, two representative IDs and the checkpoint path. The exact labels depend on the model and environment; model inference was not run here.
 
-LucaOne checkpoint contains custom Transformers code. DNAKit does not do this implicitly; use
-Default model's standard backend must still be set explicitly in `RepresentationConfig`
-`allow_remote_code=True`.
+<span id="checkpoint"></span>[FAQ: details](../../faq/tutorial_basics.md#neural-clustering)
 
-Extract only rep:
+## 7) Cluster samples {#bio-25}
+
+- **Purpose:** Group similar samples by their features.
+- **Method:** Apply the selected clustering method; MCL iterates expansion/inflation on a nonnegative affinity matrix.
+- **API:** `dnakit.bioinformatics.features.cluster_features(values, method='kmeans', seed=0, parameters=None)`
+- **Input:** A numeric feature matrix; scale it beforehand. MCL requires symmetric nonnegative affinity; requires `bio-analysis`; see [available methods](../../faq/bioinformatics.md#encoding).
+- **Output:** Returns a clustering model; `labels_` gives the cluster label for each sample.
+- **Example code:**
 
 ```python
-from dnakit.representations import RepresentationConfig, extract_representations
+from dnakit.bioinformatics.features import cluster_features
 
-reps = extract_representations(
-    records,
-    config=RepresentationConfig(allow_remote_code=True),
-)
-print(reps.representations.shape)
+model = cluster_features([[0, 0], [0, 1], [9, 9], [9, 10]],
+                         parameters={"n_clusters": 2}, seed=0)
+print(model.labels_[0] == model.labels_[1])
+print(model.labels_[0] != model.labels_[2])
 ```
 
-<span id="checkpoint"></span>**Optional models and official checkpoint**
+- **Example output:**
 
-| `model` | Default official checkpoint | Loading conditions |
+```text
+True
+True
+```
+
+Dependencies and details: [FAQ](../../faq/bioinformatics.md#encoding).
+
+## 8) Label-stratified diversity sampling {#diversity-sampling}
+
+`dnakit.datasets.diversity_sample` selects a fixed number of original candidate records.
+It defaults to frozen DNABERT2 mean embeddings, L2 normalization, and seeded
+k-means++/Lloyd within each class. The model runs inference only; no training is performed.
+The `diversity` argument selects high or low diversity:
+
+| Argument | Cluster count | Selection |
 | --- | --- | --- |
-| `grover` | [PoetschLab/GROVER](https://huggingface.co/PoetschLab/GROVER) | `neural` extra; the local independent model environment has completed the rep + k-means smoke of the real checkpoint |
-| `dnabert2` | [zhihan1996/DNABERT-2-117M](https://huggingface.co/zhihan1996/DNABERT-2-117M) | `neural` extra; requires explicit `allow_remote_code=True` |
-| `ntv2` | [InstaDeepAI/nucleotide-transformer-v2-500m-multi-species](https://huggingface.co/InstaDeepAI/nucleotide-transformer-v2-500m-multi-species) | `neural` extra; requires explicit `allow_remote_code=True` |
-| `hyenadna` | [LongSafari/hyenadna-medium-450k-seqlen-hf](https://huggingface.co/LongSafari/hyenadna-medium-450k-seqlen-hf) | `neural` extra; requires explicit `allow_remote_code=True` |
-| `caduceus` | [kuleshov-group/caduceus-ph 131k](https://huggingface.co/kuleshov-group/caduceus-ph_seqlen-131k_d_model-256_n_layer-16) | `neural`, `neural-caduceus` extras; need to explicitly `allow_remote_code=True` |
-| `lucaone` (default) | [LucaGroup/LucaOne-gene-step36.8M](https://huggingface.co/LucaGroup/LucaOne-gene-step36.8M) | `neural` extra; requires explicit `allow_remote_code=True` |
-| `generator` | [GenerTeam/GENERator-v2-eukaryote-1.2b-base](https://huggingface.co/GenerTeam/GENERator-v2-eukaryote-1.2b-base) | `neural` extra; requires explicit `allow_remote_code=True` |
-| `enformer` | [EleutherAI/enformer-official-rough](https://huggingface.co/EleutherAI/enformer-official-rough) | `neural`, `neural-enformer` extras |
-| `alphagenome` | [google/alphagenome-all-folds](https://huggingface.co/google/alphagenome-all-folds) | Must accept the model terms and install [official research code](https://github.com/google-deepmind/alphagenome_research); high hardware and JAX/Orbax environment requirements |
-| `janusdna` | [Harvard Dataverse DOI 10.7910/DVN/HDT0RN](https://doi.org/10.7910/DVN/HDT0RN) | checkpoint automatically verifies the official MD5; you must also obtain the [official source code](https://github.com/Qihao-Duan/JanusDNA) and set up `model_source_path` |
-| `evo2` | [arcinstitute/evo2_7b](https://huggingface.co/arcinstitute/evo2_7b) | `neural`, `neural-evo2` extras; follow [ official Evo 2 environment ](https://github.com/ArcInstitute/evo2) and GPU requirements |
+| `diversity="high"` (default) | `n_samples` in total, allocated proportionally | One nearest actual record per centroid |
+| `diversity="low"` | Five per class with a nonzero sample quota by default | The tightest fixed-size neighborhood among the centers |
 
-Except for GROVER's real smoke, the other models have completed registration, checkpoint analysis and correspondence in this function.
-adapter is connected, but full checkpoint value verification has not been completed one by one on the same machine. Therefore
-`DATA-027` The status is `conditional`, "Connected" cannot be interpreted as meaning that all models, hardware and versions
-Verified.
+`n_samples` always sets the **final sample size**; it equals the total cluster count
+only in `high` mode. `low_n_clusters` sets the per-class cluster count for `low` mode.
+Explicit `n_samples`, `diversity`, and `low_n_clusters` override the corresponding
+configuration values without modifying the configuration object. Omitted arguments
+use the configuration values, defaulting to 400, `"high"`, and 5 respectively.
 
-**Remote code boundaries:** Models noted in the table load Python code from checkpoint. DNAKit
-This type of execution is denied by default and can only be set explicitly after the caller reviews the official repository and checkpoint.
-`allow_remote_code=True` is loaded. checkpoint is not distributed with wheel/sdist; model license,
-Access terms, video memory and storage requirements are separately confirmed by the user.
+Class quotas follow the candidate proportions using the **largest-remainder method**:
+floor each proportional quota, then assign remaining slots in descending remainder order.
+For 840 candidates with class counts 173 and 667, selecting 400 allocates 82 and 318
+records respectively. High mode fits 82 and 318 clusters; low mode fits five per class,
+then selects 82 and 318 records. Quota and distance ties follow input order.
 
-**Result:** `NeuralClusteringResult` Save labels, cluster members, center nearest representative sequence,
-Model name, checkpoint path, original/clustering dimension, inertia, calculated silhouette, PCA
-Explained variance, seed, and actual number of iterations.
+Install model dependencies with `python -m pip install "dnakit[neural]"`.
+This example expects `sequence` and `label` columns in `candidates.csv`:
+
+```python
+from dnakit.datasets import DiversitySamplingConfig, diversity_sample
+from dnakit.representations import RepresentationConfig
+
+result = diversity_sample(
+    "candidates.csv",
+    n_samples=400,
+    diversity="high",
+    output_path="diversity_400",
+    config=DiversitySamplingConfig(
+        label_key="label",
+        seed=42,
+        representation=RepresentationConfig(
+            model="dnabert2",
+            pooling="mean",
+            allow_remote_code=True,  # Load model code from the official checkpoint
+            # checkpoint_path="/path/to/dnabert2-117m",  # Reuse local weights
+        ),
+    ),
+)
+print(len(result.records))
+for allocation in result.allocations:
+    print(allocation.label, allocation.input_count, allocation.n_samples)
+```
+
+To select a low-diversity subset:
+
+```python
+low_result = diversity_sample(
+    "candidates.csv",
+    n_samples=400,
+    diversity="low",
+    low_n_clusters=5,
+    output_path="low_diversity_400",
+    config=DiversitySamplingConfig(
+        seed=42,
+        representation=RepresentationConfig(model="dnabert2", allow_remote_code=True),
+    ),
+)
+```
+
+Low mode clusters each class separately. Each center proposes the class quota of
+nearest neighbors from **all candidates in that class**, yielding up to five proposals.
+Score each proposal by its mean Euclidean distance to **its own mean embedding** and
+choose the smallest score, breaking score ties by sorted original row indices.
+Neighborhoods may cross cluster boundaries, so a small cluster does not cause an
+underfilled sample. This is a compactness heuristic, not a global optimum.
+
+File input produces `diversity_400/diversity_sample.csv` and `diversity_400/result.json`.
+The CSV retains original columns and selected rows in input order; the JSON records
+allocations, source indices, cluster membership, centers, and model provenance.
+Alternatively pass `Iterable[DNARecord]` with labels in `record.metadata["label"]`.
+`result.records` contains the original records, preserving sequences, labels, annotations,
+and metadata.
+
+- `selected_indices` uses zero-based positions in the input; `cluster_labels` maps each
+  input record to its cluster. In low mode, use `records` and `selected_indices` for
+  the selected subset; cluster representatives alone do not constitute the sample.
+  Results record `diversity`, `low_n_clusters`, and `sampling_strategy`; inspect
+  `len(result.clusters)` for the actual total cluster count.
+- `label_key=None` samples one unlabeled pool. Otherwise every record requires a non-null
+  string, numeric, or boolean label. Types are distinct: `1` and `"1"` are separate classes.
+- Very small classes can receive zero slots; their `cluster_labels` entries are `None`.
+- Set `normalize=False` to cluster raw embeddings using Euclidean distance. No PCA is
+  performed. Other DNAKit models can be selected with `RepresentationConfig(model=...)`.
+- `n_samples` must be positive and cannot exceed the input count. High mode rejects
+  insufficient distinct embeddings. Low mode caps each class's cluster count at its
+  number of distinct embeddings and permits distinct rows with identical embeddings.
+  Neither mode repeats an input row. Empty fitted clusters raise an error.
+  Both sampling and representation `max_records` limits apply, defaulting to 10,000.
+- This method targets representative or compact subsets in model feature space. It does
+  not guarantee maximum or minimum pairwise sequence distance or deduplicate across labels. Reproducibility
+  also depends on input order, model weights, library versions, and the compute environment.
+
+Tests cover both modes with synthetic 840-to-400 embeddings, 82/318 quotas, compact
+region selection, duplicate embeddings, and CSV export. They do not establish biological diversity gains
+or constitute DNABERT2 inference on a user's candidate pool.
+References: [official DNABERT-2 implementation](https://github.com/MAGICS-LAB/DNABERT_2)
+and [scikit-learn KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html).

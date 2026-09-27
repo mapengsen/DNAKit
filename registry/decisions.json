@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-09-12",
+  "snapshot_date": "2026-09-25",
   "decisions": [
     {
       "source": "agentic-science",
@@ -48016,6 +48016,254 @@
       "path": "skills/variant-annotation/SKILL.md",
       "status": "reference_only",
       "reason": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides."
+    },
+    {
+      "source": "biomcp",
+      "path": "skills/SKILL.md",
+      "name": "biomcp",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "finemap/SKILL.md",
+      "name": "finemap",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "gigwa-mcp",
+      "path": "skills/gigwa-diversity-report/SKILL.md",
+      "name": "gigwa-diversity-report",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "gigwa-mcp",
+      "path": "skills/gigwa-explore-instance/SKILL.md",
+      "name": "gigwa-explore-instance",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "gigwa-mcp",
+      "path": "skills/gigwa-import-and-qc/SKILL.md",
+      "name": "gigwa-import-and-qc",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "gigwa-mcp",
+      "path": "skills/gigwa-qc-triage/SKILL.md",
+      "name": "gigwa-qc-triage",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "gigwa-mcp",
+      "path": "skills/gigwa-region-scan/SKILL.md",
+      "name": "gigwa-region-scan",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "gwas-fetch/SKILL.md",
+      "name": "gwas-fetch",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "ldsc/SKILL.md",
+      "name": "ldsc",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "liftover/SKILL.md",
+      "name": "liftover",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "locuszoom/SKILL.md",
+      "name": "locuszoom",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "manhattan-qq/SKILL.md",
+      "name": "manhattan-qq",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "okg-search/SKILL.md",
+      "name": "okg-search",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "prs/SKILL.md",
+      "name": "prs",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "haploqtl",
+      "path": "skills/qtl-candidate-gene/SKILL.md",
+      "name": "qtl-candidate-gene",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "tangermeme",
+      "path": "tangermeme/_skills/data/SKILL.md",
+      "name": "tangermeme",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "twas/SKILL.md",
+      "name": "twas",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "statgen-skills",
+      "path": "variant-annotate/SKILL.md",
+      "name": "variant-annotate",
+      "status": "genomics-expansion",
+      "integration": "genomics-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/genomics-new-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-clawbio",
+      "path": "skills/bioconductor-bridge/SKILL.md",
+      "name": "bioconductor-bridge",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-galaxy",
+      "path": "",
+      "name": "galaxy-bioblend",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "Transparent licensed Markdown-guide conversion; see selected original files. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-clawbio",
+      "path": "skills/galaxy-bridge/SKILL.md",
+      "name": "galaxy-bridge",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-anthropic",
+      "path": "instrument-data-to-allotrope/SKILL.md",
+      "name": "instrument-data-to-allotrope",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-deepmind",
+      "path": "skills/interpro_database/SKILL.md",
+      "name": "interpro-database",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-aws-kiro",
+      "path": "kiro-life-sciences",
+      "name": "kiro-healthomics-genomics",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "Transparent licensed Markdown-guide conversion; see selected original files. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-anthropic",
+      "path": "nextflow-development/SKILL.md",
+      "name": "nextflow-development",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-kdense",
+      "path": "skills/onekgpd/SKILL.md",
+      "name": "onekgpd-individual-queries",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-bioskills",
+      "path": "alternative-splicing/outlier-splicing-detection/SKILL.md",
+      "name": "outlier-splicing-detection",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-deepmind",
+      "path": "skills/pdb_database/SKILL.md",
+      "name": "pdb-database",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-anthropic",
+      "path": "scvi-tools/SKILL.md",
+      "name": "scvi-tools",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-bioskills",
+      "path": "single-cell/cnv-inference/SKILL.md",
+      "name": "single-cell-cnv-inference",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
+    },
+    {
+      "source": "user335-clawbio",
+      "path": "skills/ukb-ppp-region-fetch/SKILL.md",
+      "name": "ukb-ppp-region-fetch",
+      "status": "user-catalog-expansion",
+      "integration": "user-catalog-expansion",
+      "reason": "DNA task with retained license; commit-pinned complete skill import. See registry/user-catalog-skills.json for portability edits and validation limits."
     }
   ]
 }

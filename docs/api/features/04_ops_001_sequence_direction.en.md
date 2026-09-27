@@ -1,15 +1,15 @@
-# OPS-001 sequence completion
-
-Public processing APIs share [file and text input rules](00_processing_inputs.md).
+# sequence completion
 
 Reverse, complement, or reverse complement the DNA sequence to obtain a new sequence after the direction is reversed.
 
-## 1) OPS-001.1 reverse order
+## 1) reverse order {#1-ops-0011-reverse-order}
 
-- **Function:** Only reverse the character order of the DNA sequence without replacing the bases, used to check or construct the reverse position sequence.
+- **Purpose:** Only reverse the character order of the DNA sequence without replacing the bases, used to check or construct the reverse position sequence.
+- **Method:** Read bases from end to start without changing their symbols.
 - **API:** `dnakit.ops.reverse(sequence[required])`.
 - **Input:** One required `DNASequence`; no additional required parameters.
-- **Sample code:**
+- **Output:** Returns the processed `DNASequence`; read its symbols from `symbols`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -19,18 +19,20 @@ seq = DNASequence("AATCGC")
 print(reverse(seq).symbols)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 CGCTAA
 ```
 
-## 2) OPS-001.2 complementary
+## 2) complementary {#2-ops-0012-complementary}
 
-- **Function:** Replace each DNA base with a complementary base according to base pairing rules, but maintain the original position order, and use it to construct the corresponding complementary chain.
+- **Purpose:** Replace each DNA base with a complementary base according to base pairing rules, but maintain the original position order, and use it to construct the corresponding complementary chain.
+- **Method:** Replace each base with its DNA complement without reordering positions.
 - **API:** `dnakit.ops.complement(sequence[required])`.
 - **Input:** One required `DNASequence`; no additional required parameters.
-- **Sample code:**
+- **Output:** Returns the processed `DNASequence`; read its symbols from `symbols`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -40,27 +42,20 @@ seq = DNASequence("AATCGC")
 print(complement(seq).symbols)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 TTAGCG
 ```
 
-## 3) OPS-001.3 Reverse complementation
+## 3) Reverse complementation {#3-ops-0013-reverse-complementation}
 
-Large uncompressed FASTA/FNA inputs (at least 16 MiB) with default reader settings
-use file-region processing. Workers read, validate, transform, and write disjoint
-regions directly; only paths and offsets cross process boundaries. Record order is
-preserved and the temporary output is installed only after successful validation.
-`workers=1` runs the same block algorithm serially; `workers=-1` uses available CPUs
-subject to memory limits. Multiprocessing scripts need an `if __name__ == "__main__":`
-guard. Irregular wrapping, compressed files, other formats, explicit `read_config`,
-and output byte limits retain the general processing path and its validation rules.
-
-- **Function:** Simultaneously reverse the sequence order and replace it with complementary bases to obtain a 5′→3′ representation of the other strand, which can be used for reverse strand search, direction unification and primer analysis.
+- **Purpose:** Simultaneously reverse the sequence order and replace it with complementary bases to obtain a 5′→3′ representation of the other strand, which can be used for reverse strand search, direction unification and primer analysis.
+- **Method:** Reverse and complement bases while remapping strand, features and per-base annotations.
 - **API:** `dnakit.ops.reverse_complement(value, output_path=None, *, feature_policy="preserve", read_config=None, write_config=None, sequence_column=None, show_progress=True)`.
-- **Input:** DNA text, a file path, or an existing single-record `DNA`, `DNASequence`, or `DNARecord`. Text returns a reverse-complement string; existing objects retain their return types while mapping features, strands, and per-base annotations. File suffixes identify `.fna/.fa/.fasta`, `.txt`, `.csv/.tsv`, and other DNAKit I/O formats, including `.gz`. Strings containing a dot or path separator are treated as paths; use `Path` explicitly for extensionless files.
-- **Sample code:**
+- **Input:** DNA text, a file path, or one `DNA`, `DNASequence`, or `DNARecord`. Text returns a string; files return `WriteResult`. Input and output paths must differ; existing outputs are protected. [FAQ: details](../../faq/tutorial_integrations.md#reverse-complement).
+- **Output:** Returns a reverse-complemented `DNASequence` or `DNA`; file input can be written to the selected path.
+- **Example code:**
 
 ```python
 from dnakit import DNA
@@ -70,35 +65,76 @@ dna = DNA("AATCGC", id="seq-1")
 print(reverse_complement(dna).symbols)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 GCGATT
 ```
 
-DNA strings and sequence files are also supported directly:
+<!-- BEGIN GENERATED API: sequence-direction -->
+
+<span id="sequence-direction"></span>
+
+## 4) Compute a DNA reverse complement {#dnakit.databases.sequence_reverse_complement}
+
+- **Purpose:** Compute a DNA reverse complement.
+- **Method:** Complement A↔T, C↔G and N↔N, then reverse the sequence.
+- **API：** `dnakit.databases.sequence_reverse_complement(*, operation=None, sequence, verbose=True)`
+- **Input:** Provide `sequence`.
+- **Output:** Returns a mapping with `data` and related fields.
+- **Example code:**
 
 ```python
-from dnakit.ops import reverse_complement
+import dnakit
 
-print(reverse_complement("AATCGC"))  # GCGATT; accepts lowercase and whitespace
-result = reverse_complement("hg38.fna")  # writes hg38_reverse_complement.fna
-result = reverse_complement("sequences.txt", "rc.txt")
-result = reverse_complement("sequences.csv", "rc.csv", sequence_column="sequence")
+result = dnakit.databases.sequence_reverse_complement(
+    operation='reverse_complement',
+    sequence='ATGCGATCG',
+    verbose=False,
+)
+print(result)
 ```
 
-Strings containing a dot or path separator are treated as paths; use `Path` for extensionless files.
-Files infer FASTA/FNA, TXT, CSV/TSV and other DNAKit I/O formats, including gzip, and stream one record
-at a time. The result is a `WriteResult` with `record_count` and `target_artifact.relative_path`
-(the output path relative to the current working directory).
-File mode displays start/completion messages and processed record counts; set `show_progress=False`
-to silence it. DNA strings return uppercase IUPAC strings; existing DNA object return types remain unchanged.
+- **Example output:** The response has the following shape; records depend on the input and source.
 
-Without `read_config`, uncompressed input limits follow the actual file size, so hg38 requires no
-manual size settings. Gzip input has a 20 GB decompressed reading ceiling. Pass `read_config=ReadConfig(...)` to set explicit limits. Input and output must differ; existing outputs require
-`write_config=WriteConfig(overwrite=True)` to replace them.
+Response-shape excerpt; `<…>` denotes type placeholders, not a captured query result.
 
-TXT defaults to one sequence per non-empty line and writes one sequence per line without IDs.
-Use `read_config=ReadConfig(text_mode="sequence")` for one wrapped sequence spanning the whole file.
-CSV reads the `sequence` column by default, with `sequence_column` allowing another name, and preserves
-the input column names, order, labels and other extra columns. Record annotations follow the reverse-complement coordinate mapping.
+```json
+{
+  "data": {
+    "original": "<string>",
+    "reverse_complement": "<string>",
+    "length": "<integer>"
+  }
+}
+```
+
+[Full parameters and usage notes](../../faq/api/04_ops_001_sequence_direction.md#dnakit.databases.sequence_reverse_complement-parameters)
+
+<!-- END GENERATED API: sequence-direction -->
+
+## 5) Reverse-complement duplex DNA {#bio-52-reverse}
+
+- **Purpose:** Reverse the orientation of duplex DNA while preserving its duplex and end structure.
+- **Method:** Swap the Watson and Crick strands and adjust their relative offset.
+- **API:** `dnakit.bioinformatics.cloning.Duplex.from_sequence(sequence, circular=False)`; `Duplex.reverse_complement()`
+- **Input:** A fully complementary duplex or A/C/G/T sequence; nicks, internal gaps and mismatches are unsupported.
+- **Output:** Returns the reverse-complemented `Duplex` with both strands and end structures.
+- **Example code:**
+
+```python
+from dnakit.bioinformatics.cloning import Duplex
+
+molecule = Duplex.from_sequence("AACCGGTT")
+print(molecule.reverse_complement().watson)
+```
+
+- **Example output:**
+
+```text
+AACCGGTT
+```
+
+The example sequence equals its reverse complement.
+
+[Dependencies and implementation notes](../../faq/bioinformatics.md#optimization).

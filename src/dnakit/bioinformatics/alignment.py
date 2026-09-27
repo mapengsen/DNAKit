@@ -13,12 +13,14 @@ from dnakit.bioinformatics._common import (
     ToolResult,
     artifacts,
     input_path,
+    named_sequence_items,
     require,
     run,
     run_to_file,
     sequence_text,
     workspace,
 )
+from dnakit.core import DNA
 from dnakit.exceptions import BackendExecutionError, ConfigurationError, InputFormatError
 
 
@@ -106,7 +108,7 @@ def write_alignment(
 
 
 def align_sequences(
-    sequences: Mapping[str, Any],
+    sequences: DNA | Mapping[str, Any],
     output_directory: str | Path,
     *,
     method: str = "mafft",
@@ -114,20 +116,20 @@ def align_sequences(
     config: ExecutionConfig | None = None,
     verbose: bool = True,
 ) -> MultipleAlignment:
-    """Run MAFFT --auto, MUSCLE 5, or Clustal Omega; retain input/output/log files."""
-    if method not in {"mafft", "muscle", "clustalo"} or len(sequences) < 2:
+    """Align DNA or named sequences with MAFFT, MUSCLE, or Clustal Omega."""
+    items = named_sequence_items(sequences)
+    if method not in {"mafft", "muscle", "clustalo"} or len(items) < 2:
         raise ConfigurationError("Provide two sequences and method mafft/muscle/clustalo.")
     config = config or ExecutionConfig()
     directory = workspace(output_directory)
     source, target = directory / "input.fasta", directory / "alignment.fasta"
-    ids = tuple(sequences)
+    ids = tuple(record_id for record_id, _ in items)
     if len(set(ids)) != len(ids) or any(not key or any(c.isspace() for c in key) for key in ids):
         raise ConfigurationError("Provide unique FASTA-safe IDs.")
     # Internal IDs prevent aligners from truncating or rewriting caller IDs.
     source.write_text(
         "".join(
-            f">seq_{index}\n{sequence_text(value)}\n"
-            for index, value in enumerate(sequences.values())
+            f">seq_{index}\n{sequence_text(value)}\n" for index, (_, value) in enumerate(items)
         ),
         encoding="utf-8",
     )
@@ -157,7 +159,7 @@ def align_sequences(
     expected = {f"seq_{index}" for index in range(len(ids))}
     if set(rows) != expected:
         raise BackendExecutionError("Aligner changed the sequence ID set.")
-    for index, original in enumerate(sequences.values()):
+    for index, (_, original) in enumerate(items):
         if rows[f"seq_{index}"].replace("-", "") != sequence_text(original):
             raise BackendExecutionError("Aligner changed sequence content.")
     return MultipleAlignment(ids, tuple(rows[f"seq_{index}"] for index in range(len(ids))))

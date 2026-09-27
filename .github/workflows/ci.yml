@@ -52,7 +52,7 @@ jobs:
       - name: Install all supported extras
         run: >-
           python -m pip install --upgrade pip
-          ".[dev,docs,io,validation,viz]"
+          ".[dev,docs,io,validation,viz,genomics,bio-plots]"
 
       - name: Check formatting
         run: python -m ruff format --check src others/tests others/validation
@@ -69,10 +69,20 @@ jobs:
           PYTHONNOUSERSITE: "1"
         run: python -m pytest
 
+      - name: Verify pip genomics backends
+        # Synthetic checks use real pip backends and require no scientific executables.
+        # Keep this separate from the optional-dependency skips in the unit suite.
+        run: python others/validation/pip_genomics.py --quiet
+
       - name: Execute tutorial notebooks
         env:
           PYTHONNOUSERSITE: "1"
         run: python -m pytest --nbmake others/notebooks
+
+      - name: Check tutorial API documentation
+        env:
+          PYTHONNOUSERSITE: "1"
+        run: python others/docs/build_native_api_docs.py --check
 
       - name: Build documentation strictly
         env:

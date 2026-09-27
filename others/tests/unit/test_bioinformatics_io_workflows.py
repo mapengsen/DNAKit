@@ -9,6 +9,7 @@ import pytest
 
 from dnakit.bioinformatics import alignment, cloning, reads, workflows
 from dnakit.bioinformatics._common import ExecutionConfig, run_to_file
+from dnakit.core import DNA
 from dnakit.exceptions import (
     BackendExecutionError,
     BackendTimeoutError,
@@ -199,6 +200,12 @@ def test_mafft_process_contract_and_id_restoration(tmp_path: Path) -> None:
     assert result.ids == ("my_a", "my_b")
     assert result.sequences == ("ACGT", "ACTT")
     assert (tmp_path / "alignment" / "alignment.log").read_text() == "diagnostic\n"
+
+    dna_result = alignment.align_sequences(
+        DNA(["ACGT", "ACTT"]), tmp_path / "dna-alignment", program=str(program)
+    )
+    assert dna_result.ids == ("sequence_1", "sequence_2")
+    assert dna_result.sequences == ("ACGT", "ACTT")
 
 
 def test_native_sanger_mapping_and_chromatogram(tmp_path: Path) -> None:

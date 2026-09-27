@@ -38,6 +38,16 @@ def test_chinese_search_finds_the_actual_task_and_retains_duplicate_aliases() ->
     assert search_skills("zyxwvnonexistenttask")["total"] == 0
 
 
+def test_planning_skill_is_discoverable_and_installable(tmp_path: Path) -> None:
+    found = {entry["id"] for entry in search_skills("DNAKit 规划", limit=5)["skills"]}
+    assert "dnakit-plan" in found
+    assert "等待其明确确认" in read_skill_file("dnakit-plan")["content"]
+    result = install_skill("dnakit-plan", agent="codex", project_dir=tmp_path)
+    assert (Path(result["path"]) / "SKILL.md").read_bytes() == (
+        Path(__file__).resolve().parents[3] / "skills/dnakit-plan/SKILL.md"
+    ).read_bytes()
+
+
 @pytest.mark.parametrize(
     "query,expected",
     [

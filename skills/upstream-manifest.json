@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "snapshot_date": "2026-09-12",
+  "snapshot_date": "2026-09-25",
   "catalog": "../registry/catalog.json",
   "decisions": "../registry/decisions.json",
   "skills": [
@@ -230,6 +230,11 @@
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
     },
     {
+      "id": "bioconductor-bridge",
+      "source": "user335-clawbio",
+      "revision": "4848cc280c446093b1364a2445db3137d455cc17"
+    },
+    {
       "id": "bioinfo-pitfalls",
       "source": "plant-skills",
       "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
@@ -248,6 +253,11 @@
       "id": "biomart-queries",
       "source": "bioskills",
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "biomcp",
+      "source": "biomcp",
+      "revision": "3b1d6452ab63741562d2ef97495a97281b304729"
     },
     {
       "id": "bioservices-multi-database",
@@ -830,6 +840,41 @@
       "revision": "catalog-2026-09-12"
     },
     {
+      "id": "dnakit-dna-nanotechnology",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
+      "id": "dnakit-dna-storage",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
+      "id": "dnakit-external-genomics",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
+      "id": "dnakit-genomic-breeding",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
+      "id": "dnakit-methylation-summary",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
+      "id": "dnakit-plan",
+      "source": "dnakit",
+      "revision": "dnakit-plan-2026-09-25"
+    },
+    {
+      "id": "dnakit-prokaryotic-genes",
+      "source": "dnakit",
+      "revision": "dnakit-genomics-2026-09-20"
+    },
+    {
       "id": "dnanexus-integration",
       "source": "kdense",
       "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
@@ -1050,6 +1095,11 @@
       "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
     },
     {
+      "id": "finemap",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
+    },
+    {
       "id": "folklore-variant-evidence",
       "source": "kdense",
       "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
@@ -1078,6 +1128,16 @@
       "id": "functional-screen-analysis",
       "source": "encode-toolkit",
       "revision": "b1d90bc9e7ead40d49b8c89f0b9b9e7b8e592a5b"
+    },
+    {
+      "id": "galaxy-bioblend",
+      "source": "user335-galaxy",
+      "revision": "0f833c2f11fa624d9fd87c6d139dac404d6dd4ff"
+    },
+    {
+      "id": "galaxy-bridge",
+      "source": "user335-clawbio",
+      "revision": "4848cc280c446093b1364a2445db3137d455cc17"
     },
     {
       "id": "gatk-variant-calling",
@@ -1305,6 +1365,31 @@
       "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
     },
     {
+      "id": "gigwa-diversity-report",
+      "source": "gigwa-mcp",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf"
+    },
+    {
+      "id": "gigwa-explore-instance",
+      "source": "gigwa-mcp",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf"
+    },
+    {
+      "id": "gigwa-import-and-qc",
+      "source": "gigwa-mcp",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf"
+    },
+    {
+      "id": "gigwa-qc-triage",
+      "source": "gigwa-mcp",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf"
+    },
+    {
+      "id": "gigwa-region-scan",
+      "source": "gigwa-mcp",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf"
+    },
+    {
       "id": "grapevine-adna",
       "source": "plant-skills",
       "revision": "6dea4bee7aade611d22f2f1958612328bc61ec83"
@@ -1338,6 +1423,11 @@
       "id": "gwas-drug-discovery",
       "source": "tooluniverse",
       "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "gwas-fetch",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
     },
     {
       "id": "gwas-snp-interpretation",
@@ -1460,6 +1550,11 @@
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
     },
     {
+      "id": "instrument-data-to-allotrope",
+      "source": "user335-anthropic",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c"
+    },
+    {
       "id": "integronfinder",
       "source": "pku-metagenomics",
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
@@ -1473,6 +1568,11 @@
       "id": "interpret-negative-or-vus",
       "source": "genetic-counseling",
       "revision": "eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4"
+    },
+    {
+      "id": "interpro-database",
+      "source": "user335-deepmind",
+      "revision": "68832757cbbf941c620b71df5756cf6e5cc287b0"
     },
     {
       "id": "isabl-debug-analysis",
@@ -1525,14 +1625,29 @@
       "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
     },
     {
+      "id": "kiro-healthomics-genomics",
+      "source": "user335-aws-kiro",
+      "revision": "95b67e763df43e94e5bcfd8a230a58553a888cfc"
+    },
+    {
       "id": "ld-1000g-region-compute",
       "source": "clawbio",
       "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
     },
     {
+      "id": "ldsc",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
+    },
+    {
       "id": "lexicmap",
       "source": "pku-metagenomics",
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "liftover",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
     },
     {
       "id": "liftover-coordinates",
@@ -1548,6 +1663,11 @@
       "id": "locuscompare-region-render",
       "source": "clawbio",
       "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
+    },
+    {
+      "id": "locuszoom",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
     },
     {
       "id": "long-read-sequencing-basecalling",
@@ -1598,6 +1718,11 @@
       "id": "lorbin",
       "source": "pku-metagenomics",
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "manhattan-qq",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
     },
     {
       "id": "mebs",
@@ -1840,6 +1965,11 @@
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
     {
+      "id": "nextflow-development",
+      "source": "user335-anthropic",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c"
+    },
+    {
       "id": "nfcore-sarek-wrapper",
       "source": "clawbio",
       "revision": "1fcecb7e9531210baabe6d5cdbdd08de1ff3ab8d"
@@ -1855,9 +1985,19 @@
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
     },
     {
+      "id": "okg-search",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
+    },
+    {
       "id": "omg",
       "source": "pku-metagenomics",
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "onekgpd-individual-queries",
+      "source": "user335-kdense",
+      "revision": "330c8e764435a731eff571e3efdda70b363d0792"
     },
     {
       "id": "optimize-hifi-diploid-assembly",
@@ -1867,6 +2007,11 @@
     {
       "id": "ortholog-inference",
       "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "outlier-splicing-detection",
+      "source": "user335-bioskills",
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
     {
@@ -1888,6 +2033,11 @@
       "id": "pathway-disease-genetics",
       "source": "tooluniverse",
       "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "pdb-database",
+      "source": "user335-deepmind",
+      "revision": "68832757cbbf941c620b71df5756cf6e5cc287b0"
     },
     {
       "id": "phasing-imputation-genotype-imputation",
@@ -2100,6 +2250,11 @@
       "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
     },
     {
+      "id": "prs",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
+    },
+    {
       "id": "pysam",
       "source": "kdense",
       "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
@@ -2108,6 +2263,11 @@
       "id": "qsap",
       "source": "pku-metagenomics",
       "revision": "e0e19a600d9916736c0713e7659dec3782c51258"
+    },
+    {
+      "id": "qtl-candidate-gene",
+      "source": "haploqtl",
+      "revision": "210eace2912c7bf11d119cb503c89f8f6cad479f"
     },
     {
       "id": "quality-assessment",
@@ -2265,6 +2425,11 @@
       "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
     },
     {
+      "id": "scvi-tools",
+      "source": "user335-anthropic",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c"
+    },
+    {
       "id": "seq-objects",
       "source": "bioskills",
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
@@ -2302,6 +2467,11 @@
     {
       "id": "single-cell-clustering",
       "source": "bioskills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "single-cell-cnv-inference",
+      "source": "user335-bioskills",
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
     {
@@ -2353,6 +2523,11 @@
       "id": "systems-biology-metabolic-reconstruction",
       "source": "bioskills",
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    {
+      "id": "tangermeme",
+      "source": "tangermeme",
+      "revision": "d5c51b83d374576b64effb9284fc79a71a604734"
     },
     {
       "id": "taxvamb",
@@ -2415,6 +2590,11 @@
       "revision": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
     {
+      "id": "twas",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
+    },
+    {
       "id": "ucsc-conservation-and-tfbs",
       "source": "deepmind",
       "revision": "28b8482603a420708c8896f6fe5e06c276d9933d"
@@ -2423,6 +2603,11 @@
       "id": "ucsc-genome-browser",
       "source": "sciagent",
       "revision": "fe505cae14d20b6c33be2e49666425be98f005bb"
+    },
+    {
+      "id": "ukb-ppp-region-fetch",
+      "source": "user335-clawbio",
+      "revision": "4848cc280c446093b1364a2445db3137d455cc17"
     },
     {
       "id": "unibind-database",
@@ -2438,6 +2623,11 @@
       "id": "variant-analysis",
       "source": "tooluniverse",
       "revision": "7a0ceb2f3a2ae28594e55ec27344e839df8bc9f7"
+    },
+    {
+      "id": "variant-annotate",
+      "source": "statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0"
     },
     {
       "id": "variant-annotation",

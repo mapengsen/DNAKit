@@ -1,15 +1,15 @@
-# OPS-005 序列生成
-
-公共处理接口支持[统一的文件与文本输入](00_processing_inputs.md)，具体入口及输出规则见该说明。
+# 序列生成
 
 通过突变、插入、删除、片段重排、随机打乱或序列重组生成新的 DNA 序列。
 
-## 1. OPS-005.1 突变生成
 
-- **作用：** 对序列中的每个碱基独立判断是否发生替换突变。
+## 1) 突变生成 {#1-ops-0051}
+
+- **作用：** 按碱基概率生成替换突变。
+- **计算方法：** 逐位独立以 mut_frac 概率命中；命中后等概率选择其他三种碱基之一。
 - **API：** `dnakit.ops.evolution_generate(sequence[必须], augmentations=("mutation",), seed/rng[二选一], mut_frac[可选])`。
-- **概率：** `mut_frac` 表示每个碱基发生突变的概率，范围为 `0.0～1.0`，默认值为 `0.05`。命中的碱基会等概率替换为另外三种 canonical 碱基之一，因此一定会改变。
-- **补充：** `mutate()` 用于指定位置或随机位置的单次单碱基替换，不接收概率参数。
+- **输入：** canonical DNASequence；概率在 [0,1]，默认 0.05；seed/rng 二选一。
+- **输出：** 返回 `EvolutionGenerationResult`，包含生成的 `sequence` 和突变步骤 `steps`。
 - **示例代码：**
 
 ```python
@@ -35,12 +35,13 @@ ACATTCGACCTT
 5
 ```
 
-## 2. OPS-005.2 插入生成
+## 2) 插入生成 {#2-ops-0052}
 
-- **作用：** 对序列中的每个碱基独立判断是否在其后插入随机 DNA。
+- **作用：** 按位置概率插入随机 DNA 片段。
+- **计算方法：** 逐位独立以 insert_frac 概率命中，在该位置后插入长度为 [insert_min,insert_max] 的随机片段。
 - **API：** `dnakit.ops.evolution_generate(sequence[必须], augmentations=("insertion",), seed/rng[二选一], insert_frac[可选], insert_min[可选], insert_max[可选])`。
-- **概率：** `insert_frac` 表示每个碱基位置发生插入的概率，范围为 `0.0～1.0`，默认值为 `0.05`。
-- **插入长度：** `insert_min=1, insert_max=1` 时，每次命中只插入 1 个随机碱基；设置其他最小值和最大值时，每次命中会在闭区间 `[insert_min, insert_max]` 内随机选择片段长度。
+- **输入：** canonical DNASequence；概率在 [0,1]，插入长度为正整数，seed/rng 二选一。
+- **输出：** 返回 `EvolutionGenerationResult`，包含插入后的 `sequence` 和插入步骤 `steps`。
 - **示例代码：**
 
 ```python
@@ -77,13 +78,13 @@ ACGGTACTGTAACAGT 4
 ACGAGACTTACAAACCGTTACAACCAGGT 17
 ```
 
-如果只想在整条序列中随机选择一个位置，并插入一次连续片段，可使用 `indel_generate(operation="insertion", min_length=..., max_length=...)`。
+## 3) 删除生成 {#3-ops-0053}
 
-## 3. OPS-005.3 删除生成
-
-- **作用：** 对序列中的每个碱基独立判断是否删除该碱基。
+- **作用：** 按碱基概率删除序列位置。
+- **计算方法：** 逐位独立以 delete_frac 概率命中并删除该碱基。
 - **API：** `dnakit.ops.evolution_generate(sequence[必须], augmentations=("deletion",), seed/rng[二选一], delete_frac[可选])`。
-- **概率：** `delete_frac` 表示每个碱基位置发生删除的概率，范围为 `0.0～1.0`，默认值为 `0.05`。命中后只删除当前位置的一个碱基。
+- **输入：** canonical DNASequence；概率在 [0,1]，默认 0.05；seed/rng 二选一。
+- **输出：** 返回 `EvolutionGenerationResult`，包含删除后的 `sequence` 和删除步骤 `steps`。
 - **示例代码：**
 
 ```python
@@ -109,37 +110,42 @@ ACTCGCT
 5
 ```
 
-如果只想在整条序列中随机选择一个连续片段并删除一次，可使用 `indel_generate(operation="deletion", min_length=..., max_length=...)`。
+## 4) 类进化算法操作 {#4-ops-0054}
 
-## 4. OPS-005.4 类进化算法操作
+- **作用：** 组合多个随机序列变换。
+- **计算方法：** 无放回选择操作，依次执行局部反向互补、删除、易位、插入、整条反向互补、突变。
+- **API：** `dnakit.ops.evolution_generate(sequence[必须], augmentations[可选], max_augmentations[可选], hard_aug[可选], seed[可选], rng[可选], mut_frac[可选], insert_frac[可选], delete_frac[可选], insert_min/insert_max[可选], shift_min/shift_max[可选], invert_min/invert_max[可选], rc_prob[可选])`。
+- **输入：** canonical DNASequence、候选操作和 seed/rng；选中操作不保证一定改变序列。
+- **输出：** 返回 `EvolutionGenerationResult`，包含生成的 `sequence` 和各步操作 `steps`。
+- **示例代码：**
 
-`evolution_generate()` 还支持局部反向互补、易位和整条反向互补。多个候选操作先无放回抽样，再按固定顺序执行：局部反向互补、删除、易位、插入、整条反向互补、突变。逐碱基概率针对各操作执行时的当前序列。
+```python
+from dnakit import DNASequence
+from dnakit.ops import evolution_generate
 
-- **完整 API：** `dnakit.ops.evolution_generate(sequence[必须], augmentations[可选], max_augmentations[可选], hard_aug[可选], seed[可选], rng[可选], mut_frac[可选], insert_frac[可选], delete_frac[可选], insert_min/insert_max[可选], shift_min/shift_max[可选], invert_min/invert_max[可选], rc_prob[可选])`。
-- **结果：** `EvolutionGenerationResult.sequence` 是生成序列；`steps` 保存每个操作是否生效及其实际影响长度；结果同时保存随机源、随机状态和 `dnakit-evoaug-v3` 算法版本。
-- **抽样规则：** `hard_aug=True` 时每条序列恰好选择 `max_augmentations` 种操作；`False` 时从 1 到该最大值随机选择。选中某种操作不保证一定命中碱基，例如概率较低且序列较短时可能不产生变化。
+result = evolution_generate(
+    DNASequence("AAGTCC"),
+    augmentations=("reverse_complement",),
+    rc_prob=1.0,
+    seed=19,
+)
+print(result.sequence.symbols)
+```
 
-| 操作名                 | 作用                                             |
-| ---------------------- | ------------------------------------------------ |
-| `mutation`           | 每个碱基独立以`mut_frac` 概率替换              |
-| `insertion`          | 每个碱基后独立以`insert_frac` 概率插入随机 DNA |
-| `deletion`           | 每个碱基独立以`delete_frac` 概率删除           |
-| `translocation`      | 随机 roll 序列，交换断点两侧片段顺序             |
-| `inversion`          | 将连续片段替换为其反向互补序列                   |
-| `reverse_complement` | 按`rc_prob` 将整条序列替换为反向互补           |
+- **示例结果：**
 
-## 5. OPS-005.5 片段重排 <span id="5"></span>
+```text
+GGACTT
+```
 
-`rearrange_generate()` 先用随机断点把序列切成 `segment_count` 个非空片段，再执行一种重排：
+## 5) 片段重排 <span id="5"></span> {#5-ops-0055}
 
-| `operation`   | 作用                                     |
-| --------------- | ---------------------------------------- |
-| `exchange`    | 随机交换片段顺序，长度不变               |
-| `inversion`   | 选中一个片段并替换为其反向互补，长度不变 |
-| `duplication` | 选中一个片段并在其后复制一份，长度增加   |
-
+- **作用：** 随机交换、反向互补或复制序列片段。
+- **计算方法：** 随机切成非空片段，再按 operation 交换片段顺序、反向互补一个片段或复制一个片段。
 - **API：** `dnakit.ops.rearrange_generate(sequence[必须], operation[可选], segment_count[可选], seed[可选], rng[可选])`。
-- **结果：** `RearrangementResult` 保存 `breakpoints`、交换 `permutation` 或 `selected_segment`，便于复核生成过程。
+- **输入：** canonical DNASequence、片段数、操作和 seed/rng。
+- **输出：** 返回 `RearrangementResult`，示例展示 `sequence`、`breakpoints`、`permutation`。
+- **示例代码：**
 
 ```python
 from dnakit import DNASequence
@@ -156,12 +162,21 @@ print(result.sequence.symbols)
 print(result.breakpoints, result.permutation)
 ```
 
-## 6. OPS-005.6 k-mer 随机打乱 <span id="6-k-mer"></span>
+- **示例结果：**
 
-`kmer_shuffle()` 不直接独立打乱碱基，而是在原序列的 de Bruijn 多重图上随机采样 Euler 路径。因此会精确保持重叠 k-mer 的计数；例如 `k=2` 保持二联体计数，`k=3` 保持三联体计数。默认 `ensure_different=True`，会尝试生成与原序列不同的序列；若计数结构只有唯一重建结果，则抛出明确错误。
+```text
+AGTCAC
+(1, 5) (1, 0, 2)
+```
 
+## 6) k-mer 随机打乱 <span id="6-k-mer"></span> {#6-ops-0056-k-mer}
+
+- **作用：** 随机打乱序列并保持指定 k 的重叠 k-mer 计数。
+- **计算方法：** 在 de Bruijn 多重图上采样 Euler 路径，精确保留重叠 k-mer 计数。
 - **API：** `dnakit.ops.kmer_shuffle(sequence[必须], k[可选], seed[可选], rng[可选], ensure_different[可选], max_attempts[可选])`。
-- **结果：** `KmerShuffleResult` 保存 `k`、原始 k-mer 计数、尝试次数和随机状态。
+- **输入：** canonical DNASequence、k 和 seed/rng；默认必须产生不同序列，无其他可行结果时报错。
+- **输出：** 返回 `KmerShuffleResult`，示例展示 `sequence`。
+- **示例代码：**
 
 ```python
 from collections import Counter
@@ -178,15 +193,20 @@ assert Counter(
 print(generated)
 ```
 
-该实现参考 k-mer 保持打乱的 Euler 路径方法（见 [uShuffle 论文](https://pmc.ncbi.nlm.nih.gov/articles/PMC2375906/)）；它只保证指定 `k` 的重叠计数，不代表保持更高阶 k-mer、功能、表达量或实验性质。
+- **示例结果：**
 
-## 7. OPS-005.7 多序列重组 / 交叉<span id="7-crossover"></span>
+```text
+AAGATCGGATCGATC
+```
 
-`crossover()` 接收两条等长 DNA 序列和一个单点边界，生成“第一条序列前缀 + 第二条序列后缀”的子代。边界使用 0-based 半开切分位置；省略 `position` 时必须传 `seed` 或 `random.Random`，随机选择一个同时保留两侧碱基的边界。
+## 7) 多序列重组 / 交叉<span id="7-crossover"></span> {#7-ops-0057}
 
+- **作用：** 以单个边界拼接两个亲本，生成子代。
+- **计算方法：** 在 0-based 边界 position 处取第一条的前缀和第二条的后缀。
 - **API：** `dnakit.ops.crossover(first[必须], second[必须], position[可选], seed[可选], rng[可选])`。
-- **结果：** `CrossoverResult.sequence` 是子代；`position`、两个亲本长度和随机状态保存在结果中。
-- **示例：**
+- **输入：** 两条等长、线性、无 Gap 的 A/C/G/T 序列；省略 position 时必须提供 seed/rng。
+- **输出：** 返回 `CrossoverResult`，示例展示 `sequence`。
+- **示例代码：**
 
 ```python
 from dnakit import DNASequence
@@ -198,4 +218,10 @@ result = crossover(first, second, position=4)
 print(result.sequence.symbols)  # AAAATTTT
 ```
 
-该 API 当前是两条等长序列的一点交叉；不同长度、环状、含 Gap、含 IUPAC 模糊碱基的输入会被拒绝。
+- **示例结果：**
+
+```text
+AAAATTTT
+```
+
+[FAQ：补充说明](../../faq/tutorial_basics.md#generation-details)

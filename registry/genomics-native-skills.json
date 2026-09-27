@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-20",
+  "skills": [
+    {
+      "id": "dnakit-genomic-breeding",
+      "category": "breeding",
+      "summary_zh": "基因组关系矩阵与固定惩罚育种预测",
+      "native_functions": ["dnakit.genomics.genomic_relationship_matrix", "dnakit.genomics.genomic_prediction"],
+      "python_modules": ["numpy"],
+      "keywords": ["breeding", "genomic selection", "VanRaden", "RR-BLUP", "育种", "基因组选择"]
+    },
+    {
+      "id": "dnakit-prokaryotic-genes",
+      "category": "annotation",
+      "summary_zh": "原核基因预测与编码序列导出",
+      "native_functions": ["dnakit.genomics.predict_prokaryotic_genes"],
+      "python_modules": ["pyrodigal"],
+      "keywords": ["prokaryotic", "gene prediction", "coding sequence", "原核", "基因预测"]
+    },
+    {
+      "id": "dnakit-methylation-summary",
+      "category": "epigenomics",
+      "summary_zh": "bedMethyl 读取与修饰碱基计数汇总",
+      "native_functions": ["dnakit.genomics.read_bedmethyl", "dnakit.genomics.summarize_methylation"],
+      "python_modules": [],
+      "keywords": ["methylation", "bedMethyl", "epigenetics", "甲基化", "表观遗传"]
+    },
+    {
+      "id": "dnakit-dna-storage",
+      "category": "dna-storage",
+      "summary_zh": "DNA 数据编码与可逆解码",
+      "native_functions": ["dnakit.genomics.encode_dna_storage", "dnakit.genomics.decode_dna_storage"],
+      "python_modules": ["Chamaeleo"],
+      "keywords": ["DNA data storage", "encoding", "DNA存储", "数据存储"]
+    },
+    {
+      "id": "dnakit-dna-nanotechnology",
+      "category": "nanotechnology",
+      "summary_zh": "DNA 双链设计与 oxDNA 结构导出",
+      "native_functions": ["dnakit.genomics.design_dna_duplex", "dnakit.genomics.export_oxdna_design"],
+      "python_modules": ["scadnano"],
+      "keywords": ["DNA nanotechnology", "oxDNA", "scadnano", "DNA纳米", "纳米技术"]
+    },
+    {
+      "id": "dnakit-external-genomics",
+      "category": "workflows",
+      "summary_zh": "外部基因组软件与 MCP 工作流按需执行",
+      "native_functions": ["dnakit.integrations.search_projects", "dnakit.integrations.list_analyses", "dnakit.integrations.describe_analysis", "dnakit.integrations.plan_analysis", "dnakit.integrations.run_analysis", "dnakit.integrations.list_mcp_servers", "dnakit.integrations.list_mcp_tools", "dnakit.integrations.call_mcp_tool", "dnakit.integrations.call_mcp_workflow"],
+      "python_modules": [],
+      "keywords": ["genomics", "MCP", "external analysis", "基因组", "外部分析"]
+    }
+  ]
+}

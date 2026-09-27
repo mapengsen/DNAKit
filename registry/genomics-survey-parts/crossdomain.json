@@ -1,0 +1,1433 @@
+{
+  "snapshot_date": "2026-09-20",
+  "queries": [
+    {
+      "query": "genomics bioinformatics \"MCP\" \"server\" github 2026",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "genomic breeding \"SKILL.md\" github",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA genomics agent skills MCP scientific tools 2026 bioinformatics",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA data storage python package DNA fountain DNA Chamaeleo github",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA nanotechnology oxDNA scadnano python github MCP agent",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "\"bioinformatics\" \"MCP\" \"github.com\" \"server\" tools",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA storage DNASpiderWeb NOREC4DNA GitHub codec",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA nanotechnology Multistrand KinDA Peppercorn nuskell GitHub",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA shape Curves+ 3DNA DSSR DNAshapeR official software",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA replication repair sequencing \"SKILL.md\" \"MCP\"",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA storage DNASpiderWeb NOREC4DNA Chamaeleo github",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA nanotechnology KinDA nuskell multistrand Peppercorn official github",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "genomics bioinformatics MCP GenePattern Galaxy server GitHub",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "DNA shape replication repair spatial genomics single cell MCP skills github",
+      "domain": "cross-domain",
+      "notes": "官方项目和作者原文；综述/聚合页只用来发现原始来源。"
+    },
+    {
+      "query": "site.github.com DNAshapeR DNA shape toolkit",
+      "domain": "cross-domain",
+      "notes": "原作者项目检索；DNA是隐喻的商业/智能体记忆项目不纳入。"
+    },
+    {
+      "query": "site.github.com \"DNA\" \"MCP\" \"nanotechnology\"",
+      "domain": "cross-domain",
+      "notes": "原作者项目检索；DNA是隐喻的商业/智能体记忆项目不纳入。"
+    },
+    {
+      "query": "site.github.com \"DNA\" \"MCP\" \"storage\"",
+      "domain": "cross-domain",
+      "notes": "原作者项目检索；DNA是隐喻的商业/智能体记忆项目不纳入。"
+    },
+    {
+      "query": "site.github.com \"DNA\" \"SKILL.md\" \"replication\"",
+      "domain": "cross-domain",
+      "notes": "原作者项目检索；DNA是隐喻的商业/智能体记忆项目不纳入。"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "chamaeleo",
+      "name": "Chamaeleo",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/ntpz870817/Chamaeleo",
+      "homepage": "https://github.com/ntpz870817/Chamaeleo",
+      "attribution": "ntpz870817/Chamaeleo authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1038/nature11875"
+      ],
+      "capabilities": [
+        "DNA数据编码与解码"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ntpz870817/Chamaeleo/HEAD/README.md",
+        "https://raw.githubusercontent.com/ntpz870817/Chamaeleo/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/ntpz870817/Chamaeleo/HEAD/README.md",
+          "sha256": "8ab3619eeab64f526b8af13cb6a0f96c93078914c1beaa4d3d8a3421d6fe1ea5",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ntpz870817/Chamaeleo/HEAD/LICENSE",
+          "sha256": "793eb0084482f4e2c132db1ac847b913fafe4eae711c7dfd0d2487c1d7a8868d",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/ntpz870817/Chamaeleo/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "scadnano",
+      "name": "scadnano",
+      "domains": [
+        "nanotechnology"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/UC-Davis-molecular-computing/scadnano-python-package",
+      "homepage": "https://github.com/UC-Davis-molecular-computing/scadnano-python-package",
+      "attribution": "UC-Davis-molecular-computing/scadnano-python-package authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.4230/LIPIcs.DNA.2020.9"
+      ],
+      "capabilities": [
+        "DNA纳米结构设计与oxDNA导出"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/UC-Davis-molecular-computing/scadnano-python-package/HEAD/README.md",
+        "https://raw.githubusercontent.com/UC-Davis-molecular-computing/scadnano-python-package/HEAD/LICENSE.txt"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/UC-Davis-molecular-computing/scadnano-python-package/HEAD/README.md",
+          "sha256": "9297c8c0ee2d8ac2361d63219daf5668490311a2ee8f6be0e495c0dc242fe960",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/UC-Davis-molecular-computing/scadnano-python-package/HEAD/LICENSE.txt",
+          "sha256": "34e4eb47624ed6e79e64d834711f1377458736dee45c70e02e63df1975a96645",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/UC-Davis-molecular-computing/scadnano-python-package/HEAD/LICENSE.txt"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "oxdna",
+      "name": "oxDNA",
+      "domains": [
+        "nanotechnology"
+      ],
+      "kind": "simulation",
+      "repository": "https://github.com/lorenzo-rovigatti/oxDNA",
+      "homepage": "https://github.com/lorenzo-rovigatti/oxDNA",
+      "attribution": "lorenzo-rovigatti/oxDNA authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "粗粒化DNA结构与动力学模拟"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/lorenzo-rovigatti/oxDNA/HEAD/README.md",
+        "https://raw.githubusercontent.com/lorenzo-rovigatti/oxDNA/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/lorenzo-rovigatti/oxDNA/HEAD/README.md",
+          "sha256": "b97436dc2febbcc41747c208471cb1ba425708fa2b5992e605eef076929e7f19",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/lorenzo-rovigatti/oxDNA/HEAD/LICENSE",
+          "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/lorenzo-rovigatti/oxDNA/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "kinda",
+      "name": "KinDA",
+      "domains": [
+        "strand-displacement"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/DNA-and-Natural-Algorithms-Group/KinDA",
+      "homepage": "https://github.com/DNA-and-Natural-Algorithms-Group/KinDA",
+      "attribution": "DNA-and-Natural-Algorithms-Group/KinDA authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1098/rsif.2018.0107"
+      ],
+      "capabilities": [
+        "DNA链置换反应动力学分析"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/KinDA/HEAD/README.md",
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/KinDA/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/KinDA/HEAD/README.md",
+          "sha256": "b3510890c559e1a2482187f1910ced71482c88a6df072690232025dfa6c2b3aa",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/KinDA/HEAD/LICENSE",
+          "sha256": "6d73dd126b6c57351ea423812bced06788087fddd2907563650bdf2d1e5297c6",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/KinDA/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "nuskell",
+      "name": "Nuskell",
+      "domains": [
+        "strand-displacement"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/DNA-and-Natural-Algorithms-Group/nuskell",
+      "homepage": "https://github.com/DNA-and-Natural-Algorithms-Group/nuskell",
+      "attribution": "DNA-and-Natural-Algorithms-Group/nuskell authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "化学反应网络到DNA链置换电路编译"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/nuskell/HEAD/README.md",
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/nuskell/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/nuskell/HEAD/README.md",
+          "sha256": "9086ec7aefa28e71c73bd59430a085da98734819f26905f7f74cf81716fae251",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/nuskell/HEAD/LICENSE",
+          "sha256": "7af43496de6093d2597a5810b6ae0c51d8b641d59d15cbb4fc36daf2a7af6e8e",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/nuskell/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "peppercorn",
+      "name": "Peppercorn",
+      "domains": [
+        "strand-displacement"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator",
+      "homepage": "https://github.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator",
+      "attribution": "DNA-and-Natural-Algorithms-Group/peppercornenumerator authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "DNA链置换反应枚举"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator/HEAD/README.md",
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator/HEAD/README.md",
+          "sha256": "8b0d172e058586dbc030643e0a51d28e146ba3df9ecd86cab54c87babf92af78",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator/HEAD/LICENSE",
+          "sha256": "b03853953d7cd135b29c5e3b4a648d5fe7deb528a8ece8bcb1078dee8ffa1b8d",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/peppercornenumerator/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "multistrand",
+      "name": "Multistrand",
+      "domains": [
+        "strand-displacement"
+      ],
+      "kind": "simulation",
+      "repository": "https://github.com/DNA-and-Natural-Algorithms-Group/multistrand",
+      "homepage": "https://github.com/DNA-and-Natural-Algorithms-Group/multistrand",
+      "attribution": "DNA-and-Natural-Algorithms-Group/multistrand authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1007/978-3-319-21999-8_13"
+      ],
+      "capabilities": [
+        "DNA二级结构反应动力学模拟"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/multistrand/HEAD/README.md",
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/multistrand/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/multistrand/HEAD/README.md",
+          "sha256": "773518adcf601125d86e9d93b794111ae83cffba9b8d904c4dea58df0d9860cb",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/multistrand/HEAD/LICENSE",
+          "sha256": "da9f0f90936df6b11528a92d50f93874896778a6e22be7f2dd98e3687a0095cb",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/multistrand/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "piperine",
+      "name": "Piperine",
+      "domains": [
+        "strand-displacement"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/DNA-and-Natural-Algorithms-Group/piperine",
+      "homepage": "https://github.com/DNA-and-Natural-Algorithms-Group/piperine",
+      "attribution": "DNA-and-Natural-Algorithms-Group/piperine authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "DNA链置换电路序列设计"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/piperine/HEAD/README.md",
+        "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/piperine/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/piperine/HEAD/README.md",
+          "sha256": "6abca74e79524bbe291a9b8ad792a296ef52ffc58c8e47ff952f3defe7586b54",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/piperine/HEAD/LICENSE",
+          "sha256": "05c0ac1af491757791b6ea14133aa02f2ba2263999685f2ffdf4f364389aa5f4",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/DNA-and-Natural-Algorithms-Group/piperine/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "norec4dna",
+      "name": "NOREC4DNA",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/umr-ds/NOREC4DNA",
+      "homepage": "https://github.com/umr-ds/NOREC4DNA",
+      "attribution": "umr-ds/NOREC4DNA authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1186/s12859-021-04318-x"
+      ],
+      "capabilities": [
+        "DNA存储喷泉编码"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/umr-ds/NOREC4DNA/HEAD/README.md",
+        "https://raw.githubusercontent.com/umr-ds/NOREC4DNA/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/umr-ds/NOREC4DNA/HEAD/README.md",
+          "sha256": "67f712f49d129c57d7c4e151a5c332486c4d1f5cb976f4dcc2b89a70b316d6a9",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/umr-ds/NOREC4DNA/HEAD/LICENSE",
+          "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/umr-ds/NOREC4DNA/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "dnaspiderweb",
+      "name": "DNASpiderWeb",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "python-library",
+      "repository": "https://github.com/HaolingZHANG/DNASpiderWeb",
+      "homepage": "https://github.com/HaolingZHANG/DNASpiderWeb",
+      "attribution": "HaolingZHANG/DNASpiderWeb authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "受约束DNA编码与纠错"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/HaolingZHANG/DNASpiderWeb/HEAD/README.md"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/HaolingZHANG/DNASpiderWeb/HEAD/README.md",
+          "sha256": "e0d6fbe932f770e5ee7507befad6418fd5de3a75928cab588ad7d5971ce61109",
+          "type": "readme"
+        }
+      ],
+      "license_evidence": {
+        "status": "not verified; do not vendor",
+        "urls": []
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "dna-aeon",
+      "name": "DNA-Aeon",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/MW55/DNA-Aeon",
+      "homepage": "https://github.com/MW55/DNA-Aeon",
+      "attribution": "MW55/DNA-Aeon authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41467-023-36297-3"
+      ],
+      "capabilities": [
+        "面向DNA存储的压缩与纠错"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/MW55/DNA-Aeon/HEAD/README.md",
+        "https://raw.githubusercontent.com/MW55/DNA-Aeon/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/MW55/DNA-Aeon/HEAD/README.md",
+          "sha256": "a2f5f8f1c36fa6acf0b5d4140290d7a32f582d840ae281f9fc13750eb484a2d7",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/MW55/DNA-Aeon/HEAD/LICENSE",
+          "sha256": "f18a9983de27be8a5b6997c1e6032032afabd67eea40ad42300abd77d80405de",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/MW55/DNA-Aeon/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "unacorm",
+      "name": "UNACORM",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "benchmark",
+      "repository": "https://github.com/AAnzel/UNACORM",
+      "homepage": "https://github.com/AAnzel/UNACORM",
+      "attribution": "AAnzel/UNACORM authors and contributors",
+      "paper_urls": [
+        "https://arxiv.org/abs/2608.09673"
+      ],
+      "capabilities": [
+        "DNA存储编码器评估平台"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/AAnzel/UNACORM/HEAD/README.md",
+        "https://raw.githubusercontent.com/AAnzel/UNACORM/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/AAnzel/UNACORM/HEAD/README.md",
+          "sha256": "bb9290d447c3768349edd80abce5a409177db63b348b1f53f0f60d1b4b7d6fec",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/AAnzel/UNACORM/HEAD/LICENSE",
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/AAnzel/UNACORM/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "dr4dna",
+      "name": "DR4DNA",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/umr-ds/DR4DNA",
+      "homepage": "https://github.com/umr-ds/DR4DNA",
+      "attribution": "umr-ds/DR4DNA authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "DNA存储数据恢复"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/umr-ds/DR4DNA/HEAD/README.md",
+        "https://raw.githubusercontent.com/umr-ds/DR4DNA/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/umr-ds/DR4DNA/HEAD/README.md",
+          "sha256": "3a748a7563925e66a779dd708be790b721521fdda3ad4a5ca382ae8af46a6eab",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/umr-ds/DR4DNA/HEAD/LICENSE",
+          "sha256": "20b067f86de375aae6db0f283ab2e65de24d537733b89bd58432c101259d84cf",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/umr-ds/DR4DNA/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "dnastore",
+      "name": "dnastore",
+      "domains": [
+        "dna-storage"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/ihh/dnastore",
+      "homepage": "https://github.com/ihh/dnastore",
+      "attribution": "ihh/dnastore authors and contributors",
+      "paper_urls": [
+        "https://arxiv.org/abs/1606.01799"
+      ],
+      "capabilities": [
+        "无短重复模块化DNA编码"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ihh/dnastore/HEAD/README.md",
+        "https://raw.githubusercontent.com/ihh/dnastore/HEAD/LICENSE.txt"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/ihh/dnastore/HEAD/README.md",
+          "sha256": "2aa6c4ed2d0bdc497a09e82da6dcdb6d99c472b48b0543ab82c3030db553db75",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ihh/dnastore/HEAD/LICENSE.txt",
+          "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/ihh/dnastore/HEAD/LICENSE.txt"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "genepattern-mcp",
+      "name": "GenePattern MCP",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "mcp",
+      "repository": "https://github.com/genepattern/genepattern-mcp",
+      "homepage": "https://github.com/genepattern/genepattern-mcp",
+      "attribution": "genepattern/genepattern-mcp authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "GenePattern分析模块检索与云端作业管理"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/genepattern/genepattern-mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/genepattern/genepattern-mcp/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/genepattern/genepattern-mcp/HEAD/README.md",
+          "sha256": "32fec55dbbc54476a92ec54426a1202854bd9a3003e2cfac61735082129b5945",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/genepattern/genepattern-mcp/HEAD/LICENSE",
+          "sha256": "1f3e3df88edc381d4a3feb0c2a4b6f04dff56e5b1e11ad1d96a9be44a656a99d",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/genepattern/genepattern-mcp/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "galaxy-mcp",
+      "name": "Galaxy MCP",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "mcp",
+      "repository": "https://github.com/galaxyproject/galaxy-mcp",
+      "homepage": "https://github.com/galaxyproject/galaxy-mcp",
+      "attribution": "galaxyproject/galaxy-mcp authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "Galaxy工具、数据与工作流调用"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/galaxyproject/galaxy-mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/galaxyproject/galaxy-mcp/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/galaxyproject/galaxy-mcp/HEAD/README.md",
+          "sha256": "7df8cb77c4d0b62db751d4f12b2e5e08becc40a238fc86646e9fa4476df11ff8",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/galaxyproject/galaxy-mcp/HEAD/LICENSE",
+          "sha256": "dcdf0ed4bacc63366f768b141ae14edfed203bdfd19f0bf959830aa52601ae9f",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/galaxyproject/galaxy-mcp/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "bioinformatics-mcp",
+      "name": "Bioinformatics MCP",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "mcp",
+      "repository": "https://github.com/raonyguimaraes/bioinformatics-mcp",
+      "homepage": "https://github.com/raonyguimaraes/bioinformatics-mcp",
+      "attribution": "raonyguimaraes/bioinformatics-mcp authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "序列、变异、表观与单细胞分析工具服务"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/raonyguimaraes/bioinformatics-mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/raonyguimaraes/bioinformatics-mcp/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/raonyguimaraes/bioinformatics-mcp/HEAD/README.md",
+          "sha256": "344b8e66639158a1ea140ece2aa7f6844348cb24fc57b5cb241f91b8e7cb60d1",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/raonyguimaraes/bioinformatics-mcp/HEAD/LICENSE",
+          "sha256": "d74b93cca1225d4f6d38769477f77e5d7dfa999a961ce4f8b2b70918e2536adb",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/raonyguimaraes/bioinformatics-mcp/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "bioinfomcp",
+      "name": "BioinfoMCP",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "mcp-framework",
+      "repository": "https://github.com/florensiawidjaja/BioinfoMCP",
+      "homepage": "https://github.com/florensiawidjaja/BioinfoMCP",
+      "attribution": "florensiawidjaja/BioinfoMCP authors and contributors",
+      "paper_urls": [
+        "https://arxiv.org/abs/2510.02139"
+      ],
+      "capabilities": [
+        "生物信息学工具MCP封装平台"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/florensiawidjaja/BioinfoMCP/HEAD/README.md",
+        "https://raw.githubusercontent.com/florensiawidjaja/BioinfoMCP/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/florensiawidjaja/BioinfoMCP/HEAD/README.md",
+          "sha256": "9fce9c66a45c606aed70a6dc5ea28c55107acdc01bac905b30d0c8f88db05393",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/florensiawidjaja/BioinfoMCP/HEAD/LICENSE",
+          "sha256": "09d32674c53a40205382e0293a22951c40fa4eb259b9b5ee1cb7770cc02b9e5e",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/florensiawidjaja/BioinfoMCP/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "omicsclaw",
+      "name": "OmicsClaw",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "skills+agent",
+      "repository": "https://github.com/TianGzlab/OmicsClaw",
+      "homepage": "https://github.com/TianGzlab/OmicsClaw",
+      "attribution": "TianGzlab/OmicsClaw authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "多组学智能体中的DNA测序分析工作流"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/TianGzlab/OmicsClaw/HEAD/README.md",
+        "https://raw.githubusercontent.com/TianGzlab/OmicsClaw/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/TianGzlab/OmicsClaw/HEAD/README.md",
+          "sha256": "5ba5e5f659f6ef31e6c8205cf02c2105791d7f5d71207727b8b222a52a0eb626",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TianGzlab/OmicsClaw/HEAD/LICENSE",
+          "sha256": "609349f3b663ec8d0e60220b340c13da9a74e93c6074f8c47b087ad8bba13b6a",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/TianGzlab/OmicsClaw/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "variome-skills",
+      "name": "Bioinformatics Agent Skills",
+      "domains": [
+        "workflows"
+      ],
+      "kind": "skills+mcp",
+      "repository": "https://github.com/variomeanalytics/bioinformatics-agent-skills",
+      "homepage": "https://github.com/variomeanalytics/bioinformatics-agent-skills",
+      "attribution": "variomeanalytics/bioinformatics-agent-skills authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "论文来源的生物信息学工作流知识"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/variomeanalytics/bioinformatics-agent-skills/HEAD/README.md",
+        "https://raw.githubusercontent.com/variomeanalytics/bioinformatics-agent-skills/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/variomeanalytics/bioinformatics-agent-skills/HEAD/README.md",
+          "sha256": "7708c7c360b7580ef7940a08d92a9f3265c6589108aeaf57b207c4a776a4eb70",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/variomeanalytics/bioinformatics-agent-skills/HEAD/LICENSE",
+          "sha256": "3ba4e0478540900e264ccedf133a23aaace56f65b7dcedc5898a50a5177b65a8",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/variomeanalytics/bioinformatics-agent-skills/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "statgen-skills",
+      "name": "Statistical Genetics Skills",
+      "domains": [
+        "gwas"
+      ],
+      "kind": "skills",
+      "repository": "https://github.com/svdorn/statgen-skills",
+      "homepage": "https://github.com/svdorn/statgen-skills",
+      "attribution": "svdorn/statgen-skills authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "统计遗传、精细定位、PRS与TWAS流程"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/svdorn/statgen-skills/HEAD/README.md",
+        "https://raw.githubusercontent.com/svdorn/statgen-skills/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/svdorn/statgen-skills/HEAD/README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/svdorn/statgen-skills/HEAD/LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/svdorn/statgen-skills/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "plink2",
+      "name": "PLINK 2",
+      "domains": [
+        "population"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/chrchang/plink-ng",
+      "homepage": "https://github.com/chrchang/plink-ng",
+      "attribution": "chrchang/plink-ng authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "PCA、亲缘关系、LD与全基因组关联"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/chrchang/plink-ng/HEAD/README.md"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/chrchang/plink-ng/HEAD/README.md",
+          "sha256": "65febb13e4013041e4fb5210485bc11513d5aa251ef53d20f065b44004aba907",
+          "type": "readme"
+        }
+      ],
+      "license_evidence": {
+        "status": "not verified; do not vendor",
+        "urls": []
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "gcta",
+      "name": "GCTA",
+      "domains": [
+        "gwas"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/jianyangqt/gcta",
+      "homepage": "https://github.com/jianyangqt/gcta",
+      "attribution": "jianyangqt/gcta authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "遗传关系矩阵、REML遗传力与关联分析"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/jianyangqt/gcta/HEAD/README.md",
+        "https://raw.githubusercontent.com/jianyangqt/gcta/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/jianyangqt/gcta/HEAD/README.md",
+          "sha256": "5463ea0870e82041f40ded864f2a5a60ee51501480b08ddc97ad525c27c413f9",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jianyangqt/gcta/HEAD/LICENSE",
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/jianyangqt/gcta/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "fastani",
+      "name": "FastANI",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/ParBLiSS/FastANI",
+      "homepage": "https://github.com/ParBLiSS/FastANI",
+      "attribution": "ParBLiSS/FastANI authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41467-018-07641-9"
+      ],
+      "capabilities": [
+        "原核基因组平均核苷酸一致性"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ParBLiSS/FastANI/HEAD/README.md",
+        "https://raw.githubusercontent.com/ParBLiSS/FastANI/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/ParBLiSS/FastANI/HEAD/README.md",
+          "sha256": "da8d8d334993fa7a4449763d09cd5dfad517f7873a2c2c5e7856580e9e89359a",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ParBLiSS/FastANI/HEAD/LICENSE",
+          "sha256": "0f94b9fa08295c76515ee2235eed545eeeaf1c801f24349da479b6d96a865fad",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/ParBLiSS/FastANI/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "mosdepth",
+      "name": "mosdepth",
+      "domains": [
+        "sequencing"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/brentp/mosdepth",
+      "homepage": "https://github.com/brentp/mosdepth",
+      "attribution": "brentp/mosdepth authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btx699"
+      ],
+      "capabilities": [
+        "比对覆盖度统计"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/brentp/mosdepth/HEAD/README.md",
+        "https://raw.githubusercontent.com/brentp/mosdepth/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/brentp/mosdepth/HEAD/README.md",
+          "sha256": "eb5066afba05606dce7978e561a9593194037397ae9eed9570b0065b9aaa8f08",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/brentp/mosdepth/HEAD/LICENSE",
+          "sha256": "c0b8aafec0afdaf8fad198f1e44a5426e5107d6778743255f2f50c94e608eeca",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/brentp/mosdepth/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "prokka",
+      "name": "Prokka",
+      "domains": [
+        "annotation"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/tseemann/prokka",
+      "homepage": "https://github.com/tseemann/prokka",
+      "attribution": "tseemann/prokka authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu153"
+      ],
+      "capabilities": [
+        "原核基因组注释"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/tseemann/prokka/HEAD/README.md",
+        "https://raw.githubusercontent.com/tseemann/prokka/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/tseemann/prokka/HEAD/README.md",
+          "sha256": "7275cc3cd91ecee401f44d4e0f9436950e867d769e2e7ca25682a53076396027",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tseemann/prokka/HEAD/LICENSE",
+          "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/tseemann/prokka/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "barrnap",
+      "name": "Barrnap",
+      "domains": [
+        "annotation"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/tseemann/barrnap",
+      "homepage": "https://github.com/tseemann/barrnap",
+      "attribution": "tseemann/barrnap authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "核糖体RNA基因预测"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/tseemann/barrnap/HEAD/README.md",
+        "https://raw.githubusercontent.com/tseemann/barrnap/HEAD/LICENSE"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/tseemann/barrnap/HEAD/README.md",
+          "sha256": "69071789e3c6d3aef42d2b86bd5567992484afe408f553309fd26045195ef645",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tseemann/barrnap/HEAD/LICENSE",
+          "sha256": "b702289d434b8486f46fec4753b131f9a3ab426ddfba2d498e69c4661e4d1e38",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/tseemann/barrnap/HEAD/LICENSE"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "minigraph",
+      "name": "minigraph",
+      "domains": [
+        "pangenome"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/lh3/minigraph",
+      "homepage": "https://github.com/lh3/minigraph",
+      "attribution": "lh3/minigraph authors and contributors",
+      "paper_urls": [
+        "https://doi.org/10.1186/s13059-020-02168-z"
+      ],
+      "capabilities": [
+        "基于组装的泛基因组图构建"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/lh3/minigraph/HEAD/README.md",
+        "https://raw.githubusercontent.com/lh3/minigraph/HEAD/LICENSE.txt"
+      ],
+      "source_evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/lh3/minigraph/HEAD/README.md",
+          "sha256": "1ede58516a1756344c5b657562fb4ccf54fd2bdf5d750069bea71bb3a00a2ea7",
+          "type": "readme"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/lh3/minigraph/HEAD/LICENSE.txt",
+          "sha256": "0b8411a66df02c55f8b1bcb036d81da417a25383e37b07c3f00c6a4f32941ab6",
+          "type": "license"
+        }
+      ],
+      "license_evidence": {
+        "status": "see linked upstream license",
+        "urls": [
+          "https://raw.githubusercontent.com/lh3/minigraph/HEAD/LICENSE.txt"
+        ]
+      },
+      "local_matches": [],
+      "gaps": [
+        "该项目独立运行仍取决于可选依赖、输入和上游许可。"
+      ],
+      "integration_recommendation": "有稳定接口者增加可选适配；其余保留检索入口和准确未集成状态。",
+      "validation": "primary-source-reviewed; backend-not-run"
+    },
+    {
+      "id": "dnashaper",
+      "name": "DNAshapeR",
+      "domains": [
+        "nanotechnology",
+        "models"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/TsuPeiChiu/DNAshapeR",
+      "homepage": "https://github.com/TsuPeiChiu/DNAshapeR",
+      "attribution": "TsuPeiChiu/DNAshapeR authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "DNA形状预测与特征编码"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/TsuPeiChiu/DNAshapeR/HEAD/README.md",
+        "https://raw.githubusercontent.com/TsuPeiChiu/DNAshapeR/HEAD/DESCRIPTION"
+      ],
+      "license_evidence": {
+        "status": "see upstream; no source bundled",
+        "urls": [
+          "https://raw.githubusercontent.com/TsuPeiChiu/DNAshapeR/HEAD/DESCRIPTION"
+        ]
+      },
+      "integration_recommendation": "模型依赖分离安装；现有DNAKit描述符不等同于这些形状模型。",
+      "gaps": [
+        "尚无专用适配器"
+      ],
+      "local_matches": []
+    },
+    {
+      "id": "deepdnashape",
+      "name": "deepDNAshape",
+      "domains": [
+        "nanotechnology",
+        "models"
+      ],
+      "kind": "software",
+      "repository": "https://github.com/JinsenLi/deepDNAshape",
+      "homepage": "https://github.com/JinsenLi/deepDNAshape",
+      "attribution": "JinsenLi/deepDNAshape authors and contributors",
+      "paper_urls": [],
+      "capabilities": [
+        "长上下文DNA形状与形状波动预测"
+      ],
+      "verified_urls": [
+        "https://raw.githubusercontent.com/JinsenLi/deepDNAshape/HEAD/README.md",
+        "https://raw.githubusercontent.com/JinsenLi/deepDNAshape/HEAD/LICENSE"
+      ],
+      "license_evidence": {
+        "status": "see upstream; no source bundled",
+        "urls": [
+          "https://raw.githubusercontent.com/JinsenLi/deepDNAshape/HEAD/LICENSE"
+        ]
+      },
+      "integration_recommendation": "模型依赖分离安装；现有DNAKit描述符不等同于这些形状模型。",
+      "gaps": [
+        "尚无专用适配器"
+      ],
+      "local_matches": []
+    },
+    {
+      "id": "meme-suite",
+      "name": "MEME Suite / FIMO",
+      "domains": [
+        "regulation"
+      ],
+      "kind": "software",
+      "homepage": "https://meme-suite.org/meme/",
+      "repository": null,
+      "attribution": "Charles E. Grant, Timothy L. Bailey, William S. Noble; MEME Suite contributors",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btr064"
+      ],
+      "capabilities": [
+        "基于位置权重矩阵的基序扫描"
+      ],
+      "verified_urls": [
+        "https://meme-suite.org/meme/doc/fimo.html"
+      ],
+      "license_evidence": {
+        "url": "https://meme-suite.org/meme/doc/copyright.html",
+        "notes": "External installation; terms apply to the upstream software, not DNAKit adapter code."
+      },
+      "local_matches": []
+    },
+    {
+      "id": "vanraden-grm",
+      "name": "VanRaden genomic relationship method 1",
+      "domains": [
+        "breeding",
+        "population"
+      ],
+      "kind": "published-method",
+      "homepage": "https://doi.org/10.3168/jds.2007-0980",
+      "repository": null,
+      "attribution": "Paul M. VanRaden",
+      "paper_urls": [
+        "https://doi.org/10.3168/jds.2007-0980"
+      ],
+      "capabilities": [
+        "加性基因组关系矩阵"
+      ],
+      "verified_urls": [
+        "https://doi.org/10.3168/jds.2007-0980"
+      ],
+      "license_evidence": {
+        "notes": "Independent implementation of a published mathematical method; no paper or code copied."
+      },
+      "local_matches": []
+    }
+  ],
+  "excluded_false_positives": [
+    {
+      "url": "https://github.com/Sudiddii/build-DNA",
+      "reason": "DNA metaphor for business/identity; not biological DNA"
+    },
+    {
+      "url": "https://github.com/abhay-codes07/Agent-DNA-Transfer",
+      "reason": "Agent memory transfer; not biological DNA"
+    }
+  ]
+}

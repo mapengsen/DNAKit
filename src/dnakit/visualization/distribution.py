@@ -19,7 +19,8 @@ from dnakit.core.issues import Issue
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 from ._svg import SVGBuilder, number, validate_xml_text
-from .config import DistributionPlotConfig
+from .config import DistributionPlotConfig, ImageExportConfig
+from .export import save_image
 from .results import SVGArtifact
 
 DistributionTask = Literal["classification", "regression", "probability"]
@@ -361,6 +362,237 @@ def plot_distribution(
     )
 
 
+def plot_label_comparison(
+    true_labels: Iterable[DistributionValue],
+    predicted_labels: Iterable[DistributionValue],
+    *,
+    config: DistributionPlotConfig | None = None,
+    output: str | Path | None = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+) -> SVGArtifact:
+    """Compare true and predicted class proportions as paired bars per category.
+
+    The input lists must have equal lengths. Blank values are excluded from each
+    series independently, and each series is divided by its own valid count.
+    ``categories`` fixes the category order and can include unobserved classes.
+    ``bar_colors`` supplies the true and predicted colors, in that order.
+    If ``output`` is supplied, save the image in the format selected by its
+    suffix; an extensionless path defaults to PNG. Existing files are protected
+    unless ``overwrite=True``. Parent directories are created as needed.
+    """
+    resolved = DistributionPlotConfig() if config is None else config
+    if not isinstance(resolved, DistributionPlotConfig):
+        raise TypeError("config must be DistributionPlotConfig.")
+    _validate_task("classification", resolved)
+    actual, _, total, true_missing = _clean_values(
+        true_labels, "classification", resolved.max_values
+    )
+    predicted, _, predicted_total, predicted_missing = _clean_values(
+        predicted_labels, "classification", resolved.max_values
+    )
+    if total != predicted_total:
+        raise InputFormatError("true_labels and predicted_labels must have equal lengths.")
+
+    true_counter, predicted_counter = Counter(actual), Counter(predicted)
+    labels = (
+        list(resolved.categories)
+        if resolved.categories is not None
+        else list(dict.fromkeys((*true_counter, *predicted_counter)))
+    )
+    if len(labels) > 1000:
+        raise ConfigurationError("At most 1000 categories may be plotted.")
+    if (true_counter.keys() | predicted_counter.keys()) - set(labels):
+        raise InputFormatError("categories must include every observed label.")
+
+    true_valid, predicted_valid = total - true_missing, total - predicted_missing
+    true_counts = [true_counter[label] for label in labels]
+    predicted_counts = [predicted_counter[label] for label in labels]
+    true_proportions = [count / true_valid for count in true_counts]
+    predicted_proportions = [count / predicted_valid for count in predicted_counts]
+    colors = _bar_colors(2, resolved)
+    metadata: dict[str, object] = {
+        "task": "classification",
+        "normalization": "count / valid_count per series",
+        "labels": labels,
+        "series_labels": ["True", "Predicted"],
+        "true_counts": true_counts,
+        "predicted_counts": predicted_counts,
+        "true_proportions": true_proportions,
+        "predicted_proportions": predicted_proportions,
+        "total_count": total,
+        "true_valid_count": true_valid,
+        "predicted_valid_count": predicted_valid,
+        "true_missing_count": true_missing,
+        "predicted_missing_count": predicted_missing,
+        "bar_colors": colors,
+    }
+    builder = SVGBuilder(
+        resolved.size,
+        resolved.size,
+        title=resolved.title or "True and predicted label distribution",
+        description=(
+            f"Classification: {true_valid} valid true labels and "
+            f"{predicted_valid} valid predicted labels."
+        ),
+        kind="label_distribution_comparison",
+        theme=resolved.theme,
+        metadata=metadata,
+    )
+    left = max(80.0, resolved.tick_font_size * 4.5 + resolved.font_size * 2)
+    right = resolved.size - max(40, resolved.tick_font_size * 3)
+    top = max(resolved.font_size * 3, min(116.0, resolved.size / 3))
+    bottom_margin = max(80, resolved.font_size * 3 + resolved.tick_font_size * 2)
+    if resolved.label_rotation:
+        bottom_margin += resolved.tick_font_size * 7
+    bottom = resolved.size - bottom_margin
+    if right - left < 100 or bottom - top < 100:
+        raise ConfigurationError(
+            "Canvas is too small for these font sizes; increase size or reduce fonts."
+        )
+    width, height = right - left, bottom - top
+    text_style = {"font_family": resolved.theme.font_family, "fill": resolved.theme.foreground}
+
+    for tick in range(0, 101, 20):
+        y = bottom - height * tick / 100
+        if resolved.show_grid:
+            builder.line(left, y, right, y, stroke=resolved.theme.grid, class_="grid-line")
+        builder.text(
+            left - 10,
+            y + resolved.tick_font_size * 0.35,
+            f"{tick}%",
+            text_anchor="end",
+            font_size=resolved.tick_font_size,
+            **text_style,
+        )
+    builder.line(left, top, left, bottom, stroke=resolved.theme.foreground)
+    builder.line(left, bottom, right, bottom, stroke=resolved.theme.foreground)
+
+    legend_y = top - resolved.tick_font_size * 2.6
+    for series, label, color, fraction in (
+        ("true", "True", colors[0], 0.12),
+        ("predicted", "Predicted", colors[1], 0.55),
+    ):
+        x = left + width * fraction
+        builder.rect(
+            x,
+            legend_y,
+            resolved.tick_font_size * 0.7,
+            resolved.tick_font_size * 0.7,
+            fill=color,
+            class_="legend-swatch",
+            data_series=series,
+        )
+        builder.text(
+            x + resolved.tick_font_size,
+            legend_y + resolved.tick_font_size * 0.7,
+            label,
+            font_size=resolved.tick_font_size,
+            class_="legend-label",
+            **text_style,
+        )
+
+    slot_width = width / len(labels)
+    stride = max(1, math.ceil(len(labels) / resolved.max_tick_labels))
+    for index, label in enumerate(labels):
+        group_width = slot_width * resolved.bar_width
+        inner_gap = min(slot_width * 0.02, group_width * 0.1)
+        bar_width = (group_width - inner_gap) / 2
+        group_left = left + slot_width * (index + 0.5) - group_width / 2
+        for series, count, proportion, color, x in (
+            ("true", true_counts[index], true_proportions[index], colors[0], group_left),
+            (
+                "predicted",
+                predicted_counts[index],
+                predicted_proportions[index],
+                colors[1],
+                group_left + bar_width + inner_gap,
+            ),
+        ):
+            bar_height = height * proportion
+            node = builder.rect(
+                x,
+                bottom - bar_height,
+                bar_width,
+                bar_height,
+                fill=color,
+                class_="comparison-bar",
+                data_series=series,
+                data_label=label,
+                data_count=count,
+                data_proportion=proportion,
+            )
+            valid = true_valid if series == "true" else predicted_valid
+            ET.SubElement(
+                node, "{http://www.w3.org/2000/svg}title"
+            ).text = f"{series} {label}: {count}/{valid} ({proportion:.2%})"
+            if resolved.show_values:
+                builder.text(
+                    x + bar_width / 2,
+                    bottom - bar_height - 6,
+                    f"{proportion:.1%}",
+                    text_anchor="middle",
+                    font_size=resolved.value_font_size,
+                    class_="bar-value",
+                    **text_style,
+                )
+        if index % stride == 0:
+            tick_x = left + slot_width * (index + 0.5)
+            tick_y = bottom + resolved.tick_font_size + 8
+            display = label if len(label) <= 18 else label[:15] + "..."
+            builder.text(
+                tick_x,
+                tick_y,
+                display,
+                font_size=resolved.tick_font_size,
+                text_anchor="end" if resolved.label_rotation else "middle",
+                transform=f"rotate(-{resolved.label_rotation} {number(tick_x)} {number(tick_y)})",
+                class_="category-tick",
+                **text_style,
+            )
+
+    builder.text(
+        (left + right) / 2,
+        resolved.size - resolved.font_size,
+        resolved.x_label or "Category",
+        text_anchor="middle",
+        font_size=resolved.font_size,
+        **text_style,
+    )
+    axis_x, axis_y = resolved.font_size * 1.5, (top + bottom) / 2
+    builder.text(
+        axis_x,
+        axis_y,
+        resolved.y_label,
+        text_anchor="middle",
+        font_size=resolved.font_size,
+        transform=f"rotate(-90 {number(axis_x)} {number(axis_y)})",
+        **text_style,
+    )
+    issues = []
+    if true_missing or predicted_missing:
+        issues.append(
+            Issue(
+                "VIZ_MISSING_VALUES",
+                "warning",
+                "Blank labels were excluded from each series denominator.",
+                details={
+                    "true_missing_count": true_missing,
+                    "predicted_missing_count": predicted_missing,
+                },
+            )
+        )
+    artifact = builder.artifact(issues=issues)
+    if output is not None:
+        save_image(
+            artifact,
+            output,
+            config=ImageExportConfig(overwrite=overwrite, create_parents=True),
+            verbose=False,
+        )
+    return artifact
+
+
 def plot_csv_distributions(
     source: str | Path,
     *,
@@ -425,6 +657,11 @@ def plot_csv_distributions(
     return plots
 
 
-__all__ = ["DistributionTask", "plot_csv_distributions", "plot_distribution"]
+__all__ = [
+    "DistributionTask",
+    "plot_csv_distributions",
+    "plot_distribution",
+    "plot_label_comparison",
+]
 
 _register_public_verbose(globals())

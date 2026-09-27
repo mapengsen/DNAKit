@@ -1,0 +1,94 @@
+{
+  "snapshot_date": "2026-09-20",
+  "scope": {
+    "dna_directions": 37,
+    "project_records": 166,
+    "logged_searches": 88,
+    "new_public_functions": 18,
+    "analysis_adapters": 19,
+    "mcp_server_recipes": 7,
+    "added_upstream_skills": 18,
+    "added_native_skills": 6,
+    "total_skills": 560,
+    "catalogued_files": 4615
+  },
+  "checks": [
+    {
+      "name": "genomics functions, CLI adapter contracts, existing Agent/Skill regressions",
+      "passed": 255,
+      "command": "python -m pytest others/tests/unit/test_genomics_breeding.py others/tests/unit/test_genomics_genes.py others/tests/unit/test_genomics_methylation.py others/tests/unit/test_genomics_storage.py others/tests/unit/test_genomics_nanotechnology.py others/tests/unit/test_genomics_integrations.py others/tests/unit/test_agent_tools.py others/tests/unit/test_skills.py -q",
+      "optional_backends": [
+        "Pyrodigal 3.7.1",
+        "Chamaeleo 1.34",
+        "scadnano 0.21.1"
+      ]
+    },
+    {
+      "name": "real local stdio MCP and session/error/schema/redaction tests",
+      "passed": 22,
+      "command": "python -m pytest others/tests/unit/test_genomics_external_mcp.py -q"
+    },
+    {
+      "name": "additive and reproducible skill catalogue regression",
+      "passed": 6,
+      "command": "python -m pytest others/tests/unit/test_genomics_skill_expansion.py -q"
+    },
+    {
+      "name": "static type analysis",
+      "status": "passed",
+      "files": 10,
+      "command": "python -m mypy --follow-imports silent src/dnakit/genomics src/dnakit/integrations"
+    },
+    {
+      "name": "ruff",
+      "status": "passed",
+      "scope": "new genomics/integrations runtime, corresponding tests and maintenance scripts"
+    },
+    {
+      "name": "bilingual strict documentation build",
+      "status": "passed",
+      "command": "python -m mkdocs build --strict"
+    },
+    {
+      "name": "existing generated tutorial consistency",
+      "status": "passed",
+      "functions": 484,
+      "command": "python others/docs/build_native_api_docs.py --check"
+    },
+    {
+      "name": "new documented runnable native examples",
+      "status": "passed",
+      "examples": 8,
+      "languages": 2
+    },
+    {
+      "name": "skill resources/provenance/unchanged baseline",
+      "status": "passed",
+      "evidence": "registry/genomics-skills-review.json"
+    },
+    {
+      "name": "PLINK real backend",
+      "status": "passed",
+      "evidence": "registry/genomics-backend-validation.json"
+    }
+  ],
+  "limitations": [
+    "All 166 records are a dated survey, not proof of exhaustive discovery of every DNA paper/project.",
+    "Scientific workflows in newly imported upstream skills were not all executed.",
+    "15 of 19 external analysis recipes have interface/contract validation but no real-backend execution in this environment.",
+    "7 upstream MCP services were not connected to real accounts/models; the bridge protocol was exercised with a local real stdio server.",
+    "No verified public BOLE source or documented API was found.",
+    "No release was published to PyPI."
+  ],
+  "packaging": {
+    "status": "passed",
+    "wheel": "dnakit-0.1.4-py3-none-any.whl",
+    "wheel_sha256": "f69bc81937137bdeeecad3fe4a822c27b202230ceed68a1cfc0bc9a79bac7168",
+    "runtime_source_match": "exact",
+    "packaged_catalog_match": "exact",
+    "bundled_resource_hashes_verified": 4615,
+    "isolated_install_target": "/tmp/dnakit-genomics-installed-final",
+    "python": "3.10",
+    "publication": "not published"
+  }
+}

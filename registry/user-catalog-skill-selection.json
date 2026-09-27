@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-20",
+  "baseline_skill_count": 560,
+  "sources": [
+    {
+      "id": "user335-anthropic",
+      "repository": "anthropics/life-sciences",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "archive_sha256": "55a1e821671366b396062a945bd23107b2db39c659dbf9905a22c2d952720b53",
+      "content_license": "Apache-2.0",
+      "attribution": "Anthropic and life-sciences skill contributors; leaf LICENSE.txt retained",
+      "license_paths": [
+        "nextflow-development/LICENSE.txt",
+        "instrument-data-to-allotrope/LICENSE.txt",
+        "scvi-tools/LICENSE.txt"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Only the three selected skill subdirectories have verified Apache-2.0 LICENSE.txt; no repository-wide licensing claim.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-aws-kiro",
+      "repository": "aws-samples/sample-kiro-power-life-sciences",
+      "revision": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "archive_sha256": "7215731c8f47fc6f6539843a17788f40017b9b44d2297fdfe4d0a357c5cd203d",
+      "content_license": "MIT-0",
+      "attribution": "Amazon.com, Inc. or its affiliates",
+      "license_paths": [
+        "LICENSE.txt",
+        "THIRD-PARTY.txt"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-galaxy",
+      "repository": "nekrut/galaxy-claude-skills",
+      "revision": "0f833c2f11fa624d9fd87c6d139dac404d6dd4ff",
+      "archive_sha256": "d9b07c6d87742aacf941d1c7b07180711eb4b28f42898f0b5b9df847eaef8f0b",
+      "content_license": "MIT",
+      "attribution": "Copyright 2025 Galaxy MCP Contributors",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-clawbio",
+      "repository": "ClawBio/ClawBio",
+      "revision": "4848cc280c446093b1364a2445db3137d455cc17",
+      "archive_sha256": "288a6c0d447c53be6617bae739b9a56608083deddccd531c5d9bb0f7c7c50cd9",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Manuel Corpas; Hiranyamaya Dash; Aviv Madar (individual skill notices retained)",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-bioskills",
+      "repository": "GPTomics/bioSkills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a",
+      "archive_sha256": "d207cbba88d8a704205d3a14597b0df9dbc574d5dad7b0ab485d93486f66ece9",
+      "content_license": "MIT",
+      "attribution": "GPTomics/bioSkills contributors; see retained LICENSE",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-deepmind",
+      "repository": "google-deepmind/science-skills",
+      "revision": "68832757cbbf941c620b71df5756cf6e5cc287b0",
+      "archive_sha256": "46c29e627535e7794be6416d6758c3d0b4804f1d5d4f05a03e9b747a6614b949",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "attribution": "Copyright 2026 Google LLC",
+      "license_paths": [
+        "LICENSE",
+        "README.md",
+        "SKILL_LICENSES.md"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used."
+    },
+    {
+      "id": "user335-kdense",
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "revision": "330c8e764435a731eff571e3efdda70b363d0792",
+      "archive_sha256": null,
+      "content_license": "MIT",
+      "attribution": "K-Dense Inc.; OneKGPd skill author Dnaerys",
+      "license_paths": [
+        "LICENSE.md"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "acquisition": "pinned-raw-files",
+      "raw_files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "09b02a3c9df3053c55531d503357a9c7cde275970e6c3ceaa1ddf5f0e90b40c1",
+          "git_blob_sha1": "eb246475fd5a66b9bb56176f3a718984632dd98d",
+          "bytes": 1068,
+          "mode": 420
+        },
+        {
+          "path": "README.md",
+          "sha256": "d81f605b83c30fff32b144479284299303d832ef87487a9908a09d5d42c81af4",
+          "git_blob_sha1": "906646c8bce300272b471ca5d587fd077122f7c5",
+          "bytes": 75728,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/SKILL.md",
+          "sha256": "918797c80e98570537addc7d5c5a694f39e370592dc5d0b62092b8f421620444",
+          "git_blob_sha1": "22d4a92e83d42595ecea437e334dba5949f8917f",
+          "bytes": 18871,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/assets/kgpe.json",
+          "sha256": "51bce468b9c339e658305376ae338eac7912ac4b8ab31982f9ca640502b49e26",
+          "git_blob_sha1": "70edf8ad63c89abe0d9b7b81aa5108ea6160dc5d",
+          "bytes": 1037258,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/references/annotation_vocabularies.md",
+          "sha256": "642d9c647db472b30a9090f01c8662c5faa1224c1883348835b3ed64112a02c3",
+          "git_blob_sha1": "56e5cbfd09f3ac85a4d7e1966813487513ea0a5a",
+          "bytes": 4457,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/references/onekgpd_commands.md",
+          "sha256": "5539bc259351831e7c69efe00fdd316ac3a360cafc6c3055fe687debe0a65269",
+          "git_blob_sha1": "19722dc81f79afe596a3fb53d5c5a16bb42cec04",
+          "bytes": 13851,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/scripts/onekgpd_api.py",
+          "sha256": "6e7877237a628d08de6e773a945aae45d44dca33096fdf3f738b11234abf8d28",
+          "git_blob_sha1": "9bfaafe9ff643a714a5100fdc49ad795de01e865",
+          "bytes": 30403,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/scripts/onekgpd_meta.py",
+          "sha256": "57c48f2120ad2a0d29b7995373350fbc8ae898e5376f3be131056982d404e6db",
+          "git_blob_sha1": "63dcd7bc4ef7921ef0e3290565ea25540347a35f",
+          "bytes": 19389,
+          "mode": 420
+        }
+      ],
+      "tree_sha": "330c8e764435a731eff571e3efdda70b363d0792",
+      "raw_cache": "raw-kdense"
+    }
+  ],
+  "skills": [
+    {
+      "id": "nextflow-development",
+      "source_id": "user335-anthropic",
+      "upstream_path": "nextflow-development",
+      "category": "workflows",
+      "summary_zh": "nf-core WGS/WES 与 ATAC 流程部署和样本表生成",
+      "python_modules": [
+        "yaml"
+      ],
+      "commands": [
+        "python3",
+        "nextflow"
+      ],
+      "environment": [],
+      "execution_note": "The retained scripts detect input types and generate samplesheets. WGS/WES uses nf-core/sarek; ATAC uses nf-core/atacseq. Install Nextflow, its Java runtime, a supported container runtime and pipeline references separately. SRA/GEO downloads require network and SRA tools. Run scripts/check_environment.py and inspect each script --help. Pipeline test profiles and scientific workflows have not been run.",
+      "license_path": "nextflow-development/LICENSE.txt",
+      "keywords": [
+        "workflows",
+        "nf-core WGS/WES 与 ATAC 流程部署和样本表生成",
+        "nextflow-development"
+      ]
+    },
+    {
+      "id": "instrument-data-to-allotrope",
+      "source_id": "user335-anthropic",
+      "upstream_path": "instrument-data-to-allotrope",
+      "category": "sequencing",
+      "summary_zh": "DNA定量、完整性与 qPCR 仪器数据标准化",
+      "python_modules": [
+        "allotropy"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [],
+      "execution_note": "Use scripts/convert_to_asm.py for supported instrument exports and scripts/validate_asm.py for schema checks. DNA scope includes NanoDrop concentration, DNA integrity and QuantStudio/qPCR exports. Install the upstream allotropy parser and format-specific optional dependencies. PDF/Excel support depends on the actual parser; preserving this example skill does not validate every instrument format.",
+      "license_path": "instrument-data-to-allotrope/LICENSE.txt",
+      "keywords": [
+        "sequencing",
+        "DNA定量、完整性与 qPCR 仪器数据标准化",
+        "instrument-data-to-allotrope"
+      ]
+    },
+    {
+      "id": "scvi-tools",
+      "source_id": "user335-anthropic",
+      "upstream_path": "scvi-tools",
+      "category": "epigenomics",
+      "summary_zh": "PeakVI 单细胞染色质可及性与 MultiVI 多组学建模",
+      "python_modules": [
+        "scvi",
+        "anndata",
+        "scanpy"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [],
+      "execution_note": "DNA-relevant entrypoints are PeakVI for scATAC-seq and MultiVI for paired/unpaired RNA+ATAC. The complete upstream skill also contains RNA workflows; those are not counted as separate DNA additions. Install scvi-tools/PyTorch and provide count matrices, feature annotations and a suitable training environment. Training scripts are preserved; no models were trained or accuracy validated.",
+      "license_path": "scvi-tools/LICENSE.txt",
+      "keywords": [
+        "epigenomics",
+        "PeakVI 单细胞染色质可及性与 MultiVI 多组学建模",
+        "scvi-tools"
+      ]
+    },
+    {
+      "id": "kiro-healthomics-genomics",
+      "source_id": "user335-aws-kiro",
+      "upstream_path": "kiro-life-sciences",
+      "category": "workflows",
+      "summary_zh": "AWS HealthOmics 基因组流程迁移与变异分析指南",
+      "python_modules": [],
+      "commands": [
+        "uvx",
+        "aws"
+      ],
+      "environment": [
+        "AWS_PROFILE",
+        "AWS_REGION"
+      ],
+      "execution_note": "This is a transparent conversion of selected Kiro Markdown skill/steering guides, not an upstream SKILL.md or a bundled MCP implementation. Install the actual official server with `uvx awslabs.aws-healthomics-mcp-server`, configure an AWS profile/region, and inspect its live tools/list before mapping the upstream guide names. Reference: https://awslabs.github.io/mcp/servers/aws-healthomics-mcp-server/ . The AWS CLI exposes `aws omics create-workflow` and `aws omics start-run`. HealthOmics requires your IAM role, S3 input/output and container references; cloud resource creation/runs incur costs. No cloud writes were performed. Local life-sciences-* sample clients are not represented as validated scientific executors.",
+      "original_format": "kiro-markdown-and-steering",
+      "include_paths": [
+        "kiro-life-sciences/skills/genomics-pipeline-best-practices.md",
+        "kiro-life-sciences/skills/bioinformatics-file-formats.md",
+        "kiro-life-sciences/steering/pipeline-import-healthomics.md",
+        "kiro-life-sciences/steering/variant-calling-pipeline.md",
+        "kiro-life-sciences/POWER.md"
+      ],
+      "license_path": "LICENSE.txt",
+      "extra_files": {
+        "THIRD-PARTY.txt": "THIRD-PARTY.txt"
+      },
+      "description": "Prepare DNA sequencing and variant workflows for AWS HealthOmics using selected upstream Kiro guidance. Use for WDL/Nextflow import, genomic file-format checks, container references and workflow/run inspection; requires a separately configured official AWS HealthOmics MCP server or AWS CLI.",
+      "keywords": [
+        "workflows",
+        "AWS HealthOmics 基因组流程迁移与变异分析指南",
+        "kiro-healthomics-genomics"
+      ],
+      "generated_title": "Kiro HealthOmics genomic workflows"
+    },
+    {
+      "id": "galaxy-bioblend",
+      "source_id": "user335-galaxy",
+      "upstream_path": "",
+      "category": "workflows",
+      "summary_zh": "Galaxy REST 与 BioBlend 的历史、数据集和流程操作",
+      "python_modules": [
+        "bioblend"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [
+        "GALAXY_URL",
+        "GALAXY_API_KEY"
+      ],
+      "execution_note": "This is a transparent SKILL.md entrypoint around the original galaxy.md REST and galaxy-bioblend.md SDK guides. Use `from bioblend.galaxy import GalaxyInstance` with the user-selected server. History/dataset/workflow primitives complement the separately packaged galaxy-bridge recommendation CLI. references/original/setup-credentials.sh is retained as an optional manual helper and was not executed. The unrelated gene-mapping-by-log-fold-change material is excluded because numerical expression similarity cannot establish gene identity.",
+      "original_format": "markdown-guide",
+      "include_paths": [
+        "galaxy.md",
+        "galaxy-bioblend.md",
+        "setup-credentials.sh",
+        "SECURITY.md"
+      ],
+      "license_path": "LICENSE",
+      "description": "Use Galaxy REST or the BioBlend Python SDK to manage genomic analysis histories, upload or inspect datasets, discover tools and invoke existing workflows on a user-selected Galaxy server. Includes the original REST and SDK guides; server tools, account access and scientific workflows are external.",
+      "keywords": [
+        "workflows",
+        "Galaxy REST 与 BioBlend 的历史、数据集和流程操作",
+        "galaxy-bioblend"
+      ],
+      "generated_title": "Galaxy REST and BioBlend workflows"
+    },
+    {
+      "id": "bioconductor-bridge",
+      "source_id": "user335-clawbio",
+      "upstream_path": "skills/bioconductor-bridge",
+      "category": "workflows",
+      "summary_zh": "Bioconductor 基因组包发现与 R 工作流模板",
+      "python_modules": [],
+      "commands": [
+        "python3",
+        "Rscript"
+      ],
+      "environment": [],
+      "execution_note": "From this installed folder run `python bioconductor_bridge.py --help`. Domain/workflow templates are available locally; live package discovery/documentation and installation require R/BiocManager/network as indicated. The small original clawbio/common/checksums.py helper is bundled under resources and the script root is adjusted to that portable location. Root `clawbio.py` commands in retained upstream prose require a separate full ClawBio checkout; use the standalone script here.",
+      "license_path": "LICENSE",
+      "extra_files": {
+        "resources/clawbio/common/checksums.py": "clawbio/common/checksums.py"
+      },
+      "replacements": [
+        {
+          "path": "bioconductor_bridge.py",
+          "old": "PROJECT_ROOT = SKILL_DIR.parent.parent",
+          "new": "PROJECT_ROOT = SKILL_DIR / \"resources\"",
+          "count": 1
+        }
+      ],
+      "attribution": "Hiranyamaya Dash; Copyright 2026 Manuel Corpas (ClawBio license)",
+      "keywords": [
+        "workflows",
+        "Bioconductor 基因组包发现与 R 工作流模板",
+        "bioconductor-bridge"
+      ]
+    },
+    {
+      "id": "galaxy-bridge",
+      "source_id": "user335-clawbio",
+      "upstream_path": "skills/galaxy-bridge",
+      "category": "workflows",
+      "summary_zh": "Galaxy 基因组工具检索、推荐与提交",
+      "python_modules": [
+        "bioblend"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [
+        "GALAXY_URL",
+        "GALAXY_API_KEY"
+      ],
+      "execution_note": "From this installed folder run `python galaxy_bridge.py --help`. Offline --search/--recommend/--workflow read the complete bundled catalog and curated tool resources. Actual --run requires a Galaxy account, BioBlend and the user-selected server; tool versions/availability may differ from the snapshot. The bundled demo output is an upstream example, not evidence of a newly executed analysis. Root clawbio.py commands require a full ClawBio checkout.",
+      "license_path": "LICENSE",
+      "keywords": [
+        "workflows",
+        "Galaxy 基因组工具检索、推荐与提交",
+        "galaxy-bridge"
+      ]
+    },
+    {
+      "id": "ukb-ppp-region-fetch",
+      "source_id": "user335-clawbio",
+      "upstream_path": "skills/ukb-ppp-region-fetch",
+      "category": "gwas",
+      "summary_zh": "UKB-PPP 区域 pQTL 汇总统计获取与统一",
+      "python_modules": [
+        "requests",
+        "synapseclient"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [
+        "SYNAPSE_AUTH_TOKEN"
+      ],
+      "execution_note": "The module ukb_ppp_region_fetch.py exports UKBPPPClient.fetch_region; inspect --help for the CLI. A SORT1/EUR GRCh38 slice is bundled for offline use. Arbitrary regions use Synapse and need a PAT with access to syn51364943; the public-looking S3 URL can return AccessDenied. Software is MIT (Aviv Madar); bundled summary-statistic derivatives are CC-BY-4.0 with Sun et al. 2023 attribution. Sources: https://registry.opendata.aws/ukbppp/ and https://doi.org/10.1038/s41586-023-06592-6 . This is summary-level pQTL data, not individual UK Biobank records.",
+      "license_path": "skills/ukb-ppp-region-fetch/LICENSE",
+      "license": "MIT AND CC-BY-4.0",
+      "attribution": "Copyright 2026 Aviv Madar; UK Biobank Pharma Proteomics Project, Sun et al. (2023)",
+      "data_license": {
+        "path": "bundled_slices/",
+        "license": "CC-BY-4.0",
+        "attribution": "UK Biobank Pharma Proteomics Project (Sun et al. 2023 Nature; PMID 37794186); accessed via Synapse syn51364943.",
+        "evidence": [
+          "https://registry.opendata.aws/ukbppp/",
+          "https://doi.org/10.1038/s41586-023-06592-6"
+        ]
+      },
+      "keywords": [
+        "gwas",
+        "UKB-PPP 区域 pQTL 汇总统计获取与统一",
+        "ukb-ppp-region-fetch"
+      ]
+    },
+    {
+      "id": "outlier-splicing-detection",
+      "source_id": "user335-bioskills",
+      "upstream_path": "alternative-splicing/outlier-splicing-detection",
+      "category": "variants",
+      "summary_zh": "RNA 剪接异常作为 DNA 变异功能证据",
+      "python_modules": [],
+      "commands": [
+        "Rscript"
+      ],
+      "environment": [],
+      "execution_note": "Run the retained examples/fraser2_rare_disease.R only after supplying RNA-seq splice-junction/count data and a matched control panel. Install FRASER/OUTRIDER or DROP as needed. This provides functional evidence for candidate DNA splice variants; abnormal expression/splicing does not by itself establish pathogenicity. No clinical cohort or scientific workflow was run.",
+      "license_path": "LICENSE",
+      "keywords": [
+        "variants",
+        "RNA 剪接异常作为 DNA 变异功能证据",
+        "outlier-splicing-detection"
+      ]
+    },
+    {
+      "id": "single-cell-cnv-inference",
+      "source_id": "user335-bioskills",
+      "upstream_path": "single-cell/cnv-inference",
+      "category": "variants",
+      "summary_zh": "从单细胞 RNA 数据推断染色体拷贝数异常",
+      "python_modules": [],
+      "commands": [
+        "Rscript"
+      ],
+      "environment": [],
+      "execution_note": "The upstream R examples use inferCNV/copyKAT/Numbat/SCEVAN and need matching counts, genomic feature coordinates and appropriate references. The output is RNA-derived evidence about large-scale DNA copy-number states, not direct DNA measurement or a validated clinical call. Retain normal-reference selection, genomic build and uncertainty in reports.",
+      "license_path": "LICENSE",
+      "keywords": [
+        "variants",
+        "从单细胞 RNA 数据推断染色体拷贝数异常",
+        "single-cell-cnv-inference"
+      ]
+    },
+    {
+      "id": "interpro-database",
+      "source_id": "user335-deepmind",
+      "upstream_path": "skills/interpro_database",
+      "category": "annotation",
+      "summary_zh": "InterPro 蛋白域与基因组功能注释",
+      "python_modules": [
+        "polite_http"
+      ],
+      "commands": [
+        "uv"
+      ],
+      "environment": [],
+      "execution_note": "Use the bundled scripts through `uv run scripts/NAME.py --help`; their PEP 723 metadata installs the declared polite-http dependency. The original uv prerequisite is bundled under references/uv/SKILL.md. Network APIs and database terms are external. For InterPro, limit this DNA workflow to genome-encoded gene/domain annotation; for PDB, select nucleic acid structures or DNA complexes. Scripts are Apache-2.0 and instructional text is CC-BY-4.0 under the upstream README. No database query or scientific result is claimed by import.",
+      "license_path": "LICENSE",
+      "extra_files": {
+        "references/uv/SKILL.md": "skills/uv/SKILL.md",
+        "SKILL_LICENSES.md": "SKILL_LICENSES.md"
+      },
+      "keywords": [
+        "annotation",
+        "InterPro 蛋白域与基因组功能注释",
+        "interpro-database"
+      ]
+    },
+    {
+      "id": "pdb-database",
+      "source_id": "user335-deepmind",
+      "upstream_path": "skills/pdb_database",
+      "category": "databases",
+      "summary_zh": "PDB 核酸三维结构查询与下载",
+      "python_modules": [
+        "polite_http"
+      ],
+      "commands": [
+        "uv"
+      ],
+      "environment": [],
+      "execution_note": "Use the bundled scripts through `uv run scripts/NAME.py --help`; their PEP 723 metadata installs the declared polite-http dependency. The original uv prerequisite is bundled under references/uv/SKILL.md. Network APIs and database terms are external. For InterPro, limit this DNA workflow to genome-encoded gene/domain annotation; for PDB, select nucleic acid structures or DNA complexes. Scripts are Apache-2.0 and instructional text is CC-BY-4.0 under the upstream README. No database query or scientific result is claimed by import.",
+      "license_path": "LICENSE",
+      "extra_files": {
+        "references/uv/SKILL.md": "skills/uv/SKILL.md",
+        "SKILL_LICENSES.md": "SKILL_LICENSES.md"
+      },
+      "keywords": [
+        "databases",
+        "PDB 核酸三维结构查询与下载",
+        "pdb-database"
+      ]
+    },
+    {
+      "id": "onekgpd-individual-queries",
+      "source_id": "user335-kdense",
+      "upstream_path": "skills/onekgpd",
+      "category": "population",
+      "summary_zh": "1000 Genomes 个体、群体与亲缘查询",
+      "python_modules": [
+        "dnaerys"
+      ],
+      "commands": [
+        "python3"
+      ],
+      "environment": [],
+      "execution_note": "Distinct increment over population-genetics-1000genomes: query individual genotypes/variants and select variant carriers or compute service-provided pairwise relatedness, beyond the retained IGSR population/sample discovery guide. Use scripts/onekgpd_meta.py for offline sample/population metadata from assets/kgpe.json. scripts/onekgpd_api.py needs the separately installed dnaerys client and queries the public db.dnaerys.org:443 service. Only public 1000 Genomes cohort identifiers are accepted; no patient data are needed. The MIT skill and metadata do not redistribute or relicense the proprietary Dnaerys database engine. Annotation sources/terms remain as described at https://dnaerys.org/online/ .",
+      "license_path": "LICENSE.md",
+      "attribution": "Dnaerys (OneKGPd skill author); K-Dense Inc. repository license",
+      "keywords": [
+        "population",
+        "1000 Genomes 个体、群体与亲缘查询",
+        "onekgpd",
+        "individual genotype query",
+        "carrier selection",
+        "kinship"
+      ]
+    }
+  ]
+}

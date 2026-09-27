@@ -26,7 +26,9 @@ model-weight loading take place in the server's environment. Tools can also call
 
 To use a model API such as DeepSeek, choose an Agent that supports both that API and MCP, or implement
 an MCP client. Model-provider selection depends on the Agent. DNAKit's built-in `run_agent()` calls
-the local registry directly without MCP; see [Python API](python_api.md).
+the local registry directly without MCP; see [Agent](agent.md).
+
+Tool generation, description optimization or compatible repairs, local result caching, and knowledge retrieval (RAG) are enabled through the built-in runner's [configuration](agent.md#agent-actions). They are not additional MCP actions and do not automatically enable those capabilities in other MCP clients. Validated generated tools use the existing discovery, description, and execution endpoints; independent MCP servers must restart to load updates.
 
 The complete workflow is **install → configure the client → check the connection → submit a task**.
 

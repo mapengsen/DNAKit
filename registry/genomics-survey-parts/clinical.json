@@ -1,0 +1,2364 @@
+{
+  "snapshot_date": "2026-09-20",
+  "queries": [
+    {
+      "query": "genomics bioinformatics skills MCP ClinVar variant analysis GitHub",
+      "domain": "variants",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "metagenomics MCP agent skills GitHub Kraken2",
+      "domain": "metagenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "DNA methylation MCP skills GitHub Bismark modkit",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com BioMCP genomics ClinVar",
+      "domain": "clinical",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com pharmacogenomics PharmCAT MCP",
+      "domain": "clinical",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com genomics agent skill methylation metagenomics",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com nanoporetech modkit pileup bedmethyl license",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com ncbi amr AMRFinderPlus command license",
+      "domain": "metagenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com PharmGKB PharmCAT command line license",
+      "domain": "clinical",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com Sniffles2 sniffles structural variant command license",
+      "domain": "variants",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"MCP\" \"metagenomics\"",
+      "domain": "metagenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"MCP\" \"methylation\"",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"MCP\" \"variant\" \"BioMCP\"",
+      "domain": "variants",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"Skills\" \"single-cell DNA\"",
+      "domain": "single-cell-dna",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"single-cell DNA\" \"CNV\" \"CHISEL\"",
+      "domain": "single-cell-dna",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"spatial\" \"CalicoST\"",
+      "domain": "spatial-genomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"Hi-C\" \"cooltools\"",
+      "domain": "3d-genomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"sequencing\" \"skills\" \"Clair\"",
+      "domain": "sequencing",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com metagenomics \"SKILL.md\" \"PKU-EMBL\"",
+      "domain": "metagenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"AMRFinderPlus\" \"Bracken\" \"license\"",
+      "domain": "metagenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"methylation\" \"MethylGPT\"",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"DNA methylation\" \"DSS\" \"methylKit\"",
+      "domain": "epigenomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"variant calling\" \"MCP\" \"DeepVariant\"",
+      "domain": "variants",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"PharmCAT\" \"Exomiser\" \"license\"",
+      "domain": "clinical",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"fastp\" \"Flye\" \"skills\"",
+      "domain": "assembly",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    },
+    {
+      "query": "site:github.com \"Hi-C\" \"MCP\"",
+      "domain": "3d-genomics",
+      "notes": "web检索；进一步读取原作者仓库README/许可证；排除聚合转载和未经确认的功能宣称。"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "biomcp",
+      "name": "BioMCP",
+      "domains": [
+        "clinical",
+        "variants",
+        "databases"
+      ],
+      "kind": "mcp+skills",
+      "homepage": "https://github.com/genomoncology/biomcp",
+      "repository": "https://github.com/genomoncology/biomcp",
+      "paper_urls": [],
+      "attribution": "genomoncology项目作者与贡献者；Copyright (c) 2025 Ian Maurer；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/genomoncology/biomcp/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/genomoncology/biomcp/HEAD/README.md"
+      },
+      "capabilities": [
+        "变异文献、ClinVar/CIViC/PGx与临床研究数据联合查询"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-clinvar-lookup",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/clinvar_query.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "variant-interpretation",
+          "source_id": "tooluniverse",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/genomoncology/biomcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/genomoncology/biomcp/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "genechat-mcp",
+      "name": "GeneChat MCP",
+      "domains": [
+        "clinical",
+        "variants"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/natecostello/genechat-mcp",
+      "repository": "https://github.com/natecostello/genechat-mcp",
+      "paper_urls": [],
+      "attribution": "natecostello项目作者与贡献者；Copyright (c) 2026 GeneChat Contributors；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/natecostello/genechat-mcp/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/natecostello/genechat-mcp/HEAD/README.md"
+      },
+      "capabilities": [
+        "本地VCF注释后按基因、变异、PGx及PGS查询"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-pharmacogenomics",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/pharmgkb_query.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "vcf-basics",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/view_vcf.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/natecostello/genechat-mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/natecostello/genechat-mcp/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "mgnify-mcp",
+      "name": "MGnify MCP",
+      "domains": [
+        "metagenomics",
+        "databases"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/MGS-sails/mgnify-mcp",
+      "repository": "https://github.com/MGS-sails/mgnify-mcp",
+      "paper_urls": [],
+      "attribution": "MGS-sails项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/MGS-sails/mgnify-mcp/HEAD/README.md"
+      },
+      "capabilities": [
+        "MGnify v2研究、样本、分析、分类与基因目录查询"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "mgnify",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/MGS-sails/mgnify-mcp/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "bv-brc-mcp",
+      "name": "BV-BRC MCP",
+      "domains": [
+        "metagenomics",
+        "assembly",
+        "annotation"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/BV-BRC/BV-BRC-MCP",
+      "repository": "https://github.com/BV-BRC/BV-BRC-MCP",
+      "paper_urls": [],
+      "attribution": "BV-BRC项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/BV-BRC/BV-BRC-MCP/HEAD/README.md"
+      },
+      "capabilities": [
+        "细菌病毒数据库检索，外部组装、注释和宏基因组作业"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "microbial-genome-characterization",
+          "source_id": "tooluniverse",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/BV-BRC/BV-BRC-MCP/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "biomcp-typescript",
+      "name": "BioMCP TypeScript",
+      "domains": [
+        "clinical",
+        "variants",
+        "databases"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/yeyuan98/biomcp-ts",
+      "repository": "https://github.com/yeyuan98/biomcp-ts",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.22178957"
+      ],
+      "attribution": "yeyuan98项目作者与贡献者；\"Licensor\" shall mean the copyright owner or entity authorized by；the copyright owner that is granting the License.",
+      "license_evidence": {
+        "expression": "Apache-2.0",
+        "verified_file": "https://raw.githubusercontent.com/yeyuan98/biomcp-ts/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/yeyuan98/biomcp-ts/HEAD/README.md"
+      },
+      "capabilities": [
+        "变异证据、临床知识库、基因组序列和功能基因组服务"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-clinvar-lookup",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/clinvar_query.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/yeyuan98/biomcp-ts/HEAD/README.md",
+        "https://raw.githubusercontent.com/yeyuan98/biomcp-ts/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "bioskills",
+      "name": "bioSkills",
+      "domains": [
+        "variants",
+        "clinical",
+        "metagenomics",
+        "epigenomics",
+        "assembly",
+        "sequencing"
+      ],
+      "kind": "skills",
+      "homepage": "https://github.com/GPTomics/bioSkills",
+      "repository": "https://github.com/GPTomics/bioSkills",
+      "paper_urls": [],
+      "attribution": "GPTomics项目作者与贡献者；Copyright (c) 2026 GPTomics；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/GPTomics/bioSkills/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/GPTomics/bioSkills/HEAD/README.md"
+      },
+      "capabilities": [
+        "覆盖变异、CNV、甲基化、微生物和测序分析的Agent Skills"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "variant-calling-deepvariant",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_deepvariant.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "methylation-calling",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/extract_methylation.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "metagenomics-kraken",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/kraken2_classify.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "核查已收录固定版本与上游增量；优先复用原作者Skill及其脚本并保留许可证。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/GPTomics/bioSkills/HEAD/README.md",
+        "https://raw.githubusercontent.com/GPTomics/bioSkills/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "metagenomics-skills",
+      "name": "Metagenomics Skills",
+      "domains": [
+        "metagenomics",
+        "assembly"
+      ],
+      "kind": "skills",
+      "homepage": "https://github.com/PKU-EMBL/Metagenomics-Skills",
+      "repository": "https://github.com/PKU-EMBL/Metagenomics-Skills",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41467-024-46539-7",
+        "https://doi.org/10.1186/s40168-018-0541-1",
+        "https://doi.org/10.1038/s41564-018-0171-1",
+        "https://doi.org/10.1038/s41587-023-01688-w",
+        "https://doi.org/10.7554/eLife.65088",
+        "https://doi.org/10.1038/s41587-020-0603-3",
+        "https://doi.org/10.1038/s41587-020-0501-8",
+        "https://doi.org/10.1093/nar/gkac1080"
+      ],
+      "attribution": "PKU-EMBL项目作者与贡献者；Copyright (c) 2026 PKU-EMBL；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/PKU-EMBL/Metagenomics-Skills/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/PKU-EMBL/Metagenomics-Skills/HEAD/README.md"
+      },
+      "capabilities": [
+        "MAG分箱、质控、分类、功能与病毒/移动元件工作流"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "basalt",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "checkm2",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "metabat2",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "mgnify",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "核查已收录固定版本与上游增量；优先复用原作者Skill及其脚本并保留许可证。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/PKU-EMBL/Metagenomics-Skills/HEAD/README.md",
+        "https://raw.githubusercontent.com/PKU-EMBL/Metagenomics-Skills/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "clair-skills",
+      "name": "Clair Skills",
+      "domains": [
+        "variants",
+        "clinical",
+        "sequencing"
+      ],
+      "kind": "skills",
+      "homepage": "https://github.com/HKU-BAL/Clair-skills",
+      "repository": "https://github.com/HKU-BAL/Clair-skills",
+      "paper_urls": [],
+      "attribution": "HKU-BAL项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/HKU-BAL/Clair-skills/HEAD/README.md"
+      },
+      "capabilities": [
+        "Clair3/ClairS/Clair-Mosaic模型选择、命令生成与验证"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "long-read-sequencing-clair3-variants",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/clair3_workflow.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "核查已收录固定版本与上游增量；优先复用原作者Skill及其脚本并保留许可证。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/HKU-BAL/Clair-skills/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "modkit",
+      "name": "Modkit",
+      "domains": [
+        "epigenomics",
+        "sequencing"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/nanoporetech/modkit",
+      "repository": "https://github.com/nanoporetech/modkit",
+      "paper_urls": [],
+      "attribution": "nanoporetech项目作者与贡献者；non-exclusive license under Contributor copyrights Licensable by such；Section 2.1 above, no copyright license is granted:",
+      "license_evidence": {
+        "expression": "LicenseRef-ONT-Public-1.0",
+        "verified_file": "https://raw.githubusercontent.com/nanoporetech/modkit/HEAD/LICENCE.txt",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/nanoporetech/modkit/HEAD/README.md"
+      },
+      "capabilities": [
+        "modBAM甲基化汇总、bedMethyl、分相修饰和DMR"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "long-read-sequencing-nanopore-methylation",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/modkit_methylation.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "methylation-calling",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/extract_methylation.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 ONT自定义许可证；只实现独立格式解析与进程适配。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/nanoporetech/modkit/HEAD/README.md",
+        "https://raw.githubusercontent.com/nanoporetech/modkit/HEAD/LICENCE.txt"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "amrfinderplus",
+      "name": "AMRFinderPlus",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/ncbi/amr",
+      "repository": "https://github.com/ncbi/amr",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41598-021-91456-0",
+        "https://pubmed.ncbi.nlm.nih.gov/34135355/"
+      ],
+      "attribution": "ncbi项目作者与贡献者；terms of the United States Copyright Act.  It was written as part of；thus cannot be copyrighted.  This software/database is freely available",
+      "license_evidence": {
+        "expression": "LicenseRef-US-Government-Public-Domain",
+        "verified_file": "https://raw.githubusercontent.com/ncbi/amr/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/ncbi/amr/HEAD/README.md"
+      },
+      "capabilities": [
+        "组装核酸/蛋白耐药基因、耐药点突变、毒力和应激因子"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "metagenomics-amr-detection",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/batch_amr_screening.py",
+            "examples/run_amrfinder.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ncbi/amr/HEAD/README.md",
+        "https://raw.githubusercontent.com/ncbi/amr/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "pharmcat",
+      "name": "PharmCAT",
+      "domains": [
+        "clinical"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/PharmGKB/PharmCAT",
+      "repository": "https://github.com/PharmGKB/PharmCAT",
+      "paper_urls": [
+        "https://dx.doi.org/10.1002/cpt.928"
+      ],
+      "attribution": "PharmGKB项目作者与贡献者；applicable copyright doctrines of fair use, fair dealing, or other；(including copyright notices, patent notices, disclaimers of warranty,",
+      "license_evidence": {
+        "expression": "MPL-2.0",
+        "verified_file": "https://raw.githubusercontent.com/PharmGKB/PharmCAT/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/PharmGKB/PharmCAT/HEAD/README.md"
+      },
+      "capabilities": [
+        "VCF药物基因组星号等位基因、表型与指南报告"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-pharmacogenomics",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/pharmgkb_query.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "clinpgx",
+          "source_id": "clawbio",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "api.py",
+            "clinpgx.py",
+            "tests/__init__.py",
+            "tests/test_clinpgx.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/PharmGKB/PharmCAT/HEAD/README.md",
+        "https://raw.githubusercontent.com/PharmGKB/PharmCAT/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "sniffles2",
+      "name": "Sniffles2",
+      "domains": [
+        "variants",
+        "sequencing"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/fritzsedlazeck/Sniffles",
+      "repository": "https://github.com/fritzsedlazeck/Sniffles",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41587-023-02024-y",
+        "https://www.nature.com/articles/s41592-018-0001-7"
+      ],
+      "attribution": "fritzsedlazeck项目作者与贡献者；Copyright (c)；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/fritzsedlazeck/Sniffles/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/fritzsedlazeck/Sniffles/HEAD/README.md"
+      },
+      "capabilities": [
+        "长读长结构变异、群体合并、低等位基因频率SV"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "long-read-sequencing-structural-variants",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/sv_calling.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "variant-calling-structural-variant-calling",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/call_svs.sh",
+            "examples/svlen_sign_filter.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/fritzsedlazeck/Sniffles/HEAD/README.md",
+        "https://raw.githubusercontent.com/fritzsedlazeck/Sniffles/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "deepvariant",
+      "name": "DeepVariant",
+      "domains": [
+        "variants",
+        "sequencing"
+      ],
+      "kind": "model+cli",
+      "homepage": "https://github.com/google/deepvariant",
+      "repository": "https://github.com/google/deepvariant",
+      "paper_urls": [
+        "https://doi.org/10.1038/nbt.4235",
+        "https://doi.org/10.1093/bioinformatics/btaa1081"
+      ],
+      "attribution": "google项目作者与贡献者；Copyright 2020 Google LLC.；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/google/deepvariant/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/google/deepvariant/HEAD/README.md"
+      },
+      "capabilities": [
+        "多测序平台深度学习胚系SNP/Indel检测"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "variant-calling-deepvariant",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_deepvariant.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/google/deepvariant/HEAD/README.md",
+        "https://raw.githubusercontent.com/google/deepvariant/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "clair3",
+      "name": "Clair3",
+      "domains": [
+        "variants",
+        "sequencing"
+      ],
+      "kind": "model+cli",
+      "homepage": "https://github.com/HKU-BAL/Clair3",
+      "repository": "https://github.com/HKU-BAL/Clair3",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.64898/2026.02.13.705285v1",
+        "https://www.biorxiv.org/content/10.1101/2021.12.29.474431v2",
+        "https://doi.org/10.1093/bioinformatics/btag181",
+        "https://doi.org/10.1093/bioinformatics/btag376"
+      ],
+      "attribution": "HKU-BAL项目作者与贡献者；Copyright 2021 The University of Hong Kong, Department of Computer Science；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/HKU-BAL/Clair3/HEAD/LICENSE.md",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/HKU-BAL/Clair3/HEAD/README.md"
+      },
+      "capabilities": [
+        "ONT/PacBio长读长胚系SNP/Indel检测"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "long-read-sequencing-clair3-variants",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/clair3_workflow.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/HKU-BAL/Clair3/HEAD/README.md",
+        "https://raw.githubusercontent.com/HKU-BAL/Clair3/HEAD/LICENSE.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "seqkit",
+      "name": "SeqKit",
+      "domains": [
+        "sequence",
+        "sequencing"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/shenwei356/seqkit",
+      "repository": "https://github.com/shenwei356/seqkit",
+      "paper_urls": [
+        "https://doi.org/10.1002/imt2.191"
+      ],
+      "attribution": "shenwei356项目作者与贡献者；Copyright © 2016-2019 Wei Shen, 2019 Oxford Nanopore Technologies.；The above copyright notice and this permission notice shall be included in",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/shenwei356/seqkit/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/shenwei356/seqkit/HEAD/README.md"
+      },
+      "capabilities": [
+        "FASTX序列流式处理、提取、统计与去重"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "read-sequences",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/access_patterns.py",
+            "examples/basic_parsing.py",
+            "examples/fastq_quality.py",
+            "examples/genbank_features.py",
+            "examples/random_access.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/shenwei356/seqkit/HEAD/README.md",
+        "https://raw.githubusercontent.com/shenwei356/seqkit/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "fastp",
+      "name": "fastp",
+      "domains": [
+        "sequencing"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/OpenGene/fastp",
+      "repository": "https://github.com/OpenGene/fastp",
+      "paper_urls": [
+        "https://doi.org/10.1002/imt2.70078",
+        "https://doi.org/10.1002/imt2.107",
+        "https://doi.org/10.1093/bioinformatics/bty560"
+      ],
+      "attribution": "OpenGene项目作者与贡献者；Copyright (c) 2016 OpenGene - Open Source Genetics Toolbox；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/OpenGene/fastp/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/OpenGene/fastp/HEAD/README.md"
+      },
+      "capabilities": [
+        "FASTQ接头修剪、质量过滤、双端合并和QC报告"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "read-qc-fastp-workflow",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/fastp_pipeline.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/OpenGene/fastp/HEAD/README.md",
+        "https://raw.githubusercontent.com/OpenGene/fastp/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "flye",
+      "name": "Flye",
+      "domains": [
+        "assembly"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/fenderglass/Flye",
+      "repository": "https://github.com/fenderglass/Flye",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.5228989",
+        "https://doi.org/10.1038/s41592-020-00971-x",
+        "https://doi.org/10.1038/s41587-019-0072-8",
+        "https://www.doi.org/10.1073/pnas.1604560113"
+      ],
+      "attribution": "fenderglass项目作者与贡献者；Copyright (c) 2016, The Regents of the University of California；* Redistributions of source code must retain the above copyright",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/fenderglass/Flye/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/fenderglass/Flye/HEAD/README.md"
+      },
+      "capabilities": [
+        "长读长基因组和宏基因组组装"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-assembly-long-read-assembly",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/flye_assembly.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "genome-assembly-metagenome-assembly",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/metagenome_workflow.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/fenderglass/Flye/HEAD/README.md",
+        "https://raw.githubusercontent.com/fenderglass/Flye/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "hifiasm",
+      "name": "hifiasm",
+      "domains": [
+        "assembly"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/chhylp123/hifiasm",
+      "repository": "https://github.com/chhylp123/hifiasm",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41592-020-01056-5",
+        "https://doi.org/10.1038/s41587-022-01261-x",
+        "https://doi.org/10.1038/s41592-024-02269-8"
+      ],
+      "attribution": "chhylp123项目作者与贡献者；Copyright (c) 2019；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/chhylp123/hifiasm/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/chhylp123/hifiasm/HEAD/README.md"
+      },
+      "capabilities": [
+        "HiFi/ONT/Hi-C单倍型分辨组装"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-assembly-hifi-assembly",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/hifi_assembly_workflow.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "optimize-hifi-diploid-assembly",
+          "source_id": "myriad",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/chhylp123/hifiasm/HEAD/README.md",
+        "https://raw.githubusercontent.com/chhylp123/hifiasm/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "spades",
+      "name": "SPAdes",
+      "domains": [
+        "assembly",
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/ablab/spades",
+      "repository": "https://github.com/ablab/spades",
+      "paper_urls": [
+        "https://doi.org/10.7717/peerj.18050"
+      ],
+      "attribution": "ablab项目作者与贡献者；Copyright (c) 2023-2024 SPAdes team；Copyright (c) 2015-2022 Saint Petersburg State University",
+      "license_evidence": {
+        "expression": "GPL-2.0",
+        "verified_file": "https://raw.githubusercontent.com/ablab/spades/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/ablab/spades/HEAD/README.md"
+      },
+      "capabilities": [
+        "短读长、混合、宏基因组等组装模式"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "genome-assembly-short-read-assembly",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/bacterial_assembly.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [
+        "src/dnakit/bioinformatics/ngs.py:assemble_reads (dedicated SPAdes wrapper)"
+      ],
+      "gaps": [
+        "已有专用Python短读长/混合组装适配；扩展专门模式和测试，避免重复封装。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ablab/spades/HEAD/README.md",
+        "https://raw.githubusercontent.com/ablab/spades/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "kraken2",
+      "name": "Kraken2",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/DerrickWood/kraken2",
+      "repository": "https://github.com/DerrickWood/kraken2",
+      "paper_urls": [
+        "https://dx.doi.org/10.1186/gb-2014-15-3-r46",
+        "https://dx.doi.org/10.1186/s13059-018-1568-0",
+        "https://dx.doi.org/10.1186/s13059-019-1891-0",
+        "https://dx.doi.org/10.1038/s41596-022-00738-y"
+      ],
+      "attribution": "DerrickWood项目作者与贡献者；Copyright (c) 2017-2023 Derrick Wood；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/DerrickWood/kraken2/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/DerrickWood/kraken2/HEAD/README.md"
+      },
+      "capabilities": [
+        "基于k-mer的宏基因组读段分类"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "metagenomics-kraken",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/kraken2_classify.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/DerrickWood/kraken2/HEAD/README.md",
+        "https://raw.githubusercontent.com/DerrickWood/kraken2/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "bracken",
+      "name": "Bracken",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/jenniferlu717/Bracken",
+      "repository": "https://github.com/jenniferlu717/Bracken",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41596-022-00738-y"
+      ],
+      "attribution": "jenniferlu717项目作者与贡献者；Copyright (C) 2008 Free Software Foundation, Inc. <http://fsf.org/>；(1) assert copyright on the software, and (2) offer you this License",
+      "license_evidence": {
+        "expression": "GPL-3.0",
+        "verified_file": "https://raw.githubusercontent.com/jenniferlu717/Bracken/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/jenniferlu717/Bracken/HEAD/README.md"
+      },
+      "capabilities": [
+        "从Kraken分类报告估计分类单元丰度"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "metagenomics-abundance",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/bracken_abundance.sh",
+            "examples/compositional_transform.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/jenniferlu717/Bracken/HEAD/README.md",
+        "https://raw.githubusercontent.com/jenniferlu717/Bracken/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "metaphlan",
+      "name": "MetaPhlAn",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/biobakery/MetaPhlAn",
+      "repository": "https://github.com/biobakery/MetaPhlAn",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41587-023-01688-w",
+        "https://doi.org/10.1101/2024.02.19.580813"
+      ],
+      "attribution": "biobakery项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/biobakery/MetaPhlAn/HEAD/README.md"
+      },
+      "capabilities": [
+        "标记基因宏基因组分类与StrainPhlAn菌株分析"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "metagenomics-metaphlan",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/metaphlan_profile.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "metagenomics-strain-tracking",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/instrain_workflow.sh",
+            "examples/mash_comparison.sh",
+            "examples/parse_instrain_compare.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/biobakery/MetaPhlAn/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "gtdb-tk",
+      "name": "GTDB-Tk",
+      "domains": [
+        "metagenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/Ecogenomics/GTDBTk",
+      "repository": "https://github.com/Ecogenomics/GTDBTk",
+      "paper_urls": [
+        "https://www.nature.com/articles/s41564-021-00918-8",
+        "https://doi.org/10.1038/s41587-020-0501-8",
+        "https://www.nature.com/articles/nbt.4229",
+        "http://dx.doi.org/10.1038/nbt.4229",
+        "https://www.nature.com/articles/s41592-023-02018-3"
+      ],
+      "attribution": "Ecogenomics项目作者与贡献者；Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>；(1) assert copyright on the software, and (2) offer you this License",
+      "license_evidence": {
+        "expression": "GPL-3.0",
+        "verified_file": "https://raw.githubusercontent.com/Ecogenomics/GTDBTk/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/Ecogenomics/GTDBTk/HEAD/README.md"
+      },
+      "capabilities": [
+        "细菌古菌基因组GTDB分类"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "gtdb",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Ecogenomics/GTDBTk/HEAD/README.md",
+        "https://raw.githubusercontent.com/Ecogenomics/GTDBTk/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "gatk",
+      "name": "GATK",
+      "domains": [
+        "variants",
+        "clinical"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/broadinstitute/gatk",
+      "repository": "https://github.com/broadinstitute/gatk",
+      "paper_urls": [],
+      "attribution": "broadinstitute项目作者与贡献者",
+      "license_evidence": {
+        "expression": "Apache-2.0",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/broadinstitute/gatk/HEAD/README.md"
+      },
+      "capabilities": [
+        "胚系、体细胞、CNV与联合基因分型"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "gatk-variant-calling",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/joint_calling.sh",
+            "examples/single_sample.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "copy-number-gatk-cnv",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_gatk_cnv.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [
+        "src/dnakit/bioinformatics/ngs.py:call_variants is bcftools only, not GATK"
+      ],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/broadinstitute/gatk/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "ensembl-vep",
+      "name": "Ensembl VEP",
+      "domains": [
+        "variants",
+        "clinical",
+        "annotation"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/Ensembl/ensembl-vep",
+      "repository": "https://github.com/Ensembl/ensembl-vep",
+      "paper_urls": [
+        "https://doi.org/10.1186/s13059-016-0974-4"
+      ],
+      "attribution": "Ensembl项目作者与贡献者；\"Licensor\" shall mean the copyright owner or entity authorized by；the copyright owner that is granting the License.",
+      "license_evidence": {
+        "expression": "Apache-2.0",
+        "verified_file": "https://raw.githubusercontent.com/Ensembl/ensembl-vep/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/Ensembl/ensembl-vep/HEAD/README.md"
+      },
+      "capabilities": [
+        "转录本后果、编码和非编码变异注释"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "variant-annotation",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/annotate_vcf.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/Ensembl/ensembl-vep/HEAD/README.md",
+        "https://raw.githubusercontent.com/Ensembl/ensembl-vep/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "cnvkit",
+      "name": "CNVkit",
+      "domains": [
+        "variants",
+        "clinical"
+      ],
+      "kind": "python+cli",
+      "homepage": "https://github.com/etal/cnvkit",
+      "repository": "https://github.com/etal/cnvkit",
+      "paper_urls": [],
+      "attribution": "etal项目作者与贡献者；Copyright (c) 2013-2018 Eric Talevich；Copyright (c) 2013-2018 University of California",
+      "license_evidence": {
+        "expression": "Apache-2.0",
+        "verified_file": "https://raw.githubusercontent.com/etal/cnvkit/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/etal/cnvkit/HEAD/README.rst"
+      },
+      "capabilities": [
+        "靶向/WES/WGS拷贝数估计、分段与可视化"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "copy-number-cnvkit-analysis",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_cnvkit.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/etal/cnvkit/HEAD/README.rst",
+        "https://raw.githubusercontent.com/etal/cnvkit/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "exomiser",
+      "name": "Exomiser",
+      "domains": [
+        "clinical",
+        "variants"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/exomiser/Exomiser",
+      "repository": "https://github.com/exomiser/Exomiser",
+      "paper_urls": [],
+      "attribution": "exomiser项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/exomiser/Exomiser/HEAD/README.md"
+      },
+      "capabilities": [
+        "HPO表型与遗传模式联合的罕见病变异优先级"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-variant-prioritization",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/prioritize_variants.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "rare-disease-diagnosis",
+          "source_id": "tooluniverse",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "scripts/clinical_patterns.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/exomiser/Exomiser/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "sigprofilerextractor",
+      "name": "SigProfilerExtractor",
+      "domains": [
+        "clinical",
+        "variants"
+      ],
+      "kind": "python+cli",
+      "homepage": "https://github.com/AlexandrovLab/SigProfilerExtractor",
+      "repository": "https://github.com/AlexandrovLab/SigProfilerExtractor",
+      "paper_urls": [
+        "https://doi.org/10.1016/j.xgen.2022.100179"
+      ],
+      "attribution": "AlexandrovLab项目作者与贡献者；Copyright (c) 2019, S M Ashiqul Islam (Mishu) [Alexandrov Lab]；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-2-Clause",
+        "verified_file": "https://raw.githubusercontent.com/AlexandrovLab/SigProfilerExtractor/HEAD/LICENSE.txt",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/AlexandrovLab/SigProfilerExtractor/HEAD/README.md"
+      },
+      "capabilities": [
+        "突变谱特征提取和分解"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "clinical-databases-somatic-signatures",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/mutsig_fitting.R",
+            "examples/sigprofiler_analysis.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/AlexandrovLab/SigProfilerExtractor/HEAD/README.md",
+        "https://raw.githubusercontent.com/AlexandrovLab/SigProfilerExtractor/HEAD/LICENSE.txt"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "bismark",
+      "name": "Bismark",
+      "domains": [
+        "epigenomics"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/FelixKrueger/Bismark",
+      "repository": "https://github.com/FelixKrueger/Bismark",
+      "paper_urls": [],
+      "attribution": "FelixKrueger项目作者与贡献者",
+      "license_evidence": {
+        "expression": "UNVERIFIED",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/FelixKrueger/Bismark/HEAD/README.md"
+      },
+      "capabilities": [
+        "亚硫酸氢盐测序比对、去重和甲基化提取"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "methylation-bismark-alignment",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/bismark_basic.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "methylation-calling",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/extract_methylation.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/FelixKrueger/Bismark/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "methylkit",
+      "name": "methylKit",
+      "domains": [
+        "epigenomics"
+      ],
+      "kind": "r",
+      "homepage": "https://github.com/al2na/methylKit",
+      "repository": "https://github.com/al2na/methylKit",
+      "paper_urls": [],
+      "attribution": "al2na项目作者与贡献者",
+      "license_evidence": {
+        "expression": "README-Artistic-or-GPL-unresolved",
+        "verified_file": null,
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/al2na/methylKit/HEAD/README.md"
+      },
+      "capabilities": [
+        "甲基化覆盖过滤、差异甲基化与区域分析"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "methylation-methylkit",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/methylkit_analysis.R"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "methylation-dmr-detection",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/dmr_dmrseq.R",
+            "examples/dmr_methylkit.R"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 尚未核实可再分发许可证，保持reference-only，不复制内容。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/al2na/methylKit/HEAD/README.md"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "cooler",
+      "name": "Cooler",
+      "domains": [
+        "3d-genomics",
+        "epigenomics"
+      ],
+      "kind": "python+cli",
+      "homepage": "https://github.com/open2c/cooler",
+      "repository": "https://github.com/open2c/cooler",
+      "paper_urls": [
+        "https://doi.org/10.1093/bioinformatics/btz540",
+        "https://doi.org/10.1093/bioinformatics/btz540}"
+      ],
+      "attribution": "open2c项目作者与贡献者；Copyright (c) 2015-2023, Cooler developers；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/open2c/cooler/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/open2c/cooler/HEAD/README.md"
+      },
+      "capabilities": [
+        "Hi-C稀疏矩阵读写、平衡、合并和多分辨率"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "hi-c-analysis-hic-data-io",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/load_cooler.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "hi-c-analysis-matrix-operations",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/balance_and_oe.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/open2c/cooler/HEAD/README.md",
+        "https://raw.githubusercontent.com/open2c/cooler/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "cooltools",
+      "name": "Cooltools",
+      "domains": [
+        "3d-genomics",
+        "epigenomics"
+      ],
+      "kind": "python+cli",
+      "homepage": "https://github.com/open2c/cooltools",
+      "repository": "https://github.com/open2c/cooltools",
+      "paper_urls": [
+        "https://doi.org/10.1101/2022.10.31.514564"
+      ],
+      "attribution": "open2c项目作者与贡献者；Copyright (c) 2017 Cooltools developers；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/open2c/cooltools/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/open2c/cooltools/HEAD/README.md"
+      },
+      "capabilities": [
+        "Hi-C compartments、insulation、pileup与接触衰减"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "hi-c-analysis-compartment-analysis",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/call_compartments.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "hi-c-analysis-tad-detection",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/call_tads.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/open2c/cooltools/HEAD/README.md",
+        "https://raw.githubusercontent.com/open2c/cooltools/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "chisel",
+      "name": "CHISEL",
+      "domains": [
+        "single-cell-dna",
+        "clinical",
+        "variants"
+      ],
+      "kind": "cli",
+      "homepage": "https://github.com/raphael-group/chisel",
+      "repository": "https://github.com/raphael-group/chisel",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41587-020-0661-6"
+      ],
+      "attribution": "raphael-group项目作者与贡献者；Copyright (c) 2019, Princeton University；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/raphael-group/chisel/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/raphael-group/chisel/HEAD/README.md"
+      },
+      "capabilities": [
+        "低覆盖单细胞DNA单倍型/等位基因特异拷贝数及克隆推断"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "copy-number-allele-specific-copy-number",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_facets.R"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。 README仍为Python 2.7实现，应隔离旧环境/容器，避免污染DNAKit依赖。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/raphael-group/chisel/HEAD/README.md",
+        "https://raw.githubusercontent.com/raphael-group/chisel/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "snapatac2",
+      "name": "SnapATAC2",
+      "domains": [
+        "single-cell-dna",
+        "epigenomics"
+      ],
+      "kind": "python",
+      "homepage": "https://github.com/scverse/snapatac2",
+      "repository": "https://github.com/scverse/snapatac2",
+      "paper_urls": [
+        "https://doi.org/10.1038/s41592-023-02139-9"
+      ],
+      "attribution": "scverse项目作者与贡献者；Copyright (c) 2022-2026 Kai Zhang；The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/scverse/snapatac2/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/scverse/snapatac2/HEAD/README.md"
+      },
+      "capabilities": [
+        "单细胞ATAC预处理、降维、整合与调控分析"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "atac-seq-single-cell-atac",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/signac_workflow.R"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/scverse/snapatac2/HEAD/README.md",
+        "https://raw.githubusercontent.com/scverse/snapatac2/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "nf-core-sarek",
+      "name": "nf-core/sarek",
+      "domains": [
+        "variants",
+        "clinical",
+        "sequencing"
+      ],
+      "kind": "workflow",
+      "homepage": "https://github.com/nf-core/sarek",
+      "repository": "https://github.com/nf-core/sarek",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.3476425",
+        "https://doi.org/10.1093/nargab/lqae031",
+        "http://dx.doi.org/10.12688/f1000research.16665.2",
+        "https://dx.doi.org/10.1038/s41587-020-0439-x"
+      ],
+      "attribution": "nf-core项目作者与贡献者；Copyright (c) The nf-core/sarek team；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/nf-core/sarek/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/nf-core/sarek/HEAD/README.md"
+      },
+      "capabilities": [
+        "WGS/WES胚系体细胞和结构变异Nextflow流程"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "workflows-fastq-to-variants",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/bwa_bcftools_workflow.sh",
+            "examples/bwa_gatk_workflow.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [
+        "src/dnakit/workflows/common/sarek.py (existing workflow helper; audit public exposure)"
+      ],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/nf-core/sarek/HEAD/README.md",
+        "https://raw.githubusercontent.com/nf-core/sarek/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "nf-core-methylseq",
+      "name": "nf-core/methylseq",
+      "domains": [
+        "epigenomics",
+        "sequencing"
+      ],
+      "kind": "workflow",
+      "homepage": "https://github.com/nf-core/methylseq",
+      "repository": "https://github.com/nf-core/methylseq",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.1343417",
+        "https://dx.doi.org/10.1038/s41587-020-0439-x"
+      ],
+      "attribution": "nf-core项目作者与贡献者；Copyright (c) The nf-core/methylseq team；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/nf-core/methylseq/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/nf-core/methylseq/HEAD/README.md"
+      },
+      "capabilities": [
+        "WGBS/RRBS质控、比对和甲基化提取Nextflow流程"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "methylation-bismark-alignment",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/bismark_basic.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/nf-core/methylseq/HEAD/README.md",
+        "https://raw.githubusercontent.com/nf-core/methylseq/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "nf-core-taxprofiler",
+      "name": "nf-core/taxprofiler",
+      "domains": [
+        "metagenomics",
+        "sequencing"
+      ],
+      "kind": "workflow",
+      "homepage": "https://github.com/nf-core/taxprofiler",
+      "repository": "https://github.com/nf-core/taxprofiler",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.7728364",
+        "https://doi.org/10.1101/2023.10.20.563221",
+        "https://dx.doi.org/10.1038/s41587-020-0439-x"
+      ],
+      "attribution": "nf-core项目作者与贡献者；Copyright (c) The nf-core/taxprofiler team；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/nf-core/taxprofiler/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/nf-core/taxprofiler/HEAD/README.md"
+      },
+      "capabilities": [
+        "多分类器宏基因组分类与丰度Nextflow流程"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "metagenomics-kraken",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/kraken2_classify.sh"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "metagenomics-metaphlan",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/metaphlan_profile.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/nf-core/taxprofiler/HEAD/README.md",
+        "https://raw.githubusercontent.com/nf-core/taxprofiler/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "nf-core-methylong",
+      "name": "nf-core/methylong",
+      "domains": [
+        "epigenomics",
+        "sequencing"
+      ],
+      "kind": "workflow",
+      "homepage": "https://github.com/nf-core/methylong",
+      "repository": "https://github.com/nf-core/methylong",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.15366449",
+        "https://doi.org/10.5281/zenodo.15366448",
+        "https://dx.doi.org/10.1038/s41587-020-0439-x"
+      ],
+      "attribution": "nf-core项目作者与贡献者；Copyright (c) The nf-core/methylong team；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/nf-core/methylong/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/nf-core/methylong/HEAD/README.md"
+      },
+      "capabilities": [
+        "ONT/PacBio长读长修饰调用与bedMethyl"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "long-read-sequencing-nanopore-methylation",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/modkit_methylation.sh"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/nf-core/methylong/HEAD/README.md",
+        "https://raw.githubusercontent.com/nf-core/methylong/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "encode-toolkit",
+      "name": "ENCODE Toolkit",
+      "domains": [
+        "epigenomics",
+        "3d-genomics",
+        "databases"
+      ],
+      "kind": "skills+mcp",
+      "homepage": "https://github.com/ammawla/encode-toolkit",
+      "repository": "https://github.com/ammawla/encode-toolkit",
+      "paper_urls": [
+        "https://doi.org/10.5281/zenodo.18917511",
+        "https://doi.org/10.5281/zenodo.18917511}"
+      ],
+      "attribution": "ammawla项目作者与贡献者；Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>；with two steps: (1) assert copyright on the software, and (2) offer",
+      "license_evidence": {
+        "expression": "AGPL-3.0",
+        "verified_file": "https://raw.githubusercontent.com/ammawla/encode-toolkit/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/ammawla/encode-toolkit/HEAD/README.md"
+      },
+      "capabilities": [
+        "ENCODE检索与可及性、甲基化、Hi-C聚合Skills"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "accessibility-aggregation",
+          "source_id": "encode-toolkit",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "scripts/validate_peaks.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "methylation-aggregation",
+          "source_id": "encode-toolkit",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "scripts/validate_methylation.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "hic-aggregation",
+          "source_id": "encode-toolkit",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "scripts/validate_loops.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [
+        "src/dnakit/encode (existing dedicated adapters)"
+      ],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/HEAD/README.md",
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "omics-skills",
+      "name": "Omics Skills",
+      "domains": [
+        "metagenomics",
+        "assembly"
+      ],
+      "kind": "skills",
+      "homepage": "https://github.com/fmschulz/omics-skills",
+      "repository": "https://github.com/fmschulz/omics-skills",
+      "paper_urls": [],
+      "attribution": "fmschulz项目作者与贡献者；Copyright (c) 2026 Frederik Schulz；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/fmschulz/omics-skills/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/fmschulz/omics-skills/HEAD/README.md"
+      },
+      "capabilities": [
+        "微生物基因组、宏基因组、病毒工作流技能"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "viromics",
+          "source_id": "omics",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "scripts/build_viromics_evidence.py"
+          ],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "microbial-genome-characterization",
+          "source_id": "tooluniverse",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "核查已收录固定版本与上游增量；优先复用原作者Skill及其脚本并保留许可证。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/fmschulz/omics-skills/HEAD/README.md",
+        "https://raw.githubusercontent.com/fmschulz/omics-skills/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "calicost",
+      "name": "CalicoST",
+      "domains": [
+        "spatial-genomics",
+        "clinical",
+        "variants"
+      ],
+      "kind": "python+workflow",
+      "homepage": "https://github.com/raphael-group/CalicoST",
+      "repository": "https://github.com/raphael-group/CalicoST",
+      "paper_urls": [],
+      "attribution": "raphael-group项目作者与贡献者；Copyright (c) 2023, Princeton University；1. Redistributions of source code must retain the above copyright notice, this",
+      "license_evidence": {
+        "expression": "BSD-3-Clause",
+        "verified_file": "https://raw.githubusercontent.com/raphael-group/CalicoST/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/raphael-group/CalicoST/HEAD/README.md"
+      },
+      "capabilities": [
+        "从空间转录组推断等位基因特异CNA、肿瘤克隆及空间谱系"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "copy-number-allele-specific-copy-number",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/run_facets.R"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。 方法由空间RNA间接推断DNA CNA，不是直接空间DNA测序。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/raphael-group/CalicoST/HEAD/README.md",
+        "https://raw.githubusercontent.com/raphael-group/CalicoST/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "methylgpt",
+      "name": "MethylGPT",
+      "domains": [
+        "epigenomics",
+        "models"
+      ],
+      "kind": "model+python",
+      "homepage": "https://github.com/albert-ying/MethylGPT",
+      "repository": "https://github.com/albert-ying/MethylGPT",
+      "paper_urls": [
+        "https://www.biorxiv.org/content/10.1101/2024.10.30.621013v2"
+      ],
+      "attribution": "albert-ying项目作者与贡献者；\"Licensor\" shall mean the copyright owner or entity authorized by；the copyright owner that is granting the License.",
+      "license_evidence": {
+        "expression": "Apache-2.0",
+        "verified_file": "https://raw.githubusercontent.com/albert-ying/MethylGPT/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/albert-ying/MethylGPT/HEAD/README.md"
+      },
+      "capabilities": [
+        "甲基组嵌入、年龄/疾病研究预测与缺失CpG填补"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "methylation-epigenetic-clocks",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/epigenetic_clocks.R"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/albert-ying/MethylGPT/HEAD/README.md",
+        "https://raw.githubusercontent.com/albert-ying/MethylGPT/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "mgnify-genomes-catalogue-pipeline",
+      "name": "MGnify Genomes Catalogue Pipeline",
+      "domains": [
+        "metagenomics",
+        "assembly",
+        "annotation"
+      ],
+      "kind": "workflow",
+      "homepage": "https://github.com/EBI-Metagenomics/genomes-catalogue-pipeline",
+      "repository": "https://github.com/EBI-Metagenomics/genomes-catalogue-pipeline",
+      "paper_urls": [
+        "https://doi.org/10.1016/j.jmb.2023.168016"
+      ],
+      "attribution": "EBI-Metagenomics项目作者与贡献者；Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>；(1) assert copyright on the software, and (2) offer you this License",
+      "license_evidence": {
+        "expression": "GPL-3.0",
+        "verified_file": "https://raw.githubusercontent.com/EBI-Metagenomics/genomes-catalogue-pipeline/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/EBI-Metagenomics/genomes-catalogue-pipeline/HEAD/README.md"
+      },
+      "capabilities": [
+        "MAG分类、质量、代谢、移动元件与基因目录分析"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "mgnify",
+          "source_id": "pku-metagenomics",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        },
+        {
+          "skill_id": "microbial-genome-characterization",
+          "source_id": "tooluniverse",
+          "status": "bundled-workflow-instructions",
+          "scripts": [],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "已有相关工作流说明/可分发脚本，不等同专用Python API或上游工具已安装；需要参数校验、依赖探测、结果结构化与科学验证。"
+      ],
+      "integration_recommendation": "按需后端适配；不打包模型、数据库或第三方可执行程序；新增引用与版本记录。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/EBI-Metagenomics/genomes-catalogue-pipeline/HEAD/README.md",
+        "https://raw.githubusercontent.com/EBI-Metagenomics/genomes-catalogue-pipeline/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    },
+    {
+      "id": "juicebox-mcp",
+      "name": "Juicebox MCP",
+      "domains": [
+        "3d-genomics",
+        "epigenomics"
+      ],
+      "kind": "mcp",
+      "homepage": "https://github.com/aidenlab/juicebox-mcp",
+      "repository": "https://github.com/aidenlab/juicebox-mcp",
+      "paper_urls": [],
+      "attribution": "aidenlab项目作者与贡献者；Copyright (c) 2016-2019 The Regents of the University of California；The above copyright notice and this permission notice shall be included in all",
+      "license_evidence": {
+        "expression": "MIT",
+        "verified_file": "https://raw.githubusercontent.com/aidenlab/juicebox-mcp/HEAD/LICENSE",
+        "notes": "读取作者仓库许可证；未找到的显式保留未核实状态。",
+        "readme_url": "https://raw.githubusercontent.com/aidenlab/juicebox-mcp/HEAD/README.md"
+      },
+      "capabilities": [
+        "Hi-C图谱搜索、区域导航、轨道和交互可视化"
+      ],
+      "local_matches": [
+        {
+          "skill_id": "hi-c-analysis-hic-visualization",
+          "source_id": "bioskills",
+          "status": "bundled-workflow-and-scripts",
+          "scripts": [
+            "examples/plot_hic.py"
+          ],
+          "execution_validation": "not_run"
+        }
+      ],
+      "local_implementations": [],
+      "gaps": [
+        "未发现该项目专用MCP注册/桥接；DNAKit已有部分同类数据库查询，需避免重复。"
+      ],
+      "integration_recommendation": "先登记真实MCP能力、stdio/HTTP连接及所需凭据；按需连接，不自动启动服务或上传数据。",
+      "verified_urls": [
+        "https://raw.githubusercontent.com/aidenlab/juicebox-mcp/HEAD/README.md",
+        "https://raw.githubusercontent.com/aidenlab/juicebox-mcp/HEAD/LICENSE"
+      ],
+      "validation": "source-reviewed; scientific-execution-not-run"
+    }
+  ],
+  "priority_gaps": [
+    {
+      "id": "bedmethyl-native",
+      "description": "严格读取18列modkit bedMethyl并按修饰代码/染色体/链/motif保留独立覆盖加权摘要。第11列为百分比；有效覆盖=modified+canonical+other。",
+      "official_url": "https://nanoporetech.github.io/modkit/intro_pileup.html"
+    },
+    {
+      "id": "external-typed-wrappers",
+      "description": "AMRFinderPlus、Modkit、Sniffles、fastp、Kraken2已有workflow但缺专用稳定Python参数适配。"
+    },
+    {
+      "id": "clinical-engine",
+      "description": "按需接入PharmCAT/Exomiser/SigProfiler，区分研究计算与临床判断；记录指南版本。"
+    },
+    {
+      "id": "3d-genomics",
+      "description": "为Cooler/Cooltools提供可选Python入口，并登记真正的Juicebox MCP。"
+    },
+    {
+      "id": "single-cell-dna-spatial",
+      "description": "补CHISEL单细胞DNA和CalicoST间接空间CNA流程；检查旧Python/运行资源。"
+    }
+  ],
+  "method_notes": [
+    "GitHub REST API返回403限流，改为公开raw README/LICENSE读取；无私有凭据。",
+    "研究候选不等于代码集成完成；现有Skill含可调用资源的明确标记，不当成纯目录，也不当成专用科学API。",
+    "未将未找到根许可证的MCP/Skill直接复制进DNAKit。"
+  ]
+}

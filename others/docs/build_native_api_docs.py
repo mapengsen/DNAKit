@@ -1,4 +1,4 @@
-"""Build the complete public API reference for the 484-function skill migration.
+"""Maintain public API details inside the existing functional tutorials.
 
 Run with the source checkout installed: python others/docs/build_native_api_docs.py
 Use --check to verify committed pages, signatures, schemas and coverage offline.
@@ -18,13 +18,30 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from rich.console import Console
+from rich.progress import track
+from tutorial_api_examples import OVERRIDES as EXAMPLE_OVERRIDES
+from tutorial_api_examples import arguments_for, render_example
+from tutorial_api_layout import (
+    ENCODE_RESULTS_ZH,
+    RESULT_NOTES,
+    method_summary,
+    result_example,
+    success_schema,
+)
+from tutorial_api_routes import FUNCTION_ROUTES, SECTIONS, page_for, section_for
+
 from dnakit import databases, encode, workflows
 from dnakit.databases._runtime import definitions
 from dnakit.download import ena, ncbi
 from dnakit.search.ncbi import accessions
 
 ROOT = Path(__file__).resolve().parents[2]
-DEST = ROOT / "docs/api/native"
+DEST = ROOT / "docs/api/features"
+REFERENCE = ROOT / "docs/faq/api"
+TITLES = json.loads(
+    Path(__file__).with_name("tutorial_api_titles.json").read_text(encoding="utf-8")
+)
 
 # Explicit source-module membership avoids silently classifying new providers.
 GROUPS = {
@@ -421,7 +438,7 @@ DATABASE_PARAMETERS = {
         "UniProt accession; do not also supply pdb_id for the reverse structure lookup.",
     ),
     "protein_ids": (
-        "蛋白标识；输入列表或字符串类型见当前接口 Schema。",
+        "蛋白标识；输入列表或字符串类型见本行类型说明。",
         "Protein identifiers; use the list or string type specified by this operation.",
     ),
     "chrom": (
@@ -478,16 +495,16 @@ RETURN_NOTES = {
         "Mapping with pdb_id, format, data (coordinate file text), url and sha256; does not write to disk.",
     ),
     "dnakit.databases.orphanet_get_disease_genes": (
-        "返回 Orphanet_get_genes 的原始关联记录结构，见 [orphanet_get_genes](phenotypes.md#dnakit.databases.orphanet_get_genes)。",
-        "Returns the Orphanet_get_genes association result; see [orphanet_get_genes](phenotypes.md#dnakit.databases.orphanet_get_genes).",
+        "返回 Orphanet_get_genes 的原始关联记录结构，见 [orphanet_get_genes](22_database_query_phenotypes.md#dnakit.databases.orphanet_get_genes)。",
+        "Returns the Orphanet_get_genes association result; see [orphanet_get_genes](22_database_query_phenotypes.md#dnakit.databases.orphanet_get_genes).",
     ),
     "dnakit.databases.cadd_get_scores": (
         "返回 MyVariant 检索结果；字典结果另含 dnakit_score_source，表明分数来自已索引的 CADD 注释。缺失分数保持缺失，不执行新的模型预测。",
         "Returns MyVariant query results; mapping results include dnakit_score_source identifying indexed CADD annotations. Missing scores remain missing; no new model prediction is performed.",
     ),
     "dnakit.databases.string_get_functional_enrichment": (
-        "返回 STRING_functional_enrichment 的富集结果，见 [string_functional_enrichment](pathways.md#dnakit.databases.string_functional_enrichment)。",
-        "Returns STRING_functional_enrichment results; see [string_functional_enrichment](pathways.md#dnakit.databases.string_functional_enrichment).",
+        "返回 STRING_functional_enrichment 的富集结果，见 [string_functional_enrichment](37_functional_enrichment.md#dnakit.databases.string_functional_enrichment)。",
+        "Returns STRING_functional_enrichment results; see [string_functional_enrichment](37_functional_enrichment.md#dnakit.databases.string_functional_enrichment).",
     ),
     "dnakit.databases.search": (
         "列表，每项包含 name、description、upstream_name。",
@@ -619,15 +636,6 @@ def inventory() -> list[dict]:
     return sorted(records, key=lambda r: r["name"])
 
 
-def purpose(record: dict, language: str) -> str:
-    if record["name"] in PURPOSE_OVERRIDES:
-        return PURPOSE_OVERRIDES[record["name"]][0 if language == "zh" else 1]
-    if language == "zh" and record["name"] in ZH_PURPOSE:
-        return ZH_PURPOSE[record["name"]]
-    entry = record["entry"]
-    return entry["config"]["description"] if entry else doc_sections(record["fn"])[0]
-
-
 def parameter_table(record: dict, language: str) -> str:
     entry = record["entry"]
     schema = entry.get("input_schema", {}) if entry else {}
@@ -649,9 +657,7 @@ def parameter_table(record: dict, language: str) -> str:
         kind = prop.get("type", annotation(p.annotation))
         if isinstance(kind, list):
             kind = " | ".join(kind)
-        if name in required:
-            default = tr("必填（输入 Schema）", "Required by input schema", language)
-        elif p.default is inspect.Signature.empty:
+        if name in required or p.default is inspect.Signature.empty:
             default = tr("必填", "Required", language)
         else:
             default = repr(p.default)
@@ -663,42 +669,79 @@ def parameter_table(record: dict, language: str) -> str:
             desc = pair[0 if language == "zh" else 1] if pair else None
         if not desc:
             desc = tr(
-                "运行提示开关。" if name == "verbose" else "参数含义见用途与完整输入 Schema。",
+                "运行提示开关。" if name == "verbose" else "参数用法见本功能的作用与示例代码。",
                 "Progress flag."
                 if name == "verbose"
-                else "See the purpose and complete input schema.",
+                else "See this function's purpose and example code for usage.",
                 language,
             )
         limits = {k: v for k, v in prop.items() if k not in {"type", "description", "title"}}
         if limits:
             desc += " " + json.dumps(limits, ensure_ascii=False)
         rows.append(f"| `{name}` | {cell(kind)} | {cell(default)} | {cell(desc)} |")
+    for keyword in ("oneOf", "anyOf"):
+        alternatives = schema.get(keyword, [])
+        if alternatives:
+            groups = [
+                " + ".join(f"`{name}`" for name in branch["required"]) for branch in alternatives
+            ]
+            rule = tr(
+                "以下参数组必须且只能提供一组："
+                if keyword == "oneOf"
+                else "以下参数组至少提供一组：",
+                "Provide exactly one of these parameter groups: "
+                if keyword == "oneOf"
+                else "Provide at least one of these parameter groups: ",
+                language,
+            )
+            rows += ["", rule + "; ".join(groups) + tr("。", ".", language)]
     return "\n".join(rows)
 
 
-def details(title: str, content: str, kind: str = "json") -> str:
-    text = f"```{kind}\n{content}\n```" if kind else content
-    return (
-        f'??? info "{title}"\n\n'
-        + "\n".join("    " + line if line else "" for line in text.splitlines())
-        + "\n"
-    )
+def parameter_details(record: dict, language: str) -> str:
+    table = parameter_table(record, language)
+    keys = (record["entry"] or {}).get("config", {}).get("required_api_keys", [])
+    credentials = [key for key in keys if key != "CELLXGENE_CENSUS_PACKAGE_INSTALLED"]
+    if credentials:
+        table += "\n\n" + tr("运行前配置：", "Configure before running: ", language)
+        table += ", ".join(f"`{key}`" for key in credentials) + tr("。", ".", language)
+    if "CELLXGENE_CENSUS_PACKAGE_INSTALLED" in keys:
+        table += "\n\n" + tr(
+            "运行前安装 `cellxgene-census`。",
+            "Install `cellxgene-census` before running.",
+            language,
+        )
+    return table + "\n"
+
+
+def reference_link(record: dict, language: str) -> str:
+    label = tr("完整参数与使用说明", "Full parameters and usage notes", language)
+    return f"[{label}](../../faq/api/{page_for(record)}.md#{record['name']}-parameters)"
 
 
 def return_text(record: dict, language: str) -> str:
-    name, entry = record["name"], record["entry"]
+    name = record["name"]
+    if name == "dnakit.databases.download_file":
+        return tr(
+            "保存模式返回文件路径；`return_content=True` 时返回文件的文本内容。",
+            "Returns the file path when saving; with `return_content=True`, returns the file contents as text.",
+            language,
+        )
     if name == "dnakit.databases.ch_ipatlas_enrichment_analysis":
         return tr(
-            "字典包含 status=requires_submission、analysis_completed=False 和提交说明；不会返回已完成的富集检验。下面保留提供方原始结果 Schema 供追溯，不能据此认定分析已经完成。",
-            "Mapping with status=requires_submission, analysis_completed=False and submission instructions, not a completed enrichment test. The original provider schema is retained below for provenance and does not establish completed analysis.",
+            "字典包含 `status=requires_submission`、`analysis_completed=False` 和任务提交说明；本次调用尚未完成富集检验。",
+            "Mapping with `status=requires_submission`, `analysis_completed=False` and task submission instructions; the enrichment test has not been run.",
             language,
         )
     if name in RETURN_NOTES:
         return RETURN_NOTES[name][0 if language == "zh" else 1]
+    short_name = name.rsplit(".", 1)[-1]
+    if short_name in RESULT_NOTES:
+        return RESULT_NOTES[short_name][0 if language == "zh" else 1]
     if name.startswith("dnakit.download."):
         return tr(
-            "DatasetDownloadResult：files 为文件记录，metadata 含来源、解析出的 accession 和序列长度，manifest_path 指向来源清单。详细格式支持与坐标约定见[序列下载教程](../features/15_download.md#accession-sequences)。",
-            "DatasetDownloadResult with files, metadata (source, resolved accession and length), and manifest_path. See the [sequence download guide](../features/15_download.md#accession-sequences) for formats and coordinates.",
+            "DatasetDownloadResult：files 为文件记录，metadata 含来源、解析出的 accession 和序列长度，manifest_path 指向来源清单。详细格式支持与坐标约定见[序列下载教程](15_download.md#accession-sequences)。",
+            "DatasetDownloadResult with files, metadata (source, resolved accession and length), and manifest_path. See the [sequence download guide](15_download.md#accession-sequences) for formats and coordinates.",
             language,
         )
     if name == "dnakit.workflows.write_wes_report":
@@ -709,113 +752,358 @@ def return_text(record: dict, language: str) -> str:
         )
     _, _, doc_return = doc_sections(record["fn"])
     if name.startswith("dnakit.encode."):
+        if language == "zh":
+            return ENCODE_RESULTS_ZH[name.rsplit(".", 1)[-1]]
         return (
             tr("Python 返回类型为 str。", "Python return type: str. ", language) + " " + doc_return
         )
-    if entry and entry["config"].get("return_schema"):
-        return tr(
-            "返回提供方结果，经 DNAKit 参数处理、错误检查和大小限制；下方为提供方登记的结果 Schema，属于结构参考，不是本次实时请求输出。不同接口的 data 层与分页字段可能不同。",
-            "Returns the provider result after DNAKit argument handling, error checks and size limits. The registered provider result schema below is a structural reference, not a live response. Data envelopes and pagination vary by operation.",
-            language,
-        )
     return tr(
-        "返回类型为 object，具体结构由所调用操作决定；不保证统一的 data 层。提供方错误会抛出异常。",
-        "Returns object with the called operation's result structure; a common data envelope is not guaranteed. Provider errors raise exceptions.",
+        "返回该操作的处理结果，具体内容随输入与数据版本变化。",
+        "Returns the operation's result; contents depend on the input and data version.",
         language,
     )
 
 
-def render_function(record: dict, language: str) -> str:
-    name, entry = record["name"], record["entry"]
+def input_summary(record: dict, language: str) -> str:
+    entry = record["entry"] or {}
+    required = set(entry.get("input_schema", {}).get("required", []))
+    required.update(
+        name
+        for name, parameter in inspect.signature(record["fn"]).parameters.items()
+        if parameter.default is inspect.Parameter.empty
+    )
+    names = ", ".join(
+        f"`{name}`" for name in inspect.signature(record["fn"]).parameters if name in required
+    )
+    if names:
+        return tr(
+            f"必须提供 {names}。",
+            f"Provide {names}.",
+            language,
+        )
+    return tr(
+        "按示例选择查询条件；可选参数使用接口默认值。",
+        "Choose filters as shown in the example; omitted options use the operation defaults.",
+        language,
+    )
+
+
+def input_requirements(record: dict, language: str) -> str:
+    """Keep requirements needed to run the example beside its input."""
+    entry = record["entry"] or {}
+    schema = entry.get("input_schema", {})
+    notes = []
+    if record["name"] in {
+        "dnakit.databases.sequence_count_residues",
+        "dnakit.databases.sequence_stats",
+    }:
+        notes.append(
+            tr(
+                "另需提供 `sequence` 或 `uniprot_id`；使用 UniProt 编号时需要联网。",
+                "Also provide sequence or uniprot_id; UniProt lookup requires network access.",
+                language,
+            )
+        )
+    for keyword in ("oneOf", "anyOf"):
+        groups = [
+            " + ".join(f"`{name}`" for name in branch.get("required", []))
+            for branch in schema.get(keyword, [])
+            if branch.get("required")
+        ]
+        if groups:
+            notes.append(
+                tr(
+                    "参数组恰好选一组：" if keyword == "oneOf" else "参数组至少选一组：",
+                    "Select exactly one argument group: "
+                    if keyword == "oneOf"
+                    else "Select at least one argument group: ",
+                    language,
+                )
+                + " / ".join(groups)
+                + tr("。", ".", language)
+            )
+    keys = entry.get("config", {}).get("required_api_keys", [])
+    credentials = [key for key in keys if key != "CELLXGENE_CENSUS_PACKAGE_INSTALLED"]
+    if credentials:
+        notes.append(
+            tr("需配置：", "Configure: ", language)
+            + ", ".join(f"`{key}`" for key in credentials)
+            + "."
+        )
+    if "CELLXGENE_CENSUS_PACKAGE_INSTALLED" in keys:
+        notes.append(tr("需安装 `cellxgene-census`。", "Requires `cellxgene-census`.", language))
+    if entry.get("module") == "vcf_stats_tool":
+        notes.append(
+            tr(
+                "需本地 VCF/BCF 文件，且 PATH 中有 `bcftools`。",
+                "Requires a local VCF/BCF file and `bcftools` on PATH.",
+                language,
+            )
+        )
+    return " " + " ".join(notes) if notes else ""
+
+
+def example_notes(record: dict, language: str) -> str:
+    name = record["name"]
+    if name in {
+        "dnakit.databases.hpa_get_protein_interactions_by_gene",
+        "dnakit.databases.ctd_get_chemical_gene_interactions",
+    }:
+        return tr(
+            "该数据源入口当前不可用，调用会返回错误；以下代码仅说明调用形式。",
+            "This data-source operation is currently unavailable and returns an error; the code only illustrates the call syntax.",
+            language,
+        )
+    notes = []
+    if "REPLACE_ME" in repr(arguments_for(record)):
+        notes.append(
+            tr(
+                "先用文件查询功能取得实际编号，替换 `ENCFF_REPLACE_ME`。",
+                "Retrieve a real file accession with the file query API and replace `ENCFF_REPLACE_ME`.",
+                language,
+            )
+        )
+    if name.startswith("dnakit.encode.") and section_for(record) == "encode-collection":
+        notes.append(
+            tr(
+                "集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。",
+                "Collection operations use local tracking records. Track experiments before comparison, reference linking or export, and register derived files before provenance queries.",
+                language,
+            )
+        )
+    if name == "dnakit.databases.read_executed_notebook":
+        notes.append(
+            tr(
+                "准备已经执行并保存输出的 `analysis_executed.ipynb`，或替换为自己的文件路径。",
+                "Prepare an executed notebook with saved outputs at `analysis_executed.ipynb`, or supply your own path.",
+                language,
+            )
+        )
+    if name == "dnakit.workflows.write_wes_report":
+        notes.append(
+            tr(
+                "先准备 `report.md` 并安装 `dnakit[reports]`；结果将写入 `reports/pdf`。",
+                "Prepare `report.md` and install `dnakit[reports]`; output is written to `reports/pdf`.",
+                language,
+            )
+        )
+    if name == "dnakit.workflows.simulate_inheritance":
+        notes.append(
+            tr(
+                "使用显式合成位点演示独立遗传；关闭突变，不访问远程数据。",
+                "This example uses an explicit synthetic locus with mutation disabled and no remote data.",
+                language,
+            )
+        )
+    effect = (record["entry"] or {}).get("effect")
+    if effect in {"filesystem", "subprocess", "external_process"}:
+        notes.append(
+            tr(
+                "运行前准备示例涉及的本地文件与外部程序，并将路径替换为自己的输入或输出位置。",
+                "Prepare the local files and external programs used by the example, and replace paths with your input or output locations.",
+                language,
+            )
+        )
+    return " ".join(notes)
+
+
+def result_summary(record: dict, language: str) -> str:
+    name = record["name"]
+    if name in {
+        "dnakit.databases.hpa_get_protein_interactions_by_gene",
+        "dnakit.databases.ctd_get_chemical_gene_interactions",
+    }:
+        return tr(
+            "此入口当前报告服务不可用，不返回有效互作结果。",
+            "This operation currently reports an unavailable service rather than valid interaction results.",
+            language,
+        )
+    schema = success_schema((record["entry"] or {}).get("config", {}).get("return_schema", {}))
+    text = return_text(record, language)
+    if text.startswith(("返回该操作的处理结果", "Returns the operation's result")):
+        if result_example(record):
+            return tr(
+                "返回结构如下，实际记录随输入和数据源变化。",
+                "The response has the following shape; records depend on the input and source.",
+                language,
+            )
+        description = schema.get("description")
+        if description and language == "en":
+            return description
+    return text
+
+
+def output_summary(record: dict, language: str) -> str:
+    """Describe the Python return value before the worked example."""
+    name = record["name"]
+    if name.startswith("dnakit.download."):
+        return tr(
+            "返回 `DatasetDownloadResult`，包含文件 `files`、来源信息 `metadata` 和清单路径 `manifest_path`。",
+            "Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.",
+            language,
+        )
+    if name in {
+        "dnakit.databases.hpa_get_protein_interactions_by_gene",
+        "dnakit.databases.ctd_get_chemical_gene_interactions",
+    }:
+        return result_summary(record, language)
+
+    description = return_text(record, language)
+    if not description.startswith(("返回该操作的处理结果", "Returns the operation's result")):
+        return description
+
+    example = result_example(record)
+    if example:
+        shape = json.loads(example)
+        if isinstance(shape, list):
+            item = shape[0] if shape else None
+            if isinstance(item, dict):
+                fields = ", ".join(f"`{key}`" for key in list(item)[:4])
+                return tr(
+                    f"返回记录列表；每条记录包含 {fields} 等字段。",
+                    f"Returns a list of records; each record includes {fields} and related fields.",
+                    language,
+                )
+            title = TITLES[name][language]
+            return tr(
+                f"返回“{title}”的列表；元素结构见下方示例。",
+                f"Returns a list for “{title}”; the item shape is shown below.",
+                language,
+            )
+        if isinstance(shape, dict):
+            if not shape:
+                return tr(
+                    "返回字典；具体字段随请求模式变化。",
+                    "Returns a mapping whose fields depend on the request mode.",
+                    language,
+                )
+            if "<record key>" in shape:
+                item = shape["<record key>"]
+                if isinstance(item, dict):
+                    fields = ", ".join(f"`{key}`" for key in list(item)[:4])
+                    return tr(
+                        f"返回以记录键为索引的字典；每条记录包含 {fields} 等字段。",
+                        f"Returns a mapping keyed by record; each record includes {fields} and related fields.",
+                        language,
+                    )
+                return tr(
+                    "返回以记录键为索引的字典。",
+                    "Returns a mapping keyed by record.",
+                    language,
+                )
+            fields = ", ".join(f"`{key}`" for key in list(shape)[:4])
+            return tr(
+                f"返回字典，包含 {fields} 等字段。",
+                f"Returns a mapping with {fields} and related fields.",
+                language,
+            )
+        if isinstance(shape, str):
+            kind = shape.strip("<>")
+            kinds = {
+                "string": ("字符串", "string"),
+                "integer": ("整数", "integer"),
+                "number": ("数值", "number"),
+                "boolean": ("布尔值", "boolean"),
+            }
+            if kind in kinds:
+                zh, en = kinds[kind]
+                return tr(f"返回{zh}。", f"Returns a {en}.", language)
+
+    schema = success_schema((record["entry"] or {}).get("config", {}).get("return_schema", {}))
+    if schema.get("description"):
+        return schema["description"]
+    return tr(
+        "返回查询结果；字段随数据源响应变化。",
+        "Returns query results; fields depend on the source response.",
+        language,
+    )
+
+
+def render_function(record: dict, language: str, number: int) -> str:
+    name = record["name"]
+    title = TITLES[name][language]
+    summary = title + ("。" if language == "zh" else ".")
+    if language == "zh" and name in ZH_PURPOSE:
+        summary = ZH_PURPOSE[name]
+    if name in PURPOSE_OVERRIDES:
+        summary = PURPOSE_OVERRIDES[name][0 if language == "zh" else 1]
+    if name == "dnakit.databases.alpha_missense_get_protein_scores":
+        summary = tr(
+            "按 UniProt 编号汇总蛋白质各位点的替换分类、位点平均分数与阈值；可用 max_residues 限制查询位点数。",
+            "Aggregate substitution classes, residue mean scores and thresholds across a UniProt protein; max_residues limits the queried positions.",
+            language,
+        )
+    elif name == "dnakit.databases.alpha_missense_get_residue_scores":
+        summary = tr(
+            "查看指定位点的良性、不确定和致病替换分类，以及位点平均分数；返回值不是每种替换各自的数值分数。",
+            "Retrieve benign, ambiguous and pathogenic substitution classes plus residue mean scores; these are not numeric scores for each individual substitution.",
+            language,
+        )
+    elif name == "dnakit.databases.alpha_missense_get_variant_score":
+        summary = tr(
+            "查询单个错义变异的 AlphaMissense 分类。上游不提供该替换的独立数值分数，pathogenicity_score 为 null，score_available 为 false。",
+            "Retrieve an AlphaMissense classification for one missense variant. The upstream operation supplies no numeric substitution score: pathogenicity_score is null and score_available is false.",
+            language,
+        )
     output = [
-        f"## `{name}` {{#{name}}}",
+        f"## {number}) {title} {{#{name}}}",
         "",
-        purpose(record, language),
+        "- **" + tr("作用：", "Purpose:", language) + "** " + summary,
+        "- **" + tr("处理方法：", "Method:", language) + "** " + method_summary(record, language),
+        "- **API：** `" + name + signature(record["fn"]) + "`",
+        "- **"
+        + tr("输入：", "Input:", language)
+        + "** "
+        + input_summary(record, language)
+        + input_requirements(record, language),
+    ]
+    note = example_notes(record, language)
+    if note:
+        output[-1] += " " + note
+    output += [
+        "- **" + tr("输出：", "Output:", language) + "** " + output_summary(record, language),
+        "- **" + tr("示例代码：", "Example code:", language) + "**",
         "",
-        "```text",
-        name + signature(record["fn"]),
+        "```python",
+        render_example(record),
         "```",
         "",
-        parameter_table(record, language),
-        "",
-        "**" + tr("返回值", "Returns", language) + "**",
-        "",
-        return_text(record, language),
-        "",
+        "- **"
+        + tr("示例结果：", "Example output:", language)
+        + "** "
+        + result_summary(record, language),
     ]
-    if entry:
+    example = result_example(record)
+    if example and name not in {
+        "dnakit.databases.hpa_get_protein_interactions_by_gene",
+        "dnakit.databases.ctd_get_chemical_gene_interactions",
+    }:
         output += [
-            details(
-                tr(
-                    "完整输入 Schema（含别名与条件约束）",
-                    "Complete input schema, aliases and conditional constraints",
-                    language,
-                ),
-                json.dumps(entry["input_schema"], ensure_ascii=False, indent=2),
-            )
-        ]
-        schema = entry["config"].get("return_schema")
-        if schema:
-            output += [
-                details(
-                    tr("提供方登记的结果 Schema", "Registered provider result schema", language),
-                    json.dumps(schema, ensure_ascii=False, indent=2),
-                )
-            ]
-        extension = entry.get("extension")
-        if extension:
-            output += [
-                details(
-                    tr("DNAKit 参数扩展规则", "DNAKit argument extension rules", language),
-                    json.dumps(extension, ensure_ascii=False, indent=2),
-                )
-            ]
-        output += [
-            tr("**执行与来源：**", "**Execution and provenance:**", language)
-            + f" `{entry.get('effect', 'network')}`；"
-            + tr("上游接口名", "upstream name", language)
-            + f" `{entry['upstream_name']}`。",
             "",
-        ]
-        keys = entry["config"].get("required_api_keys", [])
-        if keys:
-            output += [
-                tr("**提供方凭据：**", "**Provider credentials:**", language)
-                + " "
-                + ", ".join(f"`{key}`" for key in keys),
-                "",
-            ]
-        output += [
             tr(
-                "**查看参数示例（离线，不调用提供方）：**",
-                "**Inspect parameters offline without calling the provider:**",
+                "返回结构节选；`<…>` 表示类型占位符，非本次查询的实测数据。",
+                "Response-shape excerpt; `<…>` denotes type placeholders, not a captured query result.",
                 language,
             ),
             "",
-            "```python",
-            "import dnakit",
-            f'info = dnakit.databases.describe("{name.rsplit(".", 1)[1]}", verbose=False)',
-            'print(info["input_schema"])',
+            "```json",
+            example,
             "```",
-            "",
         ]
-    else:
-        before, _, _ = doc_sections(record["fn"])
-        if language == "zh" and before != purpose(record, language):
-            output += [details("补充说明（源码原文）", before, kind="")]
-    return "\n".join(output)
+    output += ["", reference_link(record, language), ""]
+    return re.sub(r"(?m)^[ \t]+$", "", "\n".join(output))
 
 
 def page_intro(group: str, language: str) -> str:
     common = tr(
-        "每个函数均列出当前 Python 签名、参数、返回值和已登记的执行要求。提供方说明及字段描述保留源码原文。`None` 默认值在生成的数据库包装中通常表示不向服务传该参数；实际必填项与组合约束以输入 Schema 为准。坐标系和基因组版本按各接口说明使用。",
-        "Each function lists its current Python signature, parameters, returns and registered execution requirements. Provider descriptions retain source wording. In generated database wrappers, None normally omits a parameter; actual required fields and conditional constraints come from the input schema. Follow each operation's coordinate and assembly conventions.",
+        "各功能按作用、API、输入、输出、示例代码和结果说明介绍。运行前按说明准备凭据、本地文件与可选依赖；远程结果随数据库版本与查询时间变化。",
+        "Each function includes its purpose, API, inputs, outputs, example code and result description. Prepare any required credentials, local files and optional dependencies; remote results vary with database releases and query time.",
         language,
     )
     if group == "encode":
         common += "\n\n" + tr(
-            "ENCODE 接口返回文本：多数是 JSON，`get_citations` 可返回 BibTeX/RIS，`export_data` 可返回 CSV/TSV。仅 JSON 文本使用 `json.loads()`。追踪与凭据保存在 `~/.dnakit-encode/`；持久化凭据功能需要 `dnakit[encode-credentials]`。源码说明中的 `encode_...` 是保留的上游命名，在 DNAKit 中请使用本页的 `dnakit.encode.*` 函数。",
-            "ENCODE returns text: mostly JSON, but get_citations can return BibTeX/RIS and export_data can return CSV/TSV. Use json.loads() only for JSON. Tracking and credentials use ~/.dnakit-encode/; persistent credential storage needs dnakit[encode-credentials]. Names starting with encode_ in source descriptions are upstream names; use this page's dnakit.encode.* functions in DNAKit.",
+            "ENCODE 接口返回文本：多数是 JSON，`get_citations` 可返回 BibTeX/RIS，`export_data` 可返回 CSV/TSV。仅 JSON 文本使用 `json.loads()`。追踪与凭据保存在 `~/.dnakit-encode/`；持久化凭据功能需要 `dnakit[encode-credentials]`。",
+            "ENCODE returns text: mostly JSON, but get_citations can return BibTeX/RIS and export_data can return CSV/TSV. Use json.loads() only for JSON. Tracking and credentials use ~/.dnakit-encode/; persistent credential storage needs dnakit[encode-credentials].",
             language,
         )
     if group == "models":
@@ -826,8 +1114,8 @@ def page_intro(group: str, language: str) -> str:
         )
     if group == "regulation":
         common += "\n\n" + tr(
-            "ChIP-Atlas 按 gene 查峰时，未提供 peak_file 会返回 requires_data 和检索计划；提供已核对组装的 BED 后才计算区间重叠。富集入口返回 requires_submission 提交说明，不能把它当成已计算的富集统计。参数扩展分支的结果可能不同于提供方原始 Schema。",
-            "ChIP-Atlas gene-based peak queries without peak_file return requires_data and a retrieval plan; interval overlaps require a BED with verified assembly. The enrichment entry returns requires_submission instructions, not computed enrichment statistics. Extended query branches may return structures different from the original provider schema.",
+            "ChIP-Atlas 按 gene 查峰时，未提供 peak_file 会返回 requires_data 和检索计划；提供已核对组装的 BED 后才计算区间重叠。富集入口返回 requires_submission 提交说明，不能把它当成已计算的富集统计。",
+            "ChIP-Atlas gene-based peak queries without peak_file return requires_data and a retrieval plan; interval overlaps require a BED with verified assembly. The enrichment entry returns requires_submission instructions, not computed enrichment statistics.",
             language,
         )
     if group == "execution":
@@ -839,99 +1127,126 @@ def page_intro(group: str, language: str) -> str:
     return common
 
 
-def render_page(group: str, records: list[dict], language: str) -> str:
-    title = GROUPS[group][0 if language == "zh" else 1]
+def render_section(
+    section: str, records: list[dict], language: str, numbers: dict[str, int]
+) -> str:
     lines = [
-        f"# {title}",
-        "",
-        tr(
-            f"本页收录 **{len(records)} 个新增公开函数**。",
-            f"This page documents **{len(records)} newly added public functions**.",
-            language,
-        )
-        + " "
-        + tr(
-            "[完整索引](index.md) · [调用约定与完整示例](usage.md)",
-            "[Complete index](index.md) · [Conventions and examples](usage.md)",
-            language,
-        ),
-        "",
-        page_intro(group, language),
-        "",
-        tr("## 函数目录", "## Function index", language),
+        f'<span id="{section}"></span>',
         "",
     ]
-    lines += [f"- [`{r['name']}`](#{r['name']})" for r in records]
-    lines += ["", *[render_function(r, language) for r in records]]
-    return "\n".join(lines) + "\n"
+    lines += [render_function(r, language, numbers[r["name"]]) for r in records]
+    return "\n".join(lines).rstrip()
 
 
-def render_index(records: list[dict], language: str) -> str:
+def render_reference(page: str, records: list[dict], language: str) -> str:
+    suffix = ".en.md" if language == "en" else ".md"
+    title = (DEST / (page + suffix)).read_text(encoding="utf-8").splitlines()[0].lstrip("# ")
     lines = [
-        "# " + tr("新增函数完整索引", "Complete index of added functions", language),
+        "# " + title + tr("：参数与补充说明", ": parameters and notes", language),
         "",
         tr(
-            "本轮迁移共新增 **484 个公开 Python 函数**：数据库 455、ENCODE 20、工作流 6、序列检索与下载 3。每个函数在下表中只出现一次，并链接到完整参数与返回值说明。旧函数扩充参数、兼容别名、CLI/MCP 对同一函数的开放不重复计数；484 是接口数量，不是独立科研算法数。",
-            "This migration adds **484 public Python functions**: 455 database, 20 ENCODE, 6 workflow, and 3 sequence retrieval/download functions. Each appears once below and links to its parameters and returns. Extended existing functions, aliases and CLI/MCP exposures are not counted again; 484 counts interfaces, not independent scientific algorithms.",
+            f"用法和示例见[功能教程](../../api/features/{page}.md)。",
+            f"See the [tutorial](../../api/features/{page}.md) for usage and examples.",
             language,
         ),
         "",
-        tr(
-            "[调用约定与完整示例](usage.md) · [功能树](../features/function_tree.md) · [API 总览](../index.md)",
-            "[Conventions and examples](usage.md) · [Feature tree](../features/function_tree.md) · [API overview](../index.md)",
-            language,
-        ),
-        "",
-        tr(
-            "可用网页搜索框搜索函数名、数据源或任务关键词，也可以使用浏览器查找。所有接口都能直接通过 Python 使用，不要求先安装 Skill。",
-            "Search the site by function, provider or task, or use your browser's Find command. All these APIs can be called from Python without installing a Skill.",
-            language,
-        ),
-        "",
-        tr("## 按用途浏览", "## Browse by purpose", language),
-        "",
-        tr("| 用途分类 | 函数数量 |", "| Purpose | Function count |", language),
-        "| --- | ---: |",
     ]
-    for group, (zh, en, _) in GROUPS.items():
-        members = [r for r in records if r["group"] == group]
-        lines.append(f"| [{tr(zh, en, language)}]({group}.md) | {len(members)} |")
-    lines += ["| **" + tr("合计", "Total", language) + "** | **484** |", ""]
-    for group, (zh, en, _) in GROUPS.items():
+    for group in sorted({record["group"] for record in records}):
+        lines += [page_intro(group, language), ""]
+    for record in records:
         lines += [
-            "## " + tr(zh, en, language),
+            f"## {TITLES[record['name']][language]} {{#{record['name']}-parameters}}",
             "",
-            tr("| 函数 | 用途摘要 |", "| Function | Purpose summary |", language),
-            "| --- | --- |",
+            f"`{record['name']}{signature(record['fn'])}`",
+            "",
+            parameter_details(record, language),
+            "",
         ]
-        for r in records:
-            if r["group"] == group:
-                summary = purpose(r, language).split("\n")[0]
-                summary = summary if len(summary) <= 220 else summary[:217] + "…"
-                lines.append(f"| [`{r['name']}`]({group}.md#{r['name']}) | {cell(summary)} |")
-        lines += [""]
-    lines += [
-        "## " + tr("来源与维护", "Provenance and maintenance", language),
-        "",
-        tr(
-            "提供方说明、Schema 与上游别名来自当前源码内登记的接口定义，不表示已重新验证每个远程服务。DNAKit 的输入扩展、模型调用边界及仍需提交/下载的步骤见各页说明。上游来源和许可见[第三方声明](../../acknowledgements.md#third-party-notices)。",
-            "Provider descriptions, schemas and aliases come from the current bundled definitions; this does not mean every remote service has been revalidated. See each page for argument extensions, model dependencies and steps requiring submission or data. See [third-party notices](../../acknowledgements.md#third-party-notices) for provenance and licensing.",
-            language,
-        ),
-        "",
-        tr(
-            "文档从源码生成并逐项校验；维护命令在仓库根目录执行：",
-            "Generate and check this reference from the source checkout:",
-            language,
-        ),
-        "",
-        "```bash",
-        "python others/docs/build_native_api_docs.py",
-        "python others/docs/build_native_api_docs.py --check",
-        "```",
-        "",
-    ]
-    return "\n".join(lines)
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def update_section(content: str, section: str, rendered: str) -> str:
+    """Replace only the managed block, preserving handwritten tutorial prose."""
+    start = f"<!-- BEGIN GENERATED API: {section} -->"
+    end = f"<!-- END GENERATED API: {section} -->"
+    block = f"{start}\n\n{rendered}\n\n{end}"
+    if start not in content and end not in content:
+        return content.rstrip() + "\n\n" + block + "\n"
+    if content.count(start) != 1 or content.count(end) != 1:
+        raise ValueError(f"Invalid generated section markers: {section}")
+    before, remainder = content.split(start)
+    _, after = remainder.split(end)
+    return before + block + after
+
+
+def validate_coverage(output: dict[Path, str], records: list[dict]) -> None:
+    """Check all tutorials, including unmanaged prose, for duplicate details."""
+    expected = Counter({r["name"]: 1 for r in records})
+    for language in ("zh", "en"):
+        texts = [
+            output.get(path, path.read_text(encoding="utf-8"))
+            for path in (ROOT / "docs").rglob("*.md")
+            if path.name.endswith(".en.md") == (language == "en")
+        ]
+        anchors = Counter(
+            name
+            for name in re.findall(r"\{#(dnakit\.[\w.]+)\}", "\n".join(texts))
+            if name in expected
+        )
+        if anchors != expected:
+            raise ValueError(
+                f"{language} missing or duplicate API details: {anchors - expected}; missing: {expected - anchors}"
+            )
+
+
+def function_numbers(records: list[dict]) -> dict[str, int]:
+    """Number generated APIs where their blocks occur among handwritten tasks."""
+    numbers = {}
+    entries = re.compile(
+        r"^ {0,3}(?P<backticks>`{3,})[^\n]*\n.*?^ {0,3}(?P=backticks)`*[ \t]*$"
+        r"|^ {0,3}(?P<tildes>~{3,})[^\n]*\n.*?^ {0,3}(?P=tildes)~*[ \t]*$"
+        r"|<!-- BEGIN GENERATED API: (?P<section>[\w-]+) -->.*?"
+        r"<!-- END GENERATED API: (?P=section) -->"
+        r"|^#{2,3} (?P<number>\d+)[).、]\s+",
+        flags=re.M | re.S,
+    )
+    for page in sorted({page_for(record) for record in records}):
+        sections = {
+            section: [record for record in records if section_for(record) == section]
+            for section, (section_page, _, _) in SECTIONS.items()
+            if section_page == page
+        }
+        bilingual_numbers = []
+        for suffix in (".md", ".en.md"):
+            text = (DEST / (page + suffix)).read_text(encoding="utf-8")
+            page_numbers = {}
+            seen = set()
+            number = 1
+            for entry in entries.finditer(text):
+                if entry.group("backticks") is not None or entry.group("tildes") is not None:
+                    continue
+                section, handwritten_number = entry.group("section", "number")
+                if section is None:
+                    number = max(number, int(handwritten_number) + 1)
+                    continue
+                if section not in sections or section in seen:
+                    raise ValueError(f"Invalid generated section in {page + suffix}: {section}")
+                seen.add(section)
+                for record in sections[section]:
+                    page_numbers[record["name"]] = number
+                    number += 1
+            # Newly routed sections are appended in the same order as update_section.
+            for section, members in sections.items():
+                if section in seen:
+                    continue
+                for record in members:
+                    page_numbers[record["name"]] = number
+                    number += 1
+            bilingual_numbers.append(page_numbers)
+        if bilingual_numbers[0] != bilingual_numbers[1]:
+            raise ValueError(f"Tutorial numbering differs between languages: {page}")
+        numbers.update(bilingual_numbers[0])
+    return numbers
 
 
 def main() -> None:
@@ -939,27 +1254,73 @@ def main() -> None:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     records = inventory()
+    names = {r["name"] for r in records}
+    if set(TITLES) != names:
+        raise ValueError(
+            f"Title coverage mismatch: missing {names - TITLES.keys()}, extra {TITLES.keys() - names}"
+        )
+    if set(EXAMPLE_OVERRIDES) - names:
+        raise ValueError("Example overrides refer to unknown functions")
+    for name, titles in TITLES.items():
+        if set(titles) != {"zh", "en"} or any(
+            not value.strip() or "dnakit." in value for value in titles.values()
+        ):
+            raise ValueError(f"Invalid functional title: {name}")
+    numbers = function_numbers(records)
+    unknown_routes = set(FUNCTION_ROUTES) - {r["name"] for r in records}
+    if unknown_routes:
+        raise ValueError(f"Routes refer to missing functions: {sorted(unknown_routes)}")
+    retired = ROOT / "docs/api/native"
+    if retired.exists() and any(retired.glob("*.md")):
+        raise ValueError("Move legacy api/native pages into the tutorials before regenerating.")
     output: dict[Path, str] = {}
     for language in ("zh", "en"):
         suffix = ".md" if language == "zh" else ".en.md"
-        output[DEST / ("index" + suffix)] = render_index(records, language)
-        for group in GROUPS:
-            output[DEST / (group + suffix)] = render_page(
-                group, [r for r in records if r["group"] == group], language
+        for section, (page, _, _) in SECTIONS.items():
+            members = [r for r in records if section_for(r) == section]
+            if not members:
+                raise ValueError(f"Empty tutorial section: {section}")
+            path = DEST / (page + suffix)
+            content = output.get(path)
+            if content is None:
+                content = path.read_text(encoding="utf-8")
+            output[path] = update_section(
+                content, section, render_section(section, members, language, numbers)
             )
-        # Each public name has exactly one detail anchor in each language.
-        anchors = Counter(
-            re.findall(
-                r"\{#(dnakit\.[\w.]+)\}",
-                "\n".join(
-                    v
-                    for p, v in output.items()
-                    if p.name.endswith(suffix)
-                    and (language == "en" or not p.name.endswith(".en.md"))
-                ),
-            )
+        reference_links = [
+            "# " + tr("接口参数与补充说明", "API parameters and usage notes", language),
+            "",
+            tr(
+                "按功能查阅完整签名、可选参数、凭据与运行约定。直接使用请返回对应教程中的示例。",
+                "Browse full signatures, optional parameters, credentials and execution conventions by task. Each page links back to its tutorial examples.",
+                language,
+            ),
+            "",
+        ]
+        for page in sorted({page_for(record) for record in records}):
+            members = [record for record in records if page_for(record) == page]
+            output[REFERENCE / (page + suffix)] = render_reference(page, members, language)
+        # Preserve handwritten parameter pages alongside the generated references.
+        reference_pages = {
+            path
+            for path in REFERENCE.glob("*.md")
+            if path.name not in {"index.md", "index.en.md"}
+            and path.name.endswith(".en.md") == (language == "en")
+        }
+        reference_pages.update(
+            path
+            for path in output
+            if path.parent == REFERENCE
+            and path.name not in {"index.md", "index.en.md"}
+            and path.name.endswith(".en.md") == (language == "en")
         )
-        assert anchors == Counter({r["name"]: 1 for r in records}), anchors
+        for path in sorted(reference_pages):
+            content = output[path] if path in output else path.read_text(encoding="utf-8")
+            title = content.splitlines()[0].lstrip("# ")
+            page = path.name.removesuffix(suffix)
+            reference_links.append(f"- [{title}]({page}.md)")
+        output[REFERENCE / ("index" + suffix)] = "\n".join(reference_links) + "\n"
+    validate_coverage(output, records)
     manifest = {
         "scope": "Public functions added by the skill migration; aliases and existing-function extensions excluded",
         "total": len(records),
@@ -967,7 +1328,7 @@ def main() -> None:
         "functions": [
             {
                 "name": r["name"],
-                "page": f"api/native/{r['group']}.md",
+                "page": f"api/features/{page_for(r)}.md",
                 "anchor": r["name"],
                 "signature": signature(r["fn"]),
             }
@@ -978,24 +1339,31 @@ def main() -> None:
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
     )
     stale = []
-    for path, content in output.items():
+    for path, content in track(
+        output.items(),
+        description="Check documentation" if args.check else "Write documentation",
+        console=Console(stderr=True),
+        transient=True,
+    ):
         if args.check:
-            if not path.exists() or path.read_text() != content:
+            if not path.exists() or path.read_text(encoding="utf-8") != content:
                 stale.append(str(path.relative_to(ROOT)))
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content)
+            path.write_text(content, encoding="utf-8")
     if stale:
         raise SystemExit("Regenerate stale documentation: " + ", ".join(stale))
     print(
         json.dumps(
             {
-                "functions": 484,
+                "functions": len(records),
                 "languages": 2,
-                "generated_pages": 26,
+                "tutorial_pages_per_language": len({page_for(r) for r in records}),
                 "coverage": "484/484 unique detail entries per language",
                 "mode": "check" if args.check else "write",
-                "groups": Counter(r["group"] for r in records),
+                "numbered_functional_titles": len(TITLES),
+                "validated_call_examples": len(records),
+                "tutorials": Counter(page_for(r) for r in records),
             },
             ensure_ascii=False,
         )

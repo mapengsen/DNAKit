@@ -7,11 +7,13 @@ DNAKit 目前提供两种 DNA 指纹计算方法。每一位只有 `0` 或 `1`�
 ## 1) Hashed k-mer 位指纹
 
 - **作用：** 提取序列中出现的 k-mer，并将其稳定哈希到固定长度 0/1 位向量，用于 Tanimoto/Jaccard 相似度、聚类和检索，同时避免显式 `4^k` 特征空间过大。
-- **特点：** 功能上最接近分子中的 Morgan/ECFP 位指纹；无论 `k` 多大，输出长度始终为 `n_bits`。
+- **计算方法：** 将 k-mer 稳定哈希到 n_bits 个位置，并将命中的位置置 1；哈希碰撞可使不同 k-mer 共用一位。
 - **API：** `dnakit.fingerprints.hashed_kmer_fingerprint(value[必须], k[必须], n_bits[可选], canonical[可选], seed[可选], representation[可选], ambiguity_policy[可选], overlapping[可选], cross_gaps[可选])`
+- **输入：** DNA 序列和 k；可选 n_bits、seed 和 canonical。
+- **输出：** 返回 `BitFingerprintResult`，示例展示 `dimension`、`values`。
 - **常用参数：** 默认 `n_bits=2048`、`canonical=True`、`seed=0`；`representation="sparse"` 只保存值为 `1` 的位。
 
-**示例：**
+- **示例代码：**
 
 ```python
 from dnakit import DNASequence
@@ -29,7 +31,7 @@ print(result.dimension)
 print(dict(result.values))
 ```
 
-**输出：**
+- **示例结果：**
 
 ```text
 16
@@ -39,11 +41,13 @@ print(dict(result.values))
 ## 2) Panel 存在性指纹
 
 - **作用：** 把用户定义的命名模式面板转换成可解释的 0/1 位向量，每一位表示对应 motif 或识别序列是否存在，便于按已知功能模式比较和筛选序列。
-- **特点：** 类似分子中的 MACCS Keys，位含义明确，适合检测已知 motif、启动子模式或酶切识别序列。
+- **计算方法：** 按 panel 的固定顺序扫描每个命名模式，存在命中记 1，否则记 0。
 - **API：** `dnakit.fingerprints.panel_fingerprint(value[必须], panel[必须], mode[可选], overlapping[可选], representation[可选], max_panel_size[可选], max_matches_per_pattern[可选])`
+- **输入：** DNA 序列，以及按固定顺序提供的命名模式 panel。
+- **输出：** 返回 `BitFingerprintResult`，示例展示 `feature_names`、`dense_values`。
 - **模式：** 默认 `mode="iupac"`，也可使用 `mode="exact"`；默认扫描正反两条链。
 
-**示例：**
+- **示例代码：**
 
 ```python
 from dnakit import DNASequence
@@ -60,7 +64,7 @@ print(result.feature_names)
 print(result.dense_values())
 ```
 
-输出：
+- **示例结果：**
 
 ```text
 ('panel:EcoRI', 'panel:TATA_box', 'panel:start')
@@ -68,3 +72,5 @@ print(result.dense_values())
 ```
 
 - **解释：** `EcoRI` 和 `start` 对应模式存在，因此相应位为 `1`；`TATA_box` 不存在，因此为 `0`。
+
+[FAQ：补充说明](../../faq/tutorial_basics.md#fingerprint-terms)

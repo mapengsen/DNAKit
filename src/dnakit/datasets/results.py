@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Any, Literal, cast
 
 from dnakit.core import DNASet
-from dnakit.core._json import FrozenDict, JSONValue, to_json_compatible
+from dnakit.core._json import FrozenDict, JSONScalar, JSONValue, to_json_compatible
 from dnakit.exceptions import ConfigurationError
 
 DedupAction = Literal["deduplicated", "kept_all", "dropped"]
@@ -355,6 +355,49 @@ class NeuralClusteringResult:
 
 
 @dataclass(frozen=True, slots=True)
+class SamplingAllocation:
+    """Input and selected counts for one original class label."""
+
+    label: JSONScalar
+    input_count: int
+    n_samples: int
+
+
+@dataclass(frozen=True, slots=True)
+class DiversitySamplingResult:
+    """Original selected records and an auditable, input-indexed cluster assignment."""
+
+    records: DNASet
+    selected_indices: tuple[int, ...]
+    allocations: tuple[SamplingAllocation, ...]
+    clusters: tuple[Cluster, ...]
+    cluster_labels: tuple[int | None, ...]
+    centers: tuple[tuple[float, ...], ...]
+    input_count: int
+    n_samples: int
+    label_key: str | None
+    model_name: str
+    checkpoint_path: str | None
+    pooling: str
+    embedding_dimension: int
+    normalize: bool
+    seed: int
+    n_init: int
+    max_iter: int
+    tolerance: float
+    allocation_method: str = "largest-remainder"
+    representative_policy: str = "nearest-centroid"
+    diversity: Literal["high", "low"] = "high"
+    low_n_clusters: int | None = None
+    sampling_strategy: str = "one-per-cluster"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return JSON-compatible records, allocations, assignments, and model provenance."""
+
+        return cast(dict[str, Any], to_json_compatible(self))
+
+
+@dataclass(frozen=True, slots=True)
 class LinkageStep:
     step_index: int
     left_node: int
@@ -518,6 +561,7 @@ __all__ = [
     "DedupAction",
     "DedupGroup",
     "DeduplicationResult",
+    "DiversitySamplingResult",
     "HierarchicalClusteringResult",
     "IUPACDeduplicationResult",
     "IUPACDuplicateGroup",
@@ -529,6 +573,7 @@ __all__ = [
     "NeuralClusteringResult",
     "Orientation",
     "RepresentativeSelectionResult",
+    "SamplingAllocation",
     "SplitAssignment",
     "SplitQualityResult",
     "SplitResult",

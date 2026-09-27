@@ -1,122 +1,150 @@
-# OPS-010 序列切分
+# 序列切分
 
-公共处理接口支持[统一的文件与文本输入](00_processing_inputs.md)，具体入口及输出规则见该说明。
-
-**作用：** 按固定窗口、重叠滑窗、随机区间或多尺度策略把长 DNA 切成带来源坐标的片段，并以迭代器逐条返回，用于模型输入、分区分析和大序列流式处理。
-
-按照固定长度、滑动窗口、随机区间或多尺度策略切分 DNA 序列，从而生成带坐标的序列片段。
-
-所有切分都使用 0-based、半开区间坐标，并惰性返回 `SequenceChunk`，不会一次性把全部结果读入内存。
-
-<span id="1"></span>**序列切分总览**
-
-API 入口如下：
-
-- `dnakit.iter_sequence_chunks(value[必须], config[可选], start[可选], end[可选], source_id[可选], split[可选], region_index[可选], progress[可选])`：切分单条 `DNASequence` 或 `DNARecord`；
-- `dnakit.iter_fasta_chunks(source[必须], config[可选], bed[可选], read_config[可选], progress[可选])`：逐条读取并切分 FASTA；
-- `dnakit.ChunkingConfig(strategy[可选], length[可选], step[可选], min_length[可选], max_length[可选], num_samples[可选], lengths[可选], steps[可选], stage_steps[可选], include_partial[可选], seed[可选], split[可选], allow_gaps[可选])`：定义切分策略；
-- `dnakit.make_length_curriculum(lengths[必须], stage_steps[可选])`：创建先短后长的长度训练计划；
-- `dnakit.LengthCurriculum.to_config(window_step[可选], include_partial[可选], seed[可选], split[可选], allow_gaps[可选])`：把长度计划转换为切分配置；
-- `dnakit.SequenceChunk.to_record()`：把切分结果转换为 `DNARecord`，无调用参数。
-
-所有策略都返回惰性的 `SequenceChunk`，并保留来源 ID、起止坐标、split、策略和尺度编号等 provenance 信息。
+坐标统一为 0-based 半开区间；切分结果逐条惰性返回。
 
 ## 1) 固定长度、不重叠 <span id="2"></span> {#fixed-non-overlapping-chunks}
 
-**作用：** 从序列起点开始生成长度一致且互不重叠的片段，返回每段的来源坐标，适合建立无重复覆盖的训练样本或分析单元。
-
-这是 `OPS-010 序列切分` 的默认策略。每个窗口长度由 `length` 指定，窗口之间不重叠，末尾不足一个完整窗口的部分默认丢弃。
+- **作用：** 从长序列生成互不重叠的固定长度片段。
+- **计算方法：** 从起点每次前进 length；默认丢弃末尾不足长度的片段，可用 include_partial=True 保留。
+- **API：** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **输入：** DNASequence 或 DNARecord，以及下例中的长度、步长或采样配置。
+- **输出：** 返回 `SequenceChunk` 迭代器，每项包含片段序列和起止坐标。
+- **示例代码：**
 
 ```python
-from dnakit import ChunkingConfig, iter_fasta_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(length=1024)
-for chunk in iter_fasta_chunks("genome.fa", config=config):
-    print(chunk.id, chunk.source_start, chunk.source_end)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(length=4)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-如果需要保留末尾不足长度的窗口，可设置 `include_partial=True`。
+- **示例结果：**
+
+```text
+[(0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
 ## 2) 固定长度、重叠滑窗 <span id="3"></span> {#overlapping-sliding-chunks}
 
-**作用：** 按指定窗口长度和步长生成可重叠片段，使边界附近的碱基出现在多个窗口中，适合需要连续上下文覆盖的局部预测。
-
-使用 `strategy="sliding"` 和 `step` 设置窗口起点之间的距离。`step` 小于 `length` 时窗口会重叠。
+- **作用：** 按固定步长生成可重叠窗口。
+- **计算方法：** 每次前进 step；要求 1 ≤ step ≤ length。
+- **API：** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **输入：** DNASequence 或 DNARecord，以及下例中的长度、步长或采样配置。
+- **输出：** 返回 `SequenceChunk` 迭代器，每项包含重叠窗口的序列与坐标。
+- **示例代码：**
 
 ```python
-from dnakit import ChunkingConfig, iter_sequence_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(strategy="sliding", length=1024, step=512)
-for chunk in iter_sequence_chunks(sequence, config=config):
-    print(chunk.source_start, chunk.source_end)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="sliding", length=4, step=2)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-`step` 不能大于窗口长度，否则会产生未覆盖的间隔。
+- **示例结果：**
+
+```text
+[(0, 4, 'AACC'), (2, 6, 'CCGG'), (4, 8, 'GGTT')]
+```
 
 ## 3) 随机区间 <span id="4"></span> {#random-interval-chunks}
 
-**作用：** 在允许的长度范围和坐标范围内抽取指定数量的随机片段，并通过 seed 保证复现，适合随机训练采样或抽样检查长序列。
-
-随机策略在 `min_length` 和 `max_length` 范围内生成指定数量的随机区间。设置 `seed` 可以获得可复现结果。
+- **作用：** 抽取可复现的随机片段。
+- **计算方法：** 用 seed 固定随机源，在指定长度范围内抽样 num_samples 次；结果可重复。
+- **API：** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **输入：** DNASequence 或 DNARecord，以及下例中的长度、步长或采样配置。
+- **输出：** 返回 `SequenceChunk` 迭代器，每项包含随机抽取片段的序列与坐标。
+- **示例代码：**
 
 ```python
-from dnakit import ChunkingConfig, iter_sequence_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(
-    strategy="random",
-    min_length=512,
-    max_length=2048,
-    num_samples=100,
-    seed=19,
-)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="random", min_length=2, max_length=4, num_samples=3, seed=19)
 chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
+```
+
+- **示例结果：**
+
+```text
+[(0, 4, 'AACC'), (0, 4, 'AACC'), (1, 5, 'ACCG')]
 ```
 
 ## 4) 多尺度 <span id="5"></span> {#multiscale-chunks}
 
-**作用：** 使用多个窗口长度分别生成短、中、长尺度片段并标记尺度编号，用于同时建模局部 motif 与较长范围上下文。
-
-多尺度策略会按 `lengths` 中的每个长度生成窗口，适合同时提取局部和较长范围的上下文。
+- **作用：** 以多个长度分别切分同一序列。
+- **计算方法：** 按 lengths 的顺序生成每个尺度的窗口；默认每个尺度不重叠。
+- **API：** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **输入：** DNASequence 或 DNARecord，以及下例中的长度、步长或采样配置。
+- **输出：** 返回 `SequenceChunk` 迭代器，每项包含窗口长度、序列和坐标。
+- **示例代码：**
 
 ```python
-from dnakit import ChunkingConfig, iter_fasta_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(
-    strategy="multiscale",
-    lengths=(1024, 4096, 16384),
-)
-chunks = iter_fasta_chunks("genome.fa", config=config, bed="splits.bed")
-for chunk in chunks:
-    print(chunk.id, chunk.level_index, chunk.requested_length)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="multiscale", lengths=(2, 4))
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-各尺度默认不重叠，也可以通过 `steps` 为每个尺度指定步长。
+- **示例结果：**
+
+```text
+[(0, 2, 'AA'), (2, 4, 'CC'), (4, 6, 'GG'), (6, 8, 'TT'), (0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
 ## 5) 先短后长 <span id="6"></span> {#length-curriculum-chunks}
 
-**作用：** 定义训练阶段使用的序列长度及持续步数，再转换为对应切分配置，用于实现从短片段逐步增加到长片段的 curriculum 数据计划。
-
-使用 `make_length_curriculum()` 创建逐步增加序列长度的训练计划，再通过 `to_config()` 转换为切分配置。
+- **作用：** 创建先短后长的切分阶段配置。
+- **计算方法：** 将长度和 stage_steps 组成计划，再用 to_config() 生成切分配置；不会自动启动训练。
+- **API：** `dnakit.make_length_curriculum(lengths, stage_steps=...)` → `curriculum.to_config()` → `iter_sequence_chunks(...)`
+- **输入：** DNASequence 或 DNARecord，以及下例中的长度、步长或采样配置。
+- **输出：** 返回 `LengthCurriculum`，按阶段提供所选片段长度。
+- **示例代码：**
 
 ```python
-from dnakit import iter_fasta_chunks, make_length_curriculum
+from dnakit import DNASequence, make_length_curriculum, iter_sequence_chunks
 
-curriculum = make_length_curriculum(
-    (1024, 4096, 16384),
-    stage_steps=(1000, 2000, 3000),
-)
+sequence = DNASequence("AACCGGTT")
+curriculum = make_length_curriculum((2, 4), stage_steps=(10, 20))
 config = curriculum.to_config()
-chunks = iter_fasta_chunks("genome.fa", config=config)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-该计划只描述切分阶段，不会自动启动训练。
+- **示例结果：**
 
-<span id="7-fastabed"></span>**FASTA、BED 与结果元数据**
+```text
+[(0, 2, 'AA'), (2, 4, 'CC'), (4, 6, 'GG'), (6, 8, 'TT'), (0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
-`iter_sequence_chunks()` 用于切分单条 `DNASequence` 或 `DNARecord`；`iter_fasta_chunks()` 用于逐条读取并切分 FASTA。
+<span id="1"></span><span id="7-fastabed"></span>[FAQ：补充说明](../../faq/tutorial_basics.md#chunking-details)
 
-不传 `bed` 时，所有 FASTA 记录默认使用 `train` 标签；传入 BED 时，要求 BED 第 1 列与 FASTA ID 完全相同，第 4 列可使用 `train`、`valid`、`test` 等标签。
+## 正反链配对分块与多格式导出 {#paired-chunk-export}
 
-每个 `SequenceChunk` 包含 `source_id`、`source_start`、`source_end`、`split`、`strategy` 和 `level_index`。调用 `to_record()` 后，来源 ID、起止坐标、split 和尺度编号会写入记录 metadata。
+`dnakit.chunking.iter_paired_chunks(source, reverse_source=None, config=None, read_config=None, source_ids=None)` 读取正链 FASTA，逐对生成正链、反向互补链的行字典。每行包含 `id, sequence, pair_id, source_id, source_start, source_end, strand`，先正链、后反链。两条记录共用 `pair_id`，坐标均相对于正链，采用 0-based 半开区间。
 
-传入 `progress=callback` 可接收 `started`、`yielded`、`completed` 事件。当前 FASTA 读取器一次保留一条 FASTA 记录；处理染色体级大记录时，请根据实际内存调整 `ReadConfig` 的输入限制。
+提供 `reverse_source` 时，文件必须是正链 FASTA 各完整记录的反向互补，ID、顺序及长度一致；库检查这些结构条件，调用者负责提供正确的反向互补序列。正链 `[start:end)` 对应反链 `[L-end:L-start)`。省略该参数则直接对每个分块计算反向互补。`source_ids` 可筛选 FASTA ID。传入文件路径且未指定 `read_config` 时，读取上限会按较大的输入文件自动设置；传入流时可自行提供 `ReadConfig`。实现逐条处理染色体，内存需求与一对染色体大小有关，而不是与全部输出分块数有关。
+
+`export_paired_chunks(source, target, ..., overwrite=False)` 将同一迭代流直接写到一个或多个目标文件，返回 `pair_count`、`record_count`、配置的 `length` 和 `coordinates`。后缀支持 CSV、TSV、JSON、JSONL、Parquet、FASTA；空结果也能写出。CSV 等表格保存全部字段，FASTA 保存 ID 和序列。
+
+```python
+from dnakit.chunking import ChunkingConfig, export_paired_chunks
+from dnakit.io import save_json
+
+result = export_paired_chunks(
+    "normalized.fasta",
+    ["output/chunks.csv", "output/chunks.fasta"],
+    reverse_source="reverse_complement.fasta",
+    config=ChunkingConfig(length=1000),
+    overwrite=True,
+)
+save_json(result, "output/result.json", overwrite=True)
+```
+
+上例每对为两条 1000 bp 记录，共 2000 bp；不将两条链拼成一条序列。标准化、反向互补和分块可分别运行，分块脚本无需再导入 Biopython 或手工写 CSV／FASTA。文件路径的读取上限会自动适配 hg38；对流或特殊输入仍可显式传入 `read_config`。

@@ -6,7 +6,7 @@ from collections.abc import Iterator
 
 import pytest
 
-from dnakit.core import DNAAlphabet, DNARecord, DNASequence, Gap
+from dnakit.core import DNA, DNAAlphabet, DNARecord, DNASequence, DNASet, Gap
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
 from dnakit.fingerprints import kmer as kmer_fingerprint
 from dnakit.similarity import (
@@ -74,6 +74,52 @@ def test_kmer_empty_boundaries_and_gap_rejection_are_explicit() -> None:
     assert zero_error.value.code == "ZERO_VECTOR_UNDEFINED"
     with pytest.raises(UnsupportedGapOperationError):
         kmer_similarity(DNASequence(["A", Gap(1), "C"]), DNASequence("AC"), k=1)
+
+
+def test_kmer_collection_similarity_averages_every_query_reference_pair() -> None:
+    queries = DNA(["AAAA", "GGGG"])
+    references = DNA(["AAAA", "AAAT"])
+
+    result = kmer_similarity(queries, references, k=2)
+
+    assert result.value == pytest.approx(0.375)
+    assert result.components["query_means"] == pytest.approx((0.75, 0.0))
+    assert result.components["pair_count"] == 4
+    assert result.components["query_count"] == 2
+    assert result.components["reference_count"] == 2
+    assert result.parameters["aggregation"] == "mean_pairwise"
+    assert result.left_id is None
+    assert result.right_id is None
+
+
+def test_kmer_collection_accepts_one_sequence_and_typed_lists() -> None:
+    query = DNASequence("AAAA")
+    references = [DNASequence("AAAA"), DNASequence("AAAT")]
+
+    result = kmer_similarity(query, references, k=2)
+    reverse = kmer_similarity(references, query, k=2, metric="containment")
+    forward = kmer_similarity(query, references, k=2, metric="containment")
+    single = kmer_similarity(DNASet([DNARecord(id="q", sequence=query)]), query, k=2)
+
+    assert result.value == pytest.approx(0.75)
+    assert result.components["query_means"] == pytest.approx((0.75,))
+    assert reverse.value == pytest.approx(0.75)
+    assert forward.value == 1
+    assert single.value == 1
+    assert single.components["shared_weight"] == 1
+
+
+def test_kmer_collection_rejects_empty_invalid_and_oversized_pairs() -> None:
+    queries = DNA(["AAAA", "GGGG"])
+    reference = DNASequence("AAAA")
+
+    with pytest.raises(ConfigurationError, match="at least one"):
+        kmer_similarity([], reference, k=2)
+    with pytest.raises(ConfigurationError):
+        kmer_similarity(["AAAA"], reference, k=2)
+    with pytest.raises(ConfigurationError) as error:
+        kmer_similarity(queries, reference, k=2, max_pairwise_comparisons=1)
+    assert error.value.code == "SIMILARITY_PAIRWISE_LIMIT"
 
 
 def test_named_kmer_vectors_support_directional_count_containment() -> None:

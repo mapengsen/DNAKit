@@ -1,141 +1,17 @@
 # Download
 
-Download files, reference genomes, sequences, and annotations from URLs, species names, database identifiers, or query results.
+Download sequences, reference genomes and annotations; [FAQ](../../faq/tutorial_integrations.md#downloads) covers formats, retries and species names.
 
-See [genes, sequences and downloads](../native/sequences.md) for the full signatures of the new `dnakit.download.ncbi.sequence`, `dnakit.download.ena.sequence` and database file operations. ENCODE `download_files`, `batch_download` and tracking are in [ENCODE data management](../native/encode.md). Browse all additions in the [484-function index](../native/index.md).
+<span id="accession-sequences"></span>By accession: [NCBI](#dnakit.download.ncbi.sequence) · [ENA](#dnakit.download.ena.sequence). Formats and coordinates: [FAQ](../../faq/tutorial_integrations.md#downloads).
 
-## Download sequences by accession <span id="accession-sequences"></span>
+## 1) complete genome {#1-dbd-001-complete-genome}
 
-`dnakit.download.ncbi.sequence(accession, output_path, *, database="nuccore", format="fasta",
-seq_start=None, seq_stop=None, strand=1, config=None, search_config=None)` uses NCBI
-EFetch directly. `dnakit.download.ena.sequence(accession, output_path, *, format="fasta",
-config=None, search_config=None)` uses ENA Browser. Neither requires ToolUniverse.
-
-```python
-import dnakit
-
-result = dnakit.download.ncbi.sequence("NC_000913.3", "ecoli_k12.fasta", format="fasta")
-print(result.files[0].path)
-print(result.metadata["resolved_accession"], result.metadata["sequence_length"])
-print(result.manifest_path)
-```
-
-| Provider | Native formats with base DNAKit | Optional conversion with `dnakit[bio-formats]` |
-| --- | --- | --- |
-| NCBI nuccore (DNA/RNA) | fasta, genbank | embl, converted from GenBank with Biopython |
-| NCBI protein | fasta, genbank (GenPept) | EMBL protein output is unsupported |
-| ENA INSDC nucleotide records | fasta, embl | genbank, converted from EMBL with Biopython |
-
-NCBI accepts sequence accessions, including RefSeq NZ_. ENA requires INSDC
-accessions such as U00096.3. Conversion does not imply cross-database identity.
-Use existing `genome_package()` for GCA_/GCF_ assembly accessions.
-
-The returned `DatasetDownloadResult` identifies the sequence file and sibling
-`.manifest.json`: requested/resolved accession, sequence length, redacted URL,
-source/output format, conversion flag and checksums. Responses are checked for
-accession/version, format and sequence length before installation. Hashes record
-local integrity; they are not independent provider signatures. Existing outputs
-are protected unless `DownloadConfig(overwrite=True)` is supplied.
-
-Optional seq_start/seq_stop must be supplied together and are **1-based inclusive**;
-strand=2 requests the reverse complement. These options apply to NCBI nucleotide
-records; proteins use full records. Ensembl coordinate downloads retain their
-0-based half-open convention.
-
-DownloadConfig controls files, overwrite and byte limits. SearchConfig controls
-timeout, response size (20 MB default, 100 MB maximum), and NCBI api_key/email.
-An explicit search_config takes precedence for credentials; otherwise
-DownloadConfig.api_key is used. Credentials are redacted in persisted URLs.
-Use genome packages for larger assemblies. Install optional conversion support
-with `python -m pip install 'dnakit[bio-formats]'`.
-
-MCP names and flat Python aliases are `dnakit.download.ncbi_sequence` and
-`dnakit.download.ena_sequence`. The existing `dnakit.download.sequence` continues
-to retrieve Ensembl coordinate sequences.
-
-### Download progress
-
-Network downloads print a start message, progress bar, and completion path to stderr by default.
-Reference genomes also show extraction progress. If the server omits the file size, the display
-shows downloaded bytes without estimating a percentage. Completion is reported only after the
-download, requested checksums, and output installation succeed. Disable the display with
-`download_genome(..., show_progress=False)`, or `DownloadConfig(show_progress=False)` for network
-download APIs in `dnakit.download` that accept `config`. An explicit `progress` callback (`query_progress` for sequence
-downloads) takes over the display to avoid duplicate progress bars. NCBI packages, ENA, ENCODE,
-UCSC, and generic file downloads share this behavior.
-
-### Download failures and retries
-
-Genome packages, generic HTTPS file downloads and shared remote GET queries make at most three
-attempts for timeouts, interrupted connections and HTTP 408/429/500/502/503/504, with delays of
-0.25 and 0.5 seconds. HTTP 404, invalid parameters, checksum failures and invalid ZIP archives
-are not retried. POST requests are not automatically repeated.
-
-Retries restart the staged transfer; persistent HTTP Range resume after process exit is not
-implemented. When `Content-Length` is supplied, the received byte count must match. Genome
-packages also require a matching assembly accession and FASTA checksum. Files are installed
-only after complete download and validation. Overwrite conflicts retain `FileExistsError`, and directory permission failures retain their filesystem exceptions;
-and failed transfers do not replace complete existing outputs. Exhausted transient failures
-set `context["attempts"]` to 3 and guidance to retry after recovery.
-
-<span id="common-genome-names"></span>**Common species names**
-
-This section lists common NCBI species names that can be copied directly into
-`download_genome(query, ...)` or a `dnakit download-genome` command.
-
-- **API**: `dnakit.references.download_genome(query[required], output_dir[required], overwrite[optional], keep_package[optional], timeout[optional], api_key[optional], api_base_url[optional], chunk_size[optional], max_download_bytes[optional], progress[optional])`, `dnakit download-genome query[required] output_dir[required] --overwrite[optional] --keep-package[optional] --api-key[optional] --progress/--no-progress[optional]`.
-
-<span id="1"></span>**Humans and common model animals**
-
-| Common name | `query` that can be copied directly | Current reference assembly accession |
-| -------- | -------------------------- | -------------------------- |
-| Human | `Homo sapiens` | `GCF_000001405.40` |
-| Mouse | `Mus musculus` | `GCF_000001635.27` |
-| Rat | `Rattus norvegicus` | `GCF_036323735.1` |
-| Pig | `Sus scrofa` | `GCF_054392235.1` |
-| Cow | `Bos taurus` | `GCF_002263795.3` |
-| Sheep | `Ovis aries` | `GCF_016772045.2` |
-| Goat | `Capra hircus` | `GCF_001704415.2` |
-| Horse | `Equus caballus` | `GCF_041296265.1` |
-| Dog | `Canis lupus familiaris` | `GCF_011100685.1` |
-| Macaque | `Macaca mulatta` | `GCF_049350105.2` |
-| Chicken | `Gallus gallus` | `GCF_016699485.2` |
-| Zebrafish | `Danio rerio` | `GCF_049306965.2` |
-| Xenopus | `Xenopus tropicalis` | `GCF_000004195.4` |
-
-<span id="2"></span>**Common crops and plants**
-
-| Common name | `query` that can be copied directly | Current reference assembly accession |
-| -------------------------- | ------------------------------- | ----------------------- |
-| Arabidopsis | `Arabidopsis thaliana` | `GCF_000001735.4` |
-| Rice | `Oryza sativa Japonica Group` | `GCF_034140825.1` |
-| Corn | `Zea mays` | `GCF_902167145.1` |
-| Wheat | `Triticum aestivum` | `GCF_018294505.1` |
-| Soybeans | `Glycine max` | `GCF_000004515.6` |
-| Tomato | `Solanum lycopersicum` | `GCF_036512215.1` |
-| Potatoes | `Solanum tuberosum` | `GCF_000226075.1` |
-| Upland cotton | `Gossypium hirsutum` | `GCF_007990345.1` |
-| Tobacco | `Nicotiana tabacum` | `GCF_000715075.1` |
-| Populus trichocarpa | `Populus trichocarpa` | `GCF_000002775.5` |
-| Arabica coffee | `Coffea arabica` | `GCF_036785885.1` |
-
-<span id="3"></span>**Other commonly used model creatures**
-
-| Common name | `query` that can be copied directly | Current reference assembly accession |
-| --------------------- | ---------------------------------- | ----------------------- |
-| Drosophila | `Drosophila melanogaster` | `GCF_000001215.4` |
-| Caenorhabditis elegans | `Caenorhabditis elegans` | `GCF_000002985.6` |
-| Bombyx mori | `Bombyx mori` | `GCF_030269925.1` |
-| Bee | `Apis mellifera` | `GCF_003254395.2` |
-| Saccharomyces cerevisiae | `Saccharomyces cerevisiae S288C` | `GCF_000146045.2` |
-
-## 1) `DBD-001` complete genome
-
-- **Function:** Download the complete reference genome FASTA by assembly accession or common species name, and save the assembly report, source URL and verification information for establishing traceable local reference sequences.
+- **Purpose:** Download the complete reference genome FASTA by assembly accession or common species name, and save the assembly report, source URL and verification information for establishing traceable local reference sequences.
+- **Method:** Resolve the assembly, download its NCBI package and validate the FASTA and report.
 - **API:** `dnakit.references.resolve_genome_assembly(query[required], timeout[optional], api_key[optional], api_base_url[optional])`, `dnakit.references.download_genome(query[required], output_dir[required], overwrite[optional], keep_package[optional], timeout[optional], api_key[optional], api_base_url[optional], chunk_size[optional], max_download_bytes[optional], progress[optional])`.
 - **Input:** NCBI versioned accession, fixed alias (such as `hg38`), or species name; requires local output directory.
-- **Agent arguments:** `query` is an assembly identifier or taxon name, not tool-search keywords. For human hg38, pass `query="hg38"`, not `"human hg38 reference genome FASTA"`. The tool schema includes this constraint. The downloader's `api_key` is an NCBI key, not a DeepSeek key.
-- **Sample code:**
+- **Output:** `resolve_genome_assembly` returns assembly metadata; `download_genome` returns `GenomeAssembly` with the FASTA path and checksums.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -147,19 +23,21 @@ print(result.fasta_path)
 print(result.fasta_md5, result.fasta_sha256)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 references/hg38/<genomic FASTA>
 <NCBI MD5> <local SHA-256>
 ```
 
-## 2) `DBD-002` Partial genome data package
+## 2) Partial genome data package {#2-dbd-002-partial-genome-data-package}
 
-- **Function:** Download only the required chromosomes, sequence categories or file types from the specified assembly and generate a manifest to reduce the amount of transmission and storage of large genome data packages.
+- **Purpose:** Download only the required chromosomes, sequence categories or file types from the specified assembly and generate a manifest to reduce the amount of transmission and storage of large genome data packages.
+- **Method:** Select NCBI assembly package content by chromosome and file type.
 - **API:** `dnakit.download.genome_package(accessions[required], output_dir[required], include[optional], chromosomes[optional], hydrated[optional], config[optional], progress[optional])`.
 - **Input:** One or more `GCA_`/`GCF_` accessions with version numbers; optional chromosome name and `include` file type.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import genome_package
@@ -173,18 +51,20 @@ result = genome_package(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/human_chrM/ncbi_genome_package_manifest.json
 ```
 
-## 3) `DBD-003` region sequence
+## 3) region sequence {#3-dbd-003-region-sequence}
 
-- **Function:** Download the target region sequence by assembly, chromosome and start and end coordinates, and return FASTA and coordinate source records for extracting loci or verifying local analysis results.
+- **Purpose:** Download the target region sequence by assembly, chromosome and start and end coordinates, and return FASTA and coordinate source records for extracting loci or verifying local analysis results.
+- **Method:** Submit region and strand parameters to Ensembl and save the returned sequence.
 - **API:** `dnakit.download.sequence(species[required], region[required], output_path[required], strand[optional], upstream[optional], downstream[optional], mask[optional], config[optional], query_progress[optional])`.
 - **Input:** Ensembl species name and 0-based half-open region; supports chain direction, upstream and downstream expansion, and multiple regions.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with the region FASTA file and manifest path.
+- **Example code:**
 
 ```python
 from dnakit.download import sequence
@@ -198,19 +78,21 @@ print(result.files[0].path)
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/region.fa
 downloads/region.fa.manifest.json
 ```
 
-## 4) `DBD-004` Genome annotation
+## 4) Genome annotation {#4-dbd-004-genome-annotation}
 
-- **Function:** Download genome annotation files such as GFF, GTF, and GBFF that match the specified assembly, and record the version and verification values for gene, transcript, and functional region analysis.
+- **Purpose:** Download genome annotation files such as GFF, GTF, and GBFF that match the specified assembly, and record the version and verification values for gene, transcript, and functional region analysis.
+- **Method:** Retrieve selected annotation formats from the NCBI assembly package and save a manifest.
 - **API:** `dnakit.download.annotation(accession[required], output_dir[required], formats[optional], chromosomes[optional], config[optional], progress[optional])`.
 - **Input:** Assembly accession with version number; optional annotation format and chromosome filtering.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import annotation
@@ -224,19 +106,21 @@ print(result.files)
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 (DownloadedFile(...),)
 downloads/hg38_annotation/ncbi_genome_package_manifest.json
 ```
 
-## 5) `DBD-005` Gene sequence
+## 5) Gene sequence {#5-dbd-005-gene-sequence}
 
-- **Function:** Selectively download genome segments, RNA, CDS, UTR and protein FASTA according to GeneID, retain the source accession, and use it to build a local sequence collection of the specified gene.
+- **Purpose:** Selectively download genome segments, RNA, CDS, UTR and protein FASTA according to GeneID, retain the source accession, and use it to build a local sequence collection of the specified gene.
+- **Method:** Request an NCBI gene package using GeneIDs and include options.
 - **API:** `dnakit.download.gene(gene_ids[required], output_dir[required], include[optional], accession_filter[optional], include_product_report[optional], config[optional], progress[optional])`.
 - **Input:** One or more numeric NCBI GeneIDs; optional FASTA type and accession filter.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import gene
@@ -249,18 +133,20 @@ result = gene(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/gene_672/ncbi_gene_package_manifest.json
 ```
 
-## 6) `DBD-006` protein sequence
+## 6) protein sequence {#6-dbd-006-protein-sequence}
 
-- **Function:** Download public protein FASTA associated with gene or virus records, retaining protein accession and source information for translation result verification or protein reference library preparation.
+- **Purpose:** Download public protein FASTA associated with gene or virus records, retaining protein accession and source information for translation result verification or protein reference library preparation.
+- **Method:** Retrieve protein sequences by accession and save files with provenance.
 - **API:** `dnakit.download.gene(..., include=("FASTA_PROTEIN",))`; viral proteins use `dnakit.download.virus_package(..., include=("PROTEIN",))`.
 - **Input:** Gene downloads use a numeric GeneID; virus downloads use a virus accession or a single taxon.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import gene
@@ -273,18 +159,20 @@ result = gene(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/gene_672_protein/ncbi_gene_package_manifest.json
 ```
 
-## 7) `DBD-007` Assembly information
+## 7) Assembly information {#7-dbd-007-assembly-information}
 
-- **Function:** Download metadata files such as assembly reports, sequence reports, and annotation statistics, which are used to check chromosome names, assembly levels, file versions, and annotation completeness.
+- **Purpose:** Download metadata files such as assembly reports, sequence reports, and annotation statistics, which are used to check chromosome names, assembly levels, file versions, and annotation completeness.
+- **Method:** Retrieve structured assembly metadata and export it in the chosen format.
 - **API:** `dnakit.download.genome_package(accessions[required], output_dir[required], include=("SEQUENCE_REPORT",), config[optional], progress[optional])`.
 - **Input:** Assembly accession with version number; usually just select `SEQUENCE_REPORT` or other report file.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import genome_package
@@ -298,19 +186,21 @@ print(result.metadata)
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 {'accessions': ('GCF_000001405.40',), 'include': ('SEQUENCE_REPORT',), ...}
 downloads/hg38_assembly_report/ncbi_genome_package_manifest.json
 ```
 
-## 8) `DBD-008` Classification information
+## 8) Classification information {#8-dbd-008-classification-information}
 
-- **Function:** Download the scientific name, alias and complete taxonomic pedigree corresponding to the specified TaxID, and save the structured summary, which is used to unify species identification and organize data by taxonomic level.
+- **Purpose:** Download the scientific name, alias and complete taxonomic pedigree corresponding to the specified TaxID, and save the structured summary, which is used to unify species identification and organize data by taxonomic level.
+- **Method:** Retrieve taxonomy records and lineages and save structured results.
 - **API:** `dnakit.download.taxonomy(tax_ids[required], output_dir[required], include_names[optional], include_summary[optional], config[optional], progress[optional])`.
 - **Input:** One or more numeric NCBI TaxIDs; optionally named and summary reports.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import taxonomy
@@ -324,18 +214,20 @@ result = taxonomy(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/taxonomy/ncbi_taxonomy_package_manifest.json
 ```
 
-## 9) `DBD-009` Gene metadata {#query-result-export}
+## 9) Gene metadata {#query-result-export}
 
-- **Function:** Export genes, samples or run metadata obtained from public database queries to CSV, TSV or JSON to facilitate offline screening, auditing and association with downloaded files.
+- **Purpose:** Export genes, samples or run metadata obtained from public database queries to CSV, TSV or JSON to facilitate offline screening, auditing and association with downloaded files.
+- **Method:** Query gene metadata and export the result table to a local file.
 - **API:** `dnakit.download.metadata(query[required], output_path[required], format[optional], config[optional])`.
 - **Input:** `dnakit.search` Returned `QueryResult`; format supports JSON, JSONL, CSV, TSV and XML.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with the exported metadata file and manifest path.
+- **Example code:**
 
 ```python
 from dnakit.download import metadata
@@ -346,19 +238,21 @@ result = metadata(samples, "downloads/samples.csv", format="csv")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/samples.csv
 downloads/samples.csv.manifest.json
 ```
 
-## 10) `DBD-010` Virus packet
+## 10) Virus packet {#10-dbd-010-virus-packet}
 
-- **Function:** Download the data package consisting of genome, CDS, protein and annotation by virus name, TaxID or accession, and save the source list for establishing a clear version of the virus reference set.
+- **Purpose:** Download the data package consisting of genome, CDS, protein and annotation by virus name, TaxID or accession, and save the source list for establishing a clear version of the virus reference set.
+- **Method:** Retrieve the selected genome and optional annotations from an NCBI virus package.
 - **API:** `dnakit.download.virus_package(query[required], output_dir[required], by[optional], include[optional], aux_reports[optional], refseq_only[optional], annotated_only[optional], complete_only[optional], host[optional], geo_location[optional], released_since[optional], updated_since[optional], config[optional], progress[optional])`.
 - **Input:** Viral accession or individual taxon; optional RefSeq, annotated, complete genome, host, region and time filters.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import virus_package
@@ -373,18 +267,20 @@ result = virus_package(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/sars_cov_2/ncbi_virus_NC_045512.2_manifest.json
 ```
 
-## 11) `DBD-011` Raw sequencing data
+## 11) Raw sequencing data {#11-dbd-011-raw-sequencing-data}
 
-- **Function:** Press ENA Run accession to download single-ended or double-ended FASTQ, verify the integrity based on the MD5 provided by ENA, and record the corresponding relationship between the sample and the file.
+- **Purpose:** Press ENA Run accession to download single-ended or double-ended FASTQ, verify the integrity based on the MD5 provided by ENA, and record the corresponding relationship between the sample and the file.
+- **Method:** Resolve ENA Run FASTQ URLs, download files and verify provider MD5 values.
 - **API:** `dnakit.download.reads(query[required], output_dir[required], file_kind="fastq", config[optional], progress[optional])`.
 - **Input:** ENA Run accession, ENA query expression, or `QueryResult` returned by `dnakit.search.reads()`; `file_kind` is `fastq`.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import reads
@@ -398,19 +294,21 @@ print(result.files)
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 (DownloadedFile(...),)
 downloads/SRR390728_fastq/ena_fastq_manifest.json
 ```
 
-## 12) `DBD-012` Compare data
+## 12) Compare data {#12-dbd-012-compare-data}
 
-- **Function:** Download ENA's public BAM, CRAM or SAM files and available verification information, which can be used to reuse existing reads-to-reference alignment results without re-alignment.
+- **Purpose:** Download ENA's public BAM, CRAM or SAM files and available verification information, which can be used to reuse existing reads-to-reference alignment results without re-alignment.
+- **Method:** Read ENA submitted file lists and download available alignment files.
 - **API:** `dnakit.download.reads(query[required], output_dir[required], file_kind="submitted", config[optional], progress[optional])`.
 - **Input:** ENA Run accession, query expression, or ENA `QueryResult`; `file_kind` is `submitted`.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import reads
@@ -423,18 +321,20 @@ result = reads(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/SRR390728_submitted/ena_submitted_manifest.json
 ```
 
-## 13) `DBD-013` Sequencing metadata
+## 13) Sequencing metadata {#13-dbd-013-sequencing-metadata}
 
-- **Function:** Query and save structured information such as Study, Sample, Experiment, Run and file links of ENA, which is used to filter sequencing data and track sample sources.
+- **Purpose:** Query and save structured information such as Study, Sample, Experiment, Run and file links of ENA, which is used to filter sequencing data and track sample sources.
+- **Method:** Query ENA metadata and serialize it to the selected tabular or structured format.
 - **API:** `dnakit.search.reads(query[required], fields[optional], result[optional], limit[optional], offset[optional], config[optional])` plus `dnakit.download.metadata(query[required], output_path[required], format[optional], config[optional])`.
 - **Input:** ENA query expression and optional fields; query results can be exported to JSON, JSONL, CSV, TSV, or XML.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import metadata
@@ -445,19 +345,21 @@ result = metadata(runs, "downloads/ena_runs.json", format="json")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/ena_runs.json
 downloads/ena_runs.json.manifest.json
 ```
 
-## 14) `DBD-014` Mutation data
+## 14) Mutation data {#14-dbd-014-mutation-data}
 
-- **Function:** Download the dbSNP VCF, index and verification files of the specified reference version for local query of included variants and annotation of sequence variant results.
+- **Purpose:** Download the dbSNP VCF, index and verification files of the specified reference version for local query of included variants and annotation of sequence variant results.
+- **Method:** Select dbSNP release files for the assembly and download VCF, indexes and checksums.
 - **API:** `dnakit.download.variants(output_dir[required], source="dbsnp", format="vcf", assembly[optional], include_index[optional], include_checksum_files[optional], config[optional], progress[optional])`.
 - **Input:** `source="dbsnp"`, `format="vcf"` and `GRCh37`/`GRCh38` assembly versions.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import variants
@@ -472,19 +374,21 @@ print(result.files)
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 (dbsnp_GRCh38.vcf.gz, dbsnp_GRCh38.vcf.gz.tbi, ...)
 downloads/dbsnp_grch38/dbsnp_vcf_manifest.json
 ```
 
-## 15) `DBD-015` ClinVar data
+## 15) ClinVar data {#15-dbd-015-clinvar-data}
 
-- **What it does:** Download ClinVar's VCF, XML or TSV release files and version information for locally associated variants and public clinical significance annotations.
+- **Purpose:** Download ClinVar's VCF, XML or TSV release files and version information for locally associated variants and public clinical significance annotations.
+- **Method:** Select the ClinVar release format and assembly and download the corresponding files.
 - **API:** `dnakit.download.variants(output_dir[required], source="clinvar", format[optional], assembly[optional], include_index[optional], config[optional], progress[optional])`.
 - **Input:** `source="clinvar"`; format `vcf`, `xml` or `tsv`, VCF optional `GRCh37`/`GRCh38` and index.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import variants
@@ -499,18 +403,20 @@ result = variants(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/clinvar/clinvar_vcf_manifest.json
 ```
 
-## 16) `DBD-016` Expression data
+## 16) Expression data {#16-dbd-016-expression-data}
 
-- **Function:** Press GEO accession to download public expression matrices or supplementary files, and save sample and source information for offline expression data analysis.
+- **Purpose:** Press GEO accession to download public expression matrices or supplementary files, and save sample and source information for offline expression data analysis.
+- **Method:** Locate and download expression matrices or supplementary files by GEO accession.
 - **API:** `dnakit.download.expression(accession[required], output_dir[required], format[optional], platform[optional], config[optional], progress[optional])`.
 - **Input:** `GSE`, `GDS`, `GPL` or `GSM` accession; Series Matrix and common RAW typically require `GSE`, multi-platform matrices may specify `GPL`.
-- **Sample code:**
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
 
 ```python
 from dnakit.download import expression
@@ -524,18 +430,20 @@ result = expression(
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/GSE100/geo_matrix_manifest.json
 ```
 
-## 17) `DBD-017` Control data
+## 17) Control data {#17-dbd-017-control-data}
 
-- **Function:** Download ENCODE/UCSC regulatory data by species, assembly, experiment or track conditions, retaining file metadata for annotating open chromatin, binding sites and other regions.
+- **Purpose:** Download ENCODE/UCSC regulatory data by species, assembly, experiment or track conditions, retaining file metadata for annotating open chromatin, binding sites and other regions.
+- **Method:** Filter ENCODE files or explicit track resources, then download the selected results.
 - **API:** `dnakit.search.encode_search(...)` plus `dnakit.download.encode_files(query[required], output_dir[required], config[optional], progress[optional])`; explicit resources can also use `dnakit.download.tracks(resources[required], output_dir[required], source[optional], config[optional], progress[optional])`.
 - **Input:** Query results for ENCODE `object_type="File"`, or a list of HTTPS `RemoteFile`s that the caller has confirmed.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import encode_files
@@ -550,18 +458,20 @@ result = encode_files(found, "downloads/encode_regulation")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/encode_regulation/encode_files_manifest.json
 ```
 
-## 18) `DBD-018` Repeating sequence data
+## 18) Repeating sequence data {#18-dbd-018-repeating-sequence-data}
 
-- **Function:** Download repeat sequence tracks such as UCSC RepeatMasker that match the specified assembly and are used to mark repeat categories and coordinate intervals in the genome.
+- **Purpose:** Download repeat sequence tracks such as UCSC RepeatMasker that match the specified assembly and are used to mark repeat categories and coordinate intervals in the genome.
+- **Method:** Filter UCSC RepeatMasker resources by filename pattern and download matches.
 - **API:** `dnakit.search.ucsc_files(genome[required], pattern[optional], limit[optional], config[optional])` plus `dnakit.download.ucsc_files(query[required], output_dir[required], config[optional], progress[optional])`.
 - **Input:** UCSC assembly and file glob; the download interface receives the corresponding `QueryResult`.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import ucsc_files as download_ucsc_files
@@ -572,18 +482,20 @@ result = download_ucsc_files(catalog, "downloads/hg38_repeats")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/hg38_repeats/ucsc_files_manifest.json
 ```
 
-## 19) `DBD-019` Conservative data
+## 19) Conservative data {#19-dbd-019-conservative-data}
 
-- **Function:** Download the conserved tracks and description information of the specified assembly such as phyloP and phastCons, which are used to associate cross-species conservation scores for genome positions.
+- **Purpose:** Download the conserved tracks and description information of the specified assembly such as phyloP and phastCons, which are used to associate cross-species conservation scores for genome positions.
+- **Method:** Select UCSC phyloP or phastCons files and download existing conservation tracks.
 - **API:** `dnakit.search.ucsc_files(...)` plus `dnakit.download.ucsc_files(...)`; individual tracks with specified URLs are also available `dnakit.download.tracks(...)`.
 - **Input:** UCSC assembly and conservation file globs, or explicit HTTPS files confirmed by the caller.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import ucsc_files as download_ucsc_files
@@ -594,18 +506,20 @@ result = download_ucsc_files(catalog, "downloads/hg38_conservation")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/hg38_conservation/ucsc_files_manifest.json
 ```
 
-## 20) `DBD-020` Multi-species comparison
+## 20) Multi-species comparison {#20-dbd-020-multi-species-comparison}
 
-- **Function:** Download the UCSC multi-species MAF alignment file of the specified assembly and species collection for offline viewing of homologous regions and comparative genome analysis.
+- **Purpose:** Download the UCSC multi-species MAF alignment file of the specified assembly and species collection for offline viewing of homologous regions and comparative genome analysis.
+- **Method:** Query UCSC multiple-species alignment resources and download selected files.
 - **API:** `dnakit.search.ucsc_files(...)` plus `dnakit.download.ucsc_files(...)`; query result metadata can be exported with `dnakit.download.metadata(...)`.
 - **Input:** UCSC assembly and MAF/multi-sequence file globs, or explicit HTTPS files.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import ucsc_files as download_ucsc_files
@@ -616,18 +530,20 @@ result = download_ucsc_files(catalog, "downloads/hg38_maf")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/hg38_maf/ucsc_files_manifest.json
 ```
 
-## 21) `DBD-021` coordinate conversion file
+## 21) coordinate conversion file {#21-dbd-021-coordinate-conversion-file}
 
-- **What it does:** Download a UCSC chain file between two genome assembly versions and record the directions, used to map region, variant and annotation coordinates from one assembly to the other.
+- **Purpose:** Download a UCSC chain file between two genome assembly versions and record the directions, used to map region, variant and annotation coordinates from one assembly to the other.
+- **Method:** Select a UCSC chain file for the source and target assemblies and download it.
 - **API:** `dnakit.search.ucsc_files(...)` plus `dnakit.download.ucsc_files(...)`.
 - **Input:** UCSC assembly and `liftOver`/`chain` file globs.
-- **Sample code:**
+- **Output:** Returns `QueryResult` with query `records`, source `provider`, and pagination information.
+- **Example code:**
 
 ```python
 from dnakit.download import ucsc_files as download_ucsc_files
@@ -638,17 +554,20 @@ result = download_ucsc_files(catalog, "downloads/ucsc_chain")
 print(result.manifest_path)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 downloads/ucsc_chain/ucsc_files_manifest.json
 ```
 
-## 22) `DBD-022` Download from a URL
+## 22) Download from a URL {#22-dbd-022-download-from-a-url}
 
-`download_url(url, output_dir)` needs only a direct HTTPS file URL and a destination directory.
-Missing directories are created automatically. The default filename comes from the last URL
-path component, with percent escapes decoded and query parameters excluded.
+- **Purpose:** Download a file from a direct URL.
+- **Method:** Save response bytes unchanged and optionally verify MD5 or SHA-256.
+- **API:** `dnakit.download.download_url(url, output_dir, *, filename=None, config=None, ...)`
+- **Input:** A direct HTTPS file URL and output directory; replace the example URL. Existing files are protected, and archives are not extracted.
+- **Output:** Returns `DownloadedFile` with the local path, size, and checksums.
+- **Example code:**
 
 ```python
 from dnakit.download import download_url
@@ -661,14 +580,178 @@ print(result.path)       # Absolute path to the downloaded file
 print(result.byte_size)  # File size in bytes
 ```
 
-Pass `filename="reference.fa.gz"` to choose a different name; this parameter is required if
-the URL has no filename. Existing files raise `FileExistsError` by default. To replace one,
-pass `config=DownloadConfig(overwrite=True)` and import `DownloadConfig` from `dnakit.download`.
-`DownloadConfig` also controls the timeout, file size limit, and progress display.
-Use `expected_md5` / `expected_sha256` to verify the contents, or `headers` for request headers.
+- **Example output:** Absolute file path and downloaded byte count; values depend on the URL.
 
-Any file type is supported and response bytes are saved unchanged, so `.gz` files stay compressed.
-This function accepts direct file URLs; it does not resolve web or sharing pages or extract archives.
-Agents and MCP can call `dnakit.download.download_url` with the same two required arguments,
-`url` and `output_dir`. For multiple files with a provenance manifest, use
-`dataset([RemoteFile(url1), RemoteFile(url2)], output_dir)`.
+## 23) Search and download a sequence {#sequence-download-example}
+
+- **Purpose:** Find sequences by organism and download the first match.
+- **Method:** Search NCBI Entrez, resolve record IDs to accessions, then download the selected sequence.
+- **API:** `dnakit.search.ncbi.entrez(...)`; `dnakit.search.ncbi.accessions(...)`; `dnakit.download.ncbi.sequence(...)`
+- **Input:** Organism and search filters, plus an output path; requires network access and writes local files.
+- **Output:** Search returns `QueryResult`; download returns `DatasetDownloadResult` with the sequence file, length, and manifest.
+- **Example code:**
+
+```python
+import dnakit
+
+found = dnakit.search.ncbi.entrez(
+    "nuccore", organism="Escherichia coli", strain="K-12",
+    seq_type="complete_genome", retmax=3,
+)
+accessions = dnakit.search.ncbi.accessions(found.metadata["uids"])
+if accessions:
+    downloaded = dnakit.download.ncbi.sequence(accessions[0], "ecoli_k12.fasta", format="fasta")
+    print(downloaded.files[0].path)
+    print(downloaded.metadata["sequence_length"])
+    print(downloaded.manifest_path)
+else:
+    print("No sequence matches; review the query.")
+```
+
+- **Example output:** The downloaded path, sequence length and manifest; prints a no-match message if the query returns no records.
+
+<span id="common-genome-names"></span>Species names, ENA examples and options: [FAQ](../../faq/tutorial_integrations.md#downloads).
+
+<span id="encode-download-example"></span>[ENCODE batch downloads and dry-run preview](#dnakit.encode.batch_download).
+
+<!-- BEGIN GENERATED API: downloads -->
+
+<span id="downloads"></span>
+
+## 24) Download a file over HTTP or HTTPS {#dnakit.databases.download_file}
+
+- **Purpose:** Download a file over HTTP or HTTPS.
+- **Method:** Stream an HTTP(S) response to the destination, or return text when return_content=True.
+- **API：** `dnakit.databases.download_file(*, url, output_path=None, timeout=None, return_content=None, chunk_size=None, follow_redirects=None, verbose=True)`
+- **Input:** Provide `url`. Prepare the local files and external programs used by the example, and replace paths with your input or output locations.
+- **Output:** Returns the file path when saving; with `return_content=True`, returns the file contents as text.
+- **Example code:**
+
+```python
+import dnakit
+
+result = dnakit.databases.download_file(
+    url='https://www.wikipedia.org',
+    output_path='./downloads/output.txt',
+    timeout=30,
+    return_content=False,
+    chunk_size=8192,
+    follow_redirects=True,
+    verbose=False,
+)
+print(result)
+```
+
+- **Example output:** Returns the file path when saving; with `return_content=True`, returns the file contents as text.
+
+[Full parameters and usage notes](../../faq/api/15_download.md#dnakit.databases.download_file-parameters)
+
+## 25) Download an ENA nucleotide sequence with a checksum manifest {#dnakit.download.ena.sequence}
+
+- **Purpose:** Download an ENA nucleotide sequence with a checksum manifest.
+- **Method:** Resolve the accession, retrieve sequence data, and write the files and provenance manifest.
+- **API：** `dnakit.download.ena.sequence(accession, output_path, *, format='fasta', config=None, search_config=None, api_base_url='https://www.ebi.ac.uk/ena/browser/api', verbose=True)`
+- **Input:** Provide `accession`, `output_path`.
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
+
+```python
+import dnakit
+
+result = dnakit.download.ena.sequence(
+    accession='U00096.3',
+    output_path='ecoli_ena.fasta',
+    format='fasta',
+    verbose=False,
+)
+print(result)
+```
+
+- **Example output:** DatasetDownloadResult with files, metadata (source, resolved accession and length), and manifest_path. See the [sequence download guide](15_download.md#accession-sequences) for formats and coordinates.
+
+[Full parameters and usage notes](../../faq/api/15_download.md#dnakit.download.ena.sequence-parameters)
+
+## 26) Download an NCBI nucleotide or protein sequence {#dnakit.download.ncbi.sequence}
+
+- **Purpose:** Download an NCBI nucleotide or protein sequence.
+- **Method:** Resolve the accession, retrieve sequence data, and write the files and provenance manifest.
+- **API：** `dnakit.download.ncbi.sequence(accession, output_path, *, database='nuccore', format='fasta', seq_start=None, seq_stop=None, strand=1, config=None, search_config=None, api_base_url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils', verbose=True)`
+- **Input:** Provide `accession`, `output_path`.
+- **Output:** Returns `DatasetDownloadResult` with downloaded `files`, source `metadata`, and `manifest_path`.
+- **Example code:**
+
+```python
+import dnakit
+
+result = dnakit.download.ncbi.sequence(
+    accession='NC_000913.3',
+    output_path='ecoli_ncbi.fasta',
+    format='fasta',
+    verbose=False,
+)
+print(result)
+```
+
+- **Example output:** DatasetDownloadResult with files, metadata (source, resolved accession and length), and manifest_path. See the [sequence download guide](15_download.md#accession-sequences) for formats and coordinates.
+
+[Full parameters and usage notes](../../faq/api/15_download.md#dnakit.download.ncbi.sequence-parameters)
+
+<!-- END GENERATED API: downloads -->
+
+<!-- BEGIN GENERATED API: encode-downloads -->
+
+<span id="encode-downloads"></span>
+
+## 27) Find and batch-download ENCODE files {#dnakit.encode.batch_download}
+
+- **Purpose:** Find and batch-download ENCODE files.
+- **Method:** Query ENCODE with the supplied filters and parse experiment, file or download results.
+- **API：** `dnakit.encode.batch_download(download_dir, file_format=None, output_type=None, output_category=None, assembly=None, assay_title=None, organism='Homo sapiens', organ=None, biosample_type=None, target=None, preferred_default=None, organize_by='experiment', verify_md5=True, limit=100, dry_run=True, *, verbose=True)`
+- **Input:** Provide `download_dir`.
+- **Output:** Python return type: str.  JSON with download preview (dry_run=True) or download results (dry_run=False).
+- **Example code:**
+
+```python
+import dnakit
+
+result = dnakit.encode.batch_download(
+    download_dir='downloads/encode',
+    assay_title='ATAC-seq',
+    assembly='GRCh38',
+    file_format='bed',
+    limit=3,
+    dry_run=True,
+    verbose=False,
+)
+print(result)
+```
+
+- **Example output:** Python return type: str.  JSON with download preview (dry_run=True) or download results (dry_run=False).
+
+[Full parameters and usage notes](../../faq/api/15_download.md#dnakit.encode.batch_download-parameters)
+
+## 28) Download ENCODE files by accession {#dnakit.encode.download_files}
+
+- **Purpose:** Download ENCODE files by accession.
+- **Method:** Query ENCODE with the supplied filters and parse experiment, file or download results.
+- **API：** `dnakit.encode.download_files(file_accessions, download_dir, organize_by='flat', verify_md5=True, *, verbose=True)`
+- **Input:** Provide `file_accessions`, `download_dir`. Retrieve a real file accession with the file query API and replace `ENCFF_REPLACE_ME`.
+- **Output:** Python return type: str.  JSON with download results for each file (path, size, success/error, MD5 status).
+- **Example code:**
+
+```python
+import dnakit
+
+result = dnakit.encode.download_files(
+    file_accessions=['ENCFF_REPLACE_ME'],
+    download_dir='downloads/encode',
+    verbose=False,
+)
+print(result)
+```
+
+- **Example output:** Python return type: str.  JSON with download results for each file (path, size, success/error, MD5 status).
+
+[Full parameters and usage notes](../../faq/api/15_download.md#dnakit.encode.download_files-parameters)
+
+<!-- END GENERATED API: encode-downloads -->

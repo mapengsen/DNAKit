@@ -12,6 +12,7 @@ from dnakit.datasets.clustering import (
 from dnakit.datasets.config import (
     ClusterConfig,
     DeduplicationConfig,
+    DiversitySamplingConfig,
     HierarchicalClusteringConfig,
     IUPACDeduplicationConfig,
     JointSplitConfig,
@@ -36,6 +37,7 @@ from dnakit.datasets.results import (
     ClusteringResult,
     DedupGroup,
     DeduplicationResult,
+    DiversitySamplingResult,
     HierarchicalClusteringResult,
     IUPACDeduplicationResult,
     IUPACDuplicateGroup,
@@ -46,13 +48,16 @@ from dnakit.datasets.results import (
     LinkageStep,
     NeuralClusteringResult,
     RepresentativeSelectionResult,
+    SamplingAllocation,
     SplitAssignment,
     SplitQualityResult,
     SplitResult,
     SplitSubset,
     TemporalSplitResult,
 )
+from dnakit.datasets.sampling import diversity_sample
 from dnakit.datasets.split import split
+from dnakit.datasets.tabular import export_grouped_split, export_kfold_table
 
 _register_inputs(
     globals(),
@@ -63,6 +68,7 @@ _register_inputs(
         "cluster_sequences",
         "hierarchical_cluster",
         "neural_cluster_sequences",
+        "diversity_sample",
         "select_representatives",
         "split",
         "temporal_split",
@@ -83,6 +89,8 @@ __all__ = [
     "DedupGroup",
     "DeduplicationConfig",
     "DeduplicationResult",
+    "DiversitySamplingConfig",
+    "DiversitySamplingResult",
     "FileRecords",
     "FileSplitResult",
     "FileSplitSubset",
@@ -103,6 +111,7 @@ __all__ = [
     "NeuralClusteringConfig",
     "NeuralClusteringResult",
     "RepresentativeSelectionResult",
+    "SamplingAllocation",
     "SplitAssignment",
     "SplitConfig",
     "SplitQualityResult",
@@ -115,10 +124,13 @@ __all__ = [
     "deduplicate_approximate",
     "deduplicate_iupac",
     "detect_leakage",
+    "diversity_sample",
     "evaluate_split_quality",
     "exclude_by_metadata",
     "exclude_chromosomes",
     "exclude_species",
+    "export_grouped_split",
+    "export_kfold_table",
     "hierarchical_cluster",
     "joint_split",
     "neural_cluster_sequences",

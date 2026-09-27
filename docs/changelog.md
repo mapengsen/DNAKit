@@ -4,10 +4,18 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-09-27
+
+- 新增 Agent 检查点、恢复、持久知识，以及工具生成、修复、优化和贡献流程。
+- 扩展自定义训练后端与调度、配对序列分块、表格数据集与采样、评价绘图和参考一致性检查。
+- 新增可通过 pip 安装的基因组学后端，更新中英文 API 教程。
+- 增加 37 个 DNA 方向的项目检索与来源 FAQ；新增 18 个上游 Skills、6 个原生 Skills，此批使目录达到 560 项；后续增量见下一条。
+- 新增育种、原核基因识别、甲基化、DNA 存储与纳米结构函数，以及 19 项外部分析和 7 类 MCP 连接；后端按需安装，执行状态与方法引用分别记录。
+- 审核 temp 中全部 335 个项目，合并 82 条已有记录并新增 253 条来源；增加 24 个外部分析适配，补充可再分发 Skills 与真实 MCP 连接，逐项状态和引用关系见[补充审核 FAQ](faq/user_catalog.md)。
 - 新增统一 DNA／基因组学 Skills 目录、搜索与安装入口，并保留来源、许可证和资源校验信息。
 - 新增数据库、ENCODE 和工作流接口，扩展统一文件输入输出、序列处理并行执行、进度显示、模型下载与 Agent 工具调用。
 - 更新中英文 README、文档导航、MCP 安装指南与可视化示例。
-- 完整补充本轮迁移新增的 484 个公开函数文档：按 12 类用途提供签名、参数、返回值和来源说明，同步中英文导航、功能树、API 参考及调用示例。
+- 将 484 个公开函数的签名、参数、返回值和来源说明逐项融入 14 个现有功能教程，调用示例随用途归位；移除独立的新增函数索引、调用约定页及重复专题入口，同步中英文导航和链接。
 - 新增源码驱动的文档生成与 `--check` 覆盖校验，避免漏项、重复计数和参数漂移。
 
 ## [0.1.4] - 2026-09-09
@@ -18,7 +26,7 @@
 
 ### Added
 
-- 新增仅 Python API 的 `dnakit.bioinformatics`：原生编码、生成评价、系统发育、计数/距离统计、motif/约束/克隆/DAG；可选编解码、通用机器学习和 MSA/BLAST/HMMER/NGS 专业后端。新增 `bio-*` 可选依赖、离线示例和数值/真实工具测试，详见[实现边界](api/features/27_bioinformatics.md)。
+- 新增仅 Python API 的 `dnakit.bioinformatics`：原生编码、生成评价、系统发育、计数/距离统计、motif/约束/克隆/DAG；可选编解码、通用机器学习和 MSA/BLAST/HMMER/NGS 专业后端。新增 `bio-*` 可选依赖、离线示例和数值/真实工具测试，详见[实现边界](faq/bioinformatics.md)。
 
 - 新增用户自定义 DNA 性质分类/回归训练：支持 11 种已登记模型的线性探测、7 种 Transformers 模型的全量微调、默认 seed 42 的 8:1:1 划分、单/多目标完整指标，以及通过 OpenAI-compatible 接口进行隐私有界的任意文件结构分析与声明式映射。
 - Diversity 新增平均两两原始 Levenshtein 距离，Novelty 新增平均最近参考原始 Levenshtein 距离；保留默认相似度算法，支持显式选择、资源上限和可选进度条。
@@ -61,7 +69,7 @@
 
 - 面向普通用户的统一 `dnakit.DNA(...)` 门面：同一个入口接收单条/多条序列、逐条 record mapping、ID、拓扑、metadata、feature 和旧核心对象；下标与切片仍返回 `DNA`。
 - 新增 `dnakit.representations`：可选择 11 种 DNA 基础模型提取固定长度 rep，checkpoint 默认下载到当前目录 `ckpt/` 并复用；新增 `neural_cluster_sequences()` 完成 L2、可选 PCA、seed 固定的 k-means、中心最近代表序列和完整结果审计。
-- 新增 `evaluate_frechet_distance()`：默认复用 DATA-027 的 LucaOne 表征和 L2 归一化，以样本空间等价算法计算两个 DNA 集合的 Fréchet 表征分布距离。
+- 新增 `evaluate_frechet_distance()`：默认复用神经网络聚类的 LucaOne 表征和 L2 归一化，以样本空间等价算法计算两个 DNA 集合的 Fréchet 表征分布距离。
 - 新增 `evaluate_fragment_similarity()` 和 `evaluate_snn()`：分别以 exact k-mer 出现次数余弦相似度和 hashed k-mer 指纹最近邻 Tanimoto 均值实现 MOSES Frag/SNN 的 DNA 适配。
 - `dnakit.datasets.exclude_species()` 和 `exclude_chromosomes()`：按显式 metadata 精确排除一个或多个物种/染色体；缺少目标字段时结构化报错。
 - MkDocs 文档站启用中文站内搜索框、搜索建议和结果关键词高亮。
@@ -91,14 +99,14 @@
 ### Changed
 
 - `evolution_generate()` 保留 `mut_frac` 参数名，并新增逐碱基 `insert_frac`、`delete_frac` 概率；插入可用 `insert_min/insert_max` 选择单碱基或随机长度片段，算法审计版本升级为 `dnakit-evoaug-v3`。单次连续片段插入/删除继续由 `indel_generate()` 提供。
-- 文档将 FP-004 Canonical k-mer 并入 FP-003 k-mer 特征的 Canonical 模式，并将 FP-005 统一命名为 k-mer Sketch；公开 Python API 和稳定追踪编号保持兼容。
+- 文档将 Canonical k-mer 并入 k-mer 特征的 Canonical 模式，并统一 Sketch 功能名称为 k-mer Sketch；公开 Python API 和稳定追踪编号保持兼容。
 - 普通文件读取统一为 `read(..., mode="dna"|"stream")`，验证统一为 `validate()`；无后缀编辑、反向互补和环状操作对 `DNA` 输入同步注释并返回 `DNA`，旧 `read_one/read_set/validate_set/*_record` 入口继续兼容。
 - DNA 基础模型表征和神经网络聚类的默认 checkpoint 从 GROVER 改为 `LucaGroup/LucaOne-gene-step36.8M`；默认缓存目录为 `ckpt/lucaone-gene-step36-8m/`，自定义 checkpoint 代码仍需显式授权。
 - 删除内置 DiProDB 240 个数值；固定 240 字段 schema 保持不变，默认后 60 项为 `None`，用户可加载有权使用的严格 15×16 JSON 表。
 - 删除 `primer3` extra、`primer3-py` 依赖和 Python binding adapter；Primer3 统一改为用户单独安装并提供显式 CLI 路径。
 - `normalize()` 新增 `keep_ambiguous`、`keep_u`和 `keep_other`；默认保留 IUPAC 模糊碱基，审计删除 `U` 和其他非 DNA 字符。
 - 需求追踪矩阵改为逐项按当前源码、测试和本地后端状态核对，不再保留过期 `planned` 声明。
-- 将独立的 identity、query coverage 和 target coverage 功能项合并到 `SIM-008` 序列比对结果，并删除重复编号。
+- 将独立的 identity、query coverage 和 target coverage 功能项合并到序列比对结果，并删除重复编号。
 - 批处理支持有界线程执行、稳定原始索引/派生 seed 和已完成 ID 跳过。
 - 可视化范围收缩为序列、feature、alignment 和相似度矩阵，通用图片导出和 HTML 报告保持不变。
 - 可视化导出扩展为原子多格式输出，并对像素、记录数和内嵌结果字节数设硬上限。

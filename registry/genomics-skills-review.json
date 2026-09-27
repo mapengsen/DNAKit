@@ -1,0 +1,856 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-20",
+  "scope": "This genomics skills expansion; no claim of exhaustive DNA coverage or full scientific workflow validation.",
+  "counts": {
+    "baseline_skills": 536,
+    "imported_skills": 18,
+    "native_skills": 6,
+    "catalog_skills": 560,
+    "catalog_files": 4615,
+    "imported_files": 200
+  },
+  "baseline_verification": {
+    "records": "unchanged field for field",
+    "source_records": "unchanged field for field"
+  },
+  "checks": {
+    "commit_pinned_archive_checksums": "passed",
+    "skill_creator_metadata": {
+      "status": "passed",
+      "skills": 24
+    },
+    "catalog_resource_hashes": "passed",
+    "maintainer_ruff": "passed",
+    "catalog_regression_tests": {
+      "status": "passed",
+      "tests": 6
+    },
+    "full_catalog_rebuild_from_fresh_legacy_clones": "not_run; legacy Git caches absent; cleanup and hook order tested in isolated regression fixtures",
+    "upstream_scientific_workflows": "not_run"
+  },
+  "code_review": {
+    "independent_reviewer": "survey_regulation_design",
+    "status": "reviewed; reported protections implemented",
+    "resolved_findings": [
+      "Verify pinned source provenance as well as file checksums.",
+      "Compare extension catalog metadata to authoritative manifests.",
+      "Reject ID and source identity collisions.",
+      "Reject symlink escapes.",
+      "Validate all extension resources before baseline replacement."
+    ],
+    "upstream_script_review_scope": "Retained upstream source, license, path/resource dependencies, Python syntax and external process/network call sites; not a complete scientific algorithm audit."
+  },
+  "portability": {
+    "checks": [
+      {
+        "script": "skills/finemap/scripts/finemap.py",
+        "check": "--help outside repository",
+        "status": "passed"
+      },
+      {
+        "script": "skills/qtl-candidate-gene/scripts/genes_in_interval.py",
+        "check": "--help outside repository",
+        "status": "passed"
+      },
+      {
+        "script": "skills/qtl-candidate-gene/scripts/genes_in_interval.py",
+        "check": "bundled GFF interval lookup outside repository",
+        "status": "passed",
+        "genes": 51,
+        "known_gene": "Solyc09g074510.3",
+        "start": 62519836
+      }
+    ],
+    "scope": "Command help and bundled-file portability only; not full scientific validation.",
+    "installed_skill_checks": {
+      "skills": [
+        "finemap",
+        "qtl-candidate-gene"
+      ],
+      "standalone_help": "passed",
+      "repeat_install": "unchanged",
+      "qtl_gene_count": 51,
+      "finemap_annotation_helper": "self-contained",
+      "chinese_searches": [
+        "育种",
+        "DNA存储",
+        "纳米技术"
+      ]
+    }
+  },
+  "upstream_python_review": [
+    {
+      "path": "skills/finemap/references/variant-annotate/scripts/annotate.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "urllib.request.urlopen",
+          "line": 85
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 145
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 164
+        }
+      ]
+    },
+    {
+      "path": "skills/finemap/scripts/finemap.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.run",
+          "line": 149
+        },
+        {
+          "name": "subprocess.run",
+          "line": 155
+        },
+        {
+          "name": "subprocess.run",
+          "line": 166
+        },
+        {
+          "name": "subprocess.run",
+          "line": 212
+        },
+        {
+          "name": "subprocess.call",
+          "line": 259
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 291
+        },
+        {
+          "name": "subprocess.call",
+          "line": 339
+        },
+        {
+          "name": "subprocess.call",
+          "line": 633
+        },
+        {
+          "name": "subprocess.call",
+          "line": 641
+        },
+        {
+          "name": "subprocess.call",
+          "line": 649
+        },
+        {
+          "name": "subprocess.run",
+          "line": 972
+        },
+        {
+          "name": "subprocess.call",
+          "line": 1152
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1547
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1560
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1583
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1590
+        },
+        {
+          "name": "subprocess.call",
+          "line": 1635
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1802
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1822
+        },
+        {
+          "name": "subprocess.call",
+          "line": 1864
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 2025
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 2065
+        },
+        {
+          "name": "shutil.rmtree",
+          "line": 104
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 108
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 113
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 117
+        },
+        {
+          "name": "subprocess.run",
+          "line": 137
+        },
+        {
+          "name": "subprocess.run",
+          "line": 201
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 616
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 618
+        },
+        {
+          "name": "shutil.rmtree",
+          "line": 1537
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 1542
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1570
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1772
+        },
+        {
+          "name": "subprocess.run",
+          "line": 516
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1575
+        },
+        {
+          "name": "subprocess.run",
+          "line": 1778
+        },
+        {
+          "name": "shutil.rmtree",
+          "line": 1800
+        },
+        {
+          "name": "subprocess.run",
+          "line": 178
+        },
+        {
+          "name": "subprocess.run",
+          "line": 694
+        },
+        {
+          "name": "subprocess.run",
+          "line": 181
+        }
+      ]
+    },
+    {
+      "path": "skills/gwas-fetch/scripts/gwas_fetch.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.Popen",
+          "line": 146
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 59
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 85
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 115
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 208
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 230
+        }
+      ]
+    },
+    {
+      "path": "skills/ldsc/scripts/ldsc.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.run",
+          "line": 100
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 213
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 271
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 360
+        },
+        {
+          "name": "subprocess.call",
+          "line": 609
+        },
+        {
+          "name": "resolve_liability_prevalences",
+          "line": 660
+        },
+        {
+          "name": "subprocess.call",
+          "line": 681
+        },
+        {
+          "name": "subprocess.call",
+          "line": 706
+        },
+        {
+          "name": "resolve_liability_prevalences",
+          "line": 744
+        },
+        {
+          "name": "subprocess.call",
+          "line": 754
+        },
+        {
+          "name": "shutil.rmtree",
+          "line": 46
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 50
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 56
+        },
+        {
+          "name": "subprocess.check_call",
+          "line": 60
+        },
+        {
+          "name": "subprocess.run",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "path": "skills/liftover/scripts/lift_sumstats.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.Popen",
+          "line": 89
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 173
+        },
+        {
+          "name": "subprocess.run",
+          "line": 66
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 227
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 314
+        }
+      ]
+    },
+    {
+      "path": "skills/locuszoom/scripts/locuszoom.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.call",
+          "line": 382
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 274
+        }
+      ]
+    },
+    {
+      "path": "skills/manhattan-qq/scripts/manhattan_qq.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": []
+    },
+    {
+      "path": "skills/okg-search/scripts/okg_search.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "cur.execute",
+          "line": 136
+        },
+        {
+          "name": "cur.execute",
+          "line": 144
+        },
+        {
+          "name": "cur.execute",
+          "line": 163
+        },
+        {
+          "name": "cur.execute",
+          "line": 175
+        },
+        {
+          "name": "cur.execute",
+          "line": 194
+        },
+        {
+          "name": "cur.execute",
+          "line": 203
+        },
+        {
+          "name": "cur.execute",
+          "line": 219
+        },
+        {
+          "name": "cur.execute",
+          "line": 236
+        },
+        {
+          "name": "subprocess.run",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "path": "skills/prs/scripts/prs.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.Popen",
+          "line": 66
+        },
+        {
+          "name": "subprocess.call",
+          "line": 444
+        },
+        {
+          "name": "subprocess.call",
+          "line": 420
+        },
+        {
+          "name": "subprocess.call",
+          "line": 465
+        }
+      ]
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/cite_support.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": []
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/diagnostic_variants.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": []
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/gene_function.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "urllib.request.urlopen",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/genes_in_interval.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": []
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/pubmed.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "urllib.request.urlopen",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "path": "skills/qtl-candidate-gene/scripts/verify_report.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": []
+    },
+    {
+      "path": "skills/twas/scripts/twas.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "subprocess.check_call",
+          "line": 253
+        },
+        {
+          "name": "subprocess.Popen",
+          "line": 169
+        },
+        {
+          "name": "subprocess.call",
+          "line": 368
+        },
+        {
+          "name": "subprocess.check_output(['git', '-C', str(repo_dir), 'rev-parse', 'HEAD'], text=True).strip",
+          "line": 516
+        },
+        {
+          "name": "subprocess.check_output",
+          "line": 516
+        }
+      ]
+    },
+    {
+      "path": "skills/variant-annotate/scripts/annotate.py",
+      "syntax": "passed",
+      "external_or_destructive_call_sites": [
+        {
+          "name": "urllib.request.urlopen",
+          "line": 85
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 145
+        },
+        {
+          "name": "urllib.request.urlopen",
+          "line": 164
+        }
+      ]
+    }
+  ],
+  "maintainer_script_sha256": {
+    "others/skills/import_genomics_skills.py": "a177815d737d14737dffb5304c12f8fc340e1a2b5a99e11395c57f301df64b9f",
+    "others/skills/sync_genomics_expansion.py": "a7c1a4b347cad6850a34fc88d9c63d7e9942be5f016426dc42d8c4c2a6b7f116",
+    "others/skills/build_catalog.py": "d45c64903f11b433eecb597f8f3f61382251b35371dbeff87c7c21dc57103071",
+    "others/skills/write_migration.py": "72a4acfef46d53c47539ea3165504bf1dea0270b8369b6ae7fd481d7916ce40a",
+    "others/skills/write_inventory.py": "c334a117d796788e82a427e13dc5eb4862f64a5497c99eaf097aee3b7a53b253",
+    "others/tests/unit/test_genomics_skill_expansion.py": "2410f9ea0e726f00db56257bd44a746bd786827510f4bdf096175a2c7ffa4838"
+  },
+  "resource_manifest_sha256": {
+    "biomcp": "7666d0f072afdcd3ce0680dda4ae6d0cf6dc60dceb41af8bc4d71e2a4c10a7af",
+    "dnakit-dna-nanotechnology": "ce5c3901bf5bff3b6e90cfb9ce878ebaf08cd314d9cf10ce29dd084d007630f3",
+    "dnakit-dna-storage": "e34d1293a153c5eb8065f4547046117ba0fbfdb87f6a2761824a1bb407443d2d",
+    "dnakit-external-genomics": "e2221193e7b27919df5f7eef4a1b368adf32c5ca1e78ead50cda1df48140c4bf",
+    "dnakit-genomic-breeding": "aa891e1cf5ddf48206e78eda6ae9aaef13c49dbe95601944da11522fb5639789",
+    "dnakit-methylation-summary": "cb005a5047832e735ca374de138ad4e74665697e5eafbf3dc6de5f37c48981d7",
+    "dnakit-prokaryotic-genes": "1615c350b0e275836a8aae7ca9d909f582cd0aa0dd67c546d03eb0e7f9e42f10",
+    "finemap": "2478821d82503cffde60f20da0963ec9b6b77e0b5ae3a3fd7763d5c43fe71884",
+    "gigwa-diversity-report": "5cbe6a6232cce1fe3b8381e3e0e8c8be4b964e7c5cf0ca7922eb8e5099a67587",
+    "gigwa-explore-instance": "75abd910e477644677eca5dfd9ed90f2074fcb20f4a176aba3fbfc754a3848ff",
+    "gigwa-import-and-qc": "28eb2a44e27c41bc906ee1e0d81a879a22d4ddd587edbae44f1697302bdcd922",
+    "gigwa-qc-triage": "8fdef58683efb2bde40105d17064768a66d1e8da6872a29fa426ed040e29f065",
+    "gigwa-region-scan": "b373219a33abeb1a8bb007bd59ee5abc0a24d49611051780ccf9518790c07037",
+    "gwas-fetch": "6606c03256a28900422a6932ae392b6e96c082cc8280703f7e5ab305a9220e27",
+    "ldsc": "dc99fa133b53f3c4f8ae97a86111c4a57967b3b42f07af477f51f3dd8833a4b2",
+    "liftover": "be133e682b0618ec1350e3cd85202d34ebe08e8da32dbe6d20b19e5a4848ec78",
+    "locuszoom": "9ab5d030790fe8f14a1064eb93f77e5a48681776e8bc1e80018407ebd175be5a",
+    "manhattan-qq": "97a9077eb9cbcc09e19ab6569841885fbbf47e7cb53eecd10055f704768b0bf6",
+    "okg-search": "e698eacbb0bf9fc992668533b209abefa72c67c8ae95d5d140fee88138ed37c8",
+    "prs": "09b60bf7a163373c08f44e3a6328e4b9216a66512704479c37a5e5776d6289e0",
+    "qtl-candidate-gene": "b5ff270f450673cbdfddbbb673e4940d2de3b381d59319ae2cf207ba7767a28a",
+    "tangermeme": "9c1f4264e94352834275da32b25e00b3b53010e09a5656b8f81c79c6cd03d514",
+    "twas": "d06eec87564ac79defa6b94578a9c9cd5d56df5dd318b228cfe763815262fcc0",
+    "variant-annotate": "50cee2442108b2d553265ae05ceba2aa7086bd26cc27ac792e98c408e08ddf9f"
+  },
+  "files_created_or_updated": [
+    "THIRD_PARTY_NOTICES.md",
+    "licenses/skills/biomcp/CITATION.cff",
+    "licenses/skills/biomcp/LICENSE",
+    "licenses/skills/gigwa-mcp/LICENSE",
+    "licenses/skills/gigwa-mcp/NOTICE",
+    "licenses/skills/haploqtl/CITATION.cff",
+    "licenses/skills/haploqtl/LICENSE",
+    "licenses/skills/statgen-skills/LICENSE",
+    "licenses/skills/tangermeme/LICENSE",
+    "others/skills/build_catalog.py",
+    "others/skills/import_genomics_skills.py",
+    "others/skills/sync_genomics_expansion.py",
+    "others/skills/write_inventory.py",
+    "others/skills/write_migration.py",
+    "others/tests/unit/test_genomics_breeding.py",
+    "others/tests/unit/test_genomics_skill_expansion.py",
+    "registry/README.md",
+    "registry/catalog.json",
+    "registry/decisions.json",
+    "registry/genomics-native-skills.json",
+    "registry/genomics-new-skills.json",
+    "registry/genomics-skills-review.json",
+    "registry/migration.json",
+    "registry/skills.csv",
+    "registry/sources.json",
+    "skills/README.md",
+    "skills/biomcp/AUTHORING.md",
+    "skills/biomcp/CITATION.cff",
+    "skills/biomcp/DNAKIT.md",
+    "skills/biomcp/LICENSE",
+    "skills/biomcp/SKILL.md",
+    "skills/biomcp/UPSTREAM.md",
+    "skills/biomcp/examples/get-gene-BRAF.json",
+    "skills/biomcp/examples/get-gene-BRAF.txt",
+    "skills/biomcp/examples/get-trial.json",
+    "skills/biomcp/examples/get-trial.txt",
+    "skills/biomcp/examples/get-variant-rs113488022-all.json",
+    "skills/biomcp/examples/get-variant-rs113488022-all.txt",
+    "skills/biomcp/examples/search-article.json",
+    "skills/biomcp/examples/search-article.txt",
+    "skills/biomcp/examples/search-drug.json",
+    "skills/biomcp/examples/search-drug.txt",
+    "skills/biomcp/jq-examples.md",
+    "skills/biomcp/references/upstream-readme.md",
+    "skills/biomcp/schemas/article.json",
+    "skills/biomcp/schemas/disease.json",
+    "skills/biomcp/schemas/drug.json",
+    "skills/biomcp/schemas/gene.json",
+    "skills/biomcp/schemas/pathway.json",
+    "skills/biomcp/schemas/trial.json",
+    "skills/biomcp/schemas/variant.json",
+    "skills/biomcp/schemas/workflow-ladder.schema.json",
+    "skills/biomcp/use-cases/01-treatment-lookup.md",
+    "skills/biomcp/use-cases/02-symptom-phenotype.md",
+    "skills/biomcp/use-cases/03-gene-disease-orientation.md",
+    "skills/biomcp/use-cases/04-article-follow-up.md",
+    "skills/biomcp/use-cases/05-variant-pathogenicity.md",
+    "skills/biomcp/use-cases/06-drug-regulatory.md",
+    "skills/biomcp/use-cases/07-gene-function-localization.md",
+    "skills/biomcp/use-cases/08-mechanism-pathway.md",
+    "skills/biomcp/use-cases/09-trial-recruitment.md",
+    "skills/biomcp/use-cases/10-pharmacogene-cumulative.md",
+    "skills/biomcp/use-cases/11-disease-locus-mapping.md",
+    "skills/biomcp/use-cases/12-cellular-process-regulation.md",
+    "skills/biomcp/use-cases/13-mutation-catalog.md",
+    "skills/biomcp/use-cases/14-syndrome-disambiguation.md",
+    "skills/biomcp/use-cases/15-negative-evidence.md",
+    "skills/biomcp/use-cases/16-normalize-to-codes.md",
+    "skills/biomcp/use-cases/17-exact-variant-literature.md",
+    "skills/biomcp/use-cases/_TEMPLATE.ladder.json",
+    "skills/biomcp/use-cases/_TEMPLATE.md",
+    "skills/biomcp/use-cases/article-follow-up.ladder.json",
+    "skills/biomcp/use-cases/mechanism-pathway.ladder.json",
+    "skills/biomcp/use-cases/mutation-catalog.ladder.json",
+    "skills/biomcp/use-cases/normalize-to-codes.ladder.json",
+    "skills/biomcp/use-cases/pharmacogene-cumulative.ladder.json",
+    "skills/biomcp/use-cases/treatment-lookup.ladder.json",
+    "skills/biomcp/use-cases/trial-recruitment.ladder.json",
+    "skills/biomcp/use-cases/variant-pathogenicity.ladder.json",
+    "skills/dnakit-dna-nanotechnology/DNAKIT.md",
+    "skills/dnakit-dna-nanotechnology/LICENSE",
+    "skills/dnakit-dna-nanotechnology/SKILL.md",
+    "skills/dnakit-dna-nanotechnology/UPSTREAM.md",
+    "skills/dnakit-dna-storage/DNAKIT.md",
+    "skills/dnakit-dna-storage/LICENSE",
+    "skills/dnakit-dna-storage/SKILL.md",
+    "skills/dnakit-dna-storage/UPSTREAM.md",
+    "skills/dnakit-external-genomics/DNAKIT.md",
+    "skills/dnakit-external-genomics/LICENSE",
+    "skills/dnakit-external-genomics/SKILL.md",
+    "skills/dnakit-external-genomics/UPSTREAM.md",
+    "skills/dnakit-genomic-breeding/DNAKIT.md",
+    "skills/dnakit-genomic-breeding/LICENSE",
+    "skills/dnakit-genomic-breeding/SKILL.md",
+    "skills/dnakit-genomic-breeding/UPSTREAM.md",
+    "skills/dnakit-methylation-summary/DNAKIT.md",
+    "skills/dnakit-methylation-summary/LICENSE",
+    "skills/dnakit-methylation-summary/SKILL.md",
+    "skills/dnakit-methylation-summary/UPSTREAM.md",
+    "skills/dnakit-prokaryotic-genes/DNAKIT.md",
+    "skills/dnakit-prokaryotic-genes/LICENSE",
+    "skills/dnakit-prokaryotic-genes/SKILL.md",
+    "skills/dnakit-prokaryotic-genes/UPSTREAM.md",
+    "skills/finemap/DNAKIT.md",
+    "skills/finemap/LICENSE",
+    "skills/finemap/SKILL.md",
+    "skills/finemap/UPSTREAM.md",
+    "skills/finemap/references/EXAMPLES.md",
+    "skills/finemap/references/LD_OPTIONS.md",
+    "skills/finemap/references/SUMMARY_STATS.md",
+    "skills/finemap/references/upstream-readme.md",
+    "skills/finemap/references/variant-annotate/SKILL.md",
+    "skills/finemap/references/variant-annotate/scripts/annotate.py",
+    "skills/finemap/scripts/finemap.py",
+    "skills/gigwa-diversity-report/DNAKIT.md",
+    "skills/gigwa-diversity-report/LICENSE",
+    "skills/gigwa-diversity-report/NOTICE",
+    "skills/gigwa-diversity-report/SKILL.md",
+    "skills/gigwa-diversity-report/UPSTREAM.md",
+    "skills/gigwa-diversity-report/references/popgen-metrics.md",
+    "skills/gigwa-diversity-report/references/upstream-readme.md",
+    "skills/gigwa-explore-instance/DNAKIT.md",
+    "skills/gigwa-explore-instance/LICENSE",
+    "skills/gigwa-explore-instance/NOTICE",
+    "skills/gigwa-explore-instance/SKILL.md",
+    "skills/gigwa-explore-instance/UPSTREAM.md",
+    "skills/gigwa-explore-instance/references/instance-anatomy.md",
+    "skills/gigwa-explore-instance/references/upstream-readme.md",
+    "skills/gigwa-import-and-qc/DNAKIT.md",
+    "skills/gigwa-import-and-qc/LICENSE",
+    "skills/gigwa-import-and-qc/NOTICE",
+    "skills/gigwa-import-and-qc/SKILL.md",
+    "skills/gigwa-import-and-qc/UPSTREAM.md",
+    "skills/gigwa-import-and-qc/references/import-and-qc.md",
+    "skills/gigwa-import-and-qc/references/upstream-readme.md",
+    "skills/gigwa-qc-triage/DNAKIT.md",
+    "skills/gigwa-qc-triage/LICENSE",
+    "skills/gigwa-qc-triage/NOTICE",
+    "skills/gigwa-qc-triage/SKILL.md",
+    "skills/gigwa-qc-triage/UPSTREAM.md",
+    "skills/gigwa-qc-triage/references/qc-thresholds.md",
+    "skills/gigwa-qc-triage/references/upstream-readme.md",
+    "skills/gigwa-region-scan/DNAKIT.md",
+    "skills/gigwa-region-scan/LICENSE",
+    "skills/gigwa-region-scan/NOTICE",
+    "skills/gigwa-region-scan/SKILL.md",
+    "skills/gigwa-region-scan/UPSTREAM.md",
+    "skills/gigwa-region-scan/references/region-queries.md",
+    "skills/gigwa-region-scan/references/upstream-readme.md",
+    "skills/gwas-fetch/DNAKIT.md",
+    "skills/gwas-fetch/LICENSE",
+    "skills/gwas-fetch/SKILL.md",
+    "skills/gwas-fetch/UPSTREAM.md",
+    "skills/gwas-fetch/references/CATALOG_API.md",
+    "skills/gwas-fetch/references/upstream-readme.md",
+    "skills/gwas-fetch/scripts/gwas_fetch.py",
+    "skills/ldsc/DNAKIT.md",
+    "skills/ldsc/LICENSE",
+    "skills/ldsc/SKILL.md",
+    "skills/ldsc/UPSTREAM.md",
+    "skills/ldsc/references/LDSC_REFS.md",
+    "skills/ldsc/references/upstream-readme.md",
+    "skills/ldsc/scripts/ldsc.py",
+    "skills/liftover/DNAKIT.md",
+    "skills/liftover/LICENSE",
+    "skills/liftover/SKILL.md",
+    "skills/liftover/UPSTREAM.md",
+    "skills/liftover/references/COVERAGE_GAPS.md",
+    "skills/liftover/references/upstream-readme.md",
+    "skills/liftover/scripts/lift_sumstats.py",
+    "skills/locuszoom/DNAKIT.md",
+    "skills/locuszoom/LICENSE",
+    "skills/locuszoom/SKILL.md",
+    "skills/locuszoom/UPSTREAM.md",
+    "skills/locuszoom/references/LOCUSZOOMR.md",
+    "skills/locuszoom/references/upstream-readme.md",
+    "skills/locuszoom/scripts/locuszoom.py",
+    "skills/locuszoom/scripts/locuszoom_run.R",
+    "skills/manhattan-qq/DNAKIT.md",
+    "skills/manhattan-qq/LICENSE",
+    "skills/manhattan-qq/SKILL.md",
+    "skills/manhattan-qq/UPSTREAM.md",
+    "skills/manhattan-qq/references/upstream-readme.md",
+    "skills/manhattan-qq/scripts/manhattan_qq.py",
+    "skills/okg-search/DNAKIT.md",
+    "skills/okg-search/LICENSE",
+    "skills/okg-search/SKILL.md",
+    "skills/okg-search/UPSTREAM.md",
+    "skills/okg-search/references/upstream-readme.md",
+    "skills/okg-search/scripts/okg_search.py",
+    "skills/prs/DNAKIT.md",
+    "skills/prs/LICENSE",
+    "skills/prs/SKILL.md",
+    "skills/prs/UPSTREAM.md",
+    "skills/prs/references/COJO_FORMAT.md",
+    "skills/prs/references/SBAYESRC.md",
+    "skills/prs/references/upstream-readme.md",
+    "skills/prs/scripts/prs.py",
+    "skills/prs/scripts/sbayesrc_run.R",
+    "skills/qtl-candidate-gene/CITATION.cff",
+    "skills/qtl-candidate-gene/DNAKIT.md",
+    "skills/qtl-candidate-gene/EXAMPLE.md",
+    "skills/qtl-candidate-gene/LICENSE",
+    "skills/qtl-candidate-gene/SKILL.md",
+    "skills/qtl-candidate-gene/UPSTREAM.md",
+    "skills/qtl-candidate-gene/data/AccessionRename.txt",
+    "skills/qtl-candidate-gene/data/ITAG4.1_EB_regions.gff3",
+    "skills/qtl-candidate-gene/references/data-sources.md",
+    "skills/qtl-candidate-gene/references/interpretation-guide.md",
+    "skills/qtl-candidate-gene/references/upstream-readme.md",
+    "skills/qtl-candidate-gene/requirements.txt",
+    "skills/qtl-candidate-gene/scripts/cite_support.py",
+    "skills/qtl-candidate-gene/scripts/diagnostic_variants.py",
+    "skills/qtl-candidate-gene/scripts/gene_function.py",
+    "skills/qtl-candidate-gene/scripts/genes_in_interval.py",
+    "skills/qtl-candidate-gene/scripts/pubmed.py",
+    "skills/qtl-candidate-gene/scripts/verify_report.py",
+    "skills/tangermeme/DNAKIT.md",
+    "skills/tangermeme/LICENSE",
+    "skills/tangermeme/SKILL.md",
+    "skills/tangermeme/UPSTREAM.md",
+    "skills/tangermeme/references/annotate.md",
+    "skills/tangermeme/references/comparing-models.md",
+    "skills/tangermeme/references/deep_lift_shap.md",
+    "skills/tangermeme/references/design.md",
+    "skills/tangermeme/references/func-pattern.md",
+    "skills/tangermeme/references/io-loci.md",
+    "skills/tangermeme/references/model-wrapping.md",
+    "skills/tangermeme/references/motif-effects.md",
+    "skills/tangermeme/references/notebook-walkthrough.md",
+    "skills/tangermeme/references/plot.md",
+    "skills/tangermeme/references/product.md",
+    "skills/tangermeme/references/saturation_mutagenesis.md",
+    "skills/tangermeme/references/seqlets.md",
+    "skills/tangermeme/references/upstream-readme.md",
+    "skills/tangermeme/references/variant-effect.md",
+    "skills/twas/DNAKIT.md",
+    "skills/twas/LICENSE",
+    "skills/twas/SKILL.md",
+    "skills/twas/UPSTREAM.md",
+    "skills/twas/references/FUSION.md",
+    "skills/twas/references/upstream-readme.md",
+    "skills/twas/scripts/twas.py",
+    "skills/twas/scripts/twas_run.R",
+    "skills/upstream-manifest.json",
+    "skills/variant-annotate/DNAKIT.md",
+    "skills/variant-annotate/LICENSE",
+    "skills/variant-annotate/SKILL.md",
+    "skills/variant-annotate/UPSTREAM.md",
+    "skills/variant-annotate/references/upstream-readme.md",
+    "skills/variant-annotate/scripts/annotate.py",
+    "src/dnakit/genomics/breeding.py"
+  ],
+  "commands": {
+    "verify_import": "python others/skills/import_genomics_skills.py --check",
+    "synchronize_catalog": "python others/skills/sync_genomics_expansion.py",
+    "verify_catalog": "python others/skills/sync_genomics_expansion.py --check",
+    "regression_tests": "python -m pytest -q others/tests/unit/test_genomics_skill_expansion.py",
+    "install_example": "dnakit skills install qtl-candidate-gene --destination ./analysis-skills"
+  }
+}

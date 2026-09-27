@@ -1,0 +1,303 @@
+{
+  "dnakit.databases.cadd_get_scores": {
+    "variant": "chr7:g.140753336A>T",
+    "assembly": "hg38"
+  },
+  "dnakit.databases.call": {
+    "operation": "ensembl_lookup_gene",
+    "arguments": {
+      "id": "BRCA1",
+      "species": "homo_sapiens"
+    }
+  },
+  "dnakit.databases.ctd_get_chemical_gene_interactions": {
+    "input_terms": "bisphenol A"
+  },
+  "dnakit.databases.describe": {
+    "operation": "gnomad_get_sv_by_region"
+  },
+  "dnakit.databases.encode_search_experiments": {
+    "assay_title": "ATAC-seq",
+    "organism": "Homo sapiens",
+    "limit": 3
+  },
+  "dnakit.databases.execute": {
+    "request": {
+      "name": "ensembl_lookup_gene",
+      "arguments": {
+        "id": "BRCA1",
+        "species": "homo_sapiens"
+      }
+    }
+  },
+  "dnakit.databases.gbif_search_species": {
+    "query": "Arabidopsis thaliana",
+    "limit": 3
+  },
+  "dnakit.databases.gdc_get_clinical_data": {
+    "project_id": "TCGA-BRCA",
+    "size": 3
+  },
+  "dnakit.databases.gdc_get_mutation_frequency": {
+    "gene_symbol": "TP53"
+  },
+  "dnakit.databases.gdc_get_ssm_by_gene": {
+    "gene_symbol": "TP53",
+    "project_id": "TCGA-BRCA",
+    "size": 3
+  },
+  "dnakit.databases.gdc_get_survival": {
+    "project_id": "TCGA-BRCA"
+  },
+  "dnakit.databases.gdc_list_files": {
+    "data_type": "Gene Expression Quantification",
+    "size": 3
+  },
+  "dnakit.databases.gdc_list_projects": {
+    "program": "TCGA",
+    "size": 3
+  },
+  "dnakit.databases.gdc_search_cases": {
+    "project_id": "TCGA-BRCA",
+    "size": 3
+  },
+  "dnakit.databases.gtex_get_expression_summary": {
+    "gene_symbol": "TP53"
+  },
+  "dnakit.databases.gtex_query_eqtl": {
+    "gene_symbol": "TP53",
+    "size": 3
+  },
+  "dnakit.databases.hpa_get_protein_interactions_by_gene": {
+    "gene_name": "TP53"
+  },
+  "dnakit.databases.list_operations": {},
+  "dnakit.databases.mgnify_list_analyses": {
+    "study_accession": "MGYS00000596",
+    "size": 3
+  },
+  "dnakit.databases.mgnify_search_studies": {
+    "search": "human gut",
+    "size": 3
+  },
+  "dnakit.databases.orphanet_get_disease_genes": {
+    "orpha_code": "558"
+  },
+  "dnakit.databases.pdb_get_structure": {
+    "pdb_id": "1CRN",
+    "format": "cif"
+  },
+  "dnakit.databases.read_executed_notebook": {
+    "notebook_path": "analysis_executed.ipynb",
+    "max_output_chars": 2000
+  },
+  "dnakit.databases.search": {
+    "query": "gnomad",
+    "limit": 5
+  },
+  "dnakit.databases.string_get_functional_enrichment": {
+    "identifiers": "TP53\nBRCA1\nBRCA2",
+    "species": 9606
+  },
+  "dnakit.databases.web_search": {
+    "query": "NCBI genome assembly documentation",
+    "max_results": 3
+  },
+  "dnakit.databases.wiki_pathways_search": {
+    "query": "apoptosis",
+    "organism": "Homo sapiens",
+    "limit": 3
+  },
+  "dnakit.download.ena.sequence": {
+    "accession": "U00096.3",
+    "output_path": "ecoli_ena.fasta",
+    "format": "fasta"
+  },
+  "dnakit.download.ncbi.sequence": {
+    "accession": "NC_000913.3",
+    "output_path": "ecoli_ncbi.fasta",
+    "format": "fasta"
+  },
+  "dnakit.encode.batch_download": {
+    "download_dir": "downloads/encode",
+    "assay_title": "ATAC-seq",
+    "assembly": "GRCh38",
+    "file_format": "bed",
+    "limit": 3,
+    "dry_run": true
+  },
+  "dnakit.encode.compare_experiments": {
+    "accession1": "ENCSR133RZO",
+    "accession2": "ENCSR000AKS"
+  },
+  "dnakit.encode.download_files": {
+    "file_accessions": [
+      "ENCFF_REPLACE_ME"
+    ],
+    "download_dir": "downloads/encode"
+  },
+  "dnakit.encode.export_data": {
+    "format": "csv"
+  },
+  "dnakit.encode.get_citations": {
+    "export_format": "bibtex"
+  },
+  "dnakit.encode.get_experiment": {
+    "accession": "ENCSR133RZO"
+  },
+  "dnakit.encode.get_facets": {
+    "assay_title": "ATAC-seq",
+    "organism": "Homo sapiens"
+  },
+  "dnakit.encode.get_file_info": {
+    "accession": "ENCFF_REPLACE_ME"
+  },
+  "dnakit.encode.get_metadata": {
+    "metadata_type": "assays"
+  },
+  "dnakit.encode.get_provenance": {
+    "file_path": "analysis/consensus_peaks.bed"
+  },
+  "dnakit.encode.get_references": {
+    "reference_type": "doi"
+  },
+  "dnakit.encode.link_reference": {
+    "experiment_accession": "ENCSR133RZO",
+    "reference_type": "doi",
+    "reference_id": "10.1038/nature11247"
+  },
+  "dnakit.encode.list_files": {
+    "experiment_accession": "ENCSR133RZO",
+    "file_format": "bed",
+    "limit": 3
+  },
+  "dnakit.encode.list_tracked": {
+    "assay_title": "ATAC-seq"
+  },
+  "dnakit.encode.log_derived_file": {
+    "file_path": "analysis/consensus_peaks.bed",
+    "source_accessions": [
+      "ENCFF_REPLACE_ME"
+    ],
+    "description": "Consensus peak set",
+    "file_type": "bed"
+  },
+  "dnakit.encode.manage_credentials": {
+    "action": "check"
+  },
+  "dnakit.encode.search_experiments": {
+    "assay_title": "ATAC-seq",
+    "organism": "Homo sapiens",
+    "limit": 3
+  },
+  "dnakit.encode.search_files": {
+    "file_format": "bed",
+    "assembly": "GRCh38",
+    "assay_title": "ATAC-seq",
+    "limit": 3
+  },
+  "dnakit.encode.summarize_collection": {},
+  "dnakit.encode.track_experiment": {
+    "accession": "ENCSR133RZO"
+  },
+  "dnakit.search.ncbi.accessions": {
+    "uids": [
+      "556503834"
+    ]
+  },
+  "dnakit.workflows.resource_path": {
+    "skill_id": "genomic-coordinates",
+    "resource": "scripts/convert_coords.py"
+  },
+  "dnakit.workflows.run": {
+    "skill_id": "genomic-coordinates",
+    "script": "scripts/convert_coords.py",
+    "arguments": [
+      "--from",
+      "bed",
+      "--to",
+      "gff",
+      "chr1",
+      "999",
+      "1000",
+      "--format",
+      "json"
+    ],
+    "timeout_seconds": 60
+  },
+  "dnakit.workflows.run_support": {
+    "name": "gwas-lookup",
+    "arguments": [
+      "--help"
+    ]
+  },
+  "dnakit.workflows.scripts": {
+    "skill_id": "genomic-coordinates"
+  },
+  "dnakit.workflows.write_wes_report": {
+    "input_report": "report.md",
+    "output_dir": "reports/pdf"
+  },
+  "dnakit.workflows.simulate_inheritance": {
+    "father": {
+      "id": "father",
+      "sex": "Male",
+      "loci": {
+        "L1": {
+          "chromosome": "1",
+          "position": 1,
+          "ref": "A",
+          "alt": "C",
+          "dominance": "additive",
+          "effect_size": 1,
+          "alleles": [
+            "A",
+            "A"
+          ]
+        }
+      }
+    },
+    "mother": {
+      "id": "mother",
+      "sex": "Female",
+      "loci": {
+        "L1": {
+          "chromosome": "1",
+          "position": 1,
+          "ref": "A",
+          "alt": "C",
+          "dominance": "additive",
+          "effect_size": 1,
+          "alleles": [
+            "C",
+            "C"
+          ]
+        }
+      }
+    },
+    "trait_registry": {
+      "traits": {
+        "dosage": {
+          "loci": [
+            {
+              "chromosome": "1",
+              "position": 1,
+              "ref": "A",
+              "alt": "C",
+              "dominance": "additive",
+              "effect_size": 1,
+              "id": "L1",
+              "effect": 1
+            }
+          ]
+        }
+      }
+    },
+    "disease_registry": {
+      "diseases": {}
+    },
+    "offspring_count": 2,
+    "mutation_rate": 0,
+    "seed": 13
+  }
+}

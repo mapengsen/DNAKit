@@ -23,7 +23,9 @@ DNAKit 可以通过 MCP 被 Codex、Claude、Cursor、VS Code 等支持 MCP 的 
 
 使用 DeepSeek 等模型 API 时，需要选择同时支持该 API 和 MCP 的 Agent，或自行实现 MCP 客户端。
 模型服务能否切换取决于 Agent。DNAKit 的内置 `run_agent()` 则直接调用本地工具目录，不经过 MCP，
-用法见 [Python API](python_api.md)。
+用法见 [Agent](agent.md)。
+
+工具生成、说明优化或兼容修复、本地结果缓存和知识库检索（RAG）由内置 `run_agent()` 的[对应配置](agent.md#agent-actions)开启，不是 MCP 新增动作，也不会自动为其他 MCP 客户端开启这些能力。已验证并登记到 DNAKit 的生成工具由现有搜索、描述和调用入口使用；独立运行的 MCP 服务需重启后加载更新。
 
 下面的完整流程是：**安装 → 配置客户端 → 检查连接 → 输入自然语言任务**。
 

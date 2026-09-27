@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "data": "deterministic synthetic fixtures; no biological accuracy claim",
+  "subprocess_popen": "blocked during all four checks; in-process APIs inspected",
+  "versions": {
+    "numpy": "2.4.6",
+    "pyfastani": "0.6.2",
+    "pyrodigal": "3.7.1",
+    "pysam": "0.24.1"
+  },
+  "checks": {
+    "pca": {
+      "eigenvalues": [
+        2.9999999999999996,
+        0.9999999999999998
+      ],
+      "status": "passed"
+    },
+    "ani": {
+      "ani_percent": 99.99934387207031,
+      "query_fragments": 20,
+      "status": "passed"
+    },
+    "cds_prediction": {
+      "genes": 1,
+      "status": "passed"
+    },
+    "bam_statistics": {
+      "records": 1,
+      "status": "passed"
+    }
+  },
+  "verified_at": "2026-09-21T01:54:22.635533+00:00",
+  "python": "3.11.9",
+  "system": "Linux",
+  "architecture": "x86_64",
+  "installation": {
+    "type": "built wheel with genomics extra in fresh venv",
+    "wheel": "dnakit-0.1.4-py3-none-any.whl",
+    "sha256": "755f6b40e5e5ad49eff85d4935c3a52d39bc833109afe7295d1bf9e9095a49e9",
+    "source_match": [
+      "dnakit/genomics/ani.py",
+      "dnakit/genomics/population.py",
+      "dnakit/genomics/__init__.py"
+    ],
+    "genomics_dependencies": [
+      "numpy>=1.26,<3",
+      "pyrodigal>=3.7,<4",
+      "pysam>=0.22,<0.25",
+      "pyfastani>=0.6.2,<0.7"
+    ]
+  },
+  "execution_environment": {
+    "cwd": "outside source checkout",
+    "PYTHONPATH": "empty",
+    "PATH": "empty",
+    "PYTHONNOUSERSITE": "1"
+  },
+  "tests": {
+    "new_api_tests": 80,
+    "related_suite_passed": 251,
+    "related_suite_failed": 0,
+    "additional_pca_python": "3.14.6",
+    "additional_pca_passed": 51
+  },
+  "tool_catalog": {
+    "genotype_pca": "JSON call passed",
+    "average_nucleotide_identity": "JSON call passed"
+  },
+  "quality": {
+    "ruff": "passed",
+    "mypy_new_runtime_and_validation": "passed",
+    "mkdocs_strict_zh_and_en": "passed",
+    "migration_catalog": "43/43 unique IDs in both languages",
+    "independent_code_review": "passed after correcting ANI tolerance and process-guard wording"
+  },
+  "source_sha256": {
+    "src/dnakit/genomics/ani.py": "777c77c4f13db18850a237469f66f971c796bca415a0ed77c998c29548aab6a0",
+    "src/dnakit/genomics/population.py": "a4f140a3fa0b54a75cc45311b32d803f5ec6fbb082f2f7a3f9dd2fe0f96b551f",
+    "src/dnakit/genomics/__init__.py": "d39d100e70d5f09f06d61421cc26cb57490346f6511ee5b3dde747b8c7f399f3",
+    "others/validation/pip_genomics.py": "46c43af5e59cb2d8234a75e0a353e8531911df86e7c0e02ae4dac84c9b7627b3",
+    "pyproject.toml": "d0fb92a70bc4d57b8c2f02e71dd6b10a1f507c5a960ee556c6ad3b350e94c552"
+  },
+  "limits": [
+    "Synthetic fixtures only; no real biological accuracy benchmark.",
+    "Wheel installation tested on Linux x86_64 / Python 3.11; other platforms are not claimed validated.",
+    "Only genotype PCA and ANI are new APIs; the other external adapters retain their original dependencies.",
+    "Current checkout has not been published to PyPI."
+  ]
+}

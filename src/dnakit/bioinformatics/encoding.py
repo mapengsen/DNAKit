@@ -14,7 +14,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
-from dnakit.bioinformatics._common import positive, require, sequence_text
+from dnakit.bioinformatics._common import named_sequence_items, positive, require, sequence_text
+from dnakit.core import DNA
 from dnakit.exceptions import ConfigurationError
 
 DNA_ENCODINGS = (
@@ -365,7 +366,7 @@ def _composition(text: str, descriptor: str, parameters: Mapping[str, Any]) -> d
 
 
 def encode_dna(
-    sequences: Mapping[str, Any],
+    sequences: DNA | Mapping[str, Any],
     descriptor: str,
     *,
     parameters: Mapping[str, Any] | None = None,
@@ -376,7 +377,9 @@ def encode_dna(
     max_input_bases: int = 1_000_000,
     verbose: bool = True,
 ) -> EncodingResult:
-    """Compute native DNA features. Positional encodings require equal lengths.
+    """Compute native DNA features from DNA or named sequences.
+
+    Positional encodings require equal lengths.
 
     PSTNP/KNN use only explicit training labels and exclude the current training
     sample from its own reference set. PSTNPds folds A/T and C/G to A/C.
@@ -384,11 +387,12 @@ def encode_dna(
     toolkits is implied. Undefined short/constant inputs raise ConfigurationError.
     """
     np = require("numpy", "bio-analysis")
-    if descriptor not in DNA_ENCODINGS or not sequences:
+    items = named_sequence_items(sequences)
+    if descriptor not in DNA_ENCODINGS or not items:
         raise ConfigurationError("Provide sequences and a descriptor from DNA_ENCODINGS.")
-    if any(not isinstance(key, str) or not key for key in sequences):
+    if any(not isinstance(key, str) or not key for key, _ in items):
         raise ConfigurationError("Sequence IDs must be non-empty strings.")
-    texts = {key: sequence_text(value) for key, value in sequences.items()}
+    texts = {key: sequence_text(value) for key, value in items}
     if any(set(value) - set("ACGT") for value in texts.values()):
         raise ConfigurationError("Native encodings require canonical A/C/G/T sequences.")
     options = dict(parameters or {})

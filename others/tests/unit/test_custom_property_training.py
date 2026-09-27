@@ -73,23 +73,86 @@ class _FakeHTTPResponse:
 def test_custom_training_capabilities_and_secret_repr() -> None:
     capabilities = {item.name: item for item in available_custom_training_models()}
     assert capabilities["dnabert2"].full_finetune is True
-    assert capabilities["alphagenome"].full_finetune is False
+    assert all(item.full_finetune for item in capabilities.values())
     assert all(item.linear_probe for item in capabilities.values())
 
     llm = LLMSchemaConfig(api_key="do-not-display")
     assert "do-not-display" not in repr(llm)
     assert llm.endpoint == "https://api.deepseek.com/chat/completions"
-    with pytest.raises(ConfigurationError) as unsupported:
+    for model in capabilities:
         CustomPropertyTrainingConfig(
             task_type="classification",
-            model="alphagenome",
+            model=model,
             finetune_method="full",
         )
-    assert unsupported.value.code == "CUSTOM_FULL_FINETUNE_UNSUPPORTED"
     with pytest.raises(ConfigurationError):
         LLMSchemaConfig(api_key="unsafe\nheader")
     with pytest.raises(ConfigurationError):
         DataMapping(delimiter="\n")
+
+
+def test_full_training_rejects_unsafe_half_precision_optimizer() -> None:
+    with pytest.raises(ConfigurationError, match="float16 optimizer"):
+        CustomPropertyTrainingConfig(task_type="regression", model="enformer", dtype="float16")
+    config = CustomPropertyTrainingConfig(
+        task_type="regression", model="enformer", finetune_method="linear_probe", dtype="float16"
+    )
+    assert config.finetune_method == "linear_probe"
+
+
+def test_cli_passes_native_training_and_relocated_source_options(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from types import SimpleNamespace
+
+    from typer.testing import CliRunner
+
+    from dnakit.cli.app import app
+
+    captured: dict[str, Any] = {}
+
+    def train(source: Path, *, config: CustomPropertyTrainingConfig) -> Any:
+        captured["training"] = config
+        return SimpleNamespace(to_dict=lambda: {"model": config.model})
+
+    def predict(source: Path, **options: Any) -> Any:
+        captured["prediction"] = options
+        return SimpleNamespace(to_dict=lambda: {"record_count": 0})
+
+    monkeypatch.setattr("dnakit.predictions.train_custom_property_model", train)
+    monkeypatch.setattr("dnakit.predictions.predict_custom_properties", predict)
+    source = tmp_path / "data.csv"
+    source.write_text("sequence,label\nACGT,1\n", encoding="utf-8")
+    model_dir = tmp_path / "trained"
+    model_source = tmp_path / "source-code"
+    result = CliRunner().invoke(
+        app,
+        [
+            "train-property",
+            str(source),
+            str(model_dir),
+            "--task-type",
+            "classification",
+            "--model",
+            "janusdna",
+            "--model-source-path",
+            str(model_source),
+            "--dtype",
+            "float32",
+            "--workers",
+            "0",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert Path(captured["training"].model_source_path) == model_source
+    assert captured["training"].workers == 0
+    assert captured["training"].dtype == "float32"
+    result = CliRunner().invoke(
+        app,
+        ["predict-property", str(source), str(model_dir), "--model-source-path", str(model_source)],
+    )
+    assert result.exit_code == 0, result.output
+    assert captured["prediction"]["model_source_path"] == model_source
 
 
 @pytest.mark.parametrize("method", ["full", "linear_probe"])

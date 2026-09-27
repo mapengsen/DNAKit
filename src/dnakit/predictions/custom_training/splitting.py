@@ -46,10 +46,9 @@ class SplitAssignment:
     warnings: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        groups = (self.train, self.validation, self.test)
-        if any(not group for group in groups):
+        if not self.train:
             raise InputFormatError(
-                "Training, validation, and test splits must all be non-empty.",
+                "The training split must be non-empty; validation and test are optional.",
                 code="INVALID_CUSTOM_SPLIT",
             )
         flattened = (*self.train, *self.validation, *self.test)
@@ -66,14 +65,15 @@ class SplitAssignment:
 
 
 def _counts(total: int, ratios: tuple[float, float, float]) -> tuple[int, int, int]:
-    if total < 3:
+    active = [index for index, ratio in enumerate(ratios) if ratio > 0]
+    if total < len(active):
         raise InputFormatError(
-            "At least 3 records are required for an 8:1:1-style split.",
+            "At least one record is required per nonzero split ratio.",
             code="CUSTOM_DATA_TOO_SMALL",
             context={"record_count": total},
         )
     raw = [total * ratio for ratio in ratios]
-    counts = [max(1, int(value)) for value in raw]
+    counts = [max(1, int(value)) if ratios[index] > 0 else 0 for index, value in enumerate(raw)]
     while sum(counts) > total:
         candidates = [index for index, value in enumerate(counts) if value > 1]
         if not candidates:
@@ -81,7 +81,7 @@ def _counts(total: int, ratios: tuple[float, float, float]) -> tuple[int, int, i
         index = max(candidates, key=lambda item: (counts[item] - raw[item], counts[item]))
         counts[index] -= 1
     while sum(counts) < total:
-        index = max(range(3), key=lambda item: (raw[item] - counts[item], ratios[item]))
+        index = max(active, key=lambda item: (raw[item] - counts[item], ratios[item]))
         counts[index] += 1
     return counts[0], counts[1], counts[2]
 
@@ -149,6 +149,8 @@ def _stratified_indices(
     np = _numpy()
     indices = np.arange(total)
     train_count, validation_count, test_count = counts
+    if validation_count + test_count == 0:
+        return tuple(range(total)), (), ()
     first = StratifiedShuffleSplit(
         n_splits=1,
         train_size=train_count,
@@ -158,6 +160,13 @@ def _stratified_indices(
     train_positions, remaining_positions = next(first.split(indices, labels))
     remaining = indices[remaining_positions]
     remaining_labels = np.asarray(labels, dtype=object)[remaining_positions]
+    if not validation_count or not test_count:
+        held_out = tuple(int(value) for value in remaining)
+        return (
+            tuple(int(value) for value in indices[train_positions]),
+            held_out if validation_count else (),
+            held_out if test_count else (),
+        )
     second = StratifiedShuffleSplit(
         n_splits=1,
         train_size=validation_count,

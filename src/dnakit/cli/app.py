@@ -1062,14 +1062,49 @@ def train_property_command(
     test_ratio: Annotated[float, typer.Option(help="Test fraction.")] = 0.1,
     seed: Annotated[int, typer.Option(help="Random split/training seed.")] = 42,
     epochs: Annotated[int, typer.Option(help="Maximum training epochs.")] = 10,
-    batch_size: Annotated[int, typer.Option(help="Training batch size.")] = 8,
+    batch_size: Annotated[
+        int, typer.Option(help="Training batch size on the selected device.")
+    ] = 8,
+    workers: Annotated[
+        int, typer.Option(help="CPU data-loader processes; 0 disables workers.")
+    ] = 6,
     learning_rate: Annotated[
         float | None, typer.Option(help="Optional learning-rate override.")
     ] = None,
+    beta1: Annotated[float, typer.Option(help="AdamW beta1.")] = 0.9,
+    beta2: Annotated[float, typer.Option(help="AdamW beta2.")] = 0.95,
+    weight_decay: Annotated[float, typer.Option(help="AdamW weight decay.")] = 0.1,
+    gradient_accumulation_steps: Annotated[
+        int, typer.Option(help="Batches per optimizer step.")
+    ] = 1,
+    early_stopping_patience: Annotated[
+        int, typer.Option(help="Validation epochs without improvement; 0 disables early stopping.")
+    ] = 3,
+    lr_scheduler: Annotated[str, typer.Option(help="none or reduce_on_plateau.")] = "none",
+    scheduler_patience: Annotated[
+        int, typer.Option(help="Tolerated bad epochs before reducing the learning rate.")
+    ] = 1,
+    scheduler_factor: Annotated[float, typer.Option(help="Learning-rate reduction factor.")] = 0.5,
+    monitor: Annotated[
+        str,
+        typer.Option(
+            help="Validation metric: validation_loss, mcc, f1_macro, accuracy, rmse, mae."
+        ),
+    ] = "validation_loss",
+    monitor_mode: Annotated[str, typer.Option(help="auto, min, or max.")] = "auto",
+    monitor_min_delta: Annotated[
+        float, typer.Option(help="Absolute minimum metric improvement.")
+    ] = 1e-12,
     checkpoint_dir: Annotated[Path | None, typer.Option(help="Checkpoint cache root.")] = None,
     checkpoint_path: Annotated[Path | None, typer.Option(help="Existing local checkpoint.")] = None,
+    model_source_path: Annotated[
+        Path | None, typer.Option(help="Local source checkout for native model backends.")
+    ] = None,
     max_length: Annotated[int | None, typer.Option(help="Tokenizer/model input limit.")] = None,
     device: Annotated[str, typer.Option(help="auto, cpu, cuda, or cuda:N.")] = "auto",
+    dtype: Annotated[
+        str, typer.Option(help="auto, float32, bfloat16; float16 is limited to linear probing.")
+    ] = "auto",
     allow_remote_code: Annotated[
         bool,
         typer.Option(
@@ -1116,11 +1151,25 @@ def train_property_command(
             seed=seed,
             epochs=epochs,
             batch_size=batch_size,
+            workers=workers,
             learning_rate=learning_rate,
+            beta1=beta1,
+            beta2=beta2,
+            weight_decay=weight_decay,
+            gradient_accumulation_steps=gradient_accumulation_steps,
+            early_stopping_patience=early_stopping_patience,
+            lr_scheduler=lr_scheduler,  # type: ignore[arg-type]
+            scheduler_patience=scheduler_patience,
+            scheduler_factor=scheduler_factor,
+            monitor=monitor,  # type: ignore[arg-type]
+            monitor_mode=monitor_mode,  # type: ignore[arg-type]
+            monitor_min_delta=monitor_min_delta,
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
+            model_source_path=model_source_path,
             max_length=max_length,
             device=device,
+            dtype=dtype,  # type: ignore[arg-type]
             allow_remote_code=allow_remote_code,
             overwrite=overwrite,
         )
@@ -1133,6 +1182,9 @@ def train_property_command(
 def predict_property_command(
     input_path: Annotated[Path, typer.Argument(help="Local sequence dataset to predict.")],
     model_dir: Annotated[Path, typer.Argument(help="Saved custom-property model directory.")],
+    model_source_path: Annotated[
+        Path | None, typer.Option(help="Override the saved model source checkout path.")
+    ] = None,
     input_format: Annotated[str, typer.Option("--input-format")] = "auto",
     sequence_field: Annotated[str | None, typer.Option(help="Sequence field or dot path.")] = None,
     id_field: Annotated[str | None, typer.Option(help="Optional record-ID field.")] = None,
@@ -1169,6 +1221,7 @@ def predict_property_command(
             predict_custom_properties(
                 input_path,
                 model_dir=model_dir,
+                model_source_path=model_source_path,
                 mapping=mapping,
                 batch_size=batch_size,
                 device=device,

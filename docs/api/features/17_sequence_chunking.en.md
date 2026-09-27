@@ -1,122 +1,150 @@
-# OPS-010 sequence segmentation
+# sequence segmentation
 
-Public processing APIs share [file and text input rules](00_processing_inputs.md).
-
-**Function:** Cut long DNA into fragments with source coordinates according to a fixed window, overlapping sliding window, random interval or multi-scale strategy, and return them one by one with an iterator for model input, partition analysis and large sequence flow processing.
-
-Split DNA sequences according to fixed length, sliding window, random interval, or multi-scale strategies to generate sequence fragments with coordinates.
-
-All splits use 0-based, half-open interval coordinates, and lazily return `SequenceChunk`. The entire result will not be read into memory at once.
-
-<span id="1"></span>**Sequence Segmentation Overview**
-
-The API entrance is as follows:
-
-- `dnakit.iter_sequence_chunks(value[required], config[optional], start[optional], end[optional], source_id[optional], split[optional], region_index[optional], progress[optional])`: split into single `DNASequence` or `DNARecord`;
-- `dnakit.iter_fasta_chunks(source[required], config[optional], bed[optional], read_config[optional], progress[optional])`: Read and split FASTA one by one;
-- `dnakit.ChunkingConfig(strategy[optional], length[optional], step[optional], min_length[optional], max_length[optional], num_samples[optional], lengths[optional], steps[optional], stage_steps[optional], include_partial[optional], seed[optional], split[optional], allow_gaps[optional])`: Define the segmentation strategy;
-- `dnakit.make_length_curriculum(lengths[required], stage_steps[optional])`: Create a training plan of short length first and then long length;
-- `dnakit.LengthCurriculum.to_config(window_step[optional], include_partial[optional], seed[optional], split[optional], allow_gaps[optional])`: Convert length plan to split configuration;
-- `dnakit.SequenceChunk.to_record()`: Convert the segmentation result to `DNARecord`, no calling parameters.
-
-All strategies return a lazy `SequenceChunk` and retain provenance information such as source ID, start and end coordinates, split, strategy and scale numbers.
+All chunk coordinates are 0-based and half-open. Results are yielded lazily.
 
 ## 1) Fixed length, no overlap <span id="2"></span> {#fixed-non-overlapping-chunks}
 
-**Function:** Generate fragments of the same length and non-overlapping from the starting point of the sequence, and return the source coordinates of each fragment, suitable for establishing training samples or analysis units without repeated coverage.
-
-This is the default policy for `OPS-010 Sequence Chunking`. Each window length is specified by `length`; windows do not overlap, and an incomplete trailing window is discarded by default.
+- **Purpose:** Generate nonoverlapping fixed-length fragments.
+- **Method:** Advance by length from the start; discard incomplete trailing chunks unless include_partial=True.
+- **API:** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **Input:** A DNASequence or DNARecord and the lengths/step/sampling settings shown below.
+- **Output:** Returns an iterator of `SequenceChunk` entries with sequence and start/end coordinates.
+- **Example code:**
 
 ```python
-from dnakit import ChunkingConfig, iter_fasta_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(length=1024)
-for chunk in iter_fasta_chunks("genome.fa", config=config):
-    print(chunk.id, chunk.source_start, chunk.source_end)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(length=4)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-If you need to keep a window with insufficient length at the end, set `include_partial=True`.
+- **Example output:**
+
+```text
+[(0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
 ## 2) Fixed length, overlapping sliding window <span id="3"></span> {#overlapping-sliding-chunks}
 
-**Function:** Generate overlapping fragments according to the specified window length and step size, so that bases near the boundaries appear in multiple windows, suitable for local predictions that require continuous context coverage.
-
-Use `strategy="sliding"` and `step` to set the distance between the start points of the windows. Windows overlap when `step` is smaller than `length`.
+- **Purpose:** Generate overlapping windows at a fixed step.
+- **Method:** Advance by step with 1 ≤ step ≤ length.
+- **API:** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **Input:** A DNASequence or DNARecord and the lengths/step/sampling settings shown below.
+- **Output:** Returns an iterator of `SequenceChunk` entries with overlapping window sequences and coordinates.
+- **Example code:**
 
 ```python
-from dnakit import ChunkingConfig, iter_sequence_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(strategy="sliding", length=1024, step=512)
-for chunk in iter_sequence_chunks(sequence, config=config):
-    print(chunk.source_start, chunk.source_end)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="sliding", length=4, step=2)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-`step` cannot be larger than the window length, otherwise uncovered gaps will occur.
+- **Example output:**
+
+```text
+[(0, 4, 'AACC'), (2, 6, 'CCGG'), (4, 8, 'GGTT')]
+```
 
 ## 3) Random interval <span id="4"></span> {#random-interval-chunks}
 
-**Function:** Extract a specified number of random fragments within the allowed length range and coordinate range, and ensure reproduction through seed. It is suitable for random training sampling or sampling inspection of long sequences.
-
-The random strategy generates a specified number of random intervals within the range `min_length` and `max_length`. Setting `seed` gives reproducible results.
+- **Purpose:** Sample reproducible random fragments.
+- **Method:** Seed the random source and sample num_samples intervals in the requested length range; repeated intervals are possible.
+- **API:** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **Input:** A DNASequence or DNARecord and the lengths/step/sampling settings shown below.
+- **Output:** Returns an iterator of `SequenceChunk` entries with sampled sequence and coordinates.
+- **Example code:**
 
 ```python
-from dnakit import ChunkingConfig, iter_sequence_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(
-    strategy="random",
-    min_length=512,
-    max_length=2048,
-    num_samples=100,
-    seed=19,
-)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="random", min_length=2, max_length=4, num_samples=3, seed=19)
 chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
+```
+
+- **Example output:**
+
+```text
+[(0, 4, 'AACC'), (0, 4, 'AACC'), (1, 5, 'ACCG')]
 ```
 
 ## 4) Multi-scale <span id="5"></span> {#multiscale-chunks}
 
-**Function:** Use multiple window lengths to generate short, medium, and long scale fragments and mark scale numbers, which is used to simultaneously model local motifs and longer range contexts.
-
-The multi-scale strategy generates windows for each length in `lengths`, suitable for extracting both local and longer-range context.
+- **Purpose:** Split the same sequence at multiple lengths.
+- **Method:** Generate windows in lengths order; windows are nonoverlapping within each scale by default.
+- **API:** `dnakit.iter_sequence_chunks(value, config=ChunkingConfig(...))`
+- **Input:** A DNASequence or DNARecord and the lengths/step/sampling settings shown below.
+- **Output:** Returns an iterator of `SequenceChunk` entries with window length, sequence, and coordinates.
+- **Example code:**
 
 ```python
-from dnakit import ChunkingConfig, iter_fasta_chunks
+from dnakit import DNASequence, ChunkingConfig, iter_sequence_chunks
 
-config = ChunkingConfig(
-    strategy="multiscale",
-    lengths=(1024, 4096, 16384),
-)
-chunks = iter_fasta_chunks("genome.fa", config=config, bed="splits.bed")
-for chunk in chunks:
-    print(chunk.id, chunk.level_index, chunk.requested_length)
+sequence = DNASequence("AACCGGTT")
+config = ChunkingConfig(strategy="multiscale", lengths=(2, 4))
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-The scales do not overlap by default. You can also specify the step size for each scale through `steps`.
+- **Example output:**
+
+```text
+[(0, 2, 'AA'), (2, 4, 'CC'), (4, 6, 'GG'), (6, 8, 'TT'), (0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
 ## 5) Short first and then long <span id="6"></span> {#length-curriculum-chunks}
 
-**Function:** Define the sequence length and number of continuous steps used in the training phase, and then convert it into the corresponding segmentation configuration, which is used to implement the curriculum data plan that gradually increases from short segments to long segments.
-
-Use `make_length_curriculum()` to create a training plan that gradually increases sequence length, and then use `to_config()` to convert to a split configuration.
+- **Purpose:** Create a short-to-long sequence-length curriculum.
+- **Method:** Pair lengths with stage_steps and call to_config(); the plan does not start training.
+- **API:** `dnakit.make_length_curriculum(lengths, stage_steps=...)` → `curriculum.to_config()` → `iter_sequence_chunks(...)`
+- **Input:** A DNASequence or DNARecord and the lengths/step/sampling settings shown below.
+- **Output:** Returns `LengthCurriculum` with selected chunk lengths by stage.
+- **Example code:**
 
 ```python
-from dnakit import iter_fasta_chunks, make_length_curriculum
+from dnakit import DNASequence, make_length_curriculum, iter_sequence_chunks
 
-curriculum = make_length_curriculum(
-    (1024, 4096, 16384),
-    stage_steps=(1000, 2000, 3000),
-)
+sequence = DNASequence("AACCGGTT")
+curriculum = make_length_curriculum((2, 4), stage_steps=(10, 20))
 config = curriculum.to_config()
-chunks = iter_fasta_chunks("genome.fa", config=config)
+chunks = iter_sequence_chunks(sequence, config=config)
+print([(c.source_start, c.source_end, c.sequence.symbols) for c in chunks])
 ```
 
-This plan only describes the segmentation phases and does not automatically start training.
+- **Example output:**
 
-<span id="7-fastabed"></span>**FASTA, BED and result metadata**
+```text
+[(0, 2, 'AA'), (2, 4, 'CC'), (4, 6, 'GG'), (6, 8, 'TT'), (0, 4, 'AACC'), (4, 8, 'GGTT')]
+```
 
-`iter_sequence_chunks()` is used to split a single piece `DNASequence` or `DNARecord`; `iter_fasta_chunks()` is used to read and split FASTA one by one.
+<span id="1"></span><span id="7-fastabed"></span>[FAQ: details](../../faq/tutorial_basics.md#chunking-details)
 
-When `bed` is not passed, all FASTA records use the `train` tag by default; when BED is passed in, the first column of the BED is required to be exactly the same as the FASTA ID, and the fourth column can use `train`, `valid`, `test` and other tags.
+## Paired strands and multi-format export {#paired-chunk-export}
 
-Each `SequenceChunk` contains `source_id`, `source_start`, `source_end`, `split`, `strategy`, and `level_index`. After calling `to_record()`, the source ID, start and end coordinates, split and scale numbers are written to the record metadata.
+`dnakit.chunking.iter_paired_chunks(source, reverse_source=None, config=None, read_config=None, source_ids=None)` reads forward FASTA and yields adjacent forward/reverse-complement row dictionaries. Fields are `id, sequence, pair_id, source_id, source_start, source_end, strand`. Both strands share a coordinate-based pair ID and use zero-based, half-open coordinates on the forward source.
 
-Pass in `progress=callback` to receive `started`, `yielded`, `completed` events. The current FASTA reader retains one FASTA record at a time; when handling large chromosome-level records, adjust the input limit for `ReadConfig` based on actual memory.
+An optional `reverse_source` must contain whole-record reverse complements with matching IDs, order and lengths. These structural conditions are checked; callers are responsible for supplying actual reverse complements. A forward interval `[start:end)` corresponds to `[L-end:L-start)` in that file. When omitted, reverse complements are computed from each chunk. `source_ids` filters FASTA IDs. For file paths without an explicit `read_config`, the read limits are sized to the larger input file; streams may need an explicit `ReadConfig`. The reader holds one chromosome pair at a time, without collecting all output chunks.
+
+`export_paired_chunks(source, target, ..., overwrite=False)` writes the same iterator to one or several paths and returns `pair_count`, `record_count`, the configured `length`, and `coordinates`. CSV, TSV, JSON, JSONL, Parquet and FASTA suffixes are supported, including empty outputs. Tables retain every field; FASTA retains IDs and sequences.
+
+```python
+from dnakit.chunking import ChunkingConfig, export_paired_chunks
+from dnakit.io import save_json
+
+result = export_paired_chunks(
+    "normalized.fasta",
+    ["output/chunks.csv", "output/chunks.fasta"],
+    reverse_source="reverse_complement.fasta",
+    config=ChunkingConfig(length=1000),
+    overwrite=True,
+)
+save_json(result, "output/result.json", overwrite=True)
+```
+
+Each pair consists of two separate 1000 bp records, totaling 2000 bp. File-path read limits adapt to hg38 automatically; callers may still set `read_config` for streams or special inputs. Normalization, reverse complementation and chunking remain separate operations, while parsing and serialization are handled by the library.

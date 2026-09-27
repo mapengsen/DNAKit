@@ -7,7 +7,7 @@ import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Literal, TypeAlias
+from typing import Literal, TypeAlias, cast
 from urllib.parse import urlparse
 
 from dnakit._verbosity import register_public as _register_public_verbose
@@ -451,12 +451,15 @@ def available_custom_training_models(*, verbose: bool = True) -> tuple[CustomTra
 
     from dnakit.representations import available_embedding_models
 
+    from .encoder_factory import TRAINABLE_LOADERS
+
     models: list[CustomTrainingModel] = []
     for name in available_embedding_models():
         spec = get_embedding_model(name)
-        full = spec.loader == "transformers"
+        full = spec.loader in TRAINABLE_LOADERS
         notes = (
-            "Full fine-tuning and frozen linear probing are supported."
+            "Full backbone fine-tuning and frozen linear probing are supported; "
+            "the model's optional runtime and local weights are required."
             if full
             else (
                 "Frozen linear probing is supported; this backend does not expose a "
@@ -486,6 +489,13 @@ class CustomPropertyTrainingConfig:
     followed by a final fit on all its rows. This ML-only mode ignores the three
     split ratios, rejects mapped split columns, and never reads an external test
     set. Fold membership and held-out predictions are saved locally.
+
+    Neural training can use ``lr_scheduler='reduce_on_plateau'`` with a
+    validation ``monitor`` such as ``'mcc'``. Its auto mode maximizes
+    classification scores and minimizes loss or regression errors. Scheduling,
+    early stopping, and best-checkpoint selection share the same monitor and
+    absolute ``monitor_min_delta``. The default keeps loss-based selection and
+    a fixed learning rate.
     """
 
     task_type: TaskType
@@ -531,6 +541,15 @@ class CustomPropertyTrainingConfig:
     kmer_k: int = 3
     standardize_features: bool = True
     cv_folds: int | None = None
+    lr_scheduler: Literal["none", "reduce_on_plateau"] = "none"
+    scheduler_patience: int = 1
+    scheduler_factor: float = 0.5
+    monitor: Literal["validation_loss", "mcc", "f1_macro", "accuracy", "rmse", "mae"] = (
+        "validation_loss"
+    )
+    monitor_mode: Literal["auto", "min", "max"] = "auto"
+    monitor_min_delta: float = 1e-12
+    log_train_metrics: bool = False
 
     def __post_init__(self) -> None:
         if self.task_type not in {"classification", "regression"}:
@@ -538,10 +557,45 @@ class CustomPropertyTrainingConfig:
                 "task_type must be 'classification' or 'regression'.",
                 code="INVALID_CUSTOM_PROPERTY_CONFIG",
             )
+        if self.lr_scheduler not in {"none", "reduce_on_plateau"}:
+            raise ConfigurationError(
+                "lr_scheduler must be 'none' or 'reduce_on_plateau'.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
+        supported_monitors = {"validation_loss"} | (
+            {"mcc", "f1_macro", "accuracy"}
+            if self.task_type == "classification"
+            else {"rmse", "mae"}
+        )
+        if self.monitor not in supported_monitors:
+            raise ConfigurationError(
+                f"monitor must be one of {sorted(supported_monitors)} for {self.task_type}.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
+        if self.monitor_mode not in {"auto", "min", "max"}:
+            raise ConfigurationError(
+                "monitor_mode must be 'auto', 'min', or 'max'.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
+        if self.finetune_method == "machine_learning" and (
+            self.lr_scheduler != "none" or self.monitor != "validation_loss"
+        ):
+            raise ConfigurationError(
+                "lr_scheduler and monitor apply only to full or linear_probe training.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
         if self.finetune_method not in {"full", "linear_probe", "machine_learning"}:
             raise ConfigurationError(
                 "finetune_method must be 'full', 'linear_probe' or 'machine_learning'.",
                 code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
+        if self.finetune_method == "full" and self.dtype == "float16":
+            raise ConfigurationError(
+                "Full fine-tuning does not support float16 optimizer parameters.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+                hint=(
+                    "Use dtype='float32', 'bfloat16', or 'auto'; float16 is available for probing."
+                ),
             )
         if self.cv_folds is not None and (
             isinstance(self.cv_folds, bool)
@@ -615,15 +669,24 @@ class CustomPropertyTrainingConfig:
             )
         object.__setattr__(self, "output_dir", output_dir)
         ratios = (self.train_ratio, self.validation_ratio, self.test_ratio)
-        if any(
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not math.isfinite(value)
-            or (value <= 0 if self.cv_folds is None else value < 0)
-            for value in ratios
-        ) or not math.isclose(sum(ratios), 1.0, rel_tol=0.0, abs_tol=1e-9):
+        if (
+            any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value < 0
+                for value in ratios
+            )
+            or not math.isclose(sum(ratios), 1.0, rel_tol=0.0, abs_tol=1e-9)
+            or self.train_ratio <= 0
+        ):
             raise ConfigurationError(
-                "Split ratios must sum to 1 and be positive (nonnegative in CV mode).",
+                "Split ratios must be nonnegative, sum to 1, and include positive train_ratio.",
+                code="INVALID_CUSTOM_SPLIT",
+            )
+        if self.finetune_method == "machine_learning" and self.cv_folds is None and 0 in ratios:
+            raise ConfigurationError(
+                "Machine-learning training without CV requires three positive split ratios.",
                 code="INVALID_CUSTOM_SPLIT",
             )
         for name, bounded_integer, lower, upper in (
@@ -632,6 +695,7 @@ class CustomPropertyTrainingConfig:
             ("batch_size", self.batch_size, 1, 65_536),
             ("workers", self.workers, 0, 256),
             ("early_stopping_patience", self.early_stopping_patience, 0, 1_000_000),
+            ("scheduler_patience", self.scheduler_patience, 0, 1_000_000),
             ("max_records", self.max_records, 3, 10_000_000),
             ("max_file_bytes", self.max_file_bytes, 1, 100_000_000_000),
             (
@@ -653,6 +717,7 @@ class CustomPropertyTrainingConfig:
         numeric_options: tuple[tuple[str, int | float | None, bool], ...] = (
             ("learning_rate", self.learning_rate, False),
             ("weight_decay", self.weight_decay, True),
+            ("monitor_min_delta", self.monitor_min_delta, True),
             ("max_grad_norm", self.max_grad_norm, False),
         )
         for name, numeric_value, allow_zero in numeric_options:
@@ -686,6 +751,16 @@ class CustomPropertyTrainingConfig:
                     f"{name} must be a finite number in [0, 1).",
                     code="INVALID_CUSTOM_PROPERTY_CONFIG",
                 )
+        if (
+            isinstance(self.scheduler_factor, bool)
+            or not isinstance(self.scheduler_factor, (int, float))
+            or not math.isfinite(self.scheduler_factor)
+            or not 0 < self.scheduler_factor < 1
+        ):
+            raise ConfigurationError(
+                "scheduler_factor must be a finite number in (0, 1).",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            )
         if (
             isinstance(self.threshold, bool)
             or not isinstance(self.threshold, (int, float))
@@ -736,7 +811,13 @@ class CustomPropertyTrainingConfig:
                 "checkpoint_dir and checkpoint_path are mutually exclusive.",
                 code="INVALID_CUSTOM_PROPERTY_CONFIG",
             )
-        for name in ("allow_remote_code", "show_progress", "overwrite", "stratify"):
+        for name in (
+            "allow_remote_code",
+            "show_progress",
+            "overwrite",
+            "stratify",
+            "log_train_metrics",
+        ):
             if not isinstance(getattr(self, name), bool):
                 raise ConfigurationError(
                     f"{name} must be boolean.", code="INVALID_CUSTOM_PROPERTY_CONFIG"
@@ -746,6 +827,14 @@ class CustomPropertyTrainingConfig:
                 "missing_label_policy must be 'error' or 'drop'.",
                 code="INVALID_CUSTOM_PROPERTY_CONFIG",
             )
+
+    @property
+    def resolved_monitor_mode(self) -> Literal["min", "max"]:
+        """Use smaller losses/errors and larger classification scores by default."""
+
+        if self.monitor_mode != "auto":
+            return self.monitor_mode
+        return "min" if self.monitor in {"validation_loss", "rmse", "mae"} else "max"
 
     @property
     def resolved_learning_rate(self) -> float:
@@ -946,7 +1035,7 @@ class CustomPropertyPredictionResult:
         if self.output_file is not None:
             return {
                 "model_dir": self.model_dir,
-                **to_json_compatible(self.output_file),
+                **cast(dict[str, object], to_json_compatible(self.output_file)),
             }
         return {
             "model_dir": self.model_dir,

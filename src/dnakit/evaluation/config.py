@@ -14,7 +14,7 @@ from dnakit.representations import RepresentationConfig
 
 GapDenominatorPolicy: TypeAlias = Literal["exclude", "include_known", "error"]
 PairSimilarityMethod: TypeAlias = Literal["exact", "identity", "edit", "kmer"]
-DiversityCalculation: TypeAlias = Literal["similarity", "levenshtein"]
+DiversityCalculation: TypeAlias = Literal["levenshtein"]
 NoveltyCalculation: TypeAlias = Literal["similarity", "levenshtein"]
 UniquenessEquivalence: TypeAlias = Literal[
     "exact",
@@ -266,8 +266,9 @@ class DiversityEvaluationConfig:
     canonical: bool = True
     cluster_threshold: float = 0.9
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
-    calculation: DiversityCalculation = "similarity"
+    calculation: DiversityCalculation = "levenshtein"
     show_progress: bool = False
+    workers: int = 16
 
     def __post_init__(self) -> None:
         if self.method not in {"exact", "identity", "edit", "kmer"}:
@@ -280,10 +281,11 @@ class DiversityEvaluationConfig:
         )
         if not isinstance(self.limits, EvaluationLimits):
             raise ConfigurationError("limits must be EvaluationLimits.")
-        if self.calculation not in {"similarity", "levenshtein"}:
+        if self.calculation != "levenshtein":
             raise ConfigurationError("Unknown diversity calculation.")
         if not isinstance(self.show_progress, bool):
             raise ConfigurationError("show_progress must be boolean.")
+        _positive_int(self.workers, "workers", 256)
 
 
 @dataclass(frozen=True, slots=True)

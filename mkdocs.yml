@@ -12,7 +12,6 @@ watch:
   - setup.md
 not_in_nav: |
   /agent_tools*.md
-  /quickstart.md
   /tutorials/*
   /examples/index.md
   /validation.md
@@ -21,7 +20,6 @@ not_in_nav: |
   /api/features/03_validation.md
   /api/features/05_descriptors.md
   /api/features/16_common_genomes.md
-  /api/features/04_ops_007_trimming_masking.md
   /api/features/08_neural_representations.md
 
 theme:
@@ -33,7 +31,6 @@ theme:
   font: false
   features:
     - navigation.sections
-    - navigation.indexes
     - navigation.top
     - content.code.copy
     - search.suggest
@@ -58,83 +55,148 @@ plugins:
           nav:
             - Home: index.md
             - Installation: installation.md
-            - Quick Start Tutorial:
-                - Feature Tree Overview: api/features/function_tree.md
-                - Feature Module Index: api/features/index.md
-                - 1. Data Preparation:
-                    - (1) Core Data Objects: api/features/01_core_objects.md
-                    - (2) File I/O: api/features/02_io_data.md
-                    - (3) Downloads: api/features/15_download.md
-                    - (4) Data Queries: api/features/22_database_query.md
-                    - (5) Validation: api/features/03_validation.md
-                    - (6) Database and sequencing extensions:
-                        - Genes, sequences and downloads: api/native/sequences.md
-                        - ENCODE data management: api/native/encode.md
-                        - Organisms and microbiomes: api/native/organisms.md
-                        - Literature and study discovery: api/native/literature.md
-                - 2. Data Processing:
-                    - Unified Input and Output: api/features/00_processing_inputs.md
-                    - (1) DNA Sequence Standardization: api/features/03_standardization.md
-                    - (2) Intra-sequence Operations:
-                        - OPS-001 Sequence Direction Completion: api/features/04_ops_001_sequence_direction.md
-                        - OPS-002 Transcription and Translation: api/features/04_ops_002_transcription_translation.md
-                        - OPS-003 Subsequence Extraction: api/features/04_ops_003_subsequence_extraction.md
-                        - OPS-004 Sequence Editing: api/features/04_ops_004_sequence_editing.md
-                        - OPS-005 Sequence Generation: api/features/04_ops_005_mutation_generation.md
-                        - OPS-006 Sequence Concatenation: api/features/04_ops_006_sequence_concatenation.md
-                        - OPS-007:
-                            - Trimming: api/features/04_ops_007_trimming.md
-                            - Masking: api/features/04_ops_007_masking.md
-                        - OPS-008 Circular Sequence Operations: api/features/04_ops_008_circular_sequence_operations.md
-                        - OPS-010 Sequence Chunking: api/features/17_sequence_chunking.md
-                    - (3) Sequence Deduplication: api/features/10_deduplication.md
-                    - (4) Sequence Clustering: api/features/10_clustering.md
-                    - (5) Dataset Preparation and Splitting: api/features/10_datasets.md
-                - 3. Data Analysis:
-                    - (1) DNA Descriptors, Representations, and Fingerprints:
-                        - DNA Descriptors: api/features/05_all_descriptors.md
-                        - Sequence Representations: api/features/08_fingerprints.md
-                        - DNA Fingerprints: api/features/08_feature_engineering.md
-                    - (2) Sequence Search:
-                        - General Search: api/features/09_search.md
-                        - Functional Sequence Search: api/features/06_patterns.md
-                    - (3) Physicochemical Properties: api/features/07_physicochemical.md
-                    - (4) Duplex Thermodynamics: api/features/19_duplex_thermodynamics.md
-                    - (5) Secondary Structure: api/features/20_secondary_structure.md
-                    - (6) 3D Structure and Mechanics: api/features/21_structure3d.md
-                    - (7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
-                    - (8) Deep-learning Property Prediction: api/features/23_deep_learning_property_prediction.md
-                    - (9) Optional Bioinformatics Functions: api/features/24_optional_bioinformatics.md
-                    - (10) Gene Names and Intervals: api/features/26_gene_annotation.md
-                    - (11) Bioinformatics Python APIs: api/features/27_bioinformatics.md
-                    - (12) Database analysis and prediction APIs:
-                        - Variants and GWAS: api/native/variants.md
-                        - Diseases and phenotypes: api/native/phenotypes.md
-                        - Expression and regulation: api/native/regulation.md
-                        - Pathways, interactions and structures: api/native/pathways.md
-                        - Targets and drug evidence: api/native/targets.md
-                        - Trained models: api/native/models.md
-                        - Sequence analysis and inheritance: api/native/analysis.md
-                - 4. Data Evaluation:
-                    - (1) Common Evaluation Metrics: api/features/12_evaluation.md
-                    - (2) Similarity Calculation: api/features/09_similarity_alignment.md
-                    - (3) Sequence Distance and Alignment: api/features/09_alignment.md
-                - 5. Visualization: api/features/13_visualization.md
-                - 6. Engineering and Extensions:
-                    - Backends, performance and reproducibility: api/features/14_engineering.md
-                    - API discovery, workflows and reports: api/native/execution.md
-            - API Reference:
-                - API Overview: api/index.md
-                - All 484 added functions: api/native/index.md
-                - Calling conventions and examples: api/native/usage.md
-            - LLM Tools:
-                - (1) MCP: llm_tools/mcp.md
-                - (2) Python API: llm_tools/python_api.md
-                - (3) Skills: llm_tools/skills.md
-                - (4) Native Skill APIs: llm_tools/native_skills.md
+            - Feature Tree Overview: api/features/function_tree.md
+            - 1. Data Preparation:
+                - 1) Core Data Objects: api/features/01_core_objects.md
+                - 2) File I/O: api/features/02_io_data.md
+                - 3) Downloads: api/features/15_download.md
+                - 4) Data Queries:
+                    - 1. Discover and Call APIs: api/features/22_database_query_discovery.md
+                    - 2. Sequences, Assemblies and Sequencing: api/features/22_database_query_sequences.md
+                    - 3. Diseases, Phenotypes and Ontologies: api/features/22_database_query_phenotypes.md
+                    - 4. Expression, Regulation and Cancer: api/features/22_database_query_regulation.md
+                    - 5. Organisms, Taxonomy and Microbiomes: api/features/22_database_query_organisms.md
+                    - 6. Pathways, Interactions, Proteins and Structures: api/features/22_database_query_pathways.md
+                    - 7. Targets, Drugs and Associations: api/features/22_database_query_targets.md
+                    - 8. Literature, Preprints and Clinical Studies: api/features/22_database_query_literature.md
+                    - 9. ENCODE Experiments and Files: api/features/22_database_query_encode.md
+                    - "10. Genetic Variants and Population Associations":
+                        - "1) Variant Records and Population Frequencies": api/features/22_database_query_variant_frequency.md
+                        - "2) Structural Variant Queries": api/features/22_database_query_structural_variants.md
+                        - "3) ClinVar Clinical Significance": api/features/22_database_query_clinical_variants.md
+                        - "4) Gene–Disease Evidence, Dosage and Actionability": api/features/22_database_query_genetic_evidence.md
+                        - "5) Cancer Variants and Treatment Evidence": api/features/22_database_query_cancer_variants.md
+                        - "6) GWAS Studies and Associations": api/features/22_database_query_gwas.md
+                        - "7) Cohort Phenotype Associations and Fine-mapping": api/features/22_database_query_phewas.md
+                        - "8) Populations, Samples and Linkage Disequilibrium": api/features/22_database_query_population_resources.md
+                - 5) Validation: api/features/03_validation.md
+            - 2. Data Processing:
+                - 1) DNA Sequence Standardization: api/features/03_standardization.md
+                - 2) Intra-sequence Operations:
+                    - 1. Sequence Direction Completion: api/features/04_ops_001_sequence_direction.md
+                    - 2. Transcription and Translation: api/features/04_ops_002_transcription_translation.md
+                    - 3. Subsequence Extraction: api/features/04_ops_003_subsequence_extraction.md
+                    - 4. Sequence Editing: api/features/04_ops_004_sequence_editing.md
+                    - 5. Sequence Generation: api/features/04_ops_005_mutation_generation.md
+                    - 6. Sequence Concatenation and Assembly: api/features/04_ops_006_sequence_concatenation.md
+                    - 7. Circular Sequence Operations: api/features/04_ops_008_circular_sequence_operations.md
+                    - 8. Sequence Chunking: api/features/17_sequence_chunking.md
+                - 3) Sequence Deduplication: api/features/10_deduplication.md
+                - 4) Sequence Clustering: api/features/10_clustering.md
+                - 5) Dataset Preparation and Splitting: api/features/10_datasets.md
+                - 6) Sequencing Data Processing: api/features/28_read_processing.md
+                - 7) Sequence Optimization: api/features/29_sequence_optimization.md
+            - 3. Data Analysis:
+                - 1) DNA Descriptors, Representations, and Fingerprints:
+                    - 1. DNA Descriptors: api/features/05_all_descriptors.md
+                    - 2. Sequence Representations and Feature Processing: api/features/08_fingerprints.md
+                    - 3. DNA Fingerprints: api/features/08_feature_engineering.md
+                - 2) Sequence Search:
+                    - 1. General Search: api/features/09_search.md
+                    - 2. Functional Sequence Search: api/features/06_patterns.md
+                - 3) Physicochemical Properties: api/features/07_physicochemical.md
+                - 4) Duplex Thermodynamics: api/features/19_duplex_thermodynamics.md
+                - 5) Secondary Structure: api/features/20_secondary_structure.md
+                - 6) 3D Structure and Mechanics: api/features/21_structure3d.md
+                - 7) Optical and Concentration Conversions: api/features/18_optics_concentration.md
+                - "8) Property Prediction: Deep Learning and Machine Learning":
+                    - "1. Custom Model Training and Prediction": api/features/23_prediction_custom_training.md
+                    - "2. Expression, Regulatory Tracks and Contact Maps": api/features/23_prediction_regulatory_tracks.md
+                    - "3. Splicing and Genomic Regions": api/features/23_prediction_splicing_regions.md
+                    - "4. Epigenetic Marks and Open Chromatin": api/features/23_prediction_chromatin_classification.md
+                    - "5. Promoters and Enhancers": api/features/23_prediction_promoter_enhancer.md
+                    - "6. Variant Effects and Protein Stability": api/features/23_prediction_variant_effects.md
+                    - "7. Taxonomy and Molecular Function Classification": api/features/23_prediction_sequence_classification.md
+                    - "8. Molecular Relationships and Interactions": api/features/23_prediction_molecular_interactions.md
+                    - "9. Protein Features and Structure": api/features/23_prediction_protein_features.md
+                - 9) Gene Names and Intervals: api/features/26_gene_annotation.md
+                - "10) Phylogenetics and Molecular Evolution": api/features/30_phylogeny.md
+                - "11) Statistical, Differential and Enrichment Analysis":
+                    - "1. Statistical and Differential Analysis": api/features/31_statistical_analysis.md
+                    - "2. Gene Set and Pathway Enrichment": api/features/37_functional_enrichment.md
+                - 12) Sequencing Data Analysis: api/features/32_sequencing_analysis.md
+                - "13) Variant Calling, Annotation and Scoring":
+                    - "1. Variant Calling and Statistics": api/features/33_variant_calling.md
+                    - "2. Variant Annotation and Identifier Conversion": api/features/35_variant_annotation.md
+                    - "3. Variant Effect Scores and Experimental Data": api/features/36_variant_effect_scores.md
+                - 14) Inheritance Simulation: api/features/34_inheritance.md
+                - 15) Genomics and DNA Engineering: api/features/38_genomics_extensions.md
+                - 16) External Genomics and MCP: api/features/39_external_genomics.md
+            - 4. Data Evaluation:
+                - 1) Common Evaluation Metrics: api/features/12_evaluation.md
+                - 2) Similarity Calculation: api/features/09_similarity_alignment.md
+                - 3) Sequence Distance and Alignment: api/features/09_alignment.md
+            - 5. Visualization: api/features/13_visualization.md
+            - 6. Large Language Model Tools:
+                - 1) Python API: llm_tools/python_api.md
+                - 2) MCP: llm_tools/mcp.md
+                - 3) Skills: llm_tools/skills.md
+                - 4) Agent: llm_tools/agent.md
             - Changelog: changelog.md
-            - FAQ: faq.md
-            - WeChat Community: wechat.md
+            - FAQ:
+                - 1) Engineering and Extensions: api/features/14_engineering.md
+                - "2) Common questions": faq.md
+                - 3) API Reference: api/index.md
+                - "4) Core usage notes": faq/tutorial_basics.md
+                - "5) Models, downloads and integrations": faq/tutorial_integrations.md
+                - "6) Bioinformatics notes": faq/bioinformatics.md
+                - "7) Feature catalog notes": faq/tutorial_overview.md
+                - "8) DNA Project Sources and Coverage": faq/genomics_sources.md
+                - "9) Review of 335 Additional Projects": faq/user_catalog.md
+                - "10) Installing genomics capabilities through pip": faq/external_analysis_migration.md
+                - 11) API parameters:
+                    - 1. Index: faq/api/index.md
+                    - "2. sequence completion": faq/api/04_ops_001_sequence_direction.md
+                    - "3. Transcription and Translation": faq/api/04_ops_002_transcription_translation.md
+                    - "4. Sequence Editing": faq/api/04_ops_004_sequence_editing.md
+                    - "5. Sequence splicing": faq/api/04_ops_006_sequence_concatenation.md
+                    - "6. DNA descriptor": faq/api/05_all_descriptors.md
+                    - "7. Universal search": faq/api/09_search.md
+                    - "8. Data partitioning": faq/api/10_datasets.md
+                    - "9. Engineering and extensions": faq/api/14_engineering.md
+                    - "10. Download": faq/api/15_download.md
+                    - "11. Discover and call database APIs": faq/api/22_database_query_discovery.md
+                    - "12. ENCODE experiment and file queries": faq/api/22_database_query_encode.md
+                    - "13. Literature, preprint and clinical study queries": faq/api/22_database_query_literature.md
+                    - "14. Organism, taxonomy and microbiome queries": faq/api/22_database_query_organisms.md
+                    - "15. Pathway, interaction, protein and structure queries": faq/api/22_database_query_pathways.md
+                    - "16. Disease, phenotype and ontology queries": faq/api/22_database_query_phenotypes.md
+                    - "17. Expression, regulation and cancer queries": faq/api/22_database_query_regulation.md
+                    - "18. Sequence, assembly and sequencing queries": faq/api/22_database_query_sequences.md
+                    - "19. Target, drug and association queries": faq/api/22_database_query_targets.md
+                    - "20. Property prediction: deep learning and machine learning":
+                        - "1) Expression, Regulatory Tracks and Contact Maps": faq/api/23_prediction_regulatory_tracks.md
+                        - "2) Variant Effects and Protein Stability": faq/api/23_prediction_variant_effects.md
+                        - "3) Protein Features and Structure": faq/api/23_prediction_protein_features.md
+                    - "21. Genetic Variants and Population Associations":
+                        - "1) Variant Records and Population Frequencies": faq/api/22_database_query_variant_frequency.md
+                        - "2) Structural Variant Queries": faq/api/22_database_query_structural_variants.md
+                        - "3) ClinVar Clinical Significance": faq/api/22_database_query_clinical_variants.md
+                        - "4) Gene–Disease Evidence, Dosage and Actionability": faq/api/22_database_query_genetic_evidence.md
+                        - "5) Cancer Variants and Treatment Evidence": faq/api/22_database_query_cancer_variants.md
+                        - "6) GWAS Studies and Associations": faq/api/22_database_query_gwas.md
+                        - "7) Cohort Phenotype Associations and Fine-mapping": faq/api/22_database_query_phewas.md
+                        - "8) Populations, Samples and Linkage Disequilibrium": faq/api/22_database_query_population_resources.md
+                    - "22. Gene names and intervals from genomic DNA": faq/api/26_gene_annotation.md
+                    - "23. Phylogenetics and Molecular Evolution": faq/api/30_phylogeny.md
+                    - "24. Gene Set and Pathway Enrichment": faq/api/37_functional_enrichment.md
+                    - "25. Variant Calling, Annotation and Scoring":
+                        - "1) Variant Calling and Statistics": faq/api/33_variant_calling.md
+                        - "2) Variant Annotation and Identifier Conversion": faq/api/35_variant_annotation.md
+                        - "3) Variant Effect Scores and Experimental Data": faq/api/36_variant_effect_scores.md
+                    - "26. Inheritance Simulation": faq/api/34_inheritance.md
+                    - "27. Genomics and DNA Engineering": faq/api/38_genomics_extensions.md
+                    - "28. External Genomics and MCP": faq/api/39_external_genomics.md
             - Acknowledgements: acknowledgements.md
   - mkdocstrings:
       handlers:
@@ -155,7 +217,11 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 extra_css:
   - stylesheets/extra.css
@@ -163,87 +229,161 @@ extra_css:
 extra:
   generator: false
   collapsible_nav:
-    - 大模型工具
-    - LLM Tools
+    - 1. 数据准备
+    - 2. 数据处理
+    - 3. 数据分析
+    - 4. 数据评价
+    - 1. Data Preparation
+    - 2. Data Processing
+    - 3. Data Analysis
+    - 4. Data Evaluation
+    - 6. 大语言模型工具
+    - 6. Large Language Model Tools
+    - FAQ
 
 nav:
   - 首页: index.md
   - 安装: installation.md
-  - 快速入门教程:
-      - 功能树总览: api/features/function_tree.md
-      - 功能模块索引: api/features/index.md
-      - 1. 数据准备:
-          - （1）核心数据对象: api/features/01_core_objects.md
-          - （2）文件读写: api/features/02_io_data.md
-          - （3）下载: api/features/15_download.md
-          - （4）数据查询: api/features/22_database_query.md
-          - （5）合法性检查: api/features/03_validation.md
-          - （6）数据库与测序扩展:
-              - 基因、序列与下载: api/native/sequences.md
-              - ENCODE 数据管理: api/native/encode.md
-              - 物种与微生物组: api/native/organisms.md
-              - 文献与研究检索: api/native/literature.md
-      - 2. 数据处理:
-          - 统一输入与输出: api/features/00_processing_inputs.md
-          - （1）DNA序列标准化: api/features/03_standardization.md
-          - （2）序列内操作:
-              - OPS-001 序列补全: api/features/04_ops_001_sequence_direction.md
-              - OPS-002 转录与翻译: api/features/04_ops_002_transcription_translation.md
-              - OPS-003 子序列提取: api/features/04_ops_003_subsequence_extraction.md
-              - OPS-004 序列编辑: api/features/04_ops_004_sequence_editing.md
-              - OPS-005 序列生成: api/features/04_ops_005_mutation_generation.md
-              - OPS-006 序列拼接: api/features/04_ops_006_sequence_concatenation.md
-              - OPS-007:
-                  - Trimming（修剪）: api/features/04_ops_007_trimming.md
-                  - Masking（掩蔽）: api/features/04_ops_007_masking.md
-              - OPS-008 环状序列操作: api/features/04_ops_008_circular_sequence_operations.md
-              - OPS-010 序列切分: api/features/17_sequence_chunking.md
-          - （3）序列去重: api/features/10_deduplication.md
-          - （4）序列聚类: api/features/10_clustering.md
-          - （5）数据集整理与划分: api/features/10_datasets.md
-      - 3. 数据分析:
-          - （1）DNA描述符+表征+指纹:
-              - DNA描述符: api/features/05_all_descriptors.md
-              - 序列表征: api/features/08_fingerprints.md
-              - DNA指纹: api/features/08_feature_engineering.md
-          - （2）序列搜索:
-              - 通用搜索: api/features/09_search.md
-              - 序列功能搜索: api/features/06_patterns.md
-          - （3）理化性质: api/features/07_physicochemical.md
-          - （4）双链热力学扩展: api/features/19_duplex_thermodynamics.md
-          - （5）二级结构性质: api/features/20_secondary_structure.md
-          - （6）三维结构与力学性质: api/features/21_structure3d.md
-          - （7）换算: api/features/18_optics_concentration.md
-          - （8）深度学习性质预测: api/features/23_deep_learning_property_prediction.md
-          - （9）可选生物信息功能: api/features/24_optional_bioinformatics.md
-          - （10）基因名称与区间注释: api/features/26_gene_annotation.md
-          - （11）生物信息学 Python API: api/features/27_bioinformatics.md
-          - （12）数据库分析与预测接口:
-              - 遗传变异与 GWAS: api/native/variants.md
-              - 疾病与表型: api/native/phenotypes.md
-              - 表达与调控: api/native/regulation.md
-              - 通路、互作与结构: api/native/pathways.md
-              - 靶点与药物证据: api/native/targets.md
-              - 已训练模型: api/native/models.md
-              - 序列计算与遗传模拟: api/native/analysis.md
-      - 4. 数据评价:
-          - （1）常用评价指标: api/features/12_evaluation.md
-          - （2）相似度计算: api/features/09_similarity_alignment.md
-          - （3）序列距离与比对: api/features/09_alignment.md
-      - 5. 可视化: api/features/13_visualization.md
-      - 6. 工程化与扩展:
-          - 后端、性能与复现: api/features/14_engineering.md
-          - 接口发现、工作流与报告: api/native/execution.md
-  - API 参考:
-      - API 总览: api/index.md
-      - 新增 484 个函数完整索引: api/native/index.md
-      - 调用约定与完整示例: api/native/usage.md
-  - 大模型工具:
-      - （1）MCP: llm_tools/mcp.md
-      - （2）Python API: llm_tools/python_api.md
-      - （3）Skills: llm_tools/skills.md
-      - （4）Skill 统一接口: llm_tools/native_skills.md
+  - 功能树总览: api/features/function_tree.md
+  - 1. 数据准备:
+      - 1) 核心数据对象: api/features/01_core_objects.md
+      - 2) 文件读写: api/features/02_io_data.md
+      - 3) 下载: api/features/15_download.md
+      - 4) 数据查询:
+          - 1. 查找与调用数据库接口: api/features/22_database_query_discovery.md
+          - 2. 序列、组装与测序数据查询: api/features/22_database_query_sequences.md
+          - 3. 疾病、表型与本体查询: api/features/22_database_query_phenotypes.md
+          - 4. 表达、调控与肿瘤数据查询: api/features/22_database_query_regulation.md
+          - 5. 模式生物、物种与微生物组查询: api/features/22_database_query_organisms.md
+          - 6. 通路、互作、蛋白与结构查询: api/features/22_database_query_pathways.md
+          - 7. 靶点、药物与关联证据查询: api/features/22_database_query_targets.md
+          - 8. 文献、预印本与临床研究查询: api/features/22_database_query_literature.md
+          - 9. ENCODE 实验与文件查询: api/features/22_database_query_encode.md
+          - "10. 遗传变异与人群关联查询":
+              - "1) 变异记录与群体频率查询": api/features/22_database_query_variant_frequency.md
+              - "2) 结构变异查询": api/features/22_database_query_structural_variants.md
+              - "3) ClinVar 临床意义查询": api/features/22_database_query_clinical_variants.md
+              - "4) 遗传病关联、剂量与可干预性": api/features/22_database_query_genetic_evidence.md
+              - "5) 肿瘤变异与治疗证据查询": api/features/22_database_query_cancer_variants.md
+              - "6) GWAS 研究与关联查询": api/features/22_database_query_gwas.md
+              - "7) 队列表型关联与精细定位查询": api/features/22_database_query_phewas.md
+              - "8) 人群、样本与连锁查询": api/features/22_database_query_population_resources.md
+      - 5) DNA序列合法性检查: api/features/03_validation.md
+  - 2. 数据处理:
+      - 1) DNA序列标准化: api/features/03_standardization.md
+      - 2) 序列内操作:
+          - 1. 序列补全: api/features/04_ops_001_sequence_direction.md
+          - 2. 转录与翻译: api/features/04_ops_002_transcription_translation.md
+          - 3. 子序列提取: api/features/04_ops_003_subsequence_extraction.md
+          - 4. 序列编辑: api/features/04_ops_004_sequence_editing.md
+          - 5. 序列生成: api/features/04_ops_005_mutation_generation.md
+          - 6. 序列拼接与组装: api/features/04_ops_006_sequence_concatenation.md
+          - 7. 环状序列操作: api/features/04_ops_008_circular_sequence_operations.md
+          - 8. 序列切分: api/features/17_sequence_chunking.md
+      - 3) 序列去重: api/features/10_deduplication.md
+      - 4) 序列聚类: api/features/10_clustering.md
+      - 5) 数据集整理与划分: api/features/10_datasets.md
+      - 6) 测序数据整理: api/features/28_read_processing.md
+      - 7) 序列优化: api/features/29_sequence_optimization.md
+  - 3. 数据分析:
+      - 1) DNA描述符+表征+指纹:
+          - 1. DNA描述符: api/features/05_all_descriptors.md
+          - 2. 序列表征与特征处理: api/features/08_fingerprints.md
+          - 3. DNA指纹: api/features/08_feature_engineering.md
+      - 2) 序列搜索:
+          - 1. 通用搜索: api/features/09_search.md
+          - 2. 序列功能搜索: api/features/06_patterns.md
+      - 3) 理化性质: api/features/07_physicochemical.md
+      - 4) 双链热力学扩展: api/features/19_duplex_thermodynamics.md
+      - 5) 二级结构性质: api/features/20_secondary_structure.md
+      - 6) 三维结构与力学性质: api/features/21_structure3d.md
+      - 7) 换算: api/features/18_optics_concentration.md
+      - "8) 性质预测：深度学习与机器学习":
+          - "1. 自定义模型训练与预测": api/features/23_prediction_custom_training.md
+          - "2. 表达、调控与接触图预测": api/features/23_prediction_regulatory_tracks.md
+          - "3. 剪接与基因组区域预测": api/features/23_prediction_splicing_regions.md
+          - "4. 表观遗传与开放染色质判别": api/features/23_prediction_chromatin_classification.md
+          - "5. 启动子与增强子判别": api/features/23_prediction_promoter_enhancer.md
+          - "6. 变异效应与蛋白质稳定性": api/features/23_prediction_variant_effects.md
+          - "7. 物种与分子功能分类": api/features/23_prediction_sequence_classification.md
+          - "8. 分子关系与互作预测": api/features/23_prediction_molecular_interactions.md
+          - "9. 蛋白质特征与结构预测": api/features/23_prediction_protein_features.md
+      - 9) 基因名称与区间注释: api/features/26_gene_annotation.md
+      - "10) 系统发育与分子进化": api/features/30_phylogeny.md
+      - "11) 统计、差异与富集分析":
+          - "1. 统计与差异分析": api/features/31_statistical_analysis.md
+          - "2. 基因集与通路富集": api/features/37_functional_enrichment.md
+      - 12) 测序数据分析: api/features/32_sequencing_analysis.md
+      - "13) 变异检测、注释与评分":
+          - "1. 变异检测与统计": api/features/33_variant_calling.md
+          - "2. 变异注释与标识转换": api/features/35_variant_annotation.md
+          - "3. 变异效应评分与实验数据": api/features/36_variant_effect_scores.md
+      - 14) 遗传模拟: api/features/34_inheritance.md
+      - 15) 基因组与 DNA 工程: api/features/38_genomics_extensions.md
+      - 16) 外部基因组分析与 MCP: api/features/39_external_genomics.md
+  - 4. 数据评价:
+      - 1) 常用评价指标: api/features/12_evaluation.md
+      - 2) 相似度计算: api/features/09_similarity_alignment.md
+      - 3) 序列距离与比对: api/features/09_alignment.md
+  - 5. 可视化: api/features/13_visualization.md
+  - 6. 大语言模型工具:
+      - 1) Python API: llm_tools/python_api.md
+      - 2) MCP: llm_tools/mcp.md
+      - 3) Skills: llm_tools/skills.md
+      - 4) Agent: llm_tools/agent.md
   - 更新日志: changelog.md
-  - FAQ: faq.md
-  - 微信社区: wechat.md
+  - FAQ:
+      - 1) 工程与扩展: api/features/14_engineering.md
+      - "2) 常见问题": faq.md
+      - 3) API 参考: api/index.md
+      - "4) 基础用法补充": faq/tutorial_basics.md
+      - "5) 模型、下载与扩展": faq/tutorial_integrations.md
+      - "6) 生物信息学说明": faq/bioinformatics.md
+      - "7) 功能目录说明": faq/tutorial_overview.md
+      - "8) DNA 项目来源与覆盖": faq/genomics_sources.md
+      - "9) 335 个补充项目审核": faq/user_catalog.md
+      - "10) 基因组计算的 pip 安装与迁移": faq/external_analysis_migration.md
+      - 11) 接口参数:
+          - 1. 参数索引: faq/api/index.md
+          - "2. 序列补全": faq/api/04_ops_001_sequence_direction.md
+          - "3. 转录与翻译": faq/api/04_ops_002_transcription_translation.md
+          - "4. 序列编辑": faq/api/04_ops_004_sequence_editing.md
+          - "5. 序列拼接": faq/api/04_ops_006_sequence_concatenation.md
+          - "6. DNA 描述符": faq/api/05_all_descriptors.md
+          - "7. 通用搜索": faq/api/09_search.md
+          - "8. 数据划分": faq/api/10_datasets.md
+          - "9. 工程化与扩展": faq/api/14_engineering.md
+          - "10. 下载": faq/api/15_download.md
+          - "11. 查找与调用数据库接口": faq/api/22_database_query_discovery.md
+          - "12. ENCODE 实验与文件查询": faq/api/22_database_query_encode.md
+          - "13. 文献、预印本与临床研究查询": faq/api/22_database_query_literature.md
+          - "14. 模式生物、物种与微生物组查询": faq/api/22_database_query_organisms.md
+          - "15. 通路、互作、蛋白与结构查询": faq/api/22_database_query_pathways.md
+          - "16. 疾病、表型与本体查询": faq/api/22_database_query_phenotypes.md
+          - "17. 表达、调控与肿瘤数据查询": faq/api/22_database_query_regulation.md
+          - "18. 序列、组装与测序数据查询": faq/api/22_database_query_sequences.md
+          - "19. 靶点、药物与关联证据查询": faq/api/22_database_query_targets.md
+          - "20. 性质预测：深度学习与机器学习":
+              - "1) 表达、调控与接触图预测": faq/api/23_prediction_regulatory_tracks.md
+              - "2) 变异效应与蛋白质稳定性": faq/api/23_prediction_variant_effects.md
+              - "3) 蛋白质特征与结构预测": faq/api/23_prediction_protein_features.md
+          - "21. 遗传变异与人群关联查询":
+              - "1) 变异记录与群体频率查询": faq/api/22_database_query_variant_frequency.md
+              - "2) 结构变异查询": faq/api/22_database_query_structural_variants.md
+              - "3) ClinVar 临床意义查询": faq/api/22_database_query_clinical_variants.md
+              - "4) 遗传病关联、剂量与可干预性": faq/api/22_database_query_genetic_evidence.md
+              - "5) 肿瘤变异与治疗证据查询": faq/api/22_database_query_cancer_variants.md
+              - "6) GWAS 研究与关联查询": faq/api/22_database_query_gwas.md
+              - "7) 队列表型关联与精细定位查询": faq/api/22_database_query_phewas.md
+              - "8) 人群、样本与连锁查询": faq/api/22_database_query_population_resources.md
+          - "22. 原始 DNA 的基因名称与区间注释": faq/api/26_gene_annotation.md
+          - "23. 系统发育与分子进化": faq/api/30_phylogeny.md
+          - "24. 基因集与通路富集": faq/api/37_functional_enrichment.md
+          - "25. 变异检测、注释与评分":
+              - "1) 变异检测与统计": faq/api/33_variant_calling.md
+              - "2) 变异注释与标识转换": faq/api/35_variant_annotation.md
+              - "3) 变异效应评分与实验数据": faq/api/36_variant_effect_scores.md
+          - "26. 遗传模拟": faq/api/34_inheritance.md
+          - "27. 基因组与 DNA 工程": faq/api/38_genomics_extensions.md
+          - "28. 外部基因组分析与 MCP": faq/api/39_external_genomics.md
   - 致谢: acknowledgements.md

@@ -1,0 +1,1938 @@
+{
+  "dnakit.databases.alpha_missense_get_protein_scores": {
+    "zh": "查询整条蛋白质的 AlphaMissense 致病性分类",
+    "en": "Retrieve AlphaMissense classifications across a protein"
+  },
+  "dnakit.databases.alpha_missense_get_residue_scores": {
+    "zh": "查询蛋白质指定位点的替换分类与平均评分",
+    "en": "Retrieve substitution classes and mean scores at a residue"
+  },
+  "dnakit.databases.alpha_missense_get_variant_score": {
+    "zh": "查询单个错义变异的 AlphaMissense 分类",
+    "en": "Classify a missense variant with AlphaMissense"
+  },
+  "dnakit.databases.bio_bank_japan_phewas_by_variant": {
+    "zh": "查询日本生物样本库中的变异表型关联",
+    "en": "Find variant–phenotype associations in BioBank Japan"
+  },
+  "dnakit.databases.cadd_get_position_scores": {
+    "zh": "查询基因组指定位点的全部替换 CADD 分数",
+    "en": "Retrieve CADD scores for substitutions at a position"
+  },
+  "dnakit.databases.cadd_get_range_scores": {
+    "zh": "查询基因组区间内的 CADD 分数",
+    "en": "Retrieve CADD scores across a genomic interval"
+  },
+  "dnakit.databases.cadd_get_scores": {
+    "zh": "通过 MyVariant 查询已收录的 CADD 注释",
+    "en": "Retrieve indexed CADD annotations through MyVariant"
+  },
+  "dnakit.databases.cadd_get_variant_score": {
+    "zh": "查询单个变异的 CADD 有害性分数",
+    "en": "Retrieve a variant's CADD deleteriousness score"
+  },
+  "dnakit.databases.civic_get_molecular_profile": {
+    "zh": "查询 CIViC 分子特征组合详情",
+    "en": "Retrieve a CIViC molecular profile"
+  },
+  "dnakit.databases.civic_get_variant": {
+    "zh": "查询 CIViC 肿瘤变异详情",
+    "en": "Retrieve a CIViC cancer variant"
+  },
+  "dnakit.databases.civic_get_variants_by_gene": {
+    "zh": "按基因查询 CIViC 肿瘤变异",
+    "en": "Find CIViC variants associated with a gene"
+  },
+  "dnakit.databases.civic_search_assertions": {
+    "zh": "检索 CIViC 临床解释结论",
+    "en": "Search CIViC clinical assertions"
+  },
+  "dnakit.databases.civic_search_evidence_items": {
+    "zh": "检索 CIViC 变异临床证据",
+    "en": "Search CIViC clinical evidence items"
+  },
+  "dnakit.databases.civic_search_genes": {
+    "zh": "检索 CIViC 收录的肿瘤相关基因",
+    "en": "Search genes in CIViC"
+  },
+  "dnakit.databases.civic_search_therapies": {
+    "zh": "检索 CIViC 收录的药物与治疗方案",
+    "en": "Search therapies in CIViC"
+  },
+  "dnakit.databases.clin_gen_dosage_by_gene": {
+    "zh": "按基因查询 ClinGen 剂量敏感性审定结果",
+    "en": "Retrieve ClinGen gene dosage sensitivity curations"
+  },
+  "dnakit.databases.clin_gen_dosage_region_search": {
+    "zh": "按区间检索 ClinGen 剂量敏感性记录",
+    "en": "Search ClinGen dosage sensitivity by genomic interval"
+  },
+  "dnakit.databases.clin_gen_get_actionability_adult": {
+    "zh": "查询成人遗传发现的临床可干预性证据",
+    "en": "Retrieve adult clinical actionability curations"
+  },
+  "dnakit.databases.clin_gen_get_actionability_pediatric": {
+    "zh": "查询儿童遗传发现的临床可干预性证据",
+    "en": "Retrieve pediatric clinical actionability curations"
+  },
+  "dnakit.databases.clin_gen_get_dosage_sensitivity": {
+    "zh": "获取 ClinGen 剂量敏感性审定记录",
+    "en": "Retrieve ClinGen dosage sensitivity records"
+  },
+  "dnakit.databases.clin_gen_get_gene_validity": {
+    "zh": "获取 ClinGen 基因与疾病关联有效性审定记录",
+    "en": "Retrieve ClinGen gene–disease validity curations"
+  },
+  "dnakit.databases.clin_gen_get_variant_classifications": {
+    "zh": "查询 ClinGen 变异致病性审定结果",
+    "en": "Retrieve ClinGen variant classifications"
+  },
+  "dnakit.databases.clin_gen_search_actionability": {
+    "zh": "按基因检索成人与儿童临床可干预性",
+    "en": "Search gene actionability across adult and pediatric contexts"
+  },
+  "dnakit.databases.clin_gen_search_dosage_sensitivity": {
+    "zh": "按基因名称检索剂量敏感性评分",
+    "en": "Search dosage sensitivity scores by gene symbol"
+  },
+  "dnakit.databases.clin_gen_search_gene_validity": {
+    "zh": "按基因名称检索疾病关联有效性",
+    "en": "Search gene–disease validity by gene symbol"
+  },
+  "dnakit.databases.clin_var_get_clinical_significance": {
+    "zh": "查询 ClinVar 变异临床意义",
+    "en": "Retrieve ClinVar clinical significance"
+  },
+  "dnakit.databases.clin_var_get_variant_details": {
+    "zh": "查询 ClinVar 变异摘要与审查状态",
+    "en": "Retrieve ClinVar variant summaries and review status"
+  },
+  "dnakit.databases.clin_var_search_variants": {
+    "zh": "按基因、疾病或编号检索 ClinVar 变异",
+    "en": "Search ClinVar variants by gene, disease or identifier"
+  },
+  "dnakit.databases.cosmic_get_mutations_by_gene": {
+    "zh": "按基因查询 COSMIC 体细胞突变",
+    "en": "Retrieve COSMIC somatic mutations for a gene"
+  },
+  "dnakit.databases.cosmic_search_mutations": {
+    "zh": "检索 COSMIC 肿瘤体细胞突变",
+    "en": "Search COSMIC cancer mutations"
+  },
+  "dnakit.databases.dbsnp_get_frequencies": {
+    "zh": "查询 dbSNP 等位基因频率",
+    "en": "Retrieve dbSNP allele frequencies"
+  },
+  "dnakit.databases.dbsnp_get_variant_by_rsid": {
+    "zh": "按 rsID 查询 dbSNP 变异坐标与等位基因",
+    "en": "Retrieve dbSNP coordinates and alleles by rsID"
+  },
+  "dnakit.databases.ensembl_var_get_variant_consequences": {
+    "zh": "查询 Ensembl 变异后果与完整注释",
+    "en": "Retrieve Ensembl variant consequences and annotations"
+  },
+  "dnakit.databases.ensembl_vep_annotate_hgvs": {
+    "zh": "使用 HGVS 表达式进行 VEP 变异注释",
+    "en": "Annotate HGVS variants with Ensembl VEP"
+  },
+  "dnakit.databases.ensembl_vep_annotate_rsid": {
+    "zh": "使用 rsID 进行 VEP 变异注释",
+    "en": "Annotate rsID variants with Ensembl VEP"
+  },
+  "dnakit.databases.ensembl_vep_variant_recoder": {
+    "zh": "转换变异编号与 HGVS 表达形式",
+    "en": "Convert variant identifiers and HGVS representations"
+  },
+  "dnakit.databases.eve_get_gene_info": {
+    "zh": "查询基因的 EVE 评分覆盖情况",
+    "en": "Check EVE score availability for a gene"
+  },
+  "dnakit.databases.eve_get_variant_score": {
+    "zh": "查询变异的 EVE 致病性分数",
+    "en": "Retrieve an EVE variant pathogenicity score"
+  },
+  "dnakit.databases.favor_annotate_variant": {
+    "zh": "获取 GRCh38 变异的综合功能注释",
+    "en": "Annotate GRCh38 variants with FAVOR"
+  },
+  "dnakit.databases.finn_gen_get_variant_finemapping": {
+    "zh": "查询 FinnGen 变异精细定位结果",
+    "en": "Retrieve FinnGen fine-mapping results for a variant"
+  },
+  "dnakit.databases.genebass_gene_burden_phewas": {
+    "zh": "查询基因稀有变异负荷与表型的关联",
+    "en": "Query gene burden associations across phenotypes"
+  },
+  "dnakit.databases.gnomad_get_gene_constraints": {
+    "zh": "查询 gnomAD 基因变异约束指标",
+    "en": "Retrieve gnomAD gene constraint metrics"
+  },
+  "dnakit.databases.gnomad_get_sv_by_gene": {
+    "zh": "按基因查询 gnomAD 结构变异",
+    "en": "Find gnomAD structural variants by gene"
+  },
+  "dnakit.databases.gnomad_get_sv_by_region": {
+    "zh": "按基因组区间查询 gnomAD 结构变异",
+    "en": "Find gnomAD structural variants by genomic interval"
+  },
+  "dnakit.databases.gnomad_get_sv_detail": {
+    "zh": "查询 gnomAD 结构变异详情",
+    "en": "Retrieve gnomAD structural variant details"
+  },
+  "dnakit.databases.gnomad_get_variant": {
+    "zh": "查询 gnomAD 变异基本信息",
+    "en": "Retrieve gnomAD variant metadata"
+  },
+  "dnakit.databases.gnomad_get_variant_populations": {
+    "zh": "查询 gnomAD 变异的分群等位基因频率",
+    "en": "Retrieve ancestry-specific gnomAD allele frequencies"
+  },
+  "dnakit.databases.gnomad_search_variants": {
+    "zh": "检索 gnomAD 变异编号",
+    "en": "Search gnomAD variant identifiers"
+  },
+  "dnakit.databases.gwas_get_associations_for_snp": {
+    "zh": "查询指定 SNP 的 GWAS 关联",
+    "en": "Retrieve GWAS associations for a SNP"
+  },
+  "dnakit.databases.gwas_get_associations_for_study": {
+    "zh": "查询指定 GWAS 研究的关联结果",
+    "en": "Retrieve associations from a GWAS study"
+  },
+  "dnakit.databases.gwas_get_associations_for_trait": {
+    "zh": "查询指定性状的 GWAS 关联结果",
+    "en": "Retrieve GWAS associations for a trait"
+  },
+  "dnakit.databases.gwas_get_snp_by_id": {
+    "zh": "按 rsID 查询 GWAS SNP 详情",
+    "en": "Retrieve GWAS SNP details by rsID"
+  },
+  "dnakit.databases.gwas_get_snps_for_gene": {
+    "zh": "查询映射到指定基因的 GWAS SNP",
+    "en": "Retrieve GWAS SNPs mapped to a gene"
+  },
+  "dnakit.databases.gwas_get_studies_for_trait": {
+    "zh": "查询指定性状的 GWAS 研究",
+    "en": "Retrieve GWAS studies for a trait"
+  },
+  "dnakit.databases.gwas_get_study_by_id": {
+    "zh": "按研究编号查询 GWAS 详情",
+    "en": "Retrieve a GWAS study by accession"
+  },
+  "dnakit.databases.gwas_get_variants_for_trait": {
+    "zh": "检索疾病或性状相关的 GWAS 变异",
+    "en": "Find GWAS variants associated with a disease or trait"
+  },
+  "dnakit.databases.gwas_search_associations": {
+    "zh": "按关键词检索 GWAS 关联",
+    "en": "Search GWAS associations by keyword"
+  },
+  "dnakit.databases.gwas_search_associations_by_gene": {
+    "zh": "按基因检索 GWAS 风险等位基因与显著性",
+    "en": "Search gene GWAS associations and risk alleles"
+  },
+  "dnakit.databases.gwas_search_snps": {
+    "zh": "按 rsID 或基因检索 GWAS SNP",
+    "en": "Search GWAS SNPs by rsID or gene"
+  },
+  "dnakit.databases.gwas_search_studies": {
+    "zh": "按性状与队列条件检索 GWAS 研究",
+    "en": "Search GWAS studies by trait and cohort"
+  },
+  "dnakit.databases.igsr_list_data_collections": {
+    "zh": "列出 IGSR 与千人基因组数据集合",
+    "en": "List IGSR and 1000 Genomes data collections"
+  },
+  "dnakit.databases.igsr_search_populations": {
+    "zh": "检索千人基因组人群信息",
+    "en": "Search 1000 Genomes populations"
+  },
+  "dnakit.databases.igsr_search_samples": {
+    "zh": "按人群或集合检索千人基因组样本",
+    "en": "Search 1000 Genomes samples by population or collection"
+  },
+  "dnakit.databases.ldlink_get_proxies": {
+    "zh": "查询 SNP 的群体特异性连锁不平衡代理变异",
+    "en": "Find population-specific LD proxy variants"
+  },
+  "dnakit.databases.mave_db_get_effect_matrix": {
+    "zh": "将深度突变扫描数据整理为氨基酸效应矩阵",
+    "en": "Build an amino acid effect matrix from MaveDB scores"
+  },
+  "dnakit.databases.my_variant_get_pathogenicity_scores": {
+    "zh": "汇总变异的多来源致病性预测分数",
+    "en": "Retrieve multiple variant pathogenicity prediction scores"
+  },
+  "dnakit.databases.my_variant_get_variant_annotation": {
+    "zh": "按 HGVS 或 rsID 查询综合变异注释",
+    "en": "Retrieve variant annotations by HGVS or rsID"
+  },
+  "dnakit.databases.my_variant_query_variants": {
+    "zh": "按基因、位置或临床意义检索变异",
+    "en": "Search variants by gene, position or clinical significance"
+  },
+  "dnakit.databases.onco_kb_annotate_variant": {
+    "zh": "查询 OncoKB 肿瘤变异作用与治疗证据",
+    "en": "Retrieve OncoKB oncogenicity and treatment evidence"
+  },
+  "dnakit.databases.progenetix_cnv_search": {
+    "zh": "按区间检索肿瘤拷贝数变异样本",
+    "en": "Search cancer samples with regional copy number changes"
+  },
+  "dnakit.databases.progenetix_list_cohorts": {
+    "zh": "列出 Progenetix 肿瘤拷贝数变异队列",
+    "en": "List Progenetix cancer CNV cohorts"
+  },
+  "dnakit.databases.progenetix_list_filtering_terms": {
+    "zh": "列出 Progenetix 可用筛选术语",
+    "en": "List Progenetix filtering terms"
+  },
+  "dnakit.databases.progenetix_search_biosamples": {
+    "zh": "按疾病本体检索肿瘤生物样本",
+    "en": "Search cancer biosamples by disease ontology"
+  },
+  "dnakit.databases.splice_ai_get_max_delta": {
+    "zh": "查询变异的最大 SpliceAI 剪接变化分数",
+    "en": "Retrieve a variant's maximum SpliceAI delta score"
+  },
+  "dnakit.databases.splice_ai_predict_pangolin": {
+    "zh": "使用 Pangolin 预测变异的剪接影响",
+    "en": "Predict splice effects with Pangolin"
+  },
+  "dnakit.databases.splice_ai_predict_splice": {
+    "zh": "使用 SpliceAI 预测剪接位点变化",
+    "en": "Predict splice-site changes with SpliceAI"
+  },
+  "dnakit.databases.tpmi_phewas_by_variant": {
+    "zh": "查询台湾精准医疗队列的变异表型关联",
+    "en": "Query variant–phenotype associations in TPMI"
+  },
+  "dnakit.databases.ukbtopmed_phewas_by_variant": {
+    "zh": "查询 UKB-TOPMed 的变异表型关联",
+    "en": "Query variant–phenotype associations in UKB-TOPMed"
+  },
+  "dnakit.databases.variant_validator_gene2transcripts": {
+    "zh": "查询基因的转录本与 MANE 注释",
+    "en": "Retrieve gene transcripts and MANE annotations"
+  },
+  "dnakit.databases.variant_validator_validate_variant": {
+    "zh": "校验并转换 HGVS 变异描述",
+    "en": "Validate and convert HGVS variant descriptions"
+  },
+  "dnakit.databases.alpha_genome_predict_interval": {
+    "zh": "预测基因组区间的多模态调控轨道",
+    "en": "Predict multimodal genomic tracks with AlphaGenome"
+  },
+  "dnakit.databases.alpha_genome_score_variant": {
+    "zh": "评估变异对基因组调控轨道的影响",
+    "en": "Score regulatory variant effects with AlphaGenome"
+  },
+  "dnakit.databases.dyna_mut2_predict_stability": {
+    "zh": "预测氨基酸突变对蛋白质稳定性的影响",
+    "en": "Predict mutation effects on protein stability with DynaMut2"
+  },
+  "dnakit.databases.esm2_score_missense_variant": {
+    "zh": "使用 ESM-2 评估错义变异效应",
+    "en": "Score missense variants with ESM-2"
+  },
+  "dnakit.databases.esm_describe_sae_feature": {
+    "zh": "标注蛋白质稀疏特征的生物学类别",
+    "en": "Label biological categories of protein SAE features"
+  },
+  "dnakit.databases.esm_explain_variant_mechanism": {
+    "zh": "汇总变异引起的蛋白质特征扰动机制",
+    "en": "Summarize protein feature disruption caused by a variant"
+  },
+  "dnakit.databases.esm_get_region_sae_features": {
+    "zh": "汇总蛋白质指定区间的稀疏特征",
+    "en": "Aggregate protein SAE features over a residue interval"
+  },
+  "dnakit.databases.esm_get_sae_features": {
+    "zh": "提取蛋白质各残基的稀疏特征激活",
+    "en": "Extract per-residue protein SAE activations"
+  },
+  "dnakit.databases.esm_score_sequence": {
+    "zh": "计算蛋白质序列的模型对数概率",
+    "en": "Score protein sequence log-probabilities with ESMC"
+  },
+  "dnakit.databases.esm_score_variant_sae_batch": {
+    "zh": "批量评估错义变异的稀疏特征扰动",
+    "en": "Batch-score missense variants using SAE disruption"
+  },
+  "dnakit.databases.esm_score_variant_sae_disruption": {
+    "zh": "比较参考与突变蛋白质的稀疏特征",
+    "en": "Compare reference and mutant protein SAE features"
+  },
+  "dnakit.databases.evo2_score_variant": {
+    "zh": "使用 Evo 2 评估 DNA 变异效应",
+    "en": "Score DNA variant effects with Evo 2"
+  },
+  "dnakit.databases.nvidia_nim_alphafold2": {
+    "zh": "使用 AlphaFold2 预测蛋白质三维结构",
+    "en": "Predict protein structures with AlphaFold2"
+  },
+  "dnakit.databases.nvidia_nim_esmfold": {
+    "zh": "使用 ESMFold 从序列预测蛋白质结构",
+    "en": "Predict protein structures from sequence with ESMFold"
+  },
+  "dnakit.databases.coding_variant_fraction": {
+    "zh": "计算满足注释与频率条件的编码变异比例",
+    "en": "Calculate the fraction of coding variants matching filters"
+  },
+  "dnakit.databases.dna_gibson_design": {
+    "zh": "设计 Gibson 无缝组装重叠序列",
+    "en": "Design overlaps for Gibson assembly"
+  },
+  "dnakit.databases.dna_golden_gate_assemble": {
+    "zh": "推演 Golden Gate 反应的组装产物",
+    "en": "Determine Golden Gate reaction products"
+  },
+  "dnakit.databases.dna_golden_gate_design": {
+    "zh": "设计 Golden Gate 酶切位点与连接末端",
+    "en": "Design Golden Gate restriction sites and overhangs"
+  },
+  "dnakit.databases.dna_translate_reading_frames": {
+    "zh": "翻译三个正向阅读框并查找最长开放阅读框",
+    "en": "Translate forward reading frames and find the longest ORF"
+  },
+  "dnakit.databases.dna_virtual_digest": {
+    "zh": "模拟限制性内切酶消化与片段生成",
+    "en": "Simulate restriction digestion and resulting fragments"
+  },
+  "dnakit.databases.sequence_count_residues": {
+    "zh": "统计指定碱基或氨基酸的数量与比例",
+    "en": "Count a nucleotide or amino acid residue"
+  },
+  "dnakit.databases.sequence_dn_ds": {
+    "zh": "计算两条编码序列的 dN/dS",
+    "en": "Calculate dN/dS between two coding sequences"
+  },
+  "dnakit.databases.sequence_gc_content": {
+    "zh": "计算核酸序列的 GC 含量",
+    "en": "Calculate GC content of a nucleotide sequence"
+  },
+  "dnakit.databases.sequence_reverse_complement": {
+    "zh": "计算 DNA 序列的反向互补",
+    "en": "Compute a DNA reverse complement"
+  },
+  "dnakit.databases.sequence_stats": {
+    "zh": "统计序列长度、组成与类型特征",
+    "en": "Summarize sequence length, composition and type-specific properties"
+  },
+  "dnakit.databases.vcf_count_variants": {
+    "zh": "按过滤条件统计 VCF 变异数量",
+    "en": "Count filtered variants in a VCF or BCF file"
+  },
+  "dnakit.databases.vcf_normalize": {
+    "zh": "规范化 VCF 变异表示与多等位位点",
+    "en": "Normalize VCF variants and multiallelic sites"
+  },
+  "dnakit.databases.vcf_summary_stats": {
+    "zh": "汇总 VCF 变异类型与样本基因型统计",
+    "en": "Summarize VCF variant types and sample genotype statistics"
+  },
+  "dnakit.workflows.simulate_inheritance": {
+    "zh": "模拟独立位点的等位基因遗传",
+    "en": "Simulate allele inheritance at independent loci"
+  },
+  "dnakit.databases.call": {
+    "zh": "按操作名称与参数调用数据库功能",
+    "en": "Call a database operation by name and parameters"
+  },
+  "dnakit.databases.describe": {
+    "zh": "查看数据库功能的输入约束与来源",
+    "en": "Inspect database input schemas and provenance"
+  },
+  "dnakit.databases.execute": {
+    "zh": "使用结构化请求执行数据库操作",
+    "en": "Execute a structured database request"
+  },
+  "dnakit.databases.execute_tool": {
+    "zh": "按兼容工具名称调用数据库功能",
+    "en": "Dispatch a database operation using a compatible tool name"
+  },
+  "dnakit.databases.list_operations": {
+    "zh": "离线列出数据库操作与兼容名称",
+    "en": "List database operations and aliases offline"
+  },
+  "dnakit.databases.read_executed_notebook": {
+    "zh": "读取已执行 Notebook 的单元格与输出",
+    "en": "Read cells and outputs from an executed notebook"
+  },
+  "dnakit.databases.search": {
+    "zh": "按任务关键词离线查找数据库功能",
+    "en": "Discover database operations by task keywords offline"
+  },
+  "dnakit.workflows.resource_path": {
+    "zh": "定位并校验随包资源文件",
+    "en": "Locate and verify a bundled resource file"
+  },
+  "dnakit.workflows.run": {
+    "zh": "执行随包工作流并获取退出码与输出",
+    "en": "Run a bundled workflow and retrieve its exit code and output"
+  },
+  "dnakit.workflows.run_support": {
+    "zh": "执行组合流程的支持脚本",
+    "en": "Run a support script for a composite workflow"
+  },
+  "dnakit.workflows.scripts": {
+    "zh": "列出随包 Python、R 与 Shell 脚本",
+    "en": "List bundled Python, R and shell scripts"
+  },
+  "dnakit.workflows.write_wes_report": {
+    "zh": "将已有 Markdown 报告渲染为 PDF",
+    "en": "Render an existing Markdown report as a PDF"
+  },
+  "dnakit.encode.batch_download": {
+    "zh": "批量检索并下载 ENCODE 文件",
+    "en": "Find and batch-download ENCODE files"
+  },
+  "dnakit.encode.compare_experiments": {
+    "zh": "比较 ENCODE 实验的联合分析兼容性",
+    "en": "Compare ENCODE experiments for joint analysis compatibility"
+  },
+  "dnakit.encode.download_files": {
+    "zh": "按文件编号下载 ENCODE 数据",
+    "en": "Download ENCODE files by accession"
+  },
+  "dnakit.encode.export_data": {
+    "zh": "将追踪的 ENCODE 实验导出为表格",
+    "en": "Export tracked ENCODE experiments as a table"
+  },
+  "dnakit.encode.get_citations": {
+    "zh": "获取追踪实验的论文与参考文献",
+    "en": "Retrieve publications and citations for tracked experiments"
+  },
+  "dnakit.encode.get_experiment": {
+    "zh": "按编号查询 ENCODE 实验详情",
+    "en": "Retrieve ENCODE experiment details by accession"
+  },
+  "dnakit.encode.get_facets": {
+    "zh": "查询 ENCODE 筛选条件的实时记录数",
+    "en": "Retrieve live ENCODE filter counts"
+  },
+  "dnakit.encode.get_file_info": {
+    "zh": "查询 ENCODE 文件详情",
+    "en": "Retrieve ENCODE file details"
+  },
+  "dnakit.encode.get_metadata": {
+    "zh": "获取 ENCODE 检索可用的筛选值",
+    "en": "Retrieve available ENCODE search filters"
+  },
+  "dnakit.encode.get_provenance": {
+    "zh": "查询衍生文件的来源记录",
+    "en": "Retrieve derived-file provenance"
+  },
+  "dnakit.encode.get_references": {
+    "zh": "查询实验关联的外部参考标识",
+    "en": "Retrieve external references linked to experiments"
+  },
+  "dnakit.encode.link_reference": {
+    "zh": "为追踪实验关联外部参考标识",
+    "en": "Link an external reference to a tracked experiment"
+  },
+  "dnakit.encode.list_files": {
+    "zh": "列出指定 ENCODE 实验的文件",
+    "en": "List files belonging to an ENCODE experiment"
+  },
+  "dnakit.encode.list_tracked": {
+    "zh": "列出本地追踪的 ENCODE 实验",
+    "en": "List locally tracked ENCODE experiments"
+  },
+  "dnakit.encode.log_derived_file": {
+    "zh": "登记衍生文件与数据来源",
+    "en": "Record a derived file and its provenance"
+  },
+  "dnakit.encode.manage_credentials": {
+    "zh": "管理 ENCODE API 凭据",
+    "en": "Manage ENCODE API credentials"
+  },
+  "dnakit.encode.search_experiments": {
+    "zh": "按实验条件检索 ENCODE 数据",
+    "en": "Search ENCODE experiments by experimental conditions"
+  },
+  "dnakit.encode.search_files": {
+    "zh": "联合实验与文件条件检索 ENCODE 文件",
+    "en": "Search ENCODE files using experiment and file filters"
+  },
+  "dnakit.encode.summarize_collection": {
+    "zh": "按字段汇总追踪的实验集合",
+    "en": "Summarize tracked experiment collections by field"
+  },
+  "dnakit.encode.track_experiment": {
+    "zh": "在本地追踪 ENCODE 实验及其来源信息",
+    "en": "Track an ENCODE experiment and its provenance locally"
+  },
+  "dnakit.databases.download_file": {
+    "zh": "通过 HTTP 或 HTTPS 下载文件",
+    "en": "Download a file over HTTP or HTTPS"
+  },
+  "dnakit.databases.enaportal_search_samples": {
+    "zh": "按分类与关键词检索 ENA 生物样本",
+    "en": "Search ENA biological samples by taxonomy or keyword"
+  },
+  "dnakit.databases.enaportal_search_studies": {
+    "zh": "检索 ENA 测序研究项目",
+    "en": "Search ENA sequencing studies"
+  },
+  "dnakit.databases.ensembl_compara_get_gene_tree": {
+    "zh": "查询基因家族的跨物种系统发育树",
+    "en": "Retrieve a cross-species gene family tree"
+  },
+  "dnakit.databases.ensembl_compara_get_orthologues": {
+    "zh": "查询跨物种直系同源基因",
+    "en": "Retrieve orthologous genes across species"
+  },
+  "dnakit.databases.ensembl_compara_get_paralogues": {
+    "zh": "查询基因复制产生的旁系同源基因",
+    "en": "Retrieve paralogous genes"
+  },
+  "dnakit.databases.ensembl_get_homology": {
+    "zh": "按基因名称查询同源关系",
+    "en": "Retrieve gene homology by symbol"
+  },
+  "dnakit.databases.ensembl_get_overlap_features": {
+    "zh": "查询基因组区间重叠的注释特征",
+    "en": "Retrieve annotations overlapping a genomic interval"
+  },
+  "dnakit.databases.ensembl_get_regulatory_features": {
+    "zh": "查询基因组区间内的调控元件",
+    "en": "Retrieve regulatory features in a genomic interval"
+  },
+  "dnakit.databases.ensembl_get_sequence": {
+    "zh": "获取基因、转录本或区间序列",
+    "en": "Retrieve gene, transcript or genomic interval sequences"
+  },
+  "dnakit.databases.ensembl_get_structural_variants": {
+    "zh": "查询 Ensembl 区间内的结构变异",
+    "en": "Retrieve Ensembl structural variants in an interval"
+  },
+  "dnakit.databases.ensembl_get_sv_detail": {
+    "zh": "查询 Ensembl 结构变异详情",
+    "en": "Retrieve Ensembl structural variant details"
+  },
+  "dnakit.databases.ensembl_lookup_gene": {
+    "zh": "按编号或名称查询 Ensembl 基因信息",
+    "en": "Look up Ensembl genes by identifier or symbol"
+  },
+  "dnakit.databases.ensembl_seq_get_id_sequence": {
+    "zh": "按 Ensembl 编号获取核酸或蛋白质序列",
+    "en": "Retrieve a sequence by Ensembl identifier"
+  },
+  "dnakit.databases.ensembl_seq_get_region_sequence": {
+    "zh": "按基因组坐标获取 Ensembl 参考序列",
+    "en": "Retrieve Ensembl reference sequence by genomic coordinates"
+  },
+  "dnakit.databases.ensembl_vep_region": {
+    "zh": "按基因组位置进行 VEP 变异注释",
+    "en": "Annotate genomic variants with Ensembl VEP"
+  },
+  "dnakit.databases.hgnc_fetch_gene_by_symbol": {
+    "zh": "按官方基因名称查询 HGNC 注释",
+    "en": "Retrieve HGNC annotations by official gene symbol"
+  },
+  "dnakit.databases.my_gene_batch_query": {
+    "zh": "批量查询基因注释与标识映射",
+    "en": "Batch-query gene annotations and identifier mappings"
+  },
+  "dnakit.databases.my_gene_get_gene_annotation": {
+    "zh": "按基因编号获取综合注释",
+    "en": "Retrieve comprehensive annotations for a gene identifier"
+  },
+  "dnakit.databases.my_gene_query_genes": {
+    "zh": "按关键词或标识检索基因",
+    "en": "Search genes by keyword or identifier"
+  },
+  "dnakit.databases.ncbi_fetch_accessions": {
+    "zh": "将 GenBank UID 转换为序列编号",
+    "en": "Convert GenBank UIDs to sequence accessions"
+  },
+  "dnakit.databases.ncbi_get_sequence": {
+    "zh": "按 NCBI 序列编号获取核酸记录",
+    "en": "Retrieve NCBI nucleotide records by accession"
+  },
+  "dnakit.databases.ncbi_search_nucleotide": {
+    "zh": "按物种、基因或菌株检索核酸记录",
+    "en": "Search nucleotide records by organism, gene or strain"
+  },
+  "dnakit.databases.ncbi_sra_search_runs": {
+    "zh": "按研究与实验条件检索 SRA 测序运行",
+    "en": "Search SRA runs by study and experimental conditions"
+  },
+  "dnakit.databases.ncbidatasets_get_gene": {
+    "zh": "按 NCBI Gene ID 获取基因详情",
+    "en": "Retrieve gene details by NCBI Gene ID"
+  },
+  "dnakit.databases.ncbidatasets_get_gene_by_symbol": {
+    "zh": "按基因名称与物种查询 NCBI 基因",
+    "en": "Look up NCBI genes by symbol and organism"
+  },
+  "dnakit.databases.ncbidatasets_get_genome_assembly": {
+    "zh": "查询基因组组装的版本与元数据",
+    "en": "Retrieve genome assembly versions and metadata"
+  },
+  "dnakit.databases.ncbidatasets_get_orthologs": {
+    "zh": "按 NCBI 基因编号查询直系同源基因",
+    "en": "Retrieve orthologs for an NCBI Gene ID"
+  },
+  "dnakit.databases.ncbidatasets_get_sequence_reports": {
+    "zh": "获取组装中染色体与支架的序列报告",
+    "en": "Retrieve chromosome and scaffold sequence reports"
+  },
+  "dnakit.databases.ncbidatasets_get_taxonomy": {
+    "zh": "按分类编号查询物种谱系与统计",
+    "en": "Retrieve taxonomy lineages and counts by taxon ID"
+  },
+  "dnakit.databases.ncbidatasets_list_genomes_by_taxon": {
+    "zh": "列出指定分类单元的基因组组装",
+    "en": "List genome assemblies for a taxon"
+  },
+  "dnakit.databases.ncbidatasets_suggest_taxonomy": {
+    "zh": "按部分名称查找物种分类候选",
+    "en": "Find taxonomy suggestions from a partial organism name"
+  },
+  "dnakit.databases.ncbigene_get_summary": {
+    "zh": "获取 NCBI 基因摘要与功能信息",
+    "en": "Retrieve NCBI gene summaries and functional information"
+  },
+  "dnakit.databases.ncbigene_search": {
+    "zh": "按物种和关键词检索 NCBI 基因编号",
+    "en": "Search NCBI Gene IDs by organism and keyword"
+  },
+  "dnakit.databases.sra_get_experiment": {
+    "zh": "按实验编号查询 SRA 测序元数据",
+    "en": "Retrieve SRA experiment metadata by accession"
+  },
+  "dnakit.databases.sra_search_experiments": {
+    "zh": "检索 SRA 测序实验",
+    "en": "Search SRA sequencing experiments"
+  },
+  "dnakit.databases.tark_get_mane_transcripts": {
+    "zh": "查询 MANE 转录本与 RefSeq 对应关系",
+    "en": "Retrieve MANE transcripts and RefSeq mappings"
+  },
+  "dnakit.databases.tark_get_transcript": {
+    "zh": "查询 Ensembl 转录本历史记录",
+    "en": "Retrieve archived Ensembl transcript records"
+  },
+  "dnakit.download.ena.sequence": {
+    "zh": "下载 ENA 核酸序列并保存校验清单",
+    "en": "Download an ENA nucleotide sequence with a checksum manifest"
+  },
+  "dnakit.download.ncbi.sequence": {
+    "zh": "下载 NCBI 核酸或蛋白质序列",
+    "en": "Download an NCBI nucleotide or protein sequence"
+  },
+  "dnakit.search.ncbi.accessions": {
+    "zh": "批量将序列 UID 解析为带版本的编号",
+    "en": "Resolve sequence UIDs to versioned accessions in batches"
+  },
+  "dnakit.databases.dis_ge_net_get_disease_genes": {
+    "zh": "查询疾病相关基因及关联评分",
+    "en": "Retrieve disease-associated genes and association scores"
+  },
+  "dnakit.databases.dis_ge_net_get_gda": {
+    "zh": "按来源与评分筛选基因疾病关联",
+    "en": "Filter gene–disease associations by source and score"
+  },
+  "dnakit.databases.dis_ge_net_get_vda": {
+    "zh": "查询变异与疾病的关联证据",
+    "en": "Retrieve variant–disease association evidence"
+  },
+  "dnakit.databases.dis_ge_net_search_disease": {
+    "zh": "按疾病概念编号检索相关基因",
+    "en": "Find disease-associated genes by UMLS concept ID"
+  },
+  "dnakit.databases.dis_ge_net_search_gene": {
+    "zh": "按基因名称检索关联疾病",
+    "en": "Find diseases associated with a gene symbol"
+  },
+  "dnakit.databases.gen_cc_get_classifications": {
+    "zh": "统计 GenCC 基因疾病有效性分类",
+    "en": "Summarize GenCC gene–disease validity classifications"
+  },
+  "dnakit.databases.gen_cc_search_disease": {
+    "zh": "按疾病检索 GenCC 基因关联证据",
+    "en": "Search GenCC gene evidence for a disease"
+  },
+  "dnakit.databases.gen_cc_search_gene": {
+    "zh": "按基因查询 GenCC 疾病关联分类",
+    "en": "Retrieve GenCC gene–disease classifications"
+  },
+  "dnakit.databases.get_joint_associated_diseases_by_hpo_id_list": {
+    "zh": "按多个 HPO 表型检索关联疾病",
+    "en": "Retrieve diseases associated with multiple HPO phenotypes"
+  },
+  "dnakit.databases.hpo_get_diseases_by_phenotype": {
+    "zh": "查询 HPO 表型对应的疾病",
+    "en": "Retrieve diseases associated with an HPO phenotype"
+  },
+  "dnakit.databases.hpo_get_genes_by_phenotype": {
+    "zh": "查询 HPO 表型对应的基因",
+    "en": "Retrieve genes associated with an HPO phenotype"
+  },
+  "dnakit.databases.hpo_get_term": {
+    "zh": "查询 HPO 术语定义与同义词",
+    "en": "Retrieve HPO term definitions and synonyms"
+  },
+  "dnakit.databases.hpo_search_terms": {
+    "zh": "按关键词检索 HPO 表型术语",
+    "en": "Search HPO phenotype terms by keyword"
+  },
+  "dnakit.databases.marrvel_get_gene": {
+    "zh": "汇总人类基因标识与注释",
+    "en": "Aggregate human gene identifiers and annotations"
+  },
+  "dnakit.databases.marrvel_get_omim_phenotypes": {
+    "zh": "查询基因的 OMIM 表型与遗传方式",
+    "en": "Retrieve OMIM phenotypes and inheritance for a gene"
+  },
+  "dnakit.databases.monarch_get_gene_diseases": {
+    "zh": "查询 Monarch 基因疾病关联",
+    "en": "Retrieve Monarch gene–disease associations"
+  },
+  "dnakit.databases.monarch_get_gene_phenotypes": {
+    "zh": "查询 Monarch 跨物种基因表型关联",
+    "en": "Retrieve cross-species gene–phenotype associations"
+  },
+  "dnakit.databases.monarch_search": {
+    "zh": "按名称检索 Monarch 生物医学实体",
+    "en": "Search Monarch biomedical entities by name"
+  },
+  "dnakit.databases.monarch_search_gene": {
+    "zh": "检索 Monarch 基因与跨物种标识",
+    "en": "Search Monarch genes and cross-species identifiers"
+  },
+  "dnakit.databases.monarch_v3_get_associations": {
+    "zh": "查询知识图谱中的跨物种实体关联",
+    "en": "Query cross-species biomedical associations"
+  },
+  "dnakit.databases.monarch_v3_get_entity": {
+    "zh": "按 CURIE 查询生物医学实体详情",
+    "en": "Retrieve biomedical entity details by CURIE"
+  },
+  "dnakit.databases.monarch_v3_get_histopheno": {
+    "zh": "按身体系统汇总疾病表型分布",
+    "en": "Summarize disease phenotypes by body system"
+  },
+  "dnakit.databases.monarch_v3_get_mappings": {
+    "zh": "查询生物医学实体的跨本体标识映射",
+    "en": "Retrieve cross-ontology identifier mappings"
+  },
+  "dnakit.databases.monarch_v3_phenotype_similarity_search": {
+    "zh": "按表型语义相似性检索疾病",
+    "en": "Find diseases by phenotype semantic similarity"
+  },
+  "dnakit.databases.monarch_v3_search": {
+    "zh": "检索 Monarch 知识图谱实体与类别",
+    "en": "Search Monarch knowledge graph entities and categories"
+  },
+  "dnakit.databases.ols_get_term_ancestors": {
+    "zh": "查询本体术语的上位概念",
+    "en": "Retrieve ontology term ancestors"
+  },
+  "dnakit.databases.ols_get_term_children": {
+    "zh": "查询本体术语的下位概念",
+    "en": "Retrieve ontology term children"
+  },
+  "dnakit.databases.ols_get_term_info": {
+    "zh": "查询本体术语详情",
+    "en": "Retrieve ontology term details"
+  },
+  "dnakit.databases.ols_search_terms": {
+    "zh": "按关键词检索本体术语",
+    "en": "Search ontology terms by keyword"
+  },
+  "dnakit.databases.omim_get_clinical_synopsis": {
+    "zh": "获取 OMIM 疾病的临床表型摘要",
+    "en": "Retrieve an OMIM clinical phenotype synopsis"
+  },
+  "dnakit.databases.omim_get_entry": {
+    "zh": "按 MIM 编号查询 OMIM 条目",
+    "en": "Retrieve an OMIM entry by MIM number"
+  },
+  "dnakit.databases.omim_get_gene_map": {
+    "zh": "查询 OMIM 基因疾病与染色体映射",
+    "en": "Retrieve OMIM gene–disease and chromosome mappings"
+  },
+  "dnakit.databases.omim_search": {
+    "zh": "检索孟德尔遗传疾病与相关基因",
+    "en": "Search Mendelian disorders and associated genes"
+  },
+  "dnakit.databases.orphanet_get_classification": {
+    "zh": "查询罕见病分类层级",
+    "en": "Retrieve a rare disease classification hierarchy"
+  },
+  "dnakit.databases.orphanet_get_disease": {
+    "zh": "按 ORPHA 编号查询罕见病详情",
+    "en": "Retrieve rare disease details by ORPHA code"
+  },
+  "dnakit.databases.orphanet_get_disease_genes": {
+    "zh": "按 ORPHA 编号获取已报告的基因关联",
+    "en": "Retrieve reported gene associations for an ORPHA disorder"
+  },
+  "dnakit.databases.orphanet_get_epidemiology": {
+    "zh": "查询罕见病患病率与发病率",
+    "en": "Retrieve rare disease prevalence and incidence"
+  },
+  "dnakit.databases.orphanet_get_gene_diseases": {
+    "zh": "按基因检索关联罕见病",
+    "en": "Find rare diseases associated with a gene"
+  },
+  "dnakit.databases.orphanet_get_genes": {
+    "zh": "查询罕见病关联基因与关联类型",
+    "en": "Retrieve rare disease genes and association types"
+  },
+  "dnakit.databases.orphanet_get_icd_mapping": {
+    "zh": "映射罕见病与其他医学编码",
+    "en": "Map rare disease codes to other medical coding systems"
+  },
+  "dnakit.databases.orphanet_get_natural_history": {
+    "zh": "查询罕见病起病年龄与遗传方式",
+    "en": "Retrieve rare disease onset and inheritance information"
+  },
+  "dnakit.databases.orphanet_get_phenotypes": {
+    "zh": "查询罕见病表型及出现频率",
+    "en": "Retrieve rare disease phenotypes and frequencies"
+  },
+  "dnakit.databases.orphanet_search_by_name": {
+    "zh": "按完整或部分名称检索罕见病",
+    "en": "Search rare diseases by complete or partial name"
+  },
+  "dnakit.databases.orphanet_search_diseases": {
+    "zh": "按关键词检索罕见病",
+    "en": "Search rare diseases by keyword"
+  },
+  "dnakit.databases.osl_get_efo_id_by_disease_name": {
+    "zh": "将疾病名称解析为 EFO 术语编号",
+    "en": "Resolve a disease name to an EFO term"
+  },
+  "dnakit.databases.ar_xiv_search_papers": {
+    "zh": "按关键词检索 arXiv 论文",
+    "en": "Search arXiv papers by keyword"
+  },
+  "dnakit.databases.bio_rxiv_get_preprint": {
+    "zh": "按 DOI 查询 bioRxiv 预印本元数据",
+    "en": "Retrieve bioRxiv preprint metadata by DOI"
+  },
+  "dnakit.databases.bio_rxiv_list_recent_preprints": {
+    "zh": "按日期范围列出近期预印本",
+    "en": "List recent preprints within a date range"
+  },
+  "dnakit.databases.clinical_trials_search_studies": {
+    "zh": "按疾病、干预或申办方检索临床研究",
+    "en": "Search clinical studies by condition, intervention or sponsor"
+  },
+  "dnakit.databases.crossref_search_works": {
+    "zh": "检索 Crossref 学术文献与 DOI 元数据",
+    "en": "Search Crossref publications and DOI metadata"
+  },
+  "dnakit.databases.europe_pmc_search_articles": {
+    "zh": "检索 Europe PMC 文献与摘要",
+    "en": "Search Europe PMC articles and abstracts"
+  },
+  "dnakit.databases.med_rxiv_get_preprint": {
+    "zh": "按 DOI 查询 medRxiv 预印本元数据",
+    "en": "Retrieve medRxiv preprint metadata by DOI"
+  },
+  "dnakit.databases.openalex_get_author": {
+    "zh": "按 OpenAlex 编号查询作者详情",
+    "en": "Retrieve OpenAlex author details"
+  },
+  "dnakit.databases.openalex_literature_search": {
+    "zh": "使用 OpenAlex 检索学术文献",
+    "en": "Search scholarly literature with OpenAlex"
+  },
+  "dnakit.databases.openalex_search_works": {
+    "zh": "按筛选条件检索 OpenAlex 论文记录",
+    "en": "Search OpenAlex works with filters"
+  },
+  "dnakit.databases.pub_med_get_article": {
+    "zh": "按 PMID 获取 PubMed 文献完整元数据",
+    "en": "Retrieve full PubMed article metadata by PMID"
+  },
+  "dnakit.databases.pub_med_get_cited_by": {
+    "zh": "查询引用指定 PubMed 文献的论文",
+    "en": "Find articles citing a PubMed paper"
+  },
+  "dnakit.databases.pub_med_get_related": {
+    "zh": "查找与指定 PubMed 文献相似的论文",
+    "en": "Find articles related to a PubMed paper"
+  },
+  "dnakit.databases.pub_med_search_articles": {
+    "zh": "按检索式查询 PubMed 生物医学文献",
+    "en": "Search PubMed biomedical literature"
+  },
+  "dnakit.databases.search_clinical_trials": {
+    "zh": "按疾病、药物或关键词查找临床试验",
+    "en": "Find clinical trials by disease, drug or keyword"
+  },
+  "dnakit.databases.semantic_scholar_search_papers": {
+    "zh": "检索论文、摘要与简短总结",
+    "en": "Search papers, abstracts and summaries with Semantic Scholar"
+  },
+  "dnakit.databases.web_search": {
+    "zh": "通过搜索引擎检索网页",
+    "en": "Search the web using search engines"
+  },
+  "dnakit.databases.c_bio_portal_get_cancer_studies": {
+    "zh": "分页查询 cBioPortal 肿瘤研究目录",
+    "en": "Browse the cBioPortal cancer study catalogue"
+  },
+  "dnakit.databases.c_bio_portal_get_gene_info": {
+    "zh": "按 Entrez 编号查询肿瘤数据库基因信息",
+    "en": "Retrieve cBioPortal gene information by Entrez ID"
+  },
+  "dnakit.databases.c_bio_portal_get_molecular_profiles": {
+    "zh": "查询肿瘤研究的分子数据类型",
+    "en": "Retrieve molecular profiles for a cancer study"
+  },
+  "dnakit.databases.c_bio_portal_get_mutations": {
+    "zh": "查询肿瘤研究中指定基因的突变",
+    "en": "Retrieve gene mutations from a cancer study"
+  },
+  "dnakit.databases.c_bio_portal_get_samples": {
+    "zh": "查询肿瘤研究的样本集合",
+    "en": "Retrieve samples in a cancer study"
+  },
+  "dnakit.databases.cellx_gene_download_h5ad": {
+    "zh": "获取 CELLxGENE 原始 H5AD 数据文件",
+    "en": "Retrieve original CELLxGENE H5AD files"
+  },
+  "dnakit.databases.cellx_gene_get_cell_metadata": {
+    "zh": "按筛选条件查询单细胞元数据",
+    "en": "Query filtered single-cell metadata"
+  },
+  "dnakit.databases.cellx_gene_get_embeddings": {
+    "zh": "获取预计算的单细胞嵌入表示",
+    "en": "Retrieve precomputed cell embeddings"
+  },
+  "dnakit.databases.cellx_gene_get_expression_data": {
+    "zh": "按细胞与基因条件查询表达矩阵",
+    "en": "Query expression data with cell and gene filters"
+  },
+  "dnakit.databases.ch_ipatlas_enrichment_analysis": {
+    "zh": "生成 ChIP-Atlas 富集任务提交说明",
+    "en": "Prepare ChIP-Atlas enrichment submission instructions"
+  },
+  "dnakit.databases.ch_ipatlas_get_experiments": {
+    "zh": "检索 ChIP-Atlas 实验元数据",
+    "en": "Search ChIP-Atlas experiment metadata"
+  },
+  "dnakit.databases.ch_ipatlas_get_peak_data": {
+    "zh": "查询 ChIP-Atlas 峰资源与本地区间重叠",
+    "en": "Retrieve ChIP-Atlas peak resources and local overlaps"
+  },
+  "dnakit.databases.ch_ipatlas_search_datasets": {
+    "zh": "按抗原或细胞类型检索 ChIP-Atlas 数据集",
+    "en": "Search ChIP-Atlas datasets by antigen or cell type"
+  },
+  "dnakit.databases.dep_map_get_gene_dependencies": {
+    "zh": "查询 CRISPR 筛选的基因依赖信息",
+    "en": "Retrieve gene dependency information from CRISPR screens"
+  },
+  "dnakit.databases.dep_map_search_cell_lines": {
+    "zh": "按名称检索肿瘤细胞系",
+    "en": "Search cancer cell lines by name"
+  },
+  "dnakit.databases.e_qtl_get_associations": {
+    "zh": "查询 eQTL 数据集中的变异表达关联",
+    "en": "Retrieve variant–expression associations from an eQTL dataset"
+  },
+  "dnakit.databases.e_qtl_list_datasets": {
+    "zh": "列出可用的 eQTL 研究与组织数据集",
+    "en": "List available eQTL study and tissue datasets"
+  },
+  "dnakit.databases.encode_get_biosample": {
+    "zh": "查询 ENCODE 生物样本完整元数据",
+    "en": "Retrieve ENCODE biosample metadata"
+  },
+  "dnakit.databases.encode_get_chromatin_state": {
+    "zh": "检索染色质状态分割注释",
+    "en": "Search chromatin state segmentation annotations"
+  },
+  "dnakit.databases.encode_get_experiment": {
+    "zh": "查询 ENCODE 实验元数据与分析信息",
+    "en": "Retrieve ENCODE experiment metadata and analysis details"
+  },
+  "dnakit.databases.encode_list_files": {
+    "zh": "按格式与实验类型列出 ENCODE 文件",
+    "en": "List ENCODE files by format and assay"
+  },
+  "dnakit.databases.encode_search_annotations": {
+    "zh": "检索顺式调控元件与表观组注释",
+    "en": "Search cis-regulatory and epigenomic annotations"
+  },
+  "dnakit.databases.encode_search_biosamples": {
+    "zh": "按物种与处理条件检索 ENCODE 样本",
+    "en": "Search ENCODE biosamples by organism and treatment"
+  },
+  "dnakit.databases.encode_search_chromatin_accessibility": {
+    "zh": "检索 ATAC-seq 与 DNase-seq 实验",
+    "en": "Search ATAC-seq and DNase-seq experiments"
+  },
+  "dnakit.databases.encode_search_experiments": {
+    "zh": "通过数据库模块检索 ENCODE 实验",
+    "en": "Search ENCODE experiments through the database module"
+  },
+  "dnakit.databases.encode_search_histone_experiments": {
+    "zh": "按组蛋白修饰检索 ChIP-seq 实验",
+    "en": "Search histone ChIP-seq experiments by modification"
+  },
+  "dnakit.databases.encode_search_rnaseq_experiments": {
+    "zh": "按样本与实验类型检索 ENCODE RNA-seq",
+    "en": "Search ENCODE RNA-seq experiments by sample and assay"
+  },
+  "dnakit.databases.expression_atlas_search_differential": {
+    "zh": "检索差异表达实验的项目记录",
+    "en": "Search differential expression experiment records"
+  },
+  "dnakit.databases.expression_atlas_search_experiments": {
+    "zh": "检索基线与差异表达实验",
+    "en": "Search baseline and differential expression experiments"
+  },
+  "dnakit.databases.four_dn_search_data": {
+    "zh": "检索 Hi-C 与染色质构象数据",
+    "en": "Search Hi-C and chromatin conformation data"
+  },
+  "dnakit.databases.gdc_get_clinical_data": {
+    "zh": "查询 GDC 肿瘤病例的临床资料",
+    "en": "Retrieve GDC cancer case clinical data"
+  },
+  "dnakit.databases.gdc_get_mutation_frequency": {
+    "zh": "查询基因在泛癌队列中的突变频率",
+    "en": "Retrieve pan-cancer gene mutation frequencies"
+  },
+  "dnakit.databases.gdc_get_ssm_by_gene": {
+    "zh": "按基因查询 GDC 体细胞突变",
+    "en": "Retrieve GDC somatic mutations by gene"
+  },
+  "dnakit.databases.gdc_get_survival": {
+    "zh": "查询肿瘤队列的生存与删失数据",
+    "en": "Retrieve cancer cohort survival and censoring data"
+  },
+  "dnakit.databases.gdc_list_files": {
+    "zh": "按数据类型列出 GDC 文件",
+    "en": "List GDC files by data type"
+  },
+  "dnakit.databases.gdc_list_projects": {
+    "zh": "列出 GDC 肿瘤项目与汇总信息",
+    "en": "List GDC cancer projects and summaries"
+  },
+  "dnakit.databases.gdc_search_cases": {
+    "zh": "按筛选条件检索 GDC 肿瘤病例",
+    "en": "Search GDC cancer cases with filters"
+  },
+  "dnakit.databases.geo_search_atacseq_datasets": {
+    "zh": "检索 GEO 染色质可及性数据集",
+    "en": "Search GEO ATAC-seq datasets"
+  },
+  "dnakit.databases.geo_search_chipseq_datasets": {
+    "zh": "检索 GEO 蛋白质 DNA 结合数据集",
+    "en": "Search GEO ChIP-seq datasets"
+  },
+  "dnakit.databases.geo_search_rnaseq_datasets": {
+    "zh": "检索 GEO 转录组表达数据集",
+    "en": "Search GEO RNA-seq datasets"
+  },
+  "dnakit.databases.gtex_calculate_eqtl": {
+    "zh": "计算指定组织中基因与变异的 eQTL 关联",
+    "en": "Calculate a gene–variant eQTL association in a tissue"
+  },
+  "dnakit.databases.gtex_get_expression_summary": {
+    "zh": "查询基因的 GTEx 表达摘要",
+    "en": "Retrieve GTEx gene expression summaries"
+  },
+  "dnakit.databases.gtex_get_median_gene_expression": {
+    "zh": "查询基因在不同组织中的表达中位数",
+    "en": "Retrieve median gene expression across tissues"
+  },
+  "dnakit.databases.gtex_get_multi_tissue_eqtls": {
+    "zh": "查询跨组织 eQTL 荟萃分析结果",
+    "en": "Retrieve multi-tissue eQTL meta-analysis results"
+  },
+  "dnakit.databases.gtex_get_single_tissue_eqtls": {
+    "zh": "查询显著的单组织 eQTL 关联",
+    "en": "Retrieve significant single-tissue eQTL associations"
+  },
+  "dnakit.databases.gtex_get_tissue_sites": {
+    "zh": "列出 GTEx 组织类型与样本统计",
+    "en": "List GTEx tissue sites and sample statistics"
+  },
+  "dnakit.databases.gtex_query_eqtl": {
+    "zh": "按条件查询 GTEx 单组织 eQTL",
+    "en": "Query GTEx single-tissue eQTL data"
+  },
+  "dnakit.databases.harmonizome_get_gene": {
+    "zh": "汇总多组学数据中的基因信息",
+    "en": "Aggregate gene information across genomics datasets"
+  },
+  "dnakit.databases.hpa_get_cancer_prognostics_by_gene": {
+    "zh": "查询基因表达与肿瘤生存的关联",
+    "en": "Retrieve associations between gene expression and cancer survival"
+  },
+  "dnakit.databases.hpa_get_protein_interactions_by_gene": {
+    "zh": "查看已停用的 HPA 蛋白互作查询",
+    "en": "Inspect the retired HPA protein interaction query"
+  },
+  "dnakit.databases.hpa_get_rna_expression_by_source": {
+    "zh": "按组织或细胞来源查询 RNA 表达",
+    "en": "Retrieve RNA expression by biological source"
+  },
+  "dnakit.databases.hpa_get_rna_expression_in_specific_tissues": {
+    "zh": "查询基因在指定组织中的 RNA 表达",
+    "en": "Retrieve gene RNA expression in selected tissues"
+  },
+  "dnakit.databases.hpa_get_subcellular_location": {
+    "zh": "查询蛋白质亚细胞定位注释",
+    "en": "Retrieve protein subcellular localization annotations"
+  },
+  "dnakit.databases.hpa_search_genes_by_query": {
+    "zh": "检索 HPA 基因与 Ensembl 标识",
+    "en": "Search HPA genes and Ensembl identifiers"
+  },
+  "dnakit.databases.jaspar_get_matrix": {
+    "zh": "获取转录因子结合矩阵与元数据",
+    "en": "Retrieve transcription factor binding matrices and metadata"
+  },
+  "dnakit.databases.jaspar_get_matrix_versions": {
+    "zh": "列出 JASPAR 结合矩阵的历史版本",
+    "en": "List available versions of a JASPAR matrix"
+  },
+  "dnakit.databases.jaspar_get_transcription_factors": {
+    "zh": "分页列出 JASPAR 转录因子结合谱",
+    "en": "Browse JASPAR transcription factor binding profiles"
+  },
+  "dnakit.databases.jaspar_search_matrices": {
+    "zh": "按名称、物种或分类检索结合矩阵",
+    "en": "Search binding matrices by name, species or taxonomic group"
+  },
+  "dnakit.databases.re_map_get_transcription_factor_binding": {
+    "zh": "查询基因与细胞类型对应的转录因子结合位点",
+    "en": "Retrieve transcription factor binding sites by gene and cell type"
+  },
+  "dnakit.databases.regulome_db_query_variant": {
+    "zh": "按 rsID 查询变异调控注释",
+    "en": "Retrieve regulatory variant annotations by rsID"
+  },
+  "dnakit.databases.screen_get_regulatory_elements": {
+    "zh": "查询基因组区间的候选顺式调控元件",
+    "en": "Retrieve candidate cis-regulatory elements in an interval"
+  },
+  "dnakit.databases.ucsc_get_encode_c_cres": {
+    "zh": "从 UCSC 获取 ENCODE 候选顺式调控元件",
+    "en": "Retrieve ENCODE candidate cis-regulatory elements from UCSC"
+  },
+  "dnakit.databases.uni_bind_get_dataset": {
+    "zh": "查询单个直接转录因子结合数据集",
+    "en": "Retrieve a direct transcription factor binding dataset"
+  },
+  "dnakit.databases.uni_bind_list_tfs": {
+    "zh": "列出 UniBind 收录的转录因子",
+    "en": "List transcription factors in UniBind"
+  },
+  "dnakit.databases.uni_bind_search_datasets": {
+    "zh": "按转录因子与细胞条件检索结合数据集",
+    "en": "Search binding datasets by transcription factor and cell context"
+  },
+  "dnakit.databases.fly_base_get_gene": {
+    "zh": "查询果蝇基因详情",
+    "en": "Retrieve Drosophila gene details"
+  },
+  "dnakit.databases.fly_base_get_gene_alleles": {
+    "zh": "查询果蝇基因等位变异与表型",
+    "en": "Retrieve Drosophila gene alleles and phenotypes"
+  },
+  "dnakit.databases.fly_base_get_gene_disease_models": {
+    "zh": "查询果蝇基因相关疾病模型",
+    "en": "Retrieve Drosophila gene disease models"
+  },
+  "dnakit.databases.fly_base_get_gene_expression": {
+    "zh": "查询果蝇基因的发育阶段与组织表达",
+    "en": "Retrieve Drosophila developmental and anatomical expression"
+  },
+  "dnakit.databases.fly_base_get_gene_interactions": {
+    "zh": "查询果蝇基因分子互作与遗传互作",
+    "en": "Retrieve Drosophila molecular and genetic interactions"
+  },
+  "dnakit.databases.fly_base_get_gene_orthologs": {
+    "zh": "查询果蝇基因的跨物种直系同源关系",
+    "en": "Retrieve cross-species orthologs of a Drosophila gene"
+  },
+  "dnakit.databases.fly_mine_search": {
+    "zh": "检索果蝇综合基因组学记录",
+    "en": "Search integrated Drosophila genomics records"
+  },
+  "dnakit.databases.gbif_get_species": {
+    "zh": "按分类编号查询 GBIF 物种详情",
+    "en": "Retrieve GBIF species details by taxon key"
+  },
+  "dnakit.databases.gbif_search_species": {
+    "zh": "检索 GBIF 物种名称与分类",
+    "en": "Search GBIF species names and taxonomy"
+  },
+  "dnakit.databases.gtdb_get_species": {
+    "zh": "查询 GTDB 物种簇及其基因组",
+    "en": "Retrieve GTDB species clusters and their genomes"
+  },
+  "dnakit.databases.gtdb_get_taxon_info": {
+    "zh": "查询 GTDB 分类层级与版本历史",
+    "en": "Retrieve GTDB taxonomy and release history"
+  },
+  "dnakit.databases.gtdb_search_genomes": {
+    "zh": "按物种名称检索原核基因组",
+    "en": "Search prokaryotic genomes by organism name"
+  },
+  "dnakit.databases.gtdb_search_taxon": {
+    "zh": "按部分名称检索原核分类单元",
+    "en": "Search prokaryotic taxa by partial name"
+  },
+  "dnakit.databases.mgi_get_gene": {
+    "zh": "按 MGI 编号查询小鼠基因详情",
+    "en": "Retrieve mouse gene details by MGI identifier"
+  },
+  "dnakit.databases.mgi_get_phenotypes": {
+    "zh": "查询小鼠基因的突变表型注释",
+    "en": "Retrieve mouse gene mutant phenotype annotations"
+  },
+  "dnakit.databases.mgi_search_genes": {
+    "zh": "按名称或关键词检索小鼠基因",
+    "en": "Search mouse genes by name or keyword"
+  },
+  "dnakit.databases.mgnify_get_genome": {
+    "zh": "查询微生物基因组质量与分类信息",
+    "en": "Retrieve microbial genome quality and taxonomy"
+  },
+  "dnakit.databases.mgnify_get_go_terms": {
+    "zh": "查询宏基因组分析的 GO 功能注释",
+    "en": "Retrieve GO annotations from a metagenomics analysis"
+  },
+  "dnakit.databases.mgnify_get_interpro": {
+    "zh": "查询宏基因组分析的蛋白结构域组成",
+    "en": "Retrieve metagenomic protein domain annotations"
+  },
+  "dnakit.databases.mgnify_get_study_detail": {
+    "zh": "查询 MGnify 宏基因组研究详情",
+    "en": "Retrieve MGnify metagenomics study details"
+  },
+  "dnakit.databases.mgnify_get_taxonomy": {
+    "zh": "查询宏基因组分类组成与丰度",
+    "en": "Retrieve metagenomic taxonomic composition and abundance"
+  },
+  "dnakit.databases.mgnify_list_analyses": {
+    "zh": "列出指定宏基因组研究的分析记录",
+    "en": "List analyses belonging to a metagenomics study"
+  },
+  "dnakit.databases.mgnify_list_biomes": {
+    "zh": "浏览宏基因组生境分类",
+    "en": "Browse the metagenomics biome hierarchy"
+  },
+  "dnakit.databases.mgnify_search_genomes": {
+    "zh": "检索宏基因组组装与分离株基因组",
+    "en": "Search metagenome-assembled and isolate genomes"
+  },
+  "dnakit.databases.mgnify_search_studies": {
+    "zh": "按生境与关键词检索宏基因组研究",
+    "en": "Search metagenomics studies by biome and keyword"
+  },
+  "dnakit.databases.powo_search_plants": {
+    "zh": "检索全球植物名称与分类记录",
+    "en": "Search global plant names and taxonomy"
+  },
+  "dnakit.databases.rgd_get_annotations": {
+    "zh": "查询大鼠基因的疾病、表型与功能注释",
+    "en": "Retrieve rat gene disease, phenotype and functional annotations"
+  },
+  "dnakit.databases.rgd_get_gene": {
+    "zh": "按 RGD 编号查询大鼠基因详情",
+    "en": "Retrieve rat gene details by RGD identifier"
+  },
+  "dnakit.databases.rgd_get_orthologs": {
+    "zh": "查询大鼠基因的跨物种直系同源关系",
+    "en": "Retrieve cross-species orthologs of a rat gene"
+  },
+  "dnakit.databases.rgd_get_qtls_in_region": {
+    "zh": "查询大鼠基因组区间的数量性状位点",
+    "en": "Retrieve rat QTLs overlapping a genomic interval"
+  },
+  "dnakit.databases.rgd_get_strain": {
+    "zh": "按品系名称查询大鼠品系详情",
+    "en": "Retrieve rat strain details by strain symbol"
+  },
+  "dnakit.databases.rgd_get_strain_annotations": {
+    "zh": "查询大鼠品系的疾病与表型注释",
+    "en": "Retrieve rat strain disease and phenotype annotations"
+  },
+  "dnakit.databases.rgd_search_genes": {
+    "zh": "按名称或关键词检索 RGD 基因",
+    "en": "Search RGD genes by name or keyword"
+  },
+  "dnakit.databases.rgd_search_strains": {
+    "zh": "按关键词与类型检索大鼠品系",
+    "en": "Search rat strains by keyword and type"
+  },
+  "dnakit.databases.sgd_get_gene": {
+    "zh": "查询酵母基因与基因座概况",
+    "en": "Retrieve yeast gene and locus overviews"
+  },
+  "dnakit.databases.sgd_get_go_annotations": {
+    "zh": "查询酵母基因的 GO 注释与证据",
+    "en": "Retrieve yeast gene GO annotations and evidence"
+  },
+  "dnakit.databases.sgd_get_interactions": {
+    "zh": "查询酵母基因的遗传与物理互作",
+    "en": "Retrieve yeast genetic and physical interactions"
+  },
+  "dnakit.databases.sgd_get_phenotypes": {
+    "zh": "查询酵母突变表型与实验条件",
+    "en": "Retrieve yeast mutant phenotypes and experimental conditions"
+  },
+  "dnakit.databases.sgd_search": {
+    "zh": "跨数据类型检索酵母数据库",
+    "en": "Search the yeast database across data types"
+  },
+  "dnakit.databases.usda_plants_get_characteristics": {
+    "zh": "查询植物形态、生长与繁殖特征",
+    "en": "Retrieve plant morphology, growth and reproduction characteristics"
+  },
+  "dnakit.databases.usda_plants_get_profile": {
+    "zh": "查询植物名称、分类与生活型",
+    "en": "Retrieve plant names, taxonomy and growth habits"
+  },
+  "dnakit.databases.worm_base_get_expression": {
+    "zh": "查询线虫基因的组织与发育表达",
+    "en": "Retrieve nematode tissue and developmental expression"
+  },
+  "dnakit.databases.worm_base_get_gene": {
+    "zh": "查询秀丽隐杆线虫基因详情",
+    "en": "Retrieve C. elegans gene details"
+  },
+  "dnakit.databases.worm_base_get_phenotypes": {
+    "zh": "查询线虫基因的实验表型",
+    "en": "Retrieve experimentally observed nematode gene phenotypes"
+  },
+  "dnakit.databases.xenbase_get_gene": {
+    "zh": "查询爪蟾基因详情与跨库标识",
+    "en": "Retrieve Xenopus gene details and cross-references"
+  },
+  "dnakit.databases.xenbase_search_genes": {
+    "zh": "检索热带爪蟾与非洲爪蟾基因",
+    "en": "Search genes in Xenopus tropicalis and Xenopus laevis"
+  },
+  "dnakit.databases.zfin_get_gene": {
+    "zh": "查询斑马鱼基因详情",
+    "en": "Retrieve zebrafish gene details"
+  },
+  "dnakit.databases.zfin_get_gene_expression": {
+    "zh": "查询斑马鱼基因的发育与组织表达",
+    "en": "Retrieve zebrafish developmental and anatomical expression"
+  },
+  "dnakit.databases.zfin_get_gene_phenotypes": {
+    "zh": "查询斑马鱼基因突变表型",
+    "en": "Retrieve zebrafish gene mutant phenotypes"
+  },
+  "dnakit.databases.alphafold_get_prediction": {
+    "zh": "获取已收录的 AlphaFold 蛋白质结构预测",
+    "en": "Retrieve stored AlphaFold protein structure predictions"
+  },
+  "dnakit.databases.bio_grid_get_interactions": {
+    "zh": "查询实验验证的蛋白质与遗传互作",
+    "en": "Retrieve experimentally supported protein and genetic interactions"
+  },
+  "dnakit.databases.blast_protein_search": {
+    "zh": "使用远程 BLAST 检索相似蛋白质序列",
+    "en": "Search similar protein sequences with remote BLAST"
+  },
+  "dnakit.databases.bvbrc_search_epitopes": {
+    "zh": "检索病原体 B 细胞与 T 细胞表位",
+    "en": "Search pathogen B-cell and T-cell epitopes"
+  },
+  "dnakit.databases.enrichr_enrich": {
+    "zh": "对基因集合执行指定库的富集分析",
+    "en": "Run gene set enrichment against an Enrichr library"
+  },
+  "dnakit.databases.enrichr_gene_enrichment_analysis": {
+    "zh": "查询基因与富集通路的连接关系",
+    "en": "Retrieve connections between genes and enriched pathways"
+  },
+  "dnakit.databases.go_get_annotations_for_gene": {
+    "zh": "查询基因或蛋白质的 GO 注释",
+    "en": "Retrieve GO annotations for a gene or protein"
+  },
+  "dnakit.databases.go_search_terms": {
+    "zh": "按关键词检索 GO 术语",
+    "en": "Search GO terms by keyword"
+  },
+  "dnakit.databases.humanbase_ppi_analysis": {
+    "zh": "获取组织特异性蛋白互作网络",
+    "en": "Retrieve tissue-specific protein interaction networks"
+  },
+  "dnakit.databases.iedb_get_epitope_antigens": {
+    "zh": "查询免疫表位关联的抗原",
+    "en": "Retrieve antigens linked to an immune epitope"
+  },
+  "dnakit.databases.iedb_get_epitope_mhc": {
+    "zh": "查询免疫表位的 MHC 限制性关联",
+    "en": "Retrieve epitope MHC restriction associations"
+  },
+  "dnakit.databases.iedb_search_bcell": {
+    "zh": "检索 B 细胞表位实验记录",
+    "en": "Search B-cell epitope assay records"
+  },
+  "dnakit.databases.iedb_search_epitopes": {
+    "zh": "检索免疫表位及其结构编号",
+    "en": "Search immune epitopes and their structure identifiers"
+  },
+  "dnakit.databases.iedb_search_mhc": {
+    "zh": "检索 MHC 相关实验记录",
+    "en": "Search MHC-related assay records"
+  },
+  "dnakit.databases.iedb_search_tcell_assays": {
+    "zh": "检索 T 细胞免疫反应实验",
+    "en": "Search T-cell response assays"
+  },
+  "dnakit.databases.imgt_get_gene_info": {
+    "zh": "查询免疫遗传学资源与基因命名规则",
+    "en": "Retrieve immunogenetics resources and gene naming conventions"
+  },
+  "dnakit.databases.imgt_search_genes": {
+    "zh": "定位免疫球蛋白与 TCR 胚系基因检索入口",
+    "en": "Locate immunoglobulin and TCR germline gene searches"
+  },
+  "dnakit.databases.imm_port_search_studies": {
+    "zh": "按疾病与实验方法检索免疫学研究",
+    "en": "Search immunology studies by disease and assay"
+  },
+  "dnakit.databases.intact_get_complex_details": {
+    "zh": "查询蛋白质复合物组成与功能",
+    "en": "Retrieve protein complex composition and function"
+  },
+  "dnakit.databases.intact_get_interaction_network": {
+    "zh": "查询以指定蛋白质为中心的互作网络",
+    "en": "Retrieve an interaction network centered on a protein"
+  },
+  "dnakit.databases.intact_get_interactions": {
+    "zh": "查询指定蛋白质或基因的互作记录",
+    "en": "Retrieve interactions involving a protein or gene"
+  },
+  "dnakit.databases.intact_search_interactions": {
+    "zh": "按关键词检索 IntAct 分子互作",
+    "en": "Search IntAct molecular interactions by keyword"
+  },
+  "dnakit.databases.inter_pro_get_entries_for_protein": {
+    "zh": "查询蛋白质关联的结构域与家族条目",
+    "en": "Retrieve protein domain and family entries"
+  },
+  "dnakit.databases.inter_pro_get_protein_domains": {
+    "zh": "查询蛋白质结构域与功能注释",
+    "en": "Retrieve protein domain and functional annotations"
+  },
+  "dnakit.databases.kegg_find_genes": {
+    "zh": "按关键词与物种检索 KEGG 基因",
+    "en": "Search KEGG genes by keyword and organism"
+  },
+  "dnakit.databases.kegg_get_gene_info": {
+    "zh": "查询 KEGG 基因序列、功能与通路",
+    "en": "Retrieve KEGG gene sequences, functions and pathways"
+  },
+  "dnakit.databases.kegg_get_gene_pathways": {
+    "zh": "查询基因参与的 KEGG 通路",
+    "en": "Retrieve KEGG pathways containing a gene"
+  },
+  "dnakit.databases.kegg_get_pathway_genes": {
+    "zh": "列出 KEGG 通路中的成员基因",
+    "en": "List genes belonging to a KEGG pathway"
+  },
+  "dnakit.databases.kegg_get_pathway_info": {
+    "zh": "查询 KEGG 通路的基因、化合物与反应",
+    "en": "Retrieve KEGG pathway genes, compounds and reactions"
+  },
+  "dnakit.databases.kegg_search_pathway": {
+    "zh": "按关键词检索 KEGG 通路",
+    "en": "Search KEGG pathways by keyword"
+  },
+  "dnakit.databases.ncbiprotein_get_summary": {
+    "zh": "按编号查询 NCBI 蛋白质记录摘要",
+    "en": "Retrieve an NCBI protein record summary by identifier"
+  },
+  "dnakit.databases.panther_enrichment": {
+    "zh": "执行 PANTHER 基因集合过度代表分析",
+    "en": "Run PANTHER gene set overrepresentation analysis"
+  },
+  "dnakit.databases.panther_ortholog": {
+    "zh": "查询 PANTHER 跨物种直系同源基因",
+    "en": "Retrieve cross-species orthologs from PANTHER"
+  },
+  "dnakit.databases.pdb_get_structure": {
+    "zh": "读取 PDB 结构坐标文件文本",
+    "en": "Retrieve PDB coordinate file text"
+  },
+  "dnakit.databases.pdbe_get_uniprot_mappings": {
+    "zh": "映射 PDB 链与 UniProt 残基区间",
+    "en": "Map PDB chains to UniProt residue intervals"
+  },
+  "dnakit.databases.pdbe_sifts_get_best_structures": {
+    "zh": "按覆盖度与分辨率筛选蛋白质结构",
+    "en": "Rank protein structures by coverage and resolution"
+  },
+  "dnakit.databases.pfam_get_protein_annotations": {
+    "zh": "查询蛋白质 Pfam 结构域与位置",
+    "en": "Retrieve Pfam protein domains and residue positions"
+  },
+  "dnakit.databases.plant_reactome_get_pathway": {
+    "zh": "查询植物通路的反应与注释",
+    "en": "Retrieve plant pathway reactions and annotations"
+  },
+  "dnakit.databases.plant_reactome_list_species": {
+    "zh": "列出植物通路数据库覆盖的物种",
+    "en": "List species covered by Plant Reactome"
+  },
+  "dnakit.databases.plant_reactome_search_pathways": {
+    "zh": "检索植物代谢与调控通路",
+    "en": "Search plant metabolic and regulatory pathways"
+  },
+  "dnakit.databases.proteins_api_get_features": {
+    "zh": "查询蛋白质序列特征与修饰位点",
+    "en": "Retrieve protein sequence features and modified residues"
+  },
+  "dnakit.databases.proteins_api_search": {
+    "zh": "按基因、蛋白名称或编号检索蛋白质",
+    "en": "Search proteins by gene, name or accession"
+  },
+  "dnakit.databases.quick_go_annotations_by_gene": {
+    "zh": "查询基因产物的 GO 注释与证据代码",
+    "en": "Retrieve GO annotations and evidence for a gene product"
+  },
+  "dnakit.databases.rcsbdata_get_entry": {
+    "zh": "查询 PDB 结构实验方法与元数据",
+    "en": "Retrieve PDB experimental methods and structure metadata"
+  },
+  "dnakit.databases.reactome_analysis_pathway_enrichment": {
+    "zh": "执行 Reactome 通路富集分析",
+    "en": "Run Reactome pathway enrichment analysis"
+  },
+  "dnakit.databases.reactome_content_search": {
+    "zh": "检索 Reactome 通路、反应与生物实体",
+    "en": "Search Reactome pathways, reactions and entities"
+  },
+  "dnakit.databases.reactome_get_participants": {
+    "zh": "查询生物反应的参与分子与复合物",
+    "en": "Retrieve molecules and complexes participating in a reaction"
+  },
+  "dnakit.databases.reactome_get_pathway": {
+    "zh": "查询 Reactome 通路完整信息",
+    "en": "Retrieve Reactome pathway details"
+  },
+  "dnakit.databases.reactome_get_pathway_reactions": {
+    "zh": "列出通路包含的反应与子通路",
+    "en": "List reactions and subpathways within a pathway"
+  },
+  "dnakit.databases.reactome_map_uniprot_to_pathways": {
+    "zh": "将 UniProt 蛋白映射到 Reactome 通路",
+    "en": "Map a UniProt protein to Reactome pathways"
+  },
+  "dnakit.databases.string_functional_enrichment": {
+    "zh": "分析蛋白质集合的功能与通路富集",
+    "en": "Analyze functional and pathway enrichment for a protein set"
+  },
+  "dnakit.databases.string_get_functional_annotations": {
+    "zh": "查询 STRING 蛋白质综合功能注释",
+    "en": "Retrieve STRING protein functional annotations"
+  },
+  "dnakit.databases.string_get_functional_enrichment": {
+    "zh": "使用多行蛋白标识执行 STRING 富集分析",
+    "en": "Run STRING enrichment from newline-separated protein identifiers"
+  },
+  "dnakit.databases.string_get_interaction_partners": {
+    "zh": "查询蛋白质互作伙伴与置信度",
+    "en": "Retrieve protein interaction partners and confidence scores"
+  },
+  "dnakit.databases.string_get_network": {
+    "zh": "构建查询蛋白及其邻居的互作网络",
+    "en": "Retrieve an interaction network for proteins and their neighbors"
+  },
+  "dnakit.databases.string_ppi_enrichment": {
+    "zh": "检验蛋白质集合的互作富集程度",
+    "en": "Test protein interaction enrichment in a protein set"
+  },
+  "dnakit.databases.structure_annotate_per_residue": {
+    "zh": "逐残基标注结合界面、口袋与溶剂暴露",
+    "en": "Annotate residue interfaces, pockets and solvent exposure"
+  },
+  "dnakit.databases.uni_prot_get_disease_variants_by_accession": {
+    "zh": "提取 UniProt 蛋白质变异与相关注释",
+    "en": "Extract UniProt protein variants and annotations"
+  },
+  "dnakit.databases.uni_prot_get_entry_by_accession": {
+    "zh": "按编号读取完整 UniProt 条目",
+    "en": "Retrieve a complete UniProt entry by accession"
+  },
+  "dnakit.databases.uni_prot_get_features_by_accession": {
+    "zh": "提取蛋白质结构域、活性位点与序列特征",
+    "en": "Extract protein domains, active sites and sequence features"
+  },
+  "dnakit.databases.uni_prot_get_function_by_accession": {
+    "zh": "提取 UniProt 蛋白质功能注释",
+    "en": "Extract UniProt protein function annotations"
+  },
+  "dnakit.databases.uni_prot_get_sequence_by_accession": {
+    "zh": "提取 UniProt 标准蛋白质序列",
+    "en": "Extract a canonical UniProt protein sequence"
+  },
+  "dnakit.databases.uni_prot_search": {
+    "zh": "按组合检索式查询 UniProt 蛋白质",
+    "en": "Search UniProt proteins with structured queries"
+  },
+  "dnakit.databases.wiki_pathways_search": {
+    "zh": "按通路标题检索 WikiPathways",
+    "en": "Search WikiPathways by pathway title"
+  },
+  "dnakit.databases.ch_embl_get_drug_mechanisms": {
+    "zh": "按药物名称或编号查询作用机制",
+    "en": "Retrieve drug mechanisms by name or identifier"
+  },
+  "dnakit.databases.ch_embl_get_molecule": {
+    "zh": "查询 ChEMBL 分子结构与性质",
+    "en": "Retrieve ChEMBL molecular structures and properties"
+  },
+  "dnakit.databases.ch_embl_get_target_activities": {
+    "zh": "查询靶点相关的生物活性测量值",
+    "en": "Retrieve bioactivity measurements for a target"
+  },
+  "dnakit.databases.ch_embl_search_drugs": {
+    "zh": "按名称与研发阶段检索药物",
+    "en": "Search drugs by name and development phase"
+  },
+  "dnakit.databases.ch_embl_search_targets": {
+    "zh": "按名称、物种或类型检索药物靶点",
+    "en": "Search drug targets by name, organism or type"
+  },
+  "dnakit.databases.ctd_get_chemical_gene_interactions": {
+    "zh": "查看已不可用的 CTD 化学物基因互作查询",
+    "en": "Inspect the unavailable CTD chemical–gene interaction query"
+  },
+  "dnakit.databases.dgidb_get_drug_gene_interactions": {
+    "zh": "批量查询药物与基因互作证据",
+    "en": "Retrieve drug–gene interaction evidence in batches"
+  },
+  "dnakit.databases.dgidb_get_gene_druggability": {
+    "zh": "查询基因的可成药类别",
+    "en": "Retrieve gene druggability categories"
+  },
+  "dnakit.databases.drugbank_get_drug_basic_info_by_drug_name_or_id": {
+    "zh": "查询药物基本信息与批准状态",
+    "en": "Retrieve basic drug information and approval status"
+  },
+  "dnakit.databases.drugbank_get_pharmacology_by_drug_name_or_drugbank_id": {
+    "zh": "查询药效学、作用机制与药代动力学",
+    "en": "Retrieve pharmacodynamics, mechanisms and pharmacokinetics"
+  },
+  "dnakit.databases.drugbank_get_targets_by_drug_name_or_drugbank_id": {
+    "zh": "查询药物靶点、酶、载体与转运体",
+    "en": "Retrieve drug targets, enzymes, carriers and transporters"
+  },
+  "dnakit.databases.drugbank_vocab_search": {
+    "zh": "按名称与同义词检索 DrugBank 词表",
+    "en": "Search the DrugBank vocabulary by name or synonym"
+  },
+  "dnakit.databases.europepmc_disease_target_score": {
+    "zh": "查询文献支持的疾病靶点关联评分",
+    "en": "Retrieve literature-based disease–target association scores"
+  },
+  "dnakit.databases.expression_atlas_disease_target_score": {
+    "zh": "查询表达数据支持的疾病靶点关联评分",
+    "en": "Retrieve expression-based disease–target association scores"
+  },
+  "dnakit.databases.fda_get_active_ingredient_info_by_drug_name": {
+    "zh": "查询药品有效成分",
+    "en": "Retrieve active ingredients in a drug product"
+  },
+  "dnakit.databases.fda_get_adverse_reactions_by_drug_name": {
+    "zh": "查询药品标签中的不良反应信息",
+    "en": "Retrieve adverse reactions from drug labels"
+  },
+  "dnakit.databases.fda_get_boxed_warning_info_by_drug_name": {
+    "zh": "查询药品黑框警告与相关安全信息",
+    "en": "Retrieve drug boxed warnings and safety information"
+  },
+  "dnakit.databases.fda_get_clinical_studies_info_by_drug_name": {
+    "zh": "查询药品标签中的临床研究信息",
+    "en": "Retrieve clinical study information from drug labels"
+  },
+  "dnakit.databases.fda_get_indications_by_drug_name": {
+    "zh": "查询药品适应证与使用说明",
+    "en": "Retrieve drug indications and usage information"
+  },
+  "dnakit.databases.fda_get_mechanism_of_action_by_drug_name": {
+    "zh": "查询药品标签中的作用机制",
+    "en": "Retrieve mechanisms of action from drug labels"
+  },
+  "dnakit.databases.hmdb_get_diseases": {
+    "zh": "查询代谢物的疾病关联",
+    "en": "Retrieve metabolite–disease associations"
+  },
+  "dnakit.databases.hmdb_get_metabolite": {
+    "zh": "按编号或名称查询代谢物信息",
+    "en": "Retrieve metabolite information by identifier or name"
+  },
+  "dnakit.databases.hmdb_search": {
+    "zh": "按名称或分子式检索代谢物",
+    "en": "Search metabolites by name or molecular formula"
+  },
+  "dnakit.databases.open_targets_get_associated_drugs_by_disease_efo_id": {
+    "zh": "按疾病查询已知相关药物",
+    "en": "Retrieve known drugs associated with a disease"
+  },
+  "dnakit.databases.open_targets_get_associated_drugs_by_target_ensembl_id": {
+    "zh": "按靶点查询相关药物与研发阶段",
+    "en": "Retrieve target-associated drugs and development phases"
+  },
+  "dnakit.databases.open_targets_get_associated_phenotypes_by_disease_efo_id": {
+    "zh": "查询疾病相关的 HPO 表型",
+    "en": "Retrieve HPO phenotypes associated with a disease"
+  },
+  "dnakit.databases.open_targets_get_associated_targets_by_disease_efo_id": {
+    "zh": "分页查询疾病关联靶点",
+    "en": "Retrieve disease-associated targets with pagination"
+  },
+  "dnakit.databases.open_targets_get_credible_set_detail": {
+    "zh": "查询 GWAS 可信集合与位点基因映射",
+    "en": "Retrieve GWAS credible set and locus-to-gene details"
+  },
+  "dnakit.databases.open_targets_get_disease_ancestors_parents_by_efo_id": {
+    "zh": "查询疾病本体的父级与祖先概念",
+    "en": "Retrieve disease ontology parents and ancestors"
+  },
+  "dnakit.databases.open_targets_get_disease_descendants_children_by_efo_id": {
+    "zh": "查询疾病本体的子级与后代概念",
+    "en": "Retrieve disease ontology children and descendants"
+  },
+  "dnakit.databases.open_targets_get_disease_description_by_efo_id": {
+    "zh": "查询疾病名称、描述与跨库引用",
+    "en": "Retrieve disease descriptions and cross-references"
+  },
+  "dnakit.databases.open_targets_get_disease_id_description_by_name": {
+    "zh": "按疾病名称解析本体编号与描述",
+    "en": "Resolve disease names to ontology identifiers"
+  },
+  "dnakit.databases.open_targets_get_disease_synonyms_by_efo_id": {
+    "zh": "查询疾病同义名称",
+    "en": "Retrieve disease synonyms"
+  },
+  "dnakit.databases.open_targets_get_disease_therapeutic_areas_by_efo_id": {
+    "zh": "查询疾病所属的治疗领域",
+    "en": "Retrieve therapeutic areas associated with a disease"
+  },
+  "dnakit.databases.open_targets_get_diseases_phenotypes_by_target_ensembl": {
+    "zh": "分页查询靶点关联疾病与表型",
+    "en": "Retrieve target-associated diseases and phenotypes with pagination"
+  },
+  "dnakit.databases.open_targets_get_drug_adverse_events_by_chembl_id": {
+    "zh": "查询药物显著不良事件记录",
+    "en": "Retrieve significant drug adverse event records"
+  },
+  "dnakit.databases.open_targets_get_drug_chemb_id_by_generic_name": {
+    "zh": "按通用名称解析药物 ChEMBL 编号",
+    "en": "Resolve a generic drug name to a ChEMBL identifier"
+  },
+  "dnakit.databases.open_targets_get_drug_indications_by_chembl_id": {
+    "zh": "按 ChEMBL 编号查询药物适应证",
+    "en": "Retrieve drug indications by ChEMBL identifier"
+  },
+  "dnakit.databases.open_targets_get_drug_mechanisms_of_action_by_chembl_id": {
+    "zh": "按 ChEMBL 编号查询药物作用机制",
+    "en": "Retrieve drug mechanisms by ChEMBL identifier"
+  },
+  "dnakit.databases.open_targets_get_drug_warnings_by_chembl_id": {
+    "zh": "按 ChEMBL 编号查询药物警告",
+    "en": "Retrieve drug warnings by ChEMBL identifier"
+  },
+  "dnakit.databases.open_targets_get_evidence_by_datasource": {
+    "zh": "按证据来源筛选靶点疾病关联",
+    "en": "Filter target–disease evidence by data source"
+  },
+  "dnakit.databases.open_targets_get_gwas_study": {
+    "zh": "查询 GWAS 研究队列与统计元数据",
+    "en": "Retrieve GWAS cohort and study metadata"
+  },
+  "dnakit.databases.open_targets_get_publications_by_target_ensembl_id": {
+    "zh": "查询靶点相关文献记录",
+    "en": "Retrieve publications associated with a target"
+  },
+  "dnakit.databases.open_targets_get_similar_entities_by_disease_efo_id": {
+    "zh": "查询与疾病相似的生物医学实体",
+    "en": "Retrieve biomedical entities similar to a disease"
+  },
+  "dnakit.databases.open_targets_get_study_credible_sets": {
+    "zh": "查询指定 GWAS 研究的可信集合",
+    "en": "Retrieve credible sets from a GWAS study"
+  },
+  "dnakit.databases.open_targets_get_target_classes_by_ensembl_id": {
+    "zh": "查询靶点的功能类别",
+    "en": "Retrieve target functional classes"
+  },
+  "dnakit.databases.open_targets_get_target_gene_ontology_by_ensembl_id": {
+    "zh": "查询靶点的 GO 功能注释",
+    "en": "Retrieve GO annotations for a target"
+  },
+  "dnakit.databases.open_targets_get_target_genomic_location_by_ensembl_id": {
+    "zh": "查询靶点的基因组位置与方向",
+    "en": "Retrieve target genomic coordinates and strand"
+  },
+  "dnakit.databases.open_targets_get_target_homologues_by_ensembl_id": {
+    "zh": "查询靶点的同源基因",
+    "en": "Retrieve homologues of a target"
+  },
+  "dnakit.databases.open_targets_get_target_id_description_by_name": {
+    "zh": "按名称解析靶点标识与描述",
+    "en": "Resolve target names to identifiers and descriptions"
+  },
+  "dnakit.databases.open_targets_get_target_interactions_by_ensembl_id": {
+    "zh": "分页查询靶点互作伙伴与证据",
+    "en": "Retrieve target interaction partners and evidence with pagination"
+  },
+  "dnakit.databases.open_targets_get_target_safety_profile_by_ensembl_id": {
+    "zh": "查询靶点已知安全性风险记录",
+    "en": "Retrieve known target safety liabilities"
+  },
+  "dnakit.databases.open_targets_get_target_tractability_by_ensembl_id": {
+    "zh": "查询靶点对不同治疗方式的可开发性",
+    "en": "Retrieve target tractability across treatment modalities"
+  },
+  "dnakit.databases.open_targets_get_variant_credible_sets": {
+    "zh": "查询包含指定变异的 GWAS 可信集合",
+    "en": "Retrieve GWAS credible sets containing a variant"
+  },
+  "dnakit.databases.open_targets_get_variant_info": {
+    "zh": "查询变异坐标、频率与功能后果",
+    "en": "Retrieve variant coordinates, frequencies and consequences"
+  },
+  "dnakit.databases.open_targets_map_any_disease_id_to_all_other_ids": {
+    "zh": "转换疾病与表型的跨数据库标识",
+    "en": "Map disease and phenotype identifiers across databases"
+  },
+  "dnakit.databases.open_targets_multi_entity_search_by_query_string": {
+    "zh": "联合检索疾病、靶点与药物实体",
+    "en": "Search disease, target and drug entities together"
+  },
+  "dnakit.databases.open_targets_search_gwas_studies_by_disease": {
+    "zh": "按疾病或性状查找 GWAS 研究",
+    "en": "Find GWAS studies by disease or trait"
+  },
+  "dnakit.databases.open_targets_target_disease_evidence": {
+    "zh": "查询 IntOGen 肿瘤驱动基因关联证据",
+    "en": "Retrieve IntOGen cancer driver association evidence"
+  },
+  "dnakit.databases.pub_chem_get_cid_by_compound_name": {
+    "zh": "将化合物名称解析为 PubChem CID",
+    "en": "Resolve compound names to PubChem CIDs"
+  },
+  "dnakit.databases.pub_chem_get_compound_properties_by_cid": {
+    "zh": "按 CID 查询化合物分子性质",
+    "en": "Retrieve molecular properties by PubChem CID"
+  },
+  "dnakit.databases.reactome_disease_target_score": {
+    "zh": "查询通路支持的疾病靶点关联评分",
+    "en": "Retrieve pathway-based disease–target association scores"
+  }
+}

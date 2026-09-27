@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
+import inspect
 import json
 import math
+import pickle
 import sys
+from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from contextlib import suppress
 from pathlib import Path
@@ -195,9 +198,14 @@ def _unwrap_base_model(model: Any, torch: Any) -> Any:
 
 def _disable_fast_paths(model: Any, spec: DNAEmbeddingModel) -> None:
     if spec.name == "dnabert2":
+        model_modules = {type(layer).__module__ for layer in model.modules()}
         for module in tuple(sys.modules.values()):
             module_file = getattr(module, "__file__", "") or ""
-            if spec.cache_name not in module_file and "DNABERT-2-117M" not in module_file:
+            if (
+                spec.cache_name not in module_file
+                and "DNABERT-2-117M" not in module_file
+                and getattr(module, "__name__", "") not in model_modules
+            ):
                 continue
             if hasattr(module, "flash_attn_qkvpacked_func"):
                 module.__dict__["flash_attn_qkvpacked_func"] = None
@@ -206,6 +214,76 @@ def _disable_fast_paths(model: Any, spec: DNAEmbeddingModel) -> None:
             if hasattr(module, "use_fast_path"):
                 with suppress(AttributeError, RuntimeError):
                     module.use_fast_path = False
+
+
+def _transformer_special_tokens_mask(tokenizer: Any, tokens: Any, torch: Any) -> Any:
+    """Repair missing/malformed special masks without dropping unknown DNA tokens."""
+
+    provided = tokens.get("special_tokens_mask")
+    if provided is not None and provided.shape == tokens["input_ids"].shape:
+        return provided
+    # NT-v2's EsmTokenizer can include a phantom EOS position in this mask
+    # despite eos_token=None. Rebuild from the actual IDs in that case.
+    special_mask = torch.zeros_like(tokens["input_ids"], dtype=torch.long)
+    unknown = getattr(tokenizer, "unk_token_id", None)
+    for token_id in tuple(getattr(tokenizer, "all_special_ids", ()) or ()):
+        if token_id != unknown:
+            special_mask |= tokens["input_ids"] == int(token_id)
+    return special_mask
+
+
+def _forward_transformers_batch(
+    model: Any,
+    inputs: dict[str, Any],
+    *,
+    torch: Any,
+    pooling: str,
+    special_tokens_mask: Any | None,
+) -> Any:
+    """Pool differentiable outputs, respecting models without attention masks.
+
+    Bidirectional state-space encoders cannot ignore padded positions during
+    their forward pass. Run their variable-length inputs separately so a
+    sequence has the same representation regardless of its batch neighbours.
+    """
+
+    signature = inspect.signature(model.forward)
+    names = signature.parameters
+    accepts_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in names.values())
+    accepts_mask = "attention_mask" in names or accepts_kwargs
+    attention_mask = inputs.get("attention_mask")
+
+    def forward(batch: dict[str, Any], special_mask: Any | None) -> Any:
+        arguments = {key: value for key, value in batch.items() if key in names or accepts_kwargs}
+        # Token type IDs are not a generic **kwargs option (e.g. Llama routes
+        # extra keyword arguments into its attention implementation).
+        if "token_type_ids" not in names:
+            arguments.pop("token_type_ids", None)
+        if "return_dict" in names:
+            arguments["return_dict"] = True
+        if "use_cache" in names:
+            arguments["use_cache"] = False
+        outputs = model(**arguments)
+        hidden = (
+            outputs if isinstance(outputs, torch.Tensor) else _resolve_hidden_states(outputs, torch)
+        )
+        return _pool_hidden_states(
+            hidden,
+            torch=torch,
+            pooling=pooling,
+            attention_mask=batch.get("attention_mask"),
+            special_tokens_mask=special_mask,
+        )
+
+    if accepts_mask or attention_mask is None or bool(attention_mask.bool().all()):
+        return forward(inputs, special_tokens_mask)
+    vectors = []
+    for row in range(inputs["input_ids"].shape[0]):
+        valid = attention_mask[row].bool()
+        batch = {key: value[row : row + 1, valid] for key, value in inputs.items()}
+        special = None if special_tokens_mask is None else special_tokens_mask[row : row + 1, valid]
+        vectors.append(forward(batch, special))
+    return torch.cat(vectors, dim=0)
 
 
 class _TransformersBackend:
@@ -341,6 +419,13 @@ class _TransformersBackend:
                 code="EMPTY_MODEL_TOKENIZATION",
                 context={"model": self.spec.name},
             )
+        if getattr(self.tokenizer, "is_fast", False):
+            # prepare_for_model() does not apply a fast tokenizer's Rust
+            # post-processor. Keep its Encoding objects so each window receives
+            # the official CLS/SEP tokens and their exact special-token mask.
+            encoding = encoded.encodings[0]
+            encoding.truncate(self.window_length, stride=0, direction="right")
+            return [encoding, *encoding.overflowing], "encoding"
         token_chunks: list[Any] = [
             token_ids[start : start + self.window_length]
             for start in range(0, len(token_ids), self.window_length)
@@ -363,6 +448,20 @@ class _TransformersBackend:
             except (TypeError, NotImplementedError):
                 kwargs.pop("return_special_tokens_mask")
                 batch = self.tokenizer(chunks, **kwargs)
+        elif kind == "encoding":
+            prepared = []
+            for chunk in chunks:
+                encoding = self.tokenizer.backend_tokenizer.post_process(
+                    chunk, add_special_tokens=True
+                )
+                prepared.append(
+                    {
+                        "input_ids": encoding.ids,
+                        "attention_mask": encoding.attention_mask,
+                        "special_tokens_mask": encoding.special_tokens_mask,
+                    }
+                )
+            batch = self.tokenizer.pad(prepared, padding=True, return_tensors="pt")
         else:
             prepared = [
                 self.tokenizer.prepare_for_model(
@@ -370,6 +469,7 @@ class _TransformersBackend:
                     add_special_tokens=True,
                     return_attention_mask=True,
                     return_token_type_ids=False,
+                    return_special_tokens_mask=not getattr(self.tokenizer, "is_fast", False),
                     truncation=True,
                     max_length=self.window_length + self._special_token_count(),
                 )
@@ -378,12 +478,9 @@ class _TransformersBackend:
             batch = self.tokenizer.pad(prepared, padding=True, return_tensors="pt")
         values = dict(batch)
         values.pop("token_type_ids", None)
-        if "special_tokens_mask" not in values:
-            special_ids = tuple(getattr(self.tokenizer, "all_special_ids", ()) or ())
-            special_mask = self.torch.zeros_like(values["input_ids"], dtype=self.torch.long)
-            for token_id in special_ids:
-                special_mask |= values["input_ids"] == int(token_id)
-            values["special_tokens_mask"] = special_mask.long()
+        values["special_tokens_mask"] = _transformer_special_tokens_mask(
+            self.tokenizer, values, self.torch
+        )
         return values
 
     def _encode_chunk_batch(self, chunks: list[Any], kind: str) -> Any:
@@ -395,22 +492,15 @@ class _TransformersBackend:
             if isinstance(value, self.torch.Tensor)
         }
         with self.torch.inference_mode():
-            try:
-                outputs = self.model(**inputs)
-            except TypeError as exc:
-                if "attention_mask" not in str(exc):
-                    raise
-                outputs = self.model(input_ids=inputs["input_ids"])
-        hidden_states = _resolve_hidden_states(outputs, self.torch)
-        return _pool_hidden_states(
-            hidden_states,
-            torch=self.torch,
-            pooling=self.config.pooling,
-            attention_mask=inputs.get("attention_mask"),
-            special_tokens_mask=(
-                None if special_tokens_mask is None else special_tokens_mask.to(self.device)
-            ),
-        )
+            return _forward_transformers_batch(
+                self.model,
+                inputs,
+                torch=self.torch,
+                pooling=self.config.pooling,
+                special_tokens_mask=(
+                    None if special_tokens_mask is None else special_tokens_mask.to(self.device)
+                ),
+            )
 
     def _encode_sequence(self, sequence: str) -> Any:
         chunks, kind = self._chunks(sequence)
@@ -445,6 +535,7 @@ class _EnformerBackend:
         self.torch = _require_module("torch", spec)
         enformer_pytorch = _require_module("enformer_pytorch", spec)
         self.device = _resolve_torch_device(self.torch, config.device)
+        self.chunk_length = int(config.max_length or spec.chunk_length)
         try:
             self.model = enformer_pytorch.from_pretrained(
                 str(checkpoint),
@@ -460,12 +551,15 @@ class _EnformerBackend:
         # the resolved local directory, so enable the same official setting here.
         for module in self.model.modules():
             if hasattr(module, "use_tf_gamma"):
-                module.use_tf_gamma = True
+                module.use_tf_gamma = self.chunk_length == 196_608
+        self.downsample = 2 ** int(self.model.config.num_downsamples)
+        self.short_context = self.chunk_length != spec.chunk_length
+        if self.short_context:
+            self.model.crop_final.target_length = -1
         dtype = _torch_dtype(self.torch, config.dtype)
         if dtype is not None:
             self.model = self.model.to(dtype=dtype)
         self.model = self.model.to(self.device).eval()
-        self.chunk_length = int(config.max_length or spec.chunk_length)
         lookup = self.torch.zeros(256, 4, dtype=self.torch.float32, device=self.device)
         for base, vector in {
             "A": (1.0, 0.0, 0.0, 0.0),
@@ -482,7 +576,11 @@ class _EnformerBackend:
             sequence[start : start + self.chunk_length]
             for start in range(0, len(sequence), self.chunk_length)
         ]
-        chunks = [chunk + "N" * (self.chunk_length - len(chunk)) for chunk in raw_chunks]
+        padded_length = max(
+            2 * self.downsample,
+            math.ceil(self.chunk_length / self.downsample) * self.downsample,
+        )
+        chunks = [chunk + "N" * (padded_length - len(chunk)) for chunk in raw_chunks]
         vectors: list[Any] = []
         for start in range(0, len(chunks), self.config.batch_size):
             batch_chunks = chunks[start : start + self.config.batch_size]
@@ -493,12 +591,29 @@ class _EnformerBackend:
             )
             one_hot = self.lookup[encoded]
             with self.torch.inference_mode():
-                hidden = self.model(one_hot, return_only_embeddings=True)
+                hidden = self.model(
+                    one_hot.to(dtype=next(self.model.parameters()).dtype),
+                    return_only_embeddings=True,
+                )
+            mask = None
+            if self.short_context:
+                lengths = self.torch.tensor(
+                    [
+                        math.ceil(len(chunk) / self.downsample)
+                        for chunk in raw_chunks[start : start + self.config.batch_size]
+                    ],
+                    device=self.device,
+                )
+                mask = (
+                    self.torch.arange(hidden.shape[1], device=self.device)[None, :]
+                    < (lengths[:, None])
+                )
             vectors.append(
                 _pool_hidden_states(
                     hidden,
                     torch=self.torch,
                     pooling=self.config.pooling,
+                    attention_mask=mask,
                 )
             )
         return self.torch.cat(vectors, dim=0).mean(dim=0)
@@ -544,6 +659,38 @@ def _clean_janusdna_config(config: dict[str, Any]) -> dict[str, Any]:
     return cleaned
 
 
+def _load_janusdna_checkpoint(torch: Any, checkpoint: Path, spec: DNAEmbeddingModel) -> Any:
+    """Read official Lightning weights with a fixed, scoped metadata allowlist.
+
+    OmegaConf's container/metadata classes restore plain data and annotations;
+    they do not invoke configuration resolvers during deserialization. Never
+    extend this list from checkpoint-provided names or enable unrestricted pickle.
+    DNAKit's tensor-only ``weights.pt`` artifacts do not use this loader.
+    """
+    try:
+        return torch.load(checkpoint, map_location="cpu", weights_only=True)
+    except pickle.UnpicklingError:
+        configuration = _require_module("omegaconf", spec)
+        base = _require_module("omegaconf.base", spec)
+        nodes = _require_module("omegaconf.nodes", spec)
+        metadata_types = [
+            base.Metadata,
+            base.ContainerMetadata,
+            nodes.AnyNode,
+            configuration.DictConfig,
+            configuration.ListConfig,
+            list,
+            dict,
+            int,
+            defaultdict,
+            Any,
+        ]
+        existing = torch.serialization.get_safe_globals()
+        additions = [item for item in metadata_types if item not in existing]
+        with torch.serialization.safe_globals(additions):
+            return torch.load(checkpoint, map_location="cpu", weights_only=True)
+
+
 class _JanusDNABackend:
     def __init__(
         self,
@@ -572,7 +719,9 @@ class _JanusDNABackend:
         model_config._attn_implementation = "eager"
         model_config.final_attention_class = "eager"
         causal_model = modeling_module.JanusDNAForCausalLM(model_config)
-        state = self.torch.load(checkpoint / "checkpoints" / "last.ckpt", map_location="cpu")
+        state = _load_janusdna_checkpoint(
+            self.torch, checkpoint / "checkpoints" / "last.ckpt", spec
+        )
         state_dict = dict(state["state_dict"])
         self.torch.nn.modules.utils.consume_prefix_in_state_dict_if_present(state_dict, "model.")
         for key in tuple(state_dict):
@@ -605,8 +754,17 @@ class _JanusDNABackend:
             for start in range(0, len(sequence), self.chunk_length)
         ]
         vectors: list[Any] = []
-        for start in range(0, len(chunks), self.config.batch_size):
-            batch_chunks = chunks[start : start + self.config.batch_size]
+        # JanusDNA reverses state-space streams internally. Padding a short tail
+        # alongside a full chunk alters its representation even with a mask.
+        chunks_by_length: dict[int, list[str]] = {}
+        for chunk in chunks:
+            chunks_by_length.setdefault(len(chunk), []).append(chunk)
+        batches = [
+            group[start : start + self.config.batch_size]
+            for group in chunks_by_length.values()
+            for start in range(0, len(group), self.config.batch_size)
+        ]
+        for batch_chunks in batches:
             max_size = max(len(chunk) for chunk in batch_chunks) + 2
             input_ids = self.torch.full(
                 (len(batch_chunks), max_size),
@@ -724,8 +882,9 @@ class _Evo2Backend:
 
 def _build_alphagenome_apply_fn(module: Any, metadata: Any, *, force_float32: bool) -> Any:
     if not force_float32:
-        _, apply_fn, _ = module.create_model(metadata)
-        return apply_fn
+        # The official API added trunk/head apply functions after the original
+        # three-item return value. The prediction apply function remains second.
+        return module.create_model(metadata)[1]
     hk = module.hk
     jmp = module.jmp
     research_model = module.model
@@ -792,9 +951,14 @@ class _AlphaGenomeBackend:
         self.jax = jax
         self.jnp = jnp
         self.api_dna_model = api_dna_model
-        devices = list(jax.devices())
+        convert_organism = getattr(dna_model, "convert_to_organism_index", None)
+        human = api_dna_model.Organism.HOMO_SAPIENS
+        self.organism_index = (
+            int(convert_organism(human)) if convert_organism is not None else int(human.value)
+        )
         requested = config.device.strip().lower()
         if requested == "auto":
+            devices = list(jax.devices())
             self.device = next(
                 (device for device in devices if device.platform == "gpu"),
                 devices[0],
@@ -803,7 +967,14 @@ class _AlphaGenomeBackend:
             platform, separator, index_text = requested.partition(":")
             if platform == "cuda":
                 platform = "gpu"
-            matching = [device for device in devices if device.platform == platform]
+            try:
+                matching = list(jax.devices(platform))
+            except RuntimeError as exc:
+                raise ConfigurationError(
+                    "Requested JAX device is unavailable.",
+                    code="INVALID_REPRESENTATION_DEVICE",
+                    context={"device": config.device},
+                ) from exc
             try:
                 device_index = 0 if not separator else int(index_text)
             except ValueError as exc:
@@ -839,7 +1010,7 @@ class _AlphaGenomeBackend:
         apply_fn = _build_alphagenome_apply_fn(
             dna_model,
             metadata,
-            force_float32=self.device.platform != "gpu",
+            force_float32=self.device.platform != "gpu" or config.dtype == "float32",
         )
         self.apply_fn = jax.jit(apply_fn, device=self.device)
         self.chunk_length = int(config.max_length or spec.chunk_length)
@@ -849,7 +1020,6 @@ class _AlphaGenomeBackend:
     def _pad(self, sequence: str) -> str:
         size = max(len(sequence), self.minimum_length)
         size = int(math.ceil(size / self.alignment) * self.alignment)
-        size = min(size, self.chunk_length)
         return sequence[:size] + "N" * max(0, size - len(sequence))
 
     @staticmethod
@@ -868,14 +1038,18 @@ class _AlphaGenomeBackend:
     def _pool(self, embeddings: Any) -> Any:
         import numpy as np
 
-        values = np.asarray(embeddings, dtype=np.float32)
+        # Reduce on the model device, matching the differentiable encoder and
+        # avoiding a host copy of every base's embedding for long sequences.
+        values = self.jnp.asarray(embeddings, dtype=self.jnp.float32)
         if self.config.pooling == "mean":
-            return values.mean(axis=1).squeeze(0)
-        if self.config.pooling == "max":
-            return values.max(axis=1).squeeze(0)
-        if self.config.pooling == "cls":
-            return values[:, 0, :].squeeze(0)
-        return values[:, -1, :].squeeze(0)
+            pooled = values.mean(axis=1).squeeze(0)
+        elif self.config.pooling == "max":
+            pooled = values.max(axis=1).squeeze(0)
+        elif self.config.pooling == "cls":
+            pooled = values[:, 0, :].squeeze(0)
+        else:
+            pooled = values[:, -1, :].squeeze(0)
+        return np.asarray(pooled, dtype=np.float32)
 
     def _encode_sequence(self, sequence: str) -> Any:
         import numpy as np
@@ -890,7 +1064,7 @@ class _AlphaGenomeBackend:
             dna = self.jax.device_put(self._one_hot(padded), self.device)
             organism = self.jax.device_put(
                 self.jnp.asarray(
-                    [self.api_dna_model.Organism.HOMO_SAPIENS.value],
+                    [self.organism_index],
                     dtype=self.jnp.int32,
                 ),
                 self.device,

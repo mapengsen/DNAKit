@@ -1,29 +1,25 @@
 # 数据划分
 
-公共处理接口支持[统一的文件与文本输入](00_processing_inputs.md)，具体入口及输出规则见该说明。
-
 按照随机、分层、相似度或元数据约束划分 DNA 数据集，从而得到训练、验证和测试等相互隔离的数据子集。
 
 所有随机或启发式过程都记录 seed、配置、分组和资源上限。
 
-## 1) DATA-012 · 随机与稳定哈希划分
+这些记录集合接口可直接接收 `DNA(["ACGT", "TTAA", ...])`：`DNA` 会按顺序提供 `DNARecord`。需要稳定 ID 或每条记录的 metadata 时，改用 `DNA([{"id": "r1", "sequence": "ACGT", "metadata": {...}}, ...])`，也可继续传 `DNARecord` 迭代器。
 
-**作用：** 按目标比例把记录分配到 `train / valid / test` 等命名子集，或用固定 seed 生成 K-fold 划分并选择一折作为 `valid`、其余折作为 `train`。返回各子集和分配清单。
+## 1) 随机与稳定哈希划分 {#1-data-012}
 
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项支持 `method="random"`、`method="hash"` 和 `method="kfold"`。
-
-**输入：** 必填记录；比例划分通过 `ratios` 指定总和为 1 的比例，默认 `train=0.8, valid=0.1, test=0.1`。K-fold 通过 `n_splits` 指定折数、`fold_id` 指定验证折。默认 `seed=42`、`shuffle=True`。`hash` 模式要求每条记录具有稳定且唯一的 `record.id`。
-
-`SplitConfig` 和 `dnakit split` 的默认 seed 已由 `0` 调整为 `42`；需要复现此前省略 seed 的比例划分时，请显式传入 `seed=0`。
-
-**示例代码：**
+- **作用：** 按目标比例把记录分配到 `train / valid / test` 等命名子集，或用固定 seed 生成 K-fold 划分并选择一折作为 `valid`、其余折作为 `train`。返回各子集和分配清单。
+- **处理方法：** 随机模式按 seed 打乱后按比例分配；hash 模式按稳定 ID 排序；K-fold 固定划分后选择验证折。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项支持 `method="random"`、`method="hash"` 和 `method="kfold"`。
+- **输入：** 必填记录；比例划分通过 `ratios` 指定总和为 1 的比例，默认 `train=0.8, valid=0.1, test=0.1`。K-fold 需要 scikit-learn，通过 `n_splits` 指定折数、`fold_id` 指定验证折。默认 `seed=42`、`shuffle=True`。`hash` 模式要求每条记录具有稳定且唯一的 `record.id`。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
-from dnakit import DNARecord, DNASequence
+from dnakit import DNA
 from dnakit.datasets import SplitConfig, split
 
-records = [DNARecord(DNASequence("AC"), f"r{i}") for i in range(10)]
+records = DNA([{"id": f"r{i}", "sequence": "AC"} for i in range(10)])
 result = split(
     records,
     config=SplitConfig(
@@ -33,122 +29,48 @@ result = split(
 print(dict(result.counts))
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'train': 8, 'test': 2}
 ```
 
-<span id="1-hash"></span>**顺序无关的 `hash` 划分**
+<span id="1-hash"></span>稳定哈希、K-fold 示例、依赖安装与旧版 seed 兼容说明见[FAQ：详细说明](../../faq/tutorial_integrations.md#dataset-splits)。
 
-`hash` 模式在 `shuffle=True` 时使用版本化 SHA-256 计算 `seed + record.id` 的稳定排序键，在 `shuffle=False` 时按 `record.id` 的稳定字节序排列，再按比例分配记录。因此，同一批记录即使输入顺序变化，按 `record.id` 查看时分类仍完全一致；它不使用 Python 内置的进程随机化 `hash()`。
+正反链共享 `pair_id` 时，可把它放在每条记录的 metadata 中，使用 `SplitConfig(method="group", metadata_key="pair_id")` 按组划分。文件形式的数据可直接使用 `export_grouped_split`，它对每个 `pair_id` 只分配一次，自动写出分配表和各子集 CSV，无需为每一行构造 `DNARecord`。`method="kfold"` 按输入记录逐条分折；若要让配对分块同折，应先为每个 `pair_id` 建立一条代表记录，再将折号映射回两条链。Fig.4 的 A05 对 hg38 分块使用前述文件接口，而 `--n-splits` 控制两个基准数据集官方训练集的折数。
 
-**示例代码：**
+### 文件型分组划分与 K-fold 导出
+
+`dnakit.datasets.export_grouped_split(source, output_dir, group_field=..., config=...)` 按组字段进行随机比例划分。默认 `SplitConfig()` 是种子 42 的 8:1:1 划分。它在输出目录生成 `assignment.csv` 和 `train.csv`、`valid.csv`、`test.csv`；各组内所有行进入同一子集，行顺序保持原始顺序。`sample_sizes` 可按子集指定蓄水池抽样数量，`sample_filter` 控制候选行，`sample_digest_field` 为抽样结果添加 `<字段>_sha256` 列；抽样 CSV 写在 `analysis/`。返回值包含 `seed`、`group_counts` 和 `analysis_counts`。当前文件接口支持 `SplitConfig(method="random")`，输入需提供可读取的行文件，如 CSV 或 Parquet；输出为 CSV。
 
 ```python
-from dnakit import DNARecord, DNASequence
-from dnakit.datasets import SplitConfig, split
+from dnakit.datasets import SplitConfig, export_grouped_split, export_kfold_table
 
-records = [DNARecord(DNASequence("AC"), f"r{i}") for i in range(10)]
-config = SplitConfig(
-    method="hash",
-    ratios={"train": 0.6, "valid": 0.2, "test": 0.2},
-    seed=17,
-    preserve_order=False,
+summary = export_grouped_split(
+    "chunks.csv", "split_output", group_field="pair_id",
+    config=SplitConfig(seed=42),
+    sample_sizes={"train": 800, "valid": 100, "test": 100},
+    sample_filter=lambda row: row["strand"] == "+",
+    sample_digest_field="sequence",
+    overwrite=True,
 )
-first = split(records, config=config)
-second = split(list(reversed(records)), config=config)
-first_by_id = {item.record_id: item.split for item in first.assignments}
-second_by_id = {item.record_id: item.split for item in second.assignments}
-print(first_by_id == second_by_id)
-print(first.get("train").ids == second.get("train").ids)
-```
-
-**示例结果：**
-
-```text
-True
-True
-```
-
-### 固定 K-fold 划分：train / valid
-
-设置 `method="kfold"`，行为对应 [scikit-learn KFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)：
-
-```python
-KFold(n_splits=10, shuffle=True, random_state=42)
-```
-
-**同一随机种子 → 同一套固定的 K-fold 划分 → 依次选择 K 个验证折。** 保持输入记录及其顺序、`seed`、`shuffle`、`n_splits` 不变，只改变 `fold_id`。例如 10 折使用 `fold_id=0..9`，每个样本恰好作为验证样本一次；不要使用 `seed + fold_id`。每次调用会重建相同的划分并返回所选折。
-
-| `SplitConfig` 参数 | 默认值 | 含义 |
-| --- | --- | --- |
-| `method` | `"random"` | 使用 `"kfold"` 启用 K-fold；`"random"` / `"hash"` 保留比例划分 |
-| `n_splits` | K-fold 模式下为 `10` | 总折数，可改为 5、10 等；要求 `2 <= n_splits <= 样本数` |
-| `fold_id` | K-fold 模式下为 `0` | 当前验证折，范围为 `0` 到 `n_splits - 1` |
-| `seed` | `42` | 生成整套划分的固定随机种子，K-fold 要求 `0 <= seed < 2**32` |
-| `shuffle` | `True` | 划分前打乱；`False` 时按输入顺序生成连续的验证折，seed 不影响分配 |
-| `ratios` | 比例模式为 `0.8 / 0.1 / 0.1` | K-fold 模式请省略；`train / valid` 目标比例由折数推导 |
-
-K-fold 返回的子集名称固定为 `train` 和 `valid`，每个子集内部保持原始输入顺序，与 scikit-learn 一致；`preserve_order=False` 也不会额外打乱子集。样本数不能整除 K 时，前 `样本数 % K` 个验证折多一个样本，各验证折大小相差至多 1。结果和导出的分配清单记录 `seed`、`shuffle`、`n_splits`、`fold_id` 及每条记录的归属。
-
-此模式需要 scikit-learn；可安装 `python -m pip install -e ".[bio-analysis]"`。已安装 `.[ml]` 或 `.[training]` 的环境也包含所需依赖。普通比例划分不需要这项依赖。
-
-**示例：先留出固定 test，再对 train 做 10-fold。**
-
-```python
-from dnakit import DNARecord, DNASequence
-from dnakit.datasets import SplitConfig, split
-
-records = [DNARecord(DNASequence("ACGT"), f"r{i}") for i in range(100)]
-seed = 42
-n_splits = 10  # 改为 5 即可运行 5 折
-
-# 第一步只做一次，留出固定测试集。
-outer = split(
-    records,
-    config=SplitConfig(method="random", ratios={"train": 0.8, "test": 0.2}, seed=seed),
+fold_counts = export_kfold_table(
+    "benchmark_train.csv", "benchmark_train_with_folds.csv",
+    config=SplitConfig(method="kfold", n_splits=10, seed=42),
+    label_field="label", overwrite=True,
 )
-training_pool = outer.get("train")
-test = outer.get("test")
-
-# 每轮只改变 fold_id；测试集不传入 K-fold。
-for fold_id in range(n_splits):
-    fold = split(
-        training_pool,
-        config=SplitConfig(
-            method="kfold", n_splits=n_splits, fold_id=fold_id,
-            shuffle=True, seed=seed,
-        ),
-    )
-    train = fold.get("train")
-    valid = fold.get("valid")
-    print(f"fold={fold_id}: train={len(train)}, valid={len(valid)}, test={len(test)}")
-    # 在这里创建并训练一个新的模型，再用 valid 评估。
 ```
 
-上述示例的 `fold=0` 到 `fold=9` 均为 `train=72, valid=8, test=20`，验证样本逐折轮换，20 条测试样本保持固定。若已准备好训练数据，直接将其作为 `training_pool` 即可。`n_splits` 控制总折数，`fold_id` 选择某一折；遍历所有折才形成完整 K-fold 流程，`split()` 本身只划分数据，不会自动训练模型或汇总指标。
+`export_kfold_table` 保留源文件行顺序，附加从 0 开始的 `fold` 列；传入 `label_field` 时返回每折训练和验证标签计数，可用 `dnakit.io.save_json` 保存。默认 10 折、种子 42，需要 scikit-learn。它导出所有折的编号，因此 `SplitConfig.fold_id` 不用于选择单独一折。
 
-接入 `train_custom_property_model()` 时，需要在每一轮把当前 `train`、`valid` 和固定 `test` 写成训练接口支持的 split 列值，并用 `DataMapping.split_field` 映射；不能直接把 `fold_0` 等名称当作训练接口的 split 值。相关说明见[自定义模型训练](23_deep_learning_property_prediction.md)。
+## 2) 分层随机划分 {#2-data-013}
 
-**CLI：** 输入已留出的训练池，输出当前验证折对应的两个子集和分配清单：
-
-```bash
-dnakit split train.fasta runs/fold_0 --method kfold --n-splits 10 --fold-id 0 --seed 42
-```
-
-运行其余折时保持输入和 seed 不变，修改 `--fold-id` 和输出目录；可用 `--no-shuffle` 关闭打乱。Agent/MCP 的 `dnakit.datasets.split` 使用相同的 `config` 参数；JSON/YAML workflow 的 `split.params` 也接受 `method`、`n_splits`、`fold_id`，随机种子使用 workflow 的全局 `seed`，请设为 `42`。
-
-## 2) DATA-013 · 分层随机划分
-
-**作用：** 在 train、valid、test 中尽量保持指定类别标签的原始比例，返回分层后的子集及标签统计，减少类别分布偏移。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="stratified"`。
-
-**输入：** 必填记录、比例和 `metadata_key`；可选 seed、缺失字段策略和顺序策略。
-
-**示例代码：**
+- **作用：** 在 train、valid、test 中尽量保持指定类别标签的原始比例，返回分层后的子集及标签统计，减少类别分布偏移。
+- **处理方法：** 按标签分组，再按目标比例分配各组记录。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="stratified"`。
+- **输入：** 必填记录、比例和 `metadata_key`；可选 seed、缺失字段策略和顺序策略。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -171,22 +93,20 @@ result = split(
 print(dict(result.counts))
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'train': 4, 'test': 4}
 ```
 
-## 3) DATA-014 · 相似度划分
+## 3) 相似度划分 {#3-data-014}
 
-**作用：** 先按相似度阈值建立序列组，再以整组为单位分配 train、valid、test，防止近似序列跨集合形成数据泄漏。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="similarity"`。
-
-**输入：** 必填记录和比例；可选 k、阈值、IUPAC/Gap 策略、seed 和规模上限。
-
-**示例代码：**
+- **作用：** 先按相似度阈值建立序列组，再以整组为单位分配 train、valid、test，防止近似序列跨集合形成数据泄漏。
+- **处理方法：** 按 k-mer 相似度阈值建立组，再将整组分配到子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="similarity"`。
+- **输入：** 必填记录和比例；可选 k、阈值、IUPAC/Gap 策略、seed 和规模上限。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -208,22 +128,20 @@ result = split(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'a': 'train', 'b': 'train', 'c': 'test', 'd': 'test'}
 ```
 
-## 4) DATA-015 · Cluster split
+## 4) Cluster split {#4-data-015-cluster-split}
 
-**作用：** 使用已有 cluster 标签作为不可拆分分组进行数据划分，保证同一 cluster 的全部记录只进入一个子集，并报告实际比例偏差。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="group", metadata_key="cluster"`。
-
-**输入：** 必填记录、每条记录的 cluster metadata 和比例；可选 seed、缺失值策略。
-
-**示例代码：**
+- **作用：** 使用已有 cluster 标签作为不可拆分分组进行数据划分，保证同一 cluster 的全部记录只进入一个子集，并报告实际比例偏差。
+- **处理方法：** 按聚类字段形成组，再将每个完整簇分配到一个子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；`config` 使用 `dnakit.datasets.SplitConfig`，本项设置 `method="group", metadata_key="cluster"`。
+- **输入：** 必填记录、每条记录的 cluster metadata 和比例；可选 seed、缺失值策略。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -244,22 +162,20 @@ result = split(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'a1': 'train', 'a2': 'train', 'b1': 'test'}
 ```
 
-## 5) DATA-016 · 物种划分
+## 5) 物种划分 {#5-data-016}
 
-**作用：** 按物种 metadata 将记录成组后整体划分，确保同一物种不同时出现在训练集和评估集，用于检验跨物种泛化。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
-
-**输入：** 必填 species metadata key 和比例；可选 seed、缺失值策略。
-
-**示例代码：**
+- **作用：** 按物种 metadata 将记录成组后整体划分，确保同一物种不同时出现在训练集和评估集，用于检验跨物种泛化。
+- **处理方法：** 按物种元数据分组，同一物种只进入一个子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
+- **输入：** 必填 species metadata key 和比例；可选 seed、缺失值策略。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -276,22 +192,20 @@ result = split(records, config=SplitConfig(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'h1': 'train', 'h2': 'train', 'm1': 'test'}
 ```
 
-## 6) DATA-017 · 染色体划分
+## 6) 染色体划分 {#6-data-017}
 
-**作用：** 按染色体 metadata 将记录成组后整体划分，避免同一染色体的高度相关区域跨 train、valid、test 造成泄漏。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
-
-**输入：** 必填 chromosome metadata key 和比例；可选 seed、缺失值策略。
-
-**示例代码：**
+- **作用：** 按染色体 metadata 将记录成组后整体划分，避免同一染色体的高度相关区域跨 train、valid、test 造成泄漏。
+- **处理方法：** 按染色体元数据分组，同一染色体只进入一个子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
+- **输入：** 必填 chromosome metadata key 和比例；可选 seed、缺失值策略。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -308,22 +222,20 @@ result = split(records, config=SplitConfig(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'c1-a': 'train', 'c1-b': 'train', 'c2-a': 'test'}
 ```
 
-## 7) DATA-018 · 个体划分
+## 7) 个体划分 {#7-data-018}
 
-**作用：** 按个体或 donor metadata 对样本分组并整体划分，确保同一个体不跨数据子集，用于避免个体特异信息泄漏。
-
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
-
-**输入：** 必填 individual metadata key 和比例；可选 seed、缺失值策略。
-
-**示例代码：**
+- **作用：** 按个体或 donor metadata 对样本分组并整体划分，确保同一个体不跨数据子集，用于避免个体特异信息泄漏。
+- **处理方法：** 按个体元数据分组，同一个体只进入一个子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig` 的 `group` 模式。
+- **输入：** 必填 individual metadata key 和比例；可选 seed、缺失值策略。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -340,7 +252,7 @@ result = split(records, config=SplitConfig(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'p1-a': 'train', 'p1-b': 'train', 'p2-a': 'test'}
@@ -348,13 +260,12 @@ print({item.record_id: item.split for item in result.assignments})
 
 ## 8) 按自定义 label 划分
 
-**作用：** 按调用方指定的任意 metadata label（如 family、locus、batch）对记录分组，确保相同 label 值只进入一个子集，并返回分组分配结果。
-
-**API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig(method="group", metadata_key=label)`。
-
-**输入：** 必填记录、划分比例和自定义 `label`。`label` 是每条记录中的 metadata 字段名，例如 `donor`、`family`、`locus`、`batch` 或其他调用方提供的字段。
-
-**示例代码：**
+- **作用：** 按调用方指定的任意 metadata label（如 family、locus、batch）对记录分组，确保相同 label 值只进入一个子集，并返回分组分配结果。
+- **处理方法：** 按指定 metadata 字段的 label 值分组，再将整组分配到子集。
+- **API：** `dnakit.datasets.split(records[必须], config[必须])`；使用 `dnakit.datasets.SplitConfig(method="group", metadata_key=label)`。
+- **输入：** 必填记录、划分比例和自定义 `label`。`label` 是每条记录中的 metadata 字段名，例如 `donor`、`family`、`locus`、`batch` 或其他调用方提供的字段。
+- **输出：** 返回 `SplitResult`，包含命名子集 `subsets`、各子集数量 `counts` 和逐条分配 `assignments`。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence
@@ -377,22 +288,20 @@ result = split(
 print({item.record_id: item.split for item in result.assignments})
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 {'f1-a': 'train', 'f1-b': 'train', 'f2-a': 'test'}
 ```
 
-## 9) DATA-023 · 泄漏检测
+## 9) 泄漏检测 {#9-data-023}
 
-**作用：** 对 train、valid、test 等集合执行跨集合精确或近似比较，返回泄漏序列对、相似度、涉及子集和汇总比例，用于验证划分独立性。
-
-
-**API：** `dnakit.datasets.detect_leakage(splits[必须], config[可选])`；`config` 使用 `dnakit.datasets.LeakageConfig`。
-
-**输入：** 必填 split 名称到 `DNASet` 的映射；可选 identity/edit/k-mer/fingerprint、阈值和资源上限。
-
-**示例代码：**
+- **作用：** 对 train、valid、test 等集合执行跨集合精确或近似比较，返回泄漏序列对、相似度、涉及子集和汇总比例，用于验证划分独立性。
+- **处理方法：** 比较不同子集的序列或分组信息，报告跨集合重复或相似命中。
+- **API：** `dnakit.datasets.detect_leakage(splits[必须], config[可选])`；`config` 使用 `dnakit.datasets.LeakageConfig`。
+- **输入：** 必填 split 名称到 `DNASet` 的映射；可选 identity/edit/k-mer/fingerprint、阈值和资源上限。
+- **输出：** 返回 `LeakageReport`，包含是否泄漏、泄漏事件数和跨子集命中。
+- **示例代码：**
 
 ```python
 from dnakit import DNARecord, DNASequence, DNASet
@@ -408,8 +317,249 @@ report = detect_leakage(
 print(report.has_leakage, report.exact_event_count)
 ```
 
-**示例结果：**
+- **示例结果：**
 
 ```text
 True 1
 ```
+
+<!-- BEGIN GENERATED API: encode-collection -->
+
+<span id="encode-collection"></span>
+
+## 10) 比较 ENCODE 实验的联合分析兼容性 {#dnakit.encode.compare_experiments}
+
+- **作用：** 比较两个已追踪实验的兼容性。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.compare_experiments(accession1, accession2, *, verbose=True)`
+- **输入：** 必须提供 `accession1`, `accession2`。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，包含兼容性结论、问题、警告和建议。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.compare_experiments(
+    accession1='ENCSR133RZO',
+    accession2='ENCSR000AKS',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，包含兼容性结论、问题、警告和建议。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.compare_experiments-parameters)
+
+## 11) 将追踪的 ENCODE 实验导出为表格 {#dnakit.encode.export_data}
+
+- **作用：** 把本地追踪的实验导出为 CSV、TSV 或 JSON 文本。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.export_data(format='csv', assay_title=None, organism=None, organ=None, *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回指定 CSV、TSV 或 JSON 格式的表格文本。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.export_data(
+    format='csv',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回指定 CSV、TSV 或 JSON 格式的表格文本。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.export_data-parameters)
+
+## 12) 获取追踪实验的论文与参考文献 {#dnakit.encode.get_citations}
+
+- **作用：** 获取追踪实验的论文引用，可导出 BibTeX 或 RIS。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.get_citations(accession=None, export_format='json', *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回指定格式的文献引用文本，例如 BibTeX 或 RIS。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.get_citations(
+    export_format='bibtex',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回指定格式的文献引用文本，例如 BibTeX 或 RIS。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.get_citations-parameters)
+
+## 13) 查询衍生文件的来源记录 {#dnakit.encode.get_provenance}
+
+- **作用：** 查询衍生文件的来源链。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.get_provenance(file_path=None, source_accession=None, *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，包含来源链或衍生文件列表。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.get_provenance(
+    file_path='analysis/consensus_peaks.bed',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，包含来源链或衍生文件列表。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.get_provenance-parameters)
+
+## 14) 查询实验关联的外部参考标识 {#dnakit.encode.get_references}
+
+- **作用：** 查询实验关联的外部引用。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.get_references(experiment_accession=None, reference_type=None, *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，列出关联的外部引用。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.get_references(
+    reference_type='doi',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，列出关联的外部引用。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.get_references-parameters)
+
+## 15) 为追踪实验关联外部参考标识 {#dnakit.encode.link_reference}
+
+- **作用：** 关联实验与 DOI、PMID、GEO 等外部标识。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.link_reference(experiment_accession, reference_type, reference_id, description='', *, verbose=True)`
+- **输入：** 必须提供 `experiment_accession`, `reference_type`, `reference_id`。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，报告引用关联结果。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.link_reference(
+    experiment_accession='ENCSR133RZO',
+    reference_type='doi',
+    reference_id='10.1038/nature11247',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，报告引用关联结果。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.link_reference-parameters)
+
+## 16) 列出本地追踪的 ENCODE 实验 {#dnakit.encode.list_tracked}
+
+- **作用：** 列出本地追踪的实验。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.list_tracked(assay_title=None, organism=None, organ=None, *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，包含已追踪实验的元数据表和追踪统计。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.list_tracked(
+    assay_title='ATAC-seq',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，包含已追踪实验的元数据表和追踪统计。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.list_tracked-parameters)
+
+## 17) 登记衍生文件与数据来源 {#dnakit.encode.log_derived_file}
+
+- **作用：** 登记衍生文件及其来源、工具和参数。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.log_derived_file(file_path, source_accessions, description='', file_type='', tool_used='', parameters='', *, verbose=True)`
+- **输入：** 必须提供 `file_path`, `source_accessions`。 先用文件查询功能取得实际编号，替换 `ENCFF_REPLACE_ME`。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，包含新建来源记录的 ID。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.log_derived_file(
+    file_path='analysis/consensus_peaks.bed',
+    source_accessions=['ENCFF_REPLACE_ME'],
+    description='Consensus peak set',
+    file_type='bed',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，包含新建来源记录的 ID。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.log_derived_file-parameters)
+
+## 18) 按字段汇总追踪的实验集合 {#dnakit.encode.summarize_collection}
+
+- **作用：** 按实验、组织等字段汇总本地实验集合。
+- **处理方法：** 读取或更新本地 ENCODE 追踪记录，按所选操作整理结果。
+- **API：** `dnakit.encode.summarize_collection(assay_title=None, organism=None, organ=None, *, verbose=True)`
+- **输入：** 按示例选择查询条件；可选参数使用接口默认值。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，按多个维度汇总实验数量。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.summarize_collection(
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，按多个维度汇总实验数量。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.summarize_collection-parameters)
+
+## 19) 在本地追踪 ENCODE 实验及其来源信息 {#dnakit.encode.track_experiment}
+
+- **作用：** 把实验加入本地追踪目录。
+- **处理方法：** 按指定条件访问 ENCODE，解析实验、文件或下载结果。
+- **API：** `dnakit.encode.track_experiment(accession, fetch_publications=True, fetch_pipelines=True, notes='', *, verbose=True)`
+- **输入：** 必须提供 `accession`。 集合操作使用本地追踪记录；比较、关联引用和导出前，先用 `track_experiment` 登记实验。文件来源查询还需先登记衍生文件。
+- **输出：** 返回 JSON 文本，包含追踪结果、找到的文献与分析流程信息。
+- **示例代码：**
+
+```python
+import dnakit
+
+result = dnakit.encode.track_experiment(
+    accession='ENCSR133RZO',
+    verbose=False,
+)
+print(result)
+```
+
+- **示例结果：** 返回 JSON 文本，包含追踪结果、找到的文献与分析流程信息。
+
+[完整参数与使用说明](../../faq/api/10_datasets.md#dnakit.encode.track_experiment-parameters)
+
+<!-- END GENERATED API: encode-collection -->

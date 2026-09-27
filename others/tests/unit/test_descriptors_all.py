@@ -73,10 +73,11 @@ def test_descriptor_schema_has_exact_stable_240_field_layout() -> None:
     assert schema[180].name == "diprodb_twist_mean"
 
 
-def test_complete_descriptor_document_lists_schema_in_exact_order() -> None:
-    document = (Path(__file__).parents[3] / "docs/api/features/05_all_descriptors.md").read_text(
-        encoding="utf-8"
-    )
+@pytest.mark.parametrize("language_suffix", ["", ".en"])
+def test_complete_descriptor_document_lists_schema_in_exact_order(language_suffix: str) -> None:
+    document = (
+        Path(__file__).parents[3] / f"docs/faq/tutorial_integrations{language_suffix}.md"
+    ).read_text(encoding="utf-8")
     documented_rows = tuple(
         tuple(cell.strip().strip("`") for cell in line.split("|")[1:-1])
         for line in document.splitlines()

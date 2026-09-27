@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import inspect
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ from .adapters import CallPlan, analyze_callable
 ToolEffect = Literal["local", "network", "filesystem", "model", "external_process"]
 
 PUBLIC_TOOL_MODULES: tuple[str, ...] = (
+    "dnakit.generated",
     "dnakit.alignment",
     "dnakit.annotation",
     "dnakit.backends",
@@ -30,6 +32,8 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
     "dnakit.evaluation",
     "dnakit.encode",
     "dnakit.fingerprints",
+    "dnakit.genomics",
+    "dnakit.integrations",
     "dnakit.io",
     "dnakit.molbio",
     "dnakit.ops",
@@ -40,6 +44,7 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
     "dnakit.search",
     "dnakit.secondary_structure",
     "dnakit.similarity",
+    "dnakit.skills",
     "dnakit.standardize",
     "dnakit.structure3d",
     "dnakit.thermodynamics",
@@ -48,6 +53,7 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
 )
 
 CATEGORY_LABELS: dict[str, tuple[str, str]] = {
+    "generated": ("生成工具", "generated tools"),
     "encode": ("ENCODE 实验数据", "ENCODE experimental data"),
     "databases": ("科学数据库接口", "scientific database APIs"),
     "alignment": ("序列比对", "alignment"),
@@ -63,6 +69,8 @@ CATEGORY_LABELS: dict[str, tuple[str, str]] = {
     "download": ("数据下载", "data download"),
     "evaluation": ("数据评价", "dataset evaluation"),
     "fingerprints": ("DNA 指纹", "DNA fingerprints"),
+    "genomics": ("基因组与 DNA 工程", "genomics and DNA engineering"),
+    "integrations": ("外部分析与 MCP", "external analyses and MCP"),
     "io": ("文件读写", "file input and output"),
     "molbio": ("分子生物学", "molecular biology"),
     "ops": ("序列操作", "sequence operations"),
@@ -73,6 +81,7 @@ CATEGORY_LABELS: dict[str, tuple[str, str]] = {
     "search": ("数据库搜索", "database search"),
     "secondary_structure": ("二级结构", "secondary structure"),
     "similarity": ("相似性", "similarity"),
+    "skills": ("分析工作流说明", "workflow skills"),
     "standardize": ("标准化与验证", "standardization and validation"),
     "structure3d": ("三维结构", "3D structure"),
     "thermodynamics": ("理化与热力学", "physicochemical and thermodynamic"),
@@ -106,6 +115,7 @@ _FILESYSTEM_NAMES = frozenset(
 )
 _MODEL_NAMES = frozenset(
     {
+        "dnakit.datasets.diversity_sample",
         "dnakit.datasets.neural_cluster_sequences",
         "dnakit.evaluation.evaluate_frechet_distance",
         "dnakit.predictions.ensure_prediction_checkpoint",
@@ -125,6 +135,10 @@ _EXTERNAL_PROCESS_NAMES = frozenset(
         "dnakit.annotation.annotate_genes",
         "dnakit.download.build_index",
         "dnakit.thermodynamics.probe_primer3",
+        "dnakit.integrations.run_analysis",
+        "dnakit.integrations.list_mcp_tools",
+        "dnakit.integrations.call_mcp_tool",
+        "dnakit.integrations.call_mcp_workflow",
     }
 )
 _NETWORK_PREFIXES = (
@@ -159,6 +173,7 @@ class AgentToolSpec:
     hidden_parameters: tuple[str, ...]
     call_plan: CallPlan
     function: Callable[..., object]
+    search_text: str | None = None
 
     def to_summary(self) -> dict[str, object]:
         """Return compact metadata for discovery results."""
@@ -201,6 +216,8 @@ def _description(function: Callable[..., object]) -> tuple[str, str]:
 
 
 def _effect(name: str) -> ToolEffect:
+    if name == "dnakit.skills.install_skill":
+        return "filesystem"
     if name == "dnakit.workflows.write_wes_report":
         return "filesystem"
     if name in {"dnakit.workflows.run", "dnakit.workflows.run_support"}:
@@ -252,7 +269,19 @@ def _build_spec(
         incompatibilities.insert(0, denied_reason)
     effect = _effect(name)
     short_description, full_description = _description(function)
-    return AgentToolSpec(
+    if module_name == "dnakit.generated":
+        from dnakit.generated import _entries
+
+        metadata = _entries()[export_name]
+        declared_effect = metadata.get("effect", "external_process")
+        effect = cast(ToolEffect, declared_effect)
+        short_description = str(metadata.get("description", short_description))
+        for dependency in metadata["contract"].get("dependencies", []):
+            if importlib.util.find_spec(dependency) is None:
+                incompatibilities.append(
+                    f"Required generated-tool dependency is missing: {dependency}"
+                )
+    spec = AgentToolSpec(
         name=name,
         category=category,
         function_name=f"{function.__module__}.{function.__qualname__}",
@@ -261,7 +290,7 @@ def _build_spec(
         effect=effect,
         open_world=effect in {"network", "filesystem", "model", "external_process"},
         requires_confirmation=effect in {"filesystem", "model", "external_process"},
-        agent_compatible=plan.compatible and denied_reason is None,
+        agent_compatible=plan.compatible and not incompatibilities,
         incompatibilities=tuple(incompatibilities),
         hidden_parameters=tuple(
             parameter.name
@@ -271,12 +300,18 @@ def _build_spec(
         call_plan=plan,
         function=function,
     )
+    from .descriptions import apply_native_description
+
+    return apply_native_description(spec)
 
 
 def build_tool_catalog(*, verbose: bool = True) -> tuple[AgentToolSpec, ...]:
     """Discover functions explicitly exported by stable DNAKit domain modules."""
 
     tools: list[AgentToolSpec] = []
+    from dnakit.generated import _refresh
+
+    _refresh()
     for module_name in PUBLIC_TOOL_MODULES:
         module = importlib.import_module(module_name)
         for export_name in getattr(module, "__all__", ()):

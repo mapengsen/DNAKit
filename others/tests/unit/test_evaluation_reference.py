@@ -140,8 +140,12 @@ def test_novelty_memorization_and_reference_similarity_share_reference_contract(
     memorization = evaluate_memorization(queries, reference, config=config)
     similarity = evaluate_reference_similarity(queries, reference, config=config)
 
-    assert novelty.entries[0].metrics["is_novel"] is False
-    assert novelty.entries[1].metrics["is_novel"] is True
+    assert novelty.entries[0].metrics["novelty"] == 0.0
+    assert novelty.entries[1].metrics["novelty"] == 1.0
+    assert novelty.metrics["score"] == 0.5
+    assert novelty.metrics["exact_match_count"] == 1
+    assert novelty.metrics["exact_match_rate"] == 0.5
+    assert "is_novel" not in novelty.entries[0].metrics
     assert memorization.metrics["exact_copy_count"] == 1
     assert memorization.parameters["task_model_used"] is False
     assert similarity.metrics["mean_nearest_similarity"] == 0.5
@@ -158,11 +162,11 @@ def test_levenshtein_novelty_uses_the_published_nearest_reference_formula() -> N
     )
 
     assert novelty.method == "mean-nearest-reference-levenshtein-distance"
-    assert novelty.algorithm_version == "eval-novelty-levenshtein-v1"
+    assert novelty.algorithm_version == "eval-novelty-levenshtein-v2"
     assert novelty.metrics["score"] == pytest.approx(5 / 3)
     assert novelty.metrics["mean_nearest_levenshtein_distance"] == pytest.approx(5 / 3)
-    assert novelty.metrics["novel_count"] == 2
-    assert novelty.metrics["novel_fraction"] == pytest.approx(2 / 3)
+    assert novelty.metrics["exact_match_count"] == 1
+    assert novelty.metrics["exact_match_rate"] == pytest.approx(1 / 3)
     assert novelty.metrics["pairwise_comparison_count"] == 6
     assert novelty.entries[0].metrics["nearest_levenshtein_distance"] == 0.0
     assert novelty.entries[1].metrics["nearest_levenshtein_distance"] == 1.0
@@ -212,10 +216,47 @@ def test_reference_coverage_filter_and_copy_threshold_conflict_are_explicit() ->
         config=ReferenceSearchConfig(method="identity", min_coverage=0.75),
     )
     assert filtered.entries[0].metrics["nearest_reference_id"] is None
+    novelty = evaluate_novelty(
+        _set(("query", "AAAA")),
+        reference,
+        config=ReferenceSearchConfig(min_similarity=0.95, copy_threshold=0.9),
+    )
+    assert novelty.metrics["exact_match_rate"] == 0.0
     with pytest.raises(ConfigurationError) as error:
-        evaluate_novelty(
+        evaluate_memorization(
             _set(("query", "AAAA")),
             reference,
             config=ReferenceSearchConfig(min_similarity=0.95, copy_threshold=0.9),
         )
     assert error.value.code == "REFERENCE_COPY_THRESHOLD_CONFLICT"
+
+
+def test_novelty_exact_match_rate_is_independent_of_nearest_kmer_ties() -> None:
+    reference = create_reference_library(
+        _set(("reverse", "GGGGTTTT"), ("literal", "AAAACCCC")),
+        name="reference",
+        version="1",
+        source="local:test",
+    )
+    report = evaluate_novelty(_set(("query", "AAAACCCC")), reference)
+
+    assert report.entries[0].metrics["nearest_reference_id"] == "reverse"
+    assert report.entries[0].metrics["novelty"] == 0.0
+    assert report.entries[0].metrics["exact_match"] is True
+    assert report.metrics["exact_match_rate"] == 1.0
+
+
+def test_novelty_score_and_exact_fraction_ignore_copy_threshold() -> None:
+    reference = _reference()
+    queries = _set(("copy", "AAAA"), ("near", "AAAT"))
+    low = evaluate_novelty(
+        queries, reference, config=ReferenceSearchConfig(method="identity", copy_threshold=0.0)
+    )
+    high = evaluate_novelty(
+        queries, reference, config=ReferenceSearchConfig(method="identity", copy_threshold=1.0)
+    )
+
+    assert low.metrics["score"] == high.metrics["score"] == pytest.approx(0.125)
+    assert low.metrics["exact_match_rate"] == high.metrics["exact_match_rate"] == 0.5
+    assert low.entries[1].metrics["novelty"] == pytest.approx(0.25)
+    assert low.entries[1].metrics["exact_match"] is False

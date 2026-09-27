@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from concurrent.futures import ProcessPoolExecutor
+from math import fsum
 
 from dnakit._verbosity import register_public as _register_public_verbose
-from dnakit.core import DNARecord
+from dnakit.core import DNARecord, DNASequence
 from dnakit.datasets import (
     ClusterConfig,
     IUPACDeduplicationConfig,
@@ -19,14 +21,13 @@ from ._shared import (
     EvaluationInput,
     enforce_pair_limit,
     materialize_input,
-    mean,
     pair_count,
     pair_similarity,
     record_for,
     report,
     require_pairwise_compatible,
 )
-from .config import DiversityEvaluationConfig, UniquenessEvaluationConfig
+from .config import DiversityEvaluationConfig, EvaluationLimits, UniquenessEvaluationConfig
 from .results import EvaluationReport
 
 
@@ -38,10 +39,13 @@ def evaluate_uniqueness(
     value: EvaluationInput,
     *,
     config: UniquenessEvaluationConfig | None = None,
+    plot: bool = False,
     verbose: bool = True,
 ) -> EvaluationReport:
-    """Compute non-duplicate fraction under one explicitly configured equivalence."""
+    """Compute non-duplicate fraction; ``plot=True`` saves ``uniqueness_ratio.png`` in CWD."""
 
+    if not isinstance(plot, bool):
+        raise TypeError("plot must be a boolean.")
     resolved = UniquenessEvaluationConfig() if config is None else config
     if not isinstance(resolved, UniquenessEvaluationConfig):
         raise TypeError("config must be UniquenessEvaluationConfig or None.")
@@ -87,7 +91,7 @@ def evaluate_uniqueness(
     duplicate_groups = tuple(group for group in groups if len(group) > 1)
     total = len(records)
     score = unique_count / total if total else 1.0
-    return report(
+    result = report(
         name="uniqueness",
         method=f"{resolved.equivalence}-equivalence",
         version="eval-uniqueness-v1",
@@ -112,6 +116,11 @@ def evaluate_uniqueness(
             "pairwise_comparison_count": comparisons,
         },
     )
+    if plot:
+        from ._plots import save_uniqueness_chart
+
+        save_uniqueness_chart(score, unique_count, total, equivalence=resolved.equivalence)
+    return result
 
 
 def _similarity_state(
@@ -176,29 +185,85 @@ def _pair_indices(
     )
 
 
+_WORKER_SEQUENCES: tuple[DNASequence, ...] = ()
+_WORKER_MAX_CELLS = 0
+
+
+def _init_diversity_worker(sequences: tuple[str, ...], max_cells: int) -> None:
+    global _WORKER_SEQUENCES, _WORKER_MAX_CELLS
+    _WORKER_SEQUENCES = tuple(DNASequence(sequence, alphabet="iupac") for sequence in sequences)
+    _WORKER_MAX_CELLS = max_cells
+
+
+def _diversity_worker_distance(pair: tuple[int, int]) -> float:
+    left, right = pair
+    return edit_distance(
+        _WORKER_SEQUENCES[left],
+        _WORKER_SEQUENCES[right],
+        max_cells=_WORKER_MAX_CELLS,
+        verbose=False,
+    ).distance
+
+
+def _diversity_pair_distances(
+    records: tuple[DNARecord, ...], config: DiversityEvaluationConfig
+) -> Iterable[float]:
+    comparisons = pair_count(len(records))
+    if config.workers == 1 or comparisons < 2:
+        for left, right in _pair_indices(len(records), show_progress=config.show_progress):
+            yield edit_distance(
+                records[left], records[right], max_cells=config.limits.max_alignment_cells
+            ).distance
+        return
+
+    longest = sorted(records, key=lambda record: record.sequence.symbol_length, reverse=True)[:2]
+    if (longest[0].sequence.symbol_length + 1) * (
+        longest[1].sequence.symbol_length + 1
+    ) > config.limits.max_alignment_cells:
+        edit_distance(
+            longest[0], longest[1], max_cells=config.limits.max_alignment_cells, verbose=False
+        )
+
+    sequences = tuple(record.sequence.symbols for record in records)
+    with ProcessPoolExecutor(
+        max_workers=min(config.workers, comparisons),
+        initializer=_init_diversity_worker,
+        initargs=(sequences, config.limits.max_alignment_cells),
+    ) as executor:
+        distances = executor.map(
+            _diversity_worker_distance,
+            _pair_indices(len(records), show_progress=False),
+            chunksize=16,
+        )
+        if config.show_progress:
+            from dnakit._progress import track
+
+            distances = track(
+                distances,
+                description="Diversity sequence pairs",
+                total=pair_count(len(records)),
+            )
+        yield from distances
+
+
 def _evaluate_levenshtein_diversity(
     records: tuple[DNARecord, ...],
     config: DiversityEvaluationConfig,
+    *,
+    plot: bool,
 ) -> EvaluationReport:
     comparisons = pair_count(len(records))
     enforce_pair_limit(comparisons, config.limits)
     for record in records:
         require_pairwise_compatible(record.sequence, role="diversity")
-    distances = tuple(
-        float(
-            edit_distance(
-                records[left],
-                records[right],
-                max_cells=config.limits.max_alignment_cells,
-            ).distance
-        )
-        for left, right in _pair_indices(
-            len(records),
-            show_progress=config.show_progress,
-        )
-    )
-    mean_distance = mean(distances)
-    return report(
+    pair_distances: list[float] | None = [] if plot else None
+    total_distance = 0.0
+    for distance in _diversity_pair_distances(records, config):
+        total_distance += distance
+        if pair_distances is not None:
+            pair_distances.append(distance)
+    mean_distance = total_distance / comparisons if comparisons else None
+    result = report(
         name="diversity",
         method="mean-pairwise-levenshtein-distance",
         version="eval-diversity-levenshtein-v1",
@@ -212,6 +277,7 @@ def _evaluate_levenshtein_diversity(
             "topology_policy": "linearized at stored origin; no circular rotation",
             "undefined_policy": "score=None when fewer than two records",
             "show_progress": config.show_progress,
+            "workers": config.workers,
             "limits": config.limits,
             "reference": "https://doi.org/10.1016/j.compbiomed.2024.109440",
         },
@@ -221,73 +287,83 @@ def _evaluate_levenshtein_diversity(
             "record_count": len(records),
             "mean_pair_distance": mean_distance,
             "mean_pairwise_levenshtein_distance": mean_distance,
-            "minimum_pairwise_levenshtein_distance": min(distances) if distances else None,
-            "maximum_pairwise_levenshtein_distance": max(distances) if distances else None,
             "pairwise_comparison_count": comparisons,
         },
     )
+    if pair_distances is not None:
+        from ._plots import save_diversity_charts
+
+        save_diversity_charts(mean_distance, pair_distances)
+    return result
 
 
 def evaluate_diversity(
-    value: EvaluationInput, *, config: DiversityEvaluationConfig | None = None, verbose: bool = True
+    value: EvaluationInput,
+    *,
+    config: DiversityEvaluationConfig | None = None,
+    plot: bool = False,
+    verbose: bool = True,
 ) -> EvaluationReport:
-    """Evaluate diversity with similarity summaries or mean pairwise Levenshtein distance."""
+    """Evaluate mean pairwise Levenshtein distance; ``plot=True`` saves two PNGs in CWD."""
 
+    if not isinstance(plot, bool):
+        raise TypeError("plot must be a boolean.")
     resolved = DiversityEvaluationConfig() if config is None else config
     if not isinstance(resolved, DiversityEvaluationConfig):
         raise TypeError("config must be DiversityEvaluationConfig or None.")
     items = materialize_input(value, limits=resolved.limits)
     records = tuple(record_for(item) for item in items)
-    if resolved.calculation == "levenshtein":
-        return _evaluate_levenshtein_diversity(records, resolved)
-    matrix, comparisons = _similarity_state(records, resolved)
-    distances = tuple(
-        1.0 - matrix[left][right]
-        for left in range(len(records))
-        for right in range(left + 1, len(records))
-    )
-    nearest_distances = (
-        tuple(
-            min(1.0 - matrix[index][other] for other in range(len(records)) if other != index)
-            for index in range(len(records))
-        )
-        if len(records) > 1
-        else ()
-    )
-    cluster_count = _component_count(matrix, resolved.cluster_threshold)
-    cluster_coverage = cluster_count / len(records) if records else 1.0
-    mean_distance = mean(distances)
-    mean_nearest = mean(nearest_distances)
-    score = mean_nearest if mean_nearest is not None else (1.0 if len(records) <= 1 else 0.0)
+    return _evaluate_levenshtein_diversity(records, resolved, plot=plot)
+
+
+def evaluate_kmer_diversity(
+    value: EvaluationInput,
+    *,
+    k: int = 5,
+    canonical: bool = True,
+    limits: EvaluationLimits | None = None,
+    verbose: bool = True,
+) -> EvaluationReport:
+    """Report mean pairwise and nearest-neighbor canonical k-mer Jaccard distances."""
+    if isinstance(k, bool) or not isinstance(k, int) or k < 1:
+        raise ValueError("k must be a positive integer.")
+    if not isinstance(canonical, bool):
+        raise TypeError("canonical must be boolean.")
+    resolved_limits = EvaluationLimits() if limits is None else limits
+    if not isinstance(resolved_limits, EvaluationLimits):
+        raise TypeError("limits must be EvaluationLimits or None.")
+    records = tuple(record_for(item) for item in materialize_input(value, limits=resolved_limits))
+    comparisons = pair_count(len(records))
+    enforce_pair_limit(comparisons, resolved_limits)
+    nearest = [1.0] * len(records)
+    distances = []
+    for left in range(len(records)):
+        for right in range(left + 1, len(records)):
+            similarity, _ = pair_similarity(
+                records[left],
+                records[right],
+                method="kmer",
+                k=k,
+                canonical=canonical,
+                max_alignment_cells=resolved_limits.max_alignment_cells,
+            )
+            distance = 1.0 - similarity
+            distances.append(distance)
+            nearest[left] = min(nearest[left], distance)
+            nearest[right] = min(nearest[right], distance)
+    mean_pair = fsum(distances) / comparisons if comparisons else None
+    mean_nearest = fsum(nearest) / len(records) if comparisons else None
     return report(
-        name="diversity",
-        method="exhaustive-pair-distance-and-threshold-components",
-        version="eval-diversity-v1",
-        parameters={
-            "calculation": resolved.calculation,
-            "similarity_method": resolved.method,
-            "distance_definition": "1 - pair similarity",
-            "k": resolved.k,
-            "canonical": resolved.canonical,
-            "cluster_threshold": resolved.cluster_threshold,
-            "cluster_strategy": "connected-components-of-threshold-graph",
-            "short_k_policy": "literal equality when either sequence is shorter than k",
-            "topology_policy": "linearized at stored origin; no circular rotation",
-            "singleton_policy": "score=1; pair metrics undefined",
-            "show_progress": resolved.show_progress,
-            "limits": resolved.limits,
-        },
+        name="kmer_diversity",
+        method="canonical-kmer-jaccard-distance" if canonical else "kmer-jaccard-distance",
+        version="eval-kmer-diversity-v1",
+        parameters={"k": k, "canonical": canonical, "limits": resolved_limits},
         metrics={
-            "score": score,
+            "score": mean_pair,
             "record_count": len(records),
-            "mean_pair_distance": mean_distance,
-            "mean_nearest_neighbor_distance": mean_nearest,
-            "minimum_nearest_neighbor_distance": min(nearest_distances)
-            if nearest_distances
-            else None,
-            "cluster_count": cluster_count,
-            "cluster_coverage": cluster_coverage,
             "pairwise_comparison_count": comparisons,
+            "mean_pair_distance": mean_pair,
+            "mean_nearest_neighbor_distance": mean_nearest,
         },
     )
 
@@ -346,6 +422,11 @@ def evaluate_redundancy(
     )
 
 
-__all__ = ["evaluate_diversity", "evaluate_redundancy", "evaluate_uniqueness"]
+__all__ = [
+    "evaluate_diversity",
+    "evaluate_kmer_diversity",
+    "evaluate_redundancy",
+    "evaluate_uniqueness",
+]
 
 _register_public_verbose(globals())

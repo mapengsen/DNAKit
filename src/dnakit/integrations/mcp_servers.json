@@ -1,0 +1,1351 @@
+{
+  "schema_version": 2,
+  "verified_date": "2026-09-20",
+  "servers": [
+    {
+      "id": "gigwa-mcp",
+      "name": "Gigwa MCP",
+      "command": "gigwa-mcp",
+      "arguments": [],
+      "repository": "https://github.com/gkanogiannis/Gigwa-MCP",
+      "sources": [
+        "https://github.com/gkanogiannis/Gigwa-MCP/blob/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/README.md"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Anestis Gkanogiannis and contributors",
+      "installation": "Install gigwa-mcp separately into a Python >=3.10 environment; configure GIGWA_URL and optional paired GIGWA_USER/GIGWA_PASS.",
+      "required_environment": [
+        "GIGWA_URL"
+      ],
+      "optional_environment": [
+        "GIGWA_USER",
+        "GIGWA_PASS",
+        "GIGWA_TIMEOUT",
+        "GIGWA_CONNECT_TIMEOUT"
+      ],
+      "secret_environment": [
+        "GIGWA_USER",
+        "GIGWA_PASS"
+      ],
+      "environment_pairs": [
+        [
+          "GIGWA_USER",
+          "GIGWA_PASS"
+        ]
+      ],
+      "required_files": [],
+      "capabilities": [
+        "genotype data",
+        "breeding",
+        "population genetics",
+        "QC"
+      ],
+      "effects": "Tools may upload data, modify Gigwa, or write local result files; inspect each tool before invocation.",
+      "source_commit": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "chorus",
+      "name": "Chorus",
+      "command": "chorus-mcp",
+      "arguments": [],
+      "repository": "https://github.com/pinellolab/chorus",
+      "sources": [
+        "https://github.com/pinellolab/chorus/blob/cc8aabe9f5e4e562f0fc8b8bfa838fb100cba52b/README.md",
+        "https://github.com/pinellolab/chorus/blob/cc8aabe9f5e4e562f0fc8b8bfa838fb100cba52b/setup.py"
+      ],
+      "license": "MIT",
+      "attribution": "Dmitry Penzar, Lorenzo Ruggeri, Rosalba Giugno, Luca Pinello and contributors",
+      "installation": "Install the pinellolab/chorus source project and provision its oracle environments, model weights and references separately. The PyPI package named chorus is unrelated. Set executable_path to the installed chorus-mcp.",
+      "required_environment": [],
+      "optional_environment": [
+        "HF_TOKEN",
+        "HF_HOME"
+      ],
+      "secret_environment": [
+        "HF_TOKEN"
+      ],
+      "required_files": [],
+      "capabilities": [
+        "regulatory prediction",
+        "variant effects",
+        "genomic models"
+      ],
+      "effects": "Predictions can consume GPU/CPU, write reports, and download missing model assets inside the upstream server. Pre-provision assets when offline.",
+      "source_commit": "cc8aabe9f5e4e562f0fc8b8bfa838fb100cba52b",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "mavedb-link",
+      "name": "MaveDB-Link",
+      "command": "python",
+      "arguments": [
+        "mcp_server.py"
+      ],
+      "http_url": "https://mavedb-link.genefoundry.org/mcp",
+      "repository": "https://github.com/berntpopp/mavedb-link",
+      "sources": [
+        "https://github.com/berntpopp/mavedb-link/blob/1ae150ff3f041045708001403be13f908d58d077/README.md",
+        "https://github.com/berntpopp/mavedb-link/blob/1ae150ff3f041045708001403be13f908d58d077/mcp_server.py"
+      ],
+      "license": "MIT",
+      "attribution": "Bernt Popp and mavedb-link contributors",
+      "installation": "For stdio, install the source project's dependencies in Python >=3.12 and set workdir to that checkout and executable_path to its Python. The author-documented HTTP service is available with transport='http'.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [
+        "mcp_server.py"
+      ],
+      "capabilities": [
+        "MAVE scores",
+        "functional calibration",
+        "variant interpretation research"
+      ],
+      "effects": "Reads local MaveDB mirrors or contacts the MaveDB API; HTTP mode sends tool arguments to the author's hosted service.",
+      "source_commit": "1ae150ff3f041045708001403be13f908d58d077",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio",
+        "http"
+      ]
+    },
+    {
+      "id": "biomcp",
+      "name": "BioMCP",
+      "command": "biomcp",
+      "arguments": [
+        "serve"
+      ],
+      "repository": "https://github.com/genomoncology/biomcp",
+      "sources": [
+        "https://github.com/genomoncology/biomcp/blob/3b1d6452ab63741562d2ef97495a97281b304729/README.md",
+        "https://github.com/genomoncology/biomcp/blob/3b1d6452ab63741562d2ef97495a97281b304729/docs/user-guide/cli-reference.md"
+      ],
+      "license": "MIT",
+      "attribution": "Ian Maurer, GenomOncology and contributors",
+      "installation": "Install genomoncology/biomcp separately; its PyPI distribution is biomcp-cli, not the unrelated biomcp distribution. The installed executable is biomcp.",
+      "required_environment": [],
+      "optional_environment": [
+        "NCBI_API_KEY",
+        "NCI_API_KEY",
+        "ONCOKB_TOKEN",
+        "S2_API_KEY",
+        "ALPHAGENOME_API_KEY"
+      ],
+      "secret_environment": [
+        "NCBI_API_KEY",
+        "NCI_API_KEY",
+        "ONCOKB_TOKEN",
+        "S2_API_KEY",
+        "ALPHAGENOME_API_KEY"
+      ],
+      "required_files": [],
+      "capabilities": [
+        "variant evidence",
+        "clinical research",
+        "genomic databases",
+        "pharmacogenomics"
+      ],
+      "effects": "Contacts upstream biomedical APIs according to the selected tool; some sources require credentials.",
+      "source_commit": "3b1d6452ab63741562d2ef97495a97281b304729",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "juicebox",
+      "name": "Juicebox MCP",
+      "command": "node",
+      "arguments": [
+        "server.js"
+      ],
+      "repository": "https://github.com/aidenlab/juicebox-mcp",
+      "sources": [
+        "https://github.com/aidenlab/juicebox-mcp/blob/0149fd1410ae37448dd899eb33b30082ae2748d5/package.json",
+        "https://github.com/aidenlab/juicebox-mcp/blob/0149fd1410ae37448dd899eb33b30082ae2748d5/server.js"
+      ],
+      "license": "MIT",
+      "attribution": "Jim Robinson, Douglass Turner and contributors",
+      "installation": "Prepare the official source checkout and npm dependencies separately, then set workdir to the checkout and executable_path to Node if necessary.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [
+        "server.js",
+        "package.json"
+      ],
+      "capabilities": [
+        "Hi-C visualization",
+        "chromatin architecture",
+        "genomic navigation"
+      ],
+      "effects": "Starts the MCP server and local browser communication service; visualization tools may require an attached Juicebox frontend and network datasets.",
+      "source_commit": "0149fd1410ae37448dd899eb33b30082ae2748d5",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "genechat",
+      "name": "GeneChat MCP",
+      "command": "genechat",
+      "arguments": [
+        "serve"
+      ],
+      "repository": "https://github.com/natecostello/genechat-mcp",
+      "sources": [
+        "https://github.com/natecostello/genechat-mcp/blob/6f40f93c1ce6a0f914a4db34c759f733264e6cdb/README.md"
+      ],
+      "license": "MIT",
+      "attribution": "Nate Costello and GeneChat contributors",
+      "installation": "Install and initialize GeneChat and its local genome/annotation databases separately. GENECHAT_CONFIG optionally selects an existing TOML configuration.",
+      "required_environment": [],
+      "optional_environment": [
+        "GENECHAT_CONFIG"
+      ],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "local VCF queries",
+        "pharmacogenomics",
+        "genomic research"
+      ],
+      "effects": "Reads configured local genomes; returned tool results can include individual genotypes.",
+      "source_commit": "6f40f93c1ce6a0f914a4db34c759f733264e6cdb",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "genepattern",
+      "name": "GenePattern MCP",
+      "command": "python",
+      "arguments": [
+        "server.py",
+        "--transport",
+        "stdio"
+      ],
+      "repository": "https://github.com/genepattern/genepattern-mcp",
+      "sources": [
+        "https://github.com/genepattern/genepattern-mcp/blob/0e81d31101f0362eb0e050b23408a2bec35da0bb/README.md",
+        "https://github.com/genepattern/genepattern-mcp/blob/0e81d31101f0362eb0e050b23408a2bec35da0bb/LICENSE"
+      ],
+      "license": "BSD-3-Clause",
+      "attribution": "GenePattern team and contributors; underlying platform: Reich et al., GenePattern 2.0 (2006)",
+      "installation": "Install the official source checkout requirements separately with Python >=3.11. Set workdir to the checkout, executable_path to that Python, and GENEPATTERN_KEY to an existing API token.",
+      "required_environment": [
+        "GENEPATTERN_KEY"
+      ],
+      "optional_environment": [
+        "GENEPATTERN_URL",
+        "LOCAL_FILES_ENABLED"
+      ],
+      "secret_environment": [
+        "GENEPATTERN_KEY"
+      ],
+      "required_files": [
+        "server.py"
+      ],
+      "capabilities": [
+        "genomics workflows",
+        "module discovery",
+        "cloud analysis jobs",
+        "single-cell analysis"
+      ],
+      "effects": "Selected tools can submit GenePattern jobs, upload data, or download files. Uses GenePattern cloud by default or the explicitly configured GENEPATTERN_URL.",
+      "source_commit": "0e81d31101f0362eb0e050b23408a2bec35da0bb",
+      "verified_date": "2026-09-20",
+      "transports": [
+        "stdio"
+      ]
+    },
+    {
+      "id": "brapi",
+      "name": "BrAPI MCP",
+      "command": "node",
+      "arguments": [
+        "dist/index.js"
+      ],
+      "repository": "https://github.com/cyanheads/brapi-mcp-server",
+      "source_commit": "b7492bdf24dcc0abc36626f234eae03ec5e1331b",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/cyanheads/brapi-mcp-server/b7492bdf24dcc0abc36626f234eae03ec5e1331b/README.md",
+        "https://raw.githubusercontent.com/cyanheads/brapi-mcp-server/b7492bdf24dcc0abc36626f234eae03ec5e1331b/package.json",
+        "https://raw.githubusercontent.com/cyanheads/brapi-mcp-server/b7492bdf24dcc0abc36626f234eae03ec5e1331b/src/index.ts",
+        "https://raw.githubusercontent.com/cyanheads/brapi-mcp-server/b7492bdf24dcc0abc36626f234eae03ec5e1331b/src/config/server-config.ts",
+        "https://raw.githubusercontent.com/cyanheads/brapi-mcp-server/b7492bdf24dcc0abc36626f234eae03ec5e1331b/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Casey Hand (cyanheads) and contributors; community BrAPI implementation",
+      "installation": "Separately prepare the pinned @cyanheads/brapi-mcp-server release/source with its dist build and dependencies; set workdir to the package root and executable_path to Node >=24. The bridge never runs npm, npx, bunx or an installer.",
+      "required_environment": [],
+      "optional_environment": [
+        "BRAPI_DEFAULT_BASE_URL",
+        "BRAPI_DEFAULT_USERNAME",
+        "BRAPI_DEFAULT_PASSWORD",
+        "BRAPI_DEFAULT_API_KEY",
+        "BRAPI_DEFAULT_API_KEY_HEADER",
+        "BRAPI_DEFAULT_OAUTH_CLIENT_ID",
+        "BRAPI_DEFAULT_OAUTH_CLIENT_SECRET",
+        "BRAPI_DEFAULT_OAUTH_TOKEN_URL",
+        "BRAPI_ALLOW_PRIVATE_IPS",
+        "BRAPI_ENABLE_WRITES",
+        "BRAPI_EXPORT_DIR",
+        "BRAPI_REQUEST_TIMEOUT_MS"
+      ],
+      "secret_environment": [
+        "BRAPI_DEFAULT_USERNAME",
+        "BRAPI_DEFAULT_PASSWORD",
+        "BRAPI_DEFAULT_API_KEY",
+        "BRAPI_DEFAULT_OAUTH_CLIENT_ID",
+        "BRAPI_DEFAULT_OAUTH_CLIENT_SECRET"
+      ],
+      "required_files": [
+        "dist/index.js",
+        "package.json"
+      ],
+      "capabilities": [
+        "breeding trial data",
+        "germplasm",
+        "genotypes",
+        "phenotype matrices"
+      ],
+      "effects": "Queries BrAPI servers; opt-in upstream tools can submit observations or export local data. Connection aliases and dataframes require call_mcp_workflow to preserve a session.",
+      "transports": [
+        "stdio",
+        "http"
+      ],
+      "limitations": [
+        "Interface integration does not implement genomic selection or validate breeding predictions."
+      ],
+      "fixed_environment": {
+        "MCP_TRANSPORT_TYPE": "stdio"
+      },
+      "http_url": "https://brapi.caseyjhand.com/mcp",
+      "environment_pairs": [
+        [
+          "BRAPI_DEFAULT_USERNAME",
+          "BRAPI_DEFAULT_PASSWORD"
+        ],
+        [
+          "BRAPI_DEFAULT_OAUTH_CLIENT_ID",
+          "BRAPI_DEFAULT_OAUTH_CLIENT_SECRET"
+        ]
+      ]
+    },
+    {
+      "id": "ensembl",
+      "name": "Ensembl MCP (cyanheads)",
+      "command": "node",
+      "arguments": [
+        "dist/index.js"
+      ],
+      "repository": "https://github.com/cyanheads/ensembl-mcp-server",
+      "source_commit": "2ff6cd793801fea4158e6c0814bd364f774a2743",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/2ff6cd793801fea4158e6c0814bd364f774a2743/README.md",
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/2ff6cd793801fea4158e6c0814bd364f774a2743/package.json",
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/2ff6cd793801fea4158e6c0814bd364f774a2743/src/index.ts",
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/2ff6cd793801fea4158e6c0814bd364f774a2743/src/config/server-config.ts",
+        "https://raw.githubusercontent.com/cyanheads/ensembl-mcp-server/2ff6cd793801fea4158e6c0814bd364f774a2743/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Casey Hand (cyanheads) and contributors; community wrapper, not an Ensembl-authored server",
+      "installation": "Separately prepare the pinned @cyanheads/ensembl-mcp-server build and dependencies; set workdir to the package root and executable_path to Node >=24.",
+      "required_environment": [],
+      "optional_environment": [
+        "ENSEMBL_BASE_URL"
+      ],
+      "secret_environment": [],
+      "required_files": [
+        "dist/index.js",
+        "package.json"
+      ],
+      "capabilities": [
+        "gene lookup",
+        "DNA sequence retrieval",
+        "VEP consequences",
+        "homology"
+      ],
+      "effects": "Sends selected gene, sequence, variant and homology queries to Ensembl REST or the configured mirror.",
+      "transports": [
+        "stdio",
+        "http"
+      ],
+      "limitations": [],
+      "fixed_environment": {
+        "MCP_TRANSPORT_TYPE": "stdio"
+      },
+      "http_url": "https://ensembl.caseyjhand.com/mcp"
+    },
+    {
+      "id": "biothings",
+      "name": "BioThings MCP",
+      "command": "biothings-mcp",
+      "arguments": [],
+      "repository": "https://github.com/longevity-genie/biothings-mcp",
+      "source_commit": "bbfb870f55ee18482200db8492915e59d70f5fe6",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/longevity-genie/biothings-mcp/bbfb870f55ee18482200db8492915e59d70f5fe6/README.md",
+        "https://raw.githubusercontent.com/longevity-genie/biothings-mcp/bbfb870f55ee18482200db8492915e59d70f5fe6/pyproject.toml",
+        "https://raw.githubusercontent.com/longevity-genie/biothings-mcp/bbfb870f55ee18482200db8492915e59d70f5fe6/src/biothings_mcp/server.py",
+        "https://raw.githubusercontent.com/longevity-genie/biothings-mcp/bbfb870f55ee18482200db8492915e59d70f5fe6/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Anton Kulaga and Longevity Genie contributors",
+      "installation": "Install the pinned longevity-genie/biothings-mcp project separately in Python >=3.10; use its installed biothings-mcp entry point.",
+      "required_environment": [],
+      "optional_environment": [
+        "MCP_OUTPUT_DIR"
+      ],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "gene annotations",
+        "variant annotations",
+        "BioThings database queries"
+      ],
+      "effects": "Queries BioThings services and may write cached/exported result data under the upstream output directory.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "gget",
+      "name": "gget MCP",
+      "command": "gget-mcp",
+      "arguments": [
+        "stdio"
+      ],
+      "repository": "https://github.com/longevity-genie/gget-mcp",
+      "source_commit": "f3c63125e29954c20b3a81d1d5df70405ddf5896",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/longevity-genie/gget-mcp/f3c63125e29954c20b3a81d1d5df70405ddf5896/README.md",
+        "https://raw.githubusercontent.com/longevity-genie/gget-mcp/f3c63125e29954c20b3a81d1d5df70405ddf5896/pyproject.toml",
+        "https://raw.githubusercontent.com/longevity-genie/gget-mcp/f3c63125e29954c20b3a81d1d5df70405ddf5896/src/gget_mcp/server.py",
+        "https://raw.githubusercontent.com/longevity-genie/gget-mcp/f3c63125e29954c20b3a81d1d5df70405ddf5896/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Anton Kulaga, Newton Winter and Longevity Genie contributors; gget method authors retain their own credit",
+      "installation": "Install gget-mcp and its separately specified gget dependencies in Python >=3.10; the verified command is gget-mcp stdio.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "genomic database queries",
+        "sequence retrieval",
+        "gget tool access"
+      ],
+      "effects": "Queries gget-supported services; selected tools may run external searches, load models, download assets or write outputs.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Individual tools and their dependencies require separate validation; tool count is not an independent-algorithm count."
+      ]
+    },
+    {
+      "id": "ucsc-genome",
+      "name": "UCSC Genome MCP",
+      "command": "python",
+      "arguments": [
+        "ucsc-genome-mcp.py"
+      ],
+      "repository": "https://github.com/hlydecker/ucsc-genome-mcp",
+      "source_commit": "7f0f83a2f1935916f8cd35ddfb8dd3c36dac2e84",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/hlydecker/ucsc-genome-mcp/7f0f83a2f1935916f8cd35ddfb8dd3c36dac2e84/README.md",
+        "https://raw.githubusercontent.com/hlydecker/ucsc-genome-mcp/7f0f83a2f1935916f8cd35ddfb8dd3c36dac2e84/ucsc-genome-mcp.py",
+        "https://raw.githubusercontent.com/hlydecker/ucsc-genome-mcp/7f0f83a2f1935916f8cd35ddfb8dd3c36dac2e84/pyproject.toml",
+        "https://raw.githubusercontent.com/hlydecker/ucsc-genome-mcp/7f0f83a2f1935916f8cd35ddfb8dd3c36dac2e84/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Henry Lydecker (hlydecker) and contributors; community UCSC wrapper",
+      "installation": "Prepare the pinned source checkout and its requirements in Python >=3.10, set workdir to the checkout and executable_path to that Python. Use the existing hyphenated ucsc-genome-mcp.py script; upstream README/packaging also mention nonexistent underscore filenames.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [
+        "ucsc-genome-mcp.py"
+      ],
+      "capabilities": [
+        "UCSC genomes",
+        "genomic tracks",
+        "DNA region retrieval"
+      ],
+      "effects": "Sends genome, track, region and sequence queries to UCSC and caller-selected public assembly hubs.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "The pinned upstream script sometimes encodes application errors as ordinary text. DNAKit recognizes its verified error prefixes and preserves the original flag as upstream_isError when normalizing them. Other tool-specific content still needs inspection."
+      ],
+      "application_error_prefixes": [
+        "HTTP error occurred:",
+        "Error executing {tool_name}:"
+      ]
+    },
+    {
+      "id": "opentargets",
+      "name": "Open Targets MCP",
+      "command": "python",
+      "arguments": [
+        "-m",
+        "opentargets_mcp.server",
+        "--transport",
+        "stdio"
+      ],
+      "repository": "https://github.com/nickzren/opentargets-mcp",
+      "source_commit": "ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/nickzren/opentargets-mcp/ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126/README.md",
+        "https://raw.githubusercontent.com/nickzren/opentargets-mcp/ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126/pyproject.toml",
+        "https://raw.githubusercontent.com/nickzren/opentargets-mcp/ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126/src/opentargets_mcp/server.py",
+        "https://raw.githubusercontent.com/nickzren/opentargets-mcp/ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126/src/opentargets_mcp/settings.py",
+        "https://raw.githubusercontent.com/nickzren/opentargets-mcp/ecb92f8effdd6f8ea8f6a8c8de2fedb23334c126/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Nick Ren and contributors; community Open Targets wrapper",
+      "installation": "Install nickzren/opentargets-mcp separately in Python >=3.10; set executable_path to its interpreter. Uses the verified Python module entry point with explicit stdio.",
+      "required_environment": [],
+      "optional_environment": [
+        "OPEN_TARGETS_API_URL",
+        "OPEN_TARGETS_RATE_LIMIT_ENABLED",
+        "OPEN_TARGETS_RATE_LIMIT_RPS",
+        "OPEN_TARGETS_RATE_LIMIT_BURST"
+      ],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "target-disease evidence",
+        "genetic target prioritization",
+        "drug-target research"
+      ],
+      "effects": "Queries Open Targets evidence; results are research evidence and do not establish treatment suitability.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "plant-genomics",
+      "name": "Plant Genomics MCP",
+      "command": "plant-genomics-mcp",
+      "arguments": [],
+      "repository": "https://github.com/musharna/plant-genomics-mcp",
+      "source_commit": "c689ffd64f4110aff85f32cec2ed5681f6a4853f",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/musharna/plant-genomics-mcp/c689ffd64f4110aff85f32cec2ed5681f6a4853f/README.md",
+        "https://raw.githubusercontent.com/musharna/plant-genomics-mcp/c689ffd64f4110aff85f32cec2ed5681f6a4853f/pyproject.toml",
+        "https://raw.githubusercontent.com/musharna/plant-genomics-mcp/c689ffd64f4110aff85f32cec2ed5681f6a4853f/src/plant_genomics_mcp/server.py",
+        "https://raw.githubusercontent.com/musharna/plant-genomics-mcp/c689ffd64f4110aff85f32cec2ed5681f6a4853f/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Jaret Arnold (musharna) and contributors; community integration",
+      "installation": "Install the pinned plant-genomics-mcp Python distribution and dependencies separately. The plant-genomics-mcp entry point selects stdio; no HTTP token is needed for this local transport.",
+      "required_environment": [],
+      "optional_environment": [
+        "PLANT_GENOMICS_MCP_NCBI_EMAIL",
+        "PLANT_GENOMICS_MCP_BLAST_CONCURRENCY",
+        "PLANT_GENOMICS_MCP_CACHE_TTL",
+        "PLANT_GENOMICS_MCP_CACHE_SIZE",
+        "PLANT_GENOMICS_MCP_CACHE_DISABLED"
+      ],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "plant gene queries",
+        "regulatory motifs",
+        "plant comparative genomics",
+        "plant sequence searches"
+      ],
+      "effects": "Queries plant genomics services and may submit selected sequences to NCBI BLAST. Configure the named NCBI contact-email variable before BLAST use.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "The advertised hosted Tailscale endpoint has a bearer-token gate; it is not configured as an anonymous DNAKit endpoint."
+      ]
+    },
+    {
+      "id": "biocontext-kb",
+      "name": "BioContextAI Knowledgebase MCP",
+      "command": "biocontext_kb",
+      "arguments": [],
+      "repository": "https://github.com/biocontext-ai/knowledgebase-mcp",
+      "source_commit": "7e99be76f69ea89c713c4ddcc13842d70f8da6b2",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/biocontext-ai/knowledgebase-mcp/7e99be76f69ea89c713c4ddcc13842d70f8da6b2/README.md",
+        "https://raw.githubusercontent.com/biocontext-ai/knowledgebase-mcp/7e99be76f69ea89c713c4ddcc13842d70f8da6b2/pyproject.toml",
+        "https://raw.githubusercontent.com/biocontext-ai/knowledgebase-mcp/7e99be76f69ea89c713c4ddcc13842d70f8da6b2/src/biocontext_kb/main.py",
+        "https://raw.githubusercontent.com/biocontext-ai/knowledgebase-mcp/7e99be76f69ea89c713c4ddcc13842d70f8da6b2/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Malte Kuehl and the BioContextAI authors/contributors listed in the upstream citation",
+      "installation": "Install biocontext_kb separately in Python >=3.12. DNAKit fixes MCP_ENVIRONMENT=DEVELOPMENT for the verified stdio entry point.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "gene identifier mapping",
+        "biomedical knowledge queries",
+        "genomic evidence lookup"
+      ],
+      "effects": "Queries the selected biomedical knowledge services. The public hosted endpoint is described by its authors as testing-only and subject to fair use.",
+      "transports": [
+        "stdio",
+        "http"
+      ],
+      "limitations": [
+        "Data-source licenses and access limitations are separate; Google Scholar and KEGG are local-only in the upstream project."
+      ],
+      "fixed_environment": {
+        "MCP_ENVIRONMENT": "DEVELOPMENT"
+      },
+      "http_url": "https://biocontext-kb.fastmcp.app/mcp"
+    },
+    {
+      "id": "grebi",
+      "name": "GrEBI",
+      "command": null,
+      "arguments": [],
+      "repository": "https://github.com/EBISPOT/GrEBI",
+      "source_commit": "74aef794aab9b3d0e7a52d01c15c48a86d043e09",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/EBISPOT/GrEBI/74aef794aab9b3d0e7a52d01c15c48a86d043e09/README.md",
+        "https://raw.githubusercontent.com/EBISPOT/GrEBI/74aef794aab9b3d0e7a52d01c15c48a86d043e09/webapp/grebi_api/pom.xml",
+        "https://raw.githubusercontent.com/EBISPOT/GrEBI/74aef794aab9b3d0e7a52d01c15c48a86d043e09/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "EMBL-EBI SPOT / EBISPOT GrEBI contributors",
+      "installation": "Select transport='http' for the author-documented development service. Local deployment is a separate Java/API plus graph-database and HPC data-pipeline task; no local startup recipe is claimed here.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "integrated biomedical knowledge graphs",
+        "cross-resource genomic queries"
+      ],
+      "effects": "Sends queries to the EMBL-EBI development knowledge-graph service.",
+      "transports": [
+        "http"
+      ],
+      "limitations": [
+        "Development endpoint, without a production availability guarantee; no graph database or pipeline has been deployed by DNAKit."
+      ],
+      "http_url": "https://wwwdev.ebi.ac.uk/kg/api/v1/mcp"
+    },
+    {
+      "id": "ebi-tools",
+      "name": "EBI Tools MCP (QuentinCody)",
+      "command": null,
+      "arguments": [],
+      "repository": "https://github.com/QuentinCody/ebi-tools-mcp-server",
+      "source_commit": "32437e6a1ea9dee56bba4a98d502606b503c2cee",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/QuentinCody/ebi-tools-mcp-server/32437e6a1ea9dee56bba4a98d502606b503c2cee/README.md",
+        "https://raw.githubusercontent.com/QuentinCody/ebi-tools-mcp-server/32437e6a1ea9dee56bba4a98d502606b503c2cee/package.json",
+        "https://raw.githubusercontent.com/QuentinCody/ebi-tools-mcp-server/32437e6a1ea9dee56bba4a98d502606b503c2cee/src/index.ts"
+      ],
+      "license": "Not specified in repository snapshot; remote service only, no upstream code bundled",
+      "attribution": "QuentinCody and repository contributors; community implementation, not an EMBL-EBI release",
+      "installation": "Select transport='http' for the repository author's published Cloudflare Worker MCP service. No standalone Node stdio entry point is present; no mcp-remote/npx helper is required by DNAKit.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "EBI sequence-analysis jobs",
+        "job results"
+      ],
+      "effects": "Selected tools can submit sequences to EMBL-EBI Job Dispatcher and retrieve job results through a community-hosted service.",
+      "transports": [
+        "http"
+      ],
+      "limitations": [
+        "No LICENSE/LICENCE file or package license declaration was verified. Hosted transport availability is separate from job/scientific validation."
+      ],
+      "http_url": "https://ebi-tools-mcp-server.quentincody.workers.dev/mcp"
+    },
+    {
+      "id": "gwas-mcp",
+      "name": "GWAS MCP (muslus)",
+      "command": "python",
+      "arguments": [
+        "-m",
+        "gwas_mcp.server"
+      ],
+      "repository": "https://github.com/muslus/gwas-mcp",
+      "source_commit": "5d8160cda988e959234467cefae554ebdc1876e5",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/muslus/gwas-mcp/5d8160cda988e959234467cefae554ebdc1876e5/README.md",
+        "https://raw.githubusercontent.com/muslus/gwas-mcp/5d8160cda988e959234467cefae554ebdc1876e5/pyproject.toml",
+        "https://raw.githubusercontent.com/muslus/gwas-mcp/5d8160cda988e959234467cefae554ebdc1876e5/src/gwas_mcp/server.py",
+        "https://raw.githubusercontent.com/muslus/gwas-mcp/5d8160cda988e959234467cefae554ebdc1876e5/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "ZaEyAsa (upstream package/LICENSE attribution) and muslus repository contributors",
+      "installation": "Prepare the pinned muslus/gwas-mcp source and its dependencies in an isolated Python >=3.10 environment, then point executable_path at that interpreter. Avoid assuming that the separately published gwas-mcp distribution has identical code.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "GWAS evidence queries",
+        "variant annotations",
+        "genomic analysis tools"
+      ],
+      "effects": "Queries genomic evidence services; selected QC/association tools may execute local analyses and write files.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Repository owner and package author differ; the exact pinned source is the verified implementation. Individual analysis results have not been validated by DNAKit."
+      ]
+    },
+    {
+      "id": "ncbi-database",
+      "name": "NCBI Database MCP (hpend2373)",
+      "command": "python",
+      "arguments": [
+        "src/gene_to_genomic_server.py"
+      ],
+      "repository": "https://github.com/hpend2373/NCBI-Database-MCP",
+      "source_commit": "03a6b80490753ba47166903daa7d7bce35848af3",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/hpend2373/NCBI-Database-MCP/03a6b80490753ba47166903daa7d7bce35848af3/README.md",
+        "https://raw.githubusercontent.com/hpend2373/NCBI-Database-MCP/03a6b80490753ba47166903daa7d7bce35848af3/pyproject.toml",
+        "https://raw.githubusercontent.com/hpend2373/NCBI-Database-MCP/03a6b80490753ba47166903daa7d7bce35848af3/src/gene_to_genomic_server.py",
+        "https://raw.githubusercontent.com/hpend2373/NCBI-Database-MCP/03a6b80490753ba47166903daa7d7bce35848af3/requirements.txt"
+      ],
+      "license": "MIT declared in pyproject.toml; standalone license text not found",
+      "attribution": "hpend2373 and Bio-MCP Project contributors (pyproject attribution)",
+      "installation": "Prepare the pinned NCBI-Database-MCP checkout and its requirements, set workdir to the checkout and executable_path to its Python. Uses the README-supported standard MCP script rather than executing its shell installer/launcher.",
+      "required_environment": [],
+      "optional_environment": [
+        "NCBI_API_KEY"
+      ],
+      "secret_environment": [
+        "NCBI_API_KEY"
+      ],
+      "required_files": [
+        "src/gene_to_genomic_server.py"
+      ],
+      "capabilities": [
+        "gene-to-genomic sequence",
+        "NCBI gene lookup",
+        "GEO study search"
+      ],
+      "effects": "Queries NCBI gene/sequence/GEO resources; selected results can contain supplied gene or region queries.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "MIT is a project metadata declaration; no standalone LICENSE file was found at the pinned revision."
+      ]
+    },
+    {
+      "id": "pubmed",
+      "name": "PubMed MCP (cyanheads)",
+      "command": "node",
+      "arguments": [
+        "dist/index.js"
+      ],
+      "repository": "https://github.com/cyanheads/pubmed-mcp-server",
+      "source_commit": "0fdcdaf72ea728197dc6a8b333195adcd8e77b94",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/cyanheads/pubmed-mcp-server/0fdcdaf72ea728197dc6a8b333195adcd8e77b94/README.md",
+        "https://raw.githubusercontent.com/cyanheads/pubmed-mcp-server/0fdcdaf72ea728197dc6a8b333195adcd8e77b94/package.json",
+        "https://raw.githubusercontent.com/cyanheads/pubmed-mcp-server/0fdcdaf72ea728197dc6a8b333195adcd8e77b94/src/index.ts",
+        "https://raw.githubusercontent.com/cyanheads/pubmed-mcp-server/0fdcdaf72ea728197dc6a8b333195adcd8e77b94/src/config/server-config.ts",
+        "https://raw.githubusercontent.com/cyanheads/pubmed-mcp-server/0fdcdaf72ea728197dc6a8b333195adcd8e77b94/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Casey Hand (cyanheads) and contributors; community literature server",
+      "installation": "Prepare the pinned @cyanheads/pubmed-mcp-server build and dependencies separately, then set workdir to the package root and executable_path to Node >=24.",
+      "required_environment": [],
+      "optional_environment": [
+        "NCBI_API_KEY",
+        "NCBI_ADMIN_EMAIL",
+        "NCBI_TOOL_IDENTIFIER",
+        "UNPAYWALL_EMAIL",
+        "EUROPEPMC_EMAIL"
+      ],
+      "secret_environment": [
+        "NCBI_API_KEY"
+      ],
+      "required_files": [
+        "dist/index.js",
+        "package.json"
+      ],
+      "capabilities": [
+        "DNA literature discovery",
+        "citations",
+        "PubMed and Europe PMC retrieval"
+      ],
+      "effects": "Sends biomedical literature queries to PubMed/PMC, Europe PMC and optional Unpaywall; document permissions remain with the original sources.",
+      "transports": [
+        "stdio",
+        "http"
+      ],
+      "limitations": [
+        "Literature infrastructure, not a DNA prediction algorithm."
+      ],
+      "fixed_environment": {
+        "MCP_TRANSPORT_TYPE": "stdio"
+      },
+      "http_url": "https://pubmed.caseyjhand.com/mcp"
+    },
+    {
+      "id": "encode-toolkit",
+      "name": "ENCODE Toolkit",
+      "command": "python",
+      "arguments": [
+        "-m",
+        "encode_connector.server.main"
+      ],
+      "repository": "https://github.com/ammawla/encode-toolkit",
+      "source_commit": "1c7047617d112b45db1d33927d9cc11902dc38d2",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/1c7047617d112b45db1d33927d9cc11902dc38d2/README.md",
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/1c7047617d112b45db1d33927d9cc11902dc38d2/pyproject.toml",
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/1c7047617d112b45db1d33927d9cc11902dc38d2/src/encode_connector/server/main.py",
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/1c7047617d112b45db1d33927d9cc11902dc38d2/index.js",
+        "https://raw.githubusercontent.com/ammawla/encode-toolkit/1c7047617d112b45db1d33927d9cc11902dc38d2/LICENSE"
+      ],
+      "license": "AGPL-3.0",
+      "attribution": "Dr. Alex M. Mawla and contributors",
+      "installation": "Install the Python encode-toolkit distribution separately and set executable_path to its interpreter. DNAKit invokes the verified Python module directly; it does not use the npm shim which can bootstrap uv/Python.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "ENCODE experiment discovery",
+        "regulatory genomics datasets",
+        "ENCODE workflows"
+      ],
+      "effects": "Queries ENCODE experiments and files; selected upstream tools may download data, create workflows or manage local credential state.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Zenodo records are software archives, not automatically peer-reviewed papers. This bridge does not redistribute ENCODE Toolkit code."
+      ]
+    },
+    {
+      "id": "tooluniverse",
+      "name": "ToolUniverse",
+      "command": "tooluniverse",
+      "arguments": [],
+      "repository": "https://github.com/mims-harvard/ToolUniverse",
+      "source_commit": "9959ebee7638773314362f1746980a15f5b17e5b",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/mims-harvard/ToolUniverse/9959ebee7638773314362f1746980a15f5b17e5b/README.md",
+        "https://raw.githubusercontent.com/mims-harvard/ToolUniverse/9959ebee7638773314362f1746980a15f5b17e5b/pyproject.toml",
+        "https://raw.githubusercontent.com/mims-harvard/ToolUniverse/9959ebee7638773314362f1746980a15f5b17e5b/src/tooluniverse/smcp_server.py",
+        "https://raw.githubusercontent.com/mims-harvard/ToolUniverse/9959ebee7638773314362f1746980a15f5b17e5b/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Shanghua Gao, Marinka Zitnik and ToolUniverse paper/project contributors",
+      "installation": "Install the pinned ToolUniverse distribution and required provider dependencies separately. Use the installed tooluniverse console script; unlike the README uvx --refresh example, this bridge does not refresh or install anything.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "scientific tool discovery",
+        "DNA-related ToolUniverse subset"
+      ],
+      "effects": "Starts the compact ToolUniverse MCP catalog. Selected tools may contact services, load models, execute programs or write files according to their provider definitions.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Cross-disciplinary aggregate: not every exposed tool is DNA-related, and tool counts are not independent-algorithm counts. Provider credentials/dependencies must be configured separately."
+      ],
+      "fixed_environment": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    {
+      "id": "kiro-genomics",
+      "name": "AWS Kiro Life Sciences: genomics",
+      "command": "life-sciences-genomics",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/ensembl_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/clinvar_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/cosmic_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/dbsnp_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/ddbj_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/encode_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/geo_sra_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/gnomad_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/ncbi_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-genomics/src/life_sciences_genomics/clients/thousand_genomes_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-genomics component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-genomics console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [
+        "NCBI_API_KEY",
+        "COSMIC_API_KEY"
+      ],
+      "secret_environment": [
+        "NCBI_API_KEY",
+        "COSMIC_API_KEY"
+      ],
+      "required_files": [],
+      "capabilities": [
+        "genomic sequences",
+        "variants",
+        "genomic datasets"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-model-organisms",
+      "name": "AWS Kiro Life Sciences: model-organisms",
+      "command": "life-sciences-model-organisms",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/clients/flybase_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/clients/mgi_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/clients/sgd_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/clients/wormbase_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-model-organisms/src/life_sciences_model_organisms/clients/zfin_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-model-organisms component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-model-organisms console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "model-organism gene databases",
+        "gene annotations"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-epigenomics",
+      "name": "AWS Kiro Life Sciences: epigenomics",
+      "command": "life-sciences-epigenomics",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-epigenomics/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-epigenomics/src/life_sciences_epigenomics/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-epigenomics/src/life_sciences_epigenomics/clients/methbase_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-epigenomics/src/life_sciences_epigenomics/clients/ihec_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-epigenomics/src/life_sciences_epigenomics/clients/roadmap_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-epigenomics component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-epigenomics console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "epigenome dataset queries",
+        "methylome resources"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-agriculture",
+      "name": "AWS Kiro Life Sciences: agriculture",
+      "command": "life-sciences-agriculture",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/src/life_sciences_agriculture/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/src/life_sciences_agriculture/clients/gramene_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/src/life_sciences_agriculture/clients/phytozome_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/src/life_sciences_agriculture/clients/plantgdb_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-agriculture/src/life_sciences_agriculture/clients/tair_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-agriculture component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-agriculture console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "plant genomic resources",
+        "plant gene queries"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-ecology",
+      "name": "AWS Kiro Life Sciences: ecology",
+      "command": "life-sciences-ecology",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/bold_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/gbif_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/genbank_env_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/inaturalist_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/iucn_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-ecology/src/life_sciences_ecology/clients/mgnify_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-ecology component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-ecology console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [
+        "IUCN_API_KEY"
+      ],
+      "secret_environment": [
+        "IUCN_API_KEY"
+      ],
+      "required_files": [],
+      "capabilities": [
+        "environmental sequences",
+        "species barcodes",
+        "conservation genetics resources"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-clinical",
+      "name": "AWS Kiro Life Sciences: clinical",
+      "command": "life-sciences-clinical",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/chembl_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/clinicaltrials_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/drugbank_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/fda_faers_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/omim_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/opentargets_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-clinical/src/life_sciences_clinical/clients/pharmgkb_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-clinical component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-clinical console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [
+        "OMIM_API_KEY",
+        "DRUGBANK_API_KEY"
+      ],
+      "secret_environment": [
+        "OMIM_API_KEY",
+        "DRUGBANK_API_KEY"
+      ],
+      "required_files": [],
+      "capabilities": [
+        "gene-disease evidence",
+        "pharmacogenomic research"
+      ],
+      "effects": "Selected tools query external biological resources; molecular-analysis and workflow tools can submit sequences or access local result files. Named credentials are forwarded only for providers that need them.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "kiro-pipelines",
+      "name": "AWS Kiro Life Sciences: pipelines",
+      "command": "life-sciences-pipelines",
+      "arguments": [],
+      "repository": "https://github.com/aws-samples/sample-kiro-power-life-sciences",
+      "source_commit": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/README.md",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/LICENSE.txt",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/pyproject.toml",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/src/life_sciences_pipelines/server.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/src/life_sciences_pipelines/clients/cwl_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/src/life_sciences_pipelines/clients/github_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/src/life_sciences_pipelines/clients/nfcore_client.py",
+        "https://raw.githubusercontent.com/aws-samples/sample-kiro-power-life-sciences/95b67e763df43e94e5bcfd8a230a58553a888cfc/life-sciences-pipelines/src/life_sciences_pipelines/clients/wdl_client.py"
+      ],
+      "license": "MIT-0 in root LICENSE.txt; MIT declared by component pyproject.toml",
+      "attribution": "Amazon.com, Inc. or its affiliates; Kiro Life Sciences Contributors",
+      "installation": "Prepare the pinned aws-samples/sample-kiro-power-life-sciences source. Separately install life-sciences-common and the life-sciences-pipelines component in its Python >=3.10 environment, then set executable_path to the installed life-sciences-pipelines console script. No uvx or automatic install is used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "nf-core and GitHub workflow metadata search",
+        "static WDL/CWL example catalog",
+        "generate HealthOmics import instructions"
+      ],
+      "effects": "Queries public nf-core/GitHub metadata; other tools return local catalog examples or written instructions. It does not execute or submit genomic workflows.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Alpha sample component. Its entry point, tool definitions and stdio transport are source-verified; each underlying provider endpoint and scientific output still needs separate validation.",
+        "This component is part of one AWS Kiro project; it is not counted as an independent scientific algorithm.",
+        "All provider-client source files in this selected component were inspected for fixed/mock analysis paths. Providers and complete scientific outputs have not been independently validated; a successful MCP call is not evidence of valid biological analysis.",
+        "WDL/CWL lists are hard-coded metadata examples; healthomics_import returns written instructions only. No workflow is submitted or executed by this component."
+      ],
+      "project_id": "aws-kiro-life-sciences",
+      "application_error_keys": [
+        "error",
+        "errors"
+      ]
+    },
+    {
+      "id": "pubmed-anthropic",
+      "name": "PubMed (Anthropic Life Sciences hosted connector)",
+      "project_id": "anthropic-life-sciences",
+      "command": null,
+      "arguments": [],
+      "repository": "https://github.com/anthropics/life-sciences",
+      "source_commit": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/anthropics/life-sciences/e96556b637b56d6cc3a5ad33987009be9e60aa5c/README.md",
+        "https://raw.githubusercontent.com/anthropics/life-sciences/e96556b637b56d6cc3a5ad33987009be9e60aa5c/pubmed/.claude-plugin/plugin.json"
+      ],
+      "license": "Remote provider terms; the marketplace does not grant an independent server-code license",
+      "attribution": "U.S. National Library of Medicine (as attributed by the Anthropic marketplace); Anthropic marketplace maintainers",
+      "installation": "Select transport=http. The provider-published endpoint supports anonymous MCP initialization and tools/list as verified on 2026-09-20. No local installer is run.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "PubMed literature search",
+        "article metadata, full text and copyright status"
+      ],
+      "effects": "Queries are sent to the named public biological/literature service. Returned articles and data retain provider-specific terms.",
+      "transports": [
+        "http"
+      ],
+      "http_url": "https://pubmed.mcp.claude.com/mcp",
+      "limitations": [
+        "Only initialization and tools/list were exercised; provider query results and scientific conclusions were not validated."
+      ]
+    },
+    {
+      "id": "opentargets-platform",
+      "name": "Open Targets Platform official MCP",
+      "project_id": "anthropic-life-sciences",
+      "command": null,
+      "arguments": [],
+      "repository": "https://github.com/anthropics/life-sciences",
+      "source_commit": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/anthropics/life-sciences/e96556b637b56d6cc3a5ad33987009be9e60aa5c/README.md",
+        "https://raw.githubusercontent.com/anthropics/life-sciences/e96556b637b56d6cc3a5ad33987009be9e60aa5c/open-targets/.claude-plugin/plugin.json"
+      ],
+      "license": "Remote provider terms; the marketplace does not grant an independent server-code license",
+      "attribution": "OpenTargets (as attributed by the Anthropic marketplace); Anthropic marketplace maintainers",
+      "installation": "Select transport=http. The provider-published endpoint supports anonymous MCP initialization and tools/list as verified on 2026-09-20. No local installer is run.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "target and disease entity search",
+        "live Open Targets GraphQL schema and queries"
+      ],
+      "effects": "Queries are sent to the named public biological/literature service. Returned articles and data retain provider-specific terms.",
+      "transports": [
+        "http"
+      ],
+      "http_url": "https://mcp.platform.opentargets.org/mcp",
+      "limitations": [
+        "Only initialization and tools/list were exercised; provider query results and scientific conclusions were not validated."
+      ]
+    },
+    {
+      "id": "10x-genomics",
+      "name": "10x Genomics Cloud MCP",
+      "project_id": "anthropic-life-sciences",
+      "command": "node",
+      "arguments": [
+        "server/index.js"
+      ],
+      "repository": "https://github.com/10XGenomics/txg-mcp",
+      "source_commit": "2013be5d9c488f7914462cae0cf873939f6dd6b9",
+      "verified_date": "2026-09-20",
+      "sources": [
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/README.md",
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/package.json",
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/LICENSE",
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/manifest.json",
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/src/index.ts",
+        "https://raw.githubusercontent.com/10XGenomics/txg-mcp/2013be5d9c488f7914462cae0cf873939f6dd6b9/src/tools.ts",
+        "https://raw.githubusercontent.com/anthropics/life-sciences/e96556b637b56d6cc3a5ad33987009be9e60aa5c/10x-genomics/.claude-plugin/plugin.json"
+      ],
+      "license": "MIT (MCP connector); separate 10x Cloud and TXG CLI terms apply",
+      "attribution": "10x Genomics, Inc.",
+      "installation": "Separately prepare and unpack the upstream 10x Genomics MCP bundle, including its server/, node_modules/ and platform bin/ files. Set workdir to that unpacked bundle, executable_path to installed Node.js >=18, and the named TXG_CLI_ACCESS_TOKEN environment variable. DNAKit does not download a bundle or TXG binary.",
+      "required_environment": [
+        "TXG_CLI_ACCESS_TOKEN"
+      ],
+      "optional_environment": [],
+      "secret_environment": [
+        "TXG_CLI_ACCESS_TOKEN"
+      ],
+      "required_files": [
+        "server/index.js"
+      ],
+      "capabilities": [
+        "10x Cloud project/file/reference management",
+        "Cell Ranger and ATAC analysis submission and monitoring"
+      ],
+      "effects": "Selected tools can upload sequencing files, read or modify cloud projects and references, and start paid analyses. Upstream only sets accept-payment=true when that tool argument is explicitly supplied.",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Source and manifest entry points are verified. No 10x account, access token, TXG binary, cloud job or scientific result was exercised. This is one component of the Anthropic marketplace entry."
+      ]
+    }
+  ]
+}

@@ -54,7 +54,7 @@ representations for k-means clustering.
 Install the current release:
 
 ```bash
-pip install dnakit==0.1.4
+pip install dnakit==0.1.5
 ```
 
 Install the optional VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
@@ -63,11 +63,17 @@ backend with `pip install "dnakit[external-tools]"`.
 To expose DNAKit to an MCP-capable Agent, run `pip install "dnakit[agent]"` and configure the
 `dnakit-mcp` command in the Agent client.
 
+This source checkout's built-in `run_agent()` also supports optional tool generation, description optimization or compatible implementation repairs, local file result caching/resume, and retrieval from a user-selected knowledge directory (RAG). See the [Agent tutorial](docs/llm_tools/agent.en.md#agent-actions) for configuration and examples; generation and optimization require a writable checkout and explicit permission for side effects.
+
 This source checkout also includes a curated DNA/genomics Skill catalog. Install the checkout
 with `python -m pip install -e "."`, then search with `dnakit skills search "variant annotation"`
 or install the discovery skill with `dnakit skills install dnakit --agent codex`.
 See the [Skills tutorial](docs/llm_tools/skills.en.md) for Claude Code, Cursor, MCP, and citations.
 DNAKit code remains MIT; bundled Skills retain their [original licenses and attribution](THIRD_PARTY_NOTICES.md).
+
+This checkout adds [breeding, gene finding, methylation, DNA storage and nanostructure APIs](docs/api/features/38_genomics_extensions.en.md), plus [external analyses and MCP connections](docs/api/features/39_external_genomics.en.md).
+Install selected extras locally, for example `python -m pip install -e ".[bio-analysis,genomics-genes,agent]"`.
+Original projects, authors and remaining integration gaps are recorded in the [source FAQ](docs/faq/genomics_sources.en.md). The [335-project review](docs/faq/user_catalog.en.md) records every supplied project, duplicate, added interface and deferred dependency.
 
 To contribute to development, clone the repository and create the complete Conda environment:
 
@@ -110,9 +116,9 @@ See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) f
 The DNAKit project paper has not yet been published. Cite the current version as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.4, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.1.5, 2026. https://github.com/mapengsen/DNAKit
 ```
 
 This section will be updated with the paper citation after publication. When using specific algorithms, databases, or optional backends, cite their corresponding sources as well.
 
-The working tree also provides [bioinformatics Python APIs](docs/api/features/27_bioinformatics.en.md): native DNA encodings, generative metrics, statistics and specification-based optimization, plus optional format codecs and specialist alignment/NGS backends. Install these with `python -m pip install -e ".[bio]"`.
+The working tree also provides native DNA encodings, generative metrics, statistics and specification-based optimization, plus optional format codecs and specialist alignment/NGS backends. Usage is organized by task in the [feature tutorials](docs/api/features/function_tree.en.md); see [bioinformatics notes](docs/faq/bioinformatics.en.md) for dependencies and implementation details. Install these with `python -m pip install -e ".[bio]"`.

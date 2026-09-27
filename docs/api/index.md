@@ -1,20 +1,22 @@
 # API 参考
 
-本页提供核心公开命名空间的参考入口。本轮迁移新增的 **484 个函数**已逐项收录在[新增函数完整索引](native/index.md)，包含签名、参数、返回值与执行要求。核心区间 API 通常使用 0-based 半开坐标；数据库、模型和格式接口使用各自明确说明的坐标系与基因组版本。
+本页提供核心公开命名空间的参考入口。函数签名、参数、返回值、执行要求和调用示例已按用途整合进各功能教程，可通过[功能树](features/function_tree.md)查找功能。核心区间 API 通常使用 0-based 半开坐标；数据库、模型和格式接口使用各自明确说明的坐标系与基因组版本。
 
-如果希望按用途查看作用、输入、示例、输出和状态，请从[功能模块索引](features/index.md)进入。原有追踪矩阵中的 185 项是历史能力分类，不代表当前全部公开函数的数量。
+## 数据库、ENCODE 与工作流 {#native-apis}
 
-## 新增数据库、ENCODE 与工作流 API {#native-apis}
-
-| 模块 | 新增函数数 | 文档入口 |
-| --- | ---: | --- |
-| `dnakit.databases` | 455 | [按用途查找全部数据库接口](native/index.md) |
-| `dnakit.encode` | 20 | [实验、文件、下载、引用与来源管理](native/encode.md) |
-| `dnakit.workflows` | 6 | [脚本执行与报告](native/execution.md)、[遗传模拟](native/analysis.md#dnakit.workflows.simulate_inheritance) |
-| NCBI／ENA 序列接口 | 3 | [查询与下载](native/sequences.md) |
-| **合计** | **484** | [逐函数完整索引](native/index.md) · [完整调用示例](native/usage.md) |
-
-计数不重复包含旧名称别名、已有函数的可选参数扩充和 MCP/CLI 暴露。函数数量不等于独立科学算法数量。
+| 用途 | 教程与完整参数 |
+| --- | --- |
+| 数据库发现与查询 | [数据查询](features/22_database_query_discovery.md) |
+| 基因、转录本与同源注释 | [基因名称与区间注释](features/26_gene_annotation.md#gene-annotation) |
+| 变异记录、群体频率与临床意义 | [变异与频率](features/22_database_query_variant_frequency.md)、[结构变异](features/22_database_query_structural_variants.md)、[ClinVar](features/22_database_query_clinical_variants.md) |
+| 遗传关联与肿瘤证据 | [遗传病证据](features/22_database_query_genetic_evidence.md)、[肿瘤变异](features/22_database_query_cancer_variants.md)、[GWAS](features/22_database_query_gwas.md)、[队列表型关联](features/22_database_query_phewas.md)、[人群与连锁](features/22_database_query_population_resources.md) |
+| 变异注释、效应评分与富集 | [注释与标识转换](features/35_variant_annotation.md)、[效应评分与实验数据](features/36_variant_effect_scores.md)、[基因集与通路富集](features/37_functional_enrichment.md) |
+| 已训练模型与预测服务 | [调控轨道](features/23_prediction_regulatory_tracks.md)、[变异效应](features/23_prediction_variant_effects.md)、[蛋白质特征与结构](features/23_prediction_protein_features.md) |
+| 序列、链接与 ENCODE 下载 | [下载](features/15_download.md) |
+| ENCODE 实验、引用与来源记录 | [数据集整理](features/10_datasets.md#encode-collection) |
+| 变异检测与 VCF 处理 | [变异检测与 VCF 处理](features/33_variant_calling.md) |
+| 独立位点遗传模拟 | [遗传模拟](features/34_inheritance.md) |
+| 脚本、凭据与报告 | [工程化与扩展](features/14_engineering.md) |
 
 ## 统一的运行提示
 
@@ -104,7 +106,7 @@ with TemporaryDirectory() as directory:
 
 `SearchConfig` 对超时、响应字节和记录数设硬上限。结果统一为不可变 `QueryResult`，包含脱敏 URL、原始提供方字段、分页信息和 provenance。Ensembl 与 UCSC 区域入口统一接收 0-based 半开坐标；NCBI BLAST 默认异步提交，不会隐式轮询。
 
-完整查询示例和 29 项能力状态见[数据查询](features/22_database_query.md)。
+函数用法见[序列与组装查询](features/22_database_query_sequences.md)、[基因与区间注释](features/26_gene_annotation.md)、[物种查询](features/22_database_query_organisms.md)、[表达数据查询](features/22_database_query_regulation.md)和[ENCODE 查询](features/22_database_query_encode.md)。
 
 ## 公共数据下载
 
@@ -148,7 +150,7 @@ assert reverse_complement(linear).symbols == "CGTT"
 assert rotate(circular, 2).symbols == "CGAA"
 ```
 
-## OPS-010 序列切分 {#sequence-chunking}
+## 序列切分 {#sequence-chunking}
 
 ::: dnakit.chunking
 
@@ -248,21 +250,21 @@ checkpoint 自带代码，因此标准后端仍要求显式设置 `allow_remote_
 ::: dnakit.predictions
 
 `predict_properties()` 统一调度只使用官方已训练权重即可直接运行的任务，包括
-AlphaGenome、Enformer、SegmentNT、Evo 2、GENERator 和 LucaOneTasks。模型、任务、
-输入类型、依赖与输出解释见[深度学习性质预测](features/23_deep_learning_property_prediction.md)。
+AlphaGenome、Enformer、SegmentNT、Evo 2、GENERator 和 LucaOneTasks。
+调用示例按任务分为[调控轨道](features/23_prediction_regulatory_tracks.md)、[剪接与基因组区域](features/23_prediction_splicing_regions.md)、[变异效应](features/23_prediction_variant_effects.md)、[物种与分子功能分类](features/23_prediction_sequence_classification.md)和[分子关系与互作](features/23_prediction_molecular_interactions.md)。依赖与完整参数见 [FAQ：性质预测](../faq/tutorial_integrations.md#property-prediction)。
 新增的 `predict_enformer_benchmark()` 可调用 NT Revised 18 项与 Genomic Benchmarks
 9 项完整微调 checkpoint；缺失时按需自动下载，已有权重直接复用。可通过 `checkpoint_dir` 或
-`checkpoint_path` 指定位置，详见[权重缓存与自动下载](features/23_deep_learning_property_prediction.md#checkpoint-cache)。
+`checkpoint_path` 指定位置，详见[权重缓存与自动下载](../faq/tutorial_integrations.md#property-prediction)。
 
-## 可选生物信息功能 {#optional-bioinformatics}
+## 注释与比较分析的依赖与返回值 {#optional-bioinformatics}
 
 ::: dnakit.annotation
 
 ::: dnakit.comparative
 
-VEP、ClinVar、dbSNP、gnomAD、dN/dS 和 Golden Gate
-均通过按功能命名的方法调用；默认安装不加载可选后端。完整入口和安装方式见
-[可选生物信息功能](features/24_optional_bioinformatics.md)。
+`annotation` 和 `comparative` 中的方法返回 `ProviderResult`，默认安装不加载可选后端。
+调用示例分别见[变异注释](features/35_variant_annotation.md)、[ClinVar 临床意义](features/22_database_query_clinical_variants.md)、[变异记录与群体频率](features/22_database_query_variant_frequency.md)、[系统发育与分子进化](features/30_phylogeny.md)和[序列拼接与组装](features/04_ops_006_sequence_concatenation.md)。
+安装与返回值约定见 [FAQ](../faq/tutorial_integrations.md#optional-bioinformatics)。
 
 ## 相似度、搜索和比对 {#similarity-alignment}
 
@@ -319,7 +321,7 @@ assert alignment.query_coverage == 1.0
 
 ::: dnakit.evaluation
 
-reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 默认定义为相对于该库的 `1 - nearest_similarity`，也可选择论文中的平均最近参考 Levenshtein 距离；diversity 同样支持平均两两 Levenshtein 距离。memorization 是 exact 或显式阈值近似复制。
+reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 默认定义为相对于该库的 `1 - nearest_similarity`，也可选择论文中的平均最近参考 Levenshtein 距离；diversity 使用全部序列对的平均原始 Levenshtein 距离。memorization 是 exact 或显式阈值近似复制。
 
 `evaluate_synthesis_risk()` 的输出是透明规则和命中位置，不是供应商接单规则、结构预测或实验成功概率。`evaluate_scorecard()` 保留每一分项、归一化方向、权重、缺失策略和贡献。
 
@@ -464,4 +466,4 @@ dnakit workflow --help
 
 ## 生物信息学 Python API {#bioinformatics}
 
-按模块导入 `dnakit.bioinformatics`，使用原生 DNA 编码、生成评价、系统发育、统计、约束优化与克隆，以及明确的可选格式编解码和比对/NGS 专业后端。[完整 API 指南](features/27_bioinformatics.md)列出依赖、返回类型、公式与边界。本扩展不增加 CLI。
+`dnakit.bioinformatics` 的用法已按任务收录于各功能教程，例如[序列表征与特征处理](features/08_fingerprints.md)、[系统发育分析](features/30_phylogeny.md)、[统计与差异分析](features/31_statistical_analysis.md)和[序列优化](features/29_sequence_optimization.md)。依赖、返回类型、公式与实现范围见 [FAQ](../faq/bioinformatics.md)。

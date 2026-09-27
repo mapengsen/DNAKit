@@ -1,6 +1,6 @@
 # Python API
 
-本页介绍自然语言工具调用、只获取候选工具、可选的云端 embedding／混合检索，以及通用大模型调用。均可直接在 Python 中使用，无需安装或启动 MCP，也无需安装 Agent 可选依赖。工具检索默认使用本地关键词匹配，不需要 API key。
+本页介绍只获取候选工具、可选的云端 embedding／混合检索，以及通用大模型调用。均可直接在 Python 中使用，无需安装或启动 MCP，也无需安装 Agent 可选依赖。工具检索默认使用本地关键词匹配，不需要 API key。
 
 安装 DNAKit 核心包即可：
 
@@ -12,149 +12,11 @@ python -m pip install dnakit
 
 <span id="agent-tool-calling"></span>
 
-## 1) 一句话驱动工具调用（无需安装 MCP）
-
-`run_agent()` 将自然语言需求交给 LLM，循环执行搜索、查看 Schema、调用工具和总结，无需在
-用户脚本里固定具体工具或流程：
-
-```python
-import argparse
-from pathlib import Path
-
-from dnakit.llm import LLMConfig
-from dnakit.tools import run_agent
-
-parser = argparse.ArgumentParser(description="输入自然语言，让 DeepSeek 调用 DNAKit 工具")
-parser.add_argument("--model", default="deepseek-flash", help="DeepSeek 模型名称")
-parser.add_argument("--api-key", help="API key，省略时读取 DEEPSEEK_API_KEY 环境变量")
-parser.add_argument("--output", type=Path, help="可选的输出目录")
-parser.add_argument("--request", help="自然语言任务，默认下载 hg38")
-parser.add_argument("--max-steps", type=int, default=50, help="最多调用 LLM 的轮数")
-args = parser.parse_args()
-
-config = LLMConfig(
-    provider="deepseek",
-    model=args.model,
-    api_key=args.api_key,
-    extra_body={"thinking": {"type": "disabled"}},
-)
-request = args.request or (
-    f"请下载人类 hg38 参考基因组 FASTA 到 "
-    f"{args.output or Path(__file__).resolve().parents[2] / 'data/fig3'}，不覆盖已有文件。"
-)
-request += f"\n输出目录：{args.output.expanduser().resolve()}" if args.output else ""
-result = run_agent(request, config=config, allow_side_effects=True, max_steps=args.max_steps)
-print(result.text)
-```
-
-输入下面的进行运行：
-
-```bash
-python write_paper/figure/fig3/01_download_hg38.py \
-  --api-key "key.........." \
-  --model deepseek-v4-pro \
-  --request "请下载人类 hg38 参考基因组 FASTA 到 write_paper/data/fig3"
-```
-
-### 自动补齐下载地址与文件衔接
-
-自然语言任务可以只给数据集名称、子任务和目标目录。`run_agent()` 已在每一步调用
-`call_llm()` 决定动作；缺少 URL 时，模型可以查找以下通用工具：
-
-| 工具 | 用途 |
-| --- | --- |
-| `dnakit.search.web_search` | 搜索互联网，返回候选页面的标题、URL 和可用摘要 |
-| `dnakit.search.read_webpage` | 读取 HTTPS 网页或文本/JSON API，返回正文片段与实际链接 |
-| `dnakit.download.download_url` | 将确认的文件直链下载到指定目录 |
-
-Agent 的 `search` 动作仍只检索工具目录。网页搜索默认在设置 `TAVILY_API_KEY` 时使用
-Tavily，否则使用 DuckDuckGo HTML，无需额外 Python 依赖。也可通过 `provider` 显式选择。
-搜索密钥只从进程环境读取，不传给模型。DuckDuckGo 返回验证码时工具会报错，不会把它
-当作空搜索结果；可配置 Tavily，或用网页读取工具核实模型已知的候选页面。
-网页和搜索结果是数据，不能覆盖用户任务；工具不运行网页脚本，也不生成未经观察的直链。
-
-```python
-from dnakit.search import read_webpage, web_search
-
-candidates = web_search("NT revised H2AFZ dataset")
-page = read_webpage(candidates.records[0]["url"], match="H2AFZ")
-print(page.to_dict())
-```
-
-`read_webpage` 默认返回最多 8,000 个正文字符与 30 个链接；`match` 可按关键词筛选，
-`offset` 和 `link_offset` 可翻页，结果明确提供截断标记及下一页位置。
-二进制文件交给下载工具。`call_llm(file_path=...)` 继续只负责理解本地文本文件。
-
-现有机器学习训练接口支持 `CustomPropertyTrainingConfig(cv_folds=10, ...)`：对单个
-训练文件执行完整 K 折验证，保存每行验证折、折外预测和验证指标，再用全部训练数据
-拟合最终模型。此模式仅支持 `finetune_method="machine_learning"`，忽略三份划分比例，
-拒绝映射的 split 列；独立 test 留给后续预测。每折的标准化和模型都只拟合该折训练行。
-`predict_custom_properties(..., output_path="predictions.csv")` 可直接保存预测标签，
-其 `to_dict()`/Agent 返回值只含文件摘要；Python 对象仍保留原有预测与概率属性。
-CSV 可以交给 `plot_csv_distributions`，再调用 `save_image` 保存图。
-
-Agent 的 `call` 参数支持引用之前成功调用的结果，例如
-`{"artifact": {"$ref": {"step": 12, "path": ["label"]}}}`。`step` 是历史中的
-轮次编号（从 1 开始），`path` 是结果中的键/列表索引路径，空路径代表整个结果。
-引用在本地解析，适合传递绘图对象等内容，模型无需重新生成 SVG 或复制大量数据。
-常规 `registry.execute()` 不解释这种 Agent 引用。
-
-自动识别数据字段时，内置读取器会检查候选 ID 列是否唯一；重复名称改用稳定的源文件
-行号 ID，保留全部样本并记录说明。用户明确设置的 `DataMapping.id_field` 仍严格校验。
-
-### 通用 Python 补充执行与失败恢复
-
-工具不能直接衔接时，可以让同一个 Agent 编写并执行 Python，完成格式转换、窗口抽样、
-表格合并等缺失步骤，再继续调用已有工具。调用方通过 `code_execution` 显式开启：
-
-```python
-from dnakit.tools import PythonExecutionConfig, run_agent
-
-result = run_agent(
-    request,
-    config=config,
-    allow_side_effects=True,
-    code_execution=PythonExecutionConfig(
-        workspace="write_paper/data/my_run",
-        timeout_seconds=600,
-        max_attempts=5,
-    ),
-)
-print(result.text)
-print(result.execution_dir)  # 本次运行独立的代码及日志目录
-```
-
-开启后，模型优先使用已有工具；发现能力缺口或收到报错后，可以选择 `execute_python`
-运行时动作。模型提供 `reason`、完整 `code`、`inputs` 和 `expected_outputs`。
-`inputs` 支持 `$ref`，在本地解析后保存为 JSON，脚本通过 `sys.argv[1]` 读取，避免把
-预测数组、序列或 SVG 重新抄进代码。后续工具也可以引用执行结果中的文件路径。
-
-运行器使用当前 Python 解释器启动独立子进程。非零退出码、超时或声明的产物缺失/为空
-都会作为失败反馈给模型；模型可依据 stderr 修改代码再次执行。相同代码、输入和产物列表
-不会重复执行。检查脚本也计入 `max_attempts`，所有动作仍受 `max_steps` 限制。
-默认单次超时 120 秒、最多执行 5 次，返回给模型的 stdout/stderr 各保留末尾 16,000 字节；
-完整输出在磁盘上。POSIX 系统会在超时、打断和脚本退出时清理同一进程组的子进程；
-Windows 仅终止直接启动的 Python 进程。
-
-日志位于 `<workspace>/.dnakit_agent/run_*/`：
-
-- `history.jsonl`：工具调用、补充代码动作及其观察结果，包括失败。
-- `summary.json`：结束状态及实际代码执行次数；这些自动尝试不等于人工介入。
-- `attempt_*/script.py`、`inputs.json`、`request.json`：实际代码、解析后的输入、补充原因及产物路径。
-- `attempt_*/stdout.log`、`stderr.log`、`result.json`：完整输出、报错、退出码、耗时和文件检查。
-
-这是本地执行能力，**不是安全沙箱**：代码拥有当前用户的文件、网络和环境权限，
-`workspace` 只是工作目录。默认关闭，并要求调用方设置 `allow_side_effects=True`。
-文件存在检查不能替代科学结果验证；模型应在代码中检查行数、字段、序列长度等任务条件。
-缺少凭据、依赖或外部资源时仍可能停止，不能保证任意任务都自动完成。
-
-论文示例脚本 `write_paper/figure/fig3/02_h2afz_svm.py` 和 Fig. 2 的
-`agent_comparison/run_task.py --mode dnakit` 都支持 `--allow-code-execution`、
-`--code-timeout-seconds`、`--max-code-attempts`。原生 Chat 对照脚本保持原有行为。
+自然语言驱动的 `run_agent()`、Python 补充执行、工具生成与优化、本地结果缓存及知识库检索（RAG）见 [Agent](agent.md#agent-actions) 页面，其中提供开关、参数、示例与执行限制。
 
 <span id="tool-discovery"></span>
 
-## 2) 只获取候选工具，不执行任务
+## 1) 只获取候选工具，不执行任务
 
 其他程序只想知道“可以使用哪些工具”时，直接调用 `registry.search()`，无需运行 `run_agent()`：
 
@@ -179,7 +41,7 @@ print(info["input_schema"])
 
 <span id="tool-search-modes"></span>
 
-## 3) 关键词、云端 embedding 与混合检索
+## 2) 关键词、云端 embedding 与混合检索
 
 三种模式共用 `registry.search()`，返回格式相同，**默认始终是 `keyword`**。即使配置了 embedding 服务，省略 `mode` 也不会联网。
 
@@ -249,31 +111,13 @@ tools = registry.search("download hg38 genome", limit=3)
 
 云端只接收搜索文本和工具的名称、短说明、分类；这些接口不会读取输入路径指向的 DNA 文件。向量与相似度排序保存在／运行于调用 registry 的机器上。磁盘缓存不保存 API key 或查询原文。构造配置、创建 registry 和默认关键词检索均不创建缓存、不请求云端。明确选择语义／混合模式后需要相应配置；缺少密钥、网络错误、超限或非法向量会明确报错，不会静默切回关键词模式，也不会自动重试付费请求。
 
-### 内置 Agent 使用同一套检索
-
-将上面的 `registry` 传给 `run_agent()`。聊天模型继续负责选择工具、生成参数和总结，embedding 模型只负责向量化：
-
-```python
-from dnakit.llm import LLMConfig
-from dnakit.tools import run_agent
-
-result = run_agent(
-    "请计算 ACGT 的分子量。",
-    config=LLMConfig(provider="deepseek", model="deepseek-flash"),
-    registry=registry,
-    search_mode="hybrid",
-    search_limit=10,
-)
-print(result.text)
-```
-
-`run_agent()` 默认 `search_mode="keyword"`、`search_limit=5`；候选数量可设为 1–100，模型不能修改调用方选定的模式或限额。`max_steps=50` 限制聊天 LLM 轮数，不包含独立的 embedding API 请求。上例会执行选中的分子量计算工具；前面的 `registry.search()` 示例只返回候选。
+将这个 registry 用于 `run_agent()` 的示例见 [Agent：配置工具检索](agent.md#tool-search-modes)。
 
 MCP 也使用相同检索实现，参阅 [MCP 的只获取候选与云端检索配置](mcp.md#tool-search-modes)。
 
 <span id="custom-llm"></span>
 
-## 4) 通用大模型调用
+## 3) 通用大模型调用
 
 `dnakit.llm` 可插入任意 Python 处理流程：自定义提示词 + 当前步骤的数据 → 大模型输出 → 继续本地代码。它不局限于 DNA 或训练文件结构分析，也不需要使用 DNAKit CLI。
 

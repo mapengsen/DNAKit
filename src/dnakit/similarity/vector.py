@@ -8,6 +8,7 @@ from collections.abc import Mapping, Sequence
 from typing import Literal, TypeAlias, TypeGuard
 
 from dnakit._verbosity import register_public as _register_public_verbose
+from dnakit.core import DNA, DNARecord, DNASequence, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 from dnakit.fingerprints import BitFingerprintResult, FingerprintResult
@@ -29,6 +30,7 @@ FingerprintVectorResult: TypeAlias = FingerprintResult | BitFingerprintResult
 VectorInput: TypeAlias = FingerprintVectorResult | NumericVector | NamedVector
 WeightInput: TypeAlias = NumericVector | NamedVector
 KmerVectorInput: TypeAlias = FingerprintResult | NamedVector
+KmerSequenceInput: TypeAlias = SequenceInput | DNASet | Sequence[SequenceInput]
 
 _IUPAC_COMPLEMENT = str.maketrans(
     {
@@ -450,6 +452,30 @@ def _kmer_counts(
     return Counter(_canonical_word(word) if canonical else word for word in words)
 
 
+def _kmer_sequence_items(
+    value: KmerSequenceInput, *, role: str
+) -> tuple[tuple[DNASequence, str | None], ...]:
+    if isinstance(value, (DNA, DNASet)):
+        items = value.records
+    elif isinstance(value, (DNASequence, DNARecord)):
+        items = (value,)
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        items = tuple(value)
+    else:
+        raise ConfigurationError(
+            f"{role} must be DNA, DNASet, or a sequence of DNA objects.",
+            code="INVALID_SIMILARITY_SEQUENCE",
+            context={"role": role, "input_type": type(value).__name__},
+        )
+    if not items:
+        raise ConfigurationError(
+            f"{role} must contain at least one DNA sequence.",
+            code="EMPTY_SIMILARITY_COLLECTION",
+            context={"role": role},
+        )
+    return tuple(sequence_and_id(item, role=role) for item in items)
+
+
 def _kmer_components(
     left: Mapping[str, int | float],
     right: Mapping[str, int | float],
@@ -589,8 +615,8 @@ def kmer_vector_similarity(
 
 
 def kmer_similarity(
-    left: SequenceInput,
-    right: SequenceInput,
+    left: KmerSequenceInput,
+    right: KmerSequenceInput,
     *,
     k: int,
     metric: KmerMetric = "jaccard",
@@ -598,9 +624,10 @@ def kmer_similarity(
     canonical: bool = False,
     overlapping: bool = True,
     zero_vector_policy: ZeroVectorPolicy = "identity",
+    max_pairwise_comparisons: int = 1_000_000,
     verbose: bool = True,
 ) -> SimilarityResult:
-    """Compare exact literal-IUPAC k-mer sets or count multisets."""
+    """Compare k-mers; average all query-reference pairs for collection inputs."""
 
     validate_positive_int(k, "k")
     validate_bool(canonical, "canonical")
@@ -618,45 +645,67 @@ def kmer_similarity(
             context={"mode": mode},
         )
     zero_policy = _validate_zero_policy(zero_vector_policy)
-    left_sequence, left_id = sequence_and_id(left, role="left")
-    right_sequence, right_id = sequence_and_id(right, role="right")
-    left_counts = _kmer_counts(
-        left_sequence.symbols,
-        k=k,
-        overlapping=overlapping,
-        canonical=canonical,
+    validate_positive_int(max_pairwise_comparisons, "max_pairwise_comparisons")
+    left_items = _kmer_sequence_items(left, role="left")
+    right_items = _kmer_sequence_items(right, role="right")
+    pair_count = len(left_items) * len(right_items)
+    if pair_count > max_pairwise_comparisons:
+        raise ConfigurationError(
+            "K-mer similarity exceeds max_pairwise_comparisons.",
+            code="SIMILARITY_PAIRWISE_LIMIT",
+            context={"pair_count": pair_count, "limit": max_pairwise_comparisons},
+        )
+    left_counts = tuple(
+        _kmer_counts(sequence.symbols, k=k, overlapping=overlapping, canonical=canonical)
+        for sequence, _ in left_items
     )
-    right_counts = _kmer_counts(
-        right_sequence.symbols,
-        k=k,
-        overlapping=overlapping,
-        canonical=canonical,
+    right_counts = tuple(
+        _kmer_counts(sequence.symbols, k=k, overlapping=overlapping, canonical=canonical)
+        for sequence, _ in right_items
     )
-    value, components = _kmer_components(
-        left_counts,
-        right_counts,
-        mode=mode,
-        metric=metric,
-        zero_policy=zero_policy,
-    )
+    if pair_count == 1:
+        value, components = _kmer_components(
+            left_counts[0], right_counts[0], mode=mode, metric=metric, zero_policy=zero_policy
+        )
+    else:
+        query_means = tuple(
+            math.fsum(
+                _kmer_components(
+                    query, reference, mode=mode, metric=metric, zero_policy=zero_policy
+                )[0]
+                for reference in right_counts
+            )
+            / len(right_counts)
+            for query in left_counts
+        )
+        value = math.fsum(query_means) / len(query_means)
+        components = FrozenDict(
+            {
+                "query_count": len(left_items),
+                "reference_count": len(right_items),
+                "pair_count": pair_count,
+                "query_means": query_means,
+            }
+        )
+    parameters = {
+        "k": k,
+        "metric": metric,
+        "mode": mode,
+        "canonical": canonical,
+        "overlapping": overlapping,
+    }
+    if pair_count > 1:
+        parameters["aggregation"] = "mean_pairwise"
     return SimilarityResult(
         name="kmer_similarity",
         method=f"{mode}_{metric}",
         value=value,
         value_kind="similarity",
-        left_id=left_id,
-        right_id=right_id,
-        left_dimension=len(left_counts),
-        right_dimension=len(right_counts),
-        parameters=FrozenDict(
-            {
-                "k": k,
-                "metric": metric,
-                "mode": mode,
-                "canonical": canonical,
-                "overlapping": overlapping,
-            }
-        ),
+        left_id=left_items[0][1] if len(left_items) == 1 else None,
+        right_id=right_items[0][1] if len(right_items) == 1 else None,
+        left_dimension=len(set().union(*(counts.keys() for counts in left_counts))),
+        right_dimension=len(set().union(*(counts.keys() for counts in right_counts))),
+        parameters=FrozenDict(parameters),
         components=components,
         zero_vector_policy=zero_policy,
         iupac_matching="literal",

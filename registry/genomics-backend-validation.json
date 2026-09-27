@@ -1,0 +1,57 @@
+{
+  "snapshot_date": "2026-09-20",
+  "backend_version": "PLINK v2.0.0-a.6.39LM 64-bit Intel (19 Sep 2026)",
+  "binary_sha256": "f7af20f30c1228135c1b9d6824cc897a9f151bd3cc094c6f9ecde3310c702c57",
+  "fixture": "PLINK --dummy 100 1000 --seed 42; synthetic quantitative trait and covariate",
+  "scientific_accuracy": "not assessed; no real biological dataset",
+  "checks": [
+    "100 PCA rows",
+    "Finite PCA coordinates with original sample IDs",
+    "4950 unique KING sample pairs with finite coefficients",
+    "LD outputs partition 1000 variants",
+    "GWAS reports only supplied trait with 1000 rows",
+    "Finite GWAS probabilities in [0, 1]; constant variants explicitly untestable"
+  ],
+  "gwas_tested_variants": 994,
+  "gwas_constant_variants": 6,
+  "results": [
+    {
+      "analysis": "plink2-pca",
+      "status": "completed",
+      "artifacts": [
+        "dnakit-run.json",
+        "pca.eigenval",
+        "pca.eigenvec",
+        "pca.log"
+      ]
+    },
+    {
+      "analysis": "plink2-king",
+      "status": "completed",
+      "artifacts": [
+        "dnakit-run.json",
+        "kinship.kin0",
+        "kinship.log"
+      ]
+    },
+    {
+      "analysis": "plink2-ld-prune",
+      "status": "completed",
+      "artifacts": [
+        "dnakit-run.json",
+        "ld.log",
+        "ld.prune.in",
+        "ld.prune.out"
+      ]
+    },
+    {
+      "analysis": "plink2-gwas",
+      "status": "completed",
+      "artifacts": [
+        "dnakit-run.json",
+        "gwas.log",
+        "gwas.trait.glm.linear"
+      ]
+    }
+  ]
+}

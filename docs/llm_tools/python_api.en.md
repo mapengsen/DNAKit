@@ -1,6 +1,6 @@
 # Python API
 
-This page covers natural-language tool execution, candidate-only discovery, optional cloud embedding/hybrid search, and general-purpose LLM calls. All run directly in Python without an MCP server or the Agent optional dependencies. Tool search defaults to local keyword matching and needs no API key.
+This page covers candidate-only discovery, optional cloud embedding/hybrid search, and general-purpose LLM calls. All run directly in Python without an MCP server or the Agent optional dependencies. Tool search defaults to local keyword matching and needs no API key.
 
 Install DNAKit core:
 
@@ -12,158 +12,11 @@ For MCP-capable clients, see [MCP](mcp.md).
 
 <span id="agent-tool-calling"></span>
 
-## 1) Natural-language tool execution (no MCP installation required)
-
-`run_agent()` sends a natural-language request to the LLM and loops through tool search, schema
-inspection, execution, and summarization. The user script does not need to hard-code specific tools
-or a workflow:
-
-```python
-import argparse
-from pathlib import Path
-
-from dnakit.llm import LLMConfig
-from dnakit.tools import run_agent
-
-parser = argparse.ArgumentParser(description="Use natural language to call DNAKit tools with DeepSeek")
-parser.add_argument("--model", default="deepseek-flash", help="DeepSeek model name")
-parser.add_argument("--api-key", help="API key; reads DEEPSEEK_API_KEY when omitted")
-parser.add_argument("--output", type=Path, help="Optional output directory")
-parser.add_argument("--request", help="Natural-language task; defaults to downloading hg38")
-parser.add_argument("--max-steps", type=int, default=50, help="Maximum number of LLM requests")
-args = parser.parse_args()
-
-config = LLMConfig(
-    provider="deepseek",
-    model=args.model,
-    api_key=args.api_key,
-    extra_body={"thinking": {"type": "disabled"}},
-)
-request = args.request or (
-    f"Download the human hg38 reference genome FASTA to "
-    f"{args.output or Path(__file__).resolve().parents[2] / 'data/fig3'} without overwriting existing files."
-)
-request += f"\nOutput directory: {args.output.expanduser().resolve()}" if args.output else ""
-result = run_agent(request, config=config, allow_side_effects=True, max_steps=args.max_steps)
-print(result.text)
-```
-
-Run the example with:
-
-```bash
-python write_paper/figure/fig3/01_download_hg38.py \
-  --api-key "key.........." \
-  --model deepseek-v4-pro \
-  --request "Download the human hg38 reference genome FASTA to write_paper/data/fig3"
-```
-
-### Resolve missing URLs and pass files between tools
-
-A task may specify only a dataset name, subset and output directory. `run_agent()` already
-uses `call_llm()` at every step. To obtain missing external information, the model can discover:
-
-| Tool | Purpose |
-| --- | --- |
-| `dnakit.search.web_search` | Search the internet for candidate pages, returning titles and URLs |
-| `dnakit.search.read_webpage` | Read an HTTPS page or text/JSON API, returning text and observed links |
-| `dnakit.download.download_url` | Save a confirmed file URL to a local directory |
-
-The Agent's `search` action still searches the installed tool catalog. Web search uses Tavily
-when `TAVILY_API_KEY` is set, otherwise keyless DuckDuckGo HTML; `provider` can select explicitly.
-No additional Python dependency is needed. The search key stays in the process environment.
-A DuckDuckGo challenge is reported as an error, never as an empty successful search. Configure
-Tavily or read a known candidate page to verify it. Web content is untrusted data, not Agent
-instructions. No page scripts run and no unobserved download links are invented by the reader.
-
-```python
-from dnakit.search import read_webpage, web_search
-
-candidates = web_search("NT revised H2AFZ dataset")
-page = read_webpage(candidates.records[0]["url"], match="H2AFZ")
-print(page.to_dict())
-```
-
-The reader defaults to 8,000 text characters and 30 links. `match` filters by substring;
-`offset` and `link_offset` paginate, with explicit truncation flags and continuation offsets.
-Binary resources belong in the downloader. `call_llm(file_path=...)` remains a text-file input.
-
-The existing ML trainer accepts `CustomPropertyTrainingConfig(cv_folds=10, ...)`. It validates
-all folds of a training-only source, saves validation-fold membership, out-of-fold predictions
-and metrics, then refits the final model on all source rows. This is supported only with
-`finetune_method="machine_learning"`; split ratios are ignored and mapped split columns are
-rejected. An independent test file is used only for subsequent prediction. Each fold fits its
-own preprocessing and model using training rows alone.
-`predict_custom_properties(..., output_path="predictions.csv")` saves predicted labels locally.
-Its `to_dict()`/Agent result then contains a file summary; Python prediction/probability attributes
-remain available. Feed the CSV to `plot_csv_distributions` and save the plot with `save_image`.
-
-Agent `call` arguments can reference earlier successful results, for example
-`{"artifact": {"$ref": {"step": 12, "path": ["label"]}}}`. Step numbers start at 1;
-the path selects result keys/list indices, with an empty path selecting the whole result.
-References resolve locally, so the model need not regenerate SVG or copy large payloads.
-Direct `registry.execute()` calls do not interpret these Agent references.
-
-Automatic field detection checks candidate ID uniqueness for built-in readers. Duplicate names
-use stable source-row IDs without dropping samples, with an inspection warning. Explicitly
-mapped `DataMapping.id_field` values still require unique IDs.
-
-### Python fallback and failure recovery
-
-When tools cannot directly exchange data or a processing step is missing, the same
-Agent can write and execute Python, then resume registered tool calls. Enable it explicitly:
-
-```python
-from dnakit.tools import PythonExecutionConfig, run_agent
-
-result = run_agent(
-    request,
-    config=config,
-    allow_side_effects=True,
-    code_execution=PythonExecutionConfig(
-        workspace="write_paper/data/my_run",
-        timeout_seconds=600,
-        max_attempts=5,
-    ),
-)
-print(result.text)
-print(result.execution_dir)
-```
-
-The model prefers existing tools. After finding a capability gap or receiving an error,
-it can choose the `execute_python` runtime action with `reason`, complete `code`,
-`inputs`, and `expected_outputs`. Input `$ref` values resolve locally into a JSON
-file passed as `sys.argv[1]`; the model need not copy sequences, predictions or SVG
-into source code. Subsequent tool calls can reference execution output paths.
-
-Scripts run in fresh subprocesses with the current Python interpreter. Nonzero exit,
-timeout, or missing/empty declared output files produce failed observations that the
-model can use to correct its code. Identical code, inputs and output lists reuse the
-previous observation. Inspection scripts count toward `max_attempts`; all actions
-also count toward `max_steps`. Defaults are 120 seconds per execution and 5 attempts.
-Each stdout/stderr tail sent to the model is limited to 16,000 bytes; full logs stay
-on disk. POSIX cleanup terminates the process group on timeout, interruption or script
-exit. On Windows, only the directly launched Python process is terminated.
-
-Audit files live under `<workspace>/.dnakit_agent/run_*/`: `history.jsonl` records
-actions and observations, and `summary.json` records status and actual execution count.
-Each `attempt_*/` contains `script.py`, `inputs.json`, `request.json` (reason and output
-paths), `stdout.log`, `stderr.log`, and `result.json` (exit code, time, file checks).
-Automatic code attempts are distinct from human interventions.
-
-This is **not a sandbox**: scripts have the current user's filesystem, network and
-environment access. The workspace is a cwd, not an access boundary. Execution is
-disabled by default and also requires caller-owned `allow_side_effects=True`.
-File existence is not scientific validation: scripts should assert task-specific
-row counts, columns and sequence lengths. Missing credentials, dependencies or
-external resources can still block completion.
-
-The Fig. 3 `02_h2afz_svm.py` example and Fig. 2 `agent_comparison/run_task.py --mode dnakit`
-support `--allow-code-execution`, `--code-timeout-seconds`, and `--max-code-attempts`.
-The native Chat comparison keeps its original behavior.
+See [Agent](agent.md#agent-actions) for natural-language execution with `run_agent()`, Python fallback, tool generation and optimization, local result caching, and knowledge retrieval (RAG), including flags, parameters, examples, and execution limits.
 
 <span id="tool-discovery"></span>
 
-## 2) Get candidate tools without executing a task
+## 1) Get candidate tools without executing a task
 
 Programs that only need to know which tools are available can call `registry.search()` directly, without running `run_agent()`:
 
@@ -188,7 +41,7 @@ Execution is a separate step: the caller decides whether to use `registry.execut
 
 <span id="tool-search-modes"></span>
 
-## 3) Keyword, cloud embedding, and hybrid search
+## 2) Keyword, cloud embedding, and hybrid search
 
 All three modes use `registry.search()` and return the same format. **The default is always `keyword`**: omitting `mode` makes no network requests even when an embedding service is configured.
 
@@ -258,31 +111,13 @@ The first semantic/hybrid search requests the query vector, then generates uncac
 
 The cloud receives only query text and tool names, short descriptions, and categories. These interfaces do not open DNA files referenced by input paths. Vectors are cached and similarity ranking runs on the machine hosting the registry. Disk caches contain neither API keys nor raw queries. Configuration/registry construction and default keyword search create no cache files and make no cloud requests. Explicit semantic/hybrid searches require the corresponding configuration. Missing keys, network errors, limits, and invalid vectors produce errors without silently switching to keywords or automatically retrying paid requests.
 
-### Use the same retrieval in the built-in Agent
-
-Pass the configured `registry` above to `run_agent()`. The chat model still selects tools, generates arguments, and summarizes results; the embedding model only produces vectors:
-
-```python
-from dnakit.llm import LLMConfig
-from dnakit.tools import run_agent
-
-result = run_agent(
-    "Calculate the molecular weight of ACGT.",
-    config=LLMConfig(provider="deepseek", model="deepseek-flash"),
-    registry=registry,
-    search_mode="hybrid",
-    search_limit=10,
-)
-print(result.text)
-```
-
-`run_agent()` defaults to `search_mode="keyword"` and `search_limit=5`; candidate limits accept 1–100. The model cannot change the caller's mode or limit. `max_steps=50` bounds chat LLM turns, excluding independent embedding API requests. This example executes the selected molecular-weight tool; the earlier `registry.search()` examples only return candidates.
+To use this registry with `run_agent()`, see [Agent: configure tool retrieval](agent.md#tool-search-modes).
 
 MCP shares the same implementation; see [candidate-only discovery and cloud search configuration](mcp.md#tool-search-modes).
 
 <span id="custom-llm"></span>
 
-## 4) General-purpose LLM calls
+## 3) General-purpose LLM calls
 
 `dnakit.llm` can be inserted into any Python workflow: custom prompt + data from the current step
 → LLM output → further local processing. It is not limited to DNA or training-file structure

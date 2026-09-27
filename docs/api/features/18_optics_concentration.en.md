@@ -8,11 +8,12 @@ For the paper sources and internal formulas of various calculations, see [FAQ: C
 
 ## 1) Single chain molar extinction coefficient at 260 nm
 
-- **Function:** Calculate the theoretical molar extinction coefficient of single-stranded DNA at 260 nm based on the sequence and adjacent base models, and output the `M⁻¹·cm⁻¹` value for use in absorbance and concentration conversion.
+- **Purpose:** Calculate the theoretical molar extinction coefficient of single-stranded DNA at 260 nm based on the sequence and adjacent base models, and output the `M⁻¹·cm⁻¹` value for use in absorbance and concentration conversion.
 - **Calculation method:** Look up the single-base `ε260` parameter for one nucleotide; for lengths of at least 2, calculate `ε260 = Σ adjacent-dinucleotide coefficients − Σ internal single-base coefficients` deterministically.
 - **API:** `dnakit.thermodynamics.extinction_coefficient_260nm(sequence[required], max_sequence_length[optional])`
 - **Input:** Required linear, single-stranded, canonical `A/C/G/T` sequence; optional upper sequence length.
-- **Sample code:**
+- **Output:** Returns an `ExtinctionCoefficientResult`; the example shows `value_m_inverse_cm_inverse`, `wavelength_nm`, `method`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -22,7 +23,7 @@ result = extinction_coefficient_260nm(DNASequence("ACGT"))
 print(result.value_m_inverse_cm_inverse, result.wavelength_nm, result.method)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 40300.0 260 nearest-neighbor-hypochromicity
@@ -30,11 +31,12 @@ print(result.value_m_inverse_cm_inverse, result.wavelength_nm, result.method)
 
 ## 2) Single chain/double chain theoretical optical properties
 
-- **Function:** Calculate `ε260`, molecular weight and related optical properties of single-stranded or double-stranded DNA in one call, providing unified parameters for subsequent OD260, mass and substance quantity conversion.
+- **Purpose:** Calculate `ε260`, molecular weight and related optical properties of single-stranded or double-stranded DNA in one call, providing unified parameters for subsequent OD260, mass and substance quantity conversion.
 - **Calculation method:** Single-stranded calculations use adjacent-dinucleotide `ε260` and the molecular-weight formula for anhydrous DNA residues; double-stranded `average-base-pair` uses `13200 × base-pair count` as `ε260`, while `strand-sum-hypochromicity` uses `(ε1 + ε2) × (1 − h)`, where `h` is supplied by the caller. Modification `Δε` and `ΔMW` values are finally added by count.
 - **API:** `dnakit.thermodynamics.optical_properties(sequence[required], strand_type[optional], complement[optional], duplex_method[optional], hypochromicity_fraction[optional], modifications[optional])`
 - **Input:** Required canonical DNA sequence; optional single/double strand, explicit complementary strand, double strand model, hypochromicity score, and modifications.
-- **Sample code:**
+- **Output:** Returns `OpticalPropertiesResult` with 260 nm extinction coefficient, molecular weight, and method.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -56,7 +58,7 @@ print(average.extinction_coefficient_260_m_inverse_cm_inverse, average.method)
 print(explicit.extinction_coefficient_260_m_inverse_cm_inverse, explicit.method)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 40300.0 1173.84
@@ -66,11 +68,12 @@ print(explicit.extinction_coefficient_260_m_inverse_cm_inverse, explicit.method)
 
 ## 3) nmol and mass corresponding to 1 OD260
 
-- **Function:** Based on the extinction coefficient and molecular weight of DNA, convert the amount of nucleic acid corresponding to 1 OD260 into nmol and µg to avoid using fixed empirical coefficients that do not distinguish sequences.
+- **Purpose:** Based on the extinction coefficient and molecular weight of DNA, convert the amount of nucleic acid corresponding to 1 OD260 into nmol and µg to avoid using fixed empirical coefficients that do not distinguish sequences.
 - **Calculation method:** Defined by `1 OD260 = A260 × volume (mL) = 1` at a 1 cm reference optical path length, converted using `nmol/OD260 = 10⁶/ε260` and `µg/OD260 = 1000 × MW/ε260`.
 - **API:** `dnakit.thermodynamics.optical_properties(sequence[required], strand_type[optional], complement[optional], duplex_method[optional], hypochromicity_fraction[optional], modifications[optional])`
 - **Input:** Required DNA sequence; optional strand type, duplex model, and explicit modifications.
-- **Sample code:**
+- **Output:** Returns an `OpticalPropertiesResult`; the example shows `one_od260_nmol`, `one_od260_microgram`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -80,7 +83,7 @@ result = optical_properties(DNASequence("ACGT"))
 print(round(result.one_od260_nmol, 4), round(result.one_od260_microgram, 4))
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 24.8139 29.1275
@@ -88,11 +91,12 @@ print(round(result.one_od260_nmol, 4), round(result.one_od260_microgram, 4))
 
 ## 4) A260 to molar concentration, mass concentration and total amount
 
-- **Function:** Use A260, optical path, extinction coefficient and sample volume to calculate molar concentration, mass concentration, amount of total substance and total mass for quantification of nucleic acid samples.
+- **Purpose:** Use A260, optical path, extinction coefficient and sample volume to calculate molar concentration, mass concentration, amount of total substance and total mass for quantification of nucleic acid samples.
 - **Calculation method:** First calculate `A260_corrected = A260_measured − Σ(label peak × cross-absorption factor)`, then obtain molar concentration from the Beer–Lambert law as `c = A260_corrected × dilution factor / (ε260 × path length)`; mass concentration is `c × MW`, and when volume is provided, calculate `n = cV` and total mass.
 - **API:** `dnakit.thermodynamics.concentration_from_a260(measured_a260[required], properties[required], path_length_cm[optional], dilution_factor[optional], label_corrections[optional], volume_liter[optional])`
 - **Input:** Required measured A260 and `OpticalPropertiesResult`; optional path length, dilution factor, dye calibration and sample volume.
-- **Sample code:**
+- **Output:** Returns a `A260ConcentrationResult`; the example shows `amount_mol`, `mass_microgram`, `corrected_a260`, `molar_concentration_micromolar`.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -115,7 +119,7 @@ print(
 print(round(result.amount_mol * 1e9, 4), round(result.mass_microgram, 4))
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 0.403
@@ -125,11 +129,12 @@ print(round(result.amount_mol * 1e9, 4), round(result.mass_microgram, 4))
 
 ## 5) Concentration, quantity and mass interchange of substances
 
-- **What it does:** Combines molecular weight and volume to perform consistent conversions between molar concentration, mass concentration, amount and mass of a substance, and returns each result unit explicitly.
+- **Purpose:** Combines molecular weight and volume to perform consistent conversions between molar concentration, mass concentration, amount and mass of a substance, and returns each result unit explicitly.
 - **Calculation method:** Use `m = n × MW`, `n = m/MW`, `c = n/V` and `n = cV` for pure dimensional conversion; mass concentration and molar concentration are interchanged through `MW`, and no model estimation is performed.
 - **API:** `dnakit.thermodynamics.convert_oligo_quantity(molecular_weight_dalton[required], volume_liter[optional], molar_concentration_molar[optional], mass_concentration_g_per_l[optional], amount_mol[optional], mass_g[optional])`
 - **Input:** Required molecular weight; only one of the four concentration/total inputs must be provided, and the volume must also be provided when converting concentration to total amount.
-- **Sample code:**
+- **Output:** Returns an `OligoQuantityResult`; the example shows `amount_nmol`, `mass_microgram`, `input_kind`.
+- **Example code:**
 
 ```python
 from dnakit.thermodynamics import convert_oligo_quantity
@@ -143,7 +148,7 @@ print(round(result.amount_nmol, 4), round(result.mass_microgram, 4))
 print(result.input_kind)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 10.0 11.7384
@@ -152,11 +157,12 @@ molar_concentration_molar
 
 ## 6) Explicit correction of dyes and modifying groups
 
-- **Function:** Correct `ε260`, molecular weight, and A260 derived results based on user-supplied dye, end group, or other modification increments, making the concentration conversion of modified oligonucleotides auditable.
+- **Purpose:** Correct `ε260`, molecular weight, and A260 derived results based on user-supplied dye, end group, or other modification increments, making the concentration conversion of modified oligonucleotides auditable.
 - **Calculation method:** For each modification, sum `count × Δε260` and `count × ΔMW` and add them to the unmodified value; dye cross-absorption is subtracted from measured A260 as `label peak × correction factor`. All correction parameters are supplied by the caller.
 - **API:** `dnakit.thermodynamics.OpticalModification(name[required], count[optional], extinction_coefficient_260_delta_m_inverse_cm_inverse[optional], molecular_weight_delta_dalton[optional])`, `dnakit.thermodynamics.LabelAbsorbanceCorrection(name[required], absorbance_at_label_max[required], a260_correction_factor[required])`
 - **Input:** Modifier name and explicit modifier value; `OpticalModification` passes in `optical_properties()`, `LabelAbsorbanceCorrection` passes in `concentration_from_a260()`.
-- **Sample code:**
+- **Output:** Returns optical-property results corrected with explicit modification parameters.
+- **Example code:**
 
 ```python
 from dnakit import DNASequence
@@ -200,7 +206,7 @@ print(
 )
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 42300.0 1373.84

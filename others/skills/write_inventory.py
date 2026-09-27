@@ -87,22 +87,47 @@ def main() -> None:
         rows.append("")
     (ROOT / "skills/README.md").write_text("\n".join(rows), encoding="utf-8")
 
+    baseline_decisions = [
+        item
+        for item in decisions
+        if item.get("integration") not in {"genomics-expansion", "user-catalog-expansion"}
+    ]
+    baseline_selection = Counter(item["status"] for item in baseline_decisions)
+    imported_count = len(
+        json.loads((ROOT / "registry/genomics-new-skills.json").read_text())["skills"]
+    )
+    native_count = len(
+        json.loads((ROOT / "registry/genomics-native-skills.json").read_text())["skills"]
+    )
+    user_manifest = ROOT / "registry/user-catalog-skills.json"
+    user_count = (
+        len(json.loads(user_manifest.read_text())["skills"]) if user_manifest.exists() else 0
+    )
     notes = [
         "# DNAKit Skills 来源与复现记录",
         "",
         f"快照日期：{catalog['snapshot_date']}。Git commit 固定在 [sources.json](sources.json)。",
         "",
-        f"本次检查 {len(decisions)} 个 `SKILL.md` 路径（包含聚合副本、示例及范围外内容）。"
-        "这些路径数不是不同 DNA 功能的数量。",
+        f"下表保留原始扫描的 {len(baseline_decisions)} 个 `SKILL.md` 路径决策"
+        "（包含聚合副本、示例及范围外内容）。`selected` 是原始扫描入选数量，"
+        "不含后续独立清单的扩展，也不等于当前分发总量。这些路径数不是不同 DNA 功能的数量。",
         "",
         "| 筛选结果 | 路径数 |",
         "| --- | ---: |",
     ]
-    notes.extend(f"| {status} | {count} |" for status, count in catalog["selection"].items())
+    notes.extend(f"| {status} | {count} |" for status, count in baseline_selection.items())
     notes.extend(
         [
             "",
-            f"最终分发 {len(entries)} 个技能，其中 1 个是 DNAKit 自有入口。",
+            f"后续新增 {imported_count} 个上游技能见 "
+            "[genomics-new-skills.json](genomics-new-skills.json)，"
+            f"{native_count} 个原生流程见 "
+            "[genomics-native-skills.json](genomics-native-skills.json)。"
+            f"用户提供的 335 项清单另补 {user_count} 个技能，见 "
+            "[user-catalog-skills.json](user-catalog-skills.json)；"
+            "[选择与排除审查](user-catalog-skills-review.json)记录逐来源处理及验证范围。"
+            f"最终分发 {len(entries)} 个技能，其中包含 DNAKit 检索入口 "
+            "`dnakit` 和规划入口 `dnakit-plan`。",
             "",
             "## 选择与去重方法",
             "",
@@ -170,6 +195,9 @@ def main() -> None:
             "# 审阅 temp/dnakit-skills-work/ 中的选择与决策后重新生成",
             "python others/skills/build_catalog.py --fetch",
             "python others/skills/build_catalog.py --check",
+            "# 验证新增上游技能的固定版本资源；不运行科学工作流",
+            "python others/skills/import_genomics_skills.py --check",
+            "python others/skills/sync_genomics_expansion.py --check",
             "# 更新全部已审阅的 DNAKit 适配",
             "python others/skills/adaptations.py",
             "# --python 指向 Python 3.11+；运行已检查的离线脚本",
@@ -180,7 +208,10 @@ def main() -> None:
             "",
             "`skills/` 是公开分发目录；原生适配的维护模板在 `others/skills/adaptations/`，"
             "由 `registry/adaptations.json` 绑定上游版本。完整导入也会重放这些适配，"
-            "保留旧名称别名、原始元数据、许可和哈希。全部技能都有维护模板；科学后端保留原始实现。"
+            "保留旧名称别名、原始元数据、许可和哈希。新增上游技能由 "
+            "`genomics-new-skills.json` 固定完整资源；新增原生入口由 "
+            "`genomics-native-skills.json` 维护 API 与类别。`sync_genomics_expansion.py` "
+            "合并这些清单，完整目录构建也会保留它们。科学后端保留原始实现。"
             "构建时将已登记文件复制进 wheel。用户安装包后不需要 "
             "`temp` 中的原仓库，查询和安装也不需要 Git 或 Node.js。",
             "",
@@ -208,6 +239,7 @@ def main() -> None:
         ]
     )
     (ROOT / "registry/README.md").write_text("\n".join(notes), encoding="utf-8")
+    print(f"[1/1] Updated skill and registry inventories: {len(entries)} skills.", flush=True)
 
 
 if __name__ == "__main__":

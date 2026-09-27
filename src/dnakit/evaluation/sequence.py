@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
+from dataclasses import replace
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import Gap, IssueSeverity
@@ -56,11 +57,19 @@ def _validation_entry(item: InputItem, index: int, config: ValidationConfig) -> 
 def evaluate_validity(
     value: EvaluationInput,
     *,
+    sequence_length: int | None = None,
     config: ValidationConfig | None = None,
     limits: EvaluationLimits | None = None,
     verbose: bool = True,
 ) -> EvaluationReport:
-    """Evaluate object-level alphabet, length, gap, and optional record constraints."""
+    """Evaluate object-level alphabet, length, gap, and optional record constraints.
+
+    ``sequence_length`` requires every valid record to have exactly this many
+    nucleotide symbols (excluding Gap spans). When provided, it overrides
+    ``config.sequence_length`` without changing the supplied config. ``None``
+    preserves the config's length rules. For nonempty input, ``valid_fraction``
+    is 1.0 only when every record passes all validation rules.
+    """
 
     resolved = ValidationConfig() if config is None else config
     resolved_limits = EvaluationLimits() if limits is None else limits
@@ -68,6 +77,8 @@ def evaluate_validity(
         raise TypeError("config must be ValidationConfig or None.")
     if not isinstance(resolved_limits, EvaluationLimits):
         raise TypeError("limits must be EvaluationLimits or None.")
+    if sequence_length is not None:
+        resolved = replace(resolved, sequence_length=sequence_length)
     items = materialize_input(value, limits=resolved_limits)
     entries = tuple(_validation_entry(item, index, resolved) for index, item in enumerate(items))
     valid_count = sum(entry.metrics["is_valid"] is True for entry in entries)

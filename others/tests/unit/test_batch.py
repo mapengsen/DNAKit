@@ -8,7 +8,7 @@ from collections.abc import Iterator
 import pytest
 
 from dnakit.batch import BatchConfig, BatchContext, BatchProgress, iter_batch, run_batch
-from dnakit.core import DNARecord, DNASequence
+from dnakit.core import DNA, DNARecord, DNASequence
 from dnakit.exceptions import BatchExecutionError, ConfigurationError
 
 
@@ -17,6 +17,21 @@ def _records() -> list[DNARecord]:
         DNARecord(DNASequence("A"), "a"),
         DNARecord(DNASequence("CC"), "b"),
         DNARecord(DNASequence("GGG"), "c"),
+    ]
+
+
+def test_dna_batch_can_feed_record_operations_without_losing_ids() -> None:
+    sequences = DNA(["A", "CC", "GGG"])
+    result = run_batch(
+        sequences,
+        lambda record, context: (record.id, record.sequence.symbol_length, context.input_index),
+        name="length",
+    )
+
+    assert [item.value for item in result.items] == [
+        ("sequence_1", 1, 0),
+        ("sequence_2", 2, 1),
+        ("sequence_3", 3, 2),
     ]
 
 

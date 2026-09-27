@@ -17,6 +17,7 @@ from dnakit.visualization import (
     SVGTheme,
     plot_csv_distributions,
     plot_distribution,
+    plot_label_comparison,
 )
 
 
@@ -32,6 +33,70 @@ def test_classification_counts_and_missing_denominator() -> None:
     assert plot.metadata["total_count"] == 7
     assert plot.metadata["missing_count"] == 3
     assert plot.issues[0].code == "VIZ_MISSING_VALUES"
+
+
+def test_label_comparison_paired_bars_and_counts() -> None:
+    plot = plot_label_comparison(
+        [0, 0, 1, 1],
+        [0, 1, 1, 1],
+        config=DistributionPlotConfig(
+            categories=("0", "1"),
+            show_values=True,
+            bar_colors=("#123456", "#abcdef"),
+        ),
+    )
+    assert plot.metadata["true_counts"] == (2, 2)
+    assert plot.metadata["predicted_counts"] == (1, 3)
+    assert plot.metadata["true_proportions"] == (0.5, 0.5)
+    assert plot.metadata["predicted_proportions"] == (0.25, 0.75)
+    nodes = list(ET.fromstring(plot.svg).iter())
+    bars = [node for node in nodes if node.get("class") == "comparison-bar"]
+    assert [(bar.get("data-label"), bar.get("data-series")) for bar in bars] == [
+        ("0", "true"),
+        ("0", "predicted"),
+        ("1", "true"),
+        ("1", "predicted"),
+    ]
+    assert [bar.get("fill") for bar in bars] == ["#123456", "#abcdef", "#123456", "#abcdef"]
+    assert [float(bar.get("x")) for bar in bars] == sorted(float(bar.get("x")) for bar in bars)
+    assert {node.text for node in nodes if node.get("class") == "bar-value"} == {
+        "25.0%",
+        "50.0%",
+        "75.0%",
+    }
+
+
+def test_label_comparison_validates_pairing_and_category_coverage() -> None:
+    with pytest.raises(InputFormatError, match="equal lengths"):
+        plot_label_comparison([0, 1], [0])
+    with pytest.raises(InputFormatError, match="every observed"):
+        plot_label_comparison([0, 1], [0, 2], config=DistributionPlotConfig(categories=("0", "1")))
+    with pytest.raises(ConfigurationError, match="bin_edges only applies"):
+        plot_label_comparison([0, 1], [0, 1], config=DistributionPlotConfig(bin_edges=(0, 1)))
+
+
+def test_label_comparison_skips_blanks_per_series() -> None:
+    plot = plot_label_comparison(
+        ["0", None, "1"],
+        ["0", "1", None],
+        config=DistributionPlotConfig(categories=("0", "1")),
+    )
+    assert plot.metadata["true_valid_count"] == 2
+    assert plot.metadata["predicted_valid_count"] == 2
+    assert plot.metadata["true_proportions"] == (0.5, 0.5)
+    assert plot.metadata["predicted_proportions"] == (0.5, 0.5)
+    assert plot.issues[0].code == "VIZ_MISSING_VALUES"
+
+
+def test_label_comparison_saves_image_in_one_call(tmp_path: Path) -> None:
+    target = tmp_path / "plots" / "comparison.svg"
+    first = plot_label_comparison([0, 0, 1], [0, 1, 1], output=target)
+    assert target.read_text(encoding="utf-8") == first.svg
+    with pytest.raises(FileExistsError):
+        plot_label_comparison([0, 0, 1], [0, 1, 1], output=target)
+    second = plot_label_comparison([0, 1, 1], [0, 1, 1], output=target, overwrite=True)
+    assert target.read_text(encoding="utf-8") == second.svg
+    assert second.svg != first.svg
 
 
 def test_regression_boundary_inclusion_and_unequal_bins() -> None:

@@ -3,6 +3,18 @@
 这里保存 DNAKit 在 PyPI 之外的平台适配源文件。它们不会改变
 `src/dnakit/` 中的核心代码。
 
+## PyPI 发布
+
+将 `src/dnakit/_version.py`、中英文安装说明、引用和更新日志同步至新版本，
+通过本地测试后推送 `main`，再推送与版本号一致的 `vX.Y.Z` 标签。
+标签将触发 TestPyPI 流程：测试、Notebook、文档、后端验证、构建、
+源码与 Skills 校验和审查、隔离安装检查，以及 TestPyPI 上传。
+成功后自动调度现有正式发布流程；正式流程核对标签及 TestPyPI 上
+同一组文件的 SHA-256，再上传到 PyPI 并建立附带发行包的 GitHub Release。
+
+两个上传任务继续使用各自的 `testpypi` / `pypi` 环境和 Trusted Publishing。
+手动调度仍保留原有的显式确认输入。
+
 ## Bioconda
 
 [`bioconda/meta.yaml`](bioconda/meta.yaml) 是 `dnakit 0.1.1` 的 Bioconda

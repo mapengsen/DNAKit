@@ -1,20 +1,22 @@
 # API reference
 
-This page provides reference entrypoints for the core public namespaces. The migration's **484 added functions** are individually documented in the [complete index](native/index.md), with signatures, parameters, returns and execution requirements. Core interval APIs generally use 0-based half-open coordinates; database, model and format APIs follow their documented coordinate and assembly conventions.
+This page provides reference entrypoints for public namespaces. Signatures, parameters, returns, execution requirements and examples are integrated into individual tutorials; use the [feature tree](features/function_tree.md) to find a feature. Core interval APIs generally use 0-based half-open coordinates; database, model and format APIs follow their documented coordinates and assemblies.
 
-Use the [function module index](features/index.md) to browse by purpose. The original trace matrix's 185 items are historical capability categories, not the total number of current public functions.
+## Database, ENCODE and workflow APIs {#native-apis}
 
-## Added database, ENCODE and workflow APIs {#native-apis}
-
-| Module | Added functions | Reference |
-| --- | ---: | --- |
-| `dnakit.databases` | 455 | [Database functions by purpose](native/index.md) |
-| `dnakit.encode` | 20 | [Experiments, downloads, citations and provenance](native/encode.md) |
-| `dnakit.workflows` | 6 | [Execution and reports](native/execution.md), [inheritance](native/analysis.md#dnakit.workflows.simulate_inheritance) |
-| NCBI / ENA sequence APIs | 3 | [Queries and downloads](native/sequences.md) |
-| **Total** | **484** | [Individual function index](native/index.md) · [Examples](native/usage.md) |
-
-Aliases, parameter extensions to existing functions and CLI/MCP exposures are not counted again. Function counts are not counts of independent scientific algorithms.
+| Task | Tutorial and full parameters |
+| --- | --- |
+| Database discovery and queries | [Data queries](features/22_database_query_discovery.md) |
+| Gene, transcript and homology annotations | [Gene annotation](features/26_gene_annotation.md#gene-annotation) |
+| Variant records, population frequencies and clinical significance | [Variants and frequencies](features/22_database_query_variant_frequency.md), [structural variants](features/22_database_query_structural_variants.md), [ClinVar](features/22_database_query_clinical_variants.md) |
+| Genetic associations and cancer evidence | [Gene–disease evidence](features/22_database_query_genetic_evidence.md), [cancer variants](features/22_database_query_cancer_variants.md), [GWAS](features/22_database_query_gwas.md), [cohort phenotype associations](features/22_database_query_phewas.md), [populations and linkage](features/22_database_query_population_resources.md) |
+| Variant annotations, effect scores and enrichment | [Annotations and identifier conversion](features/35_variant_annotation.md), [effect scores and experiments](features/36_variant_effect_scores.md), [gene set and pathway enrichment](features/37_functional_enrichment.md) |
+| Trained models and prediction services | [Regulatory tracks](features/23_prediction_regulatory_tracks.md), [variant effects](features/23_prediction_variant_effects.md), [protein features and structure](features/23_prediction_protein_features.md) |
+| Sequence, URL and ENCODE downloads | [Downloads](features/15_download.md) |
+| ENCODE collections, citations and provenance | [Dataset preparation](features/10_datasets.md#encode-collection) |
+| Variant calling and VCF processing | [Variant calling and VCF processing](features/33_variant_calling.md) |
+| Independent-locus inheritance | [Inheritance simulation](features/34_inheritance.md) |
+| Scripts, credentials and reports | [Engineering and extensions](features/14_engineering.md) |
 
 ## Operation feedback
 
@@ -106,7 +108,7 @@ This module parses assembly accessions or species names through NCBI Datasets v2
 
 `SearchConfig` Set hard caps on timeouts, response bytes, and number of records. The results are unified into immutable `QueryResult`, containing masked URLs, origin fields, pagination information, and provenance. Ensembl and UCSC regional entrances uniformly receive 0-based half-open coordinates; NCBI BLAST submits asynchronously by default and does not poll implicitly.
 
-For complete query examples and 29 capability statuses, see [Data Query ](features/22_database_query.md).
+See [sequence and assembly queries](features/22_database_query_sequences.md), [gene and interval annotations](features/26_gene_annotation.md), [organism queries](features/22_database_query_organisms.md), [expression queries](features/22_database_query_regulation.md) and [ENCODE queries](features/22_database_query_encode.md) for function examples.
 
 ## Public data download
 
@@ -150,7 +152,7 @@ assert reverse_complement(linear).symbols == "CGTT"
 assert rotate(circular, 2).symbols == "CGAA"
 ```
 
-## OPS-010 Sequence Segmentation {#sequence-chunking}
+## Sequence Segmentation {#sequence-chunking}
 
 ::: dnakit.chunking
 
@@ -251,23 +253,24 @@ See all 11 models, checkpoints, dependencies and remote code boundaries
 
 `predict_properties()` provides one interface for official tasks that can run directly with
 released trained weights from AlphaGenome, Enformer, SegmentNT, Evo 2, GENERator, and
-LucaOneTasks. See [Deep-learning property prediction](features/23_deep_learning_property_prediction.md)
-for model/task inputs, dependencies, and output semantics.
+LucaOneTasks. Examples are organized into [regulatory tracks](features/23_prediction_regulatory_tracks.md),
+[splicing and genomic regions](features/23_prediction_splicing_regions.md), [variant effects](features/23_prediction_variant_effects.md),
+[taxonomy and molecular function](features/23_prediction_sequence_classification.md), and [molecular relationships and interactions](features/23_prediction_molecular_interactions.md).
+See [prediction FAQ](../faq/tutorial_integrations.md#property-prediction) for dependencies and complete parameters.
 The new `predict_enformer_benchmark()` wrapper runs the 18 NT Revised and nine Genomic
 Benchmarks fully fine-tuned checkpoints, downloading missing weights on demand and reusing local files.
 Use the default location or supply `checkpoint_dir`/`checkpoint_path`; see
-[checkpoint reuse and automatic downloads](features/23_deep_learning_property_prediction.md#checkpoint-cache).
+[checkpoint reuse and automatic downloads](../faq/tutorial_integrations.md#property-prediction).
 
-## Optional bioinformatics functions {#optional-bioinformatics}
+## Annotation and comparative analysis dependencies and returns {#optional-bioinformatics}
 
 ::: dnakit.annotation
 
 ::: dnakit.comparative
 
-Capability-named methods expose VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate without
-loading the optional backend during a default
-installation. See [Optional bioinformatics functions](features/24_optional_bioinformatics.md) for
-all entry points and installation instructions.
+Methods in `annotation` and `comparative` return `ProviderResult` and do not load optional backends during a default installation.
+For examples, see [variant annotation](features/35_variant_annotation.md), [ClinVar clinical significance](features/22_database_query_clinical_variants.md), [variant records and population frequencies](features/22_database_query_variant_frequency.md), [phylogenetics and molecular evolution](features/30_phylogeny.md), and [sequence concatenation and assembly](features/04_ops_006_sequence_concatenation.md).
+See the [FAQ](../faq/tutorial_integrations.md#optional-bioinformatics) for installation and return-value conventions.
 
 ## Similarity, search and comparison {#similarity-alignment}
 
@@ -324,7 +327,7 @@ Features include exact/reverse-complement/circular/IUPAC/approximate deduplicati
 
 ::: dnakit.evaluation
 
-Reference-based methods must first call `create_reference_library()` to bind name, version, source, date, filters, index parameters, and a content digest. Novelty defaults to `1 - nearest_similarity`, with the paper's mean nearest-reference Levenshtein distance available as a second method; diversity likewise supports mean pairwise Levenshtein distance. Memorization means an exact or explicit-threshold near copy.
+Reference-based methods must first call `create_reference_library()` to bind name, version, source, date, filters, index parameters, and a content digest. Novelty defaults to `1 - nearest_similarity`, with the paper's mean nearest-reference Levenshtein distance available as a second method; diversity uses the mean raw Levenshtein distance over all sequence pairs. Memorization means an exact or explicit-threshold near copy.
 
 The output of `evaluate_synthesis_risk()` is transparent rules and hit locations, not supplier order taking rules, structure predictions, or experiment success probabilities. `evaluate_scorecard()` Retain each component, normalization direction, weight, missing strategy and contribution.
 
@@ -469,4 +472,4 @@ The item-by-item scope is based on the [ requirements tracking matrix ](../plann
 
 ## Bioinformatics Python APIs {#bioinformatics}
 
-Import `dnakit.bioinformatics` submodules for native DNA encodings, generative metrics, phylogenetics, statistics, constraint optimization and cloning, with explicit optional codecs and specialist alignment/NGS backends. See the [complete API guide](features/27_bioinformatics.md) for dependencies, return types, formulas and limitations. No new CLI is provided.
+Usage of `dnakit.bioinformatics` is organized by task in the feature tutorials, including [sequence representations and feature processing](features/08_fingerprints.md), [phylogenetic analysis](features/30_phylogeny.md), [statistical and differential analysis](features/31_statistical_analysis.md), and [sequence optimization](features/29_sequence_optimization.md). Dependencies, return types, formulas and implementation boundaries are in the [FAQ](../faq/bioinformatics.md).

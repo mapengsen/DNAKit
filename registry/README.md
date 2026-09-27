@@ -1,8 +1,8 @@
 # DNAKit Skills 来源与复现记录
 
-快照日期：2026-09-12。Git commit 固定在 [sources.json](sources.json)。
+快照日期：2026-09-25。Git commit 固定在 [sources.json](sources.json)。
 
-本次检查 7114 个 `SKILL.md` 路径（包含聚合副本、示例及范围外内容）。这些路径数不是不同 DNA 功能的数量。
+下表保留原始扫描的 7114 个 `SKILL.md` 路径决策（包含聚合副本、示例及范围外内容）。`selected` 是原始扫描入选数量，不含后续独立清单的扩展，也不等于当前分发总量。这些路径数不是不同 DNA 功能的数量。
 
 | 筛选结果 | 路径数 |
 | --- | ---: |
@@ -14,7 +14,7 @@
 | license_review | 13 |
 | quality_review | 3 |
 
-最终分发 536 个技能，其中 1 个是 DNAKit 自有入口。
+后续新增 18 个上游技能见 [genomics-new-skills.json](genomics-new-skills.json)，6 个原生流程见 [genomics-native-skills.json](genomics-native-skills.json)。用户提供的 335 项清单另补 13 个技能，见 [user-catalog-skills.json](user-catalog-skills.json)；[选择与排除审查](user-catalog-skills-review.json)记录逐来源处理及验证范围。最终分发 574 个技能，其中包含 DNAKit 检索入口 `dnakit` 和规划入口 `dnakit-plan`。
 
 ## 选择与去重方法
 
@@ -106,6 +106,18 @@
 | [zamushwani2/biomedical-ai-skills](https://github.com/zamushwani2/biomedical-ai-skills/tree/71c9884f8b1a2931d1b68d3ac3eafb9337da8d6d) | `71c9884f8b1a` | Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides. |
 | [zoebischuribe-cloud/postgwas-skills](https://github.com/zoebischuribe-cloud/postgwas-skills/tree/cc7ad3dbb68bb7c7b13e3ffde8366824f0a56a4f) | `cc7ad3dbb68b` | Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides. |
 | [zongtingwei/Bioclaw_Skills_Hub](https://github.com/zongtingwei/Bioclaw_Skills_Hub/tree/d056daa153685cc59d24e9c432e4804d9cd122fe) | `d056daa15368` | Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides. |
+| [gkanogiannis/Gigwa-MCP](https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf) | `d6ccdd1a5eb1` | Reviewed DNA workflows; complete skill resources and license notices retained. |
+| [tayloranthonyanderson/haploqtl](https://github.com/tayloranthonyanderson/haploqtl/tree/210eace2912c7bf11d119cb503c89f8f6cad479f) | `210eace2912c` | Reviewed DNA workflows; complete skill resources and license notices retained. |
+| [jmschrei/tangermeme](https://github.com/jmschrei/tangermeme/tree/d5c51b83d374576b64effb9284fc79a71a604734) | `d5c51b83d374` | Reviewed DNA workflows; complete skill resources and license notices retained. |
+| [svdorn/statgen-skills](https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0) | `dc5f0c60d299` | Reviewed DNA workflows; complete skill resources and license notices retained. |
+| [genomoncology/biomcp](https://github.com/genomoncology/biomcp/tree/3b1d6452ab63741562d2ef97495a97281b304729) | `3b1d6452ab63` | Reviewed DNA workflows; complete skill resources and license notices retained. |
+| [anthropics/life-sciences](https://github.com/anthropics/life-sciences/tree/e96556b637b56d6cc3a5ad33987009be9e60aa5c) | `e96556b637b5` | Only the three selected skill subdirectories have verified Apache-2.0 LICENSE.txt; no repository-wide licensing claim. |
+| [aws-samples/sample-kiro-power-life-sciences](https://github.com/aws-samples/sample-kiro-power-life-sciences/tree/95b67e763df43e94e5bcfd8a230a58553a888cfc) | `95b67e763df4` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
+| [nekrut/galaxy-claude-skills](https://github.com/nekrut/galaxy-claude-skills/tree/0f833c2f11fa624d9fd87c6d139dac404d6dd4ff) | `0f833c2f11fa` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
+| [ClawBio/ClawBio](https://github.com/ClawBio/ClawBio/tree/4848cc280c446093b1364a2445db3137d455cc17) | `4848cc280c44` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
+| [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a) | `d91ed3d56301` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
+| [google-deepmind/science-skills](https://github.com/google-deepmind/science-skills/tree/68832757cbbf941c620b71df5756cf6e5cc287b0) | `68832757cbbf` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
+| [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills/tree/330c8e764435a731eff571e3efdda70b363d0792) | `330c8e764435` | Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms. |
 
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) 说明许可范围。SciAgent 的 README 明确区分 CC-BY-4.0 原创说明内容和 frontmatter 中的底层工具许可；K-Dense 和 ClawBio 则明确要求遵守各技能自身的许可覆盖规则。
 
@@ -142,6 +154,9 @@ python others/skills/build_catalog.py --fetch --plan
 # 审阅 temp/dnakit-skills-work/ 中的选择与决策后重新生成
 python others/skills/build_catalog.py --fetch
 python others/skills/build_catalog.py --check
+# 验证新增上游技能的固定版本资源；不运行科学工作流
+python others/skills/import_genomics_skills.py --check
+python others/skills/sync_genomics_expansion.py --check
 # 更新全部已审阅的 DNAKit 适配
 python others/skills/adaptations.py
 # --python 指向 Python 3.11+；运行已检查的离线脚本
@@ -150,7 +165,7 @@ python others/skills/write_inventory.py
 python -m build --outdir temp/dnakit-skills-dist
 ```
 
-`skills/` 是公开分发目录；原生适配的维护模板在 `others/skills/adaptations/`，由 `registry/adaptations.json` 绑定上游版本。完整导入也会重放这些适配，保留旧名称别名、原始元数据、许可和哈希。全部技能都有维护模板；科学后端保留原始实现。构建时将已登记文件复制进 wheel。用户安装包后不需要 `temp` 中的原仓库，查询和安装也不需要 Git 或 Node.js。
+`skills/` 是公开分发目录；原生适配的维护模板在 `others/skills/adaptations/`，由 `registry/adaptations.json` 绑定上游版本。完整导入也会重放这些适配，保留旧名称别名、原始元数据、许可和哈希。新增上游技能由 `genomics-new-skills.json` 固定完整资源；新增原生入口由 `genomics-native-skills.json` 维护 API 与类别。`sync_genomics_expansion.py` 合并这些清单，完整目录构建也会保留它们。科学后端保留原始实现。构建时将已登记文件复制进 wheel。用户安装包后不需要 `temp` 中的原仓库，查询和安装也不需要 Git 或 Node.js。
 
 ## 迁移清单
 

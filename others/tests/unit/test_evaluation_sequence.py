@@ -40,6 +40,58 @@ def test_validity_wraps_validation_and_serializes_empty_set() -> None:
     assert json.loads(json.dumps(report.to_dict()))["algorithm_version"] == "eval-validity-v1"
 
 
+def test_validity_exact_length_applies_to_every_record() -> None:
+    records = DNASet([_record("ok", "ACGT"), _record("short", "ACG")])
+    assert evaluate_validity(records).metrics["valid_fraction"] == 1.0
+
+    report = evaluate_validity(records, sequence_length=4)
+    assert report.metrics["valid_fraction"] == 0.5
+    assert report.metrics["valid_count"] == 1
+    assert report.metrics["invalid_count"] == 1
+    assert report.entries[0].metrics["is_valid"] is True
+    assert report.entries[1].metrics["is_valid"] is False
+    assert report.entries[1].issues[0].code == "STD_SEQUENCE_LENGTH_MISMATCH"
+    assert report.to_dict()["parameters"]["validation"]["sequence_length"] == 4
+
+    matching = DNASet([_record("a", "ACGT"), _record("b", "AAAA")])
+    assert evaluate_validity(matching, sequence_length=4).metrics["valid_fraction"] == 1.0
+    assert evaluate_validity(iter(records), sequence_length=5).metrics["valid_fraction"] == 0.0
+
+
+def test_validity_exact_length_preserves_other_rules_and_original_config() -> None:
+    config = ValidationConfig(sequence_length=5, max_ambiguity_fraction=0.0)
+    sequence = DNASequence("ACGT")
+    assert evaluate_validity(sequence, config=config).metrics["valid_fraction"] == 0.0
+    assert (
+        evaluate_validity(sequence, config=config, sequence_length=4).metrics["valid_fraction"]
+        == 1.0
+    )
+    report = evaluate_validity(
+        DNASequence("ACGN", alphabet="iupac"), config=config, sequence_length=4
+    )
+    assert report.metrics["valid_fraction"] == 0.0
+    assert report.entries[0].issues[0].code == "STD_AMBIGUITY_FRACTION_HIGH"
+    assert config.sequence_length == 5
+
+
+def test_validity_exact_length_uses_symbols_and_preserves_empty_policy() -> None:
+    sequence = DNASequence(["AC", Gap(10), "GT"])
+    assert evaluate_validity(sequence, sequence_length=4).metrics["valid_fraction"] == 1.0
+    assert evaluate_validity(DNASet([]), sequence_length=4).metrics["valid_fraction"] is None
+    assert evaluate_validity(DNASequence(""), sequence_length=0).metrics["valid_fraction"] == 0.0
+    report = evaluate_validity(
+        DNASequence(""), sequence_length=0, config=ValidationConfig(allow_empty=True)
+    )
+    assert report.metrics["valid_fraction"] == 1.0
+
+
+@pytest.mark.parametrize("length", [-1, True, 4.0, "4"])
+def test_validity_rejects_invalid_exact_length(length: object) -> None:
+    with pytest.raises(ConfigurationError) as error:
+        evaluate_validity(DNASequence("ACGT"), sequence_length=length)  # type: ignore[arg-type]
+    assert error.value.code == "INVALID_LENGTH_THRESHOLD"
+
+
 def test_ambiguity_reports_positions_weights_denominator_and_gap_policy() -> None:
     sequence = DNASequence(["ARN", Gap(2), "V"], alphabet="iupac")
     report = evaluate_ambiguity(

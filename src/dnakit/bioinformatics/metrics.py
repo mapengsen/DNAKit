@@ -8,17 +8,18 @@ from itertools import pairwise
 from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
-from dnakit.bioinformatics._common import matrix, positive, require
+from dnakit.bioinformatics._common import matrix, named_sequence_items, positive, require
+from dnakit.core import DNA
 from dnakit.exceptions import ConfigurationError
 
 
 def sequence_properties(
-    sequences: Mapping[str, Any],
+    sequences: DNA | Mapping[str, Any],
     predictors: Mapping[str, Callable[[str], float]],
     *,
     verbose: bool = True,
 ) -> dict[str, Any]:
-    """Run scalar Python predictors with stable sequence/property order.
+    """Run scalar Python predictors on DNA or a named mapping in stable order.
 
     Callbacks can wrap existing DNAKit predictors or user models. Returned
     values feed property_hit_rate, pareto_ranks, hypervolume and property_kl.
@@ -26,11 +27,16 @@ def sequence_properties(
     """
     from dnakit.bioinformatics._common import sequence_text
 
-    if not sequences or not predictors or any(not callable(p) for p in predictors.values()):
+    items = named_sequence_items(sequences)
+    if not items or not predictors or any(not callable(p) for p in predictors.values()):
         raise ConfigurationError("Provide named sequences and callable scalar predictors.")
-    texts = tuple(sequence_text(value) for value in sequences.values())
+    texts = tuple(sequence_text(value) for _, value in items)
     values = matrix([[predictor(text) for predictor in predictors.values()] for text in texts])
-    return {"ids": tuple(sequences), "names": tuple(predictors), "values": values}
+    return {
+        "ids": tuple(record_id for record_id, _ in items),
+        "names": tuple(predictors),
+        "values": values,
+    }
 
 
 def kernel_distance(

@@ -1,9 +1,10 @@
-"""Derive the migration matrix from the current catalog and maintained templates."""
+"""Derive migration from the catalog, native API manifests and maintained templates."""
 
 from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -12,9 +13,10 @@ ROOT = Path(__file__).resolve().parents[2]
 def main() -> None:
     catalog = json.loads((ROOT / "registry/catalog.json").read_text())
     rows = []
-    for entry in catalog["skills"]:
+    total = len(catalog["skills"])
+    for index, entry in enumerate(catalog["skills"], 1):
         rule = entry.get("adaptation", {})
-        functions = set()
+        functions = set(entry.get("native_functions", []))
         for path in (ROOT / "others/skills/adaptations" / entry["id"]).rglob("*"):
             if path.suffix in {".py", ".md"} and path.name != "UPSTREAM.md":
                 functions.update(
@@ -39,6 +41,8 @@ def main() -> None:
                 "execution_validation": entry["validation"]["execution"],
             }
         )
+        if index % 50 == 0 or index == total:
+            print(f"[{index}/{total}] Deriving migration records", file=sys.stderr, flush=True)
     (ROOT / "registry/migration.json").write_text(
         json.dumps(
             {
@@ -54,6 +58,7 @@ def main() -> None:
         )
         + "\n"
     )
+    print(f"[1/1] Wrote migration records for {len(rows)} skills.", flush=True)
 
 
 if __name__ == "__main__":

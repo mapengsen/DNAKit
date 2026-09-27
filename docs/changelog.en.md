@@ -4,10 +4,18 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-09-27
+
+- Add Agent checkpoints, resume, persistent knowledge, tool generation, repair, optimization and contribution workflows.
+- Extend custom training backends and scheduling, paired sequence chunking, tabular datasets and sampling, evaluation plots and reference consistency.
+- Add pip-installable genomics backends and refresh the bilingual API tutorials.
+- Add a project survey and source FAQ across 37 DNA directions; import 18 upstream Skills and create 6 native Skills, bringing that batch to 560; the subsequent import is listed below.
+- Add breeding, prokaryotic gene finding, methylation, DNA storage and nanostructure functions, plus 19 external analyses and 7 MCP connections with optional backends, explicit validation status and method attribution.
+- Audit all 335 supplied projects, merging 82 existing records and adding 253 source records; add 24 analysis adapters, reviewed Skills and MCP connections with per-item decisions and citation relationships in the [review FAQ](faq/user_catalog.md).
 - Add a curated DNA/genomics Skills catalog with search and installation commands, provenance, licenses and resource checksums.
 - Add database, ENCODE and workflow interfaces; expand unified file input/output, parallel sequence processing, progress reporting, model downloads and Agent tool execution.
 - Update both READMEs, documentation navigation, the MCP setup guide and visualization examples.
-- Document all 484 public functions added by the migration in 12 purpose groups, with signatures, parameters, returns and provenance; update both languages' navigation, feature trees, API reference and examples.
+- Integrate all 484 public functions into 14 existing functional tutorials, preserving signatures, parameters, returns, provenance and task-specific examples; remove the separate added-function index, conventions page and duplicate topic entries in both languages.
 - Add source-driven reference generation and `--check` coverage verification to detect missing entries, duplicate counts and parameter drift.
 
 ## [0.1.4] - 2026-09-09
@@ -18,7 +26,7 @@ This project follows semantic versioning. It is still in the early development s
 
 ### Added
 
-- Add Python-only `dnakit.bioinformatics`: native encodings, generative metrics, phylogenetics, count/distance statistics, motif/specification/cloning/DAG APIs; optional codecs, general ML, and specialist MSA/BLAST/HMMER/NGS backends. See [implementation boundaries](api/features/27_bioinformatics.md). New `bio-*` dependency extras, an offline example and numerical/real-tool validation tests.
+- Add Python-only `dnakit.bioinformatics`: native encodings, generative metrics, phylogenetics, count/distance statistics, motif/specification/cloning/DAG APIs; optional codecs, general ML, and specialist MSA/BLAST/HMMER/NGS backends. See [implementation boundaries](faq/bioinformatics.md). New `bio-*` dependency extras, an offline example and numerical/real-tool validation tests.
 
 - Added user-defined DNA property classification/regression training with linear probing for all 11 registered models, full fine-tuning for 7 Transformers models, 8:1:1 splitting with default seed 42, comprehensive single/multi-target metrics, and privacy-bounded arbitrary-file schema analysis through OpenAI-compatible APIs.
 - Added mean raw pairwise Levenshtein distance for Diversity and mean raw nearest-reference Levenshtein distance for Novelty, while retaining the default similarity algorithms and adding explicit selection, resource limits, and optional progress display.
@@ -61,7 +69,7 @@ This project follows semantic versioning. It is still in the early development s
 
 - Unified `dnakit.DNA(...)` facade for ordinary users: the same entrance receives single/multiple sequences, record mapping, ID, topology, metadata, feature and old core objects; subscripts and slices still return `DNA`.
 - Newly added `dnakit.representations`: 11 basic DNA models can be selected to extract fixed-length reps, and checkpoints are downloaded to the current directory `ckpt/` by default and reused; newly added `neural_cluster_sequences()` to complete L2, optional PCA, seed-fixed k-means, central nearest representative sequence and complete result audit.
-- New `evaluate_frechet_distance()`: By default, the LucaOne representation and L2 normalization of DATA-027 are reused to calculate the Fréchet representation distribution distance of two DNA collections with the sample space equivalent algorithm.
+- New `evaluate_frechet_distance()`: By default, the LucaOne representation and L2 normalization of neural network clustering are reused to calculate the Fréchet representation distribution distance of two DNA collections with the sample space equivalent algorithm.
 - Added `evaluate_fragment_similarity()` and `evaluate_snn()`: implement DNA adaptation of MOSES Frag/SNN using exact k-mer occurrence count cosine similarity and hashed k-mer fingerprint nearest neighbor Tanimoto mean respectively.
 - `dnakit.datasets.exclude_species()` and `exclude_chromosomes()`: Exactly exclude one or more species/chromosomes based on explicit metadata; structured error reporting when target fields are missing.
 - The MkDocs document site enables the search box, search suggestions and result keyword highlighting in the Chinese site.
@@ -91,14 +99,14 @@ This project follows semantic versioning. It is still in the early development s
 ### Changed
 
 - `evolution_generate()` retains the `mut_frac` parameter name, and adds base-by-base `insert_frac`, `delete_frac` probabilities; insertion is available `insert_min/insert_max` to select single base or random length fragments, and the algorithm audit version is upgraded to `dnakit-evoaug-v3`. Single-shot contiguous segment insertion/deletion continues to be provided by `indel_generate()`.
-- The document merges FP-004 Canonical k-mer into the Canonical mode of FP-003 k-mer features, and renames FP-005 k-mer Sketch; the public Python API and stable tracking number remain compatible.
+- The document merges Canonical k-mer into the Canonical mode of k-mer features, and standardizes the Sketch feature name as k-mer Sketch; the public Python API and stable tracking number remain compatible.
 - Ordinary file reading is unified as `read(..., mode="dna"|"stream")`, verification is unified as `validate()`; suffix-free editing, reverse complementation and ring operations input synchronization comments on `DNA` and return `DNA`, and the old `read_one/read_set/validate_set/*_record` entry continues to be compatible.
 - The default checkpoint for DNA foundation-model representations and neural network clustering has been changed from GROVER to `LucaGroup/LucaOne-gene-step36.8M`; the default cache directory is `ckpt/lucaone-gene-step36-8m/`, and custom checkpoint code still requires explicit authorization.
 - Removed the built-in DiProDB 240 values; the fixed 240 field schema remains unchanged, the default last 60 items are `None`, and users can load strict 15×16 JSON tables that they have permission to use.
 - Removed `primer3` extra, `primer3-py` dependencies and Python binding adapter; Primer3 is unified and changed to be installed separately by users and provides an explicit CLI path.
 - `normalize()` Added `keep_ambiguous`, `keep_u` and `keep_other`; retain IUPAC ambiguous bases by default and audit to delete `U` and other non-DNA characters.
 - The requirements tracking matrix is ​​changed to check the current source code, testing and local backend status item by item, and expired `planned` statements are no longer retained.
-- Merge independent identity, query coverage and target coverage functional items into `SIM-008` sequence alignment results and remove duplicate numbers.
+- Merge independent identity, query coverage and target coverage functional items into sequence alignment results and remove duplicate numbers.
 - Batch processing supports bounded thread execution, stable raw index/derivative seed and completed ID skipping.
 - The visualization scope is reduced to sequence, feature, alignment and similarity matrices, while general image export and HTML reporting remain unchanged.
 - Visual export expanded to atomic multi-format output with hard caps on number of pixels, records, and bytes of embedded results.

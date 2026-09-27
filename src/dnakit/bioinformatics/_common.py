@@ -68,6 +68,19 @@ def sequence_text(value: str | DNASequence | DNARecord | DNA, *, gaps: bool = Fa
     return value
 
 
+def named_sequence_items(sequences: DNA | Mapping[str, Any]) -> tuple[tuple[str, Any], ...]:
+    """Preserve IDs and order for a DNA batch or an existing named mapping."""
+
+    if isinstance(sequences, DNA):
+        items = tuple((record.id, record.sequence) for record in sequences)
+        if len({record_id for record_id, _ in items}) != len(items):
+            raise ConfigurationError("DNA record IDs must be unique for named sequence APIs.")
+        return items
+    if not isinstance(sequences, Mapping):
+        raise ConfigurationError("sequences must be DNA([...]) or an ID-to-sequence mapping.")
+    return tuple(sequences.items())
+
+
 def matrix(values: Any, *, min_rows: int = 1) -> Any:
     np = require("numpy", "bio-analysis")
     try:

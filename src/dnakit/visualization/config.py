@@ -281,6 +281,8 @@ class DistributionPlotConfig:
     must include all observed labels; unobserved categories get zero counts.
     Bars receive distinct colors by default, starting with ``theme.accent``.
     ``bar_colors`` overrides this with a repeating palette (one color for uniform bars).
+    For ``plot_label_comparison``, the first two colors distinguish true and
+    predicted labels, and ``bar_width`` controls the width of each two-bar group.
     """
 
     bins: int = 30

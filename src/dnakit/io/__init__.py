@@ -18,6 +18,7 @@ from dnakit.io.annotations import (
     write_gff3,
 )
 from dnakit.io.api import ReadMode, read, read_one, read_set, write
+from dnakit.io.artifacts import file_digest, load_arrays, load_json, save_arrays, save_json
 from dnakit.io.config import FeatureWritePolicy, ReadConfig, WriteConfig
 from dnakit.io.indexed import (
     FastaIndex,
@@ -46,6 +47,7 @@ from dnakit.io.parquet import (
     require_parquet_backend,
 )
 from dnakit.io.results import GeneratedID, WriteResult
+from dnakit.io.rows import RowWriter, iter_rows, write_rows
 from dnakit.io.source import RecordSource
 from dnakit.io.tables import (
     ParquetCompression,
@@ -80,6 +82,7 @@ __all__ = [
     "ReadConfig",
     "ReadMode",
     "RecordSource",
+    "RowWriter",
     "TableColumnType",
     "TableExportResult",
     "TableReadResult",
@@ -90,10 +93,14 @@ __all__ = [
     "build_fastq_index",
     "export_result",
     "export_table",
+    "file_digest",
     "filter_by_metadata",
     "iter_chunks",
+    "iter_rows",
+    "load_arrays",
     "load_fasta_index",
     "load_fastq_index",
+    "load_json",
     "merge_metadata",
     "parquet_backend_status",
     "read",
@@ -105,6 +112,8 @@ __all__ = [
     "read_set",
     "read_table",
     "require_parquet_backend",
+    "save_arrays",
+    "save_json",
     "select_metadata",
     "validate_metadata",
     "with_metadata",
@@ -112,6 +121,7 @@ __all__ = [
     "write_agp",
     "write_bed",
     "write_gff3",
+    "write_rows",
 ]
 
 _register_public_verbose(globals())

@@ -75,3 +75,41 @@ and [the discovery report](registry/discovery.md).
 Cite DNAKit for its curation and integration, and cite the original skills, tools,
 models, datasets and papers used in the actual analysis. No upstream endorsement
 is implied. No new paper DOI or authorship claim is created by this collection.
+
+<!-- BEGIN DNAKit genomics expansion -->
+## Genomics expansion sources
+
+| Source | License | Retained notices |
+| --- | --- | --- |
+| [gkanogiannis/Gigwa-MCP](https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf) | Apache-2.0 | [source notices](licenses/skills/gigwa-mcp/) and skill-root notices |
+| [tayloranthonyanderson/haploqtl](https://github.com/tayloranthonyanderson/haploqtl/tree/210eace2912c7bf11d119cb503c89f8f6cad479f) | MIT | [source notices](licenses/skills/haploqtl/) and skill-root notices |
+| [jmschrei/tangermeme](https://github.com/jmschrei/tangermeme/tree/d5c51b83d374576b64effb9284fc79a71a604734) | MIT | [source notices](licenses/skills/tangermeme/) and skill-root notices |
+| [svdorn/statgen-skills](https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0) | MIT | [source notices](licenses/skills/statgen-skills/) and skill-root notices |
+| [genomoncology/biomcp](https://github.com/genomoncology/biomcp/tree/3b1d6452ab63741562d2ef97495a97281b304729) | MIT | [source notices](licenses/skills/biomcp/) and skill-root notices |
+
+These skills retain the original author notices and pinned file hashes. DNAKit's added execution notes, frontmatter normalization and portable links are recorded in the extension manifest. Scientific backends and model/data/service licenses remain separate; skill inclusion is not execution validation.
+
+<!-- END DNAKit genomics expansion -->
+
+<!-- BEGIN DNAKit user catalog skills -->
+## User catalog skill additions
+
+| Skill / original author | License | Notices |
+| --- | --- | --- |
+| [bioconductor-bridge](https://github.com/ClawBio/ClawBio/tree/4848cc280c446093b1364a2445db3137d455cc17/skills/bioconductor-bridge) / Hiranyamaya Dash; Copyright 2026 Manuel Corpas (ClawBio license) | MIT | [retained notices](licenses/skills/user335-clawbio/bioconductor-bridge/) |
+| [galaxy-bioblend](https://github.com/nekrut/galaxy-claude-skills/tree/0f833c2f11fa624d9fd87c6d139dac404d6dd4ff) / Copyright 2025 Galaxy MCP Contributors | MIT | [retained notices](licenses/skills/user335-galaxy/galaxy-bioblend/) |
+| [galaxy-bridge](https://github.com/ClawBio/ClawBio/tree/4848cc280c446093b1364a2445db3137d455cc17/skills/galaxy-bridge) / Copyright 2026 Manuel Corpas; Hiranyamaya Dash; Aviv Madar (individual skill notices retained) | MIT | [retained notices](licenses/skills/user335-clawbio/galaxy-bridge/) |
+| [instrument-data-to-allotrope](https://github.com/anthropics/life-sciences/tree/e96556b637b56d6cc3a5ad33987009be9e60aa5c/instrument-data-to-allotrope) / Anthropic and life-sciences skill contributors; leaf LICENSE.txt retained | Apache-2.0 | [retained notices](licenses/skills/user335-anthropic/instrument-data-to-allotrope/) |
+| [interpro-database](https://github.com/google-deepmind/science-skills/tree/68832757cbbf941c620b71df5756cf6e5cc287b0/skills/interpro_database) / Copyright 2026 Google LLC | Apache-2.0 AND CC-BY-4.0 | [retained notices](licenses/skills/user335-deepmind/interpro-database/) |
+| [kiro-healthomics-genomics](https://github.com/aws-samples/sample-kiro-power-life-sciences/tree/95b67e763df43e94e5bcfd8a230a58553a888cfc/kiro-life-sciences) / Amazon.com, Inc. or its affiliates | MIT-0 | [retained notices](licenses/skills/user335-aws-kiro/kiro-healthomics-genomics/) |
+| [nextflow-development](https://github.com/anthropics/life-sciences/tree/e96556b637b56d6cc3a5ad33987009be9e60aa5c/nextflow-development) / Anthropic and life-sciences skill contributors; leaf LICENSE.txt retained | Apache-2.0 | [retained notices](licenses/skills/user335-anthropic/nextflow-development/) |
+| [onekgpd-individual-queries](https://github.com/K-Dense-AI/scientific-agent-skills/tree/330c8e764435a731eff571e3efdda70b363d0792/skills/onekgpd) / Dnaerys (OneKGPd skill author); K-Dense Inc. repository license | MIT | [retained notices](licenses/skills/user335-kdense/onekgpd-individual-queries/) |
+| [outlier-splicing-detection](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/outlier-splicing-detection) / GPTomics/bioSkills contributors; see retained LICENSE | MIT | [retained notices](licenses/skills/user335-bioskills/outlier-splicing-detection/) |
+| [pdb-database](https://github.com/google-deepmind/science-skills/tree/68832757cbbf941c620b71df5756cf6e5cc287b0/skills/pdb_database) / Copyright 2026 Google LLC | Apache-2.0 AND CC-BY-4.0 | [retained notices](licenses/skills/user335-deepmind/pdb-database/) |
+| [scvi-tools](https://github.com/anthropics/life-sciences/tree/e96556b637b56d6cc3a5ad33987009be9e60aa5c/scvi-tools) / Anthropic and life-sciences skill contributors; leaf LICENSE.txt retained | Apache-2.0 | [retained notices](licenses/skills/user335-anthropic/scvi-tools/) |
+| [single-cell-cnv-inference](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) / GPTomics/bioSkills contributors; see retained LICENSE | MIT | [retained notices](licenses/skills/user335-bioskills/single-cell-cnv-inference/) |
+| [ukb-ppp-region-fetch](https://github.com/ClawBio/ClawBio/tree/4848cc280c446093b1364a2445db3137d455cc17/skills/ukb-ppp-region-fetch) / Copyright 2026 Aviv Madar; UK Biobank Pharma Proteomics Project, Sun et al. (2023) | MIT AND CC-BY-4.0 | [retained notices](licenses/skills/user335-clawbio/ukb-ppp-region-fetch/) |
+
+The 335-project catalog additions retain original resource hashes and distinct software, text and bundled-data licenses. Converted Kiro/Galaxy guides are explicitly identified; remote services and scientific backends are installed/configured separately. See registry/user-catalog-skills-review.json for selection and validation limits.
+
+<!-- END DNAKit user catalog skills -->

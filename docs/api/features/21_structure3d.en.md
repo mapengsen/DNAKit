@@ -8,11 +8,12 @@ For the paper sources and internal formulas of various calculations, see [FAQ: C
 
 ## 1) Read a single PDB model
 
-- **Function:** Read a DNA model specified in the PDB, extract atomic coordinates, residues, chains and deduced sequences, and generate structural objects used in subsequent three-dimensional geometry calculations.
+- **Purpose:** Read a DNA model specified in the PDB, extract atomic coordinates, residues, chains and deduced sequences, and generate structural objects used in subsequent three-dimensional geometry calculations.
 - **Calculation method:** Parse `HEADER`, `TITLE`, `MODEL` and `ATOM` according to legacy PDB fixed column specifications, and only retain canonical DNA residues; alternative conformations only accept blanks or `A`, repeat atoms are prioritized according to the main conformation, and then selected by occupancy, and finally the A/C/G/T sequence is mapped in residue order. This is file parsing, not structure prediction.
 - **API:** `dnakit.structure3d.load_pdb(path[required], model_index[optional])`
 - **Input:** Required human-readable legacy PDB path; optional positive integer model number.
-- **Sample code:**
+- **Output:** Returns `DNA3DStructure` with atom coordinates and residue information.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -25,7 +26,7 @@ print(len(structure.atoms), len(structure.residues), structure.chain_ids)
 print(structure.sequence_by_chain)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 1BNA 1
@@ -35,11 +36,12 @@ print(structure.sequence_by_chain)
 
 ## 2) Read PDB multi-model collection
 
-- **Function:** Read multiple DNA conformations from the same PDB or model collection, unify atomic correspondences, and serve as input for RMSF and conformational change comparisons.
+- **Purpose:** Read multiple DNA conformations from the same PDB or model collection, unify atomic correspondences, and serve as input for RMSF and conformational change comparisons.
 - **Calculation method:** Use the same fixed column parsing rules as single model, group by `MODEL` number and return all models. This step only establishes chain/residue/atom identities and does not perform rotation, translation alignment or RMSF calculations.
 - **API:** `dnakit.structure3d.load_pdb_ensemble(path[required])`
 - **Input:** Required The path to the legacy PDB containing one or more DNA models.
-- **Sample code:**
+- **Output:** Returns a tuple of `DNA3DStructure` objects, one per PDB model.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -51,7 +53,7 @@ print(len(models), models[0].pdb_id)
 print(len(models[0].residues), models[0].sequence_by_chain)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 10 1AC7
@@ -60,11 +62,12 @@ print(len(models[0].residues), models[0].sequence_by_chain)
 
 ## 3) Explicit coordinate geometry analysis
 
-- **Function:** Calculate indicators such as radius of gyration, SASA, volume, shape, backbone dihedral angle, and geometric hydrogen bonds from explicit DNA atomic coordinates to quantitatively describe a three-dimensional conformation.
+- **Purpose:** Calculate indicators such as radius of gyration, SASA, volume, shape, backbone dihedral angle, and geometric hydrogen bonds from explicit DNA atomic coordinates to quantitatively describe a three-dimensional conformation.
 - **Calculation method:** Center of mass, radius of gyration, and tensor eigenvalues are calculated from atomic-mass-weighted coordinates; SASA is summed from deterministic sampling-point exposure proportions on the `vdW radius + probe` sphere, and volume is estimated from the union of voxels occupied by vdW spheres. Backbone angles use four-atom dihedrals, and hydrogen bonds are filtered with explicit distance/angle thresholds. The double-stranded helix metric is a DNAKit approximation based on paired `C1′` centers and global axes.
 - **API:** `dnakit.structure3d.analyze_structure(structure[required], sasa_probe_radius_angstrom[optional], sasa_points_per_atom[optional], volume_grid_spacing_angstrom[optional], progress[optional])`
 - **Input:** Required `DNA3DStructure`; optional 0–5 Å SASA probe, 24–4096 sample points per atom, 0.25–5 Å voxel spacing, and progress callbacks.
-- **Sample code:**
+- **Output:** Returns a `Structure3DAnalysisResult`; the example shows `helix`, `atom_count`, `residue_count`, `solvent_accessible_surface_area_angstrom2`.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -90,7 +93,7 @@ print(
 )
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 486 24
@@ -100,11 +103,12 @@ print(
 
 ## 4) NMR/Multi-model RMSF Flexible
 
-- **Function:** Calculate atom-by-atom and residue-by-residue RMSF across multiple 3D models with consistent atomic correspondence, and quantify the degree of fluctuation of different positions in the conformation ensemble.
+- **Purpose:** Calculate atom-by-atom and residue-by-residue RMSF across multiple 3D models with consistent atomic correspondence, and quantify the degree of fluctuation of different positions in the conformation ensemble.
 - **Calculation method:** First take the atomic bonds common to all models, and subtract the geometric center of the shared atoms for each model to remove translation; calculate `RMSF_i = sqrt[Σm |r_im − <r_i>|²/M]` for atoms `i`, and then perform root mean square aggregation of the residue RMSF on its atomic RMSF. Implementation without Kabsch rotation fitting.
 - **API:** `dnakit.structure3d.analyze_ensemble_flexibility(structures[required])`
 - **Input:** Required 2–10000 `DNA3DStructure` models with at least 3 common atoms.
-- **Sample code:**
+- **Output:** Returns an `EnsembleFlexibilityResult`; the example shows `model_count`, `common_atom_count`, `mean_atomic_rmsf_angstrom`, `max_atomic_rmsf_angstrom`.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -120,7 +124,7 @@ print(
 )
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 10 510
@@ -129,11 +133,12 @@ print(
 
 ## 5) 3DNA `bp_step.par` standard parameter analysis
 
-- **Function:** Parse external 3DNA parameter files and summarize base pair steps and helix parameters such as shift, slide, rise, twist, etc. to facilitate structural statistics and comparison between models.
+- **Purpose:** Parse external 3DNA parameter files and summarize base pair steps and helix parameters such as shift, slide, rise, twist, etc. to facilitate structural statistics and comparison between models.
 - **Calculation method:** Analyze each row using the 12 rigid-body parameter columns of 3DNA `bp_step.par`, checking the row count against the declared base-pair count; average rise and twist from the second row onward, then calculate `bp/turn = 360/mean twist` and `pitch = mean rise × bp/turn`. DNAKit does not recalculate the 3DNA local reference frame.
 - **API:** `dnakit.structure3d.read_3dna_bp_step(path[required])`
 - **Input:** Required An existing, UTF-8 decodable file that conforms to the 3DNA `bp_step.par` column structure.
-- **Sample code:**
+- **Output:** Returns a `ThreeDNAParameterResult`; the example shows `base_pair_count`, `mean_rise_angstrom`, `mean_twist_degree`, `base_pairs_per_turn`.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -156,7 +161,7 @@ with TemporaryDirectory() as directory:
     print(round(result.base_pairs_per_turn or 0.0, 4))
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 2
@@ -166,11 +171,12 @@ with TemporaryDirectory() as directory:
 
 ## 6) DSSR JSON summary parsing
 
-- **Function:** Parse external DSSR JSON, extract base, pairing, helix, stem-loop and hydrogen bond annotations, and convert them into structured results that can be queried, summarized and reported.
+- **Purpose:** Parse external DSSR JSON, extract base, pairing, helix, stem-loop and hydrogen bond annotations, and convert them into structured results that can be queried, summarized and reported.
 - **Calculation method:** Read the program version and `nts`, `pairs`, `helices`, `stems`, `hairpins`, `hbonds` and `ntParams/ntPars` fields in the DSSR JSON, and return the summary after first verifying the declaration count and array length. Structure identification is done by an external DSSR that generates this JSON, DNAKit does not implement the DSSR algorithm.
 - **API:** `dnakit.structure3d.read_dssr_json(path[required])`
 - **Input:** Required Existing DSSR JSON output file.
-- **Sample code:**
+- **Output:** Returns a `DSSRSummaryResult`; the example shows `nucleotide_count`, `pair_count`, `helix_count`, `stem_count`.
+- **Example code:**
 
 ```python
 from pathlib import Path
@@ -188,7 +194,7 @@ print(
 print(result.hydrogen_bond_count, result.backbone_torsion_record_count)
 ```
 
-- **Example results:**
+- **Example output:**
 
 ```text
 76 34 2 4 3

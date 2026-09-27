@@ -307,6 +307,11 @@ def train_machine_learning_property(
         if config.cv_folds is None
         else None
     )
+    if split is not None and (not split.validation or not split.test):
+        raise InputFormatError(
+            "Machine-learning training without CV requires non-empty validation and test splits.",
+            code="INVALID_CUSTOM_SPLIT",
+        )
     train_indices = split.train if split is not None else tuple(range(data.record_count))
     schema = fit_target_schema(
         data.labels,

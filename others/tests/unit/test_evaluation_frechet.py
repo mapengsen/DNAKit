@@ -1,4 +1,4 @@
-"""Tests for the LucaOne-backed Fréchet DNA representation distance."""
+"""Tests for the LucaOne-default Fréchet DNA representation distance."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from typing import Any, cast
 import numpy as np
 import pytest
 
-from dnakit.core import DNARecord, DNASequence, DNASet
+from dnakit.core import DNA, DNARecord, DNASequence, DNASet
 from dnakit.evaluation import FrechetDistanceConfig, evaluate_frechet_distance
 from dnakit.exceptions import ConfigurationError
 from dnakit.representations import RepresentationConfig
@@ -30,7 +30,26 @@ class _MappingBackend:
         return np.asarray([self.vectors[sequence] for sequence in materialized], dtype=np.float32)
 
 
-def test_frechet_defaults_to_lucaone_and_data_027_normalization() -> None:
+def test_frechet_accepts_two_dna_batches_without_per_sequence_scores() -> None:
+    generated = DNA(["AAAA", "CCCC"])
+    reference = DNA(["GGGG", "TTTT"])
+    backend = _MappingBackend({"AAAA": (0.0,), "CCCC": (2.0,), "GGGG": (1.0,), "TTTT": (3.0,)})
+
+    result = evaluate_frechet_distance(
+        generated,
+        reference,
+        config=FrechetDistanceConfig(
+            representation=RepresentationConfig(show_progress=False), normalize=False
+        ),
+        backend=backend,
+    )
+
+    assert result.metrics["left_count"] == result.metrics["right_count"] == 2
+    assert result.metrics["frechet_distance"] == pytest.approx(1.0)
+    assert not result.entries
+
+
+def test_frechet_defaults_to_lucaone_and_l2_normalization() -> None:
     config = FrechetDistanceConfig()
 
     assert config.representation.model == "lucaone"
@@ -38,6 +57,11 @@ def test_frechet_defaults_to_lucaone_and_data_027_normalization() -> None:
     assert config.representation.show_progress is True
 
     records = _set(("a", "AAAA"), ("c", "CCCC"))
+    backend = _MappingBackend({"AAAA": (1.0, 0.0), "CCCC": (0.0, 1.0)})
+    result = evaluate_frechet_distance(records, records, backend=backend)
+    assert result.parameters["encoder"] == "lucaone"
+    assert result.parameters["plot_files"] == {}
+
     with pytest.raises(ConfigurationError) as remote_code_error:
         evaluate_frechet_distance(records, records)
     assert remote_code_error.value.code == "MODEL_REMOTE_CODE_NOT_ALLOWED"
@@ -178,3 +202,78 @@ def test_frechet_config_rejects_invalid_values() -> None:
 
     with pytest.raises(ConfigurationError):
         FrechetDistanceConfig(max_cross_gram_elements=0)
+
+
+def test_optional_frechet_plots_save_png_files_and_reuse_embeddings(tmp_path: Any) -> None:
+    pytest.importorskip("matplotlib")
+    pytest.importorskip("sklearn")
+    left = _set(("left-a", "AAAA"), ("left-c", "CCCC"))
+    right = _set(("right-g", "GGGG"), ("right-t", "TTTT"))
+    backend = _MappingBackend(
+        {
+            "AAAA": (1.0, 0.0, 0.0),
+            "CCCC": (0.0, 1.0, 0.0),
+            "GGGG": (0.0, 0.0, 1.0),
+            "TTTT": (1.0, 1.0, 0.0),
+        }
+    )
+
+    result = evaluate_frechet_distance(
+        left,
+        right,
+        backend=backend,
+        plot_distance=True,
+        plot_pca=True,
+        plot_output_dir=tmp_path,
+    )
+
+    assert len(backend.calls) == 1
+    assert result.parameters["plot_distance"] is True
+    assert result.parameters["plot_pca"] is True
+    plot_files = result.parameters["plot_files"]
+    assert set(plot_files) == {"distance", "pca"}
+    for name, filename in (("distance", "frechet_distance.png"), ("pca", "frechet_pca.png")):
+        path = tmp_path / filename
+        assert plot_files[name] == str(path)
+        assert path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+
+    with pytest.raises(FileExistsError):
+        evaluate_frechet_distance(
+            left,
+            right,
+            backend=backend,
+            plot_distance=True,
+            plot_output_dir=tmp_path,
+        )
+    assert len(backend.calls) == 1
+
+    evaluate_frechet_distance(
+        left,
+        right,
+        backend=backend,
+        plot_distance=True,
+        plot_output_dir=tmp_path,
+        plot_overwrite=True,
+    )
+    assert len(backend.calls) == 2
+
+    pca_only_dir = tmp_path / "pca_only"
+    pca_only = evaluate_frechet_distance(
+        left,
+        right,
+        backend=backend,
+        plot_pca=True,
+        plot_output_dir=pca_only_dir,
+    )
+    assert set(pca_only.parameters["plot_files"]) == {"pca"}
+    assert (pca_only_dir / "frechet_pca.png").exists()
+    assert not (pca_only_dir / "frechet_distance.png").exists()
+
+
+def test_frechet_rejects_nonboolean_plot_flags_before_extraction() -> None:
+    records = _set(("a", "AAAA"), ("c", "CCCC"))
+    backend = _MappingBackend({"AAAA": (1.0,), "CCCC": (2.0,)})
+    with pytest.raises(ConfigurationError) as error:
+        evaluate_frechet_distance(records, records, backend=backend, plot_pca=cast(Any, 1))
+    assert error.value.code == "INVALID_FRECHET_PLOT_CONFIG"
+    assert backend.calls == []

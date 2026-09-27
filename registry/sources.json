@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-09-12",
+  "snapshot_date": "2026-09-20",
   "sources": [
     {
       "id": "bioskills",
@@ -879,6 +879,254 @@
       "policy": "Original repository MIT notice retained. Import only the reviewed DNA-related scope; preserve any individual license overrides.",
       "handling": "curated-import",
       "citation_guidance": "Cite zongtingwei/Bioclaw_Skills_Hub at the pinned revision and the methods, model, software and data actually used. Retain any upstream CITATION and attribution notices."
+    },
+    {
+      "id": "gigwa-mcp",
+      "repository": "gkanogiannis/Gigwa-MCP",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "archive_sha256": "c74191ff79b8adf0f085158514c25e268f8eb8ce01d0e557236b914f5c30b1c8",
+      "content_license": "Apache-2.0",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used.",
+      "catalog_integration": "genomics-expansion"
+    },
+    {
+      "id": "haploqtl",
+      "repository": "tayloranthonyanderson/haploqtl",
+      "revision": "210eace2912c7bf11d119cb503c89f8f6cad479f",
+      "archive_sha256": "e4259f0c4ae53e2a7e607e8cf9cd70dcfdbbf23a39d6c74b3a17972b472f3a66",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Taylor A. Anderson; haploqtl contributors",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used.",
+      "catalog_integration": "genomics-expansion"
+    },
+    {
+      "id": "tangermeme",
+      "repository": "jmschrei/tangermeme",
+      "revision": "d5c51b83d374576b64effb9284fc79a71a604734",
+      "archive_sha256": "110e8bd48e5827a27b0a501e39b1e8e0c52c5d0aa8405a2d62e9fe6aa2302715",
+      "content_license": "MIT",
+      "attribution": "Copyright 2024-2026 Jacob Schreiber; tangermeme contributors",
+      "prefix": "tangermeme/_skills/data",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used.",
+      "catalog_integration": "genomics-expansion"
+    },
+    {
+      "id": "statgen-skills",
+      "repository": "svdorn/statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "archive_sha256": "755eb7296e5aa7c1d22fd45fb09c46758309da69b2152782c6ff55a3b9ff8bd4",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "prefix": "",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used.",
+      "catalog_integration": "genomics-expansion"
+    },
+    {
+      "id": "biomcp",
+      "repository": "genomoncology/biomcp",
+      "revision": "3b1d6452ab63741562d2ef97495a97281b304729",
+      "archive_sha256": "b8c849562219b87dfdba7774e041ce574e74512d4b3bedccf160296209befa60",
+      "content_license": "MIT",
+      "attribution": "GenomOncology and BioMCP contributors; see retained LICENSE/CITATION.cff",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used.",
+      "catalog_integration": "genomics-expansion"
+    },
+    {
+      "id": "user335-anthropic",
+      "repository": "anthropics/life-sciences",
+      "revision": "e96556b637b56d6cc3a5ad33987009be9e60aa5c",
+      "archive_sha256": "55a1e821671366b396062a945bd23107b2db39c659dbf9905a22c2d952720b53",
+      "content_license": "Apache-2.0",
+      "attribution": "Anthropic and life-sciences skill contributors; leaf LICENSE.txt retained",
+      "license_paths": [
+        "nextflow-development/LICENSE.txt",
+        "instrument-data-to-allotrope/LICENSE.txt",
+        "scvi-tools/LICENSE.txt"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Only the three selected skill subdirectories have verified Apache-2.0 LICENSE.txt; no repository-wide licensing claim.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-aws-kiro",
+      "repository": "aws-samples/sample-kiro-power-life-sciences",
+      "revision": "95b67e763df43e94e5bcfd8a230a58553a888cfc",
+      "archive_sha256": "7215731c8f47fc6f6539843a17788f40017b9b44d2297fdfe4d0a357c5cd203d",
+      "content_license": "MIT-0",
+      "attribution": "Amazon.com, Inc. or its affiliates",
+      "license_paths": [
+        "LICENSE.txt",
+        "THIRD-PARTY.txt"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-galaxy",
+      "repository": "nekrut/galaxy-claude-skills",
+      "revision": "0f833c2f11fa624d9fd87c6d139dac404d6dd4ff",
+      "archive_sha256": "d9b07c6d87742aacf941d1c7b07180711eb4b28f42898f0b5b9df847eaef8f0b",
+      "content_license": "MIT",
+      "attribution": "Copyright 2025 Galaxy MCP Contributors",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-clawbio",
+      "repository": "ClawBio/ClawBio",
+      "revision": "4848cc280c446093b1364a2445db3137d455cc17",
+      "archive_sha256": "288a6c0d447c53be6617bae739b9a56608083deddccd531c5d9bb0f7c7c50cd9",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Manuel Corpas; Hiranyamaya Dash; Aviv Madar (individual skill notices retained)",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-bioskills",
+      "repository": "GPTomics/bioSkills",
+      "revision": "d91ed3d563019e649dc854c56ccd62551359488a",
+      "archive_sha256": "d207cbba88d8a704205d3a14597b0df9dbc574d5dad7b0ab485d93486f66ece9",
+      "content_license": "MIT",
+      "attribution": "GPTomics/bioSkills contributors; see retained LICENSE",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-deepmind",
+      "repository": "google-deepmind/science-skills",
+      "revision": "68832757cbbf941c620b71df5756cf6e5cc287b0",
+      "archive_sha256": "46c29e627535e7794be6416d6758c3d0b4804f1d5d4f05a03e9b747a6614b949",
+      "content_license": "Apache-2.0 AND CC-BY-4.0",
+      "attribution": "Copyright 2026 Google LLC",
+      "license_paths": [
+        "LICENSE",
+        "README.md",
+        "SKILL_LICENSES.md"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "catalog_integration": "user-catalog-expansion"
+    },
+    {
+      "id": "user335-kdense",
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "revision": "330c8e764435a731eff571e3efdda70b363d0792",
+      "archive_sha256": null,
+      "content_license": "MIT",
+      "attribution": "K-Dense Inc.; OneKGPd skill author Dnaerys",
+      "license_paths": [
+        "LICENSE.md"
+      ],
+      "handling": "curated-import",
+      "cache_path": "temp/user-catalog-skills-pinned",
+      "policy": "Additive reviewed DNA skill leaves; original baseline source metadata remains unchanged. Underlying tools/data retain separate terms.",
+      "citation_guidance": "Cite the original skill author, pinned source and methods/data actually used.",
+      "acquisition": "pinned-raw-files",
+      "raw_files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "09b02a3c9df3053c55531d503357a9c7cde275970e6c3ceaa1ddf5f0e90b40c1",
+          "git_blob_sha1": "eb246475fd5a66b9bb56176f3a718984632dd98d",
+          "bytes": 1068,
+          "mode": 420
+        },
+        {
+          "path": "README.md",
+          "sha256": "d81f605b83c30fff32b144479284299303d832ef87487a9908a09d5d42c81af4",
+          "git_blob_sha1": "906646c8bce300272b471ca5d587fd077122f7c5",
+          "bytes": 75728,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/SKILL.md",
+          "sha256": "918797c80e98570537addc7d5c5a694f39e370592dc5d0b62092b8f421620444",
+          "git_blob_sha1": "22d4a92e83d42595ecea437e334dba5949f8917f",
+          "bytes": 18871,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/assets/kgpe.json",
+          "sha256": "51bce468b9c339e658305376ae338eac7912ac4b8ab31982f9ca640502b49e26",
+          "git_blob_sha1": "70edf8ad63c89abe0d9b7b81aa5108ea6160dc5d",
+          "bytes": 1037258,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/references/annotation_vocabularies.md",
+          "sha256": "642d9c647db472b30a9090f01c8662c5faa1224c1883348835b3ed64112a02c3",
+          "git_blob_sha1": "56e5cbfd09f3ac85a4d7e1966813487513ea0a5a",
+          "bytes": 4457,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/references/onekgpd_commands.md",
+          "sha256": "5539bc259351831e7c69efe00fdd316ac3a360cafc6c3055fe687debe0a65269",
+          "git_blob_sha1": "19722dc81f79afe596a3fb53d5c5a16bb42cec04",
+          "bytes": 13851,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/scripts/onekgpd_api.py",
+          "sha256": "6e7877237a628d08de6e773a945aae45d44dca33096fdf3f738b11234abf8d28",
+          "git_blob_sha1": "9bfaafe9ff643a714a5100fdc49ad795de01e865",
+          "bytes": 30403,
+          "mode": 420
+        },
+        {
+          "path": "skills/onekgpd/scripts/onekgpd_meta.py",
+          "sha256": "57c48f2120ad2a0d29b7995373350fbc8ae898e5376f3be131056982d404e6db",
+          "git_blob_sha1": "63dcd7bc4ef7921ef0e3290565ea25540347a35f",
+          "bytes": 19389,
+          "mode": 420
+        }
+      ],
+      "tree_sha": "330c8e764435a731eff571e3efdda70b363d0792",
+      "raw_cache": "raw-kdense",
+      "catalog_integration": "user-catalog-expansion"
     }
   ]
 }

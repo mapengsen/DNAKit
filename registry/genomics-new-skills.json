@@ -1,0 +1,3295 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-20",
+  "sources": [
+    {
+      "id": "gigwa-mcp",
+      "repository": "gkanogiannis/Gigwa-MCP",
+      "revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "archive_sha256": "c74191ff79b8adf0f085158514c25e268f8eb8ce01d0e557236b914f5c30b1c8",
+      "content_license": "Apache-2.0",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used."
+    },
+    {
+      "id": "haploqtl",
+      "repository": "tayloranthonyanderson/haploqtl",
+      "revision": "210eace2912c7bf11d119cb503c89f8f6cad479f",
+      "archive_sha256": "e4259f0c4ae53e2a7e607e8cf9cd70dcfdbbf23a39d6c74b3a17972b472f3a66",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Taylor A. Anderson; haploqtl contributors",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used."
+    },
+    {
+      "id": "tangermeme",
+      "repository": "jmschrei/tangermeme",
+      "revision": "d5c51b83d374576b64effb9284fc79a71a604734",
+      "archive_sha256": "110e8bd48e5827a27b0a501e39b1e8e0c52c5d0aa8405a2d62e9fe6aa2302715",
+      "content_license": "MIT",
+      "attribution": "Copyright 2024-2026 Jacob Schreiber; tangermeme contributors",
+      "prefix": "tangermeme/_skills/data",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used."
+    },
+    {
+      "id": "statgen-skills",
+      "repository": "svdorn/statgen-skills",
+      "revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "archive_sha256": "755eb7296e5aa7c1d22fd45fb09c46758309da69b2152782c6ff55a3b9ff8bd4",
+      "content_license": "MIT",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "prefix": "",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used."
+    },
+    {
+      "id": "biomcp",
+      "repository": "genomoncology/biomcp",
+      "revision": "3b1d6452ab63741562d2ef97495a97281b304729",
+      "archive_sha256": "b8c849562219b87dfdba7774e041ce574e74512d4b3bedccf160296209befa60",
+      "content_license": "MIT",
+      "attribution": "GenomOncology and BioMCP contributors; see retained LICENSE/CITATION.cff",
+      "prefix": "skills",
+      "cache_path": "temp/genomics-skills-pinned",
+      "handling": "curated-import",
+      "policy": "Reviewed DNA workflows; complete skill resources and license notices retained.",
+      "citation_guidance": "Cite pinned project and the scientific methods and data actually used."
+    }
+  ],
+  "skills": [
+    {
+      "id": "biomcp",
+      "role": "dna_workflow",
+      "description": "Search and retrieve biomedical data - genes, variants, clinical trials, diagnostic tests, articles, drugs, diseases, pathways, proteins, adverse events, pharmacogenomics, and phenotype-disease matching. Use for gene function, variant pathogenicity, trials, diagnostics, drug safety, pathway context, disease workups, and literature evidence.",
+      "summary_zh": "BioMCP 基因、变异、药物基因组与文献查询",
+      "category": "clinical",
+      "capability": "biomcp",
+      "source_id": "biomcp",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": null,
+      "upstream_metadata": {
+        "name": "biomcp",
+        "description": "Search and retrieve biomedical data - genes, variants, clinical trials, diagnostic tests, articles, drugs, diseases, pathways, proteins, adverse events, pharmacogenomics, and phenotype-disease matching. Use for gene function, variant pathogenicity, trials, diagnostics, drug safety, pathway context, disease workups, and literature evidence."
+      },
+      "upstream_name": "biomcp",
+      "upstream_url": "https://github.com/genomoncology/biomcp/tree/3b1d6452ab63741562d2ef97495a97281b304729/skills",
+      "upstream_path": "skills",
+      "upstream_revision": "3b1d6452ab63741562d2ef97495a97281b304729",
+      "attribution": "GenomOncology and BioMCP contributors; see retained LICENSE/CITATION.cff",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "clinical",
+        "BioMCP 基因、变异、药物基因组与文献查询"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "biomcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "AUTHORING.md",
+          "upstream_path": "skills/AUTHORING.md",
+          "sha256": "161edb4b5dbbc5c58cfbfb09ccdb658ad3268afff2e5fbc72a1786604aec197d"
+        },
+        {
+          "path": "CITATION.cff",
+          "upstream_path": "CITATION.cff",
+          "sha256": "c18f7ed1aabdcec05ced06a1562b37538907458ef93470d5f33ec3a0811150f9"
+        },
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "6b37b76fb5f5b29c74d9c0e35f9dc18b8e46273eadba8048513887f2d5feaabf"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/SKILL.md",
+          "sha256": "6ae0a1a8c64acdb2fb0deabecb2197dfecf45507ccebad463dce2fd630ad44b9"
+        },
+        {
+          "path": "examples/get-gene-BRAF.json",
+          "upstream_path": "skills/examples/get-gene-BRAF.json",
+          "sha256": "9dcfef1ad0cd6e48383d7b451a9ecda4a065997abf4c26b096d29996ca2720f9"
+        },
+        {
+          "path": "examples/get-gene-BRAF.txt",
+          "upstream_path": "skills/examples/get-gene-BRAF.txt",
+          "sha256": "7248453a9a7d67964d9bdb411500905a02ae0de541bfca3d05c3bf2401f63870"
+        },
+        {
+          "path": "examples/get-trial.json",
+          "upstream_path": "skills/examples/get-trial.json",
+          "sha256": "b6150c59792b962e5c236fe6759fa4d4dadef2409d1a1d7d6b2faa089c317419"
+        },
+        {
+          "path": "examples/get-trial.txt",
+          "upstream_path": "skills/examples/get-trial.txt",
+          "sha256": "7953eef1bfb3d94011586d84eafd54b217d1acb003fae7ac1c33fcff6e5503c9"
+        },
+        {
+          "path": "examples/get-variant-rs113488022-all.json",
+          "upstream_path": "skills/examples/get-variant-rs113488022-all.json",
+          "sha256": "d943dd3da1d7902ba0927845b3f5c393709ad6df2af74f84b13c14a8af2e574e"
+        },
+        {
+          "path": "examples/get-variant-rs113488022-all.txt",
+          "upstream_path": "skills/examples/get-variant-rs113488022-all.txt",
+          "sha256": "35d8e9ef42df22c09c3a575adb9851c37f776bf124d1355b1f386d82c94589ca"
+        },
+        {
+          "path": "examples/search-article.json",
+          "upstream_path": "skills/examples/search-article.json",
+          "sha256": "aa9eeefb4cb1571b67438aeb026fba0c9f514fd1c084e0f8a8268b7eabb86c2d"
+        },
+        {
+          "path": "examples/search-article.txt",
+          "upstream_path": "skills/examples/search-article.txt",
+          "sha256": "9bfa8e9ca222f67d69eb39984cc0afa95b7a07eeb010c6c60a3a7024d4b2c749"
+        },
+        {
+          "path": "examples/search-drug.json",
+          "upstream_path": "skills/examples/search-drug.json",
+          "sha256": "48809331e2958e32b0d65b4dc41defd3d19c0943787d65ef030f0768d5a8bafa"
+        },
+        {
+          "path": "examples/search-drug.txt",
+          "upstream_path": "skills/examples/search-drug.txt",
+          "sha256": "92d26c520414a2f42fd14544607d33a03d437265fb79cfbe3ff2411ba474a4a2"
+        },
+        {
+          "path": "jq-examples.md",
+          "upstream_path": "skills/jq-examples.md",
+          "sha256": "6bb635313b0fea144d4bc71a0d27bb8bcf371552d76f8e50218e9315c3ead65b"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "d4ab6d38da5c47a5ee9cfc714b2155377f7197c1f2dc94f125bf2b25cc283ba1"
+        },
+        {
+          "path": "schemas/article.json",
+          "upstream_path": "skills/schemas/article.json",
+          "sha256": "9e5d0dfb0f3b0c1d7d98101cb4ae4f1d8f0e5503f34703a4d2e37a1aecab5e0b"
+        },
+        {
+          "path": "schemas/disease.json",
+          "upstream_path": "skills/schemas/disease.json",
+          "sha256": "a79dc5ef88e60710821b4a4376f767767a57cdba841b3053cf91c24b69708e82"
+        },
+        {
+          "path": "schemas/drug.json",
+          "upstream_path": "skills/schemas/drug.json",
+          "sha256": "0935e2348e341cd148644e5f5f54dd79199f66637c5a0e4588002c569c403c4a"
+        },
+        {
+          "path": "schemas/gene.json",
+          "upstream_path": "skills/schemas/gene.json",
+          "sha256": "9e4c308713274b6da7053a1470b49a7b341d60d37ef226634f7e22773a8262c1"
+        },
+        {
+          "path": "schemas/pathway.json",
+          "upstream_path": "skills/schemas/pathway.json",
+          "sha256": "cce050905aa7968a6ed55df9efab0ff47a91dedf2c077e223060047f9fd90ac1"
+        },
+        {
+          "path": "schemas/trial.json",
+          "upstream_path": "skills/schemas/trial.json",
+          "sha256": "4272385e3ab9f1dcfc1a25d701e698fd3b82dd7fc13725275c012e55cd9f1d24"
+        },
+        {
+          "path": "schemas/variant.json",
+          "upstream_path": "skills/schemas/variant.json",
+          "sha256": "3cbe78bb9c9a4860caa6c50eb90295d33711c99589226f40e4f4b56a74d2382d"
+        },
+        {
+          "path": "schemas/workflow-ladder.schema.json",
+          "upstream_path": "skills/schemas/workflow-ladder.schema.json",
+          "sha256": "47bb3db9bfc1e2b8d03a58de804d304e855842e5e7fc23015871091f95fcdd22"
+        },
+        {
+          "path": "use-cases/01-treatment-lookup.md",
+          "upstream_path": "skills/use-cases/01-treatment-lookup.md",
+          "sha256": "686fde065718a80bec5e5169dafc7bc8727cf1a71af9dc771d32906bbb7902ff"
+        },
+        {
+          "path": "use-cases/02-symptom-phenotype.md",
+          "upstream_path": "skills/use-cases/02-symptom-phenotype.md",
+          "sha256": "f15b15fed1ea4f1818c1f83378300f92d2c211911d69fe82096c98224a3b1f27"
+        },
+        {
+          "path": "use-cases/03-gene-disease-orientation.md",
+          "upstream_path": "skills/use-cases/03-gene-disease-orientation.md",
+          "sha256": "62b1097d8fd9be726a61432d8607ffe450cbb1a41e4242ccd8fedded6de4fb64"
+        },
+        {
+          "path": "use-cases/04-article-follow-up.md",
+          "upstream_path": "skills/use-cases/04-article-follow-up.md",
+          "sha256": "08049c7c6af31a78351796e6d4f3254847c68e8d7fd35fc615bb20084b886a83"
+        },
+        {
+          "path": "use-cases/05-variant-pathogenicity.md",
+          "upstream_path": "skills/use-cases/05-variant-pathogenicity.md",
+          "sha256": "c7879fb8a8ccd34f9597976c303ebb336bac8cd4fbced4b9395e10a817c8bb91"
+        },
+        {
+          "path": "use-cases/06-drug-regulatory.md",
+          "upstream_path": "skills/use-cases/06-drug-regulatory.md",
+          "sha256": "e2b10fe43c6dad2b80a83b4eaf358765f2a78018f65e39a193ac6714b5a7394a"
+        },
+        {
+          "path": "use-cases/07-gene-function-localization.md",
+          "upstream_path": "skills/use-cases/07-gene-function-localization.md",
+          "sha256": "8dd2123dfc7c7f6555c6e34d96ff7a8fa2e61fb267bc9a29c77844f7632179af"
+        },
+        {
+          "path": "use-cases/08-mechanism-pathway.md",
+          "upstream_path": "skills/use-cases/08-mechanism-pathway.md",
+          "sha256": "1907a1582d399cf927e49716722c918c22eb6d23e9017912935cc094537b1f3f"
+        },
+        {
+          "path": "use-cases/09-trial-recruitment.md",
+          "upstream_path": "skills/use-cases/09-trial-recruitment.md",
+          "sha256": "5d027cb4069c8595f6e39f81281bff00384e811bb54f69582fdce17103b70acc"
+        },
+        {
+          "path": "use-cases/10-pharmacogene-cumulative.md",
+          "upstream_path": "skills/use-cases/10-pharmacogene-cumulative.md",
+          "sha256": "e7fc3e28cb824ab76dfe232059c191e64784f95f0d3d25534dcc4bcea321cf03"
+        },
+        {
+          "path": "use-cases/11-disease-locus-mapping.md",
+          "upstream_path": "skills/use-cases/11-disease-locus-mapping.md",
+          "sha256": "8e97a01c9b864e8bd989565dca7d6aa02cb12a6e4e6e9fcd1a34a2fe32cbf8dd"
+        },
+        {
+          "path": "use-cases/12-cellular-process-regulation.md",
+          "upstream_path": "skills/use-cases/12-cellular-process-regulation.md",
+          "sha256": "e4286702be2b67d1c7c152542ffd07715258c55d48d502da8ad001df364c2e07"
+        },
+        {
+          "path": "use-cases/13-mutation-catalog.md",
+          "upstream_path": "skills/use-cases/13-mutation-catalog.md",
+          "sha256": "c993d606826ba080420e2b3a84e9340e180bcc14c1f6eaaf953d25c566992153"
+        },
+        {
+          "path": "use-cases/14-syndrome-disambiguation.md",
+          "upstream_path": "skills/use-cases/14-syndrome-disambiguation.md",
+          "sha256": "df81b2f8bb852360df9e01b9e04f6e9b972219713c293d30d21da4384cb83ee3"
+        },
+        {
+          "path": "use-cases/15-negative-evidence.md",
+          "upstream_path": "skills/use-cases/15-negative-evidence.md",
+          "sha256": "b0a491f6c42ef1da3f4906d5462db1cf6ca0f39adfa86a37510853e2e359fdbd"
+        },
+        {
+          "path": "use-cases/16-normalize-to-codes.md",
+          "upstream_path": "skills/use-cases/16-normalize-to-codes.md",
+          "sha256": "e4b5369e293edbaf1de2bc66518b468177a543e4d39f7ce1d41dcafb1f3a16d2"
+        },
+        {
+          "path": "use-cases/17-exact-variant-literature.md",
+          "upstream_path": "skills/use-cases/17-exact-variant-literature.md",
+          "sha256": "06b27a4e20bf7c29ad82f6d71967f385ec716077bd100b17d8d5a36645c76236"
+        },
+        {
+          "path": "use-cases/_TEMPLATE.ladder.json",
+          "upstream_path": "skills/use-cases/_TEMPLATE.ladder.json",
+          "sha256": "ba9f5aa10d4294df951f88e46a86ee59d97984d27add38b8e2ee8786304c981f"
+        },
+        {
+          "path": "use-cases/_TEMPLATE.md",
+          "upstream_path": "skills/use-cases/_TEMPLATE.md",
+          "sha256": "fb6cf72671a2c5c61b2d63b23b036b61b8948c42ed43c02339cf8de41f831297"
+        },
+        {
+          "path": "use-cases/article-follow-up.ladder.json",
+          "upstream_path": "skills/use-cases/article-follow-up.ladder.json",
+          "sha256": "d4bdca2b4c8e0358aaaa855c051d439050f233384bb747fe5c5719316754531b"
+        },
+        {
+          "path": "use-cases/mechanism-pathway.ladder.json",
+          "upstream_path": "skills/use-cases/mechanism-pathway.ladder.json",
+          "sha256": "498892a860ddf431a0aa2ccba3f06cb8bf0f371896e0f6fb39037cf51d352876"
+        },
+        {
+          "path": "use-cases/mutation-catalog.ladder.json",
+          "upstream_path": "skills/use-cases/mutation-catalog.ladder.json",
+          "sha256": "59df6dd537a866c84732b2cf8f5799aaaf83792342d07c3b0cd44bab6a19c812"
+        },
+        {
+          "path": "use-cases/normalize-to-codes.ladder.json",
+          "upstream_path": "skills/use-cases/normalize-to-codes.ladder.json",
+          "sha256": "76bd7a87740543b375ea4994c0a1e28fb4ee360d65e79e93983ac70b9b08668c"
+        },
+        {
+          "path": "use-cases/pharmacogene-cumulative.ladder.json",
+          "upstream_path": "skills/use-cases/pharmacogene-cumulative.ladder.json",
+          "sha256": "175f640ddcc6aab0e0e739693cb5642d2925d9d6fe3731b38ac50a327c21ee52"
+        },
+        {
+          "path": "use-cases/treatment-lookup.ladder.json",
+          "upstream_path": "skills/use-cases/treatment-lookup.ladder.json",
+          "sha256": "e6e3fb74506728c2feb3d3ebf55dd09f942f77d3b0fed14a17600c44c1784b92"
+        },
+        {
+          "path": "use-cases/trial-recruitment.ladder.json",
+          "upstream_path": "skills/use-cases/trial-recruitment.ladder.json",
+          "sha256": "265547b7346aeddf4705ae6616875479929344518b2eca1a4f1a0837e14b3560"
+        },
+        {
+          "path": "use-cases/variant-pathogenicity.ladder.json",
+          "upstream_path": "skills/use-cases/variant-pathogenicity.ladder.json",
+          "sha256": "ce0f2d5bc96b30792d9dc7435fac6781ed98ef48f687ef8d2552360e52636855"
+        }
+      ],
+      "files": [
+        {
+          "path": "AUTHORING.md",
+          "sha256": "161edb4b5dbbc5c58cfbfb09ccdb658ad3268afff2e5fbc72a1786604aec197d",
+          "bytes": 2568,
+          "mode": 420
+        },
+        {
+          "path": "CITATION.cff",
+          "sha256": "c18f7ed1aabdcec05ced06a1562b37538907458ef93470d5f33ec3a0811150f9",
+          "bytes": 698,
+          "mode": 420
+        },
+        {
+          "path": "DNAKIT.md",
+          "sha256": "08044893cb6fe6e981e35dbac4d7360e3da0014ab74d3b615c014bc8e3a6c335",
+          "bytes": 1496,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "6b37b76fb5f5b29c74d9c0e35f9dc18b8e46273eadba8048513887f2d5feaabf",
+          "bytes": 1067,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b98281b5da7613f8a627b2d97d351b030071f01447f023acfb39d19c7ecb2954",
+          "bytes": 16698,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "c94f0ba28998f85b9dbcdec90ad5c82e8ce16faac2b0f323dca56b07f51a95f5",
+          "bytes": 972,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-gene-BRAF.json",
+          "sha256": "9dcfef1ad0cd6e48383d7b451a9ecda4a065997abf4c26b096d29996ca2720f9",
+          "bytes": 1677,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-gene-BRAF.txt",
+          "sha256": "7248453a9a7d67964d9bdb411500905a02ae0de541bfca3d05c3bf2401f63870",
+          "bytes": 1082,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-trial.json",
+          "sha256": "b6150c59792b962e5c236fe6759fa4d4dadef2409d1a1d7d6b2faa089c317419",
+          "bytes": 2852,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-trial.txt",
+          "sha256": "7953eef1bfb3d94011586d84eafd54b217d1acb003fae7ac1c33fcff6e5503c9",
+          "bytes": 1379,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-variant-rs113488022-all.json",
+          "sha256": "d943dd3da1d7902ba0927845b3f5c393709ad6df2af74f84b13c14a8af2e574e",
+          "bytes": 2431,
+          "mode": 420
+        },
+        {
+          "path": "examples/get-variant-rs113488022-all.txt",
+          "sha256": "35d8e9ef42df22c09c3a575adb9851c37f776bf124d1355b1f386d82c94589ca",
+          "bytes": 5509,
+          "mode": 420
+        },
+        {
+          "path": "examples/search-article.json",
+          "sha256": "aa9eeefb4cb1571b67438aeb026fba0c9f514fd1c084e0f8a8268b7eabb86c2d",
+          "bytes": 947,
+          "mode": 420
+        },
+        {
+          "path": "examples/search-article.txt",
+          "sha256": "9bfa8e9ca222f67d69eb39984cc0afa95b7a07eeb010c6c60a3a7024d4b2c749",
+          "bytes": 951,
+          "mode": 420
+        },
+        {
+          "path": "examples/search-drug.json",
+          "sha256": "48809331e2958e32b0d65b4dc41defd3d19c0943787d65ef030f0768d5a8bafa",
+          "bytes": 1511,
+          "mode": 420
+        },
+        {
+          "path": "examples/search-drug.txt",
+          "sha256": "92d26c520414a2f42fd14544607d33a03d437265fb79cfbe3ff2411ba474a4a2",
+          "bytes": 511,
+          "mode": 420
+        },
+        {
+          "path": "jq-examples.md",
+          "sha256": "6bb635313b0fea144d4bc71a0d27bb8bcf371552d76f8e50218e9315c3ead65b",
+          "bytes": 906,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "8167ca6a3b75b0837c765989215de7e6457888417f9bfbf43ce3e61703883c1c",
+          "bytes": 21197,
+          "mode": 420
+        },
+        {
+          "path": "schemas/article.json",
+          "sha256": "9e5d0dfb0f3b0c1d7d98101cb4ae4f1d8f0e5503f34703a4d2e37a1aecab5e0b",
+          "bytes": 2298,
+          "mode": 420
+        },
+        {
+          "path": "schemas/disease.json",
+          "sha256": "a79dc5ef88e60710821b4a4376f767767a57cdba841b3053cf91c24b69708e82",
+          "bytes": 2046,
+          "mode": 420
+        },
+        {
+          "path": "schemas/drug.json",
+          "sha256": "0935e2348e341cd148644e5f5f54dd79199f66637c5a0e4588002c569c403c4a",
+          "bytes": 2553,
+          "mode": 420
+        },
+        {
+          "path": "schemas/gene.json",
+          "sha256": "9e4c308713274b6da7053a1470b49a7b341d60d37ef226634f7e22773a8262c1",
+          "bytes": 15725,
+          "mode": 420
+        },
+        {
+          "path": "schemas/pathway.json",
+          "sha256": "cce050905aa7968a6ed55df9efab0ff47a91dedf2c077e223060047f9fd90ac1",
+          "bytes": 1344,
+          "mode": 420
+        },
+        {
+          "path": "schemas/trial.json",
+          "sha256": "4272385e3ab9f1dcfc1a25d701e698fd3b82dd7fc13725275c012e55cd9f1d24",
+          "bytes": 8278,
+          "mode": 420
+        },
+        {
+          "path": "schemas/variant.json",
+          "sha256": "3cbe78bb9c9a4860caa6c50eb90295d33711c99589226f40e4f4b56a74d2382d",
+          "bytes": 4424,
+          "mode": 420
+        },
+        {
+          "path": "schemas/workflow-ladder.schema.json",
+          "sha256": "47bb3db9bfc1e2b8d03a58de804d304e855842e5e7fc23015871091f95fcdd22",
+          "bytes": 1098,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/01-treatment-lookup.md",
+          "sha256": "686fde065718a80bec5e5169dafc7bc8727cf1a71af9dc771d32906bbb7902ff",
+          "bytes": 568,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/02-symptom-phenotype.md",
+          "sha256": "f15b15fed1ea4f1818c1f83378300f92d2c211911d69fe82096c98224a3b1f27",
+          "bytes": 853,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/03-gene-disease-orientation.md",
+          "sha256": "62b1097d8fd9be726a61432d8607ffe450cbb1a41e4242ccd8fedded6de4fb64",
+          "bytes": 1031,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/04-article-follow-up.md",
+          "sha256": "08049c7c6af31a78351796e6d4f3254847c68e8d7fd35fc615bb20084b886a83",
+          "bytes": 707,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/05-variant-pathogenicity.md",
+          "sha256": "c7879fb8a8ccd34f9597976c303ebb336bac8cd4fbced4b9395e10a817c8bb91",
+          "bytes": 772,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/06-drug-regulatory.md",
+          "sha256": "e2b10fe43c6dad2b80a83b4eaf358765f2a78018f65e39a193ac6714b5a7394a",
+          "bytes": 1066,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/07-gene-function-localization.md",
+          "sha256": "8dd2123dfc7c7f6555c6e34d96ff7a8fa2e61fb267bc9a29c77844f7632179af",
+          "bytes": 753,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/08-mechanism-pathway.md",
+          "sha256": "1907a1582d399cf927e49716722c918c22eb6d23e9017912935cc094537b1f3f",
+          "bytes": 711,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/09-trial-recruitment.md",
+          "sha256": "5d027cb4069c8595f6e39f81281bff00384e811bb54f69582fdce17103b70acc",
+          "bytes": 756,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/10-pharmacogene-cumulative.md",
+          "sha256": "e7fc3e28cb824ab76dfe232059c191e64784f95f0d3d25534dcc4bcea321cf03",
+          "bytes": 754,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/11-disease-locus-mapping.md",
+          "sha256": "8e97a01c9b864e8bd989565dca7d6aa02cb12a6e4e6e9fcd1a34a2fe32cbf8dd",
+          "bytes": 868,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/12-cellular-process-regulation.md",
+          "sha256": "e4286702be2b67d1c7c152542ffd07715258c55d48d502da8ad001df364c2e07",
+          "bytes": 637,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/13-mutation-catalog.md",
+          "sha256": "c993d606826ba080420e2b3a84e9340e180bcc14c1f6eaaf953d25c566992153",
+          "bytes": 1011,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/14-syndrome-disambiguation.md",
+          "sha256": "df81b2f8bb852360df9e01b9e04f6e9b972219713c293d30d21da4384cb83ee3",
+          "bytes": 757,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/15-negative-evidence.md",
+          "sha256": "b0a491f6c42ef1da3f4906d5462db1cf6ca0f39adfa86a37510853e2e359fdbd",
+          "bytes": 865,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/16-normalize-to-codes.md",
+          "sha256": "e4b5369e293edbaf1de2bc66518b468177a543e4d39f7ce1d41dcafb1f3a16d2",
+          "bytes": 828,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/17-exact-variant-literature.md",
+          "sha256": "06b27a4e20bf7c29ad82f6d71967f385ec716077bd100b17d8d5a36645c76236",
+          "bytes": 3104,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/_TEMPLATE.ladder.json",
+          "sha256": "ba9f5aa10d4294df951f88e46a86ee59d97984d27add38b8e2ee8786304c981f",
+          "bytes": 749,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/_TEMPLATE.md",
+          "sha256": "fb6cf72671a2c5c61b2d63b23b036b61b8948c42ed43c02339cf8de41f831297",
+          "bytes": 476,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/article-follow-up.ladder.json",
+          "sha256": "d4bdca2b4c8e0358aaaa855c051d439050f233384bb747fe5c5719316754531b",
+          "bytes": 771,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/mechanism-pathway.ladder.json",
+          "sha256": "498892a860ddf431a0aa2ccba3f06cb8bf0f371896e0f6fb39037cf51d352876",
+          "bytes": 985,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/mutation-catalog.ladder.json",
+          "sha256": "59df6dd537a866c84732b2cf8f5799aaaf83792342d07c3b0cd44bab6a19c812",
+          "bytes": 905,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/normalize-to-codes.ladder.json",
+          "sha256": "76bd7a87740543b375ea4994c0a1e28fb4ee360d65e79e93983ac70b9b08668c",
+          "bytes": 865,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/pharmacogene-cumulative.ladder.json",
+          "sha256": "175f640ddcc6aab0e0e739693cb5642d2925d9d6fe3731b38ac50a327c21ee52",
+          "bytes": 993,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/treatment-lookup.ladder.json",
+          "sha256": "e6e3fb74506728c2feb3d3ebf55dd09f942f77d3b0fed14a17600c44c1784b92",
+          "bytes": 836,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/trial-recruitment.ladder.json",
+          "sha256": "265547b7346aeddf4705ae6616875479929344518b2eca1a4f1a0837e14b3560",
+          "bytes": 996,
+          "mode": 420
+        },
+        {
+          "path": "use-cases/variant-pathogenicity.ladder.json",
+          "sha256": "ce0f2d5bc96b30792d9dc7435fac6781ed98ef48f687ef8d2552360e52636855",
+          "bytes": 959,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "finemap",
+      "role": "dna_workflow",
+      "description": "Fine-map GWAS loci with SuShiE/SuSiE or SuSiE-inf using individual genotypes or summary statistics and matched LD panels. Supports single/multiple ancestry, credible sets, optional gnomAD/GTEx annotation and provenance manifests. Use for posterior inclusion probabilities, credible sets or fine-mapping method selection; solver/reference installation is separate.",
+      "summary_zh": "多后端 GWAS 精细定位与变异注释",
+      "category": "gwas",
+      "capability": "finemap",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "finemap",
+        "description": "Fine-mapping wrapper around the mancusolab/sushie Python package plus two interchangeable SuSiE-inf implementations - StatFunGen/susieR (SuSiE 2.0; Wang 2025) as the default, and FinucaneLab/fine-mapping-inf (Cui 2024 Python) behind an opt-in `--susie-inf-impl finucane` flag. Five subcommands - `susie` (single-ancestry, individual genotypes), `sushie` (multi-ancestry, individual genotypes), `region` (single-locus from GWAS sumstats + a reference VCF/PLINK; sushie computes LD internally for `--method sushie`, pandas_plink for the susie_inf backends), `sumstats` (precomputed Z + LD matrices; `--method {sushie, susie_inf, auto}` plus `--susie-inf-impl {susie2, finucane}`), and `recommend` (OKG-driven method choice given a dataset_metadata node). Auto-installs each backend on first use - sushie via pip into a managed py310 venv; SuSiE 2.0 via R+remotes into ~/.cache/finemap/r_library/ (default); FinucaneLab/fine-mapping-inf via uv pip into the same venv when explicitly requested. Records OKG provenance in a per-run .finemap.json sidecar when $OKG_REPO is set - susie_inf manifests cite `method:susie_inf` for the model, and `software:susie_ash` + `paper:susie_ash_2025` (susie2 impl) or `software:susie_inf` + `paper:susie_inf_2024` (finucane impl). Use when a user asks to fine-map a locus with SuSiE, do multi-ancestry fine-mapping with SuShiE, fine-map with the infinitesimal-background prior, or ask which method to use for a given GWAS.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+, git, and ~500 MB of disk for the sushie clone + tutorial data. Auto-installs sushie via `pip install .` (or `uv pip install`). `--method susie_inf` defaults to installing R (brew/apt) + StatFunGen/susieR (SuSiE 2.0). `--susie-inf-impl finucane` opts into FinucaneLab/fine-mapping-inf (Python). OKG provenance optional, gated on $OKG_REPO.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.3",
+          "source": "agentskills.io/specification",
+          "sushie_repo": "https://github.com/mancusolab/sushie",
+          "sushie_docs": "https://mancusolab.github.io/sushie/",
+          "sushie_paper_doi": "10.1038/s41588-025-02262-7",
+          "susie_inf_default_impl": "susie2",
+          "susie_inf_susie2_repo": "https://github.com/StatFunGen/susieR",
+          "susie_inf_susie2_label": "SuSiE 2.0 (Wang 2025)",
+          "susie_inf_finucane_repo": "https://github.com/FinucaneLab/fine-mapping-inf",
+          "susie_inf_finucane_paper_doi": "10.1038/s41588-023-01597-3"
+        }
+      },
+      "upstream_name": "finemap",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/finemap",
+      "upstream_path": "finemap",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "多后端 GWAS 精细定位与变异注释"
+      ],
+      "runtime": {
+        "python_modules": [
+          "numpy",
+          "pandas"
+        ],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/LD_OPTIONS.md",
+        "references/SUMMARY_STATS.md",
+        "references/upstream-readme.md",
+        "scripts/finemap.py"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "finemap/SKILL.md",
+          "sha256": "f70ac719abe3b69b505cc665f5140e217d40a4386c226ee63ed0f9d466f5bc0a"
+        },
+        {
+          "path": "references/EXAMPLES.md",
+          "upstream_path": "finemap/references/EXAMPLES.md",
+          "sha256": "a86cdc7bc166163daa15b4bc67c21a051ee86e10318ffec21e6cc3dcd11f0a80"
+        },
+        {
+          "path": "references/LD_OPTIONS.md",
+          "upstream_path": "finemap/references/LD_OPTIONS.md",
+          "sha256": "1ab6a4c7f7f821154fae44ba20b6c5eb70db08467cc99e2749808ddf1ec8088f"
+        },
+        {
+          "path": "references/SUMMARY_STATS.md",
+          "upstream_path": "finemap/references/SUMMARY_STATS.md",
+          "sha256": "975bd5829354d58958ce097a3cc9c6dd258b200b944db0ebdc23a3991a3df698"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "references/variant-annotate/SKILL.md",
+          "upstream_path": "variant-annotate/SKILL.md",
+          "sha256": "9e18255e368a50f0d9011a5a8366d66294638c25efd6551265fc05ed072df38e"
+        },
+        {
+          "path": "references/variant-annotate/scripts/annotate.py",
+          "upstream_path": "variant-annotate/scripts/annotate.py",
+          "sha256": "2d66c560162fbf2c594be6b5773cb83a9008cf732d4f97c834018b65369c9440"
+        },
+        {
+          "path": "scripts/finemap.py",
+          "upstream_path": "finemap/scripts/finemap.py",
+          "sha256": "6876d7f51a611cd195706166e2b7b37b7dd1a914d5c8ad64275781a3640b6db1"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "0ecab89f1ff8abfff4058e193721f45876fb1452deb06efa60ec590a6b214763",
+          "bytes": 2231,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "45753001bac1a955f964ba7a1eeccb358bb08e8093d60b7e20447c648a1b117b",
+          "bytes": 14869,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "f8445f80e716856226241fe039b46c5f484b4c54868782460632bf390a1df8da",
+          "bytes": 991,
+          "mode": 420
+        },
+        {
+          "path": "references/EXAMPLES.md",
+          "sha256": "a86cdc7bc166163daa15b4bc67c21a051ee86e10318ffec21e6cc3dcd11f0a80",
+          "bytes": 4175,
+          "mode": 420
+        },
+        {
+          "path": "references/LD_OPTIONS.md",
+          "sha256": "5995093ad4ba5779e65a36f5397d0cc515b38fd4b3716970f5639ca2474e8834",
+          "bytes": 4697,
+          "mode": 420
+        },
+        {
+          "path": "references/SUMMARY_STATS.md",
+          "sha256": "63bfe3b4d81f037148569f06ade35b899898ddd8cdcdbda80f87e2546b252bc9",
+          "bytes": 4624,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "b54f466b81cc93bd8cb5ef61c66f2db041a310f04ab15efd652cbdaf31c946be",
+          "bytes": 9553,
+          "mode": 420
+        },
+        {
+          "path": "references/variant-annotate/SKILL.md",
+          "sha256": "9e18255e368a50f0d9011a5a8366d66294638c25efd6551265fc05ed072df38e",
+          "bytes": 5996,
+          "mode": 420
+        },
+        {
+          "path": "references/variant-annotate/scripts/annotate.py",
+          "sha256": "2d66c560162fbf2c594be6b5773cb83a9008cf732d4f97c834018b65369c9440",
+          "bytes": 14026,
+          "mode": 493
+        },
+        {
+          "path": "scripts/finemap.py",
+          "sha256": "48ac7a2a33d793ae8afa979db749bcba253cd621d8cf3c5c838a83cbec41f09e",
+          "bytes": 112307,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gigwa-diversity-report",
+      "role": "dna_workflow",
+      "description": "Produce a population diversity and structure report for a Gigwa variant set. Use this when a user asks to summarise genetic diversity, describe population structure, or assess relatedness for a run identified by its variantSetDbId. Walks through dataset-wide MAF/He/Ho/PIC/Fis, principal component analysis (PCA), population-structure clustering with a suggested number of clusters K, a VanRaden kinship/relatedness matrix highlighting the closest pairs, and a UPGMA dendrogram; when a metadata TSV and group column are supplied it adds per-group diversity and pairwise Weir and Cockerham Fst. Trigger on 'run a diversity analysis in Gigwa', 'show population structure / PCA / kinship / phylogenetic tree', or 'compare diversity between populations'. Keywords: Gigwa, population genetics, diversity, PCA, population structure, kinship, Fst, UPGMA tree, He, Ho, PIC, MAF.",
+      "summary_zh": "Gigwa 群体多样性与关系报告",
+      "category": "population",
+      "capability": "gigwa-diversity-report",
+      "source_id": "gigwa-mcp",
+      "license": "Apache-2.0",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "Apache-2.0",
+      "upstream_metadata": {
+        "name": "gigwa-diversity-report",
+        "description": "Produce a population diversity and structure report for a Gigwa variant set. Use this when a user asks to summarise genetic diversity, describe population structure, or assess relatedness for a run identified by its variantSetDbId. Walks through dataset-wide MAF/He/Ho/PIC/Fis, principal component analysis (PCA), population-structure clustering with a suggested number of clusters K, a VanRaden kinship/relatedness matrix highlighting the closest pairs, and a UPGMA dendrogram; when a metadata TSV and group column are supplied it adds per-group diversity and pairwise Weir and Cockerham Fst. Trigger on 'run a diversity analysis in Gigwa', 'show population structure / PCA / kinship / phylogenetic tree', or 'compare diversity between populations'. Keywords: Gigwa, population genetics, diversity, PCA, population structure, kinship, Fst, UPGMA tree, He, Ho, PIC, MAF.",
+        "license": "Apache-2.0",
+        "metadata": {
+          "author": "Anestis Gkanogiannis",
+          "version": "1.0.0",
+          "server": "gigwa-mcp",
+          "homepage": "https://github.com/gkanogiannis/Gigwa-MCP"
+        },
+        "compatibility": "Requires the gigwa-mcp MCP server connected to the agent over stdio, driving a Gigwa 2.x instance via REST/BrAPI. Read-only: works anonymously on public instances (set GIGWA_URL; GIGWA_USER/GIGWA_PASS optional). Grouped steps need a metadata TSV readable by the server."
+      },
+      "upstream_name": "gigwa-diversity-report",
+      "upstream_url": "https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/skills/gigwa-diversity-report",
+      "upstream_path": "skills/gigwa-diversity-report",
+      "upstream_revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "population",
+        "Gigwa 群体多样性与关系报告"
+      ],
+      "runtime": {
+        "python_modules": [
+          "gigwa_mcp"
+        ],
+        "commands": [
+          "gigwa-mcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915"
+        },
+        {
+          "path": "NOTICE",
+          "upstream_path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/gigwa-diversity-report/SKILL.md",
+          "sha256": "e1cd2a29703d6797146217d6769e99cb5732f0729a1e5208e49e590e8e3b1edd"
+        },
+        {
+          "path": "references/popgen-metrics.md",
+          "upstream_path": "skills/gigwa-diversity-report/references/popgen-metrics.md",
+          "sha256": "5bcc8bb70894e2b43e31291ec51cbffd9b450046836d03cd66524ca4f6b4d971"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "0431691def53734d5712f5be46a99b65516375953877161b685ad8a693cb899f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "7a6c4db88c7a50a19c9914b454527b03d225f1867681b3915752f95dff05949b",
+          "bytes": 1766,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915",
+          "bytes": 11377,
+          "mode": 420
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1",
+          "bytes": 305,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "50dc39512c37ed4f83efccb67d03912d7f0420c2e0b02b2f18b606de54ca9b5b",
+          "bytes": 5312,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "23df2ed560bfa3fd30d399ec2de56ca383c835690cedba4946369866a959e0d4",
+          "bytes": 991,
+          "mode": 420
+        },
+        {
+          "path": "references/popgen-metrics.md",
+          "sha256": "5bcc8bb70894e2b43e31291ec51cbffd9b450046836d03cd66524ca4f6b4d971",
+          "bytes": 3806,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "7e0146c03ca867783a7b951be310acb22807e60ee4b02b6a37521a02a335b295",
+          "bytes": 50424,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gigwa-explore-instance",
+      "role": "dna_workflow",
+      "description": "Get an overview of an entire Gigwa instance and flag anything that needs attention. Use this when a user asks what data is available on a Gigwa server, wants to enumerate databases/projects/runs, or has inherited an instance and needs a health check before analysis. Confirms connectivity, server version and authenticated user; lists all databases, projects and runs with their exact BrAPI variantSetDbIds and variant/call-set counts; and runs an instance-wide import-quality audit that ranks runs BROKEN/SUSPECT/OK so badly imported data is caught early. Trigger on 'what is on this Gigwa server', 'give me an overview of the instance', 'list the databases and runs', or 'which runs were imported badly'. Keywords: Gigwa, instance overview, server info, list content, variant sets, variantSetDbId, import audit, data catalog.",
+      "summary_zh": "Gigwa 种质基因型数据发现",
+      "category": "databases",
+      "capability": "gigwa-explore-instance",
+      "source_id": "gigwa-mcp",
+      "license": "Apache-2.0",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "Apache-2.0",
+      "upstream_metadata": {
+        "name": "gigwa-explore-instance",
+        "description": "Get an overview of an entire Gigwa instance and flag anything that needs attention. Use this when a user asks what data is available on a Gigwa server, wants to enumerate databases/projects/runs, or has inherited an instance and needs a health check before analysis. Confirms connectivity, server version and authenticated user; lists all databases, projects and runs with their exact BrAPI variantSetDbIds and variant/call-set counts; and runs an instance-wide import-quality audit that ranks runs BROKEN/SUSPECT/OK so badly imported data is caught early. Trigger on 'what is on this Gigwa server', 'give me an overview of the instance', 'list the databases and runs', or 'which runs were imported badly'. Keywords: Gigwa, instance overview, server info, list content, variant sets, variantSetDbId, import audit, data catalog.",
+        "license": "Apache-2.0",
+        "metadata": {
+          "author": "Anestis Gkanogiannis",
+          "version": "1.0.0",
+          "server": "gigwa-mcp",
+          "homepage": "https://github.com/gkanogiannis/Gigwa-MCP"
+        },
+        "compatibility": "Requires the gigwa-mcp MCP server connected to the agent over stdio, driving a Gigwa 2.x instance via REST/BrAPI. Read-only and takes no arguments: works anonymously against the configured GIGWA_URL (defaults to the public ICARDA instance); GIGWA_USER/GIGWA_PASS optional."
+      },
+      "upstream_name": "gigwa-explore-instance",
+      "upstream_url": "https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/skills/gigwa-explore-instance",
+      "upstream_path": "skills/gigwa-explore-instance",
+      "upstream_revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "databases",
+        "Gigwa 种质基因型数据发现"
+      ],
+      "runtime": {
+        "python_modules": [
+          "gigwa_mcp"
+        ],
+        "commands": [
+          "gigwa-mcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915"
+        },
+        {
+          "path": "NOTICE",
+          "upstream_path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/gigwa-explore-instance/SKILL.md",
+          "sha256": "88df22ee38f2faee0d8b07e982ceb65a88c2d998090a71f733a4e21e24d02dae"
+        },
+        {
+          "path": "references/instance-anatomy.md",
+          "upstream_path": "skills/gigwa-explore-instance/references/instance-anatomy.md",
+          "sha256": "f880b0513ec5c551c7cdeb81424e662614220d22a79947b6b0b45750696c264a"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "0431691def53734d5712f5be46a99b65516375953877161b685ad8a693cb899f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "1ed4f56ddd0bcbf89c87c5910e077547e67954cf00e8dfa3838fe99cde888be7",
+          "bytes": 1766,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915",
+          "bytes": 11377,
+          "mode": 420
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1",
+          "bytes": 305,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "27f5f1942ac09fcfadc39b7b3dac20bac3f14b2f86a60a8c5f930ef75a2b715b",
+          "bytes": 4234,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "438267ca1359b6bed3b0fbf19059766d91beaf0f78306a7810144dc8cc3ef32a",
+          "bytes": 991,
+          "mode": 420
+        },
+        {
+          "path": "references/instance-anatomy.md",
+          "sha256": "f880b0513ec5c551c7cdeb81424e662614220d22a79947b6b0b45750696c264a",
+          "bytes": 3306,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "7e0146c03ca867783a7b951be310acb22807e60ee4b02b6a37521a02a335b295",
+          "bytes": 50424,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gigwa-import-and-qc",
+      "role": "dna_workflow",
+      "description": "Import a genotype dataset into a Gigwa server and run standard quality control. Use this when a user wants to load a DArTseq SNP/Silico xlsx report or a VCF (.vcf/.vcf.gz) into a Gigwa database, project and run, then verify the import is clean. Covers optional genome-anchoring of DArTseq tag sequences to a reference FASTA, confirming variant and sample counts, and the full QC sweep: per-sample and per-marker call rate, heterozygosity outliers, MAF and missingness filtering, duplicate or clonal accessions, plus an import-quality audit that catches genotype-encoding artifacts. Trigger on requests like 'import this DArTseq report into Gigwa', 'load a VCF and QC it', or 'ingest genotypes and tell me if the import looks clean'. Keywords: Gigwa, DArTseq, VCF import, genotyping, call rate, MAF, heterozygosity, duplicate accessions, import audit.",
+      "summary_zh": "Gigwa 基因型导入与质控",
+      "category": "variants",
+      "capability": "gigwa-import-and-qc",
+      "source_id": "gigwa-mcp",
+      "license": "Apache-2.0",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "Apache-2.0",
+      "upstream_metadata": {
+        "name": "gigwa-import-and-qc",
+        "description": "Import a genotype dataset into a Gigwa server and run standard quality control. Use this when a user wants to load a DArTseq SNP/Silico xlsx report or a VCF (.vcf/.vcf.gz) into a Gigwa database, project and run, then verify the import is clean. Covers optional genome-anchoring of DArTseq tag sequences to a reference FASTA, confirming variant and sample counts, and the full QC sweep: per-sample and per-marker call rate, heterozygosity outliers, MAF and missingness filtering, duplicate or clonal accessions, plus an import-quality audit that catches genotype-encoding artifacts. Trigger on requests like 'import this DArTseq report into Gigwa', 'load a VCF and QC it', or 'ingest genotypes and tell me if the import looks clean'. Keywords: Gigwa, DArTseq, VCF import, genotyping, call rate, MAF, heterozygosity, duplicate accessions, import audit.",
+        "license": "Apache-2.0",
+        "metadata": {
+          "author": "Anestis Gkanogiannis",
+          "version": "1.0.0",
+          "server": "gigwa-mcp",
+          "homepage": "https://github.com/gkanogiannis/Gigwa-MCP"
+        },
+        "compatibility": "Requires the gigwa-mcp MCP server connected to the agent over stdio, driving a Gigwa 2.x instance via REST/BrAPI. Import needs write access, so set GIGWA_URL and GIGWA_USER/GIGWA_PASS (anonymous is read-only). Input files (xlsx/VCF/FASTA) must be readable by the server."
+      },
+      "upstream_name": "gigwa-import-and-qc",
+      "upstream_url": "https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/skills/gigwa-import-and-qc",
+      "upstream_path": "skills/gigwa-import-and-qc",
+      "upstream_revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "variants",
+        "Gigwa 基因型导入与质控"
+      ],
+      "runtime": {
+        "python_modules": [
+          "gigwa_mcp"
+        ],
+        "commands": [
+          "gigwa-mcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915"
+        },
+        {
+          "path": "NOTICE",
+          "upstream_path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/gigwa-import-and-qc/SKILL.md",
+          "sha256": "c5c29efd00745b51415778bf5ba50d30b14a82f8d2e114b040c484f36ebe83e2"
+        },
+        {
+          "path": "references/import-and-qc.md",
+          "upstream_path": "skills/gigwa-import-and-qc/references/import-and-qc.md",
+          "sha256": "abea4aac9d081f45f875bdb4e14edb3cce8aa82551bd2909933fbf0c60406f70"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "0431691def53734d5712f5be46a99b65516375953877161b685ad8a693cb899f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "7bdd58dc7fbe01c1944172b3d670397186f3fc3d578ae04d6ffeec78504a0a60",
+          "bytes": 1757,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915",
+          "bytes": 11377,
+          "mode": 420
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1",
+          "bytes": 305,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "a0f0a2335b8a94a3c1e8ee60a4b4ab21ab6f6b6ca1383f028d408e44eb4ed28e",
+          "bytes": 5765,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "e9f0b02f3a31ceadd46721409623d97e8750868f43f58a7b2c6e0b8a23d2b3f3",
+          "bytes": 988,
+          "mode": 420
+        },
+        {
+          "path": "references/import-and-qc.md",
+          "sha256": "abea4aac9d081f45f875bdb4e14edb3cce8aa82551bd2909933fbf0c60406f70",
+          "bytes": 4369,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "7e0146c03ca867783a7b951be310acb22807e60ee4b02b6a37521a02a335b295",
+          "bytes": 50424,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gigwa-qc-triage",
+      "role": "dna_workflow",
+      "description": "Run the full quality-control suite on a Gigwa variant set and give a go/no-go verdict for downstream analysis. Use this when a user wants to triage or vet the quality of an already-imported run (identified by its variantSetDbId) before trusting diversity or association results. Runs call rate (worst samples and markers), heterozygosity outliers that flag contamination or off-types, duplicate/clonal accession detection, a MAF/missingness filter preview, and an import-quality audit for genotype-encoding artifacts, then summarises the key numbers into a clear go/no-go recommendation. Trigger on 'QC this Gigwa run', 'is this dataset good enough to analyse', 'check call rates and flag bad samples/markers', or 'triage data quality'. Keywords: Gigwa, quality control, QC, call rate, heterozygosity, duplicate accessions, MAF filter, missingness, import audit, go/no-go.",
+      "summary_zh": "Gigwa 基因型质控评估",
+      "category": "variants",
+      "capability": "gigwa-qc-triage",
+      "source_id": "gigwa-mcp",
+      "license": "Apache-2.0",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "Apache-2.0",
+      "upstream_metadata": {
+        "name": "gigwa-qc-triage",
+        "description": "Run the full quality-control suite on a Gigwa variant set and give a go/no-go verdict for downstream analysis. Use this when a user wants to triage or vet the quality of an already-imported run (identified by its variantSetDbId) before trusting diversity or association results. Runs call rate (worst samples and markers), heterozygosity outliers that flag contamination or off-types, duplicate/clonal accession detection, a MAF/missingness filter preview, and an import-quality audit for genotype-encoding artifacts, then summarises the key numbers into a clear go/no-go recommendation. Trigger on 'QC this Gigwa run', 'is this dataset good enough to analyse', 'check call rates and flag bad samples/markers', or 'triage data quality'. Keywords: Gigwa, quality control, QC, call rate, heterozygosity, duplicate accessions, MAF filter, missingness, import audit, go/no-go.",
+        "license": "Apache-2.0",
+        "metadata": {
+          "author": "Anestis Gkanogiannis",
+          "version": "1.0.0",
+          "server": "gigwa-mcp",
+          "homepage": "https://github.com/gkanogiannis/Gigwa-MCP"
+        },
+        "compatibility": "Requires the gigwa-mcp MCP server connected to the agent over stdio, driving a Gigwa 2.x instance via REST/BrAPI. Read-only: works anonymously on public instances (set GIGWA_URL; GIGWA_USER/GIGWA_PASS optional). Needs a variantSetDbId for an already-imported run."
+      },
+      "upstream_name": "gigwa-qc-triage",
+      "upstream_url": "https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/skills/gigwa-qc-triage",
+      "upstream_path": "skills/gigwa-qc-triage",
+      "upstream_revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "variants",
+        "Gigwa 基因型质控评估"
+      ],
+      "runtime": {
+        "python_modules": [
+          "gigwa_mcp"
+        ],
+        "commands": [
+          "gigwa-mcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915"
+        },
+        {
+          "path": "NOTICE",
+          "upstream_path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/gigwa-qc-triage/SKILL.md",
+          "sha256": "6ad467343818cc8c5a29f180fbb13a878ccdcebcdf89f19836967326fcdb04e7"
+        },
+        {
+          "path": "references/qc-thresholds.md",
+          "upstream_path": "skills/gigwa-qc-triage/references/qc-thresholds.md",
+          "sha256": "e84c1f69826d0c82bd4774ce1490b41fc1b2ec54df56248752d1e9eeac9aaea5"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "0431691def53734d5712f5be46a99b65516375953877161b685ad8a693cb899f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "dcd27a3c68b58640d6b22bf103a47dad37ad0259ad21ce4961fffb6d6e3261bc",
+          "bytes": 1745,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915",
+          "bytes": 11377,
+          "mode": 420
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1",
+          "bytes": 305,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "5ce4c20ec4ef616f5fb325c7f2d0fe2718e3ff5f02c1380bc157a93953fad4dc",
+          "bytes": 4437,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "8fed942c0f8c2acaf77474cfcdc4bee58ab7c1e95baf9e73555eecce1e8381a3",
+          "bytes": 984,
+          "mode": 420
+        },
+        {
+          "path": "references/qc-thresholds.md",
+          "sha256": "e84c1f69826d0c82bd4774ce1490b41fc1b2ec54df56248752d1e9eeac9aaea5",
+          "bytes": 3247,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "7e0146c03ca867783a7b951be310acb22807e60ee4b02b6a37521a02a335b295",
+          "bytes": 50424,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gigwa-region-scan",
+      "role": "dna_workflow",
+      "description": "Characterise the variants and diversity within a single genomic region of a Gigwa variant set. Use this when a user asks about a specific chromosome, contig or coordinate window (e.g. 'chr1' or 'chr1:1000000-2000000') in a run identified by its variantSetDbId. Confirms the contig name, counts variants in the window and again at a common-variant MAF threshold, lists the matching variants to a CSV, and characterises just that window with a diversity summary and call-rate QC. Trigger on 'scan this region in Gigwa', 'how many variants are in chr1:...', 'is this locus variable', or 'diversity around a gene or window'. Note the interval interface differs by tool: count_variants and search_variants take reference_name/start/end, while diversity_summary and qc_call_rate take a single region string. Keywords: Gigwa, genomic region, variant density, region scan, chromosome, contig, MAF, variant search, call rate.",
+      "summary_zh": "Gigwa 区域变异与多样性",
+      "category": "population",
+      "capability": "gigwa-region-scan",
+      "source_id": "gigwa-mcp",
+      "license": "Apache-2.0",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "Apache-2.0",
+      "upstream_metadata": {
+        "name": "gigwa-region-scan",
+        "description": "Characterise the variants and diversity within a single genomic region of a Gigwa variant set. Use this when a user asks about a specific chromosome, contig or coordinate window (e.g. 'chr1' or 'chr1:1000000-2000000') in a run identified by its variantSetDbId. Confirms the contig name, counts variants in the window and again at a common-variant MAF threshold, lists the matching variants to a CSV, and characterises just that window with a diversity summary and call-rate QC. Trigger on 'scan this region in Gigwa', 'how many variants are in chr1:...', 'is this locus variable', or 'diversity around a gene or window'. Note the interval interface differs by tool: count_variants and search_variants take reference_name/start/end, while diversity_summary and qc_call_rate take a single region string. Keywords: Gigwa, genomic region, variant density, region scan, chromosome, contig, MAF, variant search, call rate.",
+        "license": "Apache-2.0",
+        "metadata": {
+          "author": "Anestis Gkanogiannis",
+          "version": "1.0.0",
+          "server": "gigwa-mcp",
+          "homepage": "https://github.com/gkanogiannis/Gigwa-MCP"
+        },
+        "compatibility": "Requires the gigwa-mcp MCP server connected to the agent over stdio, driving a Gigwa 2.x instance via REST/BrAPI. Read-only: works anonymously on public instances (set GIGWA_URL; GIGWA_USER/GIGWA_PASS optional). Needs a variantSetDbId and a chromosome/contig name or coordinate window."
+      },
+      "upstream_name": "gigwa-region-scan",
+      "upstream_url": "https://github.com/gkanogiannis/Gigwa-MCP/tree/d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf/skills/gigwa-region-scan",
+      "upstream_path": "skills/gigwa-region-scan",
+      "upstream_revision": "d6ccdd1a5eb19b8a0cc224b96ad459868d9c4aaf",
+      "attribution": "Copyright 2026 Anestis Gkanogiannis; Gigwa-MCP contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "population",
+        "Gigwa 区域变异与多样性"
+      ],
+      "runtime": {
+        "python_modules": [
+          "gigwa_mcp"
+        ],
+        "commands": [
+          "gigwa-mcp"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915"
+        },
+        {
+          "path": "NOTICE",
+          "upstream_path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/gigwa-region-scan/SKILL.md",
+          "sha256": "4324e166c8902e67cd17ff50c459a3767e6f16b1763c6e38e618b4cad5810249"
+        },
+        {
+          "path": "references/region-queries.md",
+          "upstream_path": "skills/gigwa-region-scan/references/region-queries.md",
+          "sha256": "68747c48f8022f591cf3afd8c5262ba651240578d82242d8342fba489e5cfa27"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "0431691def53734d5712f5be46a99b65516375953877161b685ad8a693cb899f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "acebaa094fc14f81521b788c4d96f10596cb912c53b62e1c59fd301399174dd5",
+          "bytes": 1751,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f780f67fbd23230312fcbc6da72215650992c8a9f15570ed9026907854c56915",
+          "bytes": 11377,
+          "mode": 420
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "759a89240954d2c8c2f013f25f121a53b77915e7b2778aac64f0a36ee36573f1",
+          "bytes": 305,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "6d2698edf114fe9200a99b3cdffdc94a20ffedb3c3532e07fe2617a77b5679a8",
+          "bytes": 4652,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "41f90a7e7feb6c301c4d51abe0059d14a4a6b46198000c4c1788058ea18a94e9",
+          "bytes": 986,
+          "mode": 420
+        },
+        {
+          "path": "references/region-queries.md",
+          "sha256": "68747c48f8022f591cf3afd8c5262ba651240578d82242d8342fba489e5cfa27",
+          "bytes": 2611,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "7e0146c03ca867783a7b951be310acb22807e60ee4b02b6a37521a02a335b295",
+          "bytes": 50424,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "gwas-fetch",
+      "role": "dna_workflow",
+      "description": "Fetch harmonised GWAS summary statistics from the GWAS Catalog by accession (GCST*). Resolves the study's metadata (genome build, FTP URL, sample size, ancestry) via the OKG when available, falling back to the GWAS Catalog REST API. Caches downloads to a configurable directory and writes a sidecar provenance manifest with SHA-256 + KG node IDs. Use when a user asks to download a GWAS Catalog study, fetch sumstats for a GCST accession, or pull sumstats for an analysis pipeline. Does NOT lift coordinates — chain into the `liftover` skill for that.",
+      "summary_zh": "GWAS Catalog 汇总统计下载与溯源",
+      "category": "databases",
+      "capability": "gwas-fetch",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "gwas-fetch",
+        "description": "Fetch harmonised GWAS summary statistics from the GWAS Catalog by accession (GCST*). Resolves the study's metadata (genome build, FTP URL, sample size, ancestry) via the OKG when available, falling back to the GWAS Catalog REST API. Caches downloads to a configurable directory and writes a sidecar provenance manifest with SHA-256 + KG node IDs. Use when a user asks to download a GWAS Catalog study, fetch sumstats for a GCST accession, or pull sumstats for an analysis pipeline. Does NOT lift coordinates — chain into the `liftover` skill for that.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+ and network access (to GWAS Catalog FTP / REST API). OKG provenance optional, gated on $OKG_REPO; without it the skill falls back to the GWAS Catalog REST API for build/URL metadata.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "upstream_catalog": "https://www.ebi.ac.uk/gwas/",
+          "rest_api_base": "https://www.ebi.ac.uk/gwas/rest/api"
+        }
+      },
+      "upstream_name": "gwas-fetch",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/gwas-fetch",
+      "upstream_path": "gwas-fetch",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "databases",
+        "GWAS Catalog 汇总统计下载与溯源"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "gwas-fetch/SKILL.md",
+          "sha256": "ea6387ebe06cf5a046f5226d45f9a658e923570d5310303c26de953745b66456"
+        },
+        {
+          "path": "references/CATALOG_API.md",
+          "upstream_path": "gwas-fetch/references/CATALOG_API.md",
+          "sha256": "6af5b43bfebad7444be61025341cdf8e34652798c84e9220be2cc71719b5dea4"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/gwas_fetch.py",
+          "upstream_path": "gwas-fetch/scripts/gwas_fetch.py",
+          "sha256": "1227adfed0810c760847a8018c5e7b3c01f6fd8f1ab85d216f2ffce5852e72ec"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "7277ff1d798bb693002649cbfd441cbc072adab9b71b4c301371224639895074",
+          "bytes": 1982,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "88d93c43b47384fef009dd1d79016472ee5b6a433b81a9a3694a0f2229d500f6",
+          "bytes": 4982,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "f9492736efea29f504c87a32ee994c6c284011e64af822d8794a9358cb61df08",
+          "bytes": 961,
+          "mode": 420
+        },
+        {
+          "path": "references/CATALOG_API.md",
+          "sha256": "6af5b43bfebad7444be61025341cdf8e34652798c84e9220be2cc71719b5dea4",
+          "bytes": 1635,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/gwas_fetch.py",
+          "sha256": "1227adfed0810c760847a8018c5e7b3c01f6fd8f1ab85d216f2ffce5852e72ec",
+          "bytes": 17326,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "ldsc",
+      "role": "dna_workflow",
+      "description": "Run LD Score Regression (LDSC) for sumstats munging, SNP heritability (h2), genetic correlation (rg), and stratified/cell-type-specific partitioned heritability (partitioned, Finucane 2015/2018 S-LDSC via `--h2-cts`). Auto-installs LDSC from the CBIIT Python 3 / Mac-compatible fork and caches the canonical EUR LD-score reference files on first use. Resolves method/software/paper provenance from the OKG when $OKG_REPO is set; otherwise runs without OKG provenance. Use when a user asks to munge GWAS sumstats, estimate heritability from sumstats, compute genetic correlation between two GWAS traits, or rank tissues / cell types by heritability enrichment (S-LDSC / Finucane 2018 multi-tissue).",
+      "summary_zh": "LD Score 遗传力与遗传相关估计",
+      "category": "gwas",
+      "capability": "ldsc",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "ldsc",
+        "description": "Run LD Score Regression (LDSC) for sumstats munging, SNP heritability (h2), genetic correlation (rg), and stratified/cell-type-specific partitioned heritability (partitioned, Finucane 2015/2018 S-LDSC via `--h2-cts`). Auto-installs LDSC from the CBIIT Python 3 / Mac-compatible fork and caches the canonical EUR LD-score reference files on first use. Resolves method/software/paper provenance from the OKG when $OKG_REPO is set; otherwise runs without OKG provenance. Use when a user asks to munge GWAS sumstats, estimate heritability from sumstats, compute genetic correlation between two GWAS traits, or rank tissues / cell types by heritability enrichment (S-LDSC / Finucane 2018 multi-tissue).",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+, git, and an internet connection on first run to clone CBIIT/ldsc and download the EUR LD-score reference (~250 MB extracted). Auto-installs the LDSC Python deps (numpy, pandas, scipy, bitarray) into the active environment via uv pip / pip --user.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "ldsc_fork": "https://github.com/CBIIT/ldsc",
+          "ldsc_upstream": "https://github.com/bulik/ldsc"
+        }
+      },
+      "upstream_name": "ldsc",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/ldsc",
+      "upstream_path": "ldsc",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "LD Score 遗传力与遗传相关估计"
+      ],
+      "runtime": {
+        "python_modules": [
+          "numpy",
+          "pandas",
+          "scipy"
+        ],
+        "commands": [
+          "python3",
+          "git"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "ldsc/SKILL.md",
+          "sha256": "5e3f42f8083e3f2c78680d36fe17791896852d26f7e18563161c89d95b42cb9a"
+        },
+        {
+          "path": "references/LDSC_REFS.md",
+          "upstream_path": "ldsc/references/LDSC_REFS.md",
+          "sha256": "f9e9799c75d455cb1d30141917f75ae2e83fefb50b26f9a1f0255cad19282b9b"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/ldsc.py",
+          "upstream_path": "ldsc/scripts/ldsc.py",
+          "sha256": "136e54ca6089c446d8aec051d9c5a1d539e7b6fe39381c4c14eb1d2abffaa86f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "d1592bbd8612c43b4ede29e6edd362839909ae3b5f2459848e74afb9700d7e83",
+          "bytes": 1964,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "e2e8fd1cd3fa11abf5cb70a6ca31828553b10803997d0cfbffe4ea7be72cd2e6",
+          "bytes": 16261,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "daafac8c4f591551fae45a09db10bdf4dbece16d2205ccc0c41e0b42d103b408",
+          "bytes": 955,
+          "mode": 420
+        },
+        {
+          "path": "references/LDSC_REFS.md",
+          "sha256": "f9e9799c75d455cb1d30141917f75ae2e83fefb50b26f9a1f0255cad19282b9b",
+          "bytes": 1846,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/ldsc.py",
+          "sha256": "136e54ca6089c446d8aec051d9c5a1d539e7b6fe39381c4c14eb1d2abffaa86f",
+          "bytes": 48167,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "liftover",
+      "role": "dna_workflow",
+      "description": "KG-aware genomic liftover for GWAS summary statistics. Resolves source/target genome build (hg18/hg19/hg38) via the statgen-analysis OKG when available, falling back to the GWAS Catalog REST API. Refuses to lift unknown-provenance data and emits a coverage-gap proposal stub. Supports `--gcst (accession)` to fetch+lift directly from the GWAS Catalog. Use when a user asks to lift a sumstats file, asks whether a lift is needed for a GWAS/LD pair, or asks to fetch a GWAS Catalog study and align its build to an LD panel.",
+      "summary_zh": "GWAS 汇总统计坐标转换",
+      "category": "intervals",
+      "capability": "liftover",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "liftover",
+        "description": "KG-aware genomic liftover for GWAS summary statistics. Resolves source/target genome build (hg18/hg19/hg38) via the statgen-analysis OKG when available, falling back to the GWAS Catalog REST API. Refuses to lift unknown-provenance data and emits a coverage-gap proposal stub. Supports `--gcst <accession>` to fetch+lift directly from the GWAS Catalog. Use when a user asks to lift a sumstats file, asks whether a lift is needed for a GWAS/LD pair, or asks to fetch a GWAS Catalog study and align its build to an LD panel.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+ and uv (or pip). Installs pyliftover on first use. OKG resolution requires the user to set $OKG_REPO (or pass --okg-repo) to a local clone of an `okg` repo with a deployment exposing an MCP server at deployments/<deployment>/server.py (e.g. statgen-analysis). The skill refuses any --okg-* / --gcst invocation when $OKG_REPO is unset.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.2",
+          "source": "agentskills.io/specification"
+        }
+      },
+      "upstream_name": "liftover",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/liftover",
+      "upstream_path": "liftover",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "intervals",
+        "GWAS 汇总统计坐标转换"
+      ],
+      "runtime": {
+        "python_modules": [
+          "pyliftover"
+        ],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "liftover/SKILL.md",
+          "sha256": "e9932ecc126188c2e4de728804aaace4b576ee962a3041247b04e75174340b58"
+        },
+        {
+          "path": "references/COVERAGE_GAPS.md",
+          "upstream_path": "liftover/references/COVERAGE_GAPS.md",
+          "sha256": "f1eb07939bcb64ce1e9abf329a5b68e90eb5a55fe5055a68fa0e6500af745bbc"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/lift_sumstats.py",
+          "upstream_path": "liftover/scripts/lift_sumstats.py",
+          "sha256": "9906b96c60610d2c659ad08f149bdbafb30a539440f65cc726fc43605c88c352"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "18da069522dbb8c26904ac77c52dbec0c05940f009fa9536fdf4242e9d8672d7",
+          "bytes": 1976,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "334916562bd4d5e004211a1bf531cd1ea6102f2604c532ec667292ff724d161a",
+          "bytes": 6310,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "de36f2ea5ad864e48843eecc392f8fb5263a29f03d633491ced0523ebe96bd21",
+          "bytes": 959,
+          "mode": 420
+        },
+        {
+          "path": "references/COVERAGE_GAPS.md",
+          "sha256": "f1eb07939bcb64ce1e9abf329a5b68e90eb5a55fe5055a68fa0e6500af745bbc",
+          "bytes": 3151,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/lift_sumstats.py",
+          "sha256": "9906b96c60610d2c659ad08f149bdbafb30a539440f65cc726fc43605c88c352",
+          "bytes": 23302,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "locuszoom",
+      "role": "dna_workflow",
+      "description": "Draw LocusZoom-style regional GWAS association plots with locuszoomr, Ensembl gene tracks and LDlink LD. Select a gene, region or lead SNP and optionally add fine-mapping posterior probabilities and credible sets. Use for regional association/credible-set figures; requires R and the user's LDlink API token.",
+      "summary_zh": "GWAS 区域关联与精细定位绘图",
+      "category": "gwas",
+      "capability": "locuszoom",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "locuszoom",
+        "description": "Produce LocusZoom-style regional association plots from a GWAS sumstats file using the `locuszoomr` R package (Lewis & Knight, github.com/myles-lewis/locuszoomr). Selects a window by gene symbol, region (chr:start-end), or lead-SNP rsid, fetches pairwise LD from the LDlink REST API (1000G, configurable population), and renders a multi-track PDF + PNG with the association scatter on top and Ensembl gene tracks below. With `--finemap-pip` or `--finemap-sidecar`, adds a middle panel of per-variant PIPs coloured by credible-set membership — the canonical 3-panel fine-mapped-locus figure. Requires the user's LDlink API token; the skill prompts for it on first use and caches it under `~/.cache/locuszoom/ldlink_token`. OKG-aware - cites software:locuszoomr, ld_panel:thousand_genomes_<pop>, and the input dataset_metadata node in the sidecar manifest when `$OKG_REPO` is set; propagates method/software/paper/ld_panel OKG node IDs from a `--finemap-sidecar` into the locuszoom manifest. Use when a user asks for a locus plot, a regional association plot, a Manhattan close-up, a fine-mapped locus plot, or wants to visualize a specific gene / SNP / region in their GWAS sumstats (with or without overlaid fine-mapping results).",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+ and R 4.0+. The `locuszoomr`, `LDlinkR`, `ensembldb`, `EnsDb.Hsapiens.v75` (hg19), and `EnsDb.Hsapiens.v86` (hg38) R packages auto-install from CRAN/Bioconductor on first use. LDlink API access requires a free token from https://ldlink.nih.gov/?tab=apiaccess. OKG provenance optional, gated on $OKG_REPO.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "locuszoomr_repo": "https://github.com/myles-lewis/locuszoomr",
+          "ldlink_api_url": "https://ldlink.nih.gov/?tab=apiaccess",
+          "okg_software_node": "software:locuszoomr"
+        }
+      },
+      "upstream_name": "locuszoom",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/locuszoom",
+      "upstream_path": "locuszoom",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "GWAS 区域关联与精细定位绘图"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "python3",
+          "Rscript"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "locuszoom/SKILL.md",
+          "sha256": "089286e66d37c100755b5b2b61428d22ca8b5fb05cf9eb4e867a271a9f69195b"
+        },
+        {
+          "path": "references/LOCUSZOOMR.md",
+          "upstream_path": "locuszoom/references/LOCUSZOOMR.md",
+          "sha256": "e0c8dae367cb76c20a0fb784466cee821a4807ec6715f5519d6daa919d528378"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/locuszoom.py",
+          "upstream_path": "locuszoom/scripts/locuszoom.py",
+          "sha256": "27b1734b95e2a40f3ea2dbd8f123496a215ba419e54cee23f1b6a0bf9f1991c8"
+        },
+        {
+          "path": "scripts/locuszoom_run.R",
+          "upstream_path": "locuszoom/scripts/locuszoom_run.R",
+          "sha256": "d88b15f197a77d7e0ed6dd02f4b10f354bb6052e9c7750db5455ad86e1c00134"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "43441bd1531a9b40980371066f01101d742e19ac992fcde043b212c014f9eff3",
+          "bytes": 2042,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "344a27ac1dbe27f7660fe8ea18172a2631b87dad83d74002467eed67f7ee5f4c",
+          "bytes": 11544,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "7bb801703432bfec74fdec225bb8e8b075db65d05a3903f43818363caf71436e",
+          "bytes": 960,
+          "mode": 420
+        },
+        {
+          "path": "references/LOCUSZOOMR.md",
+          "sha256": "e0c8dae367cb76c20a0fb784466cee821a4807ec6715f5519d6daa919d528378",
+          "bytes": 7983,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/locuszoom.py",
+          "sha256": "27b1734b95e2a40f3ea2dbd8f123496a215ba419e54cee23f1b6a0bf9f1991c8",
+          "bytes": 19827,
+          "mode": 420
+        },
+        {
+          "path": "scripts/locuszoom_run.R",
+          "sha256": "d88b15f197a77d7e0ed6dd02f4b10f354bb6052e9c7750db5455ad86e1c00134",
+          "bytes": 14327,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "manhattan-qq",
+      "role": "dna_workflow",
+      "description": "Produce a Manhattan plot, QQ plot, and a QC summary (genomic inflation λ_GC, count of genome-wide-significant and suggestive hits, list of independent lead SNPs) from a GWAS summary statistics file. Auto-detects common column-name conventions (`SNP/rsid/variant_id`, `CHR/chromosome/hm_chrom`, `BP/position/base_pair_location`, `P/p_value`). Subsamples low-significance variants to keep plots fast (~seconds) on full HM3-scale or 1KG-scale sumstats. Writes a sidecar `.manhattan_qq.json` manifest citing the input dataset's OKG node when `$OKG_REPO` is set. Use when a user asks for a Manhattan plot, QQ plot, genomic-inflation check, or a quick QC pass on a GWAS sumstats file.",
+      "summary_zh": "GWAS Manhattan、QQ 与质控报告",
+      "category": "gwas",
+      "capability": "manhattan-qq",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "manhattan-qq",
+        "description": "Produce a Manhattan plot, QQ plot, and a QC summary (genomic inflation λ_GC, count of genome-wide-significant and suggestive hits, list of independent lead SNPs) from a GWAS summary statistics file. Auto-detects common column-name conventions (`SNP/rsid/variant_id`, `CHR/chromosome/hm_chrom`, `BP/position/base_pair_location`, `P/p_value`). Subsamples low-significance variants to keep plots fast (~seconds) on full HM3-scale or 1KG-scale sumstats. Writes a sidecar `.manhattan_qq.json` manifest citing the input dataset's OKG node when `$OKG_REPO` is set. Use when a user asks for a Manhattan plot, QQ plot, genomic-inflation check, or a quick QC pass on a GWAS sumstats file.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+, numpy, pandas, scipy, matplotlib. No external services or data downloads.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1"
+        }
+      },
+      "upstream_name": "manhattan-qq",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/manhattan-qq",
+      "upstream_path": "manhattan-qq",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "GWAS Manhattan、QQ 与质控报告"
+      ],
+      "runtime": {
+        "python_modules": [
+          "numpy",
+          "pandas",
+          "scipy",
+          "matplotlib"
+        ],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "manhattan-qq/SKILL.md",
+          "sha256": "734a9bf0b3e795815668e54d741d13632fc7cf3bee30ee275f1f3a4a1f62207f"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/manhattan_qq.py",
+          "upstream_path": "manhattan-qq/scripts/manhattan_qq.py",
+          "sha256": "eeb632b4624774bd030e72f953f673f56bd8f842965a59d73b6a9c6ee31bcc5f"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "c08c79da1924cda368eb7b8b64e81c8e24ec67a9e2af8e4f791f99dbd892429f",
+          "bytes": 1988,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "8e4436b123d987671c267029ff28e4bc03dc04f96541f04a28543fe93a76dea7",
+          "bytes": 8084,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "ecadf92355370d1353e109d1826575d66bff0356574931855c1319ff83ecb5f6",
+          "bytes": 963,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/manhattan_qq.py",
+          "sha256": "eeb632b4624774bd030e72f953f673f56bd8f842965a59d73b6a9c6ee31bcc5f",
+          "bytes": 13078,
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "id": "okg-search",
+      "role": "dna_workflow",
+      "description": "Query the statgen-analysis OKG for datasets matching a trait, EFO term, seed-dataset, or curated category, with controlled-vocab ancestry filtering (EUR/AFR/EAS/AMR/SAS/admixed/unknown), minimum-N power threshold, and sumstats-availability filter. Outputs a TSV ready to feed into `gwas-fetch GCST(X)` for batch chaining (e.g. genetic correlation with related immune traits). Auto-installs psycopg on first use and connects via the OKG_DSN env var; no MCP-server roundtrip overhead. Use when a user asks \"what other GWAS exist for trait X\", \"what immune-trait studies are in the graph\", \"find sibling datasets like this one\", or wants to bulk-pull a panel of GCSTs for rg / cross-trait analyses.",
+      "summary_zh": "统计遗传知识库 GWAS 数据集检索",
+      "category": "databases",
+      "capability": "okg-search",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "okg-search",
+        "description": "Query the statgen-analysis OKG for datasets matching a trait, EFO term, seed-dataset, or curated category, with controlled-vocab ancestry filtering (EUR/AFR/EAS/AMR/SAS/admixed/unknown), minimum-N power threshold, and sumstats-availability filter. Outputs a TSV ready to feed into `gwas-fetch GCST<X>` for batch chaining (e.g. genetic correlation with related immune traits). Auto-installs psycopg on first use and connects via the OKG_DSN env var; no MCP-server roundtrip overhead. Use when a user asks \"what other GWAS exist for trait X\", \"what immune-trait studies are in the graph\", \"find sibling datasets like this one\", or wants to bulk-pull a panel of GCSTs for rg / cross-trait analyses.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+, a reachable statgen-analysis Postgres (env var OKG_DSN; default postgres://postgres:okg@localhost:5449/statgen_analysis). Auto-installs `psycopg[binary]` on first run via uv pip / pip --user.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1"
+        }
+      },
+      "upstream_name": "okg-search",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/okg-search",
+      "upstream_path": "okg-search",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "databases",
+        "统计遗传知识库 GWAS 数据集检索"
+      ],
+      "runtime": {
+        "python_modules": [
+          "psycopg"
+        ],
+        "commands": [
+          "python3"
+        ],
+        "environment": [
+          "OKG_DSN"
+        ],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "okg-search/SKILL.md",
+          "sha256": "4389231b47edee4ecc1e7f72d5d7ff45d04c523ccc9eee297c601517ec55c775"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/okg_search.py",
+          "upstream_path": "okg-search/scripts/okg_search.py",
+          "sha256": "812f64aec865217e475e5f7b2f6a202d45b285cf47c2d650a07b04b3ccc31609"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "836d6d3e97140c24833f8cb1f872d7ed72ab10e8cbf13bc363f779c75d927846",
+          "bytes": 1982,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b80c47c65a055cb57394380faffb4862015ce0d3534d2d415db2f00ad8d8cce4",
+          "bytes": 12058,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "83f4f090e859901e12b2a063f766d06537cb5cc2197f0d757a27db16a206d93b",
+          "bytes": 961,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/okg_search.py",
+          "sha256": "812f64aec865217e475e5f7b2f6a202d45b285cf47c2d650a07b04b3ccc31609",
+          "bytes": 18354,
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "id": "prs",
+      "role": "dna_workflow",
+      "description": "Build a polygenic risk score from GWAS summary statistics using a parameterised PRS method. Currently implements SBayesRC (Zheng et al. 2024, Nat Genet) via the zhilizheng/SBayesRC R package; LDpred2, PRS-CS, and PRS-CSx can be added behind the same `--method` flag. OKG-aware - resolves the ancestry-matched LD eigendecomposition reference (HapMap3 EUR/EAS/AFR) via `ld_panel:sbayesrc_hm3_(anc)` and pulls sample size from the input dataset_metadata node. Writes per-SNP PRS weights plus a sidecar manifest citing the method/software/paper/LD-panel node IDs. Use when a user asks to compute PRS weights, run SBayesRC, or build a polygenic score from sumstats.",
+      "summary_zh": "SBayesRC 多基因评分权重估计",
+      "category": "gwas",
+      "capability": "prs",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "prs",
+        "description": "Build a polygenic risk score from GWAS summary statistics using a parameterised PRS method. Currently implements SBayesRC (Zheng et al. 2024, Nat Genet) via the zhilizheng/SBayesRC R package; LDpred2, PRS-CS, and PRS-CSx can be added behind the same `--method` flag. OKG-aware - resolves the ancestry-matched LD eigendecomposition reference (HapMap3 EUR/EAS/AFR) via `ld_panel:sbayesrc_hm3_<anc>` and pulls sample size from the input dataset_metadata node. Writes per-SNP PRS weights plus a sidecar manifest citing the method/software/paper/LD-panel node IDs. Use when a user asks to compute PRS weights, run SBayesRC, or build a polygenic score from sumstats.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+, R 4.0+ with `remotes`, and `unzip`. The SBayesRC R package is installed from github.com/zhilizheng/SBayesRC on first use. LD eigendecomposition references (~3-5 GB per ancestry) are downloaded from `gctbhub.cloud.edu.au` to `~/.cache/sbayesrc/` and cached. OKG provenance optional, gated on $OKG_REPO.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "sbayesrc_repo": "https://github.com/zhilizheng/SBayesRC",
+          "sbayesrc_paper_doi": "10.1038/s41588-024-01704-y",
+          "okg_method_node": "method:sbayesrc",
+          "okg_ld_panels": [
+            "ld_panel:sbayesrc_hm3_eur",
+            "ld_panel:sbayesrc_hm3_eas",
+            "ld_panel:sbayesrc_hm3_afr"
+          ]
+        }
+      },
+      "upstream_name": "prs",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/prs",
+      "upstream_path": "prs",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "SBayesRC 多基因评分权重估计"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "python3",
+          "Rscript",
+          "uv"
+        ],
+        "environment": [
+          "OKG_REPO",
+          "OKG_DSN"
+        ],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "prs/SKILL.md",
+          "sha256": "d381130ed2378ae4df520ce87c4ebb66b705e25d01b83ebf71dff9b5086dfde4"
+        },
+        {
+          "path": "references/COJO_FORMAT.md",
+          "upstream_path": "prs/references/COJO_FORMAT.md",
+          "sha256": "a725375792d94ef33a6b270297806abb9f27ed35e2a564b6715192bf5289478e"
+        },
+        {
+          "path": "references/SBAYESRC.md",
+          "upstream_path": "prs/references/SBAYESRC.md",
+          "sha256": "1159111b26a0f74f5a82f7792cc11bbaca1aefc9095d2a0dd0b89511340bd011"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/prs.py",
+          "upstream_path": "prs/scripts/prs.py",
+          "sha256": "8a8928cc62ed7f2548d1fa49b358f8b23ca9cb028dea3466d892b984c6e69259"
+        },
+        {
+          "path": "scripts/sbayesrc_run.R",
+          "upstream_path": "prs/scripts/sbayesrc_run.R",
+          "sha256": "3e777f3a955d57b46b2e3dc0cd0ca91a121729be7ed43c6f929120f61d67f58c"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "a2de808e285db5722e4a61a2bfed80b9051b676b3f16448f2c017a996dab510f",
+          "bytes": 1961,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "64ea933ff05e13b1aebff276fecf8b4c4bc038a00f1eafe9093d7e9fc60655c9",
+          "bytes": 10265,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "23f58fb955fbaf9f906215477b87bbb1d7cd7b742ccb282bac3cbf13b69191bf",
+          "bytes": 954,
+          "mode": 420
+        },
+        {
+          "path": "references/COJO_FORMAT.md",
+          "sha256": "a725375792d94ef33a6b270297806abb9f27ed35e2a564b6715192bf5289478e",
+          "bytes": 2300,
+          "mode": 420
+        },
+        {
+          "path": "references/SBAYESRC.md",
+          "sha256": "1159111b26a0f74f5a82f7792cc11bbaca1aefc9095d2a0dd0b89511340bd011",
+          "bytes": 5724,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/prs.py",
+          "sha256": "8a8928cc62ed7f2548d1fa49b358f8b23ca9cb028dea3466d892b984c6e69259",
+          "bytes": 27453,
+          "mode": 420
+        },
+        {
+          "path": "scripts/sbayesrc_run.R",
+          "sha256": "3e777f3a955d57b46b2e3dc0cd0ca91a121729be7ed43c6f929120f61d67f58c",
+          "bytes": 4478,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "qtl-candidate-gene",
+      "role": "dna_workflow",
+      "description": "Interpret a fine-mapped QTL / introgression interval for a stated trait in tomato. Given an interval (SL4.0 coordinates) and the trait it was mapped for, lists the genes in the interval from SGN ITAG4.1, enriches them with protein function from UniProt, ranks candidate genes by plausibility for that trait, grounds every literature citation with a live PubMed search, optionally flags marker-assisted-selection (MAS) markers from a two-group phenotype contrast, then self-verifies the draft — dropping any gene not in the interval and any citation that doesn't resolve — and delivers a candidate-gene report with a verification stamp. Works for any tomato trait — disease resistance, fruit size/quality, color, plant architecture, abiotic-stress tolerance. Use when a user has a QTL interval plus a trait and wants candidate or causal genes, mechanistic hypotheses, or MAS/KASP markers, or wants to interpret haploqtl clustering output.",
+      "summary_zh": "番茄 QTL 候选基因与辅助选择标记",
+      "category": "annotation",
+      "capability": "qtl-candidate-gene",
+      "source_id": "haploqtl",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": null,
+      "upstream_metadata": {
+        "name": "qtl-candidate-gene",
+        "description": "Interpret a fine-mapped QTL / introgression interval for a stated trait in tomato. Given an interval (SL4.0 coordinates) and the trait it was mapped for, lists the genes in the interval from SGN ITAG4.1, enriches them with protein function from UniProt, ranks candidate genes by plausibility for that trait, grounds every literature citation with a live PubMed search, optionally flags marker-assisted-selection (MAS) markers from a two-group phenotype contrast, then self-verifies the draft — dropping any gene not in the interval and any citation that doesn't resolve — and delivers a candidate-gene report with a verification stamp. Works for any tomato trait — disease resistance, fruit size/quality, color, plant architecture, abiotic-stress tolerance. Use when a user has a QTL interval plus a trait and wants candidate or causal genes, mechanistic hypotheses, or MAS/KASP markers, or wants to interpret haploqtl clustering output."
+      },
+      "upstream_name": "qtl-candidate-gene",
+      "upstream_url": "https://github.com/tayloranthonyanderson/haploqtl/tree/210eace2912c7bf11d119cb503c89f8f6cad479f/skills/qtl-candidate-gene",
+      "upstream_path": "skills/qtl-candidate-gene",
+      "upstream_revision": "210eace2912c7bf11d119cb503c89f8f6cad479f",
+      "attribution": "Copyright 2026 Taylor A. Anderson; haploqtl contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "annotation",
+        "番茄 QTL 候选基因与辅助选择标记"
+      ],
+      "runtime": {
+        "python_modules": [
+          "numpy",
+          "allel"
+        ],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "CITATION.cff",
+          "upstream_path": "CITATION.cff",
+          "sha256": "a14b4b58bb7cce37b80c11e95d975ce8606bb50a36a89d5b07444e554ed82d8d"
+        },
+        {
+          "path": "EXAMPLE.md",
+          "upstream_path": "skills/qtl-candidate-gene/EXAMPLE.md",
+          "sha256": "ff202ab5bc90876341e30c5f2b5b587fb0d625367599cf94966f512bf1bd292a"
+        },
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "71eb3744a4241e84e165499af6b4b0c8c8304506033aed2589a2175990b71e28"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "skills/qtl-candidate-gene/SKILL.md",
+          "sha256": "b4279321b5acb7249501cd55f79fc59cec6d1a4c7bc863d297f0f808fecbf9a0"
+        },
+        {
+          "path": "data/AccessionRename.txt",
+          "upstream_path": "skills/qtl-candidate-gene/data/AccessionRename.txt",
+          "sha256": "8e03af2a7472888e569abae205dc83c334e6aa4fe8e16ffe18b14cf2a76b9e44"
+        },
+        {
+          "path": "data/ITAG4.1_EB_regions.gff3",
+          "upstream_path": "skills/qtl-candidate-gene/data/ITAG4.1_EB_regions.gff3",
+          "sha256": "7653a019ad0ebdcfdcd0e5a7645b4bd0deffe510aa14be7232ae1f27022f9a67"
+        },
+        {
+          "path": "references/data-sources.md",
+          "upstream_path": "skills/qtl-candidate-gene/references/data-sources.md",
+          "sha256": "e585ff7f6cdf8c7d55b0dcbe0102de4529beebc74b29c8bbe8c68104d1cc9e73"
+        },
+        {
+          "path": "references/interpretation-guide.md",
+          "upstream_path": "skills/qtl-candidate-gene/references/interpretation-guide.md",
+          "sha256": "69e40ffd61de8d44981aed544de755d7e151c78bc94def0957e325c3700f45ac"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "60547569142c7abd1b827b4cc5637e724647a71da84f0d1da8341bb412b8f56c"
+        },
+        {
+          "path": "requirements.txt",
+          "upstream_path": "skills/qtl-candidate-gene/requirements.txt",
+          "sha256": "50c99b871de4f3ac32b9069ec9b96953ef89fdddcb9d29c9fb393f767835e881"
+        },
+        {
+          "path": "scripts/cite_support.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/cite_support.py",
+          "sha256": "2d383838254c7633ff57cf5032f518ca2fdc4b56d27d0c3b21b0f779985b1823"
+        },
+        {
+          "path": "scripts/diagnostic_variants.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/diagnostic_variants.py",
+          "sha256": "52b2392e69383fbd171fed34652960b2435f80e31d59867e8fc1eed4944fbd1d"
+        },
+        {
+          "path": "scripts/gene_function.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/gene_function.py",
+          "sha256": "af908eeeae9161dc650ebfa227e61250d2a451dad34f22b3d93c0755dda037d4"
+        },
+        {
+          "path": "scripts/genes_in_interval.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/genes_in_interval.py",
+          "sha256": "5308ce82b634aa131fb449b98dc987f23ff969fe709c47de7e9743a1bd0c25e6"
+        },
+        {
+          "path": "scripts/pubmed.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/pubmed.py",
+          "sha256": "006e28eeab1fcde0de42988f08de888a8c7f41adfd62936122a5ac41e266c486"
+        },
+        {
+          "path": "scripts/verify_report.py",
+          "upstream_path": "skills/qtl-candidate-gene/scripts/verify_report.py",
+          "sha256": "f38d97b26e2204625c0aa9e0af1a0271b341e25158c69f1f5038c647b1643d65"
+        }
+      ],
+      "files": [
+        {
+          "path": "CITATION.cff",
+          "sha256": "a14b4b58bb7cce37b80c11e95d975ce8606bb50a36a89d5b07444e554ed82d8d",
+          "bytes": 1046,
+          "mode": 420
+        },
+        {
+          "path": "DNAKIT.md",
+          "sha256": "7d40e43fd5107b7a7503233cfd6bda22d2f8f172d500b61d79ba350690cb453c",
+          "bytes": 1566,
+          "mode": 420
+        },
+        {
+          "path": "EXAMPLE.md",
+          "sha256": "ff202ab5bc90876341e30c5f2b5b587fb0d625367599cf94966f512bf1bd292a",
+          "bytes": 5343,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "71eb3744a4241e84e165499af6b4b0c8c8304506033aed2589a2175990b71e28",
+          "bytes": 1075,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "eb2c411ef95d0edef3ff7d70b6134327802f77b2b428590fdb0ce1692856e054",
+          "bytes": 9585,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "a2c89029eca4b08e2b56c23eab129e75ee60d723186d8ebfc4cb688df4cd0525",
+          "bytes": 985,
+          "mode": 420
+        },
+        {
+          "path": "data/AccessionRename.txt",
+          "sha256": "8e03af2a7472888e569abae205dc83c334e6aa4fe8e16ffe18b14cf2a76b9e44",
+          "bytes": 419,
+          "mode": 420
+        },
+        {
+          "path": "data/ITAG4.1_EB_regions.gff3",
+          "sha256": "7653a019ad0ebdcfdcd0e5a7645b4bd0deffe510aa14be7232ae1f27022f9a67",
+          "bytes": 119011,
+          "mode": 420
+        },
+        {
+          "path": "references/data-sources.md",
+          "sha256": "e585ff7f6cdf8c7d55b0dcbe0102de4529beebc74b29c8bbe8c68104d1cc9e73",
+          "bytes": 2678,
+          "mode": 420
+        },
+        {
+          "path": "references/interpretation-guide.md",
+          "sha256": "69e40ffd61de8d44981aed544de755d7e151c78bc94def0957e325c3700f45ac",
+          "bytes": 4483,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "c3ff0b266b8b8d2d973d39ccf5c5f37c852a05835685c1a4c5859dd513cd9aaa",
+          "bytes": 14503,
+          "mode": 420
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "50c99b871de4f3ac32b9069ec9b96953ef89fdddcb9d29c9fb393f767835e881",
+          "bytes": 399,
+          "mode": 420
+        },
+        {
+          "path": "scripts/cite_support.py",
+          "sha256": "2d383838254c7633ff57cf5032f518ca2fdc4b56d27d0c3b21b0f779985b1823",
+          "bytes": 3074,
+          "mode": 420
+        },
+        {
+          "path": "scripts/diagnostic_variants.py",
+          "sha256": "52b2392e69383fbd171fed34652960b2435f80e31d59867e8fc1eed4944fbd1d",
+          "bytes": 7582,
+          "mode": 420
+        },
+        {
+          "path": "scripts/gene_function.py",
+          "sha256": "af908eeeae9161dc650ebfa227e61250d2a451dad34f22b3d93c0755dda037d4",
+          "bytes": 3229,
+          "mode": 420
+        },
+        {
+          "path": "scripts/genes_in_interval.py",
+          "sha256": "5308ce82b634aa131fb449b98dc987f23ff969fe709c47de7e9743a1bd0c25e6",
+          "bytes": 4598,
+          "mode": 420
+        },
+        {
+          "path": "scripts/pubmed.py",
+          "sha256": "006e28eeab1fcde0de42988f08de888a8c7f41adfd62936122a5ac41e266c486",
+          "bytes": 5156,
+          "mode": 420
+        },
+        {
+          "path": "scripts/verify_report.py",
+          "sha256": "f38d97b26e2204625c0aa9e0af1a0271b341e25158c69f1f5038c647b1643d65",
+          "bytes": 8254,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "tangermeme",
+      "role": "dna_workflow",
+      "description": "Use for any task involving the tangermeme library — post-training analysis of genomic sequence-to-function (S2F) deep learning models. Triggers on predictions, DeepLIFT/SHAP attributions, marginalization/ablation/spacing of motifs, saturation mutagenesis (ISM), variant effect scoring, sequence design, seqlet calling, loading loci/FASTA/bigWig/MEME/VCF, or wrapping a PyTorch genomic model for these analyses. This is a router skill — read the relevant file under references/ for details and footguns before writing tangermeme code.",
+      "summary_zh": "DNA 模型归因、扰动与序列设计",
+      "category": "models",
+      "capability": "tangermeme",
+      "source_id": "tangermeme",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": null,
+      "upstream_metadata": {
+        "name": "tangermeme",
+        "description": "Use for any task involving the tangermeme library — post-training analysis of genomic sequence-to-function (S2F) deep learning models. Triggers on predictions, DeepLIFT/SHAP attributions, marginalization/ablation/spacing of motifs, saturation mutagenesis (ISM), variant effect scoring, sequence design, seqlet calling, loading loci/FASTA/bigWig/MEME/VCF, or wrapping a PyTorch genomic model for these analyses. This is a router skill — read the relevant file under references/ for details and footguns before writing tangermeme code."
+      },
+      "upstream_name": "tangermeme",
+      "upstream_url": "https://github.com/jmschrei/tangermeme/tree/d5c51b83d374576b64effb9284fc79a71a604734/tangermeme/_skills/data",
+      "upstream_path": "tangermeme/_skills/data",
+      "upstream_revision": "d5c51b83d374576b64effb9284fc79a71a604734",
+      "attribution": "Copyright 2024-2026 Jacob Schreiber; tangermeme contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "models",
+        "DNA 模型归因、扰动与序列设计"
+      ],
+      "runtime": {
+        "python_modules": [
+          "tangermeme",
+          "torch"
+        ],
+        "commands": [],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "ffdec4928032c05bcf1dcb50516f07ec1d1012d1fe9c8b69f1e581ceb8d6d33c"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "tangermeme/_skills/data/SKILL.md",
+          "sha256": "b79c5b91d0e35c47beb8d69407e965712637748f1a2cc947af1b275f2951b1b1"
+        },
+        {
+          "path": "references/annotate.md",
+          "upstream_path": "tangermeme/_skills/data/references/annotate.md",
+          "sha256": "781a25251e3a39a703193be1f94a666ef2b298a2bc83ccf90083375213bac874"
+        },
+        {
+          "path": "references/comparing-models.md",
+          "upstream_path": "tangermeme/_skills/data/references/comparing-models.md",
+          "sha256": "988081393bda9ec29139128971e1499573bf79b274c9ab7496a81b820a185d52"
+        },
+        {
+          "path": "references/deep_lift_shap.md",
+          "upstream_path": "tangermeme/_skills/data/references/deep_lift_shap.md",
+          "sha256": "457766eab8e9810376e86887aad0483ffb4b0b287154f0b4049695edbf234188"
+        },
+        {
+          "path": "references/design.md",
+          "upstream_path": "tangermeme/_skills/data/references/design.md",
+          "sha256": "5740bf84389b3c54f438ce4add22d6333a30d9a8542c56e5c00e4bb4f2d3407d"
+        },
+        {
+          "path": "references/func-pattern.md",
+          "upstream_path": "tangermeme/_skills/data/references/func-pattern.md",
+          "sha256": "6d1b8b6dc2f464187a77b08841a8589f616720e929d9ccfc28054c70e1e355fd"
+        },
+        {
+          "path": "references/io-loci.md",
+          "upstream_path": "tangermeme/_skills/data/references/io-loci.md",
+          "sha256": "1e187c30c4d44d46bece25d65c01f12de7b99b08f148e89443f495e0409af627"
+        },
+        {
+          "path": "references/model-wrapping.md",
+          "upstream_path": "tangermeme/_skills/data/references/model-wrapping.md",
+          "sha256": "c7614b8a474ea54f4ece53d00794e9e0eef50f5f2b555f9b63c024be6bfc7b71"
+        },
+        {
+          "path": "references/motif-effects.md",
+          "upstream_path": "tangermeme/_skills/data/references/motif-effects.md",
+          "sha256": "e95aba466eaf9e40d0935ee3136bc9b8e65c2e78e79812c3f94210aad58f7911"
+        },
+        {
+          "path": "references/notebook-walkthrough.md",
+          "upstream_path": "tangermeme/_skills/data/references/notebook-walkthrough.md",
+          "sha256": "6b1f8c6c684abcc578351c4f8796cc755f63175b8f0444a9fb3a9fbb482a0ee7"
+        },
+        {
+          "path": "references/plot.md",
+          "upstream_path": "tangermeme/_skills/data/references/plot.md",
+          "sha256": "c4037ac26cad4b1b8dd12a052c84a4377eb9bd5414fbaee77fe45a0bba75dbbb"
+        },
+        {
+          "path": "references/product.md",
+          "upstream_path": "tangermeme/_skills/data/references/product.md",
+          "sha256": "364dbaff71e17d99987975807d85c39b951395680104a8d7e0d2f3a3453536ad"
+        },
+        {
+          "path": "references/saturation_mutagenesis.md",
+          "upstream_path": "tangermeme/_skills/data/references/saturation_mutagenesis.md",
+          "sha256": "a57a6cf1bfef4b6ee13c8c1cd98de8d0ab2b118f64f5fc8053d35337a52f62ed"
+        },
+        {
+          "path": "references/seqlets.md",
+          "upstream_path": "tangermeme/_skills/data/references/seqlets.md",
+          "sha256": "aeb626d0421024a2e892f005c69762f59a27644f71a93ed48cb8a70037596f9b"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "5440405acea1d5d30381aa316ed5fa9fd7cb38fa31d6691f800b8025b43865e7"
+        },
+        {
+          "path": "references/variant-effect.md",
+          "upstream_path": "tangermeme/_skills/data/references/variant-effect.md",
+          "sha256": "672f65dcbd100821e7cdeecb593d467f0622c416e15f93caa2829d1d38f1d390"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "e25c8b9c91d3182f644be00a616a7cb1274e5026571827249e98e27db5c73d82",
+          "bytes": 1430,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "ffdec4928032c05bcf1dcb50516f07ec1d1012d1fe9c8b69f1e581ceb8d6d33c",
+          "bytes": 1077,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "7b029ba6046de990cff8962b7de483b55e2e51bd3f7e7f51baed2b3d2caacc7b",
+          "bytes": 6234,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "bb6998f29e925588ef02badbe54837a00bc09e5cd73889deaca8cb5c93991525",
+          "bytes": 976,
+          "mode": 420
+        },
+        {
+          "path": "references/annotate.md",
+          "sha256": "781a25251e3a39a703193be1f94a666ef2b298a2bc83ccf90083375213bac874",
+          "bytes": 5704,
+          "mode": 420
+        },
+        {
+          "path": "references/comparing-models.md",
+          "sha256": "988081393bda9ec29139128971e1499573bf79b274c9ab7496a81b820a185d52",
+          "bytes": 4529,
+          "mode": 420
+        },
+        {
+          "path": "references/deep_lift_shap.md",
+          "sha256": "457766eab8e9810376e86887aad0483ffb4b0b287154f0b4049695edbf234188",
+          "bytes": 7626,
+          "mode": 420
+        },
+        {
+          "path": "references/design.md",
+          "sha256": "5740bf84389b3c54f438ce4add22d6333a30d9a8542c56e5c00e4bb4f2d3407d",
+          "bytes": 8532,
+          "mode": 420
+        },
+        {
+          "path": "references/func-pattern.md",
+          "sha256": "6d1b8b6dc2f464187a77b08841a8589f616720e929d9ccfc28054c70e1e355fd",
+          "bytes": 4568,
+          "mode": 420
+        },
+        {
+          "path": "references/io-loci.md",
+          "sha256": "1e187c30c4d44d46bece25d65c01f12de7b99b08f148e89443f495e0409af627",
+          "bytes": 4799,
+          "mode": 420
+        },
+        {
+          "path": "references/model-wrapping.md",
+          "sha256": "c7614b8a474ea54f4ece53d00794e9e0eef50f5f2b555f9b63c024be6bfc7b71",
+          "bytes": 4526,
+          "mode": 420
+        },
+        {
+          "path": "references/motif-effects.md",
+          "sha256": "e95aba466eaf9e40d0935ee3136bc9b8e65c2e78e79812c3f94210aad58f7911",
+          "bytes": 6385,
+          "mode": 420
+        },
+        {
+          "path": "references/notebook-walkthrough.md",
+          "sha256": "6b1f8c6c684abcc578351c4f8796cc755f63175b8f0444a9fb3a9fbb482a0ee7",
+          "bytes": 6612,
+          "mode": 420
+        },
+        {
+          "path": "references/plot.md",
+          "sha256": "c4037ac26cad4b1b8dd12a052c84a4377eb9bd5414fbaee77fe45a0bba75dbbb",
+          "bytes": 4919,
+          "mode": 420
+        },
+        {
+          "path": "references/product.md",
+          "sha256": "364dbaff71e17d99987975807d85c39b951395680104a8d7e0d2f3a3453536ad",
+          "bytes": 3113,
+          "mode": 420
+        },
+        {
+          "path": "references/saturation_mutagenesis.md",
+          "sha256": "a57a6cf1bfef4b6ee13c8c1cd98de8d0ab2b118f64f5fc8053d35337a52f62ed",
+          "bytes": 5511,
+          "mode": 420
+        },
+        {
+          "path": "references/seqlets.md",
+          "sha256": "aeb626d0421024a2e892f005c69762f59a27644f71a93ed48cb8a70037596f9b",
+          "bytes": 3541,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "5440405acea1d5d30381aa316ed5fa9fd7cb38fa31d6691f800b8025b43865e7",
+          "bytes": 21327,
+          "mode": 420
+        },
+        {
+          "path": "references/variant-effect.md",
+          "sha256": "672f65dcbd100821e7cdeecb593d467f0622c416e15f93caa2829d1d38f1d390",
+          "bytes": 4679,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "twas",
+      "role": "dna_workflow",
+      "description": "Run a transcriptome-wide association study (TWAS) on a GWAS sumstats file using TWAS-FUSION (Gusev et al. 2016, Nat Genet) with pre-computed GTEx v8 multi-tissue expression weights. Resolves the weight panel via the OKG (`--tissue Brain_Cortex --ancestry EUR` → `dataset:fusion_gtex_v8_eur:brain_cortex`), downloads + caches the panel + the FUSION 1000G LDREF on first use, runs `FUSION.assoc_test.R` per chromosome, concatenates per-gene results, and writes a `.twas.json` sidecar citing the method/software/paper/ld_panel/dataset/tissue/cohort OKG nodes. OKG-aware - if `$OKG_REPO` is set, can also auto-suggest tissues for a given trait via the `tissue → trait relevant_to` mapping (e.g., AD → Brain_Cortex / Brain_Hippocampus / Brain_Frontal_Cortex_BA9 / Whole_Blood). Use when a user asks to run TWAS, compute gene-level association from GWAS sumstats, integrate expression weights with a GWAS, or fine-map a GWAS locus to candidate causal genes.",
+      "summary_zh": "FUSION 转录组关联与 GTEx 权重",
+      "category": "gwas",
+      "capability": "twas",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "twas",
+        "description": "Run a transcriptome-wide association study (TWAS) on a GWAS sumstats file using TWAS-FUSION (Gusev et al. 2016, Nat Genet) with pre-computed GTEx v8 multi-tissue expression weights. Resolves the weight panel via the OKG (`--tissue Brain_Cortex --ancestry EUR` → `dataset:fusion_gtex_v8_eur:brain_cortex`), downloads + caches the panel + the FUSION 1000G LDREF on first use, runs `FUSION.assoc_test.R` per chromosome, concatenates per-gene results, and writes a `.twas.json` sidecar citing the method/software/paper/ld_panel/dataset/tissue/cohort OKG nodes. OKG-aware - if `$OKG_REPO` is set, can also auto-suggest tissues for a given trait via the `tissue → trait relevant_to` mapping (e.g., AD → Brain_Cortex / Brain_Hippocampus / Brain_Frontal_Cortex_BA9 / Whole_Blood). Use when a user asks to run TWAS, compute gene-level association from GWAS sumstats, integrate expression weights with a GWAS, or fine-map a GWAS locus to candidate causal genes.",
+        "license": "MIT",
+        "compatibility": "Requires Python 3.9+ and R 4.0+ (FUSION is R). Installs the `gusevlab/fusion_twas` repo + the FUSION 1000G LDREF (~120 MB) + the requested GTEx v8 weight panel (~50-200 MB each) on first use, cached under `~/.cache/twas/`. R deps `plink2R`, `glmnet`, `methods`, `optparse` auto-install on first use. PLINK1.9 binary required (skill auto-installs from the FUSION-shipped utilities or `brew install plink` on macOS). OKG provenance optional, gated on `$OKG_REPO`.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "fusion_repo": "https://github.com/gusevlab/fusion_twas",
+          "fusion_paper_doi": "10.1038/ng.3506",
+          "fusion_paper_pmid": "26854917",
+          "okg_method_node": "method:fusion_twas",
+          "okg_software_node": "software:fusion",
+          "okg_paper_node": "paper:fusion_2016",
+          "okg_ld_panel_node": "ld_panel:fusion_1000g_eur",
+          "okg_cohort_node": "cohort:gtex_v8"
+        }
+      },
+      "upstream_name": "twas",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/twas",
+      "upstream_path": "twas",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "gwas",
+        "FUSION 转录组关联与 GTEx 权重"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "python3",
+          "Rscript",
+          "git"
+        ],
+        "environment": [
+          "OKG_REPO",
+          "OKG_DSN"
+        ],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "twas/SKILL.md",
+          "sha256": "94493bb18aec0f43c5f5780b946ebeab39be6fabb53be6c3cdb15135c2faa8b1"
+        },
+        {
+          "path": "references/FUSION.md",
+          "upstream_path": "twas/references/FUSION.md",
+          "sha256": "68acfd4d7ea1a339d5164f31501eb8ca274ff2a93eb5530012f221c1a6facd36"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/twas.py",
+          "upstream_path": "twas/scripts/twas.py",
+          "sha256": "c843dd9733be20ecc49d536079e48b99e0389b733f433f6e5722ccc663ea14fb"
+        },
+        {
+          "path": "scripts/twas_run.R",
+          "upstream_path": "twas/scripts/twas_run.R",
+          "sha256": "adfa003d06f38fa652ae37aa90b872a2e49f3b71b7f4fa0b2c1889a017af1593"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "898651fa34a56ba52cd9885da22afca6e5f8a3e1a8e4a49a6b5e2b6c29e74eab",
+          "bytes": 1964,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "9fca04103ea588c12eaa2e1786d51b304dcd2c9ab9ca4f8f1aa212f52d10fc83",
+          "bytes": 9101,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "5887f0ae7f5830bf8ca81f25c3e4837d33d9a15a8d05d37ddafb0486bd9d19ce",
+          "bytes": 955,
+          "mode": 420
+        },
+        {
+          "path": "references/FUSION.md",
+          "sha256": "68acfd4d7ea1a339d5164f31501eb8ca274ff2a93eb5530012f221c1a6facd36",
+          "bytes": 5564,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/twas.py",
+          "sha256": "c843dd9733be20ecc49d536079e48b99e0389b733f433f6e5722ccc663ea14fb",
+          "bytes": 22981,
+          "mode": 420
+        },
+        {
+          "path": "scripts/twas_run.R",
+          "sha256": "adfa003d06f38fa652ae37aa90b872a2e49f3b71b7f4fa0b2c1889a017af1593",
+          "bytes": 1973,
+          "mode": 420
+        }
+      ]
+    },
+    {
+      "id": "variant-annotate",
+      "role": "dna_workflow",
+      "description": "Per-rsID variant annotation against gnomAD (v4, GRCh38) and GTEx (v8). For a list of rsIDs, fetches the most-severe coding consequence + gene + per-population allele frequency from gnomAD, plus the top single-tissue eQTL and sQTL from GTEx. Designed for the post-fine-mapping \"what is this SNP doing\" lookup that researchers normally do by hand at gnomad.broadinstitute.org and gtexportal.org. Caches per-rsID JSON under ~/.cache/variant-annotate/ so repeated runs are free. Use when a user has a credible set, a GWAS top-hit list, or any rsID list and wants coding/regulatory context attached.",
+      "summary_zh": "gnomAD 与 GTEx 变异证据注释",
+      "category": "variants",
+      "capability": "variant-annotate",
+      "source_id": "statgen-skills",
+      "license": "MIT",
+      "license_basis": "Pinned repository LICENSE retained; underlying tools/data have separate terms.",
+      "upstream_license_field": "MIT",
+      "upstream_metadata": {
+        "name": "variant-annotate",
+        "description": "Per-rsID variant annotation against gnomAD (v4, GRCh38) and GTEx (v8). For a list of rsIDs, fetches the most-severe coding consequence + gene + per-population allele frequency from gnomAD, plus the top single-tissue eQTL and sQTL from GTEx. Designed for the post-fine-mapping \"what is this SNP doing\" lookup that researchers normally do by hand at gnomad.broadinstitute.org and gtexportal.org. Caches per-rsID JSON under ~/.cache/variant-annotate/ so repeated runs are free. Use when a user has a credible set, a GWAS top-hit list, or any rsID list and wants coding/regulatory context attached.",
+        "license": "MIT",
+        "compatibility": "Pure Python 3.9+, stdlib only (urllib + json). Network access to gnomad.broadinstitute.org and gtexportal.org required on cache miss.",
+        "metadata": {
+          "author": "stephendorn",
+          "version": "0.1",
+          "source": "agentskills.io/specification",
+          "gnomad_api": "https://gnomad.broadinstitute.org/api",
+          "gtex_api": "https://gtexportal.org/api/v2"
+        }
+      },
+      "upstream_name": "variant-annotate",
+      "upstream_url": "https://github.com/svdorn/statgen-skills/tree/dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0/variant-annotate",
+      "upstream_path": "variant-annotate",
+      "upstream_revision": "dc5f0c60d2995aebfe58b3f8a07b46f27562f4e0",
+      "attribution": "Copyright 2026 Stephen Dorn; statgen-skills contributors",
+      "citation_guidance": "Cite the pinned upstream project and underlying methods/data actually used; see UPSTREAM.md and retained citation files.",
+      "aliases": [],
+      "alternatives": [],
+      "keywords": [
+        "variants",
+        "gnomAD 与 GTEx 变异证据注释"
+      ],
+      "runtime": {
+        "python_modules": [],
+        "commands": [
+          "python3"
+        ],
+        "environment": [],
+        "manual_checks": [
+          "Read DNAKIT.md and SKILL.md for optional dependencies, versions, models, reference panels and service access."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "python_syntax": "passed",
+        "execution": "not_run"
+      },
+      "modifications": [
+        "DNAKIT.md",
+        "SKILL.md",
+        "UPSTREAM.md",
+        "references/upstream-readme.md"
+      ],
+      "excluded_upstream_resources": {},
+      "upstream_files": [
+        {
+          "path": "LICENSE",
+          "upstream_path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd"
+        },
+        {
+          "path": "SKILL.md",
+          "upstream_path": "variant-annotate/SKILL.md",
+          "sha256": "9e18255e368a50f0d9011a5a8366d66294638c25efd6551265fc05ed072df38e"
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "upstream_path": "README.md",
+          "sha256": "089b481b5e827192f85563f7a5233f59531afbfd9ad61fc961dc4d09fb019c9a"
+        },
+        {
+          "path": "scripts/annotate.py",
+          "upstream_path": "variant-annotate/scripts/annotate.py",
+          "sha256": "2d66c560162fbf2c594be6b5773cb83a9008cf732d4f97c834018b65369c9440"
+        }
+      ],
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "57dfad7641b21ef7e31526a6c9f2b83ed32a5e39ca9c07c780c2f88ed777a76c",
+          "bytes": 2000,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e8a5fc078f3924e6c3bf0b98c355cf71ea6881ab2667f9aac7f2e0a04355c2dd",
+          "bytes": 1069,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "f441920f6c7be281a01ae61da73303152a234d130c88e523159a02dd4f315258",
+          "bytes": 6131,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "6280de579198d02eec691bb291f3c101afa08f92c2bcf35457208743f6a68cc3",
+          "bytes": 967,
+          "mode": 420
+        },
+        {
+          "path": "references/upstream-readme.md",
+          "sha256": "6249e79b4b713f07f27dd660fb1b3e26489bfc0fa52c80531b9ee3586ac75b2a",
+          "bytes": 9639,
+          "mode": 420
+        },
+        {
+          "path": "scripts/annotate.py",
+          "sha256": "2d66c560162fbf2c594be6b5773cb83a9008cf732d4f97c834018b65369c9440",
+          "bytes": 14026,
+          "mode": 493
+        }
+      ]
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "source_id": "biomcp",
+      "path": "sdlc/skills/biomcp-research",
+      "reason": "Repository-specific developer issue-filing workflow; genomic research is covered by the portable biomcp skill."
+    }
+  ]
+}

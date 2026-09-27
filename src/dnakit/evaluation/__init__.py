@@ -3,6 +3,7 @@
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.evaluation.collection import (
     evaluate_diversity,
+    evaluate_kmer_diversity,
     evaluate_redundancy,
     evaluate_uniqueness,
 )
@@ -32,6 +33,10 @@ from dnakit.evaluation.reference import (
     evaluate_reference_similarity,
     nearest_reference,
 )
+from dnakit.evaluation.reference_consistency import (
+    ReferenceConsistencyConfig,
+    evaluate_reference_consistency,
+)
 from dnakit.evaluation.results import EvaluationEntry, EvaluationReport, ReferenceLibrary
 from dnakit.evaluation.scorecard import ScoreInput, evaluate_scorecard
 from dnakit.evaluation.sequence import (
@@ -53,6 +58,7 @@ __all__ = [
     "FragmentSimilarityConfig",
     "FrechetDistanceConfig",
     "QualityEvaluationConfig",
+    "ReferenceConsistencyConfig",
     "ReferenceLibrary",
     "ReferenceSearchConfig",
     "SNNConfig",
@@ -68,10 +74,12 @@ __all__ = [
     "evaluate_diversity",
     "evaluate_fragment_similarity",
     "evaluate_frechet_distance",
+    "evaluate_kmer_diversity",
     "evaluate_memorization",
     "evaluate_novelty",
     "evaluate_quality",
     "evaluate_redundancy",
+    "evaluate_reference_consistency",
     "evaluate_reference_similarity",
     "evaluate_scorecard",
     "evaluate_snn",

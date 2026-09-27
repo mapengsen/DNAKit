@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import heapq
 from collections.abc import Iterable, Mapping
+from dataclasses import replace
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNA, DNASet
@@ -45,6 +46,15 @@ def _tracked_query_items(
     from dnakit._progress import track
 
     return track(indexed, description=description, total=len(items))
+
+
+def _plot_batch_labels(items: tuple[InputItem, ...]) -> tuple[str, ...]:
+    labels: list[str | None] = []
+    for item in items:
+        value = record_for(item).metadata.get("batch")
+        labels.append(value.strip() if isinstance(value, str) and value.strip() else None)
+    fallback = "Unlabeled" if any(label is not None for label in labels) else "Evaluated set"
+    return tuple(label if label is not None else fallback for label in labels)
 
 
 def create_reference_library(
@@ -237,7 +247,6 @@ def _evaluate_levenshtein_novelty(
             )
             / longest
         )
-        is_novel = nearest_distance > 0.0
         distances.append(nearest_distance)
         entries.append(
             EvaluationEntry(
@@ -250,21 +259,19 @@ def _evaluate_levenshtein_novelty(
                         "nearest_levenshtein_distance": nearest_distance,
                         "nearest_coverage": coverage,
                         "novelty": nearest_distance,
-                        "exact_match": not is_novel,
-                        "is_novel": is_novel,
-                        "threshold": 0.0,
+                        "exact_match": nearest_distance == 0.0,
                     }
                 ),
             )
         )
     materialized = tuple(entries)
     novelty_values = tuple(distances)
-    novel_count = sum(entry.metrics["is_novel"] is True for entry in materialized)
+    exact_count = sum(entry.metrics["exact_match"] is True for entry in materialized)
     mean_distance = mean(novelty_values)
     return report(
         name="novelty",
         method="mean-nearest-reference-levenshtein-distance",
-        version="eval-novelty-levenshtein-v1",
+        version="eval-novelty-levenshtein-v2",
         parameters={
             "novelty_calculation": config.novelty_calculation,
             "formula": "mean_i min_s Levenshtein(query_i,reference_s)",
@@ -272,7 +279,7 @@ def _evaluate_levenshtein_novelty(
             "normalization": "none",
             "sequence_preprocessing": "none; no padding or truncation",
             "ambiguity_policy": "literal IUPAC symbols",
-            "threshold_rule": "is_novel iff nearest Levenshtein distance > 0",
+            "exact_match_rule": "nearest Levenshtein distance == 0",
             "similarity_and_copy_threshold_settings_used": False,
             "topology_policy": "linearized at stored origin; no circular rotation",
             "tie_break": "distance-asc,reference-input-index-asc",
@@ -285,8 +292,8 @@ def _evaluate_levenshtein_novelty(
             "score": mean_distance,
             "query_count": len(materialized),
             "reference_count": len(reference_records),
-            "novel_count": novel_count,
-            "novel_fraction": novel_count / len(materialized) if materialized else None,
+            "exact_match_count": exact_count,
+            "exact_match_rate": exact_count / len(materialized) if materialized else None,
             "mean_novelty": mean_distance,
             "mean_nearest_levenshtein_distance": mean_distance,
             "minimum_nearest_levenshtein_distance": min(novelty_values) if novelty_values else None,
@@ -354,17 +361,35 @@ def evaluate_novelty(
     reference: ReferenceLibrary,
     *,
     config: ReferenceSearchConfig | None = None,
+    plot: bool = False,
     verbose: bool = True,
 ) -> EvaluationReport:
-    """Evaluate novelty by nearest similarity or raw nearest Levenshtein distance."""
+    """Report novelty; ``plot=True`` saves three PNG charts in the working directory."""
 
+    if not isinstance(plot, bool):
+        raise TypeError("plot must be a boolean.")
     resolved = ReferenceSearchConfig() if config is None else config
     if not isinstance(resolved, ReferenceSearchConfig):
         raise TypeError("config must be ReferenceSearchConfig or None.")
     if resolved.novelty_calculation == "levenshtein":
-        return _evaluate_levenshtein_novelty(queries, reference, resolved)
-    _validate_copy_search_thresholds(resolved)
-    nearest_entries = _nearest_entries(queries, reference, resolved)
+        if not plot:
+            return _evaluate_levenshtein_novelty(queries, reference, resolved)
+        plot_items = materialize_input(queries, limits=resolved.limits)
+        result = _evaluate_levenshtein_novelty(
+            tuple(record_for(item) for item in plot_items), reference, resolved
+        )
+        from ._plots import save_novelty_charts
+
+        save_novelty_charts(
+            result,
+            [float(entry.metrics["nearest_levenshtein_distance"]) for entry in result.entries],
+            batch_labels=_plot_batch_labels(plot_items),
+        )
+        return result
+    query_items = materialize_input(queries, limits=resolved.limits)
+    query_records = tuple(record_for(item) for item in query_items)
+    nearest_entries = _nearest_entries(query_records, reference, resolved)
+    reference_symbols = {record.sequence.symbols for record in reference.records}
     entries: list[EvaluationEntry] = []
     for entry in nearest_entries:
         raw_similarity = entry.metrics["nearest_similarity"]
@@ -378,24 +403,22 @@ def evaluate_novelty(
         metrics.update(
             {
                 "novelty": novelty,
-                "is_novel": similarity is None or similarity < resolved.copy_threshold,
-                "threshold": resolved.copy_threshold,
+                "exact_match": query_items[entry.input_index].sequence.symbols in reference_symbols,
             }
         )
         entries.append(EvaluationEntry(entry.subject_id, entry.input_index, FrozenDict(metrics)))
     materialized = tuple(entries)
-    novel_count = sum(entry.metrics["is_novel"] is True for entry in materialized)
+    exact_count = sum(entry.metrics["exact_match"] is True for entry in materialized)
     novelty_values = tuple(
         value for entry in materialized if isinstance((value := entry.metrics["novelty"]), float)
     )
-    return report(
+    result = report(
         name="novelty",
         method=f"one-minus-nearest-{resolved.method}-similarity",
-        version="eval-novelty-v1",
+        version="eval-novelty-v2",
         parameters={
             "novelty_calculation": resolved.novelty_calculation,
-            "copy_threshold": resolved.copy_threshold,
-            "threshold_rule": "novel iff no hit or nearest_similarity < copy_threshold",
+            "exact_match_rule": "literal full-sequence equality to any reference record",
             "k": resolved.k,
             "canonical": resolved.canonical,
             "min_similarity": resolved.min_similarity,
@@ -408,14 +431,33 @@ def evaluate_novelty(
         metrics={
             "score": mean(novelty_values),
             "query_count": len(materialized),
-            "novel_count": novel_count,
-            "novel_fraction": novel_count / len(materialized) if materialized else None,
+            "exact_match_count": exact_count,
+            "exact_match_rate": exact_count / len(materialized) if materialized else None,
             "mean_novelty": mean(novelty_values),
             "pairwise_comparison_count": len(materialized) * len(reference.records),
         },
         entries=materialized,
         reference=reference,
     )
+    if plot:
+        nearest_distances: list[float] = []
+        if reference.records:
+            distance_config = replace(resolved, novelty_calculation="levenshtein")
+            distance_report = _evaluate_levenshtein_novelty(
+                query_records, reference, distance_config
+            )
+            nearest_distances = [
+                float(entry.metrics["nearest_levenshtein_distance"])
+                for entry in distance_report.entries
+            ]
+        from ._plots import save_novelty_charts
+
+        save_novelty_charts(
+            result,
+            nearest_distances,
+            batch_labels=_plot_batch_labels(query_items),
+        )
+    return result
 
 
 def evaluate_memorization(
@@ -540,7 +582,7 @@ def evaluate_reference_similarity(
 def _validate_copy_search_thresholds(config: ReferenceSearchConfig) -> None:
     if config.min_similarity > config.copy_threshold:
         raise ConfigurationError(
-            "min_similarity cannot exceed copy_threshold for novelty or memorization.",
+            "min_similarity cannot exceed copy_threshold for memorization.",
             code="REFERENCE_COPY_THRESHOLD_CONFLICT",
             context={
                 "min_similarity": config.min_similarity,

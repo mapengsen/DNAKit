@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import csv
-import gc
 import json
+import math
 import os
 import random
 import shutil
@@ -17,6 +17,7 @@ from typing import Any, cast
 
 from dnakit._checkpoint_status import checkpoint_status
 from dnakit._dependency_hints import dependency_hint
+from dnakit._progress import track
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core import DNARecord, DNASequence
 from dnakit.core._json import FrozenDict
@@ -37,7 +38,8 @@ from dnakit.representations import (
 
 from ._loading import _PropertyBatchLoader
 from .data import DataReader, PropertyData, inspect_property_data, load_property_data
-from .encoder import TrainableSequenceEncoder, TransformersSequenceEncoder
+from .encoder import TrainableSequenceEncoder
+from .encoder_factory import create_trainable_encoder
 from .llm import SchemaLLMClient
 from .schema import (
     CustomPropertyPredictionResult,
@@ -336,12 +338,14 @@ def _evaluate(
     return weighted_loss / count, np.concatenate(truths), np.concatenate(logits)
 
 
-def _primary_metric(metrics: Mapping[str, object], schema: TargetSchema) -> float | None:
+def _metric_value(metrics: Mapping[str, object], name: str) -> float | None:
     section: Mapping[str, object] = metrics
     aggregate = metrics.get("aggregate")
     if isinstance(aggregate, Mapping):
         section = aggregate
-    key = "rmse" if schema.task_type == "regression" else "f1_macro"
+    key = "matthews_correlation_coefficient" if name == "mcc" else name
+    if key == "accuracy" and "subset_accuracy" in section:
+        key = "subset_accuracy"
     value = section.get(key)
     return float(value) if isinstance(value, (int, float)) else None
 
@@ -357,6 +361,12 @@ def _train_head_and_encoder(
     input_dimension: int,
 ) -> tuple[Any, TrainableSequenceEncoder | None, tuple[dict[str, object], ...]]:
     torch = _torch()
+    if config.monitor == "mcc" and schema.mode == "multilabel":
+        raise ConfigurationError(
+            "monitor='mcc' requires binary, multiclass, or multioutput classification.",
+            code="INVALID_CUSTOM_PROPERTY_CONFIG",
+            hint="Use monitor='f1_macro' or 'validation_loss' for multilabel targets.",
+        )
     device = encoder.device if encoder is not None else _resolve_device(torch, config.device)
     _seed_everything(torch, config.seed)
     head = torch.nn.Linear(input_dimension, schema.output_dimension).to(device)
@@ -365,18 +375,42 @@ def _train_head_and_encoder(
         parameters.extend(
             parameter for parameter in encoder.parameters() if parameter.requires_grad
         )
+        if any(parameter.dtype == torch.float16 for parameter in parameters):
+            raise ConfigurationError(
+                "Full fine-tuning requires float32 or bfloat16 optimizer parameters.",
+                code="INVALID_CUSTOM_PROPERTY_CONFIG",
+                hint=(
+                    "Set dtype='float32' or 'bfloat16'; "
+                    "float16 AdamW can produce non-finite weights."
+                ),
+            )
     optimizer = torch.optim.AdamW(
         parameters,
         lr=config.resolved_learning_rate,
         betas=(float(config.beta1), float(config.beta2)),
         weight_decay=float(config.weight_decay),
     )
+    monitor_mode = config.resolved_monitor_mode
+    scheduler = (
+        torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode=monitor_mode,
+            patience=config.scheduler_patience,
+            factor=float(config.scheduler_factor),
+            # An absolute threshold also handles zero and negative MCC correctly.
+            threshold=float(config.monitor_min_delta),
+            threshold_mode="abs",
+        )
+        if config.lr_scheduler == "reduce_on_plateau"
+        else None
+    )
     history: list[dict[str, object]] = []
-    best_loss = float("inf")
+    best_value = float("inf") if monitor_mode == "min" else -float("inf")
     stale_epochs = 0
     head_path = staging / "head.npz"
     backbone_dir = staging / "backbone"
     for epoch in range(1, config.epochs + 1):
+        learning_rate = float(optimizer.param_groups[0]["lr"])
         head.train()
         if encoder is not None:
             encoder.train()
@@ -389,7 +423,13 @@ def _train_head_and_encoder(
             seed=config.seed + epoch,
         )
         batch_count = (len(split.train) + config.batch_size - 1) // config.batch_size
-        for batch_index, batch in enumerate(epoch_batches, start=1):
+        progress_batches = track(
+            epoch_batches,
+            description=f"Training {config.model}: epoch {epoch}/{config.epochs}",
+            total=batch_count,
+            disable=not config.show_progress,
+        )
+        for batch_index, batch in enumerate(progress_batches, start=1):
             features = _loaded_features(
                 torch,
                 batch,
@@ -399,41 +439,122 @@ def _train_head_and_encoder(
             logits = head(features)
             targets = batch["targets"].to(device)
             loss = _head_loss(torch, logits, targets, schema)
-            (loss / config.gradient_accumulation_steps).backward()
+            if not bool(torch.isfinite(loss)):
+                raise BackendExecutionError(
+                    "Training produced a non-finite loss.",
+                    code="NONFINITE_CUSTOM_TRAINING_LOSS",
+                    context={"epoch": epoch, "batch": batch_index},
+                )
+            if encoder is not None and not features.requires_grad:
+                raise BackendExecutionError(
+                    "Full fine-tuning requires differentiable backbone representations.",
+                    code="CUSTOM_ENCODER_GRADIENT_MISSING",
+                )
+            accumulation_start = (
+                ((batch_index - 1) // config.gradient_accumulation_steps)
+                * config.gradient_accumulation_steps
+                * config.batch_size
+            )
+            accumulation_samples = min(
+                config.gradient_accumulation_steps * config.batch_size,
+                len(split.train) - accumulation_start,
+            )
+            (loss * (len(targets) / accumulation_samples)).backward()
             total_loss += float(loss.detach().cpu()) * len(targets)
             count += len(targets)
             should_step = (
                 batch_index % config.gradient_accumulation_steps == 0 or batch_index == batch_count
             )
             if should_step:
-                torch.nn.utils.clip_grad_norm_(parameters, float(config.max_grad_norm))
+                try:
+                    torch.nn.utils.clip_grad_norm_(
+                        parameters, float(config.max_grad_norm), error_if_nonfinite=True
+                    )
+                except RuntimeError as exc:
+                    raise BackendExecutionError(
+                        "Training produced non-finite gradients.",
+                        code="NONFINITE_CUSTOM_TRAINING_GRADIENT",
+                        context={"epoch": epoch, "batch": batch_index},
+                    ) from exc
                 optimizer.step()
                 optimizer.zero_grad(set_to_none=True)
-        validation_loss, validation_targets, validation_logits = _evaluate(
-            torch,
-            split.validation,
-            head=head,
-            schema=schema,
-            batch_loader=batch_loader,
-            encoder=encoder,
-            device=device,
+        train_metrics = {}
+        if config.log_train_metrics:
+            _, train_targets, train_logits = _evaluate(
+                torch,
+                split.train,
+                head=head,
+                schema=schema,
+                batch_loader=batch_loader,
+                encoder=encoder,
+                device=device,
+            )
+            train_metrics = compute_metrics(
+                train_targets,
+                train_logits,
+                schema=schema,
+                threshold=config.threshold,
+            )
+        validation_loss, validation_metrics = None, {}
+        if split.validation:
+            validation_loss, validation_targets, validation_logits = _evaluate(
+                torch,
+                split.validation,
+                head=head,
+                schema=schema,
+                batch_loader=batch_loader,
+                encoder=encoder,
+                device=device,
+            )
+            validation_metrics = compute_metrics(
+                validation_targets,
+                validation_logits,
+                schema=schema,
+                threshold=config.threshold,
+            )
+        monitor_value = (
+            validation_loss
+            if config.monitor == "validation_loss"
+            else _metric_value(validation_metrics, config.monitor)
         )
-        validation_metrics = compute_metrics(
-            validation_targets,
-            validation_logits,
-            schema=schema,
-            threshold=config.threshold,
+        if not split.validation:
+            monitor_value = total_loss / count
+        if monitor_value is None or not math.isfinite(monitor_value):
+            raise BackendExecutionError(
+                "The monitored validation metric is unavailable or non-finite.",
+                code="INVALID_CUSTOM_MONITOR_VALUE",
+                context={"epoch": epoch, "monitor": config.monitor, "value": monitor_value},
+            )
+        if scheduler is not None:
+            scheduler.step(monitor_value)
+        primary_metric_name = (
+            ("rmse" if schema.task_type == "regression" else "f1_macro")
+            if config.monitor == "validation_loss"
+            else config.monitor
         )
         history.append(
             {
                 "epoch": epoch,
                 "train_loss": total_loss / count,
                 "validation_loss": validation_loss,
-                "primary_metric": _primary_metric(validation_metrics, schema),
+                "primary_metric": _metric_value(validation_metrics, primary_metric_name),
+                "primary_metric_name": primary_metric_name,
+                "monitor": config.monitor if split.validation else "train_loss",
+                "train_mcc": _metric_value(train_metrics, "mcc"),
+                "validation_mcc": _metric_value(validation_metrics, "mcc"),
+                "monitor_value": monitor_value,
+                "monitor_mode": monitor_mode if split.validation else "min",
+                "learning_rate": learning_rate,
+                "next_learning_rate": float(optimizer.param_groups[0]["lr"]),
             }
         )
-        if validation_loss < best_loss - 1e-12:
-            best_loss = validation_loss
+        improved = (
+            monitor_value < best_value - config.monitor_min_delta
+            if monitor_mode == "min"
+            else monitor_value > best_value + config.monitor_min_delta
+        )
+        if improved or not split.validation:
+            best_value = monitor_value
             stale_epochs = 0
             _save_head(head_path, head)
             if encoder is not None:
@@ -454,20 +575,10 @@ def _train_head_and_encoder(
         output_dimension=schema.output_dimension,
         device=device,
     )
-    if encoder is not None and isinstance(encoder, TransformersSequenceEncoder):
-        del encoder
-        gc.collect()
-        if bool(torch.cuda.is_available()):
-            torch.cuda.empty_cache()
-        encoder = TransformersSequenceEncoder(
-            get_embedding_model(config.model),
-            backbone_dir,
-            device=config.device,
-            dtype=config.dtype,
-            pooling=config.pooling,
-            max_length=config.max_length,
-            allow_remote_code=config.allow_remote_code,
-        )
+    if encoder is not None:
+        restore = getattr(encoder, "load_pretrained", None)
+        if callable(restore):
+            restore(backbone_dir)
     return best_head, encoder, tuple(history)
 
 
@@ -560,9 +671,12 @@ def _manifest(
         "output_dimension": schema.output_dimension,
         "threshold": config.threshold,
         "pooling": config.pooling,
+        "dtype": config.dtype,
         "max_length": config.max_length,
         "checkpoint_path": checkpoint_path,
-        "model_source_path": config.model_source_path,
+        "model_source_path": (
+            os.fspath(config.model_source_path) if config.model_source_path is not None else None
+        ),
         "requires_remote_code": get_embedding_model(config.model).trust_remote_code,
         "data_mapping": data.inspection.mapping.to_dict(),
         "training": {
@@ -582,6 +696,15 @@ def _manifest(
             "beta2": config.beta2,
             "weight_decay": config.weight_decay,
             "gradient_accumulation_steps": config.gradient_accumulation_steps,
+            "early_stopping_patience": config.early_stopping_patience,
+            "monitor": config.monitor,
+            "monitor_mode": config.resolved_monitor_mode,
+            "monitor_min_delta": config.monitor_min_delta,
+            "lr_scheduler": config.lr_scheduler,
+            "scheduler_patience": config.scheduler_patience,
+            "scheduler_factor": config.scheduler_factor,
+            "scheduler_threshold_mode": "abs",
+            "log_train_metrics": config.log_train_metrics,
         },
     }
 
@@ -604,6 +727,12 @@ def train_custom_property_model(
     default to batch_size=32 on the selected device, workers=6, and AdamW with
     lr=1e-4, betas=(0.9, 0.95), weight_decay=0.1. Use a __main__ guard in scripts
     with workers > 0; notebooks may use workers=0. This trainer is single-device.
+
+    Set ``monitor='mcc', lr_scheduler='reduce_on_plateau'`` to drive scheduling,
+    early stopping, and best-checkpoint selection with validation MCC (maximized
+    in auto mode). ``history.json`` records the monitored value and each epoch's
+    learning rate before and after the scheduler step; ``model.json`` records
+    the configured optimizer, scheduler, and stopping settings.
 
     ``machine_learning`` selects a supervised estimator through ``config.model``
     and uses ``model_params`` instead of neural optimizer/epoch settings. Inputs
@@ -667,6 +796,14 @@ def train_custom_property_model(
         task_type=config.task_type,
         stratify=config.stratify,
     )
+    if not split.validation and (
+        config.early_stopping_patience > 0 or config.lr_scheduler != "none"
+    ):
+        raise ConfigurationError(
+            "Training without validation requires early_stopping_patience=0 "
+            "and lr_scheduler='none'.",
+            code="INVALID_CUSTOM_PROPERTY_CONFIG",
+        )
     schema = fit_target_schema(
         data.labels,
         data.label_names,
@@ -676,6 +813,7 @@ def train_custom_property_model(
     )
     encoded_targets = encode_targets(data.labels, schema=schema)
     representations = None
+    _seed_everything(_torch(), config.seed)
     encoder = training_encoder
     checkpoint_path: str | None = None
     input_dimension: int
@@ -686,7 +824,11 @@ def train_custom_property_model(
             backend=representation_backend,
         )
         representations = representation_result.representations
-        checkpoint_path = representation_result.checkpoint_path
+        checkpoint_path = representation_result.checkpoint_path or (
+            str(Path(config.checkpoint_path).expanduser().resolve())
+            if config.checkpoint_path is not None
+            else None
+        )
         input_dimension = representation_result.embedding_dimension
     else:
         checkpoint_path = (
@@ -695,7 +837,7 @@ def train_custom_property_model(
             else (os.fspath(config.checkpoint_path) if config.checkpoint_path is not None else None)
         )
         if encoder is None:
-            encoder = TransformersSequenceEncoder(
+            encoder = create_trainable_encoder(
                 get_embedding_model(config.model),
                 cast(str, checkpoint_path),
                 device=config.device,
@@ -703,6 +845,12 @@ def train_custom_property_model(
                 pooling=config.pooling,
                 max_length=config.max_length,
                 allow_remote_code=config.allow_remote_code,
+                model_source_path=(
+                    os.fspath(config.model_source_path)
+                    if config.model_source_path is not None
+                    else None
+                ),
+                seed=config.seed,
             )
         torch = _torch()
         encoder.eval()
@@ -724,12 +872,20 @@ def train_custom_property_model(
             f"Detected {sequence_duplicates} duplicate sequence rows; verify that random "
             "splitting does not create train/test leakage."
         )
-    if config.finetune_method == "full" and config.max_length is None:
-        default_limit = min(get_embedding_model(config.model).chunk_length, 4_096)
+    if config.finetune_method == "full" and get_embedding_model(config.model).loader in {
+        "transformers",
+        "janusdna",
+        "evo2",
+    }:
+        default_limit = getattr(
+            encoder,
+            "max_length",
+            config.max_length or min(get_embedding_model(config.model).chunk_length, 4_096),
+        )
         if any(len(sequence) > default_limit for sequence in data.sequences):
             warnings.append(
-                f"Sequences longer than the default fine-tuning limit ({default_limit}) may be "
-                "tokenizer-truncated; set max_length explicitly after checking model capacity."
+                f"Input exceeds the fine-tuning limit ({default_limit}); sequences may be "
+                "truncated by the encoder. Check max_length and the model's input units."
             )
 
     with (
@@ -757,39 +913,36 @@ def train_custom_property_model(
         )
         torch = _torch()
         device = best_encoder.device if best_encoder is not None else next(head.parameters()).device
-        validation_loss, validation_targets, validation_logits = _evaluate(
-            torch,
-            split.validation,
-            head=head,
-            schema=schema,
-            batch_loader=batch_loader,
-            encoder=best_encoder,
-            device=device,
-        )
-        test_loss, test_targets, test_logits = _evaluate(
-            torch,
-            split.test,
-            head=head,
-            schema=schema,
-            batch_loader=batch_loader,
-            encoder=best_encoder,
-            device=device,
-        )
-        validation_metrics = compute_metrics(
-            validation_targets,
-            validation_logits,
-            schema=schema,
-            threshold=config.threshold,
-        )
-        test_metrics = compute_metrics(
-            test_targets,
-            test_logits,
-            schema=schema,
-            threshold=config.threshold,
-        )
-        validation_metrics["loss"] = validation_loss
-        test_metrics["loss"] = test_loss
-        metrics = {"validation": validation_metrics, "test": test_metrics}
+        metrics = {}
+        evaluation_outputs = {}
+        for split_name, indices in (("validation", split.validation), ("test", split.test)):
+            if not indices:
+                continue
+            loss, targets, logits = _evaluate(
+                torch,
+                indices,
+                head=head,
+                schema=schema,
+                batch_loader=batch_loader,
+                encoder=best_encoder,
+                device=device,
+            )
+            metrics[split_name] = compute_metrics(
+                targets,
+                logits,
+                schema=schema,
+                threshold=config.threshold,
+            )
+            metrics[split_name]["loss"] = loss
+            filename = f"{split_name}_predictions.jsonl"
+            _write_predictions(
+                staging / filename,
+                tuple(data.record_ids[i] for i in indices),
+                logits,
+                schema=schema,
+                threshold=config.threshold,
+            )
+            evaluation_outputs[f"{split_name}_predictions"] = str(output_dir / filename)
         manifest = _manifest(
             config,
             data,
@@ -802,14 +955,6 @@ def train_custom_property_model(
         _write_json(staging / "history.json", list(history))
         _write_json(staging / "data_inspection.json", inspection.to_dict())
         _write_splits(staging / "splits.csv", data, split)
-        test_ids = tuple(data.record_ids[index] for index in split.test)
-        _write_predictions(
-            staging / "test_predictions.jsonl",
-            test_ids,
-            test_logits,
-            schema=schema,
-            threshold=config.threshold,
-        )
 
     artifact_names = {
         "manifest": str(output_dir / "model.json"),
@@ -818,7 +963,7 @@ def train_custom_property_model(
         "history": str(output_dir / "history.json"),
         "data_inspection": str(output_dir / "data_inspection.json"),
         "splits": str(output_dir / "splits.csv"),
-        "test_predictions": str(output_dir / "test_predictions.jsonl"),
+        **evaluation_outputs,
     }
     if config.finetune_method == "full":
         artifact_names["backbone"] = str(output_dir / "backbone")
@@ -930,6 +1075,7 @@ def predict_custom_properties(
     source: str | Path,
     *,
     model_dir: str | Path,
+    model_source_path: str | Path | None = None,
     mapping: DataMapping | None = None,
     llm: LLMSchemaConfig | None = None,
     llm_client: SchemaLLMClient | None = None,
@@ -976,6 +1122,8 @@ def predict_custom_properties(
         if destination.exists() and not overwrite:
             raise FileExistsError(f"Prediction output already exists: {destination}")
     manifest = _read_manifest(root)
+    if model_source_path is not None:
+        manifest["model_source_path"] = str(Path(model_source_path).expanduser().resolve())
     is_ml = manifest.get("finetune_method") == "machine_learning"
     if is_ml and trust_model is not True:
         raise ConfigurationError(
@@ -1072,6 +1220,7 @@ def predict_custom_properties(
                 else None
             ),
             pooling=str(manifest.get("pooling", "mean")),  # type: ignore[arg-type]
+            dtype=str(manifest.get("dtype", "auto")),  # type: ignore[arg-type]
             max_length=cast(int | None, manifest.get("max_length")),
             batch_size=batch_size,
             device=device,
@@ -1088,14 +1237,15 @@ def predict_custom_properties(
         runtime_device = _resolve_device(torch, device)
     elif method == "full":
         checkpoint_status("Using local checkpoint", root / "backbone")
-        encoder = TransformersSequenceEncoder(
+        encoder = create_trainable_encoder(
             get_embedding_model(model_name),
             root / "backbone",
             device=device,
-            dtype="auto",
+            dtype=str(manifest.get("dtype", "auto")),
             pooling=str(manifest.get("pooling", "mean")),
             max_length=cast(int | None, manifest.get("max_length")),
             allow_remote_code=allow_remote_code,
+            model_source_path=cast(str | None, manifest.get("model_source_path")),
         )
         runtime_device = encoder.device
     else:
@@ -1114,8 +1264,11 @@ def predict_custom_properties(
         encoder.eval()
     output_batches: list[Any] = []
     with torch.no_grad():
-        for batch in _batches(
-            tuple(range(data.record_count)), batch_size=batch_size, shuffle=False, seed=0
+        for batch in track(
+            _batches(tuple(range(data.record_count)), batch_size=batch_size, shuffle=False, seed=0),
+            description=f"Predicting {model_name} properties",
+            total=(data.record_count + batch_size - 1) // batch_size,
+            disable=not show_progress,
         ):
             features = _features(
                 torch,

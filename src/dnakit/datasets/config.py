@@ -435,6 +435,58 @@ class NeuralClusteringConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class DiversitySamplingConfig:
+    """Control representative or compact sampling from DNA model embeddings."""
+
+    n_samples: int = 400
+    label_key: str | None = "label"
+    representation: RepresentationConfig = field(
+        default_factory=lambda: RepresentationConfig(model="dnabert2")
+    )
+    normalize: bool = True
+    seed: int = 0
+    n_init: int = 10
+    max_iter: int = 300
+    tolerance: float = 1e-4
+    max_records: int = 10_000
+    diversity: Literal["high", "low"] = "high"
+    low_n_clusters: int = 5
+
+    def __post_init__(self) -> None:
+        _validate_bounded_positive_int(self.n_samples, "n_samples", 100_000)
+        if self.diversity not in ("high", "low"):
+            raise ConfigurationError(
+                "diversity must be 'high' or 'low'.",
+                code="INVALID_DIVERSITY_SAMPLING_CONFIG",
+            )
+        _validate_bounded_positive_int(self.low_n_clusters, "low_n_clusters", 100_000)
+        if self.label_key is not None and (
+            not isinstance(self.label_key, str) or not self.label_key.strip()
+        ):
+            raise ConfigurationError(
+                "label_key must be a non-empty metadata key or None.",
+                code="INVALID_DIVERSITY_SAMPLING_CONFIG",
+            )
+        # Use the same model and k-means validation as neural clustering.
+        NeuralClusteringConfig(
+            representation=self.representation,
+            n_clusters=self.n_samples,
+            normalize=self.normalize,
+            seed=self.seed,
+            n_init=self.n_init,
+            max_iter=self.max_iter,
+            tolerance=self.tolerance,
+            max_records=self.max_records,
+        )
+        if not 0 <= self.seed < 2**32:
+            raise ConfigurationError(
+                "seed must be in [0, 2**32).",
+                code="INVALID_DIVERSITY_SAMPLING_CONFIG",
+            )
+        object.__setattr__(self, "tolerance", float(self.tolerance))
+
+
+@dataclass(frozen=True, slots=True)
 class TemporalSplitConfig:
     """Chronological split configuration using ISO-8601 metadata strings."""
 
@@ -555,6 +607,7 @@ __all__ = [
     "ConflictPolicy",
     "DedupEquivalence",
     "DeduplicationConfig",
+    "DiversitySamplingConfig",
     "HierarchicalClusteringConfig",
     "IUPACDeduplicationConfig",
     "InfeasiblePolicy",

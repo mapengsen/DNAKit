@@ -33,11 +33,24 @@ from curation_rules import (
     QUERY_ALIASES,
     classify,
 )
+from sync_genomics_expansion import (
+    extend_metadata,
+    is_managed_source,
+    managed_ids,
+    merge_decisions,
+    merge_records,
+    preflight,
+)
+from sync_genomics_expansion import (
+    notices as write_expansion_notices,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY = ROOT / "registry"
 WORK = ROOT / "temp" / "dnakit-skills-work"
 DATE = "2026-09-12"
+PLAN_DATE = "2026-09-25"
+OWNED_SKILLS = {"dnakit", "dnakit-plan"}
 ENV = {**os.environ, "GIT_LFS_SKIP_SMUDGE": "1", "GIT_TERMINAL_PROMPT": "0"}
 EQUIVALENCE = {name: group for group, names in EQUIVALENT.items() for name in names}
 
@@ -700,14 +713,17 @@ def import_selected(sources, selected):
         records.append(record)
     old_catalog = REGISTRY / "catalog.json"
     if old_catalog.exists():
-        old_ids = {x["id"] for x in json.loads(old_catalog.read_text())["skills"]} - {"dnakit"}
+        old_ids = {x["id"] for x in json.loads(old_catalog.read_text())["skills"]} - OWNED_SKILLS
     else:
         baseline = WORK / "baseline-skills"
         old_ids = (
             {p.name for p in baseline.iterdir() if p.is_dir() and (p / "UPSTREAM.md").exists()}
             if baseline.exists()
             else set()
-        )
+        ) - OWNED_SKILLS
+    # Explicit extension manifests own these folders, including native workflows.
+    # Their checked resources are merged after baseline adaptations are replayed.
+    old_ids -= managed_ids()
     for item in selected:
         target = ROOT / "skills" / item["name"]
         if target.exists() and item["name"] not in old_ids:
@@ -753,6 +769,41 @@ def entry_record():
             "commands": [],
             "environment": [],
             "manual_checks": ["Selected workflows have additional dependencies."],
+        },
+        "required_skills": [],
+        "validation": {"metadata": "passed", "resources": "checksummed", "execution": "not_run"},
+        "files": file_manifest(directory),
+    }
+
+
+def plan_entry_record():
+    """Record DNAKit's Codex planning skill alongside its workflow catalog."""
+    directory = ROOT / "skills" / "dnakit-plan"
+    (directory / "LICENSE").write_bytes((ROOT / "LICENSE").read_bytes())
+    metadata, _, _ = parse_skill((directory / "SKILL.md").read_bytes())
+    return {
+        "id": "dnakit-plan",
+        "description": metadata["description"],
+        "summary_zh": "DNAKit MCP 任务规划与确认后保存计划",
+        "category": "workflows",
+        "capability": "dnakit-planning",
+        "source_id": "dnakit",
+        "license": "MIT",
+        "upstream_name": "DNAKit planning skill",
+        "upstream_url": "https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-plan",
+        "upstream_revision": "dnakit-plan-" + PLAN_DATE,
+        "attribution": "DNAKit contributors",
+        "citation_guidance": (
+            "Cite the DNAKit software version and the data, tools, and papers used "
+            "when the approved plan is executed. No paper DOI has been assigned to this skill."
+        ),
+        "aliases": [],
+        "keywords": ["DNAKit", "MCP", "Codex", "plan", "planning", "规划", "计划"],
+        "runtime": {
+            "python_modules": ["dnakit"],
+            "commands": ["codex"],
+            "environment": [],
+            "manual_checks": ["Connect DNAKit MCP for tool discovery when available."],
         },
         "required_skills": [],
         "validation": {"metadata": "passed", "resources": "checksummed", "execution": "not_run"},
@@ -830,7 +881,8 @@ def main():
         check()
         return
     sources = json.loads((REGISTRY / "sources.json").read_text())["sources"]
-    selected, decisions = scan(sources, args.fetch)
+    baseline_sources = [source for source in sources if not is_managed_source(source)]
+    selected, decisions = scan(baseline_sources, args.fetch)
     dump(
         WORK / "selection-plan.json",
         [{k: v for k, v in x.items() if k not in {"normalized", "metadata"}} for x in selected],
@@ -849,8 +901,12 @@ def main():
     )
     if args.plan:
         return
-    records = [*import_selected(sources, selected), entry_record()]
+    old_catalog = REGISTRY / "catalog.json"
+    preflight(json.loads(old_catalog.read_text())["skills"] if old_catalog.exists() else [])
+    records = [*import_selected(baseline_sources, selected), entry_record(), plan_entry_record()]
     apply_adaptations(records, decisions)
+    records = merge_records(records)
+    decisions = merge_decisions(decisions)
     ambiguous_names = disambiguate_aliases(records)
     evidence_path = REGISTRY / "validation.json"
     if evidence_path.exists():
@@ -874,10 +930,12 @@ def main():
         "selection": dict(Counter(x["status"] for x in decisions)),
         "skills": sorted(records, key=lambda x: x["id"]),
     }
+    extend_metadata(catalog)
+    catalog["snapshot_date"] = max(catalog["snapshot_date"], PLAN_DATE)
     dump(REGISTRY / "catalog.json", catalog)
     dump(
         REGISTRY / "decisions.json",
-        {"schema_version": 1, "snapshot_date": DATE, "decisions": decisions},
+        {"schema_version": 1, "snapshot_date": catalog["snapshot_date"], "decisions": decisions},
     )
     with (REGISTRY / "skills.csv").open("w", encoding="utf-8", newline="") as handle:
         fields = [
@@ -896,7 +954,7 @@ def main():
         ROOT / "skills" / "upstream-manifest.json",
         {
             "schema_version": 2,
-            "snapshot_date": DATE,
+            "snapshot_date": catalog["snapshot_date"],
             "catalog": "../registry/catalog.json",
             "decisions": "../registry/decisions.json",
             "skills": [
@@ -908,6 +966,7 @@ def main():
     from write_migration import main as write_migration
 
     write_migration()
+    write_expansion_notices()
     check()
 
 

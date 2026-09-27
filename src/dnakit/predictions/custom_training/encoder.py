@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import shutil
 from contextlib import suppress
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -83,16 +84,16 @@ class TransformersSequenceEncoder:
         transformers = _require("transformers")
         from dnakit.representations.backends import (
             _disable_fast_paths,
+            _forward_transformers_batch,
             _module_from_file,
-            _pool_hidden_states,
-            _resolve_hidden_states,
             _resolve_torch_device,
             _torch_dtype,
+            _transformer_special_tokens_mask,
             _unwrap_base_model,
         )
 
-        self._pool_hidden_states = _pool_hidden_states
-        self._resolve_hidden_states = _resolve_hidden_states
+        self._forward_transformers_batch = _forward_transformers_batch
+        self._special_tokens_mask = _transformer_special_tokens_mask
         self.device = _resolve_torch_device(self.torch, device)
         if self.device.type == "cpu" and dtype in {"float16", "bfloat16"}:
             raise ConfigurationError(
@@ -177,6 +178,12 @@ class TransformersSequenceEncoder:
         if requested_dtype is not None:
             model = model.to(dtype=requested_dtype)
         self.model = model.to(self.device)
+        if hasattr(self.model.config, "use_cache"):
+            self.model.config.use_cache = False
+        for field in ("max_position_embeddings", "max_seq_len"):
+            limit = getattr(self.model.config, field, None)
+            if isinstance(limit, int) and limit > 0:
+                self.max_length = min(self.max_length, limit)
         for parameter in self.model.parameters():
             parameter.requires_grad_(True)
 
@@ -190,8 +197,49 @@ class TransformersSequenceEncoder:
         self.model.eval()
 
     def encode(self, sequences: list[str]) -> Any:
+        if self.spec.name == "lucaone":
+            # Its checkpoint tokenizer overrides batching incompatibly with
+            # Transformers. Single-sequence encoding also selects DNA (gene)
+            # token IDs instead of the shared vocabulary's protein alphabet.
+            prepared = []
+            for sequence in sequences:
+                token_ids = self.tokenizer.encode(
+                    sequence,
+                    seq_type="gene",
+                    add_special_tokens=False,
+                )
+                prepared.append(
+                    self.tokenizer.prepare_for_model(
+                        token_ids,
+                        add_special_tokens=True,
+                        truncation=True,
+                        max_length=self.max_length,
+                        return_attention_mask=True,
+                        return_token_type_ids=False,
+                        return_special_tokens_mask=True,
+                    )
+                )
+            tokens = self.tokenizer.pad(prepared, padding=True, return_tensors="pt")
+        else:
+            tokens = self._tokenize(sequences)
+        special_tokens_mask = self._special_tokens_mask(self.tokenizer, tokens, self.torch)
+        tokens.pop("special_tokens_mask", None)
+        tokens = {key: value.to(self.device) for key, value in tokens.items()}
+        if "attention_mask" not in tokens:
+            tokens["attention_mask"] = tokens["input_ids"].ne(self.tokenizer.pad_token_id).long()
+        return self._forward_transformers_batch(
+            self.model,
+            tokens,
+            torch=self.torch,
+            pooling=self.pooling,
+            special_tokens_mask=(
+                None if special_tokens_mask is None else special_tokens_mask.to(self.device)
+            ),
+        )
+
+    def _tokenize(self, sequences: list[str]) -> Any:
         try:
-            tokens = self.tokenizer(
+            return self.tokenizer(
                 sequences,
                 add_special_tokens=True,
                 padding=True,
@@ -202,7 +250,7 @@ class TransformersSequenceEncoder:
                 return_tensors="pt",
             )
         except (TypeError, NotImplementedError):
-            tokens = self.tokenizer(
+            return self.tokenizer(
                 sequences,
                 add_special_tokens=True,
                 padding=True,
@@ -211,30 +259,56 @@ class TransformersSequenceEncoder:
                 return_attention_mask=True,
                 return_tensors="pt",
             )
-        special_tokens_mask = tokens.pop("special_tokens_mask", None)
-        tokens = {key: value.to(self.device) for key, value in tokens.items()}
-        try:
-            outputs = self.model(**tokens, output_hidden_states=True, return_dict=True)
-        except TypeError:
-            outputs = self.model(**tokens)
-        hidden = self._resolve_hidden_states(outputs, self.torch)
-        return self._pool_hidden_states(
-            hidden,
-            torch=self.torch,
-            pooling=self.pooling,
-            attention_mask=tokens.get("attention_mask"),
-            special_tokens_mask=(
-                None if special_tokens_mask is None else special_tokens_mask.to(self.device)
-            ),
-        )
 
     def save_pretrained(self, directory: Path) -> None:
         directory.mkdir(parents=True, exist_ok=True)
+        # Caduceus ties forward/reverse projection weights without declaring
+        # them to Transformers' safetensors serializer. Clone only the aliases
+        # in the export dictionary; the live model keeps its weight sharing.
+        state_dict = self.model.state_dict()
+        seen: set[tuple[object, ...]] = set()
+        for name, tensor in state_dict.items():
+            if not isinstance(tensor, self.torch.Tensor):
+                continue
+            storage_key = (tensor.device, tensor.untyped_storage().data_ptr())
+            if storage_key in seen:
+                state_dict[name] = tensor.clone()
+            else:
+                seen.add(storage_key)
         try:
-            self.model.save_pretrained(directory, safe_serialization=True)
+            self.model.save_pretrained(directory, safe_serialization=True, state_dict=state_dict)
         except TypeError:
             self.model.save_pretrained(directory)
         self.tokenizer.save_pretrained(directory)
+        # Some tokenizers are loaded directly from a source file and are not
+        # registered with AutoTokenizer, so save_pretrained omits that file.
+        for source in self.checkpoint.glob("*.py"):
+            destination = directory / source.name
+            if source.resolve() != destination.resolve():
+                shutil.copy2(source, destination)
+
+    def load_pretrained(self, directory: Path) -> None:
+        """Restore trained weights in place without allocating another GPU model."""
+
+        if (directory / "model.safetensors.index.json").is_file():
+            modeling_utils = _require("transformers.modeling_utils")
+            modeling_utils.load_sharded_checkpoint(
+                self.model, directory, strict=True, prefer_safe=True
+            )
+        elif (directory / "model.safetensors").is_file():
+            safetensors = _require("safetensors.torch")
+            state = safetensors.load_file(str(directory / "model.safetensors"), device="cpu")
+            self.model.load_state_dict(state)
+        elif (directory / "pytorch_model.bin.index.json").is_file():
+            modeling_utils = _require("transformers.modeling_utils")
+            modeling_utils.load_sharded_checkpoint(
+                self.model, directory, strict=True, prefer_safe=False
+            )
+        else:
+            state = self.torch.load(
+                directory / "pytorch_model.bin", map_location="cpu", weights_only=True
+            )
+            self.model.load_state_dict(state)
 
 
 __all__ = ["TrainableSequenceEncoder", "TransformersSequenceEncoder"]

@@ -1,5 +1,13 @@
 # FAQ
 
+教程补充：[基础用法](faq/tutorial_basics.md) · [模型、下载与扩展](faq/tutorial_integrations.md) · [生物信息学](faq/bioinformatics.md) · [接口参数](faq/api/index.md) · [功能目录说明](faq/tutorial_overview.md)。
+
+## 如何通过 pip 一并安装基因组计算能力？ {#pip-genomics}
+
+在当前源码根目录执行 `python -m pip install -e ".[genomics]"`，安装基因型 PCA、ANI、原核 CDS 预测、BAM 统计等接口所需的 Python 计算库；发布后可使用 `python -m pip install "dnakit[genomics]"`。这些接口无需另装 PLINK、FastANI 等对应的命令行程序。
+
+具体用法见[基因组教程](api/features/38_genomics_extensions.md#pip-genomics)，43 项外部分析的逐项范围和迁移策略见[外部分析迁移说明](faq/external_analysis_migration.md)。大型数据库、模型权重和本次未迁移的专业后端仍按任务配置。
+
 ## Skills 来自哪里，如何引用与安装？ {#agent-skills-references}
 
 DNAKit 汇总 bioSkills、ToolUniverse、ClawBio、SciAgent、K-Dense、NVIDIA BioNeMo、DeepMind、PKU-EMBL、omics-skills、ENCODE Toolkit 等来源的 DNA／基因组学工作流，按任务阶段与输入条件去重，提供一个统一的 `dnakit` 入口。每个 Skill 使用独立子目录，附带辅助文件、许可证和 `UPSTREAM.md`；兼容性修改会明确记录。
@@ -23,7 +31,7 @@ dnakit skills cite variant-annotation
 
 整个技能目录都已加入 DNAKit 适配：`tooluniverse-*`、`bio-*` 等集合前缀已按命名规则去掉，原名称保留为别名。`virulencefinder`、`alphagenome-atlas-website-links` 等真实软件或模型名称继续保留。
 
-数据库封装使用 `dnakit.databases`，ENCODE 使用 `dnakit.encode`，随技能分发的脚本通过 `dnakit skills run` 或 `dnakit.workflows.run()` 执行。已迁入的封装不需要另外安装 ToolUniverse、ClawBio 或 ENCODE Toolkit。Biopython、samtools、AlphaGenome 等实际科学后端及所需模型权重、数据库和凭据仍按任务准备。每个 Skill 的 `DNAKIT.md` 说明其具体入口和边界；[统一接口教程](llm_tools/native_skills.md)介绍命令和函数。
+数据库封装使用 `dnakit.databases`，ENCODE 使用 `dnakit.encode`，随技能分发的脚本通过 `dnakit skills run` 或 `dnakit.workflows.run()` 执行。已迁入的封装不需要另外安装 ToolUniverse、ClawBio 或 ENCODE Toolkit。Biopython、samtools、AlphaGenome 等实际科学后端及所需模型权重、数据库和凭据仍按任务准备。每个 Skill 的 `DNAKIT.md` 说明其具体入口和边界；[统一接口教程](llm_tools/skills.md#unified-skill-api)介绍命令和函数。
 
 ## 序列功能搜索采用什么匹配策略？ {#pattern-matching-strategy}
 
@@ -113,14 +121,14 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 ## Diversity 和 Novelty 有哪些计算方法与参考文献？ {#diversity-novelty-references}
 
-DNAKit 保留原有归一化相似度方法，并新增论文中的原始 Levenshtein 距离方法：
+DNAKit 的 Diversity 使用论文中的原始 Levenshtein 距离公式；Novelty 提供两种计算方法：
 
-| 指标 | 默认方法 | 第二种方法 |
+| 指标 | 计算方法 | 可选方法 |
 | --- | --- | --- |
-| Diversity | `calculation="similarity"`：距离定义为 `1 - pair_similarity`，`score` 为平均最近邻距离，并同时返回平均两两距离和阈值 cluster 摘要。 | `calculation="levenshtein"`：`Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对原始编辑距离的平均值。 |
+| Diversity | `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对原始编辑距离的平均值。 | 无 |
 | Novelty | `novelty_calculation="similarity"`：每条查询为 `1 - nearest_reference_similarity`。 | `novelty_calculation="levenshtein"`：`meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`。 |
 
-第二种方法依据 Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440，[DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440)，其中第 2.8 节公式 (20) 和 (21) 将距离说明为 Levenshtein 距离。该文沿用了 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022，[PMLR 论文页](https://proceedings.mlr.press/v162/jain22a.html)中的术语。
+Levenshtein 公式依据 Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440，[DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440)，其中第 2.8 节公式 (20) 和 (21) 将距离说明为 Levenshtein 距离。该文沿用了 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022，[PMLR 论文页](https://proceedings.mlr.press/v162/jain22a.html)中的术语。
 
 文章有[官方 GitHub 仓库](https://github.com/powidla/nonB-DNA-structures-generation)，相关代码位于 [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb)。截至 2026-09-02，该仓库没有声明开源许可证，并且 notebook 使用固定 100 bp、展平 one-hot/KDTree 及分块计算，与正文公式并不完全一致。因此 DNAKit 没有复制该代码，而是用自身有界 Levenshtein 实现正文公式；不会隐式填充或截断序列，结果也不保证复现论文 Table 2 的 notebook 数值。
 
@@ -132,20 +140,20 @@ Levenshtein 结果单位为“编辑操作数”，没有归一化；数值越�
 
 | 功能 | 计算依据 | 参考文献或来源 |
 | --- | --- | --- |
-| THERMO-001 分子量 | 无水 DNA 残基质量求和、末端及 5′ 磷酸修正 | 当前实现记录的是标准寡核苷酸质量公式，尚未绑定原始论文；本地验证包含 Biopython 数值对照，但该对照不能替代科学来源引用。 |
-| THERMO-014 260 nm 消光系数 | 相邻二核苷酸 hypochromicity 参数之和减内部单碱基参数 | Warshaw & Tinoco, 1966，[DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X)；Cantor, Warshaw & Shapiro, 1970，[DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909)。 |
-| THERMO-002 Tm（Wallace） | `2 × (A+T) + 4 × (G+C)` 短寡核苷酸经验规则 | Wallace et al., 1979，[DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543)。当前实现尚未把该 DOI 写入结果 provenance，FAQ 在此补充文献关系。 |
-| THERMO-002 Tm（nearest-neighbor） | 相邻堆积、末端、对称性、盐浓度和链浓度模型 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
-| THERMO-003 盐浓度修正 | SantaLucia 单价盐熵修正式 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
-| THERMO-012 局部 Tm | 滑动窗口重复调用 Wallace 或 nearest-neighbor Tm | 不引入新的科学模型；引用继承所选择的 Wallace 1979 或 SantaLucia 1998 方法。 |
-| EVAL-013 合成风险 | GC、同碱基连续、串联重复和倒置重复五项分量等权平均 | DNAKit 内部透明启发式规则；没有外部论文或供应商规则集，分数不是实验合成成功概率。 |
-| THERMO-004 热力学参数 | 完全互补双链的 ΔH、ΔS、ΔG 和 Tm | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
-| THERMO-005 Nearest-neighbor | 与 THERMO-004 相同，同时返回逐堆积步骤明细 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
-| THERMO-006 Duplex stability | 原生完整互补路径使用 SantaLucia；可选 mismatch/dangling 路径调用 Primer3 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)；Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)。其中 `Tm > 设置温度` 的稳定布尔判据是 DNAKit 的结果解释规则。 |
-| THERMO-007 碱基堆积 | 逐相邻二核苷酸查询 ΔH/ΔS 参数并计算 ΔG | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
-| THERMO-008 Hairpin | 用户安装的 Primer3 `ntthal` 热力学发卡结构预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
-| THERMO-009 Self-dimer | 用户安装的 Primer3 `ntthal` 热力学自二聚体预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
-| THERMO-010 Heterodimer | 用户安装的 Primer3 `ntthal` 热力学异二聚体预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
+| 分子量 | 无水 DNA 残基质量求和、末端及 5′ 磷酸修正 | 当前实现记录的是标准寡核苷酸质量公式，尚未绑定原始论文；本地验证包含 Biopython 数值对照，但该对照不能替代科学来源引用。 |
+| 260 nm 消光系数 | 相邻二核苷酸 hypochromicity 参数之和减内部单碱基参数 | Warshaw & Tinoco, 1966，[DOI 10.1016/0022-2836(66)90115-X](https://doi.org/10.1016/0022-2836(66)90115-X)；Cantor, Warshaw & Shapiro, 1970，[DOI 10.1002/bip.1970.360090909](https://doi.org/10.1002/bip.1970.360090909)。 |
+| Tm（Wallace） | `2 × (A+T) + 4 × (G+C)` 短寡核苷酸经验规则 | Wallace et al., 1979，[DOI 10.1093/nar/6.11.3543](https://doi.org/10.1093/nar/6.11.3543)。当前实现尚未把该 DOI 写入结果 provenance，FAQ 在此补充文献关系。 |
+| Tm（nearest-neighbor） | 相邻堆积、末端、对称性、盐浓度和链浓度模型 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
+| 盐浓度修正 | SantaLucia 单价盐熵修正式 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
+| 局部 Tm | 滑动窗口重复调用 Wallace 或 nearest-neighbor Tm | 不引入新的科学模型；引用继承所选择的 Wallace 1979 或 SantaLucia 1998 方法。 |
+| 合成风险 | GC、同碱基连续、串联重复和倒置重复五项分量等权平均 | DNAKit 内部透明启发式规则；没有外部论文或供应商规则集，分数不是实验合成成功概率。 |
+| 热力学参数 | 完全互补双链的 ΔH、ΔS、ΔG 和 Tm | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
+| Nearest-neighbor | 与热力学参数相同，同时返回逐堆积步骤明细 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
+| Duplex stability | 原生完整互补路径使用 SantaLucia；可选 mismatch/dangling 路径调用 Primer3 | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)；Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)。其中 `Tm > 设置温度` 的稳定布尔判据是 DNAKit 的结果解释规则。 |
+| 碱基堆积 | 逐相邻二核苷酸查询 ΔH/ΔS 参数并计算 ΔG | SantaLucia, 1998，[DOI 10.1073/pnas.95.4.1460](https://doi.org/10.1073/pnas.95.4.1460)。 |
+| Hairpin | 用户安装的 Primer3 `ntthal` 热力学发卡结构预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
+| Self-dimer | 用户安装的 Primer3 `ntthal` 热力学自二聚体预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
+| Heterodimer | 用户安装的 Primer3 `ntthal` 热力学异二聚体预测 | Untergasser et al., 2012，[DOI 10.1093/nar/gks596](https://doi.org/10.1093/nar/gks596)及 [Primer3 官方手册](https://primer3.org/manual.html)；具体数值还取决于实际 Primer3 版本和参数目录。 |
 
 这些引用说明算法和参数的来源，不表示任何计算结果等同于实验测量。Tm、ΔG 和结构结果仍受盐浓度、链浓度、温度、序列长度、化学修饰以及实际后端版本影响。
 
@@ -209,7 +217,7 @@ Levenshtein 结果单位为“编辑操作数”，没有归一化；数值越�
 
 ## 深度学习性质预测有哪些参考文献？ {#deep-learning-property-prediction-references}
 
-下表覆盖[深度学习性质预测](api/features/23_deep_learning_property_prediction.md)实际集成的 54 个功能所使用的主要模型论文、任务数据集和训练协议。多个输出头共用同一篇论文，因此不按功能重复列出。
+下表覆盖深度学习性质预测实际集成的 54 个功能所使用的主要模型论文、任务数据集和训练协议。调用示例按任务放在[调控轨道](api/features/23_prediction_regulatory_tracks.md)、[剪接与基因组区域](api/features/23_prediction_splicing_regions.md)、[表观遗传与开放染色质](api/features/23_prediction_chromatin_classification.md)、[启动子与增强子](api/features/23_prediction_promoter_enhancer.md)、[变异效应](api/features/23_prediction_variant_effects.md)、[物种与分子功能分类](api/features/23_prediction_sequence_classification.md)和[分子关系与互作](api/features/23_prediction_molecular_interactions.md)。多个输出头共用同一篇论文，因此不按功能重复列出。
 
 | 对应功能 | 参考文献 |
 | --- | --- |

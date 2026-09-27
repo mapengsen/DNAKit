@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
+import importlib
+import inspect
 import json
 import re
 from collections import Counter, defaultdict
 from collections.abc import Mapping
+from dataclasses import replace
 from functools import lru_cache
+from pathlib import Path
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError
 
 from .adapters import coerce_arguments
-from .catalog import CATEGORY_LABELS, AgentToolSpec, build_tool_catalog
+from .catalog import CATEGORY_LABELS, AgentToolSpec, _build_spec, build_tool_catalog
 from .embeddings import EmbeddingConfig, ToolSearchMode, _ToolEmbeddingIndex
 from .serialization import AgentSerializationLimits, serialize_for_agent
 
@@ -73,6 +77,82 @@ class AgentToolRegistry:
     @property
     def embedding_config(self) -> EmbeddingConfig | None:
         return self._embedding_config
+
+    def _refreshed(
+        self, additions: tuple[str, ...] = (), *, replacements: tuple[str, ...] = ()
+    ) -> AgentToolRegistry:
+        """Refresh descriptions and generated exports without broadening a caller's filter."""
+        from .descriptions import apply_native_description
+
+        current = {tool.name: tool for tool in build_tool_catalog(verbose=False)}
+        if any(name not in self._by_name for name in replacements):
+            raise ConfigurationError(
+                "Only a selected registered tool may be explicitly replaced after repair.",
+                code="AGENT_DEVELOPMENT_INVALID",
+            )
+        for name in replacements:
+            if name in current:
+                continue
+            old_tool = self._by_name[name]
+            try:
+                module_name, export_name = name.rsplit(".", 1)
+                if not module_name.startswith("dnakit."):
+                    raise ValueError("The custom repair target is not a DNAKit module.")
+                module = importlib.import_module(module_name)
+                exported = getattr(module, export_name)
+                old = inspect.unwrap(old_tool.function)
+                updated = inspect.unwrap(exported)
+                if not inspect.isfunction(old) or not inspect.isfunction(updated):
+                    raise ValueError("Both old and repaired exports must be Python functions.")
+                old_source, new_source = inspect.getsourcefile(old), inspect.getsourcefile(updated)
+                if (
+                    exported is old_tool.function
+                    or not old_source
+                    or not new_source
+                    or Path(old_source).resolve() != Path(new_source).resolve()
+                    or old.__module__ != updated.__module__
+                    or old.__qualname__ != updated.__qualname__
+                    or old.__globals__ is not updated.__globals__
+                ):
+                    raise ValueError("The custom export does not match the repaired definition.")
+                current[name] = _build_spec(module_name, export_name, exported)
+            except (AttributeError, ImportError, OSError, TypeError, ValueError) as exc:
+                raise ConfigurationError(
+                    "The selected custom tool was not replaced by a matching repaired export.",
+                    code="AGENT_DEVELOPMENT_INVALID",
+                    context={"tool_name": name},
+                ) from exc
+        selected: dict[str, AgentToolSpec] = {}
+        for tool in self.tools:
+            fresh = current.get(tool.name)
+            if fresh is not None and (tool.name in replacements or fresh.function is tool.function):
+                selected[tool.name] = replace(
+                    fresh,
+                    effect=tool.effect,
+                    open_world=tool.open_world,
+                    requires_confirmation=tool.requires_confirmation,
+                    agent_compatible=tool.agent_compatible and fresh.agent_compatible,
+                    incompatibilities=tuple(
+                        dict.fromkeys((*tool.incompatibilities, *fresh.incompatibilities))
+                    ),
+                )
+            elif tool.category == "generated":
+                if fresh is not None:
+                    selected[tool.name] = fresh
+            else:
+                selected[tool.name] = apply_native_description(tool)
+        for name in additions:
+            if name not in current or current[name].category != "generated":
+                raise ConfigurationError(
+                    "Only a validated generated tool may be added at runtime.",
+                    code="AGENT_DEVELOPMENT_INVALID",
+                )
+            selected[name] = current[name]
+        return AgentToolRegistry(
+            tuple(selected.values()),
+            serialization_limits=self._serialization_limits,
+            embedding_config=self._embedding_config,
+        )
 
     def _validate_search_mode(self, mode: ToolSearchMode) -> None:
         if mode not in ("keyword", "semantic", "hybrid"):
@@ -199,13 +279,14 @@ class AgentToolRegistry:
             if not include_python_only and not tool.agent_compatible:
                 continue
             labels = CATEGORY_LABELS.get(tool.category, (tool.category, tool.category))
-            documents.append((tool.name, "\n".join((tool.name, tool.description, *labels))))
+            retrieval_text = tool.search_text if tool.search_text is not None else tool.description
+            documents.append((tool.name, "\n".join((tool.name, retrieval_text, *labels))))
             short_name = tool.name.rsplit(".", 1)[-1]
             haystack = " ".join(
                 (
                     tool.name,
                     short_name.replace("_", " "),
-                    tool.description,
+                    retrieval_text,
                     labels[0],
                     labels[1],
                 )

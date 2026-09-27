@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-20",
+  "task": "Review and integrate the 335 project/interface rows supplied in temp",
+  "input_files_unchanged": true,
+  "input_rows": 335,
+  "deduplication": {
+    "existing_project_records": 82,
+    "added_project_records": 253,
+    "total_project_records": 419
+  },
+  "skills": {
+    "baseline": 560,
+    "added": 13,
+    "total": 573,
+    "resource_files": 4992,
+    "baseline_records_unchanged": true,
+    "source_snapshots_added": 7,
+    "leaf_paths_screened": 2162
+  },
+  "analyses": {
+    "baseline": 19,
+    "added": 24,
+    "total": 43,
+    "new_projects_with_recipes": 19,
+    "new_recipes_real_backend_tested": 8,
+    "new_recipes_not_backend_tested": 16
+  },
+  "mcp": {
+    "baseline": 7,
+    "added": 25,
+    "total": 32,
+    "new_public_http_tool_discovery_passed": 8,
+    "new_upstream_stdio_tool_discovery_passed": 1
+  },
+  "sources": {
+    "documentation_responses_retrieved": 340,
+    "citation_relationships_reviewed": 86,
+    "relationships_context_confirmed": 85,
+    "planned_relationship_not_accepted_as_implemented": 1
+  },
+  "validation": [
+    {
+      "suite": "Existing external execution + new recipes + genuine synthetic backends",
+      "passed": 120,
+      "evidence": "registry/user-catalog-analysis-review.json"
+    },
+    {
+      "suite": "MCP protocol, state, errors and proxy configuration",
+      "passed": 29,
+      "evidence": "registry/user-catalog-mcp-review.json"
+    },
+    {
+      "suite": "Legacy Skills, extension replay and new skill import/standalone resources",
+      "passed": 46,
+      "log": "/tmp/dnakit-335-skills-final-tests.log"
+    },
+    {
+      "suite": "User-catalog identity, input evidence freshness, citation identity and source merging",
+      "passed": 8,
+      "file": "others/tests/unit/test_user_catalog_import.py"
+    },
+    {
+      "suite": "Agent tool exposure, execution and runner",
+      "passed": 63,
+      "log": "/tmp/dnakit-335-agent-tests.log"
+    },
+    {
+      "suite": "Ruff on changed Python modules and tests",
+      "status": "passed"
+    },
+    {
+      "suite": "Mypy integration modules and final MCP runtime",
+      "status": "passed"
+    },
+    {
+      "suite": "MkDocs strict Chinese and English build",
+      "status": "passed",
+      "seconds": 42.07
+    },
+    {
+      "suite": "Offline source/import/generator checks",
+      "status": "passed"
+    }
+  ],
+  "code_review": {
+    "independent_review": "passed",
+    "resolved": [
+      "Stale source evidence rejected by input hash and relation identity checks",
+      "Multiple snapshots of one repository retain the union of bundled skills",
+      "Existing OneKGPd alias preserved by choosing a distinct new skill ID",
+      "Upstream queued/mock/incorrect-result components excluded",
+      "Synapse OAuth connector deferred until authentication is supported",
+      "Ordinary-text/JSON upstream errors recognized while retaining the original protocol flag",
+      "MMseqs input-copy/memory and RepeatMasker parallel-batch semantics checked"
+    ]
+  },
+  "wheel": {
+    "wheel": "dist/user-catalog-335/dnakit-0.1.4-py3-none-any.whl",
+    "sha256": "3e5063f1639249af48d0b54b1df1e40f2fe2d3c329b50f897979c449dc2ac801",
+    "bytes": 22378294,
+    "skills": 573,
+    "resources_verified": 4992,
+    "runtime_and_json_match": true,
+    "catalog_matches": true,
+    "metadata_MIT_0_and_socks": true
+  },
+  "isolated_install": {
+    "installed_module": "/tmp/dnakit-335-installed/dnakit/__init__.py",
+    "skills": 573,
+    "analyses": 43,
+    "mcp_servers": 32,
+    "projects": 419,
+    "new_skill_search": "passed",
+    "known_mock_components_excluded": true
+  },
+  "limitations": [
+    "Source discovery, workflow guidance, interface tests and scientific validation are distinct.",
+    "No model weights or large reference databases are bundled; backends remain opt-in.",
+    "BOLE benchmark evidence is public; complete executable framework/API not verified.",
+    "Not every software/model project in the 335 rows has a dedicated executor.",
+    "The local wheel uses repository version 0.1.4; no PyPI publication was performed."
+  ],
+  "changes_manifest": "others/docs/user_catalog_335_changes.md"
+}

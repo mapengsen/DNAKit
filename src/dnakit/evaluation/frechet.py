@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+import os
+from pathlib import Path
 from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
@@ -109,14 +111,20 @@ def evaluate_frechet_distance(
     *,
     config: FrechetDistanceConfig | None = None,
     backend: RepresentationBackend | None = None,
+    plot_distance: bool = False,
+    plot_pca: bool = False,
+    plot_output_dir: str | os.PathLike[str] = ".",
+    plot_overwrite: bool = False,
     verbose: bool = True,
 ) -> EvaluationReport:
     """Compare two DNA collections with a Gaussian Fréchet representation distance.
 
-    The default representation model is LucaOne, matching ``DATA-027``.  A
-    standard LucaOne backend still requires explicit ``allow_remote_code=True``
-    after the caller reviews its checkpoint code.  Passing ``backend`` enables
-    controlled custom encoders and tests without a checkpoint download.
+    The default representation model is LucaOne.  Its standard backend
+    requires explicit ``allow_remote_code=True``.  ``plot_distance`` and
+    ``plot_pca`` independently save PNG images to ``plot_output_dir`` when
+    enabled; existing files require ``plot_overwrite=True``.  Passing
+    ``backend`` enables controlled custom encoders and tests without a
+    checkpoint download.
     """
 
     resolved = FrechetDistanceConfig() if config is None else config
@@ -125,6 +133,39 @@ def evaluate_frechet_distance(
             "config must be FrechetDistanceConfig or None.",
             code="INVALID_FRECHET_DISTANCE_CONFIG",
         )
+    for name, enabled in (
+        ("plot_distance", plot_distance),
+        ("plot_pca", plot_pca),
+        ("plot_overwrite", plot_overwrite),
+    ):
+        if not isinstance(enabled, bool):
+            raise ConfigurationError(f"{name} must be boolean.", code="INVALID_FRECHET_PLOT_CONFIG")
+    if isinstance(plot_output_dir, str) and not plot_output_dir.strip():
+        raise ConfigurationError(
+            "plot_output_dir must be a non-empty path.", code="INVALID_FRECHET_PLOT_CONFIG"
+        )
+    try:
+        plot_directory = Path(plot_output_dir).expanduser()
+    except TypeError as exc:
+        raise ConfigurationError(
+            "plot_output_dir must be path-like.", code="INVALID_FRECHET_PLOT_CONFIG"
+        ) from exc
+    targets = {
+        name: plot_directory / filename
+        for name, filename, enabled in (
+            ("distance", "frechet_distance.png", plot_distance),
+            ("pca", "frechet_pca.png", plot_pca),
+        )
+        if enabled
+    }
+    if targets:
+        from ._frechet_plots import require_plot_dependencies
+
+        require_plot_dependencies(pca=plot_pca)
+        if not plot_overwrite:
+            for target in targets.values():
+                if target.exists():
+                    raise FileExistsError(target)
     left_items = materialize_input(left, limits=resolved.limits)
     right_items = materialize_input(right, limits=resolved.limits)
     require_nonempty(left_items, "Fréchet DNA distance")
@@ -170,6 +211,30 @@ def evaluate_frechet_distance(
     right_matrix = matrix[len(left_items) :]
     components = _frechet_components(left_matrix, right_matrix, np)
 
+    plot_files: dict[str, str] = {}
+    if targets:
+        from ._frechet_plots import save_distance_bar, save_pca_scatter
+
+        if plot_distance:
+            plot_files["distance"] = str(
+                save_distance_bar(
+                    components["frechet_distance"],
+                    targets["distance"],
+                    encoder=representation_result.model_name,
+                    overwrite=plot_overwrite,
+                ).resolve()
+            )
+        if plot_pca:
+            plot_files["pca"] = str(
+                save_pca_scatter(
+                    matrix,
+                    len(left_items),
+                    targets["pca"],
+                    encoder=representation_result.model_name,
+                    overwrite=plot_overwrite,
+                ).resolve()
+            )
+
     return report(
         name="frechet_dna_distance",
         method="gaussian-frechet-distance-over-dna-model-representations",
@@ -198,6 +263,9 @@ def evaluate_frechet_distance(
             "sample_covariance_ddof": 1,
             "numerical_method": "exact sample-space cross-Gram nuclear norm",
             "lower_is_better": True,
+            "plot_distance": plot_distance,
+            "plot_pca": plot_pca,
+            "plot_files": plot_files,
             "max_cross_gram_elements": resolved.max_cross_gram_elements,
             "limits": resolved.limits,
             "inference": (

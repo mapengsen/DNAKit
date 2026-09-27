@@ -12,6 +12,7 @@
 - **计算方法：** 按 legacy PDB 固定列规格解析 `HEADER`、`TITLE`、`MODEL` 和 `ATOM`，只保留 canonical DNA 残基；备选构象只接受空白或 `A`，重复原子按主构象优先、再按 occupancy 选择，最后按残基顺序映射 A/C/G/T 序列。这是文件解析，不是结构预测。
 - **API：** `dnakit.structure3d.load_pdb(path[必须], model_index[可选])`
 - **输入：** 必填可读的 legacy PDB 路径；可选正整数模型编号。
+- **输出：** 返回 `DNA3DStructure`，包含原子坐标和残基信息。
 - **示例代码：**
 
 ```python
@@ -39,6 +40,7 @@ print(structure.sequence_by_chain)
 - **计算方法：** 使用与单模型相同的固定列解析规则，按 `MODEL` 编号分组并返回全部模型。此步只建立链/残基/原子标识，不做旋转、平移对齐或 RMSF 计算。
 - **API：** `dnakit.structure3d.load_pdb_ensemble(path[必须])`
 - **输入：** 必填包含一个或多个 DNA 模型的 legacy PDB 路径。
+- **输出：** 返回 `DNA3DStructure` 元组，每项包含一个 PDB 模型。
 - **示例代码：**
 
 ```python
@@ -64,6 +66,7 @@ print(len(models[0].residues), models[0].sequence_by_chain)
 - **计算方法：** 由原子质量加权坐标计算质心、回转半径和张量特征值；SASA 用 `vdW 半径 + probe` 球面的确定性采样点暴露比例求和，体积用 vdW 球占据的体素并集估算；骨架角由四原子二面角计算，氢键用明确的距离/角度阈值筛选。双链螺旋指标是配对 `C1′` 中心和全局轴的 DNAKit 近似值。
 - **API：** `dnakit.structure3d.analyze_structure(structure[必须], sasa_probe_radius_angstrom[可选], sasa_points_per_atom[可选], volume_grid_spacing_angstrom[可选], progress[可选])`
 - **输入：** 必填 `DNA3DStructure`；可选 0–5 Å SASA probe、24–4096 个每原子采样点、0.25–5 Å 体素间距和进度回调。
+- **输出：** 返回 `Structure3DAnalysisResult`，示例展示 `helix`、`atom_count`、`residue_count`、`solvent_accessible_surface_area_angstrom2`。
 - **示例代码：**
 
 ```python
@@ -104,6 +107,7 @@ print(
 - **计算方法：** 先取所有模型共有的原子键，对每个模型减去共有原子的几何中心以去除平移；对原子 `i` 计算 `RMSF_i = sqrt[Σm |r_im − <r_i>|²/M]`，残基 RMSF 再对其原子 RMSF 做均方根聚合。实现不做 Kabsch 旋转拟合。
 - **API：** `dnakit.structure3d.analyze_ensemble_flexibility(structures[必须])`
 - **输入：** 必填 2–10000 个 `DNA3DStructure` 模型，且至少有 3 个公共原子。
+- **输出：** 返回 `EnsembleFlexibilityResult`，示例展示 `model_count`、`common_atom_count`、`mean_atomic_rmsf_angstrom`、`max_atomic_rmsf_angstrom`。
 - **示例代码：**
 
 ```python
@@ -133,6 +137,7 @@ print(
 - **计算方法：** 按 3DNA `bp_step.par` 的 12 个刚体参数列解析每行，校验行数与声明碱基对数；对第二行起的 step 求平均 rise/twist，再计算 `bp/turn = 360/平均twist` 和 `pitch = 平均rise × bp/turn`。DNAKit 不重新计算 3DNA 局部参考框架。
 - **API：** `dnakit.structure3d.read_3dna_bp_step(path[必须])`
 - **输入：** 必填已存在、UTF-8 可解码且符合 3DNA `bp_step.par` 列结构的文件。
+- **输出：** 返回 `ThreeDNAParameterResult`，示例展示 `base_pair_count`、`mean_rise_angstrom`、`mean_twist_degree`、`base_pairs_per_turn`。
 - **示例代码：**
 
 ```python
@@ -170,6 +175,7 @@ with TemporaryDirectory() as directory:
 - **计算方法：** 读取 DSSR JSON 中的程序版本以及 `nts`、`pairs`、`helices`、`stems`、`hairpins`、`hbonds` 和 `ntParams/ntPars` 字段，优先校验声明计数与数组长度后返回摘要。结构识别由生成该 JSON 的外部 DSSR 完成，DNAKit 不执行 DSSR 算法。
 - **API：** `dnakit.structure3d.read_dssr_json(path[必须])`
 - **输入：** 必填已存在的 DSSR JSON 输出文件。
+- **输出：** 返回 `DSSRSummaryResult`，示例展示 `nucleotide_count`、`pair_count`、`helix_count`、`stem_count`。
 - **示例代码：**
 
 ```python

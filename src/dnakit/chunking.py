@@ -9,13 +9,17 @@ coordinate convention already used by DNAKit.
 
 from __future__ import annotations
 
+import os
 import random
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Generator, Iterator, Sequence
+from contextlib import ExitStack
 from dataclasses import dataclass
 from itertools import pairwise
+from pathlib import Path
 from typing import Any, Literal, TypeAlias
 
 from dnakit._processing.dispatch import accept_inputs as _accept_inputs
+from dnakit._processing.inputs import input_config
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.core.coordinates import Interval
 from dnakit.core.facade import DNA, resolve_single_dna
@@ -25,6 +29,8 @@ from dnakit.exceptions import ConfigurationError, CoordinateError, InputFormatEr
 from dnakit.io.annotations import AnnotationDocument, AnnotationSource, read_bed
 from dnakit.io.api import ReadableSource, read
 from dnakit.io.config import ReadConfig
+from dnakit.io.rows import write_rows
+from dnakit.ops.direction import reverse_complement
 from dnakit.ops.edit import subsequence
 
 ChunkStrategy = Literal["fixed", "sliding", "random", "multiscale", "curriculum"]
@@ -936,6 +942,133 @@ def chunk_sequences(
 
 chunk_sequences = _accept_inputs(chunk_sequences, mode="chunks")
 
+
+def iter_paired_chunks(
+    source: ReadableSource,
+    *,
+    reverse_source: ReadableSource | None = None,
+    config: ChunkingConfig | None = None,
+    read_config: ReadConfig | None = None,
+    source_ids: Sequence[str] | None = None,
+    verbose: bool = True,
+) -> Generator[dict[str, Any], None, None]:
+    """Yield adjacent forward/reverse-complement rows with a shared pair ID.
+
+    Input is FASTA. If supplied, ``reverse_source`` must contain the whole
+    reverse-complement records in matching ID order and length. Otherwise
+    each chunk's reverse complement is computed directly. Both strands use
+    coordinates on the forward source: reverse input is sliced at [L-end:L-start).
+    ``source_ids`` selects FASTA IDs. File-path inputs automatically receive
+    limits sized to the larger FASTA file unless ``read_config`` is explicit.
+    Memory is bounded by one chromosome pair.
+    """
+    resolved = ChunkingConfig() if config is None else config
+    selected = None if source_ids is None else set(source_ids)
+    if read_config is None:
+        paths = [
+            Path(value)
+            for value in (source, reverse_source)
+            if isinstance(value, (str, os.PathLike))
+        ]
+        if paths:
+            read_config = max(
+                (input_config(path, None) for path in paths),
+                key=lambda config: config.max_input_bytes,
+            )
+    with ExitStack() as stack:
+        forward = stack.enter_context(
+            read(source, format="fasta", config=read_config, verbose=False)
+        )
+        reverse = (
+            None
+            if reverse_source is None
+            else stack.enter_context(
+                read(reverse_source, format="fasta", config=read_config, verbose=False)
+            )
+        )
+        records = (
+            ((r, None) for r in forward) if reverse is None else zip(forward, reverse, strict=True)
+        )
+        for record, rc in records:
+            if rc is not None and (record.id != rc.id or len(record.sequence) != len(rc.sequence)):
+                raise InputFormatError(
+                    "Forward and reverse FASTA records must have matching IDs and lengths.",
+                    code="PAIRED_CHUNK_SOURCE_MISMATCH",
+                )
+            if selected is not None and record.id not in selected:
+                continue
+            length = len(record.sequence)
+            reverse_text = None if rc is None else rc.sequence.to_string()
+            for chunk in iter_sequence_chunks(record, config=resolved, verbose=False):
+                start, end = chunk.source_start, chunk.source_end
+                pair_id = f"{record.id}:{start}-{end}"
+                negative = (
+                    reverse_complement(chunk.sequence, verbose=False).to_string()
+                    if reverse_text is None
+                    else reverse_text[length - end : length - start]
+                )
+                for strand, sequence in (("+", chunk.sequence.to_string()), ("-", negative)):
+                    yield {
+                        "id": f"{pair_id}:{strand}",
+                        "sequence": sequence,
+                        "pair_id": pair_id,
+                        "source_id": record.id,
+                        "source_start": start,
+                        "source_end": end,
+                        "strand": strand,
+                    }
+
+
+def export_paired_chunks(
+    source: ReadableSource,
+    target: str | os.PathLike[str] | Sequence[str | os.PathLike[str]],
+    *,
+    reverse_source: ReadableSource | None = None,
+    config: ChunkingConfig | None = None,
+    read_config: ReadConfig | None = None,
+    source_ids: Sequence[str] | None = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+) -> dict[str, Any]:
+    """Stream paired chunks to CSV/TSV/JSON/JSONL/Parquet/FASTA destinations.
+
+    Each input pair is consumed once even with multiple output formats.
+    Returns counts and the forward-source coordinate convention. Empty input
+    produces empty output files (with column headers for CSV/TSV).
+    """
+    resolved = ChunkingConfig() if config is None else config
+    records = iter_paired_chunks(
+        source,
+        reverse_source=reverse_source,
+        config=resolved,
+        read_config=read_config,
+        source_ids=source_ids,
+    )
+    try:
+        count = write_rows(
+            records,
+            target,
+            columns=(
+                "id",
+                "sequence",
+                "pair_id",
+                "source_id",
+                "source_start",
+                "source_end",
+                "strand",
+            ),
+            overwrite=overwrite,
+        )
+    finally:
+        records.close()
+    return {
+        "pair_count": count // 2,
+        "record_count": count,
+        "length": resolved.length,
+        "coordinates": "0-based-half-open",
+    }
+
+
 __all__ = [
     "ChunkBedSource",
     "ChunkProgress",
@@ -946,7 +1079,9 @@ __all__ = [
     "LengthCurriculumStage",
     "SequenceChunk",
     "chunk_sequences",
+    "export_paired_chunks",
     "iter_fasta_chunks",
+    "iter_paired_chunks",
     "iter_sequence_chunks",
     "make_length_curriculum",
 ]

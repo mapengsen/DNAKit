@@ -2,7 +2,7 @@
 
 DNA／基因组学技能集合：统一搜索、按需安装、保留原作者及许可证。
 
-当前快照：2026-09-12。共 **536** 个技能：526 个 DNA 相关工作流、9 个组合流程必需的辅助技能、1 个 DNAKit 入口。
+当前快照：2026-09-20。共 **573** 个技能：563 个 DNA 相关工作流、9 个组合流程必需的辅助技能、1 个 DNAKit 入口。
 
 每个子目录包含一个 `SKILL.md` 及所需辅助文件；原始来源和修改记录保留在 `UPSTREAM.md`。运行依赖以各技能说明为准。
 
@@ -28,15 +28,18 @@ dnakit skills cite variant-annotation
 | 来源 | 保留数量 |
 | --- | ---: |
 | agentic-science | 3 |
+| biomcp | 1 |
 | bionemo | 3 |
 | bioskills | 329 |
 | clawbio | 20 |
 | damlab | 2 |
 | deepmind | 7 |
-| dnakit | 1 |
+| dnakit | 7 |
 | encode-toolkit | 16 |
 | feynman | 1 |
 | genetic-counseling | 6 |
+| gigwa-mcp | 5 |
+| haploqtl | 1 |
 | isabl | 8 |
 | kdense | 8 |
 | misha | 1 |
@@ -49,7 +52,16 @@ dnakit skills cite variant-annotation
 | polyploid-cloning | 1 |
 | research-suite | 2 |
 | sciagent | 21 |
+| statgen-skills | 10 |
+| tangermeme | 1 |
 | tooluniverse | 35 |
+| user335-anthropic | 3 |
+| user335-aws-kiro | 1 |
+| user335-bioskills | 2 |
+| user335-clawbio | 3 |
+| user335-deepmind | 2 |
+| user335-galaxy | 1 |
+| user335-kdense | 1 |
 
 同一任务阶段的重复实现只保留一个，替代来源记录在目录中，旧名称可通过别名检索。输入条件不同的工作流、组合流程和组成步骤可分别保留。
 
@@ -86,12 +98,13 @@ dnakit skills cite variant-annotation
 | [transcription-translation](transcription-translation/SKILL.md) | bioskills | Transcribe DNA to RNA and translate to protein using Biopython, with NCBI codon-table selection, CDS validation, and six-frame ORF finding. Use when converting a CDS or ORF to i... |
 | [write-sequences](write-sequences/SKILL.md) | bioskills | Write biological sequences to files (FASTA, FASTQ, GenBank, EMBL) using Biopython Bio.SeqIO. Use when saving sequences, creating new sequence files, or outputting modified records. |
 
-### 测序与质控 / Sequencing and quality control (19)
+### 测序与质控 / Sequencing and quality control (20)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
 | [amplicon-qc](amplicon-qc/SKILL.md) | clawbio | 16S/18S rRNA amplicon preprocessing — from raw paired-end FASTQ files through N removal and primer trimming, producing outputs ready for DADA2 quality filtering and denoising. D... |
 | [busco-status-interpretation](busco-status-interpretation/SKILL.md) | sciagent | Guide to interpreting BUSCO completeness statuses: why Duplicated BUSCOs count as complete, parsing output files, computing/comparing completeness across proteomes/genomes, comm... |
+| [instrument-data-to-allotrope](instrument-data-to-allotrope/SKILL.md) | user335-anthropic | Convert laboratory instrument output files (PDF, CSV, Excel, TXT) to Allotrope Simple Model (ASM) JSON format or flattened 2D CSV. Use this skill when scientists need to standar... |
 | [long-read-sequencing-basecalling](long-read-sequencing-basecalling/SKILL.md) | bioskills | Basecalls raw Oxford Nanopore signal (POD5/FAST5) into reads with Dorado, choosing the chemistry-matched model and accuracy tier (fast/hac/sup), requesting modified bases (5mCG_... |
 | [long-read-sequencing-clair3-variants](long-read-sequencing-clair3-variants/SKILL.md) | bioskills | Calls germline small variants (SNPs and indels) from Oxford Nanopore and PacBio HiFi long reads with Clair3, a two-stage (pileup + full-alignment) deep-learning caller, selectin... |
 | [long-read-sequencing-haplotype-phasing](long-read-sequencing-haplotype-phasing/SKILL.md) | bioskills | Phases small variants, SVs, and methylation from Oxford Nanopore and PacBio long reads (read-backed/physical phasing) with WhatsHap, LongPhase, or HiPhase, and haplotags the BAM... |
@@ -135,7 +148,7 @@ dnakit skills cite variant-annotation
 | [sam-bam-basics](sam-bam-basics/SKILL.md) | bioskills | View, convert, and understand SAM/BAM/CRAM alignment files using samtools and pysam. Use when inspecting alignments, converting between formats, or understanding alignment file ... |
 | [samtools-bam-processing](samtools-bam-processing/SKILL.md) | sciagent | CLI toolkit for SAM/BAM/CRAM: sort, index, convert, filter, QC alignments. Core commands: view, sort, index, flagstat, stats, depth, markdup, merge. Required between alignment a... |
 
-### 基因组区间 / Genomic intervals (13)
+### 基因组区间 / Genomic intervals (14)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -151,6 +164,7 @@ dnakit skills cite variant-annotation
 | [genome-intervals-proximity-operations](genome-intervals-proximity-operations/SKILL.md) | bioskills | Performs proximity operations on genomic intervals with bedtools (closest, window, flank, slop) and pybedtools - nearest-feature queries with signed/strand-aware distance, fixed... |
 | [genomic-coordinates](genomic-coordinates/SKILL.md) | kdense | Convert genomic intervals between coordinate conventions, normalise and compare variant representations, and detect assembly or contig-naming mismatches before they corrupt an a... |
 | [importing-tracks](importing-tracks/SKILL.md) | misha | Use when importing external data (WIG / bigWig / BED / TSV / BAM / 2D contacts / array matrices) into a misha track DB, when picking which `gtrack.*import*` / `gtrack.create_*` ... |
+| [liftover](liftover/SKILL.md) | statgen-skills | KG-aware genomic liftover for GWAS summary statistics. Resolves source/target genome build (hg18/hg19/hg38) via the statgen-analysis OKG when available, falling back to the GWAS... |
 | [liftover-coordinates](liftover-coordinates/SKILL.md) | encode-toolkit | Convert genomic coordinates between assembly versions (GRCh37/hg19 to GRCh38/hg38, mm9 to mm10). Guides UCSC liftOver for BED files, CrossMap for VCF/bigWig, and handles unmappe... |
 
 ### 基因组组装 / Genome assembly (11)
@@ -169,11 +183,12 @@ dnakit skills cite variant-annotation
 | [genome-assembly-short-read-assembly](genome-assembly-short-read-assembly/SKILL.md) | bioskills | Assembles a genome de novo from Illumina short reads with SPAdes (isolate/careful/sc/meta/plasmid/rna modes), MEGAHIT (low-memory, huge datasets), Unicycler (bacterial finishing... |
 | [optimize-hifi-diploid-assembly](optimize-hifi-diploid-assembly/SKILL.md) | myriad | Activate when an agent must generate, compare, quality-control, or select a diploid PacBio HiFi de novo genome assembly using hifiasm; when requests mention HiFi read assembly, ... |
 
-### 基因组注释 / Genome annotation (12)
+### 基因组注释 / Genome annotation (15)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
 | [alphagem](alphagem/SKILL.md) | pku-metagenomics | AlphaGEM — genome-scale metabolic modelling aided by protein structure alignment and deep-learning dark-metabolism mining. Use when: (1) Building or refining GEMs beyond sequenc... |
+| [dnakit-prokaryotic-genes](dnakit-prokaryotic-genes/SKILL.md) | dnakit | Predict prokaryotic and metagenomic CDS with optional Pyrodigal through DNAKit, returning coordinates, coding sequences and proteins. Use for bacterial or archaeal sequence anno... |
 | [expression-matrix-gene-id-mapping](expression-matrix-gene-id-mapping/SKILL.md) | bioskills | Maps between gene identifier systems (Ensembl, Entrez, HGNC symbol, UniProt, RefSeq, MANE) using AnnotationDbi, biomaRt, mygene, pyensembl, and Ensembl REST. Encodes Ensembl ver... |
 | [genome-annotation-annotation-qc](genome-annotation-annotation-qc/SKILL.md) | bioskills | Assesses the quality and completeness of a genome annotation with BUSCO (conserved single-copy ortholog recovery), OMArk (proteome completeness, consistency, and contamination),... |
 | [genome-annotation-annotation-transfer](genome-annotation-annotation-transfer/SKILL.md) | bioskills | Transfers gene annotations between genome assemblies via coordinate liftover (UCSC liftOver, CrossMap for same-species version updates) or feature/sequence projection (Liftoff f... |
@@ -182,11 +197,13 @@ dnakit skills cite variant-annotation
 | [genome-annotation-ncrna-annotation](genome-annotation-ncrna-annotation/SKILL.md) | bioskills | Identifies non-coding RNAs (tRNA, rRNA, snoRNA, snRNA, riboswitches, sRNAs) using Infernal covariance-model search against Rfam, tRNAscan-SE 2.0 for tRNA, barrnap for rRNA, and ... |
 | [genome-annotation-prokaryotic-annotation](genome-annotation-prokaryotic-annotation/SKILL.md) | bioskills | Annotates bacterial and archaeal genomes (isolates, MAGs, plasmids) with Bakta (active versioned databases, NCBI-compliant output) or Prokka (legacy), producing GFF3/GenBank/EMB... |
 | [genome-annotation-repeat-annotation](genome-annotation-repeat-annotation/SKILL.md) | bioskills | Discovers, classifies, and masks repetitive elements and transposable elements with RepeatModeler2 (de novo family library), RepeatMasker (masking against a library), EDTA (plan... |
+| [interpro-database](interpro-database/SKILL.md) | user335-deepmind | Identify domains, families, and sites in proteins; find all proteins in a family or sharing a domain; explore species distribution for a domain; annotate genomes with protein fa... |
+| [qtl-candidate-gene](qtl-candidate-gene/SKILL.md) | haploqtl | Interpret a fine-mapped QTL / introgression interval for a stated trait in tomato. Given an interval (SL4.0 coordinates) and the trait it was mapped for, lists the genes in the ... |
 | [systems-biology-gene-essentiality](systems-biology-gene-essentiality/SKILL.md) | bioskills | Performs in-silico single and double gene deletions, condition-dependent essentiality, and synthetic-lethality screens on genome-scale metabolic models with COBRApy, evaluating ... |
 | [systems-biology-metabolic-reconstruction](systems-biology-metabolic-reconstruction/SKILL.md) | bioskills | Builds draft genome-scale metabolic models from an annotated genome using CarveMe (top-down carving of a BiGG universal model) or gapseq (bottom-up pathway-evidence reconstructi... |
 | [vitis-te](vitis-te/SKILL.md) | plant-skills | Transposable-element annotation and curation for plant genomes (Vitis). Use for EDTA, TEtrimmer, TEsorter, curated libraries, RepeatMasker, LAI. Do not hook a classifier-only to... |
 
-### 变异检测与处理 / Variant calling and processing (28)
+### 变异检测与处理 / Variant calling and processing (33)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -204,9 +221,14 @@ dnakit skills cite variant-annotation
 | [copy-number-subclonal-copy-number](copy-number-subclonal-copy-number/SKILL.md) | bioskills | Resolve subclonal copy number, whole-genome doubling, and copy-number tumor evolution from bulk sequencing with Battenberg, TITAN, and MEDICC2. Covers clonal versus subclonal co... |
 | [data-visualization-lollipop-protein-maps](data-visualization-lollipop-protein-maps/SKILL.md) | bioskills | Plot per-gene mutation distributions on a protein-domain map (lollipop / needle plots) showing mutation position, recurrence count, and variant classification with maftools, g3-... |
 | [gatk-variant-calling](gatk-variant-calling/SKILL.md) | bioskills | Call germline SNPs and indels with GATK HaplotypeCaller and the GVCF joint-genotyping workflow. Covers the local-reassembly + PairHMM mechanism (why HC beats pileup callers on i... |
+| [gigwa-import-and-qc](gigwa-import-and-qc/SKILL.md) | gigwa-mcp | Import a genotype dataset into a Gigwa server and run standard quality control. Use this when a user wants to load a DArTseq SNP/Silico xlsx report or a VCF (.vcf/.vcf.gz) into ... |
+| [gigwa-qc-triage](gigwa-qc-triage/SKILL.md) | gigwa-mcp | Run the full quality-control suite on a Gigwa variant set and give a go/no-go verdict for downstream analysis. Use this when a user wants to triage or vet the quality of an alre... |
+| [outlier-splicing-detection](outlier-splicing-detection/SKILL.md) | user335-bioskills | Detects aberrant splicing in single rare-disease patients vs a control panel using FRASER 2.0 (Bioconductor; Beta-binomial autoencoder on Intron Jaccard Index, default delta cut... |
+| [single-cell-cnv-inference](single-cell-cnv-inference/SKILL.md) | user335-bioskills | Infer large-scale copy-number alterations from tumor single-cell or single-nucleus RNA-seq to separate malignant from normal cells and call subclones, using inferCNV, copyKAT, N... |
 | [splice-variant-prediction](splice-variant-prediction/SKILL.md) | bioskills | Predicts whether a DNA variant alters mRNA splicing using sequence-based deep-learning tools — SpliceAI (10kb context dilated CNN, clinical default), Pangolin (multi-tissue), MM... |
 | [tiledbvcf](tiledbvcf/SKILL.md) | kdense | Efficient storage and retrieval of genomic variant data using TileDB. Scalable VCF/BCF ingestion, incremental sample addition, compressed storage, parallel queries, and export c... |
 | [variant-analysis](variant-analysis/SKILL.md) | tooluniverse | VCF and variant analysis — parsing, annotation, classification (synonymous, missense, frameshift, stop_gained), VAF filtering, coding vs non-coding categorization, multi-conditi... |
+| [variant-annotate](variant-annotate/SKILL.md) | statgen-skills | Per-rsID variant annotation against gnomAD (v4, GRCh38) and GTEx (v8). For a list of rsIDs, fetches the most-severe coding consequence + gene + per-population allele frequency f... |
 | [variant-annotation](variant-annotation/SKILL.md) | bioskills | Annotates VCF variants with functional consequences, population frequencies, and pathogenicity scores using bcftools annotate/csq, Ensembl VEP, SnpEff, and ANNOVAR. Use when dec... |
 | [variant-calling](variant-calling/SKILL.md) | bioskills | Call germline SNPs and indels from a BAM/CRAM with bcftools mpileup and call, and select the right calling engine for the job. Use when generating a VCF from aligned reads, choo... |
 | [variant-calling-deepvariant](variant-calling-deepvariant/SKILL.md) | bioskills | Calls germline SNPs and indels with Google DeepVariant, which reframes variant calling as CNN image classification over multi-channel pileup tensors. Covers platform-specific mo... |
@@ -219,11 +241,12 @@ dnakit skills cite variant-annotation
 | [vcf-manipulation](vcf-manipulation/SKILL.md) | bioskills | Combine, split, sort, intersect, and subset VCF/BCF files with bcftools merge, concat, isec, sort, view, and reheader. Use when merging different samples into a cohort VCF, conc... |
 | [vcf-statistics](vcf-statistics/SKILL.md) | bioskills | Compute and interpret VCF quality-control metrics (Ti/Tv, het/hom, novel/known, missingness, HWE, contamination, relatedness) with bcftools stats, vcftools, plot-vcfstats, and i... |
 
-### 遗传变异与疾病研究 / Variant interpretation and disease research (52)
+### 遗传变异与疾病研究 / Variant interpretation and disease research (53)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
 | [analytical-validation](analytical-validation/SKILL.md) | bioskills | Treats a ctDNA assay as a molecule-counting experiment at the Poisson edge and builds its analytical-validation case the measurement-science way. Covers the genome-equivalent cu... |
+| [biomcp](biomcp/SKILL.md) | biomcp | Search and retrieve biomedical data - genes, variants, clinical trials, diagnostic tests, articles, drugs, diseases, pathways, proteins, adverse events, pharmacogenomics, and ph... |
 | [cancer-genomics-tcga](cancer-genomics-tcga/SKILL.md) | tooluniverse | TCGA/GDC cancer genomics analysis — cohort construction, clinical metadata retrieval, somatic mutation frequencies, survival analysis, and multi-omics integration. Use for TCGA-... |
 | [cancer-variant-interpretation](cancer-variant-interpretation/SKILL.md) | tooluniverse | Clinical interpretation of somatic cancer mutations for precision oncology. Transforms a gene + variant + cancer-type input into an actionable report: clinical evidence tier (CI... |
 | [cfdna-preprocessing](cfdna-preprocessing/SKILL.md) | bioskills | Decides how to preprocess plasma cfDNA sequencing data so the recoverable signal survives - library-prep-aware fragment expectations (dsDNA vs ssDNA/adaptase prep), UMI/duplex c... |
@@ -276,7 +299,7 @@ dnakit skills cite variant-annotation
 | [tumor-fraction-estimation](tumor-fraction-estimation/SKILL.md) | bioskills | Estimates tumor fraction (the genome-wide proportion of cfDNA molecules that are tumor-derived, the cfDNA analogue of bulk-tumor purity) from shallow whole-genome sequencing wit... |
 | [variant-interpretation](variant-interpretation/SKILL.md) | tooluniverse | Clinical variant interpretation from raw variant calls to ACMG-classified recommendations with structural impact analysis. Use for VUS classification, pathogenicity assessment w... |
 
-### GWAS 与因果遗传学 / GWAS and causal genetics (19)
+### GWAS 与因果遗传学 / GWAS and causal genetics (26)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -292,23 +315,33 @@ dnakit skills cite variant-annotation
 | [causal-genomics-proteome-mr-drug-target](causal-genomics-proteome-mr-drug-target/SKILL.md) | bioskills | Runs cis-pQTL Mendelian randomization for drug-target validation using UKB-PPP (Olink), deCODE (SomaScan), Fenland, INTERVAL, ARIC, and FinnGen-PPP proteomes plus colocalization... |
 | [causal-genomics-transcriptome-wide-association](causal-genomics-transcriptome-wide-association/SKILL.md) | bioskills | Performs gene-level association from GWAS summary statistics via genetically predicted tissue expression using FUSION, PrediXcan, S-PrediXcan, S-MultiXcan, UTMOST, MOSTWAS, kTWA... |
 | [data-visualization-manhattan-qq-locuszoom](data-visualization-manhattan-qq-locuszoom/SKILL.md) | bioskills | Build Manhattan, Miami, QQ, and locuszoom-style regional plots from GWAS, TWAS, PWAS, and QTL summary statistics with correct genomic-inflation diagnostics, multi-trait overlays... |
+| [finemap](finemap/SKILL.md) | statgen-skills | Fine-map GWAS loci with SuShiE/SuSiE or SuSiE-inf using individual genotypes or summary statistics and matched LD panels. Supports single/multiple ancestry, credible sets, optio... |
 | [gtex-database](gtex-database/SKILL.md) | deepmind | Use when you want to retrieve quantitative RNA expression data and variant eQTL information from the GTEx (Genotype-Tissue Expression) Project across 54 non-diseased tissue sites.  |
 | [gwas-drug-discovery](gwas-drug-discovery/SKILL.md) | tooluniverse | Transform GWAS signals into drug targets and repurposing opportunities. Connects GWAS-significant loci to causal genes via fine-mapping/eQTL, then to druggable proteins via DGId... |
 | [gwas-snp-interpretation](gwas-snp-interpretation/SKILL.md) | tooluniverse | Interpret a single GWAS SNP across multiple databases — GWAS Catalog hits, LD/haplotype context, eQTL evidence, regulatory annotation, ClinVar pathogenicity, gnomAD frequency. U... |
 | [gwas-trait-to-gene](gwas-trait-to-gene/SKILL.md) | tooluniverse | Discover causal genes for diseases/traits from GWAS data using Open Targets L2G (locus-to-gene) scoring — integrates eQTL, chromatin interaction, and distance evidence. Use for ... |
+| [ldsc](ldsc/SKILL.md) | statgen-skills | Run LD Score Regression (LDSC) for sumstats munging, SNP heritability (h2), genetic correlation (rg), and stratified/cell-type-specific partitioned heritability (partitioned, Fi... |
 | [locuscompare-region-render](locuscompare-region-render/SKILL.md) | clawbio | Render a 4-panel regional LocusCompare diagnostic for one (lead variant, exposure study, outcome study) tuple - overlays GWAS Manhattan, QTL Manhattan, GENCODE gene track, and c... |
+| [locuszoom](locuszoom/SKILL.md) | statgen-skills | Draw LocusZoom-style regional GWAS association plots with locuszoomr, Ensembl gene tracks and LDlink LD. Select a gene, region or lead SNP and optionally add fine-mapping poster... |
+| [manhattan-qq](manhattan-qq/SKILL.md) | statgen-skills | Produce a Manhattan plot, QQ plot, and a QC summary (genomic inflation λ_GC, count of genome-wide-significant and suggestive hits, list of independent lead SNPs) from a GWAS sum... |
 | [pathway-disease-genetics](pathway-disease-genetics/SKILL.md) | tooluniverse | Connect GWAS variants to biological pathways and druggable targets. Maps GWAS hits to causal genes (via fine-mapping/eQTL), then to pathways (Reactome, KEGG, WikiPathways), then... |
 | [phewas](phewas/SKILL.md) | tooluniverse | Cross-ancestry / cross-biobank phenome-wide association (PheWAS) and replication. Given ONE variant (rsID) or ONE gene, look up every phenotype it associates with across Europea... |
+| [prs](prs/SKILL.md) | statgen-skills | Build a polygenic risk score from GWAS summary statistics using a parameterised PRS method. Currently implements SBayesRC (Zheng et al. 2024, Nat Genet) via the zhilizheng/SBaye... |
+| [twas](twas/SKILL.md) | statgen-skills | Run a transcriptome-wide association study (TWAS) on a GWAS sumstats file using TWAS-FUSION (Gusev et al. 2016, Nat Genet) with pre-computed GTEx v8 multi-tissue expression weig... |
+| [ukb-ppp-region-fetch](ukb-ppp-region-fetch/SKILL.md) | user335-clawbio | Fetch a regional slice of plasma pQTL summary statistics from the UK Biobank Pharma Proteomics Project (UKB-PPP; Sun 2023 Nature) for a specific (protein, ancestry) measurement.... |
 
-### 群体与进化遗传学 / Population and evolutionary genetics (18)
+### 群体与进化遗传学 / Population and evolutionary genetics (21)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
 | [ancestry-risk-profiler](ancestry-risk-profiler/SKILL.md) | clawbio | Infers genetic super-population ancestry from a 23andMe/AncestryDNA file and computes ancestry-stratified odds ratios with an exploratory Ancestry Elevation Score (AES) showing ... |
 | [equity-scorer](equity-scorer/SKILL.md) | clawbio | Compute HEIM diversity and equity metrics from VCF or ancestry data. Generates heterozygosity, FST, PCA plots, and a composite HEIM Equity Score with markdown reports. |
 | [genotype-imputation-benchmarking](genotype-imputation-benchmarking/SKILL.md) | research-suite | Design, run, diagnose, and audit genotype-imputation benchmarks across low coverage, arrays, panels, families, or reference-free workflows. Use when a task needs data contracts,... |
+| [gigwa-diversity-report](gigwa-diversity-report/SKILL.md) | gigwa-mcp | Produce a population diversity and structure report for a Gigwa variant set. Use this when a user asks to summarise genetic diversity, describe population structure, or assess r... |
+| [gigwa-region-scan](gigwa-region-scan/SKILL.md) | gigwa-mcp | Characterise the variants and diversity within a single genomic region of a Gigwa variant set. Use this when a user asks about a specific chromosome, contig or coordinate window... |
 | [grapevine-adna](grapevine-adna/SKILL.md) | plant-skills | Ancient DNA processing and authentication for plants (grapevine-oriented). Use for aDNA FASTQ→BAM, damage, contamination, capture, or projecting ancient samples onto a modern pa... |
 | [ld-1000g-region-compute](ld-1000g-region-compute/SKILL.md) | clawbio | Compute pairwise r² between a lead variant and every variant in a window using the 1000 Genomes Phase 3 GRCh38 reference panel, ancestry-stratified. Use when an agent needs LD c... |
+| [onekgpd-individual-queries](onekgpd-individual-queries/SKILL.md) | user335-kdense | Query the 1000 Genomes Project dataset (3,202 whole-genome-sequenced individuals, GRCh38) at the level of individual participants. Use when a question is about individuals or va... |
 | [phasing-imputation-genotype-imputation](phasing-imputation-genotype-imputation/SKILL.md) | bioskills | Imputes untyped genotypes against a phased reference panel with Beagle, Minimac4, or IMPUTE5 (array data) or from genotype likelihoods with GLIMPSE2, QUILT2, or STITCH (low-cove... |
 | [phasing-imputation-haplotype-phasing](phasing-imputation-haplotype-phasing/SKILL.md) | bioskills | Estimates haplotype phase from population linkage disequilibrium with SHAPEIT5, SHAPEIT4, Eagle2, or Beagle - turning unphased genotypes (0/1) into phased haplotypes (0\|1) for ... |
 | [phasing-imputation-imputation-qc](phasing-imputation-imputation-qc/SKILL.md) | bioskills | Assesses and filters phasing/imputation output - the quality metrics (Beagle DR2, Minimac R2 and EmpRsq, IMPUTE/GLIMPSE INFO), MAF-stratified filtering, true accuracy by masking... |
@@ -323,7 +356,7 @@ dnakit skills cite variant-annotation
 | [recombinator](recombinator/SKILL.md) | clawbio | Produce offspring genomes from parent pairs via meiotic recombination, mutation, and clinical evaluation |
 | [vitis-popgen](vitis-popgen/SKILL.md) | plant-skills | Population-genetics workflow from a clean VCF: clones, PCA, ADMIXTURE, Fst, TreeMix, Dsuite, selection. Use for Vitis / perennial crops where clones and families wreck structure... |
 
-### 调控与表观基因组 / Regulatory and epigenomics (64)
+### 调控与表观基因组 / Regulatory and epigenomics (66)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -357,6 +390,7 @@ dnakit skills cite variant-annotation
 | [chipseq-visualization](chipseq-visualization/SKILL.md) | bioskills | Visualizes ChIP-seq data using deepTools (computeMatrix, plotHeatmap, plotProfile, bamCoverage, bamCompare), pyGenomeTracks (modern INI-driven track plots), Gviz (R browser-styl... |
 | [compare-biosamples](compare-biosamples/SKILL.md) | encode-toolkit | Compare ENCODE experiments across different biosamples, tissues, or cell lines to identify tissue-specific regulatory patterns. Use when the user wants cross-tissue comparison, ... |
 | [data-visualization-genome-tracks](data-visualization-genome-tracks/SKILL.md) | bioskills | Build genome-browser-style multi-track figures with pyGenomeTracks (config-driven), Gviz (R), and IGV batch screenshotting. Covers BigWig coverage tracks, BED/peak overlays, gen... |
+| [dnakit-methylation-summary](dnakit-methylation-summary/SKILL.md) | dnakit | Read modkit extended bedMethyl and compute coverage-weighted methylation summaries with DNAKit. Use for nanopore modification counts, including separate 5mC and 5hmC groups. |
 | [epigenomics](epigenomics/SKILL.md) | tooluniverse | Genomics and epigenomics analysis: DNA methylation (CpG, 5mC, 5hmC, bisulfite, RRBS), m6A RNA modification (MeRIP-seq), ChIP-seq peaks, ATAC-seq accessibility, histone modificat... |
 | [epigenomics-chromatin](epigenomics-chromatin/SKILL.md) | tooluniverse | Histone-modification ChIP-seq, ATAC-seq accessibility, chromatin state, and TF binding analysis from ENCODE, Roadmap Epigenomics, ChIP-Atlas. Use for chromatin-state-by-tissue q... |
 | [gene-regulatory-networks](gene-regulatory-networks/SKILL.md) | tooluniverse | Gene regulatory network analysis — TF-target inference (JASPAR motifs, ChIP-seq), motif scanning, eQTL integration, perturbation evidence (knockout/overexpression). Use for 'whi... |
@@ -389,6 +423,7 @@ dnakit skills cite variant-annotation
 | [regulatory-elements](regulatory-elements/SKILL.md) | encode-toolkit | Discover and characterize regulatory elements (enhancers, promoters, silencers, insulators, super-enhancers) using ENCODE data and the cCRE catalog. Use when the user wants to f... |
 | [regulatory-genomics](regulatory-genomics/SKILL.md) | tooluniverse | Transcription factor binding, cis-regulatory elements (cCREs), chromatin accessibility, and regulatory annotation using JASPAR (motifs), ENCODE (cCREs, ChIP-seq), RegulomeDB (re... |
 | [regulatory-variant-analysis](regulatory-variant-analysis/SKILL.md) | tooluniverse | Non-coding/regulatory variant interpretation — GWAS association lookup, eQTL evidence (GTEx), chromatin state (ENCODE), regulatory variant scoring (RegulomeDB, CADD), and TF-bin... |
+| [scvi-tools](scvi-tools/SKILL.md) | user335-anthropic | Deep learning for single-cell analysis using scvi-tools. This skill should be used when users need (1) data integration and batch correction with scVI/scANVI, (2) ATAC-seq analy... |
 | [ucsc-conservation-and-tfbs](ucsc-conservation-and-tfbs/SKILL.md) | deepmind | Fetch Evolutionary Conservation scores (phyloP, phastCons) and Transcription Factor Binding Sites (TFBS) from the UCSC Genome Browser. Use when analyzing whether genomic variant... |
 | [variant-to-mechanism](variant-to-mechanism/SKILL.md) | tooluniverse | End-to-end variant-to-mechanism analysis — trace a variant (rsID/coordinates) through regulatory context, target gene(s), molecular pathway(s), and phenotypic consequences. Inte... |
 
@@ -541,7 +576,7 @@ dnakit skills cite variant-annotation
 | [viromics](viromics/SKILL.md) | omics | Detect, quality-control, and classify viral contigs. Use when identifying viruses in assemblies, checking viral completeness and contamination, or assigning viral taxonomy. |
 | [virulencefinder](virulencefinder/SKILL.md) | pku-metagenomics | VirulenceFinder — CGE virulence gene detection in bacterial assemblies/reads for supported species (historically E. coli, Enterococcus, S. aureus, Listeria, …). Upstream: https:... |
 
-### 基因组数据库 / Genomic databases (39)
+### 基因组数据库 / Genomic databases (43)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -565,9 +600,11 @@ dnakit skills cite variant-annotation
 | [gene-database](gene-database/SKILL.md) | sciagent | NCBI Gene via E-utilities: curated records across 1M+ taxa. Official symbols, aliases, RefSeq IDs, summaries, coordinates, GO, interactions. Use for gene ID resolution and cross... |
 | [geo-data](geo-data/SKILL.md) | bioskills | Query and download from NCBI Gene Expression Omnibus (GEO) and EMBL-EBI's BioStudies/ArrayExpress mirror. Use when finding expression datasets, navigating SuperSeries vs SubSeri... |
 | [gget-genomic-databases](gget-genomic-databases/SKILL.md) | sciagent | Unified CLI/Python interface to 20+ genomic databases. Gene lookups (Ensembl search/info/seq), BLAST/BLAT, AlphaFold, Enrichr enrichment, OpenTargets disease/drug, CELLxGENE sin... |
+| [gigwa-explore-instance](gigwa-explore-instance/SKILL.md) | gigwa-mcp | Get an overview of an entire Gigwa instance and flag anything that needs attention. Use this when a user asks what data is available on a Gigwa server, wants to enumerate databa... |
 | [gtdb](gtdb/SKILL.md) | pku-metagenomics | Use the Genome Taxonomy Database (GTDB) public releases — taxonomy tables, trees, metadata, and representative genomes. Use this skill when: (1) Choosing or citing a GTDB releas... |
 | [gwas-catalog-region-fetch](gwas-catalog-region-fetch/SKILL.md) | clawbio | Fetch a region of GWAS summary statistics from the NHGRI-EBI GWAS Catalog harmonised collection via tabix-on-FTP. Use when an agent needs GWAS beta / SE / p-value for every vari... |
 | [gwas-database](gwas-database/SKILL.md) | sciagent | NHGRI-EBI GWAS Catalog REST API for SNP-trait associations from published GWAS. Query studies, associations, variants, traits, genes, summary stats. Build PRS candidates, analyz... |
+| [gwas-fetch](gwas-fetch/SKILL.md) | statgen-skills | Fetch harmonised GWAS summary statistics from the GWAS Catalog by accession (GCST*). Resolves the study's metadata (genome build, FTP URL, sample size, ancestry) via the OKG whe... |
 | [jaspar-database](jaspar-database/SKILL.md) | sciagent | JASPAR 2024 TF binding profiles via REST API and pyJASPAR. Retrieve PFMs/PWMs by TF name, JASPAR ID, species, or structural class. Scan DNA for TFBS; browse by taxon (human, mou... |
 | [local-blast](local-blast/SKILL.md) | bioskills | Build local BLAST databases and run searches using NCBI BLAST+ command-line tools. Use when running >50 queries, building custom databases with -parse_seqids and -taxid, downloa... |
 | [mgnify](mgnify/SKILL.md) | pku-metagenomics | Use EMBL-EBI MGnify for analysed microbiome studies and biome genome catalogues (including UHGG / human-gut and other biomes). Use this skill when: (1) Browsing or citing MGnify... |
@@ -575,7 +612,9 @@ dnakit skills cite variant-annotation
 | [monarch-database](monarch-database/SKILL.md) | sciagent | Monarch Initiative knowledge graph REST API for disease-gene-phenotype associations and cross-species orthology. MONDO disease-to-gene/phenotype, HP phenotype profiles, cross-sp... |
 | [mouse-phenome-database](mouse-phenome-database/SKILL.md) | sciagent | Retrieve mouse phenotype data from the Jackson Laboratory Mouse Phenome Database (MPD) via its REST API. Browse 520+ projects, look up per-project measure metadata, pull strain-... |
 | [ncbi-datasets-cli](ncbi-datasets-cli/SKILL.md) | bioskills | Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use wh... |
+| [okg-search](okg-search/SKILL.md) | statgen-skills | Query the statgen-analysis OKG for datasets matching a trait, EFO term, seed-dataset, or curated category, with controlled-vocab ancestry filtering (EUR/AFR/EAS/AMR/SAS/admixed/... |
 | [ortholog-inference](ortholog-inference/SKILL.md) | bioskills | Pull pre-computed ortholog calls from public databases (OrthoDB, Ensembl Compara, OMA browser, eggNOG, PANTHER, KEGG Orthology, HomoloGene) via their REST APIs. Use when ortholo... |
+| [pdb-database](pdb-database/SKILL.md) | user335-deepmind | Use when you want to search for or download experimentally-determined 3D structures for biomolecules (proteins, nucleic acids, bound ligands). Supports searching by sequence sim... |
 | [population-genetics-1000genomes](population-genetics-1000genomes/SKILL.md) | tooluniverse | Population genetics using the 1000 Genomes Project (IGSR) — superpopulation/population search, sample metadata, variant frequencies across AFR/AMR/EAS/EUR/SAS, ancestry-specific... |
 | [progenomes](progenomes/SKILL.md) | pku-metagenomics | proGenomes4 — nearly 2 million consistently QC'd and annotated high-quality prokaryotic genomes with habitat metadata, pan-genomes, MGE/BGC annotations. Use when: (1) Building l... |
 | [regulomedb-database](regulomedb-database/SKILL.md) | sciagent | Query RegulomeDB v2 GET REST API to score variants for regulatory function and retrieve overlapping evidence (TF binding, histone marks, DNase peaks, footprints, motifs, eQTLs, ... |
@@ -585,7 +624,7 @@ dnakit skills cite variant-annotation
 | [ucsc-genome-browser](ucsc-genome-browser/SKILL.md) | sciagent | Query UCSC Genome Browser REST API for DNA sequences, tracks, gene models, and conservation across 100+ assemblies. Retrieve sequence by region, list/fetch BED/bigWig tracks, ch... |
 | [unibind-database](unibind-database/SKILL.md) | deepmind | Queries the UniBind database for experimentally validated transcription factor (TF) binding sites. Use when retrieving direct TF-DNA interaction datasets, downloading binding si... |
 
-### DNA 模型与加速 / DNA models and acceleration (14)
+### DNA 模型与加速 / DNA models and acceleration (15)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -603,19 +642,22 @@ dnakit skills cite variant-annotation
 | [nucleotide-transformer](nucleotide-transformer/SKILL.md) | pku-metagenomics | InstaDeep Nucleotide Transformer family — DNA foundation models from NT/NT-v2 through NTv3 (multi-species, long-context seq–function and generation). Use when: (1) DNA embedding... |
 | [omg](omg/SKILL.md) | pku-metagenomics | Open MetaGenomic (OMG) corpus and gLM2 mixed-modality genomic language model — large pretraining data from IMG + MGnify (Tbp-scale DNA + billions of CDS). Use when: (1) Pretrain... |
 | [parabricks](parabricks/SKILL.md) | bionemo | Route NVIDIA Parabricks pbrun tools, assess GPU/runtime readiness, and provide version-aware command guidance for FASTQ/BAM processing, RNA-seq, variant calling, BAM QC, and GVC... |
+| [tangermeme](tangermeme/SKILL.md) | tangermeme | Use for any task involving the tangermeme library — post-training analysis of genomic sequence-to-function (S2F) deep learning models. Triggers on predictions, DeepLIFT/SHAP att... |
 
-### 组合流程与技能入口 / Composite workflows and skill discovery (69)
+### 组合流程与技能入口 / Composite workflows and skill discovery (75)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
 | [batch-analysis](batch-analysis/SKILL.md) | encode-toolkit | Guide for multi-experiment batch operations: QC screening, batch download, comparison, and report generation across many ENCODE experiments simultaneously. Use when users need t... |
 | [benchling-integration](benchling-integration/SKILL.md) | sciagent | Benchling R&D Python SDK: CRUD on registry entities (DNA, RNA, proteins, custom), inventory, ELN, workflow automation. Needs Benchling account and API key. Use biopython for loc... |
+| [bioconductor-bridge](bioconductor-bridge/SKILL.md) | user335-clawbio | Bioconductor package discovery, workflow recommendation, setup inspection, and starter code generation grounded in official Bioconductor containers and BiocManager. |
 | [bioinfo-pitfalls](bioinfo-pitfalls/SKILL.md) | plant-skills | Bioinformatics troubleshooting: HWE, multiple testing, aDNA damage, VCF merge traps, Slurm, array QC. Use when a pipeline looks significant but wrong, a tool errors on macOS/HPC... |
 | [bioinformatics-methods-results-writer](bioinformatics-methods-results-writer/SKILL.md) | damlab | Write Methods and Results sections for bioinformatics manuscripts from code, notebooks, logs, figures, and tables. Use when drafting or revising computational biology prose, esp... |
 | [bioinformatics-project](bioinformatics-project/SKILL.md) | omics | Structure reproducible bioinformatics projects with canonical layouts, restartable drivers, pinned environments, provenance, and lab notebooks. Use when starting or reorganizing... |
 | [cite-encode](cite-encode/SKILL.md) | encode-toolkit | Generate proper ENCODE citations for publications, grants, and presentations. Use when the user needs to cite ENCODE data, create bibliography entries, write acknowledgment sect... |
 | [data-provenance](data-provenance/SKILL.md) | encode-toolkit | Track exact provenance for every operation on ENCODE data — tool versions, reference files, scripts, parameters, and timestamps — to enable publication-ready methods writing. Us... |
 | [dnakit](dnakit/SKILL.md) | dnakit | Find and use curated DNA and genomics workflows from the DNAKit skill catalog. Use for DNA sequence processing, sequencing QC, alignment, assembly, variant analysis, GWAS, popul... |
+| [dnakit-external-genomics](dnakit-external-genomics/SKILL.md) | dnakit | Discover reviewed DNA projects, run registered external genomics analyses and connect to registered scientific MCP servers through DNAKit. Use when a workflow needs an optional ... |
 | [dnanexus-integration](dnanexus-integration/SKILL.md) | kdense | Build and operate reproducible genomics workloads on DNAnexus with the dx CLI, dxpy, apps/applets, native workflows, dxCompiler, and Nextflow. Use for DNAnexus data transfers, d... |
 | [encode-toolkit-setup](encode-toolkit-setup/SKILL.md) | encode-toolkit | Set up ENCODE access through DNAKit, including MCP discovery, public queries, credentials and connection troubleshooting. |
 | [experimental-design-batch-design](experimental-design-batch-design/SKILL.md) | bioskills | Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable o... |
@@ -624,6 +666,8 @@ dnakit skills cite variant-annotation
 | [experimental-design-randomization-blocking](experimental-design-randomization-blocking/SKILL.md) | bioskills | Structures biological experiments so inference is valid by construction, covering Fisher's principles (randomization, replication, local control), the experimental-vs-observatio... |
 | [experimental-design-sample-size](experimental-design-sample-size/SKILL.md) | bioskills | Estimates the minimum biological replicates (or cells/events) for a target power at a target FDR in genomics experiments using ssizeRNA, PROPER, powsimR for scRNA-seq, and pilot... |
 | [foundation-housekeeping](foundation-housekeeping/SKILL.md) | omics | Add schema-backed metadata validation, normalized Parquet tables, and a DuckDB catalog to a bioinformatics project. Use when an analysis needs LinkML/Pydantic records or a query... |
+| [galaxy-bioblend](galaxy-bioblend/SKILL.md) | user335-galaxy | Use Galaxy REST or the BioBlend Python SDK to manage genomic analysis histories, upload or inspect datasets, discover tools and invoke existing workflows on a user-selected Gala... |
+| [galaxy-bridge](galaxy-bridge/SKILL.md) | user335-clawbio | Galaxy tool discovery, intelligent recommendation, and execution — 8,000+ bioinformatics tools from usegalaxy.org with multi-signal scoring and workflow suggestions |
 | [genomics-study-design](genomics-study-design/SKILL.md) | research-suite | Design and audit non-model, polyploid, duplicated, or non-human genomic studies. Use when a task needs reference assemblies, truth sets, mapping, variant discovery, species-awar... |
 | [illumina-bridge](illumina-bridge/SKILL.md) | clawbio | Import DRAGEN-exported Illumina result bundles into ClawBio for local tertiary analysis and downstream routing. |
 | [isabl-debug-analysis](isabl-debug-analysis/SKILL.md) | isabl | Systematically debug a failed Isabl analysis. Use when an analysis has FAILED status or unexpected behavior. |
@@ -634,10 +678,12 @@ dnakit skills cite variant-annotation
 | [isabl-run-pipeline](isabl-run-pipeline/SKILL.md) | isabl | Submit and run multiple Isabl applications as a pipeline. Use when chaining apps together or running a sequence of analyses on samples. |
 | [isabl-submit-data](isabl-submit-data/SKILL.md) | isabl | Submit sequencing data to Isabl by creating individuals, samples, and experiments. Use when registering new data files or importing from external sources. |
 | [isabl-write-app](isabl-write-app/SKILL.md) | isabl | Guide through creating a new Isabl bioinformatics application. Use when building pipelines that integrate with the Isabl platform. |
+| [kiro-healthomics-genomics](kiro-healthomics-genomics/SKILL.md) | user335-aws-kiro | Prepare DNA sequencing and variant workflows for AWS HealthOmics using selected upstream Kiro guidance. Use for WDL/Nextflow import, genomic file-format checks, container refere... |
 | [multi-omics-data-harmonization](multi-omics-data-harmonization/SKILL.md) | bioskills | Harmonizes already-normalized per-omic matrices onto a common footing before joint integration - assembling a MultiAssayExperiment, choosing the per-omic variance-stabilizing tr... |
 | [multi-omics-integration](multi-omics-integration/SKILL.md) | tooluniverse | Multi-omics integration — orchestrate per-layer analysis (transcriptomics, proteomics, epigenomics, genomics, metabolomics) then perform cross-omics correlation, multi-omics clu... |
 | [multi-omics-mixomics-analysis](multi-omics-mixomics-analysis/SKILL.md) | bioskills | Builds supervised and unsupervised multivariate integration across bulk omics blocks with mixOmics - sPLS for sparse pairwise correlation, DIABLO (block.splsda) for a multi-bloc... |
 | [multi-omics-mofa-integration](multi-omics-mofa-integration/SKILL.md) | bioskills | Discovers shared and view-specific latent factors across bulk multi-omics blocks (RNA-seq, proteomics, methylation) on a common sample axis with MOFA2's unsupervised Bayesian gr... |
+| [nextflow-development](nextflow-development/SKILL.md) | user335-anthropic | Run nf-core bioinformatics pipelines (rnaseq, sarek, atacseq) on sequencing data. Use when analyzing RNA-seq, WGS/WES, or ATAC-seq data—either local FASTQs or public datasets fr... |
 | [nfcore-sarek-wrapper](nfcore-sarek-wrapper/SKILL.md) | clawbio | ClawBio wrapper around nf-core/sarek 3.8.1 covering mapping through annotation for germline, tumor-only, and somatic paired analyses. |
 | [pipeline-guide](pipeline-guide/SKILL.md) | encode-toolkit | Access ENCODE uniform analysis pipelines, generate user-specific Nextflow/WDL pipelines, manage compute resources, and integrate with cloud platforms. Use when the user wants to... |
 | [plant-omics-db](plant-omics-db/SKILL.md) | plant-skills | Build a journal-ready plant multi-omics database (genome, germplasm, variome, transcriptome, GWAS, tools). Use when the user wants a NAR/MP/PC class plant genomics web database,... |
@@ -677,3 +723,21 @@ dnakit skills cite variant-annotation
 | [workflows-outbreak-pipeline](workflows-outbreak-pipeline/SKILL.md) | bioskills | Orchestrates genomic-epidemiology outbreak investigation from pathogen isolates to transmission networks, forking bacterial (snippy -> Gubbins recombination-masking -> IQ-TREE -... |
 | [workflows-somatic-variant-pipeline](workflows-somatic-variant-pipeline/SKILL.md) | bioskills | Chains a somatic (tumor-normal) SNV/indel and structural-variant pipeline end to end with GATK Mutect2 (or Strelka2), wiring the somatic-specific machinery - panel-of-normals an... |
 | [workflows-tcr-pipeline](workflows-tcr-pipeline/SKILL.md) | bioskills | Orchestrates an end-to-end immune-repertoire pipeline from FASTQ to clonotypes, diversity, overlap, somatic hypermutation and lineages, routing on two forks. Use when deciding b... |
+
+### 基因组育种与农业 / Genomic breeding and agriculture (1)
+
+| Skill | 来源 | 用途 |
+| --- | --- | --- |
+| [dnakit-genomic-breeding](dnakit-genomic-breeding/SKILL.md) | dnakit | Compute diploid genomic relationships and fixed-lambda RR-BLUP predictions with DNAKit. Use for genotype-to-phenotype breeding research when aligned dosage matrices and training... |
+
+### DNA 数据存储 / DNA data storage (1)
+
+| Skill | 来源 | 用途 |
+| --- | --- | --- |
+| [dnakit-dna-storage](dnakit-dna-storage/SKILL.md) | dnakit | Encode bytes into DNA payloads and decode intact packets through the optional Chamaeleo Goldman codec. Use for computational DNA storage demonstrations and codec integration. |
+
+### DNA 纳米技术 / DNA nanotechnology (1)
+
+| Skill | 来源 | 用途 |
+| --- | --- | --- |
+| [dnakit-dna-nanotechnology](dnakit-dna-nanotechnology/SKILL.md) | dnakit | Construct an assigned scadnano DNA duplex and export caller-supplied scadnano geometry into oxDNA topology and configuration text using DNAKit. |

@@ -12,6 +12,7 @@
 - **计算方法：** 用栈按括号类型配对开闭位置；连续的 `(i,j)、(i+1,j−1)` 配对合并为 stem，最内层且无嵌套配对的链内区间计为 hairpin loop。结构类型和 3′ 端二聚体标记由这些固定规则派生，不做折叠预测。
 - **API：** `dnakit.secondary_structure.analyze_dot_bracket(strands[必须], dot_bracket[必须], three_prime_window[可选])`
 - **输入：** 必填 DNA 链集合和长度一致的 dot-bracket；多链用 `+` 分隔，支持 `() [] {} <>`。
+- **输出：** 返回 `SecondaryStructureSummary`，示例展示 `structure_type`、`base_pair_count`、`stem_lengths`、`hairpin_loop_lengths`。
 - **示例代码：**
 
 ```python
@@ -39,6 +40,7 @@ hairpin 6
 - **计算方法：** 要求方阵对称、元素在 `[0,1]` 且每行连同对角线之和为 1；对角线 `P(i,i)` 作为未配对概率，行和减对角线作为总配对概率。窗口可接近性是窗口内各位点未配对边缘概率的算术平均。
 - **API：** `dnakit.secondary_structure.pair_probability_metrics(strands[必须], probability_matrix[必须], accessibility_window_size[可选])`
 - **输入：** 必填 DNA 链集合和对称方阵；对角线是未配对概率，每行含对角线后的和必须为 1；可选可接近性窗口长度。
+- **输出：** 返回 `PairProbabilityResult`，示例展示 `pairing_probabilities_by_base`、`unpaired_probabilities_by_base`、`most_accessible_window_start`。
 - **示例代码：**
 
 ```python
@@ -75,6 +77,7 @@ print(result.most_accessible_window_start)
 - **计算方法：** 为每个位点确定目标状态：未配对时取 `P(i,i)`，与 `j` 配对时取 `P(i,j)`；归一化集合缺陷为 `Σ[1 − P(目标状态)] / N`。
 - **API：** `dnakit.secondary_structure.ensemble_defect_from_probabilities(target[必须], probabilities[必须])`
 - **输入：** 必填 `SecondaryStructureSummary` 目标和描述相同 DNA 链的 `PairProbabilityResult`。
+- **输出：** 返回目标结构的集合缺陷浮点数。
 - **示例代码：**
 
 ```python
@@ -109,6 +112,7 @@ print(ensemble_defect_from_probabilities(target, probabilities))
 - **计算方法：** 按 Boltzmann 关系 `P(target) = exp[−(Gtarget − Gensemble)/(RT)]` 计算，并将浮点结果限制在 `[0,1]`；函数不自行计算两个自由能。
 - **API：** `dnakit.secondary_structure.target_structure_probability(target_free_energy_kcal_per_mol[必须], ensemble_free_energy_kcal_per_mol[必须], temperature_celsius[可选])`
 - **输入：** 必填目标结构和集合的 kcal/mol 自由能；可选 0–100 °C 温度。
+- **输出：** 返回目标结构的热力学概率浮点数。
 - **示例代码：**
 
 ```python
@@ -127,10 +131,11 @@ print(same_energy, round(higher_target_energy, 6))
 
 ## 5) NUPACK 被动可用性检查
 
-- **作用：** 检查当前环境能否导入并调用兼容的 NUPACK 后端，返回版本和能力信息，使结构计算在运行前明确报告可用性。
+- **作用：** 检查当前环境能否定位 NUPACK 安装，返回版本和安装信息，供执行结构分析前检查。
 - **计算方法：** 仅用 Python 包定位和包元数据读取检查 `nupack` 模块、版本与安装位置；不导入模块、不执行科学计算，也不验证数值准确性。
 - **API：** `dnakit.secondary_structure.probe_nupack()`
 - **输入：** 无。
+- **输出：** 返回 `BackendInfo`，包含 NUPACK 后端是否可用及版本信息。
 - **示例代码：**
 
 ```python
@@ -140,7 +145,7 @@ status = probe_nupack()
 print(status.available, status.version, status.metadata["import_executed"])
 ```
 
-- **当前本地示例结果：**
+- **示例结果：** 当前本地环境；安装情况不同可能改变输出。
 
 ```text
 False None False
@@ -152,6 +157,7 @@ False None False
 - **计算方法：** 用温度、`[Na⁺]+[K⁺]`、`Mg²⁺` 和 ensemble 构造 NUPACK DNA 模型，再显式调用外部 NUPACK 的 `pfunc`、`mfe`、`pairs`、`subopt`、`sample`、结构概率和 defect 接口；DNAKit 只负责输入限制、结果解析和来源记录。
 - **API：** `dnakit.secondary_structure.NupackAdapter.analyze_complex(strands[必须], conditions[可选], ensemble[可选], target_structure[可选], suboptimal_energy_gap_kcal_per_mol[可选], num_samples[可选], accessibility_window_size[可选])`
 - **输入：** 必填 DNA 链集合；可选 NUPACK 条件、ensemble、目标 dot-bracket、0–20 kcal/mol 次优差值和 0–100000 个抽样。
+- **输出：** 返回 `NupackComplexResult`，示例展示 `mfe_structures`、`ensemble_free_energy_kcal_per_mol`、`dot_bracket`。
 - **示例代码：**
 
 ```python
@@ -171,7 +177,7 @@ else:
     print("NUPACK unavailable")
 ```
 
-- **当前本地示例结果：**
+- **示例结果：** 当前本地环境；安装情况不同可能改变输出。
 
 ```text
 NUPACK unavailable
@@ -183,6 +189,7 @@ NUPACK unavailable
 - **计算方法：** 将命名链、投料浓度、最大复合物大小和目标复合物传给外部 NUPACK `tube_analysis`，由其求各复合物的平衡浓度和配对概率；DNAKit 再按本次枚举的复合物浓度总和计算目标/非目标比例。
 - **API：** `dnakit.secondary_structure.NupackAdapter.analyze_tube(strands[必须], concentrations_molar[必须], target_strand_names[必须], conditions[可选], max_complex_size[可选])`
 - **输入：** 必填命名 DNA 链映射、键集合相同的摩尔浓度映射和目标复合物链名；最多 20 种链，`max_complex_size` 为 1–4。
+- **输出：** 返回 `NupackTubeResult`，示例展示 `target_complex_concentration_molar`、`target_complex_fraction`、`non_target_complex_fraction`。
 - **示例代码：**
 
 ```python
@@ -203,7 +210,7 @@ else:
     print("NUPACK unavailable")
 ```
 
-- **当前本地示例结果：**
+- **示例结果：** 当前本地环境；安装情况不同可能改变输出。
 
 ```text
 NUPACK unavailable

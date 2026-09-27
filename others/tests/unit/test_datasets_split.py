@@ -6,13 +6,21 @@ import json
 
 import pytest
 
-from dnakit.core import DNAAlphabet, DNARecord, DNASequence, Gap
+from dnakit.core import DNA, DNAAlphabet, DNARecord, DNASequence, Gap
 from dnakit.datasets import SplitConfig, split
 from dnakit.exceptions import ConfigurationError, UnsupportedGapOperationError
 
 
 def _records(count: int) -> list[DNARecord]:
     return [DNARecord(DNASequence("ACGT"), f"r{index}") for index in range(count)]
+
+
+def test_split_accepts_dna_batch_with_explicit_record_ids() -> None:
+    records = DNA([{"id": f"r{index}", "sequence": "ACGT"} for index in range(10)])
+    result = split(records, config=SplitConfig(ratios={"train": 0.8, "test": 0.2}, seed=17))
+
+    assert result.counts == {"train": 8, "test": 2}
+    assert {assignment.record_id for assignment in result.assignments} == set(records.ids)
 
 
 def test_random_split_has_exact_counts_seed_and_original_subset_order() -> None:
