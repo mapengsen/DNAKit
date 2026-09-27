@@ -36,9 +36,12 @@ def audit(dist: Path, *, root: Path = ROOT) -> None:
     catalog_bytes = catalog_path.read_bytes()
     catalog = json.loads(catalog_bytes)
     bundle = {"catalog.json": hashlib.sha256(catalog_bytes).hexdigest()}
+    executable = {}
     for skill in catalog["skills"]:
         for resource in skill["files"]:
-            bundle[f"{skill['id']}/{resource['path']}"] = resource["sha256"]
+            resource_name = f"{skill['id']}/{resource['path']}"
+            bundle[resource_name] = resource["sha256"]
+            executable[resource_name] = bool(resource.get("mode", 0o644) & 0o111)
     expected_python = {
         p.relative_to(root / "src").as_posix()
         for p in (root / "src/dnakit").rglob("*")
@@ -48,6 +51,7 @@ def audit(dist: Path, *, root: Path = ROOT) -> None:
         assert archive.stat().st_size <= 100_000_000, f"Archive too large: {archive}"
         wheel = archive.suffix == ".whl"
         contents: dict[str, bytes] = {}
+        modes: dict[str, int] = {}
         if wheel:
             with zipfile.ZipFile(archive) as handle:
                 entries = handle.infolist()
@@ -68,6 +72,7 @@ def audit(dist: Path, *, root: Path = ROOT) -> None:
                         stream = handle.extractfile(member)
                         assert stream is not None
                         contents[member.name] = stream.read()
+                        modes[member.name] = member.mode
         assert 0 < len(names) <= 30_000, f"Unexpected archive member count: {archive}"
         assert len(names) == len(set(names)), f"Duplicate archive members: {archive}"
         for name in names:
@@ -131,6 +136,10 @@ def audit(dist: Path, *, root: Path = ROOT) -> None:
                 assert hashlib.sha256(relative[source_name]).hexdigest() == digest, (
                     f"Sdist skill checksum mismatch: {source_name}"
                 )
+                if name in executable:
+                    assert bool(modes[prefix + source_name] & 0o111) == executable[name], (
+                        f"Sdist skill executable mode mismatch: {source_name}"
+                    )
             assert {"LICENSE", "docs/planning/requirements_traceability.csv"} <= relative.keys()
             native = {
                 name.removeprefix("src/"): data

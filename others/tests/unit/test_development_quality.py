@@ -7,6 +7,7 @@ import importlib.util
 import os
 import shutil
 import subprocess
+import sysconfig
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -26,7 +27,16 @@ def _require_checkers() -> None:
         pytest.skip("Actual contribution checks require Ruff and Mypy")
 
 
-def test_real_ruff_formats_candidate_and_strict_mypy_accepts_types(tmp_path: Path) -> None:
+@pytest.mark.parametrize("installed", [False, True])
+def test_real_ruff_formats_candidate_and_strict_mypy_accepts_types(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, installed: bool
+) -> None:
+    if installed:
+        monkeypatch.setattr(
+            quality,
+            "__file__",
+            str(Path(sysconfig.get_path("purelib")) / "dnakit/tools/development_quality.py"),
+        )
     _require_checkers()
     source = quality.prepare_generated_source(
         "def metric(value:int,*,offset:int=0)->int:\n return value+offset\n",
@@ -54,7 +64,16 @@ def test_real_ruff_formats_candidate_and_strict_mypy_accepts_types(tmp_path: Pat
     assert all(Path(item["log"]).is_file() for item in report["checks"].values())
 
 
-def test_real_strict_mypy_rejects_an_incorrect_return_type(tmp_path: Path) -> None:
+@pytest.mark.parametrize("installed", [False, True])
+def test_real_strict_mypy_rejects_an_incorrect_return_type(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, installed: bool
+) -> None:
+    if installed:
+        monkeypatch.setattr(
+            quality,
+            "__file__",
+            str(Path(sysconfig.get_path("purelib")) / "dnakit/tools/development_quality.py"),
+        )
     _require_checkers()
     source = quality.prepare_generated_source(
         'def metric(value: int) -> int:\n    return "wrong type"\n',

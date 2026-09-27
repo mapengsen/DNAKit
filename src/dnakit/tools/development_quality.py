@@ -43,9 +43,13 @@ def _run(
     command: list[str], *, root: Path, directory: Path, label: str, source: str | None = None
 ) -> subprocess.CompletedProcess[str]:
     environment = os.environ.copy()
-    environment["MYPYPATH"] = os.pathsep.join(
-        [str(root / "src"), str(Path(__file__).resolve().parents[2])]
-    )
+    source_paths = [root / "src"]
+    package_source = Path(__file__).resolve().parents[2]
+    # Installed typed packages are discovered by Mypy itself. Adding the whole
+    # site-packages directory to MYPYPATH is forbidden by Mypy.
+    if package_source.name == "src" and package_source not in source_paths:
+        source_paths.append(package_source)
+    environment["MYPYPATH"] = os.pathsep.join(str(path) for path in source_paths)
     try:
         result = subprocess.run(
             command,

@@ -68,6 +68,8 @@ def _archives(root: Path, *, tamper: str | None = None) -> Path:
         for name, data in source.items():
             member = tarfile.TarInfo(f"dnakit-0.1.5/{name}")
             member.size = len(data)
+            if tamper == "mode" and name == "skills/example/SKILL.md":
+                member.mode = 0o755
             archive.addfile(member, io.BytesIO(data))
     return dist
 
@@ -76,7 +78,7 @@ def test_release_archives_preserve_catalog_and_source(tmp_path: Path) -> None:
     audit(_archives(tmp_path), root=tmp_path)
 
 
-@pytest.mark.parametrize("tamper", ["skill", "missing", "code", "cache", "sdist"])
+@pytest.mark.parametrize("tamper", ["skill", "missing", "code", "cache", "sdist", "mode"])
 def test_release_archives_reject_corruption(tmp_path: Path, tamper: str) -> None:
     with pytest.raises(AssertionError):
         audit(_archives(tmp_path, tamper=tamper), root=tmp_path)

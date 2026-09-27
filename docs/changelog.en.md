@@ -6,6 +6,7 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [0.1.5] - 2026-09-27
 
+- Fix installed-package tool quality checks and preserve executable Skills resources in Git checkouts.
 - Add Agent checkpoints, resume, persistent knowledge, tool generation, repair, optimization and contribution workflows.
 - Extend custom training backends and scheduling, paired sequence chunking, tabular datasets and sampling, evaluation plots and reference consistency.
 - Add pip-installable genomics backends and refresh the bilingual API tutorials.
