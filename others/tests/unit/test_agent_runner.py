@@ -18,6 +18,7 @@ from dnakit.tools import (
     AgentResult,
     AgentToolRegistry,
     EmbeddingConfig,
+    RerankerConfig,
     default_tool_registry,
     run_agent,
 )
@@ -170,7 +171,7 @@ def test_llm_errors_and_interrupts_propagate(
     llm.assert_called_once()
 
 
-@pytest.mark.parametrize("mode", ["keyword", "semantic", "hybrid"])
+@pytest.mark.parametrize("mode", ["keyword", "semantic", "hybrid", "bm25", "bm25_hybrid", "rerank"])
 def test_agent_uses_configured_search_without_sharing_embedding_credentials(
     monkeypatch: pytest.MonkeyPatch,
     mode: Any,
@@ -184,9 +185,16 @@ def test_agent_uses_configured_search_without_sharing_embedding_credentials(
     registry = AgentToolRegistry(
         (default_tool_registry(verbose=False).resolve(WEIGHT),),
         embedding_config=embedding,
+        reranker_config=RerankerConfig(
+            model="rerank-only-model",
+            base_url="https://rerank.example/v2",
+            api_key="rerank-only-key",
+        ),
     )
     embed = Mock(side_effect=lambda texts, config: [(1.0, 0.0)] * len(texts))
     monkeypatch.setattr("dnakit.tools.embeddings._embed", embed)
+    rerank = Mock(side_effect=lambda query, documents, config: [n for n, _ in documents])
+    monkeypatch.setattr("dnakit.tools.registry._rerank", rerank)
     inputs = _model(monkeypatch, [*_steps(WEIGHT, {"sequence": "ACGT"}), _finish()])
     result = run_agent(
         "Calculate molecular weight",
@@ -201,7 +209,10 @@ def test_agent_uses_configured_search_without_sharing_embedding_credentials(
     assert inputs[0]["search"] == {"mode": mode, "limit": 1}
     assert "embedding-only-key" not in str(inputs)
     assert "embedding-only-model" not in str(inputs)
-    assert embed.call_count == (0 if mode == "keyword" else 2)
+    assert "rerank-only-key" not in str(inputs)
+    assert "rerank-only-model" not in str(inputs)
+    assert embed.call_count == (0 if mode in ("keyword", "bm25") else 2)
+    assert rerank.call_count == (1 if mode == "rerank" else 0)
 
 
 @pytest.mark.parametrize(

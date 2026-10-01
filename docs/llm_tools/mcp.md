@@ -242,6 +242,35 @@ create_server(registry).run(show_banner=False)
 
 Python、内置 Agent 和 MCP 使用同一个 `registry.search()`。模式说明、缓存更新及其他参数见 [Python API：关键词、云端 embedding 与混合检索](python_api.md#tool-search-modes)。
 
+### BM25、BM25＋Dense 与 Reranker
+
+现有 `search_dnakit_tools` 新增三种模式，无需注册额外 MCP 工具：
+
+| `mode` | 前置配置 |
+| --- | --- |
+| `bm25` | 无；本地 BM25，不调用模型 |
+| `bm25_hybrid` | 上述 embedding 配置；BM25＋Dense 的 RRF 融合 |
+| `rerank` | embedding 配置及下列独立重排服务配置 |
+
+例如，只检索 BM25 候选：
+
+```json
+{"name":"search_dnakit_tools","arguments":{"query":"download human reference genome","mode":"bm25","limit":10}}
+```
+
+在 MCP **服务进程**的环境中配置重排服务（客户端配置格式沿用上面的 `env` 示例）：
+
+```bash
+export DNAKIT_RERANK_BASE_URL="https://your-reranker-service.example/v2"
+export DNAKIT_RERANK_MODEL="your-reranker-model"
+export DNAKIT_RERANK_API_KEY="your-reranker-api-key"
+export DNAKIT_RERANK_CANDIDATE_LIMIT="50"
+```
+
+重启 MCP 后，将请求中的 `mode` 改为 `bm25_hybrid` 或 `rerank`。重排先取 BM25＋Dense 的固定前 50 个候选，再评分并返回前 `limit` 个；`limit` 不能超过候选池上限。`DNAKIT_RERANK_CANDIDATE_LIMIT` 可省略，默认 50，范围 1–1000。服务须支持 [Python API 文档](python_api.md#tool-search-modes)中说明的 Cohere 风格 `/rerank` 协议，不自动使用聊天服务。未配置时返回明确错误，默认 `keyword` 不受影响。
+
+可选 `DNAKIT_BM25_K1`、`DNAKIT_BM25_B` 分别覆盖默认 `1.2`、`0.75`，用于 `bm25`、`bm25_hybrid` 和 `rerank` 的 BM25 阶段。配置在进程启动时读取，不会在启动时调用模型。使用 Python 创建 MCP 时，可直接传入带 `bm25_config=BM25Config(...)` 和 `reranker_config=RerankerConfig(...)` 的 registry。
+
 ## 8) 常见问题
 
 | 现象 | 检查方式 |

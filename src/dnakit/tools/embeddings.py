@@ -19,7 +19,7 @@ from dnakit.exceptions import BackendExecutionError, ConfigurationError, InputFo
 from dnakit.llm.client import _NoRedirects, _strict_json
 from dnakit.llm.models import LLMConfig
 
-ToolSearchMode = Literal["keyword", "semantic", "hybrid"]
+ToolSearchMode = Literal["keyword", "semantic", "hybrid", "bm25", "bm25_hybrid", "rerank"]
 
 
 def _default_cache_dir() -> Path:

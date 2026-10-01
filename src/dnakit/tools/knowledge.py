@@ -19,12 +19,12 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from dnakit._progress import Progress, track
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
-from .embeddings import EmbeddingConfig, ToolSearchMode, _ToolEmbeddingIndex
+from .embeddings import EmbeddingConfig, _ToolEmbeddingIndex
 
 _SUFFIXES = frozenset(
     {".txt", ".md", ".markdown", ".rst", ".json", ".jsonl", ".csv", ".tsv", ".yaml", ".yml"}
@@ -66,7 +66,7 @@ class RAGConfig:
 
     directory: str | os.PathLike[str]
     index_dir: str | os.PathLike[str] | None = None
-    mode: ToolSearchMode = "keyword"
+    mode: Literal["keyword", "semantic", "hybrid"] = "keyword"
     embedding_config: EmbeddingConfig | None = None
     top_k: int = 5
     chunk_size: int = 1200

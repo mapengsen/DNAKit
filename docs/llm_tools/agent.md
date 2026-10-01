@@ -125,7 +125,7 @@ print(result.text)
 - **作用：** 从已注册的工具目录中找到与任务相关的候选，返回工具名称、说明、分类等信息。
 - **处理方法：** 默认按工具名称、描述和分类进行关键词匹配；语义模式使用 embedding 与余弦相似度，混合模式合并两种排名。此步骤不执行候选工具，也不搜索互联网。
 - **API：** `AgentToolRegistry.search(query[可选], category[可选], limit[可选], include_python_only[可选], mode[可选])`；模型动作格式为 `{"action":"search","query":"功能关键词"}`。
-- **输入：** 手动调用时 `query` 默认空字符串，表示列出工具；Agent 动作要求非空 `query`。直接调用默认 `limit=20`，Agent 使用调用方指定的 `search_limit`，默认 `5`。`mode` 可取 `keyword`、`semantic`、`hybrid`；后两种需配置 embedding 服务。
+- **输入：** 手动调用时 `query` 默认空字符串，表示列出工具；Agent 动作要求非空 `query`。直接调用默认 `limit=20`，Agent 使用调用方指定的 `search_limit`，默认 `5`。`mode` 可取 `keyword`、`bm25`（本地），以及 `semantic`、`hybrid`、`bm25_hybrid`、`rerank`（需 embedding）；`rerank` 还需独立重排配置。
 - **示例代码：** 以下关键词检索可离线运行，不需要模型密钥。
 
 ```python
@@ -508,6 +508,8 @@ print(result.text)
 ```
 
 `run_agent()` 默认 `search_mode="keyword"`、`search_limit=5`；候选数量可设为 1–100，模型不能修改调用方选定的模式或限额。`max_steps=50` 限制本次聊天模型调用总次数，包含开发审查和描述验证，不包含独立的 embedding API 请求。上例会执行选中的分子量计算工具。
+
+新增 `search_mode="bm25"` 可离线检索；`"bm25_hybrid"` 使用 BM25＋Dense 融合。`"rerank"` 在此基础上重排固定候选池，需要 registry 同时配置 `EmbeddingConfig` 和 `RerankerConfig`，并令 `search_limit <= candidate_limit`。配置示例见 [Python API](python_api.md#tool-search-modes)。重排 API 请求也不计入聊天 `max_steps`；缺少配置或密钥会在聊天请求前报错。
 
 <span id="agent-cache"></span>
 

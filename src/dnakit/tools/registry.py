@@ -18,6 +18,8 @@ from dnakit.exceptions import ConfigurationError
 from .adapters import coerce_arguments
 from .catalog import CATEGORY_LABELS, AgentToolSpec, _build_spec, build_tool_catalog
 from .embeddings import EmbeddingConfig, ToolSearchMode, _ToolEmbeddingIndex
+from .reranking import RerankerConfig, _rerank
+from .retrieval import BM25Config, _bm25_scores, _rrf
 from .serialization import AgentSerializationLimits, serialize_for_agent
 
 _TOKEN = re.compile(r"[\w]+", re.UNICODE)
@@ -33,6 +35,8 @@ class AgentToolRegistry:
         *,
         serialization_limits: AgentSerializationLimits | None = None,
         embedding_config: EmbeddingConfig | None = None,
+        bm25_config: BM25Config | None = None,
+        reranker_config: RerankerConfig | None = None,
     ) -> None:
         if embedding_config is not None and not isinstance(embedding_config, EmbeddingConfig):
             raise ConfigurationError(
@@ -43,6 +47,16 @@ class AgentToolRegistry:
         self._embedding_index = (
             _ToolEmbeddingIndex(embedding_config) if embedding_config is not None else None
         )
+        if bm25_config is not None and not isinstance(bm25_config, BM25Config):
+            raise ConfigurationError(
+                "bm25_config must be BM25Config or None.", code="INVALID_BM25_CONFIG"
+            )
+        if reranker_config is not None and not isinstance(reranker_config, RerankerConfig):
+            raise ConfigurationError(
+                "reranker_config must be RerankerConfig or None.", code="INVALID_RERANKER_CONFIG"
+            )
+        self._bm25_config = BM25Config() if bm25_config is None else bm25_config
+        self._reranker_config = reranker_config
         discovered = build_tool_catalog() if tools is None else tools
         names = [tool.name for tool in discovered]
         if len(names) != len(set(names)):
@@ -77,6 +91,14 @@ class AgentToolRegistry:
     @property
     def embedding_config(self) -> EmbeddingConfig | None:
         return self._embedding_config
+
+    @property
+    def bm25_config(self) -> BM25Config:
+        return self._bm25_config
+
+    @property
+    def reranker_config(self) -> RerankerConfig | None:
+        return self._reranker_config
 
     def _refreshed(
         self, additions: tuple[str, ...] = (), *, replacements: tuple[str, ...] = ()
@@ -152,19 +174,49 @@ class AgentToolRegistry:
             tuple(selected.values()),
             serialization_limits=self._serialization_limits,
             embedding_config=self._embedding_config,
+            bm25_config=self._bm25_config,
+            reranker_config=self._reranker_config,
         )
 
     def _validate_search_mode(self, mode: ToolSearchMode) -> None:
-        if mode not in ("keyword", "semantic", "hybrid"):
+        if mode not in ("keyword", "semantic", "hybrid", "bm25", "bm25_hybrid", "rerank"):
             raise ConfigurationError(
-                "mode must be keyword, semantic, or hybrid.", code="AGENT_SEARCH_MODE_INVALID"
+                "mode must be keyword, semantic, hybrid, bm25, bm25_hybrid, or rerank.",
+                code="AGENT_SEARCH_MODE_INVALID",
             )
-        if mode != "keyword" and self._embedding_index is None:
+        if mode not in ("keyword", "bm25") and self._embedding_index is None:
             raise ConfigurationError(
-                "Semantic and hybrid search require an embedding configuration.",
+                "Semantic, hybrid, bm25_hybrid and rerank require an embedding configuration.",
                 code="MISSING_EMBEDDING_CONFIG",
                 hint="Use AgentToolRegistry(embedding_config=EmbeddingConfig(...)).",
             )
+        if mode == "rerank" and self._reranker_config is None:
+            raise ConfigurationError(
+                "Rerank search requires a reranker configuration.",
+                code="MISSING_RERANKER_CONFIG",
+                hint="Use AgentToolRegistry(reranker_config=RerankerConfig(...), ...).",
+            )
+
+    def _validate_search_limit(self, limit: int, mode: ToolSearchMode) -> None:
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 100:
+            raise ConfigurationError(
+                "Search limit must be an integer in [1, 100].", code="AGENT_TOOL_LIMIT_INVALID"
+            )
+        if mode == "rerank":
+            assert self._reranker_config is not None
+            if limit > self._reranker_config.candidate_limit:
+                raise ConfigurationError(
+                    "Search limit must not exceed RerankerConfig.candidate_limit.",
+                    code="AGENT_TOOL_LIMIT_INVALID",
+                )
+
+    def _validate_search_credentials(self, mode: ToolSearchMode) -> None:
+        if mode == "rerank":
+            assert self._reranker_config is not None
+            self._reranker_config.resolved_api_key()
+        if mode not in ("keyword", "bm25"):
+            assert self._embedding_config is not None
+            self._embedding_config.resolved_api_key()
 
     def stats(self) -> dict[str, object]:
         """Return aggregate catalog counts without loading optional backends."""
@@ -247,6 +299,9 @@ class AgentToolRegistry:
         similarity. Hybrid search combines lexical and semantic rankings with
         reciprocal rank fusion (k=60), prioritizing exact function names. Filters
         apply before either search. Blank queries list tools without API calls.
+        BM25 is local; bm25_hybrid fuses BM25 and semantic ranks without name boosts.
+        Rerank sends the top candidate_limit bm25_hybrid results to a configured
+        reranker, then truncates to limit (which must not exceed candidate_limit).
         Cloud failures propagate; the requested mode never silently changes.
         """
 
@@ -256,11 +311,7 @@ class AgentToolRegistry:
                 "Agent tool search query must be a string.",
                 code="AGENT_TOOL_QUERY_INVALID",
             )
-        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 100:
-            raise ConfigurationError(
-                "Agent tool search limit must be an integer in [1, 100].",
-                code="AGENT_TOOL_LIMIT_INVALID",
-            )
+        self._validate_search_limit(limit, mode)
         if category is not None and (
             not isinstance(category, str) or category not in CATEGORY_LABELS
         ):
@@ -309,22 +360,35 @@ class AgentToolRegistry:
         ranked.sort(key=lambda item: (-item[0], item[1]))
         if mode == "keyword" or not normalized or not documents:
             return tuple(item[2] for item in ranked[:limit])
+        bm25_names: list[str] = []
+        if mode in ("bm25", "bm25_hybrid", "rerank"):
+            bm25_scores = _bm25_scores(query, documents, self._bm25_config)
+            bm25_names = sorted(bm25_scores, key=lambda name: (-bm25_scores[name], name))
+            if mode == "bm25":
+                return tuple(self._by_name[name] for name in bm25_names[:limit])
+        if mode == "rerank":
+            # Fail before paying for embeddings if the reranker credential is missing.
+            self._validate_search_credentials(mode)
         assert self._embedding_index is not None
         semantic_names = self._embedding_index.rank(query.strip(), documents)
         if mode == "semantic":
             return tuple(self._by_name[name] for name in semantic_names[:limit])
-        scores: defaultdict[str, float] = defaultdict(float)
-        for names in ([item[1] for item in ranked], semantic_names):
-            for position, name in enumerate(names, start=1):
-                scores[name] += 1.0 / (60 + position)
-        names = sorted(
-            scores,
-            key=lambda name: (
-                normalized not in (name.casefold(), name.rsplit(".", 1)[-1].casefold()),
-                -scores[name],
-                name,
-            ),
-        )
+        lexical_names = [item[1] for item in ranked] if mode == "hybrid" else bm25_names
+        names = _rrf((lexical_names, semantic_names))
+        if mode == "hybrid":
+            # Stable sort preserves the original hybrid's exact-name precedence.
+            names.sort(
+                key=lambda name: (
+                    normalized not in (name.casefold(), name.rsplit(".", 1)[-1].casefold())
+                )
+            )
+        if mode == "rerank":
+            assert self._reranker_config is not None
+            texts = dict(documents)
+            candidates = names[: self._reranker_config.candidate_limit]
+            names = _rerank(
+                query.strip(), [(name, texts[name]) for name in candidates], self._reranker_config
+            )
         return tuple(self._by_name[name] for name in names[:limit])
 
     def execute(

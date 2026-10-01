@@ -14,6 +14,8 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DNAKi
 from .catalog import CATEGORY_LABELS
 from .embeddings import EmbeddingConfig, ToolSearchMode
 from .registry import AgentToolRegistry, default_tool_registry
+from .reranking import RerankerConfig
+from .retrieval import BM25Config
 from .serialization import serialize_for_agent
 
 
@@ -95,8 +97,9 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
             "Use search_dnakit_tools to find a capability, describe_dnakit_tool to inspect "
             "its JSON schema, then call_dnakit_tool with the full tool name. File-writing, "
             "model-download, and external-process tools require allow_side_effects=true."
-            " Search defaults to keyword matching. Semantic and hybrid modes require "
-            "server-side embedding configuration. Search/describe never execute the candidates."
+            " Search defaults to keyword matching; bm25 is also local. Semantic, hybrid, "
+            "bm25_hybrid and rerank require server-side embedding configuration; rerank "
+            "additionally requires a reranker. Search/describe never execute the candidates."
             " For DNA workflow guidance, use search_dnakit_skills, then read_dnakit_skill."
             " Read each skill's DNAKIT.md for native database/ENCODE functions and bundled"
             " workflow entrypoints. Actual scientific libraries, tools, data and models keep"
@@ -185,16 +188,22 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
         description=(
             "Search DNAKit public functions by capability, function name, or category. "
             "Defaults to keyword matching; use English scientific terms for that mode. "
-            "Semantic/hybrid search sends query and tool descriptions to a configured "
-            "embedding API and caches tool vectors locally. "
+            "bm25 uses local Okapi BM25. semantic/hybrid/bm25_hybrid/rerank send query and "
+            "tool descriptions to a configured embedding API and cache tool vectors locally. "
+            "bm25_hybrid combines BM25 and semantic ranks with RRF. rerank additionally "
+            "sends a fixed pool of bm25_hybrid candidates to a configured reranker API. "
             "Returns candidates without executing them. "
-            f"Cloud embedding search configured: {resolved_registry.embedding_config is not None}."
+            f"Cloud embedding search configured: {resolved_registry.embedding_config is not None}. "
+            f"Reranker configured: {resolved_registry.reranker_config is not None}."
         ),
         annotations={
             "readOnlyHint": resolved_registry.embedding_config is None,
             "destructiveHint": False,
             "idempotentHint": True,
-            "openWorldHint": resolved_registry.embedding_config is not None,
+            "openWorldHint": (
+                resolved_registry.embedding_config is not None
+                or resolved_registry.reranker_config is not None
+            ),
         },
     )
     def search_tools(
@@ -330,6 +339,7 @@ def main(*, verbose: bool = True) -> None:
 
     base_url = os.environ.get("DNAKIT_EMBEDDING_BASE_URL")
     model = os.environ.get("DNAKIT_EMBEDDING_MODEL")
+    embedding_config = None
     if base_url is not None or model is not None:
         if not base_url or not model:
             raise ConfigurationError(
@@ -340,7 +350,44 @@ def main(*, verbose: bool = True) -> None:
         cache_dir = os.environ.get("DNAKIT_EMBEDDING_CACHE_DIR")
         if cache_dir is not None:
             embedding_config = replace(embedding_config, cache_dir=cache_dir)
-        registry = AgentToolRegistry(embedding_config=embedding_config)
+    bm25_config = None
+    k1, b = os.environ.get("DNAKIT_BM25_K1"), os.environ.get("DNAKIT_BM25_B")
+    if k1 is not None or b is not None:
+        try:
+            bm25_config = BM25Config(
+                k1=float(k1) if k1 is not None else 1.2,
+                b=float(b) if b is not None else 0.75,
+            )
+        except ValueError:
+            raise ConfigurationError(
+                "DNAKIT_BM25_K1 and DNAKIT_BM25_B must be numbers.", code="INVALID_BM25_CONFIG"
+            ) from None
+    reranker_config = None
+    rerank_url = os.environ.get("DNAKIT_RERANK_BASE_URL")
+    rerank_model = os.environ.get("DNAKIT_RERANK_MODEL")
+    candidates = os.environ.get("DNAKIT_RERANK_CANDIDATE_LIMIT")
+    if rerank_url is not None or rerank_model is not None or candidates is not None:
+        if not rerank_url or not rerank_model:
+            raise ConfigurationError(
+                "Set both DNAKIT_RERANK_BASE_URL and DNAKIT_RERANK_MODEL.",
+                code="INVALID_RERANKER_CONFIG",
+            )
+        try:
+            candidate_limit = 50 if candidates is None else int(candidates)
+        except ValueError:
+            raise ConfigurationError(
+                "DNAKIT_RERANK_CANDIDATE_LIMIT must be an integer.",
+                code="INVALID_RERANKER_CONFIG",
+            ) from None
+        reranker_config = RerankerConfig(
+            model=rerank_model, base_url=rerank_url, candidate_limit=candidate_limit
+        )
+    if embedding_config is not None or bm25_config is not None or reranker_config is not None:
+        registry = AgentToolRegistry(
+            embedding_config=embedding_config,
+            bm25_config=bm25_config,
+            reranker_config=reranker_config,
+        )
         server = create_server(registry)
     else:
         server = create_server()

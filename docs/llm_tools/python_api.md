@@ -43,13 +43,16 @@ print(info["input_schema"])
 
 ## 2) 关键词、云端 embedding 与混合检索
 
-三种模式共用 `registry.search()`，返回格式相同，**默认始终是 `keyword`**。即使配置了 embedding 服务，省略 `mode` 也不会联网。
+六种模式共用 `registry.search()`，返回格式相同，**默认始终是 `keyword`**。即使配置了 embedding 服务，省略 `mode` 也不会联网。
 
 | `mode` | 检索方式 | 是否调用 embedding API |
 | --- | --- | --- |
 | `keyword`（默认） | 匹配工具名称、功能短说明、中英文分类 | 否 |
 | `semantic` | 将查询和上述工具描述转成向量，按余弦相似度排序 | 是 |
 | `hybrid` | 合并关键词排名和语义排名 | 是 |
+| `bm25` | 本地 Okapi BM25 词项检索 | 否 |
+| `bm25_hybrid` | BM25 与语义排名的等权 RRF 融合 | 是 |
+| `rerank` | BM25＋Dense 召回固定候选池，再通过独立重排 API 排序 | 是，另调用重排 API |
 
 混合检索使用等权倒数排名融合（RRF，`k=60`），完整函数名或短函数名的精确匹配优先。分类 `category` 和 `include_python_only` 过滤在检索前生效。空白查询用于列出工具，或分类过滤后没有候选时，不请求 embedding API。向量模式返回最相近的候选，不保证候选一定能完成需求；执行前仍需查看 Schema。
 
@@ -114,6 +117,58 @@ tools = registry.search("download hg38 genome", limit=3)
 将这个 registry 用于 `run_agent()` 的示例见 [Agent：配置工具检索](agent.md#tool-search-modes)。
 
 MCP 也使用相同检索实现，参阅 [MCP 的只获取候选与云端检索配置](mcp.md#tool-search-modes)。
+
+### BM25、BM25＋Dense 与检索后重排
+
+`bm25` 不需要模型、API key 或新增依赖，可以直接运行：
+
+```python
+from dnakit.tools import AgentToolRegistry, BM25Config
+
+registry = AgentToolRegistry(bm25_config=BM25Config(k1=1.2, b=0.75))
+tools = registry.search("download human reference genome", mode="bm25", limit=10)
+print([tool.name for tool in tools])
+```
+
+BM25 使用正值 IDF `log(1 + (N - df + 0.5) / (df + 0.5))`；默认 `k1=1.2`、`b=0.75`。统计量在过滤后的候选目录内计算，仅返回得分大于零的工具，同分按完整工具名排序。文本来自工具名、检索说明（默认短说明）和中英文类别，与语义检索使用相同字段。英文转小写，下划线／连字符标识符同时保留整体和分词；中文文档使用单字及相邻双字，多个连续汉字的查询使用相邻双字。没有自动翻译、词干化或停用词删除。中文分词不会把中文描述翻译成工具的英文说明。
+
+`bm25_hybrid` 复用 `EmbeddingConfig`，以等权 RRF（`k=60`）融合完整 BM25 正分排名和完整语义排名，最后截取 `limit`。它不使用原 `hybrid` 的工具名称精确匹配优先规则。
+
+`rerank` 先运行 `bm25_hybrid`，再将前 `candidate_limit` 个候选发送到重排 API。使用 [Cohere Rerank 风格协议](https://docs.cohere.com/v2/reference/rerank)：`POST /rerank`，请求包含 `model`、`query`、字符串数组 `documents`、`top_n`；响应包含 `results`，每项具有 `index` 和数值 `relevance_score`。其他协议需要另行适配，不能直接把聊天或 embedding 接口地址当作重排地址。
+
+```bash
+export DNAKIT_RERANK_BASE_URL="https://your-reranker-service.example/v2"
+export DNAKIT_RERANK_MODEL="your-reranker-model"
+export DNAKIT_RERANK_API_KEY="your-reranker-api-key"
+```
+
+配置好本节前面的 embedding 环境变量后：
+
+```python
+import os
+
+from dnakit.tools import AgentToolRegistry, BM25Config, EmbeddingConfig, RerankerConfig
+
+registry = AgentToolRegistry(
+    bm25_config=BM25Config(k1=1.2, b=0.75),
+    embedding_config=EmbeddingConfig(
+        model=os.environ["DNAKIT_EMBEDDING_MODEL"],
+        base_url=os.environ["DNAKIT_EMBEDDING_BASE_URL"],
+    ),
+    reranker_config=RerankerConfig(
+        model=os.environ["DNAKIT_RERANK_MODEL"],
+        base_url=os.environ["DNAKIT_RERANK_BASE_URL"],
+        candidate_limit=50,
+    ),
+)
+for mode in ("bm25", "bm25_hybrid", "rerank"):
+    tools = registry.search("下载人类 hg38 参考基因组", mode=mode, limit=10)
+    print(mode, [tool.name for tool in tools])
+```
+
+`RerankerConfig` 的 `model`、`base_url` 必填；地址可为 API 前缀或完整 `/rerank` 地址。默认独立读取 `DNAKIT_RERANK_API_KEY`，可用 `api_key_env` 或隐藏于 repr 的 `api_key` 覆盖，不借用聊天或 embedding 密钥。`candidate_limit` 默认 50，允许 1–1000；`limit` 仍为 1–100，且不能超过候选池上限。可设置 `timeout_seconds=60`、`max_request_bytes=1_000_000`、`max_response_bytes=2_000_000`。
+
+重排每次对整个固定候选池评分，再截取输出；相同分数保留召回顺序，不随 Top-1／5／10 改变候选池。所有索引、结果数量及有限数值均被核对，缺失或重复结果报错。缺少配置、密钥、网络失败或超限均明确报错，不自动降级或重试。重排不执行候选工具，也不持久化查询、重排分数或密钥；其 embedding 缓存仍按前述规则保存。`run_agent(..., registry=registry, search_mode="rerank", search_limit=10)` 使用同一实现；工具目录刷新会保留这些配置。知识库 RAG 的模式仍单独配置。
 
 <span id="custom-llm"></span>
 

@@ -127,7 +127,7 @@ The model cannot enable these permissions or invent `cache`/`rag` JSON actions. 
 - **Purpose:** Find candidates relevant to a task in the registered tool catalog, including their names, descriptions, and categories.
 - **Method:** Default keyword retrieval matches tool names, descriptions, and categories. Semantic retrieval uses embeddings and cosine similarity; hybrid retrieval combines both rankings. This action does not execute candidate tools or search the internet.
 - **API:** `AgentToolRegistry.search(query[optional], category[optional], limit[optional], include_python_only[optional], mode[optional])`; model action format: `{"action":"search","query":"capability keywords"}`.
-- **Input:** For manual calls, `query` defaults to an empty string to list tools; Agent actions require a nonempty `query`. Direct calls default to `limit=20`; the Agent uses the caller's `search_limit`, defaulting to `5`. `mode` accepts `keyword`, `semantic`, or `hybrid`; the latter two require an embedding service.
+- **Input:** For manual calls, `query` defaults to an empty string to list tools; Agent actions require a nonempty `query`. Direct calls default to `limit=20`; the Agent uses the caller's `search_limit`, defaulting to `5`. Modes are `keyword` and `bm25` (local), or `semantic`, `hybrid`, `bm25_hybrid`, and `rerank` (requiring embeddings). `rerank` also requires separate reranker settings.
 - **Example code:** This keyword search runs offline without model credentials.
 
 ```python
@@ -515,6 +515,8 @@ print(result.text)
 ```
 
 `run_agent()` defaults to `search_mode="keyword"` and `search_limit=5`; candidate limits accept 1–100. The model cannot change the caller's mode or limit. `max_steps=50` bounds total model calls, including development reviews and evaluations but excluding independent embedding API requests. This example executes the selected molecular-weight tool.
+
+Use `search_mode="bm25"` for local BM25 or `"bm25_hybrid"` for BM25 + Dense fusion. `"rerank"` reranks a fixed pool from that fusion, requiring both `EmbeddingConfig` and `RerankerConfig` on the registry and `search_limit <= candidate_limit`. See the [Python API](python_api.md#tool-search-modes) for configuration examples. Reranker requests also fall outside chat `max_steps`; missing configuration or credentials fail before a chat request.
 
 <span id="agent-cache"></span>
 

@@ -43,13 +43,16 @@ Execution is a separate step: the caller decides whether to use `registry.execut
 
 ## 2) Keyword, cloud embedding, and hybrid search
 
-All three modes use `registry.search()` and return the same format. **The default is always `keyword`**: omitting `mode` makes no network requests even when an embedding service is configured.
+All six modes use `registry.search()` and return the same format. **The default is always `keyword`**: omitting `mode` makes no network requests even when an embedding service is configured.
 
 | `mode` | Retrieval method | Calls the embedding API? |
 | --- | --- | --- |
 | `keyword` (default) | Match tool names, short descriptions, and bilingual categories | No |
 | `semantic` | Embed the query and those tool descriptions, then rank by cosine similarity | Yes |
 | `hybrid` | Combine keyword and semantic rankings | Yes |
+| `bm25` | Local Okapi BM25 lexical retrieval | No |
+| `bm25_hybrid` | Equal-weight RRF of BM25 and semantic rankings | Yes |
+| `rerank` | Recall a fixed BM25 + Dense pool, then use a separate reranking API | Yes, plus a reranking API |
 
 Hybrid search uses equally weighted reciprocal rank fusion (RRF, `k=60`), prioritizing exact full or short function names. `category` and `include_python_only` filters apply before retrieval. Blank queries list tools without embedding requests; an empty filtered catalog also makes no request. Vector search returns the nearest candidates, which are not guaranteed to satisfy the task; inspect their schemas before execution.
 
@@ -114,6 +117,58 @@ The cloud receives only query text and tool names, short descriptions, and categ
 To use this registry with `run_agent()`, see [Agent: configure tool retrieval](agent.md#tool-search-modes).
 
 MCP shares the same implementation; see [candidate-only discovery and cloud search configuration](mcp.md#tool-search-modes).
+
+### BM25, BM25 + Dense, and retrieval with reranking
+
+BM25 runs without models, credentials, or additional dependencies:
+
+```python
+from dnakit.tools import AgentToolRegistry, BM25Config
+
+registry = AgentToolRegistry(bm25_config=BM25Config(k1=1.2, b=0.75))
+tools = registry.search("download human reference genome", mode="bm25", limit=10)
+print([tool.name for tool in tools])
+```
+
+BM25 uses positive IDF `log(1 + (N - df + 0.5) / (df + 0.5))`, with defaults `k1=1.2`, `b=0.75`. Corpus statistics are computed after catalog filtering. Only positive-score tools are returned; ties use canonical tool names. It uses the same fields as semantic retrieval: name, retrieval description (the short description by default), and bilingual categories. Latin text is case-folded, with underscore/hyphen identifiers retained and split into components. CJK documents use unigrams and adjacent bigrams; multi-character CJK queries use adjacent bigrams. There is no translation, stemming, or stop-word removal.
+
+`bm25_hybrid` reuses `EmbeddingConfig` and fuses the complete positive BM25 ranking and complete semantic ranking using equal-weight RRF (`k=60`), then truncates to `limit`. It does not apply the original `hybrid` mode's exact-name priority.
+
+`rerank` recalls the first `candidate_limit` results from `bm25_hybrid` and scores that pool with a separate API. The supported [Cohere-style reranking protocol](https://docs.cohere.com/v2/reference/rerank) is `POST /rerank`, with `model`, `query`, a string array `documents`, and `top_n`. The response must contain `results` with `index` and numeric `relevance_score`. Other protocols require adapters; chat and embedding endpoints are not reranking endpoints.
+
+```bash
+export DNAKIT_RERANK_BASE_URL="https://your-reranker-service.example/v2"
+export DNAKIT_RERANK_MODEL="your-reranker-model"
+export DNAKIT_RERANK_API_KEY="your-reranker-api-key"
+```
+
+After setting the embedding environment variables above:
+
+```python
+import os
+
+from dnakit.tools import AgentToolRegistry, BM25Config, EmbeddingConfig, RerankerConfig
+
+registry = AgentToolRegistry(
+    bm25_config=BM25Config(k1=1.2, b=0.75),
+    embedding_config=EmbeddingConfig(
+        model=os.environ["DNAKIT_EMBEDDING_MODEL"],
+        base_url=os.environ["DNAKIT_EMBEDDING_BASE_URL"],
+    ),
+    reranker_config=RerankerConfig(
+        model=os.environ["DNAKIT_RERANK_MODEL"],
+        base_url=os.environ["DNAKIT_RERANK_BASE_URL"],
+        candidate_limit=50,
+    ),
+)
+for mode in ("bm25", "bm25_hybrid", "rerank"):
+    tools = registry.search("Download the human hg38 reference genome", mode=mode, limit=10)
+    print(mode, [tool.name for tool in tools])
+```
+
+`RerankerConfig` requires `model` and `base_url`; the URL may be an API prefix or the complete `/rerank` endpoint. Credentials default to `DNAKIT_RERANK_API_KEY`, independently of chat and embedding keys; override with `api_key_env` or a repr-hidden `api_key`. `candidate_limit` defaults to 50 and accepts 1–1000. Output `limit` still accepts 1–100 and must not exceed the pool budget. Other settings are `timeout_seconds=60`, `max_request_bytes=1_000_000`, and `max_response_bytes=2_000_000`.
+
+The entire fixed candidate pool is reranked before output truncation, so changing Top-1/5/10 does not change recall. Equal scores preserve recall order. Missing/duplicate results, invalid indexes, non-finite scores, missing configuration/credentials, API failures, and byte-limit violations raise explicit errors without retries or fallback. Reranking neither executes tools nor persists queries, scores, or credentials; embedding caching still follows the rules above. `run_agent(..., registry=registry, search_mode="rerank", search_limit=10)` shares this implementation, and registry refreshes preserve the settings. Knowledge RAG modes remain separately configured.
 
 <span id="custom-llm"></span>
 

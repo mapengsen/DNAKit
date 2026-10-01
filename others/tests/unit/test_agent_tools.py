@@ -13,7 +13,7 @@ import pytest
 import dnakit.tools.server as server_module
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.predictions import PropertyPredictionConfig
-from dnakit.tools import AgentToolRegistry, EmbeddingConfig, default_tool_registry
+from dnakit.tools import AgentToolRegistry, EmbeddingConfig, RerankerConfig, default_tool_registry
 from dnakit.tools.adapters import coerce_value
 from dnakit.tools.catalog import PUBLIC_TOOL_MODULES
 
@@ -359,12 +359,18 @@ def test_mcp_search_modes_match_python_and_do_not_execute(
             api_key="offline-key",
             cache_dir=None,
         ),
+        reranker_config=RerankerConfig(
+            model="offline-rerank", base_url="https://rerank.example/v2", api_key="rerank-only-key"
+        ),
     )
     monkeypatch.setattr(
         "dnakit.tools.embeddings._embed", lambda texts, config: [(1.0, 0.0)] * len(texts)
     )
+    monkeypatch.setattr(
+        "dnakit.tools.registry._rerank", lambda query, documents, config: [n for n, _ in documents]
+    )
     server_module.create_server(registry, verbose=False)
-    for mode in ("keyword", "semantic", "hybrid"):
+    for mode in ("keyword", "semantic", "hybrid", "bm25", "bm25_hybrid", "rerank"):
         result = cast(
             dict[str, Any], fake.tools["search_dnakit_tools"]("download genome", mode=mode)
         )
@@ -394,9 +400,20 @@ def test_mcp_entrypoint_loads_embedding_settings_from_environment(
     monkeypatch.setenv("DNAKIT_EMBEDDING_MODEL", "offline-model")
     monkeypatch.setenv("DNAKIT_EMBEDDING_BASE_URL", "https://embedding.example/v1")
     monkeypatch.setenv("DNAKIT_EMBEDDING_CACHE_DIR", str(tmp_path / "vectors"))
+    monkeypatch.setenv("DNAKIT_BM25_K1", "1.5")
+    monkeypatch.setenv("DNAKIT_BM25_B", "0.5")
+    monkeypatch.setenv("DNAKIT_RERANK_MODEL", "offline-rerank")
+    monkeypatch.setenv("DNAKIT_RERANK_BASE_URL", "https://rerank.example/v2")
+    monkeypatch.setenv("DNAKIT_RERANK_CANDIDATE_LIMIT", "60")
     server_module.main(verbose=False)
     assert fake.ran is True
     embedding_config = registries[0].embedding_config
     assert embedding_config is not None
     assert embedding_config.model == "offline-model"
+    assert registries[0].bm25_config.k1 == 1.5
+    assert registries[0].bm25_config.b == 0.5
+    reranker_config = registries[0].reranker_config
+    assert reranker_config is not None
+    assert reranker_config.candidate_limit == 60
+    assert reranker_config.model == "offline-rerank"
     assert not (tmp_path / "vectors").exists()

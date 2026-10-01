@@ -9,6 +9,8 @@ from .embeddings import EmbeddingConfig, ToolSearchMode
 from .execution import PythonExecutionConfig
 from .knowledge import RAGConfig, retrieve_knowledge
 from .registry import AgentToolRegistry, default_tool_registry
+from .reranking import RerankerConfig
+from .retrieval import BM25Config
 from .serialization import AgentSerializationLimits, serialize_for_agent
 from .server import create_server
 
@@ -17,9 +19,11 @@ __all__ = [
     "AgentSerializationLimits",
     "AgentToolRegistry",
     "AgentToolSpec",
+    "BM25Config",
     "EmbeddingConfig",
     "PythonExecutionConfig",
     "RAGConfig",
+    "RerankerConfig",
     "ToolEffect",
     "ToolSearchMode",
     "build_tool_catalog",

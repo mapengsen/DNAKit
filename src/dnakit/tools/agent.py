@@ -28,8 +28,9 @@ Return exactly one JSON action per turn, using one of these forms:
 {"action":"finish","status":"blocked","text":"Explain what is missing or failed"}
 
 Search across capabilities as needed; you may search and call multiple different tools.
-For keyword search, use English capability keywords. For semantic or hybrid search,
-use a meaningful capability description; preserve the user's intent and identifiers.
+For keyword search, use English capability keywords. For bm25, use capability keywords.
+For semantic, hybrid, bm25_hybrid or rerank, use a meaningful capability description;
+preserve the user's intent and identifiers.
 The search mode and candidate limit are configured by the caller, not by your actions.
 Always describe a discovered tool before calling it. Read the entire input schema,
 including descriptions, required parameters and defaults. Search keywords are NOT
@@ -359,9 +360,10 @@ def run_agent(
     and saves scripts, inputs, output logs and action history in execution_dir.
     It is not sandboxed. Failed scripts return observations for model correction,
     bounded by both max_steps and code_execution.max_attempts.
-    Search defaults to keyword matching with five candidates. Semantic/hybrid
-    search requires a registry configured with EmbeddingConfig; its cloud calls
-    and tool-vector cache are independent of the chat LLM and max_steps.
+    Search defaults to keyword matching with five candidates. BM25 also runs locally.
+    Semantic/hybrid/bm25_hybrid/rerank require EmbeddingConfig; rerank additionally
+    requires RerankerConfig. Their API calls and tool-vector cache are independent
+    of the chat LLM and max_steps.
     ``cache_dir`` saves each step to local JSON files. ``reuse_results=True``
     restores valid history for the same request, working directories and RAG evidence;
     it requires cache_dir. Changed tools or known input/output files invalidate
@@ -440,17 +442,8 @@ def run_agent(
     if development_root is not None:
         registry = registry._refreshed()
     registry._validate_search_mode(search_mode)
-    if (
-        isinstance(search_limit, bool)
-        or not isinstance(search_limit, int)
-        or not 1 <= search_limit <= 100
-    ):
-        raise ConfigurationError(
-            "search_limit must be an integer in [1, 100].", code="AGENT_TOOL_LIMIT_INVALID"
-        )
-    if search_mode != "keyword":
-        assert registry.embedding_config is not None
-        registry.embedding_config.resolved_api_key()
+    registry._validate_search_limit(search_limit, search_mode)
+    registry._validate_search_credentials(search_mode)
     knowledge = retrieve_knowledge(request, config=rag, verbose=verbose) if rag else []
     checkpoint = (
         _AgentCheckpoint(

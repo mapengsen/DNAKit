@@ -264,6 +264,35 @@ create_server(registry).run(show_banner=False)
 
 Python, the built-in Agent, and MCP share `registry.search()`. See [Python API: keyword, cloud embedding, and hybrid search](python_api.md#tool-search-modes) for ranking modes, cache updates, and other settings.
 
+### BM25, BM25 + Dense, and reranking
+
+The existing `search_dnakit_tools` endpoint accepts three additional modes:
+
+| `mode` | Configuration required |
+| --- | --- |
+| `bm25` | None; local BM25 with no model requests |
+| `bm25_hybrid` | Embedding settings above; RRF of BM25 and Dense |
+| `rerank` | Embedding settings plus the independent reranking service below |
+
+For example:
+
+```json
+{"name":"search_dnakit_tools","arguments":{"query":"download human reference genome","mode":"bm25","limit":10}}
+```
+
+Configure these variables in the MCP **server process** environment (using the client `env` configuration illustrated above):
+
+```bash
+export DNAKIT_RERANK_BASE_URL="https://your-reranker-service.example/v2"
+export DNAKIT_RERANK_MODEL="your-reranker-model"
+export DNAKIT_RERANK_API_KEY="your-reranker-api-key"
+export DNAKIT_RERANK_CANDIDATE_LIMIT="50"
+```
+
+Restart MCP, then request `bm25_hybrid` or `rerank`. Reranking scores the fixed first 50 BM25 + Dense candidates before returning `limit` results; output `limit` must not exceed the pool budget. The optional `DNAKIT_RERANK_CANDIDATE_LIMIT` defaults to 50 and accepts 1–1000. The service must support the Cohere-style `/rerank` protocol described in the [Python API documentation](python_api.md#tool-search-modes); chat services are never selected implicitly. Missing configuration returns an explicit error; default keyword search is unaffected.
+
+Optional `DNAKIT_BM25_K1` and `DNAKIT_BM25_B` override defaults `1.2` and `0.75` for the BM25 stage of `bm25`, `bm25_hybrid`, and `rerank`. Settings are read at startup without model requests. Python-created servers can instead receive a registry configured with `bm25_config=BM25Config(...)` and `reranker_config=RerankerConfig(...)`.
+
 ## 8) Troubleshooting
 
 | Symptom | What to check |
