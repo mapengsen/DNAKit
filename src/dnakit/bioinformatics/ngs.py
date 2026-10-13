@@ -35,20 +35,21 @@ def map_reads(
     config: ExecutionConfig | None = None,
     verbose: bool = True,
 ) -> ToolResult:
-    """Build private BWA/Bowtie2 index and map single/paired reads to SAM."""
-    if method not in {"bwa", "bowtie2"}:
-        raise ConfigurationError("method must be bwa or bowtie2.")
+    """Build a private BWA/BWA-MEM2/Bowtie2 index and map reads to SAM."""
+    if method not in {"bwa", "bwa-mem2", "bowtie2"}:
+        raise ConfigurationError("method must be bwa, bwa-mem2 or bowtie2.")
     fasta, one = input_path(reference), input_path(first)
     two = input_path(second) if second is not None else None
     config = config or ExecutionConfig()
     directory = workspace(output_directory)
     prefix, sam = directory / "reference", directory / "aligned.sam"
-    if method == "bwa":
-        log = run(program or "bwa", ("index", "-p", str(prefix), str(fasta)), directory, config)
+    if method in {"bwa", "bwa-mem2"}:
+        executable = program or method
+        log = run(executable, ("index", "-p", str(prefix), str(fasta)), directory, config)
         args = ["mem", "-t", str(config.threads), str(prefix), str(one)]
         if two is not None:
             args.append(str(two))
-        log += run_to_file(program or "bwa", args, sam, config)
+        log += run_to_file(executable, args, sam, config)
     else:
         log = run(
             "bowtie2-build",

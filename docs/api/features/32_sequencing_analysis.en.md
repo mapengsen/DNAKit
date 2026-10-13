@@ -29,6 +29,7 @@ Dependencies and details: [FAQ](../../faq/bioinformatics.md#reads).
 - **Purpose:** Process reads into QC reports, BAM and VCF.
 - **Method:** Chain FastQC → BWA → samtools → bcftools and retain each stage result.
 - **API:** `dnakit.bioinformatics.ngs.dna_seq_workflow(reference, first, output_directory, second=None, ploidy=2, qc=True, config=None)`
+- **Agent/MCP API:** `dnakit.ngs.run_dna_seq_workflow(reference, read1, output_directory, read2=None, ploidy=2, qc=True, ...)`; returns a JSON-serializable stage envelope retaining QC, mapping, BAM and VCF artifacts.
 - **Input:** Reference FASTA with `.fai`, FASTQ input, all four programs on PATH, and a new output directory.
 - **Output:** Returns a mapping of stage names to `ToolResult` objects, including VCF artifact paths.
 - **Example code:**
@@ -53,6 +54,7 @@ Dependencies and details: [FAQ](../../faq/bioinformatics.md#reads).
 - **Purpose:** Create BAM, transcripts and gene counts from RNA-seq reads.
 - **Method:** Run HISAT2, samtools, StringTie and featureCounts.
 - **API:** `dnakit.bioinformatics.ngs.rna_seq_workflow(reference, annotation, first, output_directory, second=None, strandedness=0)`
+- **Agent/MCP API:** `dnakit.ngs.run_rna_seq_workflow(reference, annotation, read1, output_directory, read2=None, strandedness=0, ...)`; returns a JSON-serializable stage envelope retaining BAM, transcripts, counts and logs.
 - **Input:** Reference FASTA, GTF and FASTQ; required programs on PATH; `strandedness` is 0/1/2; a new output directory.
 - **Output:** Returns a mapping of stage names to `ToolResult` objects, including expression-count artifact paths.
 - **Example code:**
@@ -76,6 +78,8 @@ Dependencies and details: [FAQ](../../faq/bioinformatics.md#reads).
 - **Purpose:** Compare treatment/control BAM files to produce peaks and coverage tracks.
 - **Method:** Run MACS3 callpeak.
 - **API:** `dnakit.bioinformatics.ngs.chip_seq_workflow(treatment, control, output_directory, genome_size=..., paired_end=False, qvalue=0.05)`
+- **Agent/MCP API:** `dnakit.ngs.call_chip_peaks(treatment, control, output_directory, genome_size=..., paired_end=False, qvalue=0.05, ...)`; returns a JSON-serializable stage envelope, runs fixed MACS3 `callpeak` and collects samtools coverage.
+- **Citation and license:** The survey records MACS3 as BSD-3-Clause but supplies no DOI; cite the official source for the exact version used in a paper.
 - **Input:** Prepared treatment/control BAM files, effective genome size and library layout; MACS3 on PATH; a new output directory.
 - **Output:** Returns `ToolResult` with `backend`, artifact paths in `artifacts`, and execution `log`.
 - **Example code:**

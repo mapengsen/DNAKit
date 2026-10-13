@@ -2,11 +2,11 @@
 
 Function usage and examples are included in their task tutorials. This page covers dependencies, parameter catalogs, implementation conventions and validation.
 
-`dnakit.bioinformatics` adds traditional bioinformatics, DNA representations, generative evaluation, statistics and molecular design. These development APIs are **Python only**. Coverage below describes actual behavior, not complete equivalence to Biopython, SeqKit, scikit-bio, UGENE, iLearnPlus, iFeatureOmega, seqme, pydna or DNA Chisel.
+`dnakit.bioinformatics` adds traditional bioinformatics, DNA representations, generative evaluation, statistics and molecular design. These development APIs are **Python only**. Coverage below describes actual behavior, not complete equivalence to Biopython, SeqKit, scikit-bio, UGENE, iLearnPlus, iFeatureOmega, seqme, pydna, DNA Chisel, GeneBlocks or sourmash.
 
 ## Which dependencies are required? {#dependencies}
 
-DNAKit implements domain logic itself. NumPy/SciPy supply arrays, linear algebra, distances and numerical solvers; scikit-learn supplies general machine-learning algorithms. There are no iFeatureOmega, iLearnPlus, seqme or DNA Chisel function adapters.
+DNAKit implements domain logic itself. NumPy/SciPy supply arrays, linear algebra, distances and numerical solvers; scikit-learn supplies general machine-learning algorithms. scikit-bio, seqme, DNA Chisel, Biotite, Edlib, GeneBlocks, sourmash, Cutadapt, PyRanges, pyfastx, dnaio, mappy, pyBigWig, pybedtools, gffutils, pySBOL3, scadnano, polars-bio, DnaCauldron, DNA Features Viewer and gtars have explicit adapters; BWA, BWA-MEM2, Bowtie2, SAMtools, BCFtools, SPAdes, IQ-TREE2, FastTree, FreeBayes, VCFtools, vcfanno, SURVIVOR, GEMINI, Ensembl VEP, Picard, MACS3, NCBI BLAST+, minimap2, BEDTools, fastp, FastQC, MultiQC, NanoFilt, Filtlong, NanoPlot, Porechop, Trimmomatic, AfterQC, SeqMagick, Shasta, Merqury, BUSCO, DeepVariant, cuteSV, Sniffles2, DELLY, HTSlib, seqtk, WhatsHap, BamTools, VSEARCH, BEDOPS, Flye, hifiasm, MEGAHIT and GATK4 use caller-provided external executables, while iFeatureOmega and iLearnPlus remain external-backend boundaries.
 
 | Extra | Purpose | Packages |
 | --- | --- | --- |
@@ -15,8 +15,40 @@ DNAKit implements domain logic itself. NumPy/SciPy supply arrays, linear algebra
 | `bio-reads` | FASTA indexing and random BAM access | pysam/htslib |
 | `bio-plots` | Trees, dotplots, chromatograms, gels | Matplotlib |
 | `bio-assembly` | Complex overlap assembly and permissive construct parsing | pydna |
+| `bio-seqme` | seqme sequence-design metrics; model extras are separate | seqme (BSD-3-Clause) |
+| `bio-dnachisel` | DNA Chisel constraint and objective optimization adapter | DNA Chisel (MIT) |
+| `bio-skibio` | beta-diversity and PERMANOVA statistics adapter | scikit-bio (BSD-3-Clause) |
+| `bio-biotite` | bounded optimal nucleotide pairwise alignment | Biotite (BSD-3-Clause) |
+| `bio-edlib` | bounded edit-distance alignment | Edlib (MIT) |
+| `bio-geneblocks` | bounded DNA sequence diff blocks | GeneBlocks (MIT) |
+| `bio-sourmash` | bounded local DNA MinHash comparison | sourmash (BSD-3-Clause) |
+| `bio-cutadapt` | Cutadapt FASTQ adapter trimming | Cutadapt (MIT) |
+| `bio-pyranges` | BED interval summary and merge | PyRanges (MIT) |
+| `bio-pyfastx` | bounded FASTA/FASTQ summary | pyfastx (MIT) |
+| `bio-dnaio` | bounded read-only FASTA/FASTQ stream summary | dnaio (MIT) |
+| `bio-mappy` | bounded local sequence mapping | mappy/minimap2 (MIT) |
+| `bio-pybigwig` | bounded bigWig region statistics | pyBigWig (MIT) |
+| `bio-pybedtools` | bounded BED intersection; bedtools is still separate | pybedtools (MIT) + BEDTools (MIT) |
+| `bio-gffutils` | read-only queries against an existing GFF/GTF FeatureDB | gffutils (MIT) |
+| `bio-pysbol3` | read-only inventory of a local SBOL3 RDF document | pySBOL3 (MIT) |
+| `bio-scadnano` | read-only inventory of a local scadnano `.sc` design | scadnano (MIT) |
+| `bio-polarsbio` | bounded local BED/CSV interval overlap | polars-bio (Apache-2.0) |
+| `bio-dnacauldron` | Gibson/Type IIS assembly simulation | DnaCauldron (MIT) |
+| `bio-dna-features-viewer` | read-only inventory of local GenBank/GFF features | DNA Features Viewer (MIT) |
+| `bio-gtars` | read-only inventory of a local BED RegionSet | gtars (BSD-2-Clause) |
+| `bio-pyfaidx` | read-only FASTA interval adapter | pyfaidx (BSD-3-Clause) |
+| `bio-vcfpy` | bounded VCF summary parsing | vcfpy (MIT) |
+| `bio-cyvcf2` | bounded VCF summary parsing | cyvcf2 (MIT) |
 | `bio` | All extras above | External executables are installed separately |
-| `bio-validation` | Independent numerical references in tests, not runtime dependencies | scikit-bio, statsmodels |
+| `bio-validation` | scikit-bio statistics adapter plus independent numerical references | scikit-bio, statsmodels |
+
+BWA-MEM2, BLAST+, minimap2, BEDTools, MACS3, FastTree, NanoFilt, Filtlong, NanoPlot, Porechop, Trimmomatic, AfterQC, SeqMagick, Shasta, Merqury, BUSCO, DeepVariant, cuteSV, Sniffles2, DELLY, HTSlib, seqtk, WhatsHap, BamTools, VSEARCH, BEDOPS, Flye, hifiasm, MEGAHIT, GEMINI, Ensembl VEP and GATK4, DIAMOND, MMseqs2, Kraken2, Prokka, Bakta, CheckM2, Bracken, Centrifuge, Kaiju, Unicycler, GTDB-Tk, HUMAnN and MethylDackel also have formal Agent/MCP facades: `dnakit.ngs.map_reads(method="bwa-mem2")`, `dnakit.alignment.build_blast_database()` / `dnakit.alignment.local_blast()`, `dnakit.alignment.map_long_reads()`, `dnakit.alignment.intersect_bed()`, `dnakit.ngs.call_chip_peaks()`, `dnakit.phylogeny.infer_fast_tree()`, `dnakit.sequencing_qc.filter_nanopore_reads()`, `filter_long_reads()`, `summarize_long_reads()`, `trim_porechop()`, `trim_trimmomatic()`, `run_afterqc()`, `dnakit.fasta_fastq.convert_seqmagick()`, `dnakit.assembly.assemble_shasta()`, `dnakit.assembly.evaluate_merqury()`, `dnakit.assembly.run_busco()`, `dnakit.variants.call_deepvariant()`, `dnakit.variants.call_cutesv()`, `dnakit.variants.call_sniffles2()`, `dnakit.variants.call_delly()`, `dnakit.ngs.compress_index_vcf_htslib()`, `dnakit.ngs.sample_sequences_seqtk()`, `dnakit.ngs.phase_variants_whatshap()`, `dnakit.ngs.sort_bam_bamtools()`, `dnakit.fasta_fastq.cluster_vsearch()`, `dnakit.alignment.sort_bed_bedops()`, `dnakit.assembly.assemble_flye()`, `dnakit.assembly.assemble_hifiasm()`, `dnakit.assembly.assemble_megahit()` and `dnakit.variants.call_gatk_haplotypecaller()`, `dnakit.variants.load_gemini_database()`, `dnakit.variants.query_gemini_database()`, `dnakit.variants.annotate_vcf_ensembl_vep()`, `dnakit.alignment.search_diamond_blastp()`, `search_diamond_blastx()`, `search_mmseqs_protein()`, `cluster_mmseqs_protein()`, `dnakit.microbiome.classify_kraken2()`, `dnakit.annotation.annotate_prokka()`, `annotate_bakta()`, `predict_checkm2()`, `dnakit.microbiome.estimate_bracken_abundance()`, `classify_centrifuge()`, `classify_kaiju()`, `dnakit.assembly.assemble_unicycler()`, `dnakit.microbiome.classify_gtdbtk()`, `profile_humann()` and `dnakit.epigenome.extract_methylation_methyldackel()`. They run only caller-installed programs and expose bounded fixed subsets of each CLI. The cited records are Vasimuddin et al. (2019), DOI `10.1109/IPDPS.2019.00041`; Camacho et al. (2009), DOI `10.1186/1471-2105-10-421`; Li (2018), DOI `10.1093/bioinformatics/bty191`; Quinlan & Hall (2010), DOI `10.1093/bioinformatics/btq033`; Price, Dehal & Arkin (2010), DOI `10.1371/journal.pone.0009490`; De Coster et al. (2018), DOI `10.1093/bioinformatics/bty149`; Wick et al. (2017), DOI `10.1099/mgen.0.000132`; Bolger, Lohse & Usadel (2014), DOI `10.1093/bioinformatics/btu170`; and De Coster & Rademakers (2023), DOI `10.1093/bioinformatics/btad311`; Chen et al. (2017), DOI `10.1186/s12859-017-1469-3`; Shafin et al. (2020), DOI `10.1038/s41587-020-0503-6`. The survey identifies MACS3 and AfterQC as permissive upstream records and Filtlong/Porechop/Trimmomatic as GPL-3.0; the official Filtlong project supplies no DOI and Trimmomatic adapter sequences have separate Illumina terms. AfterQC's README recommends fastp for maintained C++ workflows, so this route preserves historical AfterQC reproducibility rather than claiming current upstream maintenance. SeqMagick has no DOI in its official project; GATK4 should be cited as McKenna et al. (2010), DOI `10.1101/gr.107524.110`, and the current GATK source carries Apache-2.0.
+
+The VCF, duplicate-marking and consensus facades are `dnakit.variants.annotate_vcf_vcfanno()`, `dnakit.variants.merge_structural_variants_survivor()`, `dnakit.ngs.mark_duplicates_picard()` and `dnakit.alignment.consensus_spoa()`. They run caller-installed vcfanno, SURVIVOR, Picard and SPOA with fixed parameter subsets. Cite Pedersen et al. (2016), DOI `10.1186/s13059-016-0973-5`; Jeffares et al. (2017), DOI `10.1038/NCOMMS14061`; Broad Institute *Picard Toolkit* (2019); and SPOA, DOI `10.1093/bioinformatics/btg109`. The four official repositories record MIT licenses.
+
+The GEMINI facades are `dnakit.variants.load_gemini_database()` and `dnakit.variants.query_gemini_database()` for local database construction and bounded SQL queries. Cite Paila et al. (2013), DOI `10.1371/journal.pcbi.1003153`; the official repository records MIT. Annotation databases, resource downloads and the complete GEMINI CLI remain caller-prepared.
+
+The Ensembl VEP facade is `dnakit.variants.annotate_vcf_ensembl_vep()`. Cite McLaren et al. (2016), DOI `10.1186/s13059-016-0974-4`; the official repository records Apache-2.0. VEP caches, reference sequences, plugins and the complete CLI remain caller-prepared.
 
 Install the working tree with the complete Python dependencies:
 
@@ -38,7 +70,7 @@ Import submodules explicitly. Dependencies load when needed; APIs do not install
 | --- | --- | --- |
 | `alignment` | `MultipleAlignment.from_sequences`, `.distances` | Native equal-width, unique-ID alignment; p-distance with pairwise deletion or gaps as a state |
 | `alignment` | `read_alignment`, `write_alignment` | Biopython single-alignment FASTA/Clustal/Stockholm/PHYLIP codecs |
-| `alignment` | `align_sequences` | MAFFT `--auto`, MUSCLE **5**, Clustal Omega; restore IDs and verify sequence content |
+| `alignment` | `align_sequences` | Python: `dnakit.bioinformatics.alignment.align_sequences`; Agent/MCP: `dnakit.alignment.align_sequences`; MAFFT `--auto`, MUSCLE **5**, Clustal Omega; restore IDs and verify sequence content |
 | `alignment` | `build_blast_database`, `local_blast` | Local nucleotide database and BLAST XML output |
 | `alignment` | `parse_search_results` | Streaming Bio.SearchIO QueryResult objects for BLAST XML/tab and protein HMMER2/3 formats |
 | `alignment` | `build_profile`, `search_profile`, `parse_nhmmer_table` | hmmbuild, nucleotide nhmmer / protein hmmsearch; native nhmmer table parser |
@@ -61,11 +93,11 @@ NJ retains negative branch estimates and has an arbitrary root; UPGMA assumes a 
 | `reads` | `Region`, `read_regions` | BED or selected GTF feature rows; convert GTF coordinates exactly once |
 | `reads` | `index_reference`, `IndexedReference.fetch` | Explicit `.fai` creation, context-managed indexed access, reverse complements |
 | `reads` | `alignment_summary`, `coverage_consensus` | pysam decoding, native flag counts and A/C/G/T depth/majority consensus |
-| `ngs` | `map_reads` | Private BWA MEM / Bowtie2 reference index and SAM mapping |
-| `ngs` | `prepare_bam` | samtools name-sort/fixmate/coordinate-sort/markdup/index/stats |
-| `ngs` | `call_variants` | bcftools mpileup/call/norm and indexed VCF; explicit ploidy |
-| `ngs` | `assemble_reads` | SPAdes single/paired short-read or Nanopore hybrid assembly |
-| `ngs` | `quality_control`, `dna_seq_workflow` | FastQC; QC→BWA→BAM→variant calling with all intermediates retained |
+| `ngs` | `map_reads` | `dnakit.ngs.map_reads`: private BWA MEM / BWA-MEM2 / Bowtie2 reference index and SAM mapping |
+| `ngs` | `prepare_bam` | `dnakit.ngs.prepare_bam`: samtools name-sort/fixmate/coordinate-sort/markdup/index/stats |
+| `ngs` | `call_variants` | `dnakit.ngs.call_variants`: bcftools mpileup/call/norm and indexed VCF; explicit ploidy |
+| `ngs` | `assemble_reads` | `dnakit.ngs.assemble_reads`: SPAdes single/paired short-read or Nanopore hybrid assembly |
+| `ngs` | `quality_control`, `dna_seq_workflow` | Existing FastQC workflow; new bounded `dnakit.sequencing_qc.run_fastqc()` and `run_multiqc()` report facades; QC→BWA→BAM→variant calling with all intermediates retained |
 | `ngs` | `rna_seq_workflow` | HISAT2→BAM→StringTie→featureCounts, strandedness 0/1/2 |
 | `ngs` | `chip_seq_workflow` | Prepared treatment/control BAMs → MACS3 peaks and coverage |
 
@@ -124,6 +156,23 @@ Pseudo type-I uses lagged mean squared differences across properties; SC uses pe
 `authenticity` requires the **generator’s training set**; other reference sets are usually independent reference/validation sets. Fix embedding model, scaling and k before comparing methods. Conventional PRDC and clipped metrics differ; KID is not FID. Histogram property KL differs from seqme's KDE estimate. Conformity returns `value`, `standard_error`, and fold scores. It measures distributional consistency, not posterior class probability.
 
 ## What assumptions apply to statistical and count inference? {#statistics}
+
+`dnakit.integrations.beta_diversity_scikit_bio()` and
+`dnakit.integrations.permanova_scikit_bio()` are bounded optional scikit-bio
+routes. They accept a finite metric allowlist and JSON numeric matrices; the
+full scikit-bio statistics namespace is not re-exported.
+
+`dnakit.integrations.fetch_pyfaidx_region()` provides read-only FASTA extraction
+using zero-based half-open coordinates. `summarize_vcf_vcfpy()` and
+`summarize_vcf_cyvcf2()` provide bounded VCF summaries. Each requires its
+explicit optional backend and preserves backend provenance.
+
+`dnakit.integrations.align_biotite()` provides bounded optimal nucleotide
+pairwise alignment; `align_edlib()` provides edit distance, locations or a CIGAR
+path; PyRanges adapters read zero-based half-open BED and summarize or merge
+intervals. Inputs over `max_rows` are rejected instead of silently truncated;
+`merge_pyranges_bed(slack=0)` merges adjacent intervals, and `stranded=True`
+requires `+` or `-` on every row.
 
 | Module | API | Scope |
 | --- | --- | --- |

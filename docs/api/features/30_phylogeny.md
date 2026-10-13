@@ -1,5 +1,34 @@
 # 系统发育与分子进化
 
+## 1) 调用 IQ-TREE 2 进行最大似然建树
+
+- **作用：** 将已有的多序列比对交给调用者安装的 IQ-TREE 2，生成最大似然树和完整报告文件。
+- **计算方法：** 固定调用 `iqtree2 -s ... -m ... -nt ... -pre ...`；可选 `-B` 超快速 bootstrap。DNAKit 不复制或安装 IQ-TREE 2 源码。
+- **API：** `dnakit.phylogeny.infer_ml_tree(alignment, output_directory, model="MFP", bootstrap=0, threads=1, ...)`
+- **输入：** FASTA、PHYLIP、NEXUS 等 IQ-TREE 2 支持的比对文件；新输出目录；调用者 PATH 中的 `iqtree2`。
+- **输出：** JSON 可序列化阶段信封，包含 `.treefile`、`.iqtree`、`.log` 等产物路径，以及模型、bootstrap 和 provenance。
+- **引用与许可：** IQ-TREE 2 应引用 Minh et al. (2020), DOI `10.1093/molbev/msaa015`；官方仓库记录 GPL-2.0。若使用 ModelFinder、UFBoot 或其他专门功能，还应按 IQ-TREE 2 文档补充对应论文。
+
+```python
+from dnakit.phylogeny import infer_ml_tree
+
+result = infer_ml_tree(
+    "alignment.fasta",
+    "iqtree-result",
+    model="MFP",
+    bootstrap=1000,
+)
+print(result["result"]["treefile"])
+```
+
+## 2) 使用 FastTree 进行近似最大似然建树
+
+- **作用：** 将已有比对交给调用者安装的 FastTree，捕获近似最大似然 Newick 树。
+- **计算方法：** 固定调用 `FastTree [-nt] [-gtr] [-gamma] alignment`，标准输出写入 `tree.newick`，stderr 单独保留；不复制或安装 FastTree。
+- **API：** `dnakit.phylogeny.infer_fast_tree(alignment, output_directory, nucleotide=True, gtr=False, gamma=False, ...)`
+- **输入与输出：** 输入是本地比对文件和新输出目录；返回 JSON 可序列化信封，包含 `tree.newick`、stderr、固定参数和 provenance。
+- **引用与许可：** 引用 Price, Dehal & Arkin (2010), [10.1371/journal.pone.0009490](https://doi.org/10.1371/journal.pone.0009490)；FastTree 2 官方仓库记录 GPL-3.0。
+
 ## 1) 从距离矩阵构建进化树 {#bio-6}
 
 - **作用：** 使用 NJ 或 UPGMA 构建带枝长的树。

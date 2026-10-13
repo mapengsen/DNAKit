@@ -2,11 +2,11 @@
 
 各函数的用法与示例已归入对应任务教程；本页补充依赖、参数清单、实现约定和验证方法。
 
-`dnakit.bioinformatics` 补充传统生物信息学、DNA 特征工程、生成评价、统计分析和分子设计。以下接口属于开发版，**仅提供 Python API**。本页按真实实现范围列出能力，不表示与 Biopython、SeqKit、scikit-bio、UGENE、iLearnPlus、iFeatureOmega、seqme、pydna、DNA Chisel 的全部功能等价。
+`dnakit.bioinformatics` 补充传统生物信息学、DNA 特征工程、生成评价、统计分析和分子设计。以下接口属于开发版，**仅提供 Python API**。本页按真实实现范围列出能力，不表示与 Biopython、SeqKit、scikit-bio、UGENE、iLearnPlus、iFeatureOmega、seqme、pydna、DNA Chisel、GeneBlocks 或 sourmash 的全部功能等价。
 
 ## 需要安装哪些依赖？ {#dependencies}
 
-核心领域逻辑由 DNAKit 实现；NumPy/SciPy 提供数组、线性代数、距离和数值求解，scikit-learn 提供通用机器学习算法。没有调用 iFeatureOmega、iLearnPlus、seqme 或 DNA Chisel 的功能接口。
+核心领域逻辑由 DNAKit 实现；NumPy/SciPy 提供数组、线性代数、距离和数值求解，scikit-learn 提供通用机器学习算法。scikit-bio、seqme、DNA Chisel、Biotite、Edlib、GeneBlocks、sourmash、Cutadapt、PyRanges、pyfastx、dnaio、mappy、pyBigWig、pybedtools、gffutils、pySBOL3、scadnano、polars-bio、DnaCauldron、DNA Features Viewer 和 gtars 通过显式适配器调用；BWA、BWA-MEM2、Bowtie2、SAMtools、BCFtools、SPAdes、IQ-TREE2、FastTree、FreeBayes、VCFtools、vcfanno、SURVIVOR、GEMINI、Ensembl VEP、Picard、MACS3、NCBI BLAST+、minimap2、BEDTools、fastp、FastQC、MultiQC、NanoFilt、Filtlong、NanoPlot、Porechop、Trimmomatic、AfterQC、SeqMagick、Shasta、Merqury、BUSCO、DeepVariant、cuteSV、Sniffles2、DELLY、HTSlib、seqtk、WhatsHap、BamTools、VSEARCH、BEDOPS、Flye、hifiasm、MEGAHIT 和 GATK4 通过用户提供的外部可执行程序调用，iFeatureOmega 和 iLearnPlus 仍保持外部后端边界。
 
 | 可选依赖 | 用途 | 安装包 |
 | --- | --- | --- |
@@ -15,8 +15,66 @@
 | `bio-reads` | FASTA 索引与 BAM 随机访问 | pysam/htslib |
 | `bio-plots` | 树、dotplot、色谱、凝胶绘图 | Matplotlib |
 | `bio-assembly` | 复杂同源重叠组装、宽容构建文件解析 | pydna |
+| `bio-seqme` | seqme 序列设计评价指标；模型 extras 需单独安装 | seqme（BSD-3-Clause） |
+| `bio-dnachisel` | DNA Chisel 约束和目标优化适配器 | DNA Chisel（MIT） |
+| `bio-skibio` | beta diversity 与 PERMANOVA 统计适配器 | scikit-bio（BSD-3-Clause） |
+| `bio-biotite` | 有界最优核苷酸成对比对 | Biotite（BSD-3-Clause） |
+| `bio-edlib` | 有界编辑距离比对 | Edlib（MIT） |
+| `bio-geneblocks` | 有界 DNA 序列差异块比较 | GeneBlocks（MIT） |
+| `bio-sourmash` | 有界本地 DNA MinHash 比较 | sourmash（BSD-3-Clause） |
+| `bio-cutadapt` | Cutadapt FASTQ 接头清理适配器 | Cutadapt（MIT） |
+| `bio-pyranges` | BED 区间汇总与合并 | PyRanges（MIT） |
+| `bio-pyfastx` | 有界 FASTA/FASTQ 汇总 | pyfastx（MIT） |
+| `bio-dnaio` | 只读有界 FASTA/FASTQ 流汇总 | dnaio（MIT） |
+| `bio-mappy` | 有界本地序列映射 | mappy/minimap2（MIT） |
+| `bio-pybigwig` | 有界 bigWig 区域统计 | pyBigWig（MIT） |
+| `bio-pybedtools` | 有界 BED 交集；仍需单独安装 bedtools | pybedtools（MIT）+ BEDTools（MIT） |
+| `bio-gffutils` | 只读查询已有 GFF/GTF FeatureDB | gffutils（MIT） |
+| `bio-pysbol3` | 只读汇总本地 SBOL3 RDF 文档 | pySBOL3（MIT） |
+| `bio-scadnano` | 只读汇总本地 scadnano `.sc` 设计 | scadnano（MIT） |
+| `bio-polarsbio` | 本地 BED/CSV 区间有界交集 | polars-bio（Apache-2.0） |
+| `bio-dnacauldron` | Gibson/Type IIS 组装模拟 | DnaCauldron（MIT） |
+| `bio-dna-features-viewer` | 只读汇总本地 GenBank/GFF 特征 | DNA Features Viewer（MIT） |
+| `bio-gtars` | 只读汇总本地 BED RegionSet | gtars（BSD-2-Clause） |
+| `bio-pyfaidx` | 只读 FASTA 区间提取适配器 | pyfaidx（BSD-3-Clause） |
+| `bio-vcfpy` | 有界 VCF 汇总解析 | vcfpy（MIT） |
+| `bio-cyvcf2` | 有界 VCF 汇总解析 | cyvcf2（MIT） |
 | `bio` | 上述依赖的合集 | 不安装外部可执行程序 |
-| `bio-validation` | 测试中的独立数值对照；运行 API 不需要 | scikit-bio、statsmodels |
+| `bio-validation` | scikit-bio 统计适配器与测试中的独立数值对照 | scikit-bio、statsmodels |
+
+BWA-MEM2、BLAST+、minimap2、BEDTools、MACS3、FastTree、NanoFilt、Filtlong、NanoPlot、Porechop、Trimmomatic、AfterQC、SeqMagick、GATK4、Shasta、Merqury、BUSCO、DeepVariant、cuteSV、Sniffles2、DELLY、HTSlib、seqtk、WhatsHap、BamTools、VSEARCH、BEDOPS、Flye、hifiasm、MEGAHIT、vcfanno、SURVIVOR、GEMINI、Ensembl VEP、Picard、DIAMOND、MMseqs2、Kraken2、Prokka、Bakta、CheckM2、Bracken、Centrifuge、Kaiju、Unicycler、GTDB-Tk、HUMAnN 和 MethylDackel 也有正式的 Agent/MCP 门面：
+`dnakit.ngs.map_reads(method="bwa-mem2")`、`dnakit.alignment.build_blast_database()` / `dnakit.alignment.local_blast()`、
+`dnakit.alignment.map_long_reads()`、`dnakit.alignment.intersect_bed()`、
+`dnakit.ngs.call_chip_peaks()`、`dnakit.fasta_fastq.convert_seqmagick()`、
+`dnakit.assembly.assemble_shasta()`、`dnakit.assembly.evaluate_merqury()`、`dnakit.assembly.run_busco()`、
+`dnakit.variants.call_deepvariant()`、`dnakit.variants.call_cutesv()`、`dnakit.variants.call_sniffles2()`、`dnakit.variants.call_delly()`、`dnakit.ngs.compress_index_vcf_htslib()`、`dnakit.ngs.sample_sequences_seqtk()`、`dnakit.ngs.phase_variants_whatshap()`、`dnakit.alignment.sort_bed_bedops()`、`dnakit.assembly.assemble_flye()`、`dnakit.assembly.assemble_hifiasm()`、`dnakit.assembly.assemble_megahit()`、`dnakit.variants.call_gatk_haplotypecaller()`、
+`dnakit.variants.annotate_vcf_vcfanno()`、`dnakit.variants.merge_structural_variants_survivor()` 和
+`dnakit.variants.load_gemini_database()`、`dnakit.variants.query_gemini_database()`、`dnakit.variants.annotate_vcf_ensembl_vep()`、`dnakit.ngs.mark_duplicates_picard()`、`dnakit.alignment.search_diamond_blastp()`、`search_diamond_blastx()`、`search_mmseqs_protein()`、`cluster_mmseqs_protein()`、`dnakit.microbiome.classify_kraken2()`、`dnakit.annotation.annotate_prokka()`、`annotate_bakta()`、`predict_checkm2()`、`dnakit.microbiome.estimate_bracken_abundance()`、`classify_centrifuge()`、`classify_kaiju()`、`dnakit.assembly.assemble_unicycler()`、`dnakit.microbiome.classify_gtdbtk()`、`profile_humann()` 和 `dnakit.epigenome.extract_methylation_methyldackel()`。
+它们只运行调用者已安装的程序，参数是固定的有界子集，并保留 Vasimuddin et al. (2019), DOI `10.1109/IPDPS.2019.00041`；Camacho et al.
+(2009), DOI `10.1186/1471-2105-10-421`；Li (2018), DOI
+`10.1093/bioinformatics/bty191`；Quinlan & Hall (2010), DOI
+`10.1093/bioinformatics/btq033`；McKenna et al. (2010), DOI `10.1101/gr.107524.110`；Shafin et al. (2020), DOI `10.1038/s41587-020-0503-6` 的引用信息。
+
+FastTree 门面为 `dnakit.phylogeny.infer_fast_tree()`，引用 Price, Dehal & Arkin
+(2010), DOI `10.1371/journal.pone.0009490`，上游 GPL-3.0。
+
+长读长 QC 门面为 `dnakit.sequencing_qc.filter_nanopore_reads()`、
+`filter_long_reads()` 和 `summarize_long_reads()`。它们分别调用用户提供的
+NanoFilt、Filtlong、NanoPlot 和 Porechop，固定参数并保留 FASTQ/统计报告产物；引用为
+De Coster et al. (2018), DOI `10.1093/bioinformatics/bty149`；Filtlong 官方项目未提供 DOI；
+De Coster & Rademakers (2023), DOI `10.1093/bioinformatics/btad311`。NanoFilt 和
+Filtlong、Porechop 和 Trimmomatic 为 GPL-3.0，NanoPlot 为 MIT；NanoFilt 和 Porechop 上游已说明不再更新。Trimmomatic 的 Illumina adapter 序列另有上游使用条款。AfterQC 引用 Chen et al. (2017), DOI `10.1186/s12859-017-1469-3`；Shafin et al. (2020), DOI `10.1038/s41587-020-0503-6`；上游 MIT；官方 README 建议维护中的 C++ 工作流使用 fastp，因此这里保留 AfterQC 历史工作流的可复现入口。
+
+vcfanno、SURVIVOR、Picard 和 SPOA 的门面分别引用 Pedersen et al. (2016), DOI
+`10.1186/s13059-016-0973-5`；Jeffares et al. (2017), DOI
+`10.1038/NCOMMS14061`；Broad Institute *Picard Toolkit* (2019)；以及 SPOA 的
+`10.1093/bioinformatics/btg109`。四者官方仓库均为 MIT；SURVIVOR 这里只暴露 VCF 合并模式，Picard 这里只暴露 MarkDuplicates，SPOA 这里只暴露共识 FASTA 模式。
+
+GEMINI 门面为 `dnakit.variants.load_gemini_database()` 和
+`dnakit.variants.query_gemini_database()`，分别覆盖本地数据库构建和有界 SQL 查询；引用
+Paila et al. (2013), DOI `10.1371/journal.pcbi.1003153`，官方仓库记录 MIT。注释数据库、资源下载和完整 GEMINI CLI 仍由调用者准备。
+
+Ensembl VEP 门面为 `dnakit.variants.annotate_vcf_ensembl_vep()`，引用 McLaren et al. (2016), DOI `10.1186/s13059-016-0974-4`，官方仓库记录 Apache-2.0。VEP 缓存、参考序列、插件和完整 CLI 仍由调用者准备。
 
 安装当前工作区的完整 Python 依赖：
 
@@ -38,7 +96,7 @@ python -m pip install -e ".[bio-analysis]"
 | --- | --- | --- |
 | `alignment` | `MultipleAlignment.from_sequences`, `.distances` | 原生 MSA 对象；等宽、唯一 ID，p-distance 的 pairwise deletion / gap-as-state |
 | `alignment` | `read_alignment`, `write_alignment` | 单个 FASTA/Clustal/Stockholm/PHYLIP 等 MSA 的 Biopython 编解码 |
-| `alignment` | `align_sequences` | MAFFT `--auto`、MUSCLE **5**、Clustal Omega；还原原始 ID 并验证序列内容 |
+| `alignment` | `align_sequences` | Python：`dnakit.bioinformatics.alignment.align_sequences`；Agent/MCP：`dnakit.alignment.align_sequences`；MAFFT `--auto`、MUSCLE **5**、Clustal Omega；还原原始 ID 并验证序列内容 |
 | `alignment` | `build_blast_database`, `local_blast` | 本地核酸数据库与 BLAST XML 输出 |
 | `alignment` | `parse_search_results` | 流式 Biopython SearchIO QueryResult；BLAST XML/tab、蛋白 HMMER2/3 格式 |
 | `alignment` | `build_profile`, `search_profile`, `parse_nhmmer_table` | hmmbuild、核酸 nhmmer / 蛋白 hmmsearch；原生 nhmmer 表解析 |
@@ -61,11 +119,11 @@ NJ 保留负枝长估计，根位置任意；UPGMA 假定分子钟。RF 要求�
 | `reads` | `Region`, `read_regions` | BED 或指定 GTF feature；GTF 1-based 闭区间转换一次 |
 | `reads` | `index_reference`, `IndexedReference.fetch` | 显式建立 `.fai`、上下文管理随机读取，支持反向互补 |
 | `reads` | `alignment_summary`, `coverage_consensus` | pysam 解码、原生 flag 统计及区域 A/C/G/T 覆盖/多数共识 |
-| `ngs` | `map_reads` | BWA MEM / Bowtie2 私有索引 → SAM |
-| `ngs` | `prepare_bam` | samtools name-sort/fixmate/coordinate-sort/markdup/index/stats |
-| `ngs` | `call_variants` | bcftools mpileup/call/norm → 索引 VCF；显式倍性 |
-| `ngs` | `assemble_reads` | SPAdes 短读长/双端/含 Nanopore 的混合组装 |
-| `ngs` | `quality_control`, `dna_seq_workflow` | FastQC；QC→BWA→BAM→变异调用，各阶段结果保留 |
+| `ngs` | `map_reads` | `dnakit.ngs.map_reads`：BWA MEM / BWA-MEM2 / Bowtie2 私有索引 → SAM |
+| `ngs` | `prepare_bam` | `dnakit.ngs.prepare_bam`：samtools name-sort/fixmate/coordinate-sort/markdup/index/stats |
+| `ngs` | `call_variants` | `dnakit.ngs.call_variants`：bcftools mpileup/call/norm → 索引 VCF；显式倍性 |
+| `ngs` | `assemble_reads` | `dnakit.ngs.assemble_reads`：SPAdes 短读长/双端/含 Nanopore 的混合组装 |
+| `ngs` | `quality_control`, `dna_seq_workflow` | 既有 FastQC 工作流；新的 `dnakit.sequencing_qc.run_fastqc()`、`run_multiqc()` 提供有界外部报告门面；QC→BWA→BAM→变异调用，各阶段结果保留 |
 | `ngs` | `rna_seq_workflow` | HISAT2→BAM→StringTie→featureCounts；链特异性 0/1/2 |
 | `ngs` | `chip_seq_workflow` | 已准备的 treatment/control BAM → MACS3 peaks 与 coverage |
 
@@ -122,6 +180,20 @@ Pseudo type-I 的滞后项为跨性质的平方差均值；SC 使用各性质的
 `authenticity` 必须使用**生成器训练集**；其他 reference 通常是独立参考/验证集。几何指标的 embedding 模型、缩放及 k 必须在比较前固定。PRDC 与 clipped 指标不能混用名称；KID 不是 FID。性质 KL 的直方图估计与 seqme KDE 估计不等价。Conformity 返回 `value`、`standard_error` 和 fold 分数；这是分布一致性指标，不是类别后验概率。
 
 ## 统计与计数推断有哪些适用条件？ {#statistics}
+
+`dnakit.integrations.beta_diversity_scikit_bio()` 和
+`dnakit.integrations.permanova_scikit_bio()` 是 scikit-bio 的可选边界，
+只接受有限的距离度量和 JSON 数值矩阵；它们不重导出 scikit-bio 的完整统计命名空间。
+
+`dnakit.integrations.fetch_pyfaidx_region()` 提供 0-based 半开区间的只读
+FASTA 提取；`summarize_vcf_vcfpy()` 和 `summarize_vcf_cyvcf2()` 提供有界
+VCF 汇总。三者都要求显式安装对应的可选后端，并保留后端来源信息。
+
+`dnakit.integrations.align_biotite()` 提供有界的最优核苷酸成对比对；
+`align_edlib()` 提供编辑距离、位置或 CIGAR 路径；PyRanges 适配器读取
+0-based 半开 BED，并提供汇总和重叠区间合并。`max_rows` 超限时会拒绝
+整个输入，不会静默截断；`merge_pyranges_bed()` 的 `slack=0` 合并相邻
+区间，`stranded=True` 时要求每行都有 `+` 或 `-`。
 
 | 模块 | API | 范围 |
 | --- | --- | --- |

@@ -360,7 +360,8 @@ def test_ancom_bc_matches_independent_reference() -> None:
         + design[:, 1, None] * np.r_[np.full(6, 1.2), np.full(6, -1.0), np.zeros(48)]
     )
     actual = ancom_bc(data, design)
-    variance, beta, _, _ = _estimate_params(np.log(data), design)
+    # Zero-free data needs no missing mask, and no covariance output is required here.
+    variance, beta, *_ = _estimate_params(np.log(data), design, None, None)
     expected = np.array(
         [_estimate_bias_em(beta[j], variance[:, j], tol=1e-5, max_iter=1000)[0] for j in range(2)]
     )

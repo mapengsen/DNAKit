@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": "biopython",
+      "name": "Biopython",
+      "aliases": ["biopython", "bio-python"],
+      "kind": "pip",
+      "doi": "10.1093/bioinformatics/btp163",
+      "citation": "Cock et al. (2009), Biopython: freely available Python tools for computational molecular biology and bioinformatics.",
+      "citation_status": "verified_doi",
+      "license": "Biopython License Agreement; selected files are also BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btp163",
+        "https://github.com/biopython/biopython/blob/master/LICENSE.rst"
+      ],
+      "notes": "Do not describe the entire distribution as BSD-3-Clause; retain the Biopython license notice."
+    },
+    {
+      "id": "seqkit",
+      "name": "SeqKit",
+      "aliases": ["seqkit"],
+      "kind": "cli",
+      "doi": "10.1002/imt2.191",
+      "citation": "Shen, Sipos and Zhao (2024), SeqKit2: A Swiss army knife for sequence and alignment processing.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "external_cli_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1002/imt2.191",
+        "https://doi.org/10.1371/journal.pone.0163962",
+        "https://github.com/shenwei356/seqkit/blob/master/LICENSE"
+      ],
+      "notes": "DNAKit exposes bounded FASTA/FASTQ operations and does not claim to reimplement the complete SeqKit CLI."
+    },
+    {
+      "id": "scikit-bio",
+      "name": "scikit-bio",
+      "aliases": ["scikit-bio", "skbio"],
+      "kind": "pip",
+      "doi": "10.1038/s41592-025-02981-z",
+      "citation": "Aton et al. (2026), Scikit-bio: a fundamental Python library for biological omic data analysis.",
+      "citation_status": "verified_doi",
+      "license": "BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1038/s41592-025-02981-z",
+        "https://github.com/scikit-bio/scikit-bio"
+      ],
+      "notes": "The DNAKit adapter exposes bounded statistics, not the complete scikit-bio namespace."
+    },
+    {
+      "id": "dna-chisel",
+      "name": "DNA Chisel",
+      "aliases": ["dna chisel", "dnachisel"],
+      "kind": "pip",
+      "doi": "10.1093/bioinformatics/btaa558",
+      "citation": "Zulkower and Rosser (2020), DNA Chisel, a versatile sequence optimizer.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btaa558",
+        "https://github.com/Edinburgh-Genome-Foundry/DnaChisel/blob/master/LICENSE"
+      ],
+      "notes": "Optimization results must report the exact specification classes and package version."
+    },
+    {
+      "id": "seqme",
+      "name": "seqme",
+      "aliases": ["seqme"],
+      "kind": "pip",
+      "doi": "arXiv:2511.04239",
+      "citation": "seqme project preprint, arXiv:2511.04239.",
+      "citation_status": "preprint_or_project",
+      "license": "BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version_and_preprint_status",
+      "source_urls": [
+        "https://arxiv.org/abs/2511.04239",
+        "https://github.com/szczurek-lab/seqme/blob/main/LICENSE"
+      ],
+      "notes": "Report model names and model-weight licenses separately from the seqme code license."
+    },
+    {
+      "id": "pydna",
+      "name": "pydna",
+      "aliases": ["pydna"],
+      "kind": "pip",
+      "doi": "10.1186/s12859-015-0544-x",
+      "citation": "Pereira et al. (2015), Pydna: a simulation and documentation tool for DNA assembly strategies using python.",
+      "citation_status": "verified_doi",
+      "license": "BSD",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1186/s12859-015-0544-x",
+        "https://github.com/pydna-group/pydna"
+      ],
+      "notes": "Assembly output should record the pydna version and input construct definitions."
+    },
+    {
+      "id": "biotite",
+      "name": "Biotite",
+      "aliases": ["biotite"],
+      "kind": "pip",
+      "doi": "10.1186/s12859-018-2367-z",
+      "citation": "Kunzmann and Hamacher (2018), Biotite: a unifying open source computational biology framework in Python.",
+      "citation_status": "verified_doi",
+      "license": "BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1186/s12859-018-2367-z",
+        "https://github.com/biotite-dev/biotite"
+      ],
+      "notes": "The adapter records the substitution matrix, gap penalty and alignment mode."
+    },
+    {
+      "id": "edlib",
+      "name": "Edlib",
+      "aliases": ["edlib"],
+      "kind": "pip",
+      "doi": "10.1093/bioinformatics/btw753",
+      "citation": "Šošić and Šikić (2017), Edlib: a C/C++ library for fast, exact sequence alignment using edit distance.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btw753",
+        "https://github.com/Martinsos/edlib"
+      ],
+      "notes": "Report NW/HW/SHW mode, task, k and coordinate convention with each result."
+    },
+    {
+      "id": "pyfaidx",
+      "name": "pyfaidx",
+      "aliases": ["pyfaidx"],
+      "kind": "pip",
+      "doi": "10.7287/peerj.preprints.970v1",
+      "citation": "Shirley et al. (2015), Efficient \"pythonic\" access to FASTA files using pyfaidx, PeerJ PrePrints 3:e1196.",
+      "citation_status": "verified_doi",
+      "license": "BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version_and_access_date",
+      "source_urls": [
+        "https://doi.org/10.7287/peerj.preprints.970v1",
+        "https://github.com/mdshw5/pyfaidx"
+      ],
+      "notes": "The cited item is a CC-BY-4.0 preprint; the pyfaidx source code remains separately licensed under BSD-3-Clause."
+    },
+    {
+      "id": "dnaio",
+      "name": "dnaio",
+      "aliases": ["dnaio"],
+      "kind": "pip",
+      "doi": "10.5281/zenodo.10548864",
+      "citation": "Martin and Vorderman, dnaio software archive, Zenodo DOI 10.5281/zenodo.10548864.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version_and_access_date",
+      "source_urls": [
+        "https://doi.org/10.5281/zenodo.10548864",
+        "https://github.com/biocore/dnaio"
+      ],
+      "notes": "This is a software archive DOI, not a peer-reviewed article DOI; cite Cutadapt separately when its methods are used."
+    },
+    {
+      "id": "mappy-minimap2",
+      "name": "mappy/minimap2",
+      "aliases": ["mappy", "minimap2"],
+      "kind": "pip_or_cli",
+      "doi": "10.1093/bioinformatics/bty191",
+      "citation": "Li (2018), Minimap2: pairwise alignment for nucleotide sequences.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_or_external_cli",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/bty191",
+        "https://github.com/lh3/minimap2"
+      ],
+      "notes": "Report whether the Python binding or the standalone minimap2 executable was used."
+    },
+    {
+      "id": "sourmash",
+      "name": "sourmash",
+      "aliases": ["sourmash"],
+      "kind": "pip",
+      "doi": "10.21105/joss.06830",
+      "citation": "sourmash project, Journal of Open Source Software, DOI 10.21105/joss.06830.",
+      "citation_status": "verified_doi",
+      "license": "BSD-3-Clause",
+      "license_status": "verified",
+      "reuse_route": "optional_pip_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.21105/joss.06830",
+        "https://github.com/sourmash-bio/sourmash"
+      ],
+      "notes": "Report k-mer size, scaled value, abundance mode and whether a database was used."
+    },
+    {
+      "id": "cutadapt",
+      "name": "Cutadapt",
+      "aliases": ["cutadapt"],
+      "kind": "cli",
+      "doi": "10.14806/ej.17.1.200",
+      "citation": "Martin (2011), Cutadapt removes adapter sequences from high-throughput sequencing reads.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "external_cli_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.14806/ej.17.1.200",
+        "https://github.com/marcelm/cutadapt"
+      ],
+      "notes": "Report the exact adapter sequences and filtering parameters, not only the package name."
+    },
+    {
+      "id": "fastp",
+      "name": "fastp",
+      "aliases": ["fastp"],
+      "kind": "cli",
+      "doi": "10.1002/imt2.70078",
+      "citation": "Chen (2025), fastp 2: Scalable quality control and preprocessing for high-throughput sequencing data.",
+      "citation_status": "verified_doi",
+      "license": "MIT",
+      "license_status": "verified",
+      "reuse_route": "external_cli_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1002/imt2.70078",
+        "https://github.com/OpenGene/fastp"
+      ],
+      "notes": "Record the fastp version and JSON report together with all filtering thresholds."
+    },
+    {
+      "id": "fastqc",
+      "name": "FastQC",
+      "aliases": ["fastqc"],
+      "kind": "cli",
+      "doi": null,
+      "citation": "FastQC project documentation and the exact released version used.",
+      "citation_status": "project_citation",
+      "license": "GPL-3.0",
+      "license_status": "verified",
+      "reuse_route": "external_cli_adapter",
+      "article_citation": "allowed_with_version_and_access_date",
+      "source_urls": [
+        "https://www.bioinformatics.babraham.ac.uk/projects/fastqc/"
+      ],
+      "notes": "The survey supplied no DOI; include project URL, version, access date and report settings."
+    },
+    {
+      "id": "multiqc",
+      "name": "MultiQC",
+      "aliases": ["multiqc"],
+      "kind": "cli",
+      "doi": "10.1093/bioinformatics/btw354",
+      "citation": "Ewels et al. (2016), MultiQC: summarize analysis results for multiple tools and samples in a single report.",
+      "citation_status": "verified_doi",
+      "license": "GPL-3.0-or-later",
+      "license_status": "verified",
+      "reuse_route": "external_cli_adapter",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btw354",
+        "https://github.com/MultiQC/MultiQC"
+      ],
+      "notes": "Report the input modules, configuration and output report version."
+    },
+    {
+      "id": "primer3-py",
+      "name": "primer3-py",
+      "aliases": ["primer3", "primer3-py"],
+      "kind": "pip",
+      "doi": null,
+      "citation": "Primer3 project documentation and the exact released version used.",
+      "citation_status": "project_citation",
+      "license": "GPL-2.0-or-later",
+      "license_status": "verified",
+      "reuse_route": "external_or_optional_gpl_component",
+      "article_citation": "allowed_with_version",
+      "source_urls": [
+        "https://github.com/libnano/primer3-py"
+      ],
+      "notes": "Citable in a paper, but distribution and linking obligations must be reviewed separately."
+    },
+    {
+      "id": "ilearnplus",
+      "name": "iLearnPlus",
+      "aliases": ["ilearnplus"],
+      "kind": "pip_or_cli",
+      "doi": null,
+      "citation": "Chen et al. (2021), iLearnPlus: a comprehensive and automatic machine-learning platform for DNA, RNA and protein sequence analysis.",
+      "citation_status": "paper_citation_requires_source_check",
+      "license": null,
+      "license_status": "unverified",
+      "reuse_route": "reference_only_until_license_confirmed",
+      "article_citation": "allowed_with_version_and_source_check",
+      "source_urls": [
+        "https://github.com/Superzchen/iLearnPlus"
+      ],
+      "notes": "Do not copy or redistribute source until a repository-level license is confirmed."
+    },
+    {
+      "id": "nupack",
+      "name": "NUPACK",
+      "aliases": ["nupack"],
+      "kind": "software_or_service",
+      "doi": null,
+      "citation": "NUPACK documentation and the exact version or subscription used.",
+      "citation_status": "project_citation",
+      "license": "Restricted commercial/service terms; verify the active terms",
+      "license_status": "restricted",
+      "reuse_route": "external_service_only",
+      "article_citation": "allowed_with_version_and_terms",
+      "source_urls": [
+        "https://docs.nupack.org/"
+      ],
+      "notes": "Citing the service is separate from redistributing code, building a hosted wrapper or distributing model-generated code."
+    }
+  ]
+}

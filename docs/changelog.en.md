@@ -4,6 +4,15 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-13
+
+- Add about 1,200 optional-dependency wrappers: `dnakit.xxx()` calls the upstream package and, when it is missing, gives a `dnakit[bio-...]` install hint. The public function count grows from 2,432 to 3,648 across variants, population genetics, alignment, annotation, databases, epigenome, microbiome, molecular lab, sequence, regulation and prediction.
+- Add about 90 `bio-*` optional dependency groups (for example scikit-allel, parasail, pyhmmer, bioframe, hail and scanpy).
+- Add `parasail_dp_variant()` and `parasail_ssw_profile_align()`, which choose a parasail dynamic-programming kernel from name parts.
+- Review aliases, re-exports and parameter branches of wrapped functions row by row; the ledger has 15,485 rows and the coverage table is `new_vision/2026-10-10/full_function_coverage.csv`.
+- Add bilingual API pages 48 to 109. Each function lists purpose, method, API, input, output and an example that was run.
+- Importing an optional dependency no longer changes the caller's logging setup; the test configuration restores global logging state between tests.
+
 ## [0.1.5] - 2026-09-27
 
 - Fix installed-package tool quality checks and preserve executable Skills resources in Git checkouts.

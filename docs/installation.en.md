@@ -2,10 +2,10 @@
 
 ## Install from PyPI
 
-Install `0.1.5`:
+Install `0.2.0`:
 
 ```bash
-pip install dnakit==0.1.5
+pip install dnakit==0.2.0
 ```
 
 Package page: [pypi.org/project/dnakit](https://pypi.org/project/dnakit/)
@@ -42,6 +42,34 @@ python -m pip install "dnakit[external-tools]"
 ```
 
 The default `pip install dnakit` neither installs nor loads this backend.
+
+## Third-party pip adapters
+
+The coverage matrix exposes scikit-bio, seqme, DNA Chisel, pySBOL3, scadnano, polars-bio, DnaCauldron, DNA Features Viewer, gtars, GeneBlocks, sourmash and Cutadapt through explicit optional
+adapters:
+
+```bash
+python -m pip install "dnakit[bio-skibio,bio-seqme,bio-dnachisel,bio-biotite,bio-edlib,bio-geneblocks,bio-sourmash,bio-cutadapt,bio-pyranges,bio-pyfastx,bio-dnaio,bio-mappy,bio-pybigwig,bio-pybedtools,bio-gffutils,bio-pysbol3,bio-scadnano,bio-polarsbio,bio-dnacauldron,bio-dna-features-viewer,bio-gtars,bio-pyfaidx,bio-vcfpy,bio-cyvcf2]"
+```
+
+Use `dnakit.integrations.beta_diversity_scikit_bio()`,
+`dnakit.integrations.permanova_scikit_bio()`,
+`dnakit.integrations.evaluate_seqme()`,
+`dnakit.integrations.optimize_with_dnachisel()`,
+`dnakit.integrations.summarize_sbol3_document()` and
+`dnakit.integrations.summarize_scadnano_design()`,
+`dnakit.integrations.overlap_polars_bio_bed()` and
+`dnakit.integrations.simulate_dnacauldron_assembly()` and
+`dnakit.integrations.summarize_dna_features_viewer()` and
+`dnakit.integrations.summarize_gtars_regions()` and
+`dnakit.integrations.diff_geneblocks_sequences()` and
+`dnakit.integrations.compare_sourmash_sequences()` after installation. Cutadapt, fastp,
+FastQC and MultiQC are exposed as `dnakit.sequencing_qc.run_cutadapt()`,
+`run_fastp()`, `run_fastqc()` and `run_multiqc()` with caller-installed executables;
+the `bio-cutadapt` extra installs the Python Cutadapt package but does not replace the
+documented executable boundary. seqme model
+extras, model weights and DNA Chisel external data remain subject to their
+upstream terms.
 
 ## Deep-learning property prediction
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib
+import logging
 import math
 import os
 import shutil
@@ -27,7 +28,11 @@ from dnakit.exceptions import (
 
 
 def require(module: str, extra: str) -> Any:
-    """Import a dependency without changing the user's installation."""
+    """Import a dependency without changing the user's installation or global logging."""
+    # Some packages (for example MACS3) install a global logger class and root handler at import.
+    root = logging.getLogger()
+    logger_class = logging.getLoggerClass()
+    handlers, level = list(root.handlers), root.level
     try:
         return importlib.import_module(module)
     except ImportError as exc:
@@ -35,6 +40,13 @@ def require(module: str, extra: str) -> Any:
             f"{module} could not be imported: {exc}",
             hint=f'Install the optional dependency with: python -m pip install "dnakit[{extra}]"',
         ) from exc
+    finally:
+        if logging.getLoggerClass() is not logger_class:
+            logging.setLoggerClass(logger_class)
+        for handler in list(root.handlers):
+            if handler not in handlers:
+                root.removeHandler(handler)
+        root.setLevel(level)
 
 
 def symbol(module: ModuleType | Any, name: str) -> Any:
@@ -157,6 +169,7 @@ def run(
     config: ExecutionConfig,
     *,
     outputs: Iterable[Path] = (),
+    environment: Mapping[str, str] | None = None,
 ) -> str:
     outputs = tuple(outputs)
     result = execute_bounded_command(
@@ -168,6 +181,7 @@ def run(
         max_output_bytes=config.max_output_bytes,
         monitored_output_paths=tuple(outputs),
         max_monitored_output_bytes=config.max_artifact_bytes,
+        environment_overrides=environment,
     )
     if result.return_code != 0:
         raise BackendExecutionError(

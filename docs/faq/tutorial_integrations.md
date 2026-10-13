@@ -1008,6 +1008,8 @@ python others/examples/train_machine_learning_properties.py --demo
 
 分类报告包括 Accuracy、Balanced Accuracy、Precision、Recall、F1、Jaccard、MCC、Cohen's kappa、Log loss、AUROC、Average Precision、混淆矩阵及逐类别/逐标签结果；多标签任务另含 subset accuracy、Hamming loss、LRAP 和 coverage error。回归报告包括 MAE、MSE、RMSE、R²、explained variance、median absolute error、max error、bias、MAPE、SMAPE、Pearson 和 Spearman，并同时给出汇总与逐目标结果。F1、AUROC 等分类指标不会伪装成回归指标；样本不足或数学上未定义的指标返回 `null`。
 
+<a id="模型与微调方式"></a>
+
 #### 模型与微调方式
 
 默认 `finetune_method="full"`。当前 11 个模型均提供全量微调和冻结骨干的 `linear_probe`：DNABERT-2、NT-v2、HyenaDNA、Caduceus、GROVER、LucaOne、GENERator、Enformer、Evo 2、JanusDNA、AlphaGenome。全量微调更新骨干与新任务头，线性探测只更新线性任务头。请用 `available_custom_training_models()` 获取支持矩阵；能力登记不表示本机已安装模型依赖或已完成全部官方大权重训练。

@@ -76,7 +76,7 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 50 | [QUAST](https://github.com/ablab/quast) | 新增记录 | quast-assembly |  |
 | 51 | [RepeatMasker](https://github.com/Dfam-consortium/RepeatMasker) | 新增记录 | repeatmasker-library |  |
 | 52 | [RepeatModeler](https://github.com/Dfam-consortium/RepeatModeler) | 新增记录 | Source only; no adapter |  |
-| 53 | [BCFtools](https://github.com/samtools/bcftools) | 新增记录 | dnakit.bioinformatics.ngs.call_variants |  |
+| 53 | [BCFtools](https://github.com/samtools/bcftools) | 新增记录 | `dnakit.ngs.call_variants` | Danecek et al. (2021), DOI 10.1093/gigascience/giab008; MIT; caller-provided bcftools required |
 | 54 | [CADD](https://github.com/kircherlab/CADD-scripts) | 新增记录 | Source only; no adapter | 评分/数据库使用许可需单独核对 |
 | 55 | [Clair3](https://github.com/HKU-BAL/Clair3) | 合并已有 | 1 related workflow guides |  |
 | 56 | [CNVkit](https://github.com/etal/cnvkit) | 合并已有 | 1 related workflow guides |  |
@@ -85,7 +85,7 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 59 | [DeepVariant](https://github.com/google/deepvariant) | 合并已有 | 1 related workflow guides | 通常用官方容器；不是普通pip包 |
 | 60 | [DELLY](https://github.com/dellytools/delly) | 新增记录 | Source only; no adapter |  |
 | 61 | [Ensembl VEP](https://github.com/Ensembl/ensembl-vep) | 合并已有 | dnakit.annotation.variants.annotate_variant_vep; dnakit.annotation.variants.annotate_rsid_vep; 1 related workflow guides | ; Existing Ensembl REST annotation through the configured ToolUniverse provider; not a local VEP CLI installation. |
-| 62 | [FreeBayes](https://github.com/freebayes/freebayes) | 新增记录 | Source only; no adapter |  |
+| 62 | [FreeBayes](https://github.com/freebayes/freebayes) | New record | `dnakit.variants.call_freebayes`; one unified small-variant calling facade | MIT; Garrison & Marth (2012), arXiv:1207.3907; caller-provided freebayes required |
 | 63 | [GATK-SV](https://github.com/broadinstitute/gatk-sv) | 新增记录 | Source only; no adapter | 不是GATK4单个命令的简单同义名 |
 | 64 | [GATK4](https://github.com/broadinstitute/gatk) | 合并已有 | 2 related workflow guides | 子工具不重复计为独立项目 |
 | 65 | [hap.py](https://github.com/Illumina/hap.py) | 新增记录 | Source only; no adapter |  |
@@ -149,13 +149,13 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 123 | [coloc](https://github.com/chr1swallace/coloc) | 新增记录 | Source only; no adapter |  |
 | 124 | [EIGENSOFT](https://github.com/DReichLab/EIG) | 新增记录 | Source only; no adapter |  |
 | 125 | [fastSTRUCTURE](https://github.com/rajanil/fastStructure) | 新增记录 | Source only; no adapter | 旧Python依赖需核对 |
-| 126 | [IQ-TREE 2](https://github.com/iqtree/iqtree2) | 新增记录 | Source only; no adapter |  |
-| 127 | [MAFFT](https://mafft.cbrc.jp/alignment/software/) | 新增记录 | dnakit.bioinformatics.alignment.align_sequences | ; align_sequences(method='mafft'); external MAFFT required. |
+| 126 | [IQ-TREE 2](https://github.com/iqtree/iqtree2) | New record | `dnakit.phylogeny.infer_ml_tree`; one unified maximum-likelihood tree facade | GPL-2.0; Minh et al. (2020), DOI 10.1093/molbev/msaa015; caller-provided iqtree2 required |
+| 127 | [MAFFT](https://mafft.cbrc.jp/alignment/software/) | 新增记录 | `dnakit.alignment.align_sequences`; `dnakit.bioinformatics.alignment.align_sequences` | Katoh & Standley (2013), DOI 10.1093/molbev/mst010; BSD; fixed multiple-alignment facade; caller-provided MAFFT required |
 | 128 | [moments](https://github.com/MomentsLD/moments) | 新增记录 | Source only; no adapter |  |
 | 129 | [MrBayes](https://github.com/NBISweden/MrBayes) | 新增记录 | Source only; no adapter |  |
 | 130 | [MSMC2](https://github.com/stschiff/msmc2) | 新增记录 | Source only; no adapter |  |
 | 131 | [msprime](https://github.com/tskit-dev/msprime) | 合并已有 | 1 related workflow guides |  |
-| 132 | [MUSCLE](https://github.com/rcedgar/muscle) | 新增记录 | dnakit.bioinformatics.alignment.align_sequences | ; align_sequences(method='muscle'); MUSCLE 5 required. |
+| 132 | [MUSCLE](https://github.com/rcedgar/muscle) | 新增记录 | `dnakit.alignment.align_sequences`; `dnakit.bioinformatics.alignment.align_sequences` | Edgar (2022), DOI 10.1038/s41467-022-34630-w; GPL-3.0; fixed multiple-alignment facade; caller-provided MUSCLE 5 required |
 | 133 | [PCAngsd](https://github.com/Rosemeis/pcangsd) | 新增记录 | Source only; no adapter |  |
 | 134 | [PLINK 2](https://www.cog-genomics.org/plink/2.0/) | 合并已有 | plink2-pca; plink2-king; plink2-ld-prune; plink2-gwas |  |
 | 135 | [PSMC](https://github.com/lh3/psmc) | 新增记录 | Source only; no adapter |  |
@@ -198,13 +198,13 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 172 | [RGI](https://github.com/arpcard/rgi) | 新增记录 | Source only; no adapter | CARD数据库许可与软件分别核对 |
 | 173 | [SemiBin](https://github.com/BigDataBiology/SemiBin) | 新增记录 | Source only; no adapter |  |
 | 174 | [Snippy](https://github.com/tseemann/snippy) | 新增记录 | Source only; no adapter |  |
-| 175 | [SPAdes / metaSPAdes](https://github.com/ablab/spades) | 合并已有 | dnakit.bioinformatics.ngs.assemble_reads; 1 related workflow guides | 同一套件组件合并计数; Existing SPAdes short-read/hybrid wrapper; not every metaSPAdes mode. |
+| 175 | [SPAdes / metaSPAdes](https://github.com/ablab/spades) | 合并已有 | `dnakit.ngs.assemble_reads`; 1 related workflow guide | Bankevich et al. (2012), DOI 10.1089/cmb.2012.0021; GPL-2.0; caller-provided spades.py required; not every metaSPAdes mode |
 | 176 | [VAMB](https://github.com/RasmussenLab/vamb) | 新增记录 | 1 related workflow guides |  |
 | 177 | [VSEARCH](https://github.com/torognes/vsearch) | 新增记录 | vsearch-dereplicate; vsearch-cluster |  |
 | 178 | [Cello v2](https://github.com/CIDARLAB/Cello-v2) | 新增记录 | Source only; no adapter | 安装与适用宿主按原文档核对 |
-| 179 | [DNA Cauldron](https://github.com/Edinburgh-Genome-Foundry/DnaCauldron) | 新增记录 | Source only; no adapter |  |
+| 179 | [DNA Cauldron](https://github.com/Edinburgh-Genome-Foundry/DnaCauldron) | 新增记录 | `dnakit.integrations.simulate_dnacauldron_assembly` | Requires `dnakit[bio-dnacauldron]`; MIT; Gibson/Type IIS simulation |
 | 180 | [DNA Chisel](https://github.com/Edinburgh-Genome-Foundry/DnaChisel) | 合并已有 | 1 related workflow guides |  |
-| 181 | [DNA Features Viewer](https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer) | 新增记录 | Source only; no adapter |  |
+| 181 | [DNA Features Viewer](https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer) | 新增记录 | `dnakit.integrations.summarize_dna_features_viewer` | Requires `dnakit[bio-dna-features-viewer]`; MIT; read-only GenBank/GFF feature inventory |
 | 182 | [DNA Fountain](https://github.com/TeamErlich/dna-fountain) | 新增记录 | Source only; no adapter | 原论文代码使用旧Python；不应直接装入主环境 |
 | 183 | [DNA Weaver](https://github.com/Edinburgh-Genome-Foundry/DnaWeaver) | 合并已有 | Source only; no adapter |  |
 | 184 | [DNAplotlib](https://github.com/VoigtLab/dnaplotlib) | 新增记录 | Source only; no adapter | README采用PYTHONPATH导入；不要假定包名即PyPI包 |
@@ -212,8 +212,8 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 186 | [Primer3](https://github.com/primer3-org/primer3) | 新增记录 | Source only; no adapter |  |
 | 187 | [primer3-py](https://github.com/libnano/primer3-py) | 新增记录 | Source only; no adapter | 不是独立引物算法；需引用底层Primer3 |
 | 188 | [pydna](https://github.com/pydna-group/pydna) | 新增记录 | dnakit.bioinformatics.cloning.assemble_duplexes; dnakit.bioinformatics.cloning.read_constructs |  |
-| 189 | [pySBOL3](https://github.com/SynBioDex/pySBOL3) | 合并已有 | Source only; no adapter |  |
-| 190 | [scadnano](https://github.com/UC-Davis-molecular-computing/scadnano) | 合并已有 | dnakit.genomics.design_dna_duplex; dnakit.genomics.export_oxdna_design; 1 related workflow guides | 属于DNA纳米技术扩展方向 |
+| 189 | [pySBOL3](https://github.com/SynBioDex/pySBOL3) | 合并已有 | `dnakit.integrations.summarize_sbol3_document` | Requires `dnakit[bio-pysbol3]`; MIT; local SBOL3 inventory only |
+| 190 | [scadnano](https://github.com/UC-Davis-molecular-computing/scadnano) | 合并已有 | `dnakit.integrations.summarize_scadnano_design`; dnakit.genomics.design_dna_duplex; dnakit.genomics.export_oxdna_design | Requires `dnakit[bio-scadnano]`; MIT; DNA nanostructure extension |
 | 191 | [SynBioHub](https://github.com/SynBioHub/synbiohub) | 新增记录 | Source only; no adapter |  |
 | 192 | [EuroForMix](https://euroformix.com/) | 合并已有 | 1 related workflow guides | 需实验室验证、正确群体频率与专家复核 |
 | 193 | [ExpansionHunter](https://github.com/Illumina/ExpansionHunter) | 新增记录 | Source only; no adapter | 当前仓库标注PolyForm Strict 1.0.0；不是无条件可商用开源 |
@@ -250,51 +250,51 @@ Use plan_analysis/run_analysis for registered analyses and list_mcp_tools/call_m
 | 224 | [SeSAMe](https://bioconductor.org/packages/release/bioc/html/sesame.html) | 新增记录 | Source only; no adapter |  |
 | 225 | [Tombo](https://github.com/nanoporetech/tombo) | 新增记录 | Source only; no adapter | 旧模型依赖链；不建议盲目升级安装 |
 | 226 | [ArchR](https://github.com/GreenleafLab/ArchR) | 新增记录 | Source only; no adapter |  |
-| 227 | [BEDTools](https://github.com/arq5x/bedtools2) | 新增记录 | 1 related workflow guides |  |
+| 227 | [BEDTools](https://github.com/arq5x/bedtools2) | 新增记录 | `dnakit.alignment.intersect_bed` | Quinlan & Hall (2010), DOI 10.1093/bioinformatics/btq033; MIT; caller-provided bedtools required |
 | 228 | [bioframe](https://github.com/open2c/bioframe) | 新增记录 | Source only; no adapter |  |
 | 229 | [Biopython](https://github.com/biopython/biopython) | 新增记录 | dnakit.bioinformatics.reads.read_fastx; dnakit.bioinformatics.alignment.read_alignment; dnakit.bioinformatics.motifs.build_motif |  |
 | 230 | [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html) | 新增记录 | Source only; no adapter |  |
 | 231 | [bioutils](https://github.com/biocommons/bioutils) | 新增记录 | Source only; no adapter |  |
-| 232 | [Bowtie2](https://github.com/BenLangmead/bowtie2) | 新增记录 | dnakit.bioinformatics.ngs.map_reads | ; map_reads(method='bowtie2'); bowtie2 and bowtie2-build required. |
+| 232 | [Bowtie2](https://github.com/BenLangmead/bowtie2) | 新增记录 | `dnakit.ngs.map_reads` | Langmead & Salzberg (2012), DOI 10.1038/nmeth.1923; GPL-3.0; `method='bowtie2'`; bowtie2 and bowtie2-build required |
 | 233 | [BSgenome](https://bioconductor.org/packages/release/bioc/html/BSgenome.html) | 新增记录 | Source only; no adapter |  |
-| 234 | [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) | 新增记录 | Source only; no adapter |  |
+| 234 | [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) | 新增记录 | `dnakit.ngs.map_reads(method="bwa-mem2")`; one unified mapping facade | MIT; Vasimuddin et al. (2019), DOI 10.1109/IPDPS.2019.00041; caller-provided bwa-mem2 required |
 | 235 | [Cactus](https://github.com/ComparativeGenomicsToolkit/cactus) | 合并已有 | 2 related workflow guides |  |
 | 236 | [Canu](https://github.com/marbl/canu) | 新增记录 | Source only; no adapter |  |
 | 237 | [Cooler](https://github.com/open2c/cooler) | 合并已有 | 2 related workflow guides |  |
 | 238 | [cooltools](https://github.com/open2c/cooltools) | 合并已有 | 2 related workflow guides |  |
-| 239 | [Cutadapt](https://github.com/marcelm/cutadapt) | 新增记录 | Source only; no adapter |  |
+| 239 | [Cutadapt](https://github.com/marcelm/cutadapt) | 新增记录 | `dnakit.sequencing_qc.run_cutadapt` fixed-option external adapter |  |
 | 240 | [cyvcf2](https://github.com/brentp/cyvcf2) | 新增记录 | Source only; no adapter |  |
 | 241 | [deepTools](https://github.com/deeptools/deepTools) | 新增记录 | 1 related workflow guides |  |
-| 242 | [fastp](https://github.com/OpenGene/fastp) | 合并已有 | 1 related workflow guides |  |
-| 243 | [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) | 新增记录 | dnakit.bioinformatics.ngs.quality_control |  |
+| 242 | [fastp](https://github.com/OpenGene/fastp) | 合并已有 | `dnakit.sequencing_qc.run_fastp` fixed-option external adapter; 1 related workflow guide |  |
+| 243 | [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) | New record | `dnakit.sequencing_qc.run_fastqc`; existing `dnakit.bioinformatics.ngs.quality_control` workflow | Caller-provided FastQC executable; GPL-3.0; no DOI supplied by the survey |
 | 244 | [Flye](https://github.com/mikolmogorov/Flye) | 合并已有 | flye-assembly; 2 related workflow guides | 旧fenderglass地址已迁移 |
 | 245 | [GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) | 新增记录 | Source only; no adapter |  |
-| 246 | [gffutils](https://github.com/daler/gffutils) | 新增记录 | 1 related workflow guides |  |
+| 246 | [gffutils](https://github.com/daler/gffutils) | 新增记录 | `dnakit.integrations.query_gffutils_database` |  |
 | 247 | [gget](https://github.com/scverse/gget) | 新增记录 | Source only; no adapter | 由pachterlab迁移至scverse |
-| 248 | [Hail](https://hail.is/) | 新增记录 | Source only; no adapter | 需要独立计算环境；安装包不等于配置完毕 |
+| 248 | [Hail](https://hail.is/) | 新增记录 | Optional adapter in `dnakit.variants` (Hail functions; needs Java and `bio-hail`) | 需要独立计算环境；安装包不等于配置完毕 |
 | 249 | [hgvs](https://github.com/biocommons/hgvs) | 新增记录 | Source only; no adapter |  |
 | 250 | [HiCExplorer](https://github.com/deeptools/HiCExplorer) | 新增记录 | Source only; no adapter |  |
 | 251 | [hifiasm](https://github.com/chhylp123/hifiasm) | 合并已有 | hifiasm-assembly; 2 related workflow guides |  |
 | 252 | [HTSlib](https://github.com/samtools/htslib) | 新增记录 | Source only; no adapter | 供pysam、BCFtools等使用 |
 | 253 | [IGV](https://github.com/igvteam/igv) | 新增记录 | Source only; no adapter |  |
-| 254 | [MACS3](https://github.com/macs3-project/MACS) | 新增记录 | 1 related workflow guides |  |
+| 254 | [MACS3](https://github.com/macs3-project/MACS) | 新增记录 | `dnakit.ngs.call_chip_peaks`; 1 related workflow guide | BSD-3-Clause; fixed MACS3 callpeak + samtools coverage; no DOI supplied by the survey; caller-provided executables required |
 | 255 | [minigraph](https://github.com/lh3/minigraph) | 合并已有 | minigraph-pangenome |  |
-| 256 | [Minimap2](https://github.com/lh3/minimap2) | 新增记录 | dnakit.annotation.genes.annotate_genes | ；官方另提供mappy Python绑定，需独立核对版本; Existing reference-based gene annotation/alignment wrapper; not every minimap2 CLI mode. |
+| 256 | [Minimap2](https://github.com/lh3/minimap2) | 新增记录 | `dnakit.alignment.map_long_reads`; `dnakit.annotation.genes.annotate_genes` | Li (2018), DOI 10.1093/bioinformatics/bty191; MIT; fixed presets and SAM/PAF output; caller-provided minimap2 required |
 | 257 | [MMseqs2](https://github.com/soedinglab/MMseqs2) | 新增记录 | mmseqs-protein-search; mmseqs-protein-cluster |  |
-| 258 | [MultiQC](https://github.com/MultiQC/MultiQC) | 新增记录 | Source only; no adapter |  |
-| 259 | [NCBI BLAST+](https://blast.ncbi.nlm.nih.gov/doc/blast-help/) | 新增记录 | dnakit.bioinformatics.alignment.build_blast_database; dnakit.bioinformatics.alignment.local_blast |  |
+| 258 | [MultiQC](https://github.com/MultiQC/MultiQC) | New record | `dnakit.sequencing_qc.run_multiqc` | Caller-provided MultiQC executable; GPL-3.0-or-later; Ewels et al. (2016), DOI 10.1093/bioinformatics/btw354 |
+| 259 | [NCBI BLAST+](https://blast.ncbi.nlm.nih.gov/doc/blast-help/) | 新增记录 | `dnakit.alignment.build_blast_database`; `dnakit.alignment.local_blast` | Camacho et al. (2009), DOI 10.1186/1471-2105-10-421; public-domain software statement; fixed nucleotide database and blastn XML output; caller-provided BLAST+ required |
 | 260 | [NCBI Datasets](https://www.ncbi.nlm.nih.gov/datasets/docs/v2/) | 新增记录 | Source only; no adapter | CLI与API是数据获取入口，不是新增预测算法 |
 | 261 | [ODGI](https://github.com/pangenome/odgi) | 新增记录 | Source only; no adapter |  |
 | 262 | [pairtools](https://github.com/open2c/pairtools) | 新增记录 | Source only; no adapter |  |
 | 263 | [PGGB](https://github.com/pangenome/pggb) | 合并已有 | 2 related workflow guides |  |
-| 264 | [pybedtools](https://github.com/daler/pybedtools) | 新增记录 | Source only; no adapter | 多数操作需要外部bedtools可执行程序 |
-| 265 | [pyBigWig](https://github.com/deeptools/pyBigWig) | 新增记录 | 1 related workflow guides |  |
+| 264 | [pybedtools](https://github.com/daler/pybedtools) | 新增记录 | `dnakit.integrations.intersect_pybedtools_bed` | 多数操作需要外部bedtools executable |
+| 265 | [pyBigWig](https://github.com/deeptools/pyBigWig) | 新增记录 | `dnakit.integrations.summarize_pybigwig_region` |  |
 | 266 | [pyfaidx](https://github.com/mdshw5/pyfaidx) | 新增记录 | Source only; no adapter |  |
-| 267 | [pyfastx](https://github.com/lmdu/pyfastx) | 新增记录 | Source only; no adapter |  |
+| 267 | [pyfastx](https://github.com/lmdu/pyfastx) | 新增记录 | `dnakit.integrations.summarize_pyfastx` |  |
 | 268 | [PyRanges0](https://github.com/pyranges/pyranges0) | 新增记录 | Source only; no adapter | 旧pyranges地址已重定向；新旧API需区分 |
 | 269 | [pysam](https://github.com/pysam-developers/pysam) | 新增记录 | dnakit.bioinformatics.reads.alignment_summary; dnakit.bioinformatics.reads.coverage_consensus |  |
 | 270 | [Rsamtools](https://bioconductor.org/packages/release/bioc/html/Rsamtools.html) | 新增记录 | Source only; no adapter |  |
-| 271 | [SAMtools](https://github.com/samtools/samtools) | 新增记录 | dnakit.bioinformatics.ngs.prepare_bam; 2 related workflow guides |  |
+| 271 | [SAMtools](https://github.com/samtools/samtools) | 新增记录 | `dnakit.ngs.prepare_bam`; 2 related workflow guides | Danecek et al. (2021), DOI 10.1093/gigascience/giab008; MIT; caller-provided samtools required |
 | 272 | [SeqKit](https://github.com/shenwei356/seqkit) | 合并已有 | 1 related workflow guides |  |
 | 273 | [seqtk](https://github.com/lh3/seqtk) | 新增记录 | Source only; no adapter |  |
 | 274 | [Signac](https://github.com/stuart-lab/signac) | 新增记录 | Source only; no adapter |  |

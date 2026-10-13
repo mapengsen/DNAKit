@@ -132,6 +132,78 @@ plugins:
                 - 14) Inheritance Simulation: api/features/34_inheritance.md
                 - 15) Genomics and DNA Engineering: api/features/38_genomics_extensions.md
                 - 16) External Genomics and MCP: api/features/39_external_genomics.md
+                - 17) Public DNA tool coverage: api/features/40_public_tool_coverage.md
+                - 18) Publication evidence and variant statistics: api/features/41_publication_evidence.md
+                - 19) Dependency-free sequence primitives: api/features/42_sequence_local.md
+                - 20) Publication audit for 320 tools: api/features/43_publication_audit.md
+                - 21) Dependency-free VCF record operations: api/features/43_variant_record_operations.en.md
+                - 22) Annotation coordinates and gene models: api/features/44_annotation_intervals.en.md
+                - 23) Native FASTA and VCF record algorithms: api/features/43_native_record_algorithms.en.md
+                - 24) Native assembly metrics: api/features/45_native_assembly_metrics.en.md
+                - 25) Native alignment records: api/features/46_native_alignment_records.en.md
+                - 26) Native sequence algorithms: api/features/47_native_sequence_algorithms.en.md
+                - 27) Optional VCF backends and population statistics: api/features/48_variant_backends.en.md
+                - 28) Optional sequence backends - Biopython, scikit-bio, pyfastx, screed and py2bit: api/features/49_sequence_backends.en.md
+                - 29) Optional alignment backends - minimap2, edlib, parasail, and pyhmmer: api/features/50_alignment_backends.en.md
+                - 30) Optional interval, annotation, and region-set backends: api/features/51_annotation_backends.en.md
+                - 31) Variant nomenclature and genotype files - varcode, hgvs, PLINK, and BGEN: api/features/52_variant_formats.en.md
+                - 32) Optional gene-level database backends: api/features/53_gene_database_backends.en.md
+                - 33) Sequencing QC adapter, UMI, and SLOW5 signal backends: api/features/54_sequencing_backends.en.md
+                - 34) Optional epigenome backends - contact matrices, pair statistics, coverage and methylation: api/features/55_epigenome_backends.en.md
+                - 35) Optional regulatory-genomics backends - motif scans, fragment counts and model attributions: api/features/56_regulation_backends.en.md
+                - 36) Optional tskit and dadi population-genetics backends: api/features/57_population_backends.en.md
+                - 37) Optional phylogeny backends - dendropy, toytree, and pyvolve: api/features/58_phylogeny_backends.en.md
+                - 38) Optional MinHash and k-mer backends: api/features/59_microbiome_backends.en.md
+                - 39) Optional molecular-lab backends - DNA design, records and drawing: api/features/60_molecular_lab_backends.en.md
+                - 40) Data utilities for optional DNA model packages: api/features/61_dna_model_backends.en.md
+                - 42) Transcriptomics single-cell backends - AnnData, scanpy, muon, and scVI: api/features/63_transcriptomics_backends.en.md
+                - 43) Pipeline-definition tools - WDL, CWL, Snakemake, nf-core and Galaxy: api/features/64_workflow_backends.en.md
+                - 44) Service backends and a local Toil job graph: api/features/65_service_backends.en.md
+                - 41) Optional Hail backends - MatrixTable import, QC and population analysis: api/features/62_hail_backends.en.md
+                - 45) Optional sequence functions - DNA and gene-level wrappers over Biopython and scikit-bio: api/features/66_full_G1a.en.md
+                - 46) G1b - offline pyfaidx, dnaio and screed wrappers: api/features/67_full_G1b.en.md
+                - 47) Alignment extensions - parasail, edlib and pyhmmer: api/features/68_full_G2.en.md
+                - 48) Feature 69 - G3 interval, annotation, and bigWig wrappers: api/features/69_full_G3.en.md
+                - 49) 70 Full G4 - polars-bio, gtars, ncls, and genomicranges annotation functions: api/features/70_full_G4.en.md
+                - 50) Variant and interval helpers from pysam, cyvcf2 and vcfpy: api/features/71_full_G5.en.md
+                - 51) 72 Variants - offline varcode, hgvs and scikit-allel functions: api/features/72_full_G6a.en.md
+                - 52) G6b - PLINK relationship matrices, bed-reader genotype matrices and BGEN expectations and dosages: api/features/73_full_G6b.en.md
+                - 53) G7 database functions - gget, MyGene, MyVariant and biothings_client: api/features/74_full_G7.en.md
+                - 54) pyensembl, genomepy and NCBI Datasets genome functions: api/features/75_full_G8.en.md
+                - 55) Offline cutadapt and umi-tools sequence and UMI functions: api/features/76_full_G9.en.md
+                - 56) G10 - file and matrix functions from cooler, cooltools and pairtools: api/features/77_full_G10.en.md
+                - 57) Epigenome functions - methylpy, MACS3 and deepTools: api/features/78_full_G11.en.md
+                - 58) gimmemotifs, tangermeme and snapATAC2 regulatory functions: api/features/79_full_G12.en.md
+                - 59) Optional tskit and dadi population-genetics functions (group 80): api/features/80_full_G13.en.md
+                - 60) DendroPy, toytree, and pyvolve phylogeny functions (G14): api/features/81_full_G14.en.md
+                - 61) Sourmash and khmer k-mer helpers: api/features/82_full_G15.en.md
+                - 62) DnaChisel, DnaCauldron and pydna sequence functions: api/features/83_full_G16a.en.md
+                - 63) 84. Third-party package interfaces G16b - SBOL3, SnapGene, DNA Features Viewer, pyGenomeViz, primer3-py: api/features/84_full_G16b.en.md
+                - 64) 85 G17a - offline DNA utilities from alphagenome, grelu and enformer-pytorch: api/features/85_full_G17a.en.md
+                - 65) G17b functions - selene-sdk, genomic-benchmarks and kipoi: api/features/86_full_G17b.en.md
+                - 66) G18a functions - bioframe intervals, regions, sequences, files and assemblies: api/features/87_review_G18a.en.md
+                - 67) G18b functions - sourmash, khmer and primer3: api/features/88_review_G18b.en.md
+                - 68) G18c review - sbol3, screed and pyfaidx: api/features/89_review_G18c.en.md
+                - 69) G18d review - kipoi, genomic-benchmarks and gReLU: api/features/90_review_G18d.en.md
+                - 70) Review wrappers for dadi and tskit (group G18e, doc 91): api/features/91_review_G18e.en.md
+                - 71) G18f review functions - polars-bio and gtars: api/features/92_review_G18f.en.md
+                - 72) 93 G18g - interval and annotation functions from pybedtools, gffutils and gtfparse: api/features/93_review_G18g.en.md
+                - 73) Review G18h - pysam and hgvs variant helpers: api/features/94_review_G18h.en.md
+                - 74) G18i - gimmemotifs, tangermeme and snapATAC2 regulatory review functions: api/features/95_review_G18i.en.md
+                - 75) 96 G18j Review - pyensembl, gget, biothings_client and genomepy: api/features/96_review_G18j.en.md
+                - 76) Review G18k - varcode and scikit-allel variant utilities: api/features/97_review_G18k.en.md
+                - 77) G18l - review functions from cooler, cooltools and pairtools: api/features/98_review_G18l.en.md
+                - 78) Review batch G18m - other rows of methylpy, MACS3 and deepTools: api/features/99_review_G18m.en.md
+                - 79) G18n review wrappers - pydna, DnaCauldron and DnaChisel: api/features/100_review_G18n.en.md
+                - 80) G18o functions - Biopython, scikit-bio, cutadapt and umi_tools review wrappers: api/features/101_review_G18o.en.md
+                - 81) 102 Review additions (G18p) - toytree, dendropy and pyranges1: api/features/102_review_G18p.en.md
+                - 82) G18q review - selene-sdk, enformer-pytorch and alphagenome variant scoring: api/features/103_review_G18q.en.md
+                - 83) H1 family-variant review - dadi, tskit and scikit-allel: api/features/104_family_H1.en.md
+                - 84) H2 features - family-variant check of pydna, DnaCauldron, DnaChisel and primer3: api/features/105_family_H2.en.md
+                - 85) H3 family-variant review - Bio, skbio, screed, cutadapt, umi_tools, khmer: api/features/106_family_H3.en.md
+                - 86) H4 family-variant check - polars-bio, pyensembl, gtars, bioframe and five more packages: api/features/107_family_H4.en.md
+                - 87) 108 Family-variant review (H5) - microbiome, regulation, epigenome, variants, predictions: api/features/108_family_H5.en.md
+                - 88) parasail kernels by name parts, and SSW with a reusable profile: api/features/109_family_parasail.en.md
             - 4. Data Evaluation:
                 - 1) Common Evaluation Metrics: api/features/12_evaluation.md
                 - 2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -142,6 +214,39 @@ plugins:
                 - 2) MCP: llm_tools/mcp.md
                 - 3) Skills: llm_tools/skills.md
                 - 4) Agent: llm_tools/agent.md
+            - 7. Expanded Function Catalog (837 capabilities):
+                - Catalog overview: api/features/candidate_catalog/index.md
+                - Alignment: api/features/candidate_catalog/alignment.md
+                - Annotation: api/features/candidate_catalog/annotation.md
+                - Assembly: api/features/candidate_catalog/assembly.md
+                - Breeding: api/features/candidate_catalog/breeding.md
+                - Clinical genomics: api/features/candidate_catalog/clinical.md
+                - Databases: api/features/candidate_catalog/databases.md
+                - CRISPR design: api/features/candidate_catalog/design-crispr.md
+                - Epigenomics: api/features/candidate_catalog/epigenome.md
+                - Experimental design: api/features/candidate_catalog/experimental-design.md
+                - External adapters: api/features/candidate_catalog/external-adapters.md
+                - FASTA and FASTQ: api/features/candidate_catalog/fasta-fastq.md
+                - Forensic and reproductive genomics: api/features/candidate_catalog/forensic-reproductive.md
+                - Three-dimensional genome: api/features/candidate_catalog/genome3d.md
+                - GWAS: api/features/candidate_catalog/gwas.md
+                - Haplotypes: api/features/candidate_catalog/haplotypes.md
+                - Input and output formats: api/features/candidate_catalog/io-formats.md
+                - Knowledge graph: api/features/candidate_catalog/knowledge-graph.md
+                - Microbiome: api/features/candidate_catalog/microbiome.md
+                - Machine-learning models: api/features/candidate_catalog/ml-models.md
+                - Molecular laboratory: api/features/candidate_catalog/molecular-lab.md
+                - Phylogeny: api/features/candidate_catalog/phylogeny.md
+                - Population genetics: api/features/candidate_catalog/population.md
+                - Regulation: api/features/candidate_catalog/regulation.md
+                - Replication and DNA repair: api/features/candidate_catalog/replication-repair.md
+                - Sequence analysis: api/features/candidate_catalog/sequence.md
+                - Sequencing quality control: api/features/candidate_catalog/sequencing-qc.md
+                - Single-cell and spatial genomics: api/features/candidate_catalog/singlecell-spatial.md
+                - Transcriptomics: api/features/candidate_catalog/transcriptomics.md
+                - Variant analysis: api/features/candidate_catalog/variants.md
+                - Visualization: api/features/candidate_catalog/visualization.md
+                - Workflow and data security: api/features/candidate_catalog/workflow-security.md
             - Changelog: changelog.md
             - FAQ:
                 - 1) Engineering and Extensions: api/features/14_engineering.md
@@ -321,6 +426,78 @@ nav:
       - 14) 遗传模拟: api/features/34_inheritance.md
       - 15) 基因组与 DNA 工程: api/features/38_genomics_extensions.md
       - 16) 外部基因组分析与 MCP: api/features/39_external_genomics.md
+      - 17) 市面 DNA 工具覆盖: api/features/40_public_tool_coverage.md
+      - 18) 论文引用证据与变异统计: api/features/41_publication_evidence.md
+      - 19) 无外部依赖的序列基础算法: api/features/42_sequence_local.md
+      - 20) 320项工具论文引用审计: api/features/43_publication_audit.md
+      - 21) 无外部依赖的 VCF 记录操作: api/features/43_variant_record_operations.md
+      - 22) 注释坐标与基因模型: api/features/44_annotation_intervals.md
+      - 23) 原生 FASTA 与 VCF 记录算法: api/features/43_native_record_algorithms.md
+      - 24) 原生 Assembly 指标: api/features/45_native_assembly_metrics.md
+      - 25) 原生 Alignment 记录: api/features/46_native_alignment_records.md
+      - 26) 原生序列算法: api/features/47_native_sequence_algorithms.md
+      - 27) 可选 VCF 后端与群体遗传统计: api/features/48_variant_backends.md
+      - 28) 可选序列后端：Biopython、scikit-bio、pyfastx、screed 与 py2bit: api/features/49_sequence_backends.md
+      - 29) 可选比对后端：minimap2、edlib、parasail 与 pyhmmer: api/features/50_alignment_backends.md
+      - 30) 可选区间、注释与区域集后端: api/features/51_annotation_backends.md
+      - 31) 变异命名与基因型文件：varcode、hgvs、PLINK 与 BGEN: api/features/52_variant_formats.md
+      - 32) 基因级数据库可选后端: api/features/53_gene_database_backends.md
+      - 33) 测序质控适配器、UMI 与 SLOW5 信号后端: api/features/54_sequencing_backends.md
+      - 34) 可选表观基因组后端：接触矩阵、配对统计、覆盖度与甲基化: api/features/55_epigenome_backends.md
+      - 35) 调控基因组可选后端：基序扫描、fragment 计数与模型归因: api/features/56_regulation_backends.md
+      - 36) 可选 tskit 与 dadi 群体遗传后端: api/features/57_population_backends.md
+      - 37) 可选系统发育后端：dendropy、toytree 与 pyvolve: api/features/58_phylogeny_backends.md
+      - 38) 可选 MinHash 与 k-mer 后端: api/features/59_microbiome_backends.md
+      - 39) 可选分子实验室后端：DNA 设计、记录与绘图: api/features/60_molecular_lab_backends.md
+      - 40) 可选 DNA 模型包的数据工具: api/features/61_dna_model_backends.md
+      - 42) 转录组单细胞后端：AnnData、scanpy、muon 与 scVI: api/features/63_transcriptomics_backends.md
+      - 43) 流水线定义工具：WDL、CWL、Snakemake、nf-core 与 Galaxy: api/features/64_workflow_backends.md
+      - 44) 服务后端与本地 Toil 作业: api/features/65_service_backends.md
+      - 41) 可选 Hail 后端：MatrixTable 导入、质控与群体分析: api/features/62_hail_backends.md
+      - 45) 可选序列函数：Biopython 与 scikit-bio 的 DNA 与基因级封装: api/features/66_full_G1a.md
+      - 46) G1b：pyfaidx、dnaio 与 screed 离线封装: api/features/67_full_G1b.md
+      - 47) 对齐补充封装：parasail、edlib 与 pyhmmer: api/features/68_full_G2.md
+      - 48) 第 69 号：G3 区间、注释与 bigWig 包装: api/features/69_full_G3.md
+      - 49) 70 全量 G4：polars-bio、gtars、ncls 与 genomicranges 注释函数: api/features/70_full_G4.md
+      - 50) pysam、cyvcf2 与 vcfpy 的变异与区域辅助函数: api/features/71_full_G5.md
+      - 51) 72 变异：varcode、hgvs 与 scikit-allel 离线函数: api/features/72_full_G6a.md
+      - 52) G6b：PLINK 关系矩阵、bed-reader 基因型矩阵与 BGEN 期望和剂量: api/features/73_full_G6b.md
+      - 53) G7 数据库函数：gget、MyGene、MyVariant 与 biothings_client: api/features/74_full_G7.md
+      - 54) pyensembl、genomepy 与 NCBI Datasets 的基因组函数: api/features/75_full_G8.md
+      - 55) cutadapt 与 umi-tools 的离线序列和 UMI 函数: api/features/76_full_G9.md
+      - 56) G10：cooler、cooltools 与 pairtools 的文件与矩阵函数: api/features/77_full_G10.md
+      - 57) 表观组函数：methylpy、MACS3 与 deepTools: api/features/78_full_G11.md
+      - 58) gimmemotifs、tangermeme 与 snapATAC2 的调控区域函数: api/features/79_full_G12.md
+      - 59) 可选 tskit 与 dadi 群体遗传函数（第 80 组）: api/features/80_full_G13.md
+      - 60) DendroPy、toytree 与 pyvolve 系统发育函数（G14）: api/features/81_full_G14.md
+      - 61) 草图与 k-mer 辅助函数（sourmash 与 khmer）: api/features/82_full_G15.md
+      - 62) DnaChisel、DnaCauldron 与 pydna 序列函数: api/features/83_full_G16a.md
+      - 63) 84. 第三方包接口 G16b：SBOL3、SnapGene、DNA Features Viewer、pyGenomeViz、primer3-py: api/features/84_full_G16b.md
+      - 64) 85 G17a：alphagenome、grelu 与 enformer-pytorch 的离线 DNA 工具: api/features/85_full_G17a.md
+      - 65) G17b 功能：selene-sdk、genomic-benchmarks 与 kipoi: api/features/86_full_G17b.md
+      - 66) G18a 功能：bioframe 区间、区域、序列、文件与组装工具: api/features/87_review_G18a.md
+      - 67) G18b 功能：sourmash、khmer 与 primer3: api/features/88_review_G18b.md
+      - 68) G18c 复核：sbol3、screed 与 pyfaidx: api/features/89_review_G18c.md
+      - 69) G18d 复核：kipoi、genomic_benchmarks 与 gReLU: api/features/90_review_G18d.md
+      - 70) 群体遗传复审包装函数：dadi 与 tskit（第 91 组，G18e）: api/features/91_review_G18e.md
+      - 71) G18f 功能：polars-bio 与 gtars: api/features/92_review_G18f.md
+      - 72) 93 G18g：pybedtools、gffutils 与 gtfparse 的区间与注释函数: api/features/93_review_G18g.md
+      - 73) 审阅组 G18h：pysam 与 hgvs 变异区辅助函数: api/features/94_review_G18h.md
+      - 74) G18i：gimmemotifs、tangermeme 与 snapATAC2 调控区域函数复核: api/features/95_review_G18i.md
+      - 75) 96 G18j 复审功能：pyensembl、gget、biothings_client 与 genomepy: api/features/96_review_G18j.md
+      - 76) 审查 G18k：varcode 与 scikit-allel 变异工具: api/features/97_review_G18k.md
+      - 77) G18l：cooler、cooltools 与 pairtools 的评审函数: api/features/98_review_G18l.md
+      - 78) 审查批次 G18m：methylpy、MACS3 与 deepTools 的 other 行: api/features/99_review_G18m.md
+      - 79) G18n 审阅封装：pydna、DnaCauldron 与 DnaChisel: api/features/100_review_G18n.md
+      - 80) G18o 功能：Biopython、scikit-bio、cutadapt 与 umi_tools 的评审包装: api/features/101_review_G18o.md
+      - 81) 102 审阅补充（G18p）：toytree、dendropy 与 pyranges1: api/features/102_review_G18p.md
+      - 82) G18q 复核：selene-sdk、enformer-pytorch 与 alphagenome 变异评分: api/features/103_review_G18q.md
+      - 83) H1 家族变体复核：dadi、tskit 与 scikit-allel: api/features/104_family_H1.md
+      - 84) H2 功能：pydna、DnaCauldron、DnaChisel 与 primer3 的 family-variant 核查: api/features/105_family_H2.md
+      - 85) H3 族变体复核：Bio、skbio、screed、cutadapt、umi_tools、khmer: api/features/106_family_H3.md
+      - 86) H4 家族变体复核：polars-bio、pyensembl、gtars、bioframe 等 9 个包: api/features/107_family_H4.md
+      - 87) 108 复核 family-variant（H5）：微生物组、调控、表观基因组、变异、预测: api/features/108_family_H5.md
+      - 88) 按名称部件选择的 parasail 内核，及可复用查询 profile 的 SSW: api/features/109_family_parasail.md
   - 4. 数据评价:
       - 1) 常用评价指标: api/features/12_evaluation.md
       - 2) 相似度计算: api/features/09_similarity_alignment.md
@@ -331,6 +508,39 @@ nav:
       - 2) MCP: llm_tools/mcp.md
       - 3) Skills: llm_tools/skills.md
       - 4) Agent: llm_tools/agent.md
+  - 7. 扩展功能目录（837项）:
+      - 目录总览: api/features/candidate_catalog/index.md
+      - 序列比对: api/features/candidate_catalog/alignment.md
+      - 基因与变异注释: api/features/candidate_catalog/annotation.md
+      - 基因组组装: api/features/candidate_catalog/assembly.md
+      - 育种分析: api/features/candidate_catalog/breeding.md
+      - 临床基因组学: api/features/candidate_catalog/clinical.md
+      - 科学数据库: api/features/candidate_catalog/databases.md
+      - CRISPR 设计: api/features/candidate_catalog/design-crispr.md
+      - 表观基因组学: api/features/candidate_catalog/epigenome.md
+      - 实验设计: api/features/candidate_catalog/experimental-design.md
+      - 外部工具适配: api/features/candidate_catalog/external-adapters.md
+      - FASTA 与 FASTQ: api/features/candidate_catalog/fasta-fastq.md
+      - 法医与生殖基因组学: api/features/candidate_catalog/forensic-reproductive.md
+      - 三维基因组: api/features/candidate_catalog/genome3d.md
+      - GWAS: api/features/candidate_catalog/gwas.md
+      - 单倍型: api/features/candidate_catalog/haplotypes.md
+      - 输入输出格式: api/features/candidate_catalog/io-formats.md
+      - 知识图谱: api/features/candidate_catalog/knowledge-graph.md
+      - 微生物组: api/features/candidate_catalog/microbiome.md
+      - 机器学习模型: api/features/candidate_catalog/ml-models.md
+      - 分子实验: api/features/candidate_catalog/molecular-lab.md
+      - 系统发育: api/features/candidate_catalog/phylogeny.md
+      - 群体遗传学: api/features/candidate_catalog/population.md
+      - 基因调控: api/features/candidate_catalog/regulation.md
+      - DNA 复制与修复: api/features/candidate_catalog/replication-repair.md
+      - 序列分析: api/features/candidate_catalog/sequence.md
+      - 测序质量控制: api/features/candidate_catalog/sequencing-qc.md
+      - 单细胞与空间组学: api/features/candidate_catalog/singlecell-spatial.md
+      - 转录组学: api/features/candidate_catalog/transcriptomics.md
+      - 变异分析: api/features/candidate_catalog/variants.md
+      - 可视化: api/features/candidate_catalog/visualization.md
+      - 工作流与数据安全: api/features/candidate_catalog/workflow-security.md
   - 更新日志: changelog.md
   - FAQ:
       - 1) 工程与扩展: api/features/14_engineering.md

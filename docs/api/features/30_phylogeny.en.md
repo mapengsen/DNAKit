@@ -1,5 +1,34 @@
 # Phylogenetics and Molecular Evolution
 
+## 1) Infer a maximum-likelihood tree with IQ-TREE 2
+
+- **Purpose:** Pass an existing multiple-sequence alignment to caller-installed IQ-TREE 2 and retain the maximum-likelihood tree and report files.
+- **Method:** Run the fixed `iqtree2 -s ... -m ... -nt ... -pre ...` command; optionally add `-B` ultrafast bootstrap. DNAKit does not copy or install IQ-TREE 2 source.
+- **API:** `dnakit.phylogeny.infer_ml_tree(alignment, output_directory, model="MFP", bootstrap=0, threads=1, ...)`
+- **Input:** An alignment format supported by IQ-TREE 2, a new output directory, and caller-installed `iqtree2` on PATH.
+- **Output:** A JSON-serializable stage envelope containing `.treefile`, `.iqtree`, `.log` and other artifact paths, plus model, bootstrap and provenance.
+- **Citation and license:** Cite Minh et al. (2020), DOI `10.1093/molbev/msaa015`; the official repository records GPL-2.0. If using ModelFinder, UFBoot or another specialized feature, add the corresponding IQ-TREE 2 citations.
+
+```python
+from dnakit.phylogeny import infer_ml_tree
+
+result = infer_ml_tree(
+    "alignment.fasta",
+    "iqtree-result",
+    model="MFP",
+    bootstrap=1000,
+)
+print(result["result"]["treefile"])
+```
+
+## 2) Infer an approximate maximum-likelihood tree with FastTree
+
+- **Purpose:** Pass an existing alignment to caller-installed FastTree and capture its approximate maximum-likelihood Newick tree.
+- **Method:** Run the fixed `FastTree [-nt] [-gtr] [-gamma] alignment` command; stdout becomes `tree.newick` and stderr is retained separately. DNAKit does not copy or install FastTree.
+- **API:** `dnakit.phylogeny.infer_fast_tree(alignment, output_directory, nucleotide=True, gtr=False, gamma=False, ...)`
+- **Input and output:** A local alignment and a new output directory; the JSON-serializable envelope contains `tree.newick`, stderr, fixed options and provenance.
+- **Citation and license:** Cite Price, Dehal & Arkin (2010), [10.1371/journal.pone.0009490](https://doi.org/10.1371/journal.pone.0009490); the FastTree 2 repository records GPL-3.0.
+
 ## 1) Build a tree from a distance matrix {#bio-6}
 
 - **Purpose:** Build a tree with branch lengths using NJ or UPGMA.

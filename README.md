@@ -54,7 +54,7 @@ representations for k-means clustering.
 Install the current release:
 
 ```bash
-pip install dnakit==0.1.5
+pip install dnakit==0.2.0
 ```
 
 Install the optional VEP, ClinVar, dbSNP, gnomAD, dN/dS, and Golden Gate
@@ -116,7 +116,7 @@ See [CHANGELOG.md](https://github.com/mapengsen/DNAKit/blob/main/CHANGELOG.md) f
 The DNAKit project paper has not yet been published. Cite the current version as:
 
 ```text
-DNAKit contributors. DNAKit 0.1.5, 2026. https://github.com/mapengsen/DNAKit
+DNAKit contributors. DNAKit 0.2.0, 2026. https://github.com/mapengsen/DNAKit
 ```
 
 This section will be updated with the paper citation after publication. When using specific algorithms, databases, or optional backends, cite their corresponding sources as well.

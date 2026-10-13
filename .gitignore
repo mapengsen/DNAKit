@@ -71,3 +71,7 @@ outputs/
 
 # Local server connection notes
 /可用服务器.md
+
+# Local notes containing API keys / server credentials (never commit)
+不同厂家的agent使用方法.md
+.claude/settings.local.json

@@ -2,10 +2,10 @@
 
 ## 从 PyPI 安装
 
-安装 `0.1.5`：
+安装 `0.2.0`：
 
 ```bash
-pip install dnakit==0.1.5
+pip install dnakit==0.2.0
 ```
 
 地址为：[pypi.org/project/dnakit](https://pypi.org/project/dnakit/)
@@ -42,6 +42,28 @@ python -m pip install "dnakit[external-tools]"
 ```
 
 默认的 `pip install dnakit` 不会安装或加载该后端。
+
+## 第三方 pip 适配器
+
+覆盖矩阵中的 scikit-bio、seqme、DNA Chisel、pySBOL3、scadnano、polars-bio、DnaCauldron、DNA Features Viewer、gtars、GeneBlocks、sourmash 和 Cutadapt 等工具通过显式可选适配器接入统一接口；fastp、FastQC 和 MultiQC 通过用户提供的外部可执行程序接入：
+
+```bash
+python -m pip install "dnakit[bio-skibio,bio-seqme,bio-dnachisel,bio-biotite,bio-edlib,bio-geneblocks,bio-sourmash,bio-cutadapt,bio-pyranges,bio-pyfastx,bio-dnaio,bio-mappy,bio-pybigwig,bio-pybedtools,bio-gffutils,bio-pysbol3,bio-scadnano,bio-polarsbio,bio-dnacauldron,bio-dna-features-viewer,bio-gtars,bio-pyfaidx,bio-vcfpy,bio-cyvcf2]"
+```
+
+随后可使用 `dnakit.integrations.beta_diversity_scikit_bio()`、
+`dnakit.integrations.permanova_scikit_bio()`、`dnakit.integrations.evaluate_seqme()` 和
+`dnakit.integrations.optimize_with_dnachisel()`、`dnakit.integrations.summarize_sbol3_document()` 和
+`dnakit.integrations.summarize_scadnano_design()`、`dnakit.integrations.overlap_polars_bio_bed()` 和
+`dnakit.integrations.simulate_dnacauldron_assembly()` 和
+`dnakit.integrations.summarize_dna_features_viewer()` 和
+`dnakit.integrations.summarize_gtars_regions()` 以及
+`dnakit.integrations.diff_geneblocks_sequences()` 以及
+`dnakit.integrations.compare_sourmash_sequences()`；Cutadapt、fastp、FastQC 和
+MultiQC 的 FASTQ 预处理与 QC 接口是 `dnakit.sequencing_qc.run_cutadapt()`、
+`run_fastp()`、`run_fastqc()` 和 `run_multiqc()`，需要用户单独提供相应可执行程序和输出路径。
+seqme 的模型 extras、模型权重和
+DNA Chisel 的外部数据仍需按上游条款单独处理。
 
 ## 深度学习性质预测
 

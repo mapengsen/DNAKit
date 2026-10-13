@@ -210,6 +210,8 @@ print(result)
 - **API：** `dnakit.bioinformatics.ngs.assemble_reads(first, output_directory, second=None, nanopore=None, memory_gb=8)`
 - **输入：** FASTQ 输入；SPAdes 在 PATH 中；新输出目录；可用内存满足 `memory_gb`。
 - **输出：** 返回 `ToolResult`，包含后端 `backend`、产物路径 `artifacts` 和运行日志 `log`。
+- **Agent/MCP API：** `dnakit.ngs.assemble_reads(read1, output_directory, read2=None, nanopore=None, memory_gb=8, ...)`；返回 JSON 可序列化的组装产物路径与日志。
+- **引用与许可：** SPAdes 使用 Bankevich et al. (2012), DOI `10.1089/cmb.2012.0021`（GPL-2.0）；后端由调用者安装。
 - **示例代码：**
 
 ```python

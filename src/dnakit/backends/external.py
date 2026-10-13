@@ -10,7 +10,7 @@ import stat
 import subprocess
 import threading
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from dataclasses import dataclass
 from itertools import islice
@@ -98,6 +98,7 @@ def execute_bounded_command(
     max_output_bytes: int = 1_000_000,
     monitored_output_paths: Iterable[str | Path] = (),
     max_monitored_output_bytes: int = 100_000_000,
+    environment_overrides: Mapping[str, str] | None = None,
     verbose: bool = True,
 ) -> BoundedCommandResult:
     """Run an explicit executable without a shell under time and output limits.
@@ -182,8 +183,23 @@ def execute_bounded_command(
             code="UNSAFE_EXTERNAL_OUTPUT_PATH",
         )
 
+    if environment_overrides is not None:
+        if not isinstance(environment_overrides, Mapping):
+            raise ConfigurationError("environment_overrides must be a string mapping.")
+        if any(
+            not isinstance(key, str)
+            or not key
+            or "\x00" in key
+            or not isinstance(value, str)
+            or "\x00" in value
+            for key, value in environment_overrides.items()
+        ):
+            raise ConfigurationError("environment_overrides keys and values must be NUL-free strings.")
+
     environment = os.environ.copy()
     environment.update({"LANG": "C", "LC_ALL": "C", "PYTHONDONTWRITEBYTECODE": "1"})
+    if environment_overrides:
+        environment.update(environment_overrides)
     # Preserve a virtual environment's Python entrypoint (and other executable
     # aliases). Resolving the symlink for execution can select a different Python
     # environment even though it points to the same validated binary.

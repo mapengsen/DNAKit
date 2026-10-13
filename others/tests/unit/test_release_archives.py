@@ -49,7 +49,7 @@ def _archives(root: Path, *, tamper: str | None = None) -> Path:
         "dnakit/py.typed": b"",
         "dnakit/skills/_data/catalog.json": catalog,
         "dnakit/skills/_data/example/SKILL.md": skill,
-        "dnakit-0.1.5.dist-info/licenses/LICENSE": b"MIT\n",
+        "dnakit-0.2.0.dist-info/licenses/LICENSE": b"MIT\n",
     }
     if tamper == "skill":
         wheel["dnakit/skills/_data/example/SKILL.md"] = b"changed"
@@ -59,14 +59,14 @@ def _archives(root: Path, *, tamper: str | None = None) -> Path:
         wheel["dnakit/__init__.py"] = b"changed"
     elif tamper == "cache":
         wheel["dnakit/__pycache__/local.pyc"] = b"cache"
-    with zipfile.ZipFile(dist / "dnakit-0.1.5-py3-none-any.whl", "w") as archive:
+    with zipfile.ZipFile(dist / "dnakit-0.2.0-py3-none-any.whl", "w") as archive:
         for name, data in wheel.items():
             archive.writestr(name, data)
     if tamper == "sdist":
         source["skills/example/SKILL.md"] = b"changed"
-    with tarfile.open(dist / "dnakit-0.1.5.tar.gz", "w:gz") as archive:
+    with tarfile.open(dist / "dnakit-0.2.0.tar.gz", "w:gz") as archive:
         for name, data in source.items():
-            member = tarfile.TarInfo(f"dnakit-0.1.5/{name}")
+            member = tarfile.TarInfo(f"dnakit-0.2.0/{name}")
             member.size = len(data)
             if tamper == "mode" and name == "skills/example/SKILL.md":
                 member.mode = 0o755

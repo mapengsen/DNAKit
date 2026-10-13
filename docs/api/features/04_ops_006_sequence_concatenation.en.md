@@ -210,6 +210,8 @@ Response-shape excerpt; `<…>` denotes type placeholders, not a captured query 
 - **API:** `dnakit.bioinformatics.ngs.assemble_reads(first, output_directory, second=None, nanopore=None, memory_gb=8)`
 - **Input:** FASTQ input, SPAdes on PATH, a new output directory and sufficient memory for `memory_gb`.
 - **Output:** Returns `ToolResult` with `backend`, artifact paths in `artifacts`, and execution `log`.
+- **Agent/MCP API:** `dnakit.ngs.assemble_reads(read1, output_directory, read2=None, nanopore=None, memory_gb=8, ...)`; returns JSON-serializable assembly artifact paths and diagnostics.
+- **Citation and license:** cite SPAdes as Bankevich et al. (2012), DOI `10.1089/cmb.2012.0021` (GPL-2.0). The caller installs the backend.
 - **Example code:**
 
 ```python

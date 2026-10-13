@@ -29,6 +29,7 @@ print(result["consensus"])
 - **作用：** 从 reads 依次得到质控报告、BAM 和 VCF。
 - **计算方法：** 串联 FastQC → BWA → samtools → bcftools，并保留各阶段结果。
 - **API：** `dnakit.bioinformatics.ngs.dna_seq_workflow(reference, first, output_directory, second=None, ploidy=2, qc=True, config=None)`
+- **Agent/MCP API：** `dnakit.ngs.run_dna_seq_workflow(reference, read1, output_directory, read2=None, ploidy=2, qc=True, ...)`；返回 JSON 可序列化的阶段信封，保留 QC、mapping、BAM 和 VCF 产物。
 - **输入：** 带 `.fai` 的参考 FASTA 和 FASTQ；对应四个程序在 PATH 中；新输出目录。
 - **输出：** 返回按阶段名索引的 `ToolResult` 字典，包含 VCF 等产物路径。
 - **示例代码：**
@@ -53,6 +54,7 @@ print(stages["variants"].artifacts["variants.vcf.gz"])
 - **作用：** 从 RNA-seq reads 得到 BAM、转录本和基因计数。
 - **计算方法：** 依次运行 HISAT2、samtools、StringTie 和 featureCounts。
 - **API：** `dnakit.bioinformatics.ngs.rna_seq_workflow(reference, annotation, first, output_directory, second=None, strandedness=0)`
+- **Agent/MCP API：** `dnakit.ngs.run_rna_seq_workflow(reference, annotation, read1, output_directory, read2=None, strandedness=0, ...)`；返回 JSON 可序列化的阶段信封，保留 BAM、转录本、counts 和日志。
 - **输入：** 参考 FASTA、GTF 和 FASTQ；上述程序在 PATH 中；`strandedness` 为 0/1/2；新输出目录。
 - **输出：** 返回按阶段名索引的 `ToolResult` 字典，包含表达计数表等产物路径。
 - **示例代码：**
@@ -76,6 +78,8 @@ print(stages["rna"].artifacts["counts.tsv"])
 - **作用：** 比较 treatment/control BAM，得到富集峰与覆盖轨迹。
 - **计算方法：** 使用 MACS3 callpeak 进行峰检测。
 - **API：** `dnakit.bioinformatics.ngs.chip_seq_workflow(treatment, control, output_directory, genome_size=..., paired_end=False, qvalue=0.05)`
+- **Agent/MCP API：** `dnakit.ngs.call_chip_peaks(treatment, control, output_directory, genome_size=..., paired_end=False, qvalue=0.05, ...)`；返回 JSON 可序列化的阶段信封，固定调用 MACS3 `callpeak` 并收集 samtools coverage。
+- **引用与许可：** MACS3 项目调查记录为 BSD-3-Clause；当前调查表未提供 DOI，论文使用时应补充实际采用版本的官方引用。
 - **输入：** 已处理的 treatment/control BAM、有效基因组大小、文库单双端信息；MACS3 在 PATH 中；新输出目录。
 - **输出：** 返回 `ToolResult`，包含后端 `backend`、产物路径 `artifacts` 和运行日志 `log`。
 - **示例代码：**

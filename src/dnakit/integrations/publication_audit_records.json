@@ -1,0 +1,869 @@
+{
+  "schema_version": 1,
+  "description": "Manually reviewed DOI evidence for high-use DNA and genomics tools. DOI values were checked against the DOI/Crossref record and are not inferred from package names.",
+  "records": [
+    {
+      "id": "afterqc",
+      "aliases": [
+        "AfterQC"
+      ],
+      "doi": "10.1186/s12859-017-1469-3",
+      "citation": "Zhou et al. (2017), AfterQC: automatic filtering, trimming, error removing and quality control for fastq data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s12859-017-1469-3"
+      ]
+    },
+    {
+      "id": "bakta",
+      "aliases": [
+        "Bakta"
+      ],
+      "doi": "10.1099/mgen.0.000685",
+      "citation": "Schwengers et al. (2021), Bakta: rapid and standardized annotation of bacterial genomes via alignment-free sequence identification.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1099/mgen.0.000685"
+      ]
+    },
+    {
+      "id": "bedops",
+      "aliases": [
+        "BEDOPS"
+      ],
+      "doi": "10.1093/bioinformatics/bts277",
+      "citation": "Neph et al. (2012), BEDOPS: high-performance genomic feature operations.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/bts277"
+      ]
+    },
+    {
+      "id": "bowtie2",
+      "aliases": [
+        "Bowtie2",
+        "Bowtie 2"
+      ],
+      "doi": "10.1038/nmeth.1923",
+      "citation": "Langmead and Salzberg (2012), Fast gapped-read alignment with Bowtie 2.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nmeth.1923"
+      ]
+    },
+    {
+      "id": "bwa",
+      "aliases": [
+        "BWA"
+      ],
+      "doi": "10.1093/bioinformatics/btp324",
+      "citation": "Li and Durbin (2009), Fast and accurate short read alignment with Burrows–Wheeler transform.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btp324"
+      ]
+    },
+    {
+      "id": "checkm2",
+      "aliases": [
+        "CheckM2"
+      ],
+      "doi": "10.1038/s41592-023-01940-w",
+      "citation": "Chklovski et al. (2023), CheckM2: a rapid, scalable and accurate tool for assessing microbial genome quality using machine learning.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41592-023-01940-w"
+      ]
+    },
+    {
+      "id": "cutesv",
+      "aliases": [
+        "cuteSV"
+      ],
+      "doi": "10.1186/s13059-020-02107-y",
+      "citation": "Jiang et al. (2020), Long-read-based human genomic structural variation detection with cuteSV.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s13059-020-02107-y"
+      ]
+    },
+    {
+      "id": "deepvariant",
+      "aliases": [
+        "DeepVariant"
+      ],
+      "doi": "10.1038/nbt.4235",
+      "citation": "Poplin et al. (2018), A universal SNP and small-indel variant caller using deep neural networks.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nbt.4235"
+      ]
+    },
+    {
+      "id": "delly",
+      "aliases": [
+        "DELLY"
+      ],
+      "doi": "10.1093/bioinformatics/bts378",
+      "citation": "Rausch et al. (2012), DELLY: structural variant discovery by integrated paired-end and split-read analysis.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/bts378"
+      ]
+    },
+    {
+      "id": "diamond",
+      "aliases": [
+        "DIAMOND"
+      ],
+      "doi": "10.1038/nmeth.3176",
+      "citation": "Buchfink et al. (2015), Fast and sensitive protein alignment using DIAMOND.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nmeth.3176"
+      ]
+    },
+    {
+      "id": "fasttree",
+      "aliases": [
+        "FastTree"
+      ],
+      "doi": "10.1371/journal.pone.0009490",
+      "citation": "Price, Dehal and Arkin (2010), FastTree 2 – Approximately Maximum-Likelihood Trees for Large Alignments.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1371/journal.pone.0009490"
+      ]
+    },
+    {
+      "id": "flye",
+      "aliases": [
+        "Flye"
+      ],
+      "doi": "10.1038/s41587-019-0072-8",
+      "citation": "Kolmogorov et al. (2019), Assembly of long, error-prone reads using repeat graphs.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41587-019-0072-8"
+      ]
+    },
+    {
+      "id": "gemini",
+      "aliases": [
+        "GEMINI"
+      ],
+      "doi": "10.1371/journal.pcbi.1003153",
+      "citation": "Paila et al. (2013), GEMINI: Integrative Exploration of Genetic Variation and Genome Annotations.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1371/journal.pcbi.1003153"
+      ]
+    },
+    {
+      "id": "gtdb-tk",
+      "aliases": [
+        "GTDB-Tk",
+        "GTDB TK"
+      ],
+      "doi": "10.1093/bioinformatics/btac672",
+      "citation": "Chaumeil et al. (2022), GTDB-Tk v2: memory friendly classification with the genome taxonomy database.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btac672"
+      ]
+    },
+    {
+      "id": "hifiasm",
+      "aliases": [
+        "hifiasm"
+      ],
+      "doi": "10.1038/s41592-020-01056-5",
+      "citation": "Cheng et al. (2021), Haplotype-resolved de novo assembly using phased assembly graphs with hifiasm.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41592-020-01056-5"
+      ]
+    },
+    {
+      "id": "iq-tree2",
+      "aliases": [
+        "IQ-TREE2",
+        "IQ-TREE 2",
+        "IQ-TREE"
+      ],
+      "doi": "10.1093/molbev/msaa015",
+      "citation": "Minh et al. (2020), IQ-TREE 2: New Models and Efficient Methods for Phylogenetic Inference in the Genomic Era.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/molbev/msaa015"
+      ]
+    },
+    {
+      "id": "kaiju",
+      "aliases": [
+        "Kaiju"
+      ],
+      "doi": "10.1038/ncomms11257",
+      "citation": "Menzel, Ng and Krogh (2016), Fast and sensitive taxonomic classification for metagenomics with Kaiju.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/ncomms11257"
+      ]
+    },
+    {
+      "id": "kraken2",
+      "aliases": [
+        "Kraken2",
+        "Kraken 2"
+      ],
+      "doi": "10.1186/s13059-019-1891-0",
+      "citation": "Wood, Lu and Langmead (2019), Improved metagenomic analysis with Kraken 2.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s13059-019-1891-0"
+      ]
+    },
+    {
+      "id": "megahit",
+      "aliases": [
+        "MEGAHIT"
+      ],
+      "doi": "10.1093/bioinformatics/btv033",
+      "citation": "Li et al. (2015), MEGAHIT: an ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btv033"
+      ]
+    },
+    {
+      "id": "merqury",
+      "aliases": [
+        "Merqury"
+      ],
+      "doi": "10.1186/s13059-020-02134-9",
+      "citation": "Rhie et al. (2020), Merqury: reference-free quality, completeness, and phasing assessment for genome assemblies.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s13059-020-02134-9"
+      ]
+    },
+    {
+      "id": "mmseqs2",
+      "aliases": [
+        "MMseqs2",
+        "MMseqs 2"
+      ],
+      "doi": "10.1038/nbt.3988",
+      "citation": "Steinegger and Söding (2017), MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nbt.3988"
+      ]
+    },
+    {
+      "id": "nanoplot",
+      "aliases": [
+        "NanoPlot",
+        "NanoFilt"
+      ],
+      "doi": "10.1093/bioinformatics/bty149",
+      "citation": "De Coster et al. (2018), NanoPack: visualizing and processing long-read sequencing data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/bty149"
+      ]
+    },
+    {
+      "id": "ncbi-blast-plus",
+      "aliases": [
+        "NCBI BLAST+",
+        "BLAST+",
+        "blast"
+      ],
+      "doi": "10.1186/1471-2105-10-421",
+      "citation": "Camacho et al. (2009), BLAST+: architecture and applications.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/1471-2105-10-421"
+      ]
+    },
+    {
+      "id": "nextflow",
+      "aliases": [
+        "Nextflow"
+      ],
+      "doi": "10.1038/nbt.3820",
+      "citation": "Di Tommaso et al. (2017), Nextflow enables reproducible computational workflows.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nbt.3820"
+      ]
+    },
+    {
+      "id": "nf-core",
+      "aliases": [
+        "nf-core/tools",
+        "nf-core"
+      ],
+      "doi": "10.1038/s41587-020-0439-x",
+      "citation": "Ewels et al. (2020), The nf-core framework for community-curated bioinformatics pipelines.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41587-020-0439-x"
+      ]
+    },
+    {
+      "id": "prokka",
+      "aliases": [
+        "Prokka"
+      ],
+      "doi": "10.1093/bioinformatics/btu153",
+      "citation": "Seemann (2014), Prokka: rapid prokaryotic genome annotation.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu153"
+      ]
+    },
+    {
+      "id": "shasta",
+      "aliases": [
+        "Shasta"
+      ],
+      "doi": "10.1038/s41587-020-0503-6",
+      "citation": "Shafin et al. (2020), Nanopore sequencing and the Shasta toolkit enable efficient de novo assembly of eleven human genomes.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41587-020-0503-6"
+      ]
+    },
+    {
+      "id": "snakemake",
+      "aliases": [
+        "Snakemake"
+      ],
+      "doi": "10.1093/bioinformatics/bts480",
+      "citation": "Köster and Rahmann (2012), Snakemake—a scalable bioinformatics workflow engine.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/bts480"
+      ]
+    },
+    {
+      "id": "sniffles2",
+      "aliases": [
+        "Sniffles2",
+        "Sniffles 2"
+      ],
+      "doi": "10.1038/s41587-023-02024-y",
+      "citation": "Smolka et al. (2024), Detection of mosaic and population-level structural variants with Sniffles2.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41587-023-02024-y"
+      ]
+    },
+    {
+      "id": "spades",
+      "aliases": [
+        "SPAdes"
+      ],
+      "doi": "10.1089/cmb.2012.0021",
+      "citation": "Bankevich et al. (2012), SPAdes: A New Genome Assembly Algorithm and Its Applications to Single-Cell Sequencing.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1089/cmb.2012.0021"
+      ]
+    },
+    {
+      "id": "trimmomatic",
+      "aliases": [
+        "Trimmomatic"
+      ],
+      "doi": "10.1093/bioinformatics/btu170",
+      "citation": "Bolger, Lohse and Usadel (2014), Trimmomatic: a flexible trimmer for Illumina sequence data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu170"
+      ]
+    },
+    {
+      "id": "unicycler",
+      "aliases": [
+        "Unicycler"
+      ],
+      "doi": "10.1371/journal.pcbi.1005595",
+      "citation": "Wick et al. (2017), Unicycler: Resolving bacterial genome assemblies from short and long sequencing reads.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1371/journal.pcbi.1005595"
+      ]
+    },
+    {
+      "id": "vsearch",
+      "aliases": [
+        "VSEARCH"
+      ],
+      "doi": "10.7717/peerj.2584",
+      "citation": "Rognes et al. (2016), VSEARCH: a versatile open source tool for metagenomics.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.7717/peerj.2584"
+      ]
+    },
+    {
+      "id": "whats-hap",
+      "aliases": [
+        "WhatsHap"
+      ],
+      "doi": "10.1038/nmeth.4140",
+      "citation": "Martin et al. (2016), WhatsHap: weighted minimum error correction for haplotype assembly.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/nmeth.4140"
+      ]
+    },
+    {
+      "id": "cyvcf2",
+      "aliases": [
+        "cyvcf2"
+      ],
+      "doi": "10.1093/bioinformatics/btx057",
+      "citation": "Pedersen and Quinlan (2017), cyvcf2: fast, flexible variant analysis with Python.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btx057"
+      ]
+    },
+    {
+      "id": "ete-toolkit",
+      "aliases": [
+        "ETE Toolkit",
+        "ETE 3"
+      ],
+      "doi": "10.1093/molbev/msw046",
+      "citation": "Huerta-Cepas et al. (2016), ETE 3: Reconstruction, Analysis, and Visualization of Phylogenomic Data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/molbev/msw046"
+      ]
+    },
+    {
+      "id": "pyranges",
+      "aliases": [
+        "PyRanges"
+      ],
+      "doi": "10.1093/bioinformatics/btz615",
+      "citation": "Stovner and Sætrom (2020), PyRanges: efficient comparison of genomic intervals in Python.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btz615"
+      ]
+    },
+    {
+      "id": "bcftools",
+      "aliases": [
+        "BCFtools",
+        "SAMtools",
+        "HTSlib"
+      ],
+      "doi": "10.1093/gigascience/giab008",
+      "citation": "Danecek et al. (2021), Twelve years of SAMtools and BCFtools.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/gigascience/giab008"
+      ]
+    },
+    {
+      "id": "bedtools",
+      "aliases": [
+        "BEDTools"
+      ],
+      "doi": "10.1093/bioinformatics/btq033",
+      "citation": "Quinlan and Hall (2010), BEDTools: a flexible suite of utilities for comparing genomic features.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btq033"
+      ]
+    },
+    {
+      "id": "busco",
+      "aliases": [
+        "BUSCO"
+      ],
+      "doi": "10.1093/bioinformatics/btv351",
+      "citation": "Simão et al. (2015), BUSCO: assessing genome assembly and annotation completeness with single-copy orthologs.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btv351"
+      ]
+    },
+    {
+      "id": "bracken",
+      "aliases": [
+        "Bracken"
+      ],
+      "doi": "10.7717/peerj-cs.104",
+      "citation": "Lu et al. (2017), Bracken: estimating species abundance in metagenomics data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.7717/peerj-cs.104"
+      ]
+    },
+    {
+      "id": "centrifuge",
+      "aliases": [
+        "Centrifuge"
+      ],
+      "doi": "10.1101/gr.210641.116",
+      "citation": "Kim et al. (2016), Centrifuge: rapid and sensitive classification of metagenomic sequences.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1101/gr.210641.116"
+      ]
+    },
+    {
+      "id": "bamtools",
+      "aliases": [
+        "BamTools"
+      ],
+      "doi": "10.1093/bioinformatics/btr174",
+      "citation": "Barnett et al. (2011), BamTools: a C++ API and toolkit for analyzing and managing BAM files.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btr174"
+      ]
+    },
+    {
+      "id": "vcfanno",
+      "aliases": [
+        "vcfanno"
+      ],
+      "doi": "10.1186/s13059-016-0973-5",
+      "citation": "Pedersen et al. (2016), Vcfanno: fast, flexible annotation of genetic variants.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s13059-016-0973-5"
+      ]
+    },
+    {
+      "id": "pybedtools",
+      "aliases": [
+        "pybedtools"
+      ],
+      "doi": "10.1093/bioinformatics/btr539",
+      "citation": "Dale, Pedersen and Quinlan (2011), Pybedtools: a flexible Python library for manipulating genomic datasets and annotations.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btr539"
+      ]
+    },
+    {
+      "id": "pyfastx",
+      "aliases": [
+        "pyfastx"
+      ],
+      "doi": "10.1093/bib/bbaa368",
+      "citation": "Du et al. (2021), Pyfastx: a robust Python package for fast random access to sequences from plain and gzipped FASTA/Q files.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bib/bbaa368"
+      ]
+    },
+    {
+      "id": "pysbol3",
+      "aliases": [
+        "PySBOL3",
+        "pySBOL3"
+      ],
+      "doi": "10.1021/acssynbio.2c00249",
+      "citation": "Zhang et al. (2022), pySBOL3: SBOL3 for Python Programmers.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1021/acssynbio.2c00249"
+      ]
+    },
+    {
+      "id": "selene",
+      "aliases": [
+        "Selene"
+      ],
+      "doi": "10.1038/s41592-019-0360-8",
+      "citation": "Chen et al. (2019), Selene: a PyTorch-based deep learning library for sequence data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41592-019-0360-8"
+      ]
+    },
+    {
+      "id": "chipseeker",
+      "aliases": [
+        "ChIPseeker"
+      ],
+      "doi": "10.1093/bioinformatics/btv145",
+      "citation": "Yu et al. (2015), ChIPseeker: an R/Bioconductor package for ChIP peak annotation, comparison and visualization.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btv145"
+      ]
+    },
+    {
+      "id": "crispresso2",
+      "aliases": [
+        "CRISPResso2"
+      ],
+      "doi": "10.1038/s41587-019-0032-3",
+      "citation": "Clement et al. (2019), CRISPResso2 provides accurate and rapid genome editing sequence analysis.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/s41587-019-0032-3"
+      ]
+    },
+    {
+      "id": "igv",
+      "aliases": [
+        "IGV",
+        "Integrative Genomics Viewer"
+      ],
+      "doi": "10.1093/bib/bbs017",
+      "citation": "Robinson et al. (2011), Integrative Genomics Viewer (IGV): high-performance genomics data visualization and exploration.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bib/bbs017"
+      ]
+    },
+    {
+      "id": "jbrowse2",
+      "aliases": [
+        "JBrowse 2",
+        "JBrowse2"
+      ],
+      "doi": "10.1186/s13059-023-02914-z",
+      "citation": "Buels et al. (2023), JBrowse 2: a modular genome browser with views of synteny and structural variation.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/s13059-023-02914-z"
+      ]
+    },
+    {
+      "id": "macs3",
+      "aliases": [
+        "MACS3"
+      ],
+      "doi": "10.1093/gpbjnl/qzag097",
+      "citation": "Zhang et al. (2026), MACS3: A Peak-calling Platform for Bulk and Single-cell Regulatory Genomics.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/gpbjnl/qzag097"
+      ]
+    },
+    {
+      "id": "gatk",
+      "aliases": [
+        "GATK4",
+        "GATK、部分旧版工具",
+        "GATK"
+      ],
+      "doi": "10.1101/gr.107524.110",
+      "citation": "McKenna et al. (2010), The Genome Analysis Toolkit: A MapReduce framework for analyzing next-generation DNA sequencing data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1101/gr.107524.110"
+      ]
+    },
+    {
+      "id": "genomicranges",
+      "aliases": [
+        "GenomicRanges"
+      ],
+      "doi": "10.1371/journal.pcbi.1003118",
+      "citation": "Lawrence et al. (2013), Software for Computing and Annotating Genomic Ranges.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1371/journal.pcbi.1003118"
+      ]
+    },
+    {
+      "id": "variantannotation",
+      "aliases": [
+        "VariantAnnotation"
+      ],
+      "doi": "10.1093/bioinformatics/btu168",
+      "citation": "Obenchain et al. (2014), VariantAnnotation: a Bioconductor package for exploration and annotation of genetic variants.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu168"
+      ]
+    },
+    {
+      "id": "rtracklayer",
+      "aliases": [
+        "rtracklayer"
+      ],
+      "doi": "10.1093/bioinformatics/btp328",
+      "citation": "Lawrence, Carey and Gentleman (2009), rtracklayer: an R package for interfacing with genome browsers.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btp328"
+      ]
+    },
+    {
+      "id": "methylkit",
+      "aliases": [
+        "methylKit"
+      ],
+      "doi": "10.1186/gb-2012-13-10-r87",
+      "citation": "Akalin et al. (2012), methylKit: a comprehensive R package for the analysis of genome-wide DNA methylation profiles.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1186/gb-2012-13-10-r87"
+      ]
+    },
+    {
+      "id": "minfi",
+      "aliases": [
+        "minfi"
+      ],
+      "doi": "10.1093/bioinformatics/btu049",
+      "citation": "Aryee et al. (2014), Minfi: a flexible and comprehensive Bioconductor package for the analysis of Infinium DNA methylation microarrays.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btu049"
+      ]
+    },
+    {
+      "id": "csaw",
+      "aliases": [
+        "csaw"
+      ],
+      "doi": "10.1093/nar/gkv1191",
+      "citation": "Lun and Smyth (2015), csaw: a Bioconductor package for differential binding analysis of ChIP-seq data using sliding windows.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/nar/gkv1191"
+      ]
+    },
+    {
+      "id": "karyoploter",
+      "aliases": [
+        "karyoploteR"
+      ],
+      "doi": "10.1093/bioinformatics/btx346",
+      "citation": "Gel and Serra (2017), karyoploteR: an R/Bioconductor package to plot customizable genomes displaying arbitrary data.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btx346"
+      ]
+    },
+    {
+      "id": "champ",
+      "aliases": [
+        "ChAMP"
+      ],
+      "doi": "10.1093/bioinformatics/btt684",
+      "citation": "Morris et al. (2014), ChAMP: 450k Chip Analysis Methylation Pipeline.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btt684"
+      ]
+    },
+    {
+      "id": "diffbind",
+      "aliases": [
+        "DiffBind"
+      ],
+      "doi": "10.18129/B9.bioc.DiffBind",
+      "citation": "Stark and Brown, DiffBind: Differential Binding Analysis of ChIP-Seq Peak Data, Bioconductor package DOI.",
+      "publication_type": "software_archive",
+      "source_urls": [
+        "https://doi.org/10.18129/B9.bioc.DiffBind",
+        "https://bioconductor.org/packages/release/bioc/html/DiffBind.html"
+      ]
+    },
+    {
+      "id": "humann",
+      "aliases": [
+        "HUMAnN",
+        "HUMAnN3"
+      ],
+      "doi": "10.7554/eLife.65088",
+      "citation": "Beghini et al. (2021), Integrating taxonomic, functional, and strain-level profiling of diverse microbial communities with bioBakery 3.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.7554/eLife.65088",
+        "https://huttenhower.sph.harvard.edu/humann/"
+      ],
+      "notes": "For HUMAnN2, cite Franzosa et al. (2018), DOI 10.1038/s41592-018-0176-y; report the major version and database versions."
+    },
+    {
+      "id": "galaxy",
+      "aliases": [
+        "Galaxy",
+        "Galaxy（2026 年 2 月 25 日后的 MIT 版本）"
+      ],
+      "doi": "10.1093/nar/gkag469",
+      "citation": "The Galaxy Community (2026), Galaxy for accessible, reproducible, and collaborative data analyses: 2026 update.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/nar/gkag469",
+        "https://galaxyproject.org/citing-galaxy/"
+      ],
+      "notes": "Specify the Galaxy instance and version; the DOI supports the platform citation, not the license of every hosted tool."
+    },
+    {
+      "id": "survivor",
+      "aliases": [
+        "SURVIVOR"
+      ],
+      "doi": "10.1038/ncomms14061",
+      "citation": "Jeffares et al. (2017), Transient structural variations have strong effects on quantitative traits and reproductive isolation in fission yeast; the paper describes the SURVIVOR toolkit used in the study.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1038/ncomms14061",
+        "https://github.com/fritzsedlazeck/SURVIVOR"
+      ],
+      "notes": "This is a peer-reviewed primary-use paper rather than a standalone software-method paper; record the exact SURVIVOR version and parameters."
+    },
+    {
+      "id": "spoa",
+      "aliases": [
+        "SPOA"
+      ],
+      "doi": "10.1093/bioinformatics/18.3.452",
+      "citation": "Lee, Grasso and Sharlow (2002), Multiple sequence alignment using partial order graphs.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/18.3.452"
+      ],
+      "notes": "The article supports the partial-order alignment method; cite the SPOA implementation version separately."
+    },
+    {
+      "id": "gget",
+      "aliases": [
+        "gget"
+      ],
+      "doi": "10.1093/bioinformatics/btac836",
+      "citation": "Luebbert and Pachter (2023), Efficient querying of genomic reference databases with gget.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btac836",
+        "https://gget.bio/"
+      ],
+      "notes": "Report the gget version and the external database release/access date for each query."
+    },
+    {
+      "id": "dna-features-viewer",
+      "aliases": [
+        "DnaFeaturesViewer",
+        "DNA Features Viewer",
+        "dna-features-viewer"
+      ],
+      "doi": "10.1093/bioinformatics/btaa213",
+      "citation": "Zulkower and Rosser (2020), DNA Features Viewer: a sequence annotation formatting and plotting library for Python.",
+      "publication_type": "journal_article",
+      "source_urls": [
+        "https://doi.org/10.1093/bioinformatics/btaa213",
+        "https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer"
+      ],
+      "notes": "The paper covers the annotation plotting library; retain the exact package version in the Methods section."
+    }
+  ]
+}
