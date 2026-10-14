@@ -204,6 +204,7 @@ plugins:
                 - 86) H4 family-variant check - polars-bio, pyensembl, gtars, bioframe and five more packages: api/features/107_family_H4.en.md
                 - 87) 108 Family-variant review (H5) - microbiome, regulation, epigenome, variants, predictions: api/features/108_family_H5.en.md
                 - 88) parasail kernels by name parts, and SSW with a reusable profile: api/features/109_family_parasail.en.md
+                - 89) MCP catalog - 17 more third-party servers: api/features/110_mcp_catalog_expansion.en.md
             - 4. Data Evaluation:
                 - 1) Common Evaluation Metrics: api/features/12_evaluation.md
                 - 2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -498,6 +499,7 @@ nav:
       - 86) H4 家族变体复核：polars-bio、pyensembl、gtars、bioframe 等 9 个包: api/features/107_family_H4.md
       - 87) 108 复核 family-variant（H5）：微生物组、调控、表观基因组、变异、预测: api/features/108_family_H5.md
       - 88) 按名称部件选择的 parasail 内核，及可复用查询 profile 的 SSW: api/features/109_family_parasail.md
+      - 89) MCP 目录 - 新增 17 个第三方服务器: api/features/110_mcp_catalog_expansion.md
   - 4. 数据评价:
       - 1) 常用评价指标: api/features/12_evaluation.md
       - 2) 相似度计算: api/features/09_similarity_alignment.md

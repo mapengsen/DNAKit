@@ -75,3 +75,4 @@ outputs/
 # Local notes containing API keys / server credentials (never commit)
 不同厂家的agent使用方法.md
 .claude/settings.local.json
+/public_package_info.md

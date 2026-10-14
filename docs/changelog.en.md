@@ -4,9 +4,11 @@ This project follows semantic versioning. It is still in the early development s
 
 ## [Unreleased]
 
+- Add 17 third-party servers to the MCP catalog (49 in total). Each entry pins the upstream commit and records the licence, environment variables and external effects; 12 were started over stdio and their tool names checked. Ten candidates were left out; the reasons are in page 110.
+
 ## [0.2.0] - 2026-10-13
 
-- Add about 1,200 optional-dependency wrappers: `dnakit.xxx()` calls the upstream package and, when it is missing, gives a `dnakit[bio-...]` install hint. The public function count grows from 2,432 to 3,648 across variants, population genetics, alignment, annotation, databases, epigenome, microbiome, molecular lab, sequence, regulation and prediction.
+- Add about 1,200 optional-dependency wrappers: `dnakit.xxx()` calls the upstream package and, when it is missing, gives a `dnakit[bio-...]` install hint. The number of public Python functions grows from 1,826 to 3,042 across variants, population genetics, alignment, annotation, databases, epigenome, microbiome, molecular lab, sequence, regulation and prediction.
 - Add about 90 `bio-*` optional dependency groups (for example scikit-allel, parasail, pyhmmer, bioframe, hail and scanpy).
 - Add `parasail_dp_variant()` and `parasail_ssw_profile_align()`, which choose a parasail dynamic-programming kernel from name parts.
 - Review aliases, re-exports and parameter branches of wrapped functions row by row; the ledger has 15,485 rows and the coverage table is `new_vision/2026-10-10/full_function_coverage.csv`.

@@ -34,7 +34,7 @@ def test_integration_inventory_separates_surface_counts() -> None:
     assert inventory["python_functions"] >= inventory["agent_compatible_python_functions"]
     assert inventory["mcp_server_recipes"] > 0
     assert inventory["registered_skills"] > 0
-    assert inventory["tool_surface_total"] == 3648
+    assert inventory["tool_surface_total"] == 3665
     assert inventory["survey_unique_projects"] == 320
     assert inventory["survey_records_by_kind"]["mcp"] == 103
     assert inventory["survey_records_by_integration_status"]["project_evidence_only"] == 44

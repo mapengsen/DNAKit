@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_date": "2026-09-20",
+  "verified_date": "2026-10-14",
   "servers": [
     {
       "id": "gigwa-mcp",
@@ -1346,6 +1346,1038 @@
       "limitations": [
         "Source and manifest entry points are verified. No 10x account, access token, TXG binary, cloud job or scientific result was exercised. This is one component of the Anthropic marketplace entry."
       ]
+    },
+    {
+      "id": "seqeron-sequence",
+      "name": "Seqeron Sequence MCP",
+      "command": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "src/Seqeron/Mcp/Seqeron.Mcp.Sequence"
+      ],
+      "repository": "https://github.com/AlexanderV/Seqeron",
+      "sources": [
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/README.md",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/LICENSE",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/docs/mcp/README.md",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/src/Seqeron/Mcp/Seqeron.Mcp.Sequence/README.md",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/src/Seqeron/Mcp/Seqeron.Mcp.Sequence/Program.cs",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/src/Seqeron/Mcp/Seqeron.Mcp.Sequence/Tools/SequenceTools.cs",
+        "https://github.com/AlexanderV/Seqeron/blob/7ee2db67549fbc97b82b73e4a38b5cf73170737b/src/Seqeron/Mcp/Seqeron.Mcp.Sequence/Seqeron.Mcp.Sequence.csproj"
+      ],
+      "license": "MIT",
+      "attribution": "Gabor Barat (copyright holder per LICENSE) and Seqeron contributors",
+      "installation": "Source-based: clone the pinned commit, install the .NET 10 SDK (net10.0 target), set workdir to the checkout root and executable_path to the dotnet executable; the first dotnet run builds the project. No environment variables are read. This entry covers only the Seqeron.Mcp.Sequence server; the repository ships ten more servers (Parsers, Alignment, Analysis, Annotation, MolTools, Population, ...) that are not cataloged.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [
+        "src/Seqeron/Mcp/Seqeron.Mcp.Sequence/Program.cs"
+      ],
+      "capabilities": [
+        "dna and rna validation",
+        "reverse complement and translation",
+        "gc content and nucleotide composition",
+        "melting temperature",
+        "sequence complexity and k-mer analysis",
+        "iupac code matching"
+      ],
+      "effects": "Pure local computation on sequences passed as tool arguments; the Sequence server's code makes no network calls and reads or writes no files.",
+      "source_commit": "7ee2db67549fbc97b82b73e4a38b5cf73170737b",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "dna_validate",
+        "dna_reverse_complement",
+        "gc_content",
+        "melting_temperature",
+        "translate_dna",
+        "kmer_count",
+        "complexity_dust_score",
+        "iupac_match"
+      ],
+      "startup_check": "2026-10-14: not started here: needs the .NET 10 SDK; tool names were checked against the source."
+    },
+    {
+      "id": "smartapi-biothings",
+      "name": "SmartAPI MCP (BioThings core)",
+      "command": "smartapi-mcp",
+      "arguments": [
+        "--api_set",
+        "biothings_core",
+        "--facade",
+        "on"
+      ],
+      "repository": "https://github.com/biothings/smartapi-mcp",
+      "sources": [
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/README.md",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/LICENSE",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/pyproject.toml",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/smartapi_mcp/cli.py",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/smartapi_mcp/config.py",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/smartapi_mcp/smartapi.py",
+        "https://github.com/biothings/smartapi-mcp/blob/2cd3f4dc4d1db186f8106b257a8aa40d2f994673/smartapi_mcp/biothings.py"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "BioThings Team and smartapi-mcp contributors",
+      "installation": "pip install smartapi-mcp (PyPI, version 0.6.0 at verification) into a Python >=3.10 environment; the catalog arguments select the core BioThings API set with the generic five-tool facade forced on (MyGene.info, MyVariant.info, MyChem.info, MyDisease.info, MyGeneSet.info, MyTaxon.info). No credentials are needed; optionally set SMARTAPI_LOG_LEVEL or LOG_LEVEL.",
+      "required_environment": [],
+      "optional_environment": [
+        "SMARTAPI_LOG_LEVEL",
+        "LOG_LEVEL"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "gene annotation lookup",
+        "variant annotation lookup",
+        "batch identifier annotation",
+        "gene set and taxon lookup",
+        "bioinformatics api discovery"
+      ],
+      "effects": "Fetches API specs from the SmartAPI registry (smart-api.info) at startup and sends query and lookup requests (GET /query, GET and POST by id) to the public BioThings services; no files are written and no credentials are sent. The cataloged --api_set biothings_core selects only BioThings APIs.",
+      "source_commit": "2cd3f4dc4d1db186f8106b257a8aa40d2f994673",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "list_biothings_apis",
+        "biothings_query",
+        "biothings_get",
+        "biothings_getbatch",
+        "biothings_fields"
+      ],
+      "limitations": [
+        "Facade mode (--facade on) is forced because the default auto threshold (10 BioThings APIs) would instead emit hundreds of per-API tools for this 6-API set; non-standard endpoints of individual APIs are not reachable in non-strict facade mode.",
+        "In an environment with a SOCKS proxy configured, install 'socksio' (httpx[socks]) or the server exits at start."
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 5 tools; every name in tool_names was present."
+    },
+    {
+      "id": "just-prs",
+      "name": "just-prs MCP",
+      "command": "just-prs-mcp",
+      "arguments": [
+        "stdio"
+      ],
+      "repository": "https://github.com/dna-seq/just-prs-mcp",
+      "sources": [
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/README.md",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/LICENSE",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/pyproject.toml",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/manifest.json",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/src/just_prs_mcp/server.py",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/src/just_prs_mcp/settings.py",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/src/just_prs_mcp/tools/catalog.py",
+        "https://github.com/dna-seq/just-prs-mcp/blob/a231ce82970b8fabdc2e163b3e77661b140cb22d/src/just_prs_mcp/tools/compute.py"
+      ],
+      "license": "MIT",
+      "attribution": "Anton Kulaga, Newton Winter and just-prs-mcp contributors",
+      "installation": "pip install just-prs-mcp (PyPI, version 0.5.0 at verification) into a Python >=3.13 environment (the optional 'reference' extra adds pgenlib on non-Windows); default mode is essentials and no API key is needed. Optionally set PRS_MCP_MODE (essentials or extended), PRS_MCP_CACHE_DIR, PRS_MCP_DEFAULT_GENOME_BUILD, PRS_MCP_DEFAULT_PANEL, PRS_MCP_DUCKDB_MEMORY_LIMIT.",
+      "required_environment": [],
+      "optional_environment": [
+        "PRS_MCP_MODE",
+        "PRS_MCP_CACHE_DIR",
+        "PRS_MCP_DEFAULT_GENOME_BUILD",
+        "PRS_MCP_DEFAULT_PANEL",
+        "PRS_MCP_DUCKDB_MEMORY_LIMIT"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "polygenic risk scores",
+        "pgs catalog search",
+        "vcf normalization",
+        "percentile and absolute risk",
+        "genome comparison"
+      ],
+      "effects": "Queries the PGS Catalog and downloads scoring files, reference data and sample genomes (Zenodo) into a local cache, reads local VCF or array files, writes normalized Parquet files, job state, logs and trait HTML reports to the cache directory; extended mode adds bulk downloads and a HuggingFace upload tool that needs an HF token, which this entry deliberately does not expose.",
+      "source_commit": "a231ce82970b8fabdc2e163b3e77661b140cb22d",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "search_scores",
+        "score_info",
+        "best_performance",
+        "search_traits",
+        "trait_info",
+        "normalize_vcf",
+        "download_sample_genome",
+        "list_genomes",
+        "vcf_metainfo",
+        "compute_prs",
+        "compute_prs_batch",
+        "compute_prs_by_trait",
+        "percentile",
+        "absolute_risk",
+        "assess_quality",
+        "compare_genomes",
+        "build_prs_prompt",
+        "plot_trait_panel",
+        "prs_job_status",
+        "list_prs_jobs"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 20 tools; every name in tool_names was present."
+    },
+    {
+      "id": "dnallm",
+      "name": "DNALLM MCP Server",
+      "command": "dnallm-mcp-server",
+      "arguments": [],
+      "repository": "https://github.com/zhangtaolab/DNALLM",
+      "sources": [
+        "https://github.com/zhangtaolab/DNALLM/blob/f7a7fcb914f94a2d82c2af96be0e648eab4a719f/README.md",
+        "https://github.com/zhangtaolab/DNALLM/blob/f7a7fcb914f94a2d82c2af96be0e648eab4a719f/LICENSE",
+        "https://github.com/zhangtaolab/DNALLM/blob/f7a7fcb914f94a2d82c2af96be0e648eab4a719f/pyproject.toml",
+        "https://github.com/zhangtaolab/DNALLM/blob/f7a7fcb914f94a2d82c2af96be0e648eab4a719f/dnallm/mcp/server.py",
+        "https://github.com/zhangtaolab/DNALLM/blob/f7a7fcb914f94a2d82c2af96be0e648eab4a719f/dnallm/mcp/configs/mcp_server_config.yaml"
+      ],
+      "license": "MIT",
+      "attribution": "Zhangtaolab and DNALLM contributors",
+      "installation": "Install the PyPI package dnallm (Python >=3.11, installs the dnallm-mcp-server console script), plus a torch build suited to the hardware; because the wheel does not ship dnallm/mcp/configs, also keep a source checkout and set workdir to it so the default --config dnallm/mcp/configs/mcp_server_config.yaml resolves.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [
+        "dnallm/mcp/configs/mcp_server_config.yaml"
+      ],
+      "capabilities": [
+        "DNA language model inference",
+        "sequence classification",
+        "in silico mutagenesis",
+        "variant effect scoring",
+        "model interpretation"
+      ],
+      "effects": "Loads the DNA language models named in the YAML configuration (downloading weights from Hugging Face or ModelScope on first use), runs local CPU/GPU inference, writes temporary VCF files for variant scoring, and may save predictions under the output_dir set in the model inference configs; no sequence data is sent to a DNALLM-operated service.",
+      "source_commit": "f7a7fcb914f94a2d82c2af96be0e648eab4a719f",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "_dna_sequence_predict",
+        "_dna_batch_predict",
+        "_dna_multi_model_predict",
+        "_list_loaded_models",
+        "_get_model_info",
+        "_list_models_by_task_type",
+        "_get_all_available_models",
+        "_health_check",
+        "_dna_stream_predict",
+        "_dna_stream_batch_predict",
+        "_dna_stream_multi_model_predict",
+        "_dna_mutagenesis",
+        "_dna_interpret",
+        "_ism_scan",
+        "_hotspots",
+        "_zero_shot_score"
+      ],
+      "startup_check": "2026-10-14: not started here: needs a torch build and model files; tool names were checked against the source."
+    },
+    {
+      "id": "just-dna-agents",
+      "name": "just-dna-agents MCP",
+      "command": "just-dna-agents-mcp",
+      "arguments": [
+        "serve",
+        "--transport",
+        "stdio"
+      ],
+      "repository": "https://github.com/dna-seq/just-dna-agents",
+      "sources": [
+        "https://github.com/dna-seq/just-dna-agents/blob/2896f4fe7b2f2e1b7a48dda2f721eab87123e770/README.md",
+        "https://github.com/dna-seq/just-dna-agents/blob/2896f4fe7b2f2e1b7a48dda2f721eab87123e770/LICENSE",
+        "https://github.com/dna-seq/just-dna-agents/blob/2896f4fe7b2f2e1b7a48dda2f721eab87123e770/just-dna-agents-mcp/pyproject.toml",
+        "https://github.com/dna-seq/just-dna-agents/blob/2896f4fe7b2f2e1b7a48dda2f721eab87123e770/just-dna-agents-mcp/src/just_dna_agents_mcp/server.py",
+        "https://github.com/dna-seq/just-dna-agents/blob/2896f4fe7b2f2e1b7a48dda2f721eab87123e770/just-dna-agents-mcp/src/just_dna_agents_mcp/config.py"
+      ],
+      "license": "MIT",
+      "attribution": "DNA-Seq and just-dna-agents contributors (Anton Kulaga)",
+      "installation": "Install the just-dna-agents-mcp and just-dna-agents packages from the pinned GitHub repository subdirectories (neither name resolves on PyPI although the README says the package is published) into a Python >=3.14 environment; optional JUST_DNA_AGENTS_MCP_OUTPUT_DIR and JUST_DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL settings control compilation.",
+      "required_environment": [],
+      "optional_environment": [
+        "JUST_DNA_AGENTS_MCP_OUTPUT_DIR",
+        "JUST_DNA_AGENTS_MCP_RESOLVE_WITH_ENSEMBL",
+        "JUST_DNA_ENSEMBL_CACHE"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "variant annotation module validation",
+        "annotation module compilation",
+        "rsid and position resolution",
+        "module spec format reference"
+      ],
+      "effects": "validate_spec reads a caller-given spec directory; compile_module writes parquet files to the output directory (default current directory) and, with Ensembl resolution enabled, may use an Ensembl variation reference whose parquet cache the repository's resolver downloads from the Hugging Face dataset just-dna-seq/ensembl_variations; the compiler internals live in the separate just-dna-compiler package and were not inspected.",
+      "source_commit": "2896f4fe7b2f2e1b7a48dda2f721eab87123e770",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "validate_spec",
+        "compile_module",
+        "get_spec_format",
+        "get_spec_schemas",
+        "list_icons",
+        "list_colors"
+      ],
+      "startup_check": "2026-10-14: not started here: needs Python >=3.14; tool names were checked against the source."
+    },
+    {
+      "id": "genomi",
+      "name": "Genomi",
+      "command": "genomi",
+      "arguments": [
+        "serve"
+      ],
+      "repository": "https://github.com/exon-research/genomi",
+      "sources": [
+        "https://github.com/exon-research/genomi/blob/1df4f5bfb635e2d08f93a1102b70b840fbe80d86/README.md",
+        "https://github.com/exon-research/genomi/blob/1df4f5bfb635e2d08f93a1102b70b840fbe80d86/LICENSE",
+        "https://github.com/exon-research/genomi/blob/1df4f5bfb635e2d08f93a1102b70b840fbe80d86/pyproject.toml",
+        "https://github.com/exon-research/genomi/blob/1df4f5bfb635e2d08f93a1102b70b840fbe80d86/src/genomi/interfaces/mcp.py",
+        "https://github.com/exon-research/genomi/blob/1df4f5bfb635e2d08f93a1102b70b840fbe80d86/src/genomi/interfaces/cli.py"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Exon Research and Genomi contributors",
+      "installation": "Install the exon-research/genomi source project (not on PyPI; Python >=3.10, depends on a git-pinned gxl-paperclip) so that the genomi console script exists, then run genomi install to materialize reference libraries; optionally set GENOMI_HOME to relocate its data directory (default ~/.genomi).",
+      "required_environment": [],
+      "optional_environment": [
+        "GENOMI_HOME",
+        "GENOMI_MCP_BACKGROUND",
+        "GENOMI_MCP_BACKGROUND_TIMEOUT_SECONDS",
+        "PHARMCAT_JAR"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "personal genome parsing",
+        "variant resolution",
+        "ClinVar and gnomAD evidence",
+        "pharmacogenomics",
+        "polygenic scores",
+        "ancestry"
+      ],
+      "effects": "Parses user-supplied genome files into a local Active Genome Index and evidence database under GENOMI_HOME, keeps a local journal, runs background jobs, and genomi.install downloads public reference libraries; returned results can contain individual genotypes, and optional lab operations may contact external evidence providers.",
+      "source_commit": "1df4f5bfb635e2d08f93a1102b70b840fbe80d86",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "genomi.parse_source",
+        "genomi.describe_context",
+        "genomi.check_libraries",
+        "genomi.invoke",
+        "genomi.check_background_job",
+        "genomi.install",
+        "journal.append_entry",
+        "journal.search_entries"
+      ],
+      "limitations": [
+        "Hand-written JSON-RPC 2024-11-05 server (not FastMCP); the default tools/list exposes only the base operations, and capability operations such as variant.resolve are reached through genomi.invoke after reading the matching skill document."
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 37 tools; every name in tool_names was present."
+    },
+    {
+      "id": "galaxy-mcp",
+      "name": "Galaxy MCP",
+      "command": "galaxy-mcp",
+      "arguments": [],
+      "repository": "https://github.com/galaxyproject/galaxy-mcp",
+      "sources": [
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/README.md",
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/LICENSE",
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/python/pyproject.toml",
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/python/src/galaxy_mcp/__main__.py",
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/python/src/galaxy_mcp/server.py",
+        "https://github.com/galaxyproject/galaxy-mcp/blob/591b88956bcbc7d851cb896275bf41b774b5bba2/server.json"
+      ],
+      "license": "MIT",
+      "attribution": "Dannon Baker, the Galaxy Project and Galaxy MCP contributors",
+      "installation": "Install the PyPI package galaxy-mcp (Python >=3.10; PyPI has 1.11.2 while the pinned commit is 1.12.0.dev0) and set GALAXY_URL and GALAXY_API_KEY for the target Galaxy instance.",
+      "required_environment": [
+        "GALAXY_URL",
+        "GALAXY_API_KEY"
+      ],
+      "optional_environment": [],
+      "secret_environment": [
+        "GALAXY_API_KEY"
+      ],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "Galaxy bioinformatics tool execution",
+        "IWC workflow search and invocation",
+        "genome-build dataset upload",
+        "sequence data history management"
+      ],
+      "effects": "Connects to the configured Galaxy server with the API key and can run tools and workflows, create histories, pages and user-defined tools, and upload local files or URLs (stdio mode reads and writes local paths), so it modifies the remote Galaxy account and submits data to that server.",
+      "source_commit": "591b88956bcbc7d851cb896275bf41b774b5bba2",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "connect",
+        "search_tools_by_name",
+        "get_tool_details",
+        "run_tool",
+        "get_histories",
+        "upload_file",
+        "upload_file_from_url",
+        "download_dataset",
+        "search_iwc_workflows",
+        "import_workflow_from_iwc",
+        "invoke_workflow",
+        "get_invocations"
+      ],
+      "limitations": [
+        "General-purpose bioinformatics platform bridge: no tool is specific to DNA or genes; relevance comes from the Galaxy tools and workflows available on the configured instance."
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 48 tools; every name in tool_names was present."
+    },
+    {
+      "id": "gnomad",
+      "name": "gnomAD MCP",
+      "command": "python",
+      "arguments": [
+        "server.py"
+      ],
+      "repository": "https://github.com/koido/gnomad-mcp",
+      "sources": [
+        "https://github.com/koido/gnomad-mcp/blob/63f09d21385751430c968ed770bb214f3067d786/README.md",
+        "https://github.com/koido/gnomad-mcp/blob/63f09d21385751430c968ed770bb214f3067d786/server.py",
+        "https://github.com/koido/gnomad-mcp/blob/63f09d21385751430c968ed770bb214f3067d786/pyproject.toml",
+        "https://github.com/koido/gnomad-mcp/blob/63f09d21385751430c968ed770bb214f3067d786/LICENSE"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Masaru Koido and gnomad-mcp contributors",
+      "installation": "Clone the pinned koido/gnomad-mcp checkout (not on PyPI, no console script) and install its dependencies (fastmcp, gql, aiohttp, httpx) in Python >=3.13; set workdir to the checkout and executable_path to that Python. No environment variables or credentials are needed.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [
+        "server.py"
+      ],
+      "capabilities": [
+        "population allele frequencies",
+        "gene constraint metrics",
+        "variant lookup",
+        "ClinVar annotations",
+        "structural and copy number variants",
+        "short tandem repeats"
+      ],
+      "effects": "Sends GraphQL queries over HTTPS to the public gnomAD browser API at https://gnomad.broadinstitute.org/api (gene, variant, region and metadata lookups); the server tools do not write local files or modify remote data.",
+      "source_commit": "63f09d21385751430c968ed770bb214f3067d786",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "get_gene_info",
+        "search_for_genes",
+        "get_region_info",
+        "get_variant_info",
+        "get_clinvar_variant_info",
+        "get_mitochondrial_variant_info",
+        "get_structural_variant_info",
+        "get_copy_number_variant_info",
+        "search_for_variants",
+        "get_str_info",
+        "get_variant_liftover",
+        "get_metadata"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 12 tools; every name in tool_names was present."
+    },
+    {
+      "id": "addgene",
+      "name": "Addgene MCP",
+      "command": "addgene-mcp",
+      "arguments": [
+        "stdio"
+      ],
+      "repository": "https://github.com/longevity-genie/addgene-mcp",
+      "sources": [
+        "https://github.com/longevity-genie/addgene-mcp/blob/b402762fdf10de6c5a179700f4dd7912a31682f2/README.md",
+        "https://github.com/longevity-genie/addgene-mcp/blob/b402762fdf10de6c5a179700f4dd7912a31682f2/pyproject.toml",
+        "https://github.com/longevity-genie/addgene-mcp/blob/b402762fdf10de6c5a179700f4dd7912a31682f2/src/addgene_mcp/server.py",
+        "https://github.com/longevity-genie/addgene-mcp/blob/b402762fdf10de6c5a179700f4dd7912a31682f2/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Anton Kulaga and Longevity Genie contributors",
+      "installation": "pip install addgene-mcp==0.1.3 (PyPI, Python >=3.12) or install the pinned repository separately; the installed console script is addgene-mcp and 'addgene-mcp stdio' starts the stdio server. No credentials are required; MCP_HOST, MCP_PORT and MCP_TRANSPORT only affect the HTTP/SSE modes.",
+      "required_environment": [],
+      "optional_environment": [
+        "MCP_HOST",
+        "MCP_PORT",
+        "MCP_TRANSPORT",
+        "SCRAPY_DOWNLOAD_DELAY",
+        "SCRAPY_ROBOTSTXT_OBEY",
+        "SCRAPY_USER_AGENT"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "plasmid search",
+        "plasmid sequence retrieval",
+        "GenBank and SnapGene downloads",
+        "vector and expression metadata"
+      ],
+      "effects": "Scrapes https://www.addgene.org through a Scrapy subprocess for plasmid search and sequence information (Scrapy may keep a local HTTP cache); download_sequence fetches a GenBank or SnapGene file from Addgene and writes it to the current working directory or a caller-chosen directory, creating it if needed.",
+      "source_commit": "b402762fdf10de6c5a179700f4dd7912a31682f2",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "addgene_search_plasmids",
+        "addgene_get_sequence_info",
+        "addgene_get_popular_plasmids",
+        "addgene_download_sequence"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 4 tools; every name in tool_names was present."
+    },
+    {
+      "id": "alphagenome-jolab",
+      "name": "AlphaGenome MCP (JoLab)",
+      "command": "alphagenome-mcp",
+      "arguments": [],
+      "repository": "https://github.com/taehojo/alphagenome-mcp",
+      "sources": [
+        "https://github.com/taehojo/alphagenome-mcp/blob/0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc/README.md",
+        "https://github.com/taehojo/alphagenome-mcp/blob/0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc/package.json",
+        "https://github.com/taehojo/alphagenome-mcp/blob/0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc/requirements.txt",
+        "https://github.com/taehojo/alphagenome-mcp/blob/0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc/src/tools.ts",
+        "https://github.com/taehojo/alphagenome-mcp/blob/0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc/LICENSE"
+      ],
+      "license": "MIT",
+      "attribution": "Taeho Jo and alphagenome-mcp contributors",
+      "installation": "Install with npm install -g @jolab/alphagenome-mcp (Node.js >=18, installed executable alphagenome-mcp) plus pip install 'alphagenome>=0.9.0' numpy in a Python >=3.10 interpreter; set ALPHAGENOME_API_KEY (and optionally ALPHAGENOME_PYTHON to that interpreter, ALPHAGENOME_TIMEOUT_MS).",
+      "required_environment": [
+        "ALPHAGENOME_API_KEY"
+      ],
+      "optional_environment": [
+        "ALPHAGENOME_PYTHON",
+        "ALPHAGENOME_TIMEOUT_MS"
+      ],
+      "secret_environment": [
+        "ALPHAGENOME_API_KEY"
+      ],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "regulatory variant effect prediction",
+        "splicing impact",
+        "chromatin and TF binding impact",
+        "expression impact",
+        "region scanning",
+        "AlphaGenome Atlas lookup"
+      ],
+      "effects": "Sends variant coordinates and alleles through a Python subprocess to the Google DeepMind AlphaGenome API (Atlas lookups or live inference) using the caller's API key; no local files are written by the tools. The upstream README states the API is free for non-commercial use only, so commercial use is restricted and requires accepting DeepMind's AlphaGenome Terms of Use and rate limits.",
+      "source_commit": "0c9f2b82c7c2f4cda7e6ba615b4d96dca61645dc",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "predict_variant_effect",
+        "batch_score_variants",
+        "assess_pathogenicity",
+        "batch_pathogenicity_filter",
+        "generate_variant_report",
+        "explain_variant_impact",
+        "predict_tissue_specific",
+        "compare_variants",
+        "predict_splice_impact",
+        "predict_expression_impact",
+        "analyze_gwas_locus",
+        "compare_alleles",
+        "batch_tissue_comparison",
+        "predict_tf_binding_impact",
+        "predict_chromatin_impact",
+        "compare_protective_risk",
+        "compare_variants_same_gene",
+        "predict_allele_specific_effects",
+        "annotate_regulatory_context",
+        "batch_modality_screen",
+        "atlas_list_scorers",
+        "atlas_lookup_variant",
+        "atlas_lookup_variants",
+        "atlas_scan_region"
+      ],
+      "startup_check": "2026-10-14: not started here: needs Node.js >=18 (16 installed) and an AlphaGenome API key; tool names were checked against the source."
+    },
+    {
+      "id": "locus",
+      "name": "Locus",
+      "command": "locus-mcp",
+      "arguments": [],
+      "repository": "https://github.com/mattsmcnulty/locus",
+      "sources": [
+        "https://github.com/mattsmcnulty/locus/blob/24b046548e9e976fc7e28395b86ff262e6d3c343/README.md",
+        "https://github.com/mattsmcnulty/locus/blob/24b046548e9e976fc7e28395b86ff262e6d3c343/LICENSE",
+        "https://github.com/mattsmcnulty/locus/blob/24b046548e9e976fc7e28395b86ff262e6d3c343/pyproject.toml",
+        "https://github.com/mattsmcnulty/locus/blob/24b046548e9e976fc7e28395b86ff262e6d3c343/src/locus/mcp_server.py",
+        "https://github.com/mattsmcnulty/locus/blob/24b046548e9e976fc7e28395b86ff262e6d3c343/src/locus/config.py"
+      ],
+      "license": "MIT",
+      "attribution": "Matthew McNulty and Locus contributors",
+      "installation": "Install separately into a Python >=3.11 environment from the pinned source (pip install git+https://github.com/mattsmcnulty/locus.git@24b046548e9e976fc7e28395b86ff262e6d3c343; not the unrelated PyPI package named locus), then build the local DuckDB genome store with the upstream pipeline (locus download all; locus pipeline); set LOCUS_DATA_DIR (or LOCUS_DB_PATH) to the data directory because the default location is derived from the source tree.",
+      "required_environment": [
+        "LOCUS_DATA_DIR"
+      ],
+      "optional_environment": [
+        "LOCUS_DB_PATH",
+        "LOCUS_SAMPLE_ID"
+      ],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "personal genome VCF queries",
+        "ClinVar and ACMG findings",
+        "pharmacogenomics",
+        "ancestry and polygenic risk",
+        "GWAS and literature lookup"
+      ],
+      "effects": "Most tools run read-only queries against the local DuckDB store; ask_about and variants_in_study send rsIDs to the Ensembl REST API and write temporary marker files under the Locus work directory, variants_in_study queries the GWAS Catalog, and literature_for sends the query to NCBI PubMed E-utilities.",
+      "source_commit": "24b046548e9e976fc7e28395b86ff262e6d3c343",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Requires a prebuilt Locus DuckDB store from the user's own VCFs; tools return an error note until it exists.",
+        "Upstream documents macOS Apple Silicon only; AlphaMissense data it downloads is CC-BY-NC 4.0 (non-commercial) although the code is MIT."
+      ],
+      "tool_names": [
+        "genome_overview",
+        "lookup_variant_by_rsid",
+        "lookup_variants_in_gene",
+        "lookup_variants_in_region",
+        "clinical_findings",
+        "pharmacogenomics",
+        "allele_frequency",
+        "structural_variants",
+        "predicted_damaging",
+        "secondary_findings",
+        "carrier_status",
+        "traits",
+        "ancestry",
+        "polygenic_risk",
+        "gwas_associations",
+        "whats_new",
+        "ask_about",
+        "literature_for",
+        "variants_in_study",
+        "gene_disease_validity",
+        "variant_dossier",
+        "run_sql"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 22 tools; every name in tool_names was present."
+    },
+    {
+      "id": "sequence-simulation",
+      "name": "MCP Sequence Simulation",
+      "command": "node",
+      "arguments": [
+        "dist/server.js"
+      ],
+      "repository": "https://github.com/coreymhudson/mcp-sequence-simulation",
+      "sources": [
+        "https://github.com/coreymhudson/mcp-sequence-simulation/blob/dea87b2a45594ff969eb5f05826642f99d42ac29/README.md",
+        "https://github.com/coreymhudson/mcp-sequence-simulation/blob/dea87b2a45594ff969eb5f05826642f99d42ac29/LICENSE",
+        "https://github.com/coreymhudson/mcp-sequence-simulation/blob/dea87b2a45594ff969eb5f05826642f99d42ac29/package.json",
+        "https://github.com/coreymhudson/mcp-sequence-simulation/blob/dea87b2a45594ff969eb5f05826642f99d42ac29/src/server.ts"
+      ],
+      "license": "BSD-2-Clause",
+      "attribution": "Corey Hudson and mcp-sequence-simulation contributors",
+      "installation": "Install separately from the pinned source checkout with npm install && npm run build (Node.js with npm; package.json declares no engines field), then set workdir to the checkout and keep dist/server.js; no environment variables are used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [
+        "dist/server.js"
+      ],
+      "capabilities": [
+        "random DNA generation",
+        "protein sequence generation",
+        "sequence mutation simulation",
+        "phylogeny simulation",
+        "FASTQ read simulation",
+        "evolutionary population simulation"
+      ],
+      "effects": "Pure local computation that returns simulated sequences, trees and FASTQ text in the tool response; the source contains no network calls, file writes or environment access.",
+      "source_commit": "dea87b2a45594ff969eb5f05826642f99d42ac29",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "generate_dna_sequence",
+        "generate_protein_sequence",
+        "mutate_sequence",
+        "evolve_sequence",
+        "simulate_phylogeny",
+        "simulate_fastq_file"
+      ],
+      "startup_check": "2026-10-14: not started here: needs Node.js >=18 (16 installed) and a build; tool names were checked against the source."
+    },
+    {
+      "id": "ncbi-sra",
+      "name": "NCBI SRA MCP Server",
+      "command": "python",
+      "arguments": [
+        "-c",
+        "from sra_mcp_server import mcp; mcp.run()"
+      ],
+      "repository": "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server",
+      "sources": [
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/README.md",
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/LICENSE",
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/pyproject.toml",
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/requirements.txt",
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/sra_mcp_server.py",
+        "https://github.com/CSI-Genomics-and-Data-Analytics-Core/ncbi-sra-mcp-server/blob/5569215722ba8554c80aa66f8d971b5bfe09a984/.vscode/mcp.json"
+      ],
+      "license": "MIT",
+      "attribution": "ncbi-sra-mcp-server contributors (CSI Genomics and Data Analytics Core)",
+      "installation": "Not on PyPI: install separately from the pinned source checkout in a Python >=3.11 environment (pip install -r requirements.txt, which provides fastmcp), set workdir to the checkout and executable_path to that Python; optionally set NCBI_EMAIL and NCBI_API_KEY, and install sra-tools (prefetch, fasterq-dump) for toolkit downloads.",
+      "required_environment": [],
+      "optional_environment": [
+        "NCBI_EMAIL",
+        "NCBI_API_KEY"
+      ],
+      "secret_environment": [
+        "NCBI_API_KEY"
+      ],
+      "environment_pairs": [],
+      "required_files": [
+        "sra_mcp_server.py",
+        "fast_entrez_client.py"
+      ],
+      "capabilities": [
+        "SRA run search",
+        "sequencing run metadata",
+        "ENA FASTQ file URLs",
+        "sequencing data download"
+      ],
+      "effects": "Queries NCBI Entrez E-utilities and the ENA portal API; sra_download starts background jobs that create the destination directory (default ./downloads) and write .sra or FASTQ files via urllib or the sra-tools prefetch/fasterq-dump subprocesses.",
+      "source_commit": "5569215722ba8554c80aa66f8d971b5bfe09a984",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Launched through 'python -c' because running sra_mcp_server.py as __main__ prints a plain-text banner to stdout before mcp.run(); a stdio client that does not skip non-JSON lines would fail on it. Both forms were started with the FastMCP client and listed the six tools."
+      ],
+      "tool_names": [
+        "sra_search",
+        "sra_metadata",
+        "sra_files",
+        "sra_download",
+        "sra_status",
+        "sra_cancel"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 6 tools; every name in tool_names was present."
+    },
+    {
+      "id": "bioinformatics-mcp",
+      "name": "bioinformatics-mcp",
+      "command": "bioinformatics-mcp",
+      "arguments": [],
+      "repository": "https://github.com/raonyguimaraes/bioinformatics-mcp",
+      "sources": [
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/README.md",
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/LICENSE",
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/pyproject.toml",
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/server.json",
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/src/bioinformatics_mcp/__main__.py",
+        "https://github.com/raonyguimaraes/bioinformatics-mcp/blob/b607d569a95fad247125894efa4b3e14e024c5e2/src/bioinformatics_mcp/tools/databases.py"
+      ],
+      "license": "MIT",
+      "attribution": "Raony Guimaraes and bioinformatics-mcp contributors",
+      "installation": "Install separately into a Python >=3.11 environment from the pinned source (pip install \"bioinformatics-mcp[full] @ git+https://github.com/raonyguimaraes/bioinformatics-mcp.git@b607d569a95fad247125894efa4b3e14e024c5e2\"; the README's PyPI name returned 404 on PyPI); no environment variables are used.",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "environment_pairs": [],
+      "required_files": [],
+      "capabilities": [
+        "FASTA ORFs and GC content",
+        "VCF parsing and statistics",
+        "NCBI Gene and ClinVar queries",
+        "Ensembl and UniProt lookup",
+        "methylation analysis"
+      ],
+      "effects": "Database tools send queries to NCBI E-utilities, UniProt, Ensembl and STRING over HTTPS; save_anndata and export_obs_table write files to caller-supplied paths; other tools read local sequence, VCF, BAM, CSV and AnnData files and hold datasets in memory.",
+      "source_commit": "b607d569a95fad247125894efa4b3e14e024c5e2",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "limitations": [
+        "Single-cell, spatial and variant tools need optional extras; the full tool set is 72 tools, many for single-cell RNA-seq rather than DNA."
+      ],
+      "tool_names": [
+        "parse_fasta",
+        "gc_content",
+        "translate_sequence",
+        "reverse_complement",
+        "find_orfs",
+        "parse_vcf",
+        "vcf_summary_stats",
+        "bam_stats",
+        "search_ncbi_gene",
+        "fetch_ncbi_gene_details",
+        "fetch_ncbi_sequence",
+        "search_ncbi_nucleotide",
+        "search_uniprot",
+        "fetch_uniprot_entry",
+        "search_ensembl_genes",
+        "fetch_ensembl_sequence",
+        "search_pubmed",
+        "fetch_pubmed_abstract",
+        "fetch_gene_ontology",
+        "search_clinvar",
+        "get_protein_interactions",
+        "get_string_enrichment",
+        "parse_bedgraph",
+        "parse_methylation_table",
+        "methylation_summary_by_chromosome",
+        "find_differentially_methylated_regions",
+        "cpg_density",
+        "plot_methylation_distribution",
+        "load_anndata",
+        "load_csv",
+        "load_10x_mtx",
+        "save_anndata",
+        "list_datasets",
+        "inspect_dataset",
+        "remove_dataset",
+        "export_obs_table",
+        "export_gene_expression",
+        "run_standard_pipeline",
+        "rank_genes_groups",
+        "run_enrichment_analysis"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 70 tools; every name in tool_names was present."
+    },
+    {
+      "id": "rewire-genomics",
+      "name": "Rewire Genomics MCP",
+      "command": "genomics-mcp",
+      "arguments": [],
+      "repository": "https://github.com/rewire-bio/genomics-mcp",
+      "sources": [
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/README.md",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/pyproject.toml",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/LICENSE",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/docs/install.md",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/docs/archive-sources.md",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/src/genomics_mcp/server.py",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/src/genomics_mcp/registry.py",
+        "https://github.com/rewire-bio/genomics-mcp/blob/c4190699201b8a2f447dc52075c5977d7b32e287/src/genomics_mcp/config.py"
+      ],
+      "license": "MIT",
+      "attribution": "Tim Richardson and rewire-bio/genomics-mcp contributors",
+      "installation": "Install the pinned repository checkout into a Python >=3.12,<3.13 environment (pip install of the checkout, with --no-binary pybigwig; needs a C compiler plus libcurl and zlib development files for remote bigWig/bigBed); the upstream docs say there is no PyPI package although PyPI lists rewire-genomics-mcp 0.1.0 by the same author, so prefer the checkout. Optionally set GENOMICS_MCP_ALLOWED_ROOTS to the folders the server may read, and EGA credentials only for controlled EGA data.",
+      "required_environment": [],
+      "optional_environment": [
+        "GENOMICS_MCP_ALLOWED_ROOTS",
+        "GENOMICS_MCP_WORK_DIR",
+        "GENOMICS_MCP_CONFIG",
+        "GENOMICS_MCP_LOG_LEVEL",
+        "GENOMICS_MCP_CACHE_ENABLED",
+        "GENOMICS_MCP_SRA_TOOLKIT_DIR",
+        "GENOMICS_MCP_EGA_USERNAME",
+        "GENOMICS_MCP_EGA_PASSWORD",
+        "GENOMICS_MCP_EGA_PUBLIC_TEST_ACCOUNT",
+        "GENOMICS_MCP_EGA_CLIENT_SECRET"
+      ],
+      "secret_environment": [
+        "GENOMICS_MCP_EGA_USERNAME",
+        "GENOMICS_MCP_EGA_PASSWORD",
+        "GENOMICS_MCP_EGA_CLIENT_SECRET"
+      ],
+      "environment_pairs": [
+        [
+          "GENOMICS_MCP_EGA_USERNAME",
+          "GENOMICS_MCP_EGA_PASSWORD"
+        ]
+      ],
+      "required_files": [],
+      "capabilities": [
+        "bounded genomic region reads (BAM, VCF, FASTA, bigWig)",
+        "dataset discovery (EGA, ENA, ENCODE, GEO)",
+        "variant normalization and lookup",
+        "gene and protein reference lookup",
+        "sequence and feature retrieval"
+      ],
+      "effects": "Calls public services (EGA, ENA, ENCODE, GEO, NCBI, Ensembl, HGNC, ClinVar, gnomAD, UniProt, Open Targets) over HTTPS and reads local files under the allowed roots; fetch_file, cancel_transfer and convert_sra_run write downloaded files into the server work directory (default under the XDG cache), values from private files go to external APIs only when a call sets allow_external_annotation.",
+      "source_commit": "c4190699201b8a2f447dc52075c5977d7b32e287",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "list_sources",
+        "search_datasets",
+        "describe_dataset",
+        "list_files",
+        "list_samples",
+        "get_sample_metadata",
+        "fetch_file",
+        "get_transfer_status",
+        "cancel_transfer",
+        "convert_sra_run",
+        "get_reads",
+        "get_coverage",
+        "get_pileup",
+        "get_variants",
+        "get_sequence",
+        "get_features",
+        "get_signal",
+        "inspect_locus",
+        "compare_samples",
+        "resolve_identifier",
+        "normalize_variant",
+        "lookup_variant",
+        "lookup_gene",
+        "lookup_protein"
+      ],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 24 tools; every name in tool_names was present."
+    },
+    {
+      "id": "bioinformatics-ncbi-uniprot",
+      "name": "Bioinformatics MCP Server (NCBI and UniProt)",
+      "command": "bioinformatics-server",
+      "arguments": [],
+      "repository": "https://github.com/AiAgentKarl/bioinformatics-mcp-server",
+      "sources": [
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/README.md",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/pyproject.toml",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/LICENSE",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/src/server.py",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/src/tools/genes.py",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/src/tools/proteins.py",
+        "https://github.com/AiAgentKarl/bioinformatics-mcp-server/blob/b073742a7059f5cad816d0cf41f9fcdf49586933/src/tools/literature.py"
+      ],
+      "license": "MIT",
+      "attribution": "AiAgentKarl",
+      "installation": "pip install bioinformatics-mcp-server (PyPI 0.1.0) into a Python >=3.11 environment; no environment variables or API keys are needed. The wheel installs a top-level package named src, so use a dedicated environment. Pin the dependency 'mcp<2': the upstream package leaves mcp unpinned and its server fails to import under mcp 2.x (FastMCP was renamed).",
+      "required_environment": [],
+      "optional_environment": [],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "NCBI gene search and details",
+        "ClinVar variant search",
+        "NCBI nucleotide and protein sequence retrieval",
+        "taxonomy lookup",
+        "UniProt protein lookup"
+      ],
+      "effects": "Read-only HTTPS queries to NCBI E-utilities (Gene, ClinVar, Taxonomy, Nucleotide, PubMed) and the UniProt REST API; every request sends tool and a fixed contact email parameter to NCBI, nothing is written locally.",
+      "source_commit": "b073742a7059f5cad816d0cf41f9fcdf49586933",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "search_genes",
+        "get_gene_details",
+        "search_clinvar_variants",
+        "get_taxonomy",
+        "get_ncbi_sequence",
+        "search_proteins",
+        "get_protein_details",
+        "search_pubmed",
+        "get_pubmed_abstract",
+        "get_pubmed_citations"
+      ],
+      "limitations": [
+        "Tool error messages and instructions are partly in German."
+      ],
+      "environment_pairs": [],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 10 tools; every name in tool_names was present."
+    },
+    {
+      "id": "uniprot-provenance",
+      "name": "UniProt MCP Server (smaniches)",
+      "command": "uniprot-mcp-server",
+      "arguments": [],
+      "repository": "https://github.com/smaniches/uniprot-mcp",
+      "sources": [
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/README.md",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/pyproject.toml",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/LICENSE",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/NOTICE",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/src/uniprot_mcp/server.py",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/src/uniprot_mcp/client.py",
+        "https://github.com/smaniches/uniprot-mcp/blob/a43171f41a8c9119883834ceb02b2eb1fa64b415/src/uniprot_mcp/cache.py"
+      ],
+      "license": "Apache-2.0",
+      "attribution": "Santiago Maniches and TOPOLOGICA LLC",
+      "installation": "pip install uniprot-mcp-server (PyPI 1.3.9) into a Python >=3.11 environment; optionally set UNIPROT_PIN_RELEASE (for example 2026_01) to pin the UniProt release and UNIPROT_MCP_CACHE_DIR to enable the offline replay cache directory. No API key is needed.",
+      "required_environment": [],
+      "optional_environment": [
+        "UNIPROT_PIN_RELEASE",
+        "UNIPROT_MCP_CACHE_DIR"
+      ],
+      "secret_environment": [],
+      "required_files": [],
+      "capabilities": [
+        "protein variant lookup",
+        "ClinVar records by gene",
+        "disease associations",
+        "cross-reference and ID mapping",
+        "orthology and proteome search"
+      ],
+      "effects": "Read-only HTTPS queries to rest.uniprot.org and www.uniprot.org, NCBI E-utilities (ClinVar) and the AlphaFold EBI service; ID mapping submits identifiers to UniProt as a job, and uniprot_replay_from_cache reads local files from UNIPROT_MCP_CACHE_DIR; live responses are not written to that cache in the pinned code.",
+      "source_commit": "a43171f41a8c9119883834ceb02b2eb1fa64b415",
+      "verified_date": "2026-10-14",
+      "transports": [
+        "stdio"
+      ],
+      "tool_names": [
+        "uniprot_get_entry",
+        "uniprot_search",
+        "uniprot_get_sequence",
+        "uniprot_get_variants",
+        "uniprot_id_mapping",
+        "uniprot_lookup_variant",
+        "uniprot_resolve_clinvar",
+        "uniprot_get_disease_associations",
+        "uniprot_resolve_orthology",
+        "uniprot_target_dossier",
+        "uniprot_replay_from_cache",
+        "uniprot_provenance_verify",
+        "uniprot_get_proteome",
+        "uniprot_search_proteomes",
+        "uniprot_taxonomy_search"
+      ],
+      "limitations": [
+        "Protein-centric (41 tools in total); only the variant, ClinVar, disease, ID-mapping and proteome tools touch gene-level data. tool_names lists a verified subset of the 41."
+      ],
+      "environment_pairs": [],
+      "startup_check": "2026-10-14: started over stdio in a clean environment and listed 41 tools; every name in tool_names was present."
     }
   ]
 }

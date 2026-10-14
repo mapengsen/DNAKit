@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import multiprocessing
+import threading
 from collections.abc import Iterable
 from concurrent.futures import ProcessPoolExecutor
 from math import fsum
@@ -225,8 +227,13 @@ def _diversity_pair_distances(
         )
 
     sequences = tuple(record.sequence.symbols for record in records)
+    # Forking a multi-threaded process (e.g. the MCP server, which runs tools in a worker
+    # thread) can deadlock the children on inherited locks, so spawn there. Single-threaded
+    # callers keep fork, which also works from scripts without a __main__ guard.
+    context = "spawn" if threading.active_count() > 1 else None
     with ProcessPoolExecutor(
         max_workers=min(config.workers, comparisons),
+        mp_context=multiprocessing.get_context(context),
         initializer=_init_diversity_worker,
         initargs=(sequences, config.limits.max_alignment_cells),
     ) as executor:
