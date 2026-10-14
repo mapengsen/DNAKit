@@ -76,3 +76,5 @@ outputs/
 不同厂家的agent使用方法.md
 .claude/settings.local.json
 /public_package_info.md
+# Local audit directory kept by the author (survey, coverage ledgers); not published
+/new_vision/

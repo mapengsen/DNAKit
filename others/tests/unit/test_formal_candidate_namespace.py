@@ -6,6 +6,8 @@ import csv
 import importlib
 from pathlib import Path
 
+import pytest
+
 import dnakit
 from dnakit.tools.catalog import build_tool_catalog
 from dnakit.tools.registry import default_tool_registry
@@ -44,6 +46,8 @@ def test_candidate_functions_are_discoverable_by_the_agent_registry() -> None:
 
 def test_all_in_scope_catalog_candidates_are_formal_dnakit_exports() -> None:
     root = Path(__file__).parents[3]
+    if not (root / "new_vision/DNAKit_unified_function_catalog.csv").exists():
+        pytest.skip("new_vision/ is a local audit directory and is not part of the repository")
     catalog = list(csv.DictReader((root / "new_vision/DNAKit_unified_function_catalog.csv").open(encoding="utf-8")))
     comparison = {
         row["capability_id"]: row

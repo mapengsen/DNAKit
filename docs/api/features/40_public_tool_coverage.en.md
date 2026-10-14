@@ -5,6 +5,8 @@ keeps the project-by-project cross-reference in
 `new_vision/2026-10-10/public_dna_tools_coverage.{json,csv,md}` and exposes the
 same records through `dnakit.integrations`.
 
+> `new_vision/` is a local audit directory kept by the author. It is not part of the repository, so the paths below point to files you will not find in a checkout. The results are summarised on this page and available through `dnakit.integrations`.
+
 The source text declares 282 spreadsheet records. The Markdown available in
 this repository contains 425 explicit mentions, which collapse to 320
 conservatively normalized source records. Classification, citation and

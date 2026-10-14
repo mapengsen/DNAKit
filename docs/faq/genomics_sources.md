@@ -4,7 +4,7 @@
 
 Snapshot: **2026-09-20**. Projects/sources: **419**. Logged searches: **88**.
 
-针对 `new_vision/2026-10-10/public_dna_tools.md` 的逐项清单，另有[公开 DNA 工具覆盖矩阵](../api/features/40_public_tool_coverage.md)：原文声明 282 条表格记录，当前 Markdown 可解析出 425 次明确提及，保守去重后得到 320 条来源记录；分类、引用和不同提供方的记录会保留为证据，拼写别名才会合并。`dnakit.integrations` 提供离线查询、引用和统一路由，并为 scikit-bio、seqme、DNA Chisel、Biotite、Edlib、GeneBlocks、sourmash、PyRanges、pyfastx、dnaio、mappy、pyBigWig、pybedtools、gffutils、pySBOL3、scadnano、polars-bio、DnaCauldron、DNA Features Viewer、gtars、pyfaidx、vcfpy 与 cyvcf2 提供可选 pip 适配器；Cutadapt、fastp、FastQC、MultiQC、BWA、Bowtie2、SAMtools、BCFtools、SPAdes、SPOA、NanoFilt、Filtlong、NanoPlot、Porechop、Trimmomatic、AfterQC、SeqMagick、GATK4、GEMINI、Ensembl VEP、Shasta、Merqury、BUSCO、DeepVariant、cuteSV、Sniffles2、DELLY、BEDOPS、Flye、hifiasm、MEGAHIT、vcfanno、SURVIVOR 和 Picard 通过固定参数外部适配器接入；不把“发现了项目”误标为“已复制全部功能”。
+针对 `new_vision/2026-10-10/public_dna_tools.md`（作者本地的审计目录，不在仓库中）的逐项清单，另有[公开 DNA 工具覆盖矩阵](../api/features/40_public_tool_coverage.md)：原文声明 282 条表格记录，当前 Markdown 可解析出 425 次明确提及，保守去重后得到 320 条来源记录；分类、引用和不同提供方的记录会保留为证据，拼写别名才会合并。`dnakit.integrations` 提供离线查询、引用和统一路由，并为 scikit-bio、seqme、DNA Chisel、Biotite、Edlib、GeneBlocks、sourmash、PyRanges、pyfastx、dnaio、mappy、pyBigWig、pybedtools、gffutils、pySBOL3、scadnano、polars-bio、DnaCauldron、DNA Features Viewer、gtars、pyfaidx、vcfpy 与 cyvcf2 提供可选 pip 适配器；Cutadapt、fastp、FastQC、MultiQC、BWA、Bowtie2、SAMtools、BCFtools、SPAdes、SPOA、NanoFilt、Filtlong、NanoPlot、Porechop、Trimmomatic、AfterQC、SeqMagick、GATK4、GEMINI、Ensembl VEP、Shasta、Merqury、BUSCO、DeepVariant、cuteSV、Sniffles2、DELLY、BEDOPS、Flye、hifiasm、MEGAHIT、vcfanno、SURVIVOR 和 Picard 通过固定参数外部适配器接入；不把“发现了项目”误标为“已复制全部功能”。
 
 检索不限于最初 11 个领域；这是可持续补充的版本化清单，不能据此宣称已经穷尽全球全部 DNA 论文和项目。
 

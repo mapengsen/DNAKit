@@ -11,7 +11,7 @@
 - 新增约 1,200 个可选依赖封装：`dnakit.xxx()` 内部调用原包，未安装时给出 `dnakit[bio-...]` 安装提示；Python 公开函数由 1,826 个增至 3,042 个，覆盖变异、群体遗传、比对、注释、数据库、表观基因组、微生物组、分子生物学实验、序列、调控和预测等方向。
 - 新增约 90 个 `bio-*` 可选依赖组（如 scikit-allel、parasail、pyhmmer、bioframe、hail、scanpy 等）。
 - 新增 `parasail_dp_variant()` 与 `parasail_ssw_profile_align()`，按名称部件选择 parasail 的动态规划内核。
-- 对已包装函数的别名、再导出和参数分支逐行复核，台账共 15,485 行，覆盖表见 `new_vision/2026-10-10/full_function_coverage.csv`。
+- 对已包装函数的别名、再导出和参数分支逐行复核，台账共 15,485 行，覆盖表见 `new_vision/2026-10-10/full_function_coverage.csv`（作者本地的审计文件，不在仓库中）。
 - 补充第 48 到 109 页中英文 API 文档，每个函数给出作用、处理方法、API、输入、输出以及真实运行的示例。
 - 导入可选依赖时不再改动调用方的日志设置；测试配置会在用例之间还原全局日志状态。
 
