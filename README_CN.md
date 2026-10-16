@@ -37,12 +37,51 @@
 </p>
 
 <p align="center">
+  <a href="http://47.122.120.132">
+    <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md">
+    <img src="https://img.shields.io/badge/GUI-Windows-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="GUI for Windows">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md">
+    <img src="https://img.shields.io/badge/GUI-macOS-000000?logo=apple&logoColor=white" alt="GUI for macOS">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md">
+    <img src="https://img.shields.io/badge/GUI-Linux-FCC624?logo=linux&logoColor=black" alt="GUI for Linux">
+  </a>
+</p>
+
+<p align="center">
   <strong>DNAkit: A Comprehensive Toolkit for Efficient DNA Research</strong>
 </p>
 
 # DNAKit 是什么？
 
 DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA 领域的 RDKit”。它覆盖标准化、文件与注释格式、基础操作、描述符、模式扫描、热力学、指纹、相似度、聚类与数据划分、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型直接预测性质或提取 rep 后进行 k-means 聚类等各种各样的操作。
+
+# 网页版与桌面版
+
+不写代码也能使用 DNAKit。网页版和桌面版使用同一套界面：单序列工具（描述符、ORF、motif、序列比较）、
+数据集工具（去重、训练/验证/测试集划分、格式转换、描述符特征表）、全部 Agent 可调用函数（附等价的
+Python 和 MCP 调用），以及 Skills 目录。
+
+**网页版：** 浏览器打开 [http://47.122.120.132](http://47.122.120.132)，无需安装。网页运行在共享 CPU 上，单次调用限时，
+不执行写文件、下载模型或调用外部程序的函数。
+
+**桌面版：** 在自己电脑的窗口中运行同一界面，没有上述限制。
+
+| <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
+|:---:|:---:|:---:|
+| `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
+| `dnakit gui` | `dnakit gui` | `dnakit gui` |
+
+在 PyPI 发布下一个版本之前，可以从 GitHub 安装：`pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"`（Linux 用 `gui-qt`）。桌面版在 Windows 上
+使用 WebView2，在 macOS 上使用 WebKit；Linux 上使用 GTK WebKit 或 Qt 后端，没有显示器的服务器会改用
+浏览器打开。详见[图形界面说明](https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md)。
+
+<p align="center">
+  <img alt="DNAKit 桌面版" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/gui-window.png" width="80%">
+</p>
 
 # 安装与快速入门
 

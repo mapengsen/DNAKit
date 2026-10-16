@@ -55,6 +55,7 @@ plugins:
           nav:
             - Home: index.md
             - Installation: installation.md
+            - Graphical Interface: gui.md
             - Feature Tree Overview: api/features/function_tree.md
             - 1. Data Preparation:
                 - 1) Core Data Objects: api/features/01_core_objects.md
@@ -350,6 +351,7 @@ extra:
 nav:
   - 首页: index.md
   - 安装: installation.md
+  - 图形界面: gui.md
   - 功能树总览: api/features/function_tree.md
   - 1. 数据准备:
       - 1) 核心数据对象: api/features/01_core_objects.md

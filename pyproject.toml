@@ -189,6 +189,15 @@ agent = [
   "fastmcp>=3.4.5,<4",
   "httpx[socks]>=0.27,<1",
 ]
+gui = [
+  "gradio>=6.29,<7",
+  "pywebview>=6.2,<7",
+]
+# Qt window backend for Linux desktops without GTK WebKit; Windows and macOS use system components.
+gui-qt = [
+  "dnakit[gui]",
+  "pywebview[qt]>=6.2,<7",
+]
 neural = [
   "gdown>=5.2,<6",
   "huggingface-hub>=0.28,<2",
@@ -252,6 +261,7 @@ dnakit = ["py.typed"]
 "dnakit.integrations" = ["*.json"]
 "dnakit.generated" = ["manifest.json"]
 "dnakit.tools" = ["_data/*.json"]
+"dnakit.gui" = ["examples/*.fasta"]
 "dnakit.encode._backend" = ["LICENSE", "UPSTREAM.json"]
 "dnakit.workflows.common" = ["LICENSE", "UPSTREAM.json"]
 "dnakit.workflows.prs" = ["LICENSE", "UPSTREAM.json", "*.json", "*.txt", "data/*.txt"]
@@ -290,7 +300,10 @@ module = [
 follow_imports = "skip"
 
 [[tool.mypy.overrides]]
-module = ["reportlab.*", "jsonschema", "jsonschema.*", "cellxgene_census", "pandas.*"]
+module = [
+  "reportlab.*", "jsonschema", "jsonschema.*", "cellxgene_census", "pandas.*",
+  "gradio", "gradio.*", "webview", "webview.*", "PIL", "PIL.*",
+]
 ignore_missing_imports = true
 
 [tool.ruff]

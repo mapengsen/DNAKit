@@ -1,0 +1,2 @@
+# dnakit.gui ships from the release after 0.2.0; until then deploy.sh copies it from this checkout.
+dnakit[bio-analysis,bio-formats,bio-plots]==0.2.0

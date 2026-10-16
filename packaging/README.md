@@ -94,3 +94,63 @@ Galaxy Tool Shed 包装器位于 [`galaxy/dnakit/`](../galaxy/dnakit/) 中。Gal
 全部通过。运行测试时将独立安装的 Bioconda 0.1.1 环境加入 `PATH`，
 使用 `--no_dependency_resolution`；未测试 Galaxy 自动创建 Conda 环境。
 验证和上传命令见 [`galaxy/dnakit/README.rst`](../galaxy/dnakit/README.rst)。
+
+## 网页演示（Hugging Face Spaces 或自建服务器）
+
+网页演示与桌面程序 `dnakit gui` 共用 [`src/dnakit/gui/`](../src/dnakit/gui/) 中的界面代码，
+修改界面只改这一处。[`huggingface_space/app.py`](huggingface_space/app.py) 只是以
+`GuiSettings.public_demo()` 启动同一界面：不执行写文件、下载模型或调用外部程序的函数，单次调用
+限时 60 秒，路径参数只能指向访问者自己的临时目录。
+
+`dnakit.gui` 从 0.2.0 之后的版本开始随 PyPI 发布。在此之前，`requirements.txt` 仍固定
+`dnakit==0.2.0`，由 `deploy.sh` 把源码中的 `src/dnakit/gui` 复制到服务器；发布新版本后把
+`requirements.txt` 改为 `dnakit[gui,bio-analysis,bio-formats,bio-plots]==<新版本>`。
+
+本地预览（与服务器相同的限制）：
+
+```bash
+python -m pip install -e ".[gui]"
+dnakit gui --public-demo --browser
+```
+
+### Hugging Face Spaces
+
+Hugging Face 现在要求 PRO 订阅才能在 cpu-basic 上运行 Gradio Space。有订阅时：
+
+```bash
+pip install -U huggingface_hub
+hf auth login
+hf repo create <用户名>/DNAKit --repo-type space --space-sdk gradio
+hf upload <用户名>/DNAKit packaging/huggingface_space . --repo-type space
+```
+
+### 自建服务器（systemd + nginx）
+
+[`dnakit-web.service`](huggingface_space/dnakit-web.service) 以无登录权限的 `dnakit` 用户运行网页，
+程序在 `/opt/dnakit-web/app`，虚拟环境在 `/opt/dnakit-web/venv`，限制为 2 核 CPU、1 GB 内存，
+系统目录只读、`/tmp` 私有，只监听 `127.0.0.1:7860`。前面由 nginx
+（[`nginx-dnakit.conf`](huggingface_space/nginx-dnakit.conf)）监听 80 端口：HTML 到达后立即显示
+加载页，Gradio 前端文件直接从磁盘发送并缓存一年，文本内容 gzip 压缩。
+
+首次安装（在服务器上，以 root 执行）：
+
+```bash
+apt-get install -y python3-venv nginx
+useradd --system --home-dir /var/lib/dnakit-web --shell /usr/sbin/nologin dnakit
+mkdir -p /opt/dnakit-web/app
+python3 -m venv /opt/dnakit-web/venv
+/opt/dnakit-web/venv/bin/pip install "dnakit[bio-analysis,bio-formats,bio-plots]==0.2.0" "gradio==6.29.1"
+ln -sfn "$(/opt/dnakit-web/venv/bin/python -c 'import gradio, pathlib; print(pathlib.Path(gradio.__file__).parent / "templates/frontend")')" /opt/dnakit-web/frontend
+rm -f /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/dnakit /etc/nginx/sites-enabled/dnakit
+systemctl enable nginx dnakit-web  # 服务文件由下面的 deploy.sh 写入
+```
+
+之后每次更新界面，在本机源码目录执行一条命令即可（复制界面代码和服务文件、重启并检查）：
+
+```bash
+packaging/huggingface_space/deploy.sh root@<服务器>
+```
+
+升级 gradio 后重新执行上面的 `ln -sfn` 一行，使 nginx 发送新版前端文件。在中国大陆服务器上用域名对外
+提供网站需先完成 ICP 备案。

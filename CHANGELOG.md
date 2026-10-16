@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- 新增图形界面：`pip install "dnakit[gui]"` 后运行 `dnakit gui` 打开桌面窗口（pywebview；无窗口组件时改用浏览器），也可用 `dnakit.gui.build_app(GuiSettings.public_demo())` 部署网页演示。两者共用同一套界面代码，包含单序列工具、数据集工具、全部 Agent 可调用函数的检索与运行，以及 Skills 检索；桌面版不限时，写文件等有副作用的函数经确认后执行，网页版限时且不执行这类函数。Linux 的 Qt 窗口后端为可选依赖组 `gui-qt`。
+- `dnakit compare --help` 中的方法名由 `levenshtein` 更正为实际可用的 `edit`。
 - MCP 目录新增 17 个第三方服务器（共 49 个），每个条目固定上游提交、记录许可证、环境变量和对外影响；12 个已通过 stdio 实际启动并核对工具名。未收录 10 个候选，原因见文档 110。
 
 ## [0.2.0] - 2026-10-13

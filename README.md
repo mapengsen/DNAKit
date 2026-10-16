@@ -37,6 +37,21 @@
 </p>
 
 <p align="center">
+  <a href="http://47.122.120.132">
+    <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md">
+    <img src="https://img.shields.io/badge/GUI-Windows-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="GUI for Windows">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md">
+    <img src="https://img.shields.io/badge/GUI-macOS-000000?logo=apple&logoColor=white" alt="GUI for macOS">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md">
+    <img src="https://img.shields.io/badge/GUI-Linux-FCC624?logo=linux&logoColor=black" alt="GUI for Linux">
+  </a>
+</p>
+
+<p align="center">
   <strong>DNAKit: A Comprehensive Toolkit for Efficient DNA Research</strong>
 </p>
 
@@ -48,6 +63,33 @@ pattern scanning, thermodynamics, fingerprints, similarity analysis, clustering 
 splitting, comprehensive evaluation, molecular-biology simulation, and visualization. DNA
 foundation models can optionally be used for direct property prediction or to extract
 representations for k-means clustering.
+
+# Web demo and desktop app
+
+DNAKit also runs without writing code. The web demo and the desktop app share one interface:
+sequence tools (descriptors, ORFs, motifs, comparison), dataset tools (deduplication,
+train/valid/test split, format conversion, descriptor feature tables), every Agent-callable
+function with its equivalent Python and MCP call, and the Skills catalog.
+
+**Web demo:** open [http://47.122.120.132](http://47.122.120.132) in a browser, with nothing to install. It runs on a shared CPU,
+so calls have a time limit and functions that write files, download models or run external
+programs are not executed.
+
+**Desktop app:** the same interface in a window on your own computer, without those limits.
+
+| <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
+|:---:|:---:|:---:|
+| `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
+| `dnakit gui` | `dnakit gui` | `dnakit gui` |
+
+Until the next PyPI release, install the desktop app from GitHub with
+`pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"` (Linux: `gui-qt`). The app uses WebView2 on Windows and WebKit on macOS; on Linux it uses
+GTK WebKit or the Qt backend, and on a server without a display it opens in a browser. See the
+[graphical interface guide](https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md).
+
+<p align="center">
+  <img alt="DNAKit desktop app" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/gui-window.png" width="80%">
+</p>
 
 # Installation and quick start
 

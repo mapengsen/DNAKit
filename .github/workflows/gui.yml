@@ -1,0 +1,79 @@
+name: GUI
+
+# Open the `dnakit gui` desktop window on Linux, Windows and macOS, check that the page renders,
+# and keep a screenshot of each window as a workflow artifact.
+
+on:
+  push:
+    paths:
+      - "src/dnakit/gui/**"
+      - "src/dnakit/cli/gui.py"
+      - "others/tests/unit/test_gui.py"
+      - ".github/workflows/gui.yml"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - "src/dnakit/gui/**"
+      - "src/dnakit/cli/gui.py"
+      - "others/tests/unit/test_gui.py"
+      - ".github/workflows/gui.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  window:
+    name: Desktop window / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Linux display and Qt libraries
+        if: runner.os == 'Linux'
+        run: >-
+          sudo apt-get update && sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-cursor0
+          libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0
+          libxcb-image0 libxcb-render-util0 libegl1 libnss3 libasound2t64
+
+      - name: Install DNAKit with the GUI extra
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          if [ "$RUNNER_OS" = "Linux" ]; then extra="gui-qt"; else extra="gui"; fi
+          python -m pip install ".[$extra,dev]" Pillow
+
+      - name: Run GUI unit tests
+        run: python -m pytest others/tests/unit/test_gui.py
+
+      - name: Open the window and check that the page renders (Linux)
+        if: runner.os == 'Linux'
+        env:
+          QTWEBENGINE_CHROMIUM_FLAGS: --no-sandbox
+        run: >-
+          xvfb-run -a -s "-screen 0 1400x1000x24"
+          dnakit gui --workdir gui-work --self-test 180 --screenshot gui-${{ runner.os }}.png
+
+      - name: Open the window and check that the page renders
+        if: runner.os != 'Linux'
+        run: dnakit gui --workdir gui-work --self-test 180 --screenshot gui-${{ runner.os }}.png
+
+      - name: Upload window screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-window-${{ runner.os }}
+          path: gui-${{ runner.os }}.png
+          if-no-files-found: warn

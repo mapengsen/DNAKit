@@ -1,0 +1,42 @@
+[Unit]
+Description=DNAKit web demo (Gradio)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=dnakit
+Group=dnakit
+WorkingDirectory=/opt/dnakit-web/app
+ExecStart=/opt/dnakit-web/venv/bin/python app.py
+Environment=GRADIO_SERVER_NAME=127.0.0.1
+Environment=GRADIO_SERVER_PORT=7860
+Environment=GRADIO_ANALYTICS_ENABLED=False
+Environment=HOME=/var/lib/dnakit-web
+Environment=MPLCONFIGDIR=/var/lib/dnakit-web/matplotlib
+StateDirectory=dnakit-web
+Restart=always
+RestartSec=5
+
+# Resource limits: at most 2 CPU cores and 1 GB RAM; killed first under memory pressure.
+CPUQuota=200%
+MemoryMax=1G
+MemorySwapMax=0
+OOMScoreAdjust=500
+TasksMax=256
+
+# Sandbox: unprivileged user without capabilities, read-only system, private /tmp.
+# nginx (nginx-dnakit.conf) listens on port 80 and forwards to 127.0.0.1:7860.
+CapabilityBoundingSet=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

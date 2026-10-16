@@ -21,6 +21,7 @@ from dnakit._progress import Progress
 from dnakit._version import __version__
 from dnakit.cli.database import app as database_app
 from dnakit.cli.gene_annotation import annotate_genes_command
+from dnakit.cli.gui import gui_command
 from dnakit.cli.skills import app as skills_app
 from dnakit.cli.visualization import plot_distribution_command
 from dnakit.core import DNAAlphabet, DNARecord, DNASequence
@@ -61,6 +62,7 @@ error_console = Console(stderr=True)
 
 app.command("annotate-genes")(annotate_genes_command)
 app.command("plot-distribution")(plot_distribution_command)
+app.command("gui")(gui_command)
 app.add_typer(skills_app, name="skills")
 app.add_typer(database_app, name="database")
 
@@ -499,7 +501,7 @@ def compare_command(
     left: Annotated[str, typer.Argument(help="Left raw DNA sequence.")],
     right: Annotated[str, typer.Argument(help="Right raw DNA sequence.")],
     method: Annotated[
-        str, typer.Option(help="exact, hamming, levenshtein, or kmer_jaccard.")
+        str, typer.Option(help="exact, hamming, edit (Levenshtein), or kmer_jaccard.")
     ] = "exact",
     k: Annotated[int, typer.Option(help="k value for k-mer methods.")] = 3,
 ) -> None:
