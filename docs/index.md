@@ -15,6 +15,12 @@
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
     <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&logoColor=white" alt="GNU Guix package">
   </a>
+  <a href="llm_tools/mcp/">
+    <img src="https://img.shields.io/badge/MCP-server-1A1A1A?logo=modelcontextprotocol&logoColor=white" alt="MCP server">
+  </a>
+  <a href="llm_tools/skills/">
+    <img src="https://img.shields.io/badge/Skills-agent%20workflows-D97757?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMyAxIDMgMTRoN2wtMS41IDlMMjAgOS41aC03LjJ6Ii8+PC9zdmc+" alt="Agent Skills">
+  </a>
   <a href="https://dnakit.mapengsen.asia">
     <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
   </a>

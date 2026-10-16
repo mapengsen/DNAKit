@@ -37,6 +37,15 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/llm_tools/mcp.md">
+    <img src="https://img.shields.io/badge/MCP-server-1A1A1A?logo=modelcontextprotocol&logoColor=white" alt="MCP server">
+  </a>
+  <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/llm_tools/skills.md">
+    <img src="https://img.shields.io/badge/Skills-agent%20workflows-D97757?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMyAxIDMgMTRoN2wtMS41IDlMMjAgOS41aC03LjJ6Ii8+PC9zdmc+" alt="Agent Skills">
+  </a>
+</p>
+
+<p align="center">
   <a href="https://dnakit.mapengsen.asia">
     <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
   </a>
