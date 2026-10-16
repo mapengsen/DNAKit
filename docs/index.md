@@ -15,7 +15,7 @@
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
     <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&logoColor=white" alt="GNU Guix package">
   </a>
-  <a href="http://47.122.120.132">
+  <a href="https://dnakit.mapengsen.asia">
     <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
   </a>
   <a href="gui/">
@@ -37,7 +37,7 @@ DNAKit 是面向 DNA/基因方便操作的可复现分析工具包。它提供�
 4. **数据评价：** 有效性、唯一性、多样性与新颖性评价，以及相似度、距离和序列比对。
 5. **可视化：** 序列文字图、位置高亮、线性与环状 DNA 图、序列比对图。
 6. **大语言模型工具：** 提供 [Python API](llm_tools/python_api.md)、[MCP 接入](llm_tools/mcp.md)、[Skills 工作流](llm_tools/skills.md)与内置 [Agent](llm_tools/agent.md)，支持通用大模型调用与自然语言任务执行。
-7. **图形界面与网页版：** [网页版](http://47.122.120.132)无需安装，打开浏览器即可使用；[桌面版](gui.md)（`dnakit gui`）支持 Windows、macOS 和 Linux，提供序列与数据集工具、全部函数的检索与运行以及 Skills 目录。
+7. **图形界面与网页版：** [网页版](https://dnakit.mapengsen.asia)无需安装，打开浏览器即可使用；[桌面版](gui.md)（`dnakit gui`）支持 Windows、macOS 和 Linux，提供序列与数据集工具、全部函数的检索与运行以及 Skills 目录。
 
 # 支持与社区
 

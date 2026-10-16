@@ -15,7 +15,7 @@
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
     <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&amp;logoColor=white" alt="GNU Guix package">
   </a>
-  <a href="http://47.122.120.132">
+  <a href="https://dnakit.mapengsen.asia">
     <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&amp;logoColor=white" alt="Web demo">
   </a>
   <a href="gui/">
@@ -37,7 +37,7 @@ DNAKit is a reproducible analysis toolkit that makes DNA and gene operations con
 4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
 5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
 6. **Large language model tools:** provide a [Python API](llm_tools/python_api.md), [MCP integration](llm_tools/mcp.md), [Skills workflows](llm_tools/skills.md), and a built-in [Agent](llm_tools/agent.md) for general-purpose LLM calls and natural-language task execution.
-7. **Graphical interface and web demo:** the [web demo](http://47.122.120.132) runs in a browser with nothing to install; the [desktop app](gui.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
+7. **Graphical interface and web demo:** the [web demo](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](gui.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
 
 # Support and community
 

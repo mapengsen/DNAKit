@@ -37,7 +37,7 @@
 </p>
 
 <p align="center">
-  <a href="http://47.122.120.132">
+  <a href="https://dnakit.mapengsen.asia">
     <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md">
@@ -67,7 +67,7 @@ DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA �
 4. **数据评价：** 有效性、唯一性、多样性与新颖性评价，以及相似度、距离和序列比对。
 5. **可视化：** 序列文字图、位置高亮、线性与环状 DNA 图、序列比对图。
 6. **大语言模型工具：** 提供 [Python API](docs/llm_tools/python_api.md)、[MCP 接入](docs/llm_tools/mcp.md)、[Skills 工作流](docs/llm_tools/skills.md)与内置 [Agent](docs/llm_tools/agent.md)，支持通用大模型调用与自然语言任务执行。
-7. **图形界面与网页版：** [网页版](http://47.122.120.132)无需安装，打开浏览器即可使用；[桌面版](docs/gui.md)（`dnakit gui`）支持 Windows、macOS 和 Linux，提供序列与数据集工具、全部函数的检索与运行以及 Skills 目录。
+7. **图形界面与网页版：** [网页版](https://dnakit.mapengsen.asia)无需安装，打开浏览器即可使用；[桌面版](docs/gui.md)（`dnakit gui`）支持 Windows、macOS 和 Linux，提供序列与数据集工具、全部函数的检索与运行以及 Skills 目录。
 
 # 网页版与桌面版
 
@@ -75,7 +75,7 @@ DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA �
 数据集工具（去重、训练/验证/测试集划分、格式转换、描述符特征表）、全部 Agent 可调用函数（附等价的
 Python 和 MCP 调用），以及 Skills 目录。
 
-**网页版：** 浏览器打开 [http://47.122.120.132](http://47.122.120.132)，无需安装。网页运行在共享 CPU 上，单次调用限时，
+**网页版：** 浏览器打开 [https://dnakit.mapengsen.asia](https://dnakit.mapengsen.asia)，无需安装。网页运行在共享 CPU 上，单次调用限时，
 不执行写文件、下载模型或调用外部程序的函数。
 
 **桌面版：** 在自己电脑的窗口中运行同一界面，没有上述限制。
