@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -34,8 +35,10 @@ def test_cli_gui_help_does_not_need_gui_dependencies() -> None:
     result = runner.invoke(app, ["gui", "--help"])
 
     assert result.exit_code == 0, result.output
+    # Typer forces colored help on GitHub Actions; compare the plain text.
+    plain = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
     for option in ("--browser", "--workdir", "--no-open", "--public-demo"):
-        assert option in result.output
+        assert option in plain
 
 
 def test_missing_gradio_reports_the_gui_extra(monkeypatch: pytest.MonkeyPatch) -> None:
