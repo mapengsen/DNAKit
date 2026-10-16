@@ -64,6 +64,16 @@ splitting, comprehensive evaluation, molecular-biology simulation, and visualiza
 foundation models can optionally be used for direct property prediction or to extract
 representations for k-means clustering.
 
+It provides:
+
+1. **Data preparation:** DNA sequence and annotation file I/O, database downloads and queries, and validation.
+2. **Data processing:** sequence standardization and editing, transcription and translation, deduplication and clustering, and dataset splitting.
+3. **Data analysis:** DNA descriptors, representations and fingerprints, sequence and pattern searches, physicochemical and thermodynamic properties, and deep-learning property prediction.
+4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
+5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
+6. **Large language model tools:** a [Python API](docs/llm_tools/python_api.en.md), [MCP integration](docs/llm_tools/mcp.en.md), [Skills workflows](docs/llm_tools/skills.en.md), and a built-in [Agent](docs/llm_tools/agent.en.md) for general-purpose LLM calls and natural-language task execution.
+7. **Graphical interface and web demo:** the [web demo](http://47.122.120.132) runs in a browser with nothing to install; the [desktop app](docs/gui.en.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
+
 # Web demo and desktop app
 
 DNAKit also runs without writing code. The web demo and the desktop app share one interface:

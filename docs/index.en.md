@@ -15,6 +15,18 @@
   <a href="https://github.com/mapengsen/DNAKit/tree/main/packaging/guix">
     <img src="https://img.shields.io/badge/GNU%20Guix-package-A42E2B?logo=gnu&amp;logoColor=white" alt="GNU Guix package">
   </a>
+  <a href="http://47.122.120.132">
+    <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&amp;logoColor=white" alt="Web demo">
+  </a>
+  <a href="gui/">
+    <img src="https://img.shields.io/badge/GUI-Windows-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="GUI for Windows">
+  </a>
+  <a href="gui/">
+    <img src="https://img.shields.io/badge/GUI-macOS-000000?logo=apple&amp;logoColor=white" alt="GUI for macOS">
+  </a>
+  <a href="gui/">
+    <img src="https://img.shields.io/badge/GUI-Linux-FCC624?logo=linux&amp;logoColor=black" alt="GUI for Linux">
+  </a>
 </p>
 
 DNAKit is a reproducible analysis toolkit that makes DNA and gene operations convenient. It provides:
@@ -25,6 +37,7 @@ DNAKit is a reproducible analysis toolkit that makes DNA and gene operations con
 4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
 5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
 6. **Large language model tools:** provide a [Python API](llm_tools/python_api.md), [MCP integration](llm_tools/mcp.md), [Skills workflows](llm_tools/skills.md), and a built-in [Agent](llm_tools/agent.md) for general-purpose LLM calls and natural-language task execution.
+7. **Graphical interface and web demo:** the [web demo](http://47.122.120.132) runs in a browser with nothing to install; the [desktop app](gui.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
 
 # Support and community
 
