@@ -89,10 +89,10 @@ Python 和 MCP 调用），以及 Skills 目录。
 
 **桌面版：** 在自己电脑的窗口中运行同一界面，没有上述限制。
 
-| <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
-|:---:|:---:|:---:|
-| `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
-| `dnakit gui` | `dnakit gui` | `dnakit gui` |
+| **系统** | <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
+|:---|:---:|:---:|:---:|
+| **1. 安装** | `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
+| **2. 打开桌面版** | `dnakit gui` | `dnakit gui` | `dnakit gui` |
 
 在 PyPI 发布下一个版本之前，可以从 GitHub 安装：`pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"`（Linux 用 `gui-qt`）。桌面版在 Windows 上
 使用 WebView2，在 macOS 上使用 WebKit；Linux 上使用 GTK WebKit 或 Qt 后端，没有显示器的服务器会改用
