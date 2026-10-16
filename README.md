@@ -47,7 +47,7 @@
 
 <p align="center">
   <a href="https://dnakit.mapengsen.asia">
-    <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web demo">
+    <img src="https://img.shields.io/badge/Web%20App-online-2EA44F?logo=googlechrome&logoColor=white" alt="Web app">
   </a>
   <a href="https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md">
     <img src="https://img.shields.io/badge/GUI-Windows-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="GUI for Windows">
@@ -81,16 +81,16 @@ It provides:
 4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
 5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
 6. **Large language model tools:** a [Python API](docs/llm_tools/python_api.en.md), [MCP integration](docs/llm_tools/mcp.en.md), [Skills workflows](docs/llm_tools/skills.en.md), and a built-in [Agent](docs/llm_tools/agent.en.md) for general-purpose LLM calls and natural-language task execution.
-7. **Graphical interface and web demo:** the [web demo](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](docs/gui.en.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
+7. **Graphical interface and web app:** the [web app](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](docs/gui.en.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
 
-# Web demo and desktop app
+# Web app and desktop app
 
-DNAKit also runs without writing code. The web demo and the desktop app share one interface:
+DNAKit also runs without writing code. The web app and the desktop app share one interface:
 sequence tools (descriptors, ORFs, motifs, comparison), dataset tools (deduplication,
 train/valid/test split, format conversion, descriptor feature tables), every Agent-callable
 function with its equivalent Python and MCP call, and the Skills catalog.
 
-**Web demo:** open [https://dnakit.mapengsen.asia](https://dnakit.mapengsen.asia) in a browser, with nothing to install. It runs on a shared CPU,
+**Web app:** open [https://dnakit.mapengsen.asia](https://dnakit.mapengsen.asia) in a browser, with nothing to install. It runs on a shared CPU,
 so calls have a time limit and functions that write files, download models or run external
 programs are not executed.
 

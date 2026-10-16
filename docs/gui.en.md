@@ -6,7 +6,7 @@ and the MCP server, without writing code. It comes in two forms built from one c
 - **Desktop app**: `dnakit gui` opens a native window on your own computer. Files stay local,
   there is no time limit, and functions that write files, download model weights or run external
   programs run after you confirm them.
-- **Web demo**: the same page hosted on a server for trying DNAKit in a browser. It runs on a
+- **Web app**: the same page hosted on a server for trying DNAKit in a browser. It runs on a
   shared CPU with time limits and does not execute functions with side effects.
 
 ## Install and start
@@ -28,7 +28,7 @@ interface in your default web browser.
 | `--browser` | Open in the default web browser instead of a window |
 | `--no-open` | Only serve the page, e.g. on a remote server |
 | `--host`, `--port` | Address and port to serve on (default `127.0.0.1`, first free port from 7860) |
-| `--public-demo` | Apply the web-demo restrictions described below |
+| `--public-demo` | Apply the web-app restrictions described below |
 
 On a remote server without a desktop, run `dnakit gui --no-open --port 7860` and open the page
 through SSH port forwarding (`ssh -L 7860:127.0.0.1:7860 server`) or your editor's port
@@ -47,9 +47,9 @@ forwarding.
 Every result shows the equivalent command line, Python call and, in the function explorer, the
 MCP request an agent sends, so a task tried in the interface can be scripted directly.
 
-## Desktop app and web demo
+## Desktop app and web app
 
-| | Desktop app (`GuiSettings.local`) | Web demo (`GuiSettings.public_demo`) |
+| | Desktop app (`GuiSettings.local`) | Web app (`GuiSettings.public_demo`) |
 |---|---|---|
 | Files | Saved in the work folder | Per-visitor temporary folder, deleted after 6 hours |
 | Time limit per call | None (a **Stop** button ends a call) | 60 s |
@@ -66,7 +66,7 @@ Single-sequence tools accept up to 30,000 nt because the sequence is passed on t
 from dnakit.gui import GuiSettings, build_app, launch
 
 launch(GuiSettings.local("results"))  # desktop window, results in ./results
-demo = build_app(GuiSettings.public_demo())  # Gradio Blocks app for your own server
+app = build_app(GuiSettings.public_demo())  # Gradio Blocks app for your own server
 ```
 
-`packaging/README.md` describes the systemd and nginx configuration used for the hosted demo.
+`packaging/README.md` describes the systemd and nginx configuration used for the hosted web app.

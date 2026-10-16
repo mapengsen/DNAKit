@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/badge/Skills-agent%20workflows-D97757?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMyAxIDMgMTRoN2wtMS41IDlMMjAgOS41aC03LjJ6Ii8+PC9zdmc+" alt="Agent Skills">
   </a>
   <a href="https://dnakit.mapengsen.asia">
-    <img src="https://img.shields.io/badge/Web%20demo-online-2EA44F?logo=googlechrome&amp;logoColor=white" alt="Web demo">
+    <img src="https://img.shields.io/badge/Web%20App-online-2EA44F?logo=googlechrome&amp;logoColor=white" alt="Web app">
   </a>
   <a href="gui/">
     <img src="https://img.shields.io/badge/GUI-Windows-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="GUI for Windows">
@@ -43,7 +43,7 @@ DNAKit is a reproducible analysis toolkit that makes DNA and gene operations con
 4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
 5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
 6. **Large language model tools:** provide a [Python API](llm_tools/python_api.md), [MCP integration](llm_tools/mcp.md), [Skills workflows](llm_tools/skills.md), and a built-in [Agent](llm_tools/agent.md) for general-purpose LLM calls and natural-language task execution.
-7. **Graphical interface and web demo:** the [web demo](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](gui.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
+7. **Graphical interface and web app:** the [web app](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](gui.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
 
 # Support and community
 
