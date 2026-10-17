@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import re
+from importlib import resources
+from pathlib import Path
 from typing import Any
 
 import gradio as gr
@@ -29,7 +32,8 @@ MONO = ["SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", "DejaVu Sans M
 
 CSS = """
 .gradio-container {max-width: 1180px !important; margin: auto;}
-#hero h1 {margin-bottom: 0.2rem;}
+#hero h1 {margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.45em;}
+#hero h1 img.dk-logo {height: 1.5em; width: auto; margin: 0;}
 #hero p {margin-top: 0; color: var(--body-text-color-subdued);}
 .dk-plot {display: flex; justify-content: center;}
 .dk-plot svg {width: 100%; max-width: 480px; height: auto;}
@@ -85,10 +89,22 @@ Source: <https://github.com/mapengsen/DNAKit>
 """
 
 
+def logo_path() -> Path:
+    """Return the bundled DNAKit logo (also the window and browser-tab icon)."""
+
+    return Path(str(resources.files("dnakit.gui").joinpath("assets/dnakit-icon.png")))
+
+
+def _logo_html() -> str:
+    data = base64.b64encode(logo_path().read_bytes()).decode("ascii")
+    return f'<img class="dk-logo" src="data:image/png;base64,{data}" alt="DNAKit logo">'
+
+
 def _hero(backend: GuiBackend) -> str:
     settings = backend.settings
     head = (
-        "# DNAKit\nA unified DNA toolkit for Python, the command line and AI agents: "
+        f"# {_logo_html()} DNAKit\n"
+        "A unified DNA toolkit for Python, the command line and AI agents: "
         f"**{backend.stats['agent_compatible']:,} functions** in {backend.stats['categories']} "
         f"modules and **{backend.skill_total} workflow Skills**. Version {dnakit.__version__}. "
     )
@@ -365,6 +381,7 @@ def launch_options(settings: GuiSettings) -> dict[str, Any]:
         "css": CSS,
         "allowed_paths": [str(settings.workdir)],
         "footer_links": ["api", "gradio"],
+        "favicon_path": str(logo_path()),
     }
     if settings.max_upload_mb:
         options["max_file_size"] = f"{settings.max_upload_mb}mb"
