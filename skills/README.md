@@ -2,7 +2,7 @@
 
 DNA／基因组学技能集合：统一搜索、按需安装、保留原作者及许可证。
 
-当前快照：2026-09-20。共 **573** 个技能：563 个 DNA 相关工作流、9 个组合流程必需的辅助技能、1 个 DNAKit 入口。
+当前快照：2026-09-25。共 **575** 个技能：563 个 DNA 相关工作流、9 个组合流程必需的辅助技能、1 个 DNAKit 入口。
 
 每个子目录包含一个 `SKILL.md` 及所需辅助文件；原始来源和修改记录保留在 `UPSTREAM.md`。运行依赖以各技能说明为准。
 
@@ -34,7 +34,7 @@ dnakit skills cite variant-annotation
 | clawbio | 20 |
 | damlab | 2 |
 | deepmind | 7 |
-| dnakit | 7 |
+| dnakit | 9 |
 | encode-toolkit | 16 |
 | feynman | 1 |
 | genetic-counseling | 6 |
@@ -644,7 +644,7 @@ dnakit skills cite variant-annotation
 | [parabricks](parabricks/SKILL.md) | bionemo | Route NVIDIA Parabricks pbrun tools, assess GPU/runtime readiness, and provide version-aware command guidance for FASTQ/BAM processing, RNA-seq, variant calling, BAM QC, and GVC... |
 | [tangermeme](tangermeme/SKILL.md) | tangermeme | Use for any task involving the tangermeme library — post-training analysis of genomic sequence-to-function (S2F) deep learning models. Triggers on predictions, DeepLIFT/SHAP att... |
 
-### 组合流程与技能入口 / Composite workflows and skill discovery (75)
+### 组合流程与技能入口 / Composite workflows and skill discovery (77)
 
 | Skill | 来源 | 用途 |
 | --- | --- | --- |
@@ -658,6 +658,8 @@ dnakit skills cite variant-annotation
 | [data-provenance](data-provenance/SKILL.md) | encode-toolkit | Track exact provenance for every operation on ENCODE data — tool versions, reference files, scripts, parameters, and timestamps — to enable publication-ready methods writing. Us... |
 | [dnakit](dnakit/SKILL.md) | dnakit | Find and use curated DNA and genomics workflows from the DNAKit skill catalog. Use for DNA sequence processing, sequencing QC, alignment, assembly, variant analysis, GWAS, popul... |
 | [dnakit-external-genomics](dnakit-external-genomics/SKILL.md) | dnakit | Discover reviewed DNA projects, run registered external genomics analyses and connect to registered scientific MCP servers through DNAKit. Use when a workflow needs an optional ... |
+| [dnakit-plan](dnakit-plan/SKILL.md) | dnakit | 在执行前规划多步骤 DNAKit 基因组学任务。适用于用户希望 Codex 检查 DNAKit 能力、确认关键选择，并保存经确认的 Markdown 计划供后续会话执行的情况；不用于立即执行任务或回答简单事实问题。 |
+| [dnakit-tool-generation](dnakit-tool-generation/SKILL.md) | dnakit | 为 DNAKit 设计、实现和验证可复用的新工具。先检查现有工具和工作流能否满足需求，再实现一个或多个候选工具；适用于支持 DNAKit MCP 或等效工具接口的 Agent。 |
 | [dnanexus-integration](dnanexus-integration/SKILL.md) | kdense | Build and operate reproducible genomics workloads on DNAnexus with the dx CLI, dxpy, apps/applets, native workflows, dxCompiler, and Nextflow. Use for DNAnexus data transfers, d... |
 | [encode-toolkit-setup](encode-toolkit-setup/SKILL.md) | encode-toolkit | Set up ENCODE access through DNAKit, including MCP discovery, public queries, credentials and connection troubleshooting. |
 | [experimental-design-batch-design](experimental-design-batch-design/SKILL.md) | bioskills | Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable o... |

@@ -14,7 +14,7 @@
 | license_review | 13 |
 | quality_review | 3 |
 
-后续新增 18 个上游技能见 [genomics-new-skills.json](genomics-new-skills.json)，6 个原生流程见 [genomics-native-skills.json](genomics-native-skills.json)。用户提供的 335 项清单另补 13 个技能，见 [user-catalog-skills.json](user-catalog-skills.json)；[选择与排除审查](user-catalog-skills-review.json)记录逐来源处理及验证范围。最终分发 574 个技能，其中包含 DNAKit 检索入口 `dnakit` 和规划入口 `dnakit-plan`。
+后续新增 18 个上游技能见 [genomics-new-skills.json](genomics-new-skills.json)，6 个原生流程见 [genomics-native-skills.json](genomics-native-skills.json)。用户提供的 335 项清单另补 13 个技能，见 [user-catalog-skills.json](user-catalog-skills.json)；[选择与排除审查](user-catalog-skills-review.json)记录逐来源处理及验证范围。最终分发 575 个技能，其中包含 DNAKit 检索入口 `dnakit` 和规划入口 `dnakit-plan`。
 
 ## 选择与去重方法
 

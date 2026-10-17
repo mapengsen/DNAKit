@@ -95,6 +95,7 @@ def test_full_build_replays_extensions_after_baseline_adaptations(
     }
     native = {**baseline, "id": "dnakit", "capability": "entry"}
     planning = {**baseline, "id": "dnakit-plan", "capability": "planning"}
+    generation = {**baseline, "id": "dnakit-tool-generation", "capability": "tool-generation"}
     added = {**baseline, "id": "added", "capability": "added"}
     events = []
 
@@ -103,7 +104,12 @@ def test_full_build_replays_extensions_after_baseline_adaptations(
         return [], []
 
     def adapt(records, decisions):
-        assert {row["id"] for row in records} == {"existing", "dnakit", "dnakit-plan"}
+        assert {row["id"] for row in records} == {
+            "existing",
+            "dnakit",
+            "dnakit-plan",
+            "dnakit-tool-generation",
+        }
         events.append("adapt")
 
     def merge(records):
@@ -119,6 +125,7 @@ def test_full_build_replays_extensions_after_baseline_adaptations(
     monkeypatch.setattr(build, "import_selected", lambda sources, selected: [baseline])
     monkeypatch.setattr(build, "entry_record", lambda: native)
     monkeypatch.setattr(build, "plan_entry_record", lambda: planning)
+    monkeypatch.setattr(build, "tool_generation_entry_record", lambda: generation)
     monkeypatch.setattr(build, "apply_adaptations", adapt)
     monkeypatch.setattr(build, "merge_records", merge)
     monkeypatch.setattr(build, "merge_decisions", lambda decisions: decisions)
@@ -135,6 +142,7 @@ def test_full_build_replays_extensions_after_baseline_adaptations(
         "existing",
         "dnakit",
         "dnakit-plan",
+        "dnakit-tool-generation",
         "added",
     }
     assert events == ["preflight", "adapt", "merge"]

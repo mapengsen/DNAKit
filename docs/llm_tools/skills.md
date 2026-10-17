@@ -67,6 +67,16 @@ $dnakit-plan 下载 hg38 参考基因组并准备训练数据。
 
 Skill 要求先通过 DNAKit MCP 搜索所需工具并核对参数，在 Markdown 中逐步列出具体工具名、关键参数、输入输出和验收方法；关键问题、确认后保存以及停止执行也由 Skill 规定。按提示回答问题并确认最终方案即可；在允许写文件的模式中，Codex 会保存到 `plans/`，无需重复说明这些规则。下次只需说“按 `plans/<任务名>.md` 执行”。`/plan` 是可选的额外规划模式；若该模式不允许写文件，确认后切回普通模式再保存。规划 Skill 提供流程指引；若必须由程序保证“未经确认绝不执行”，还需在调用 Codex 的入口设置独立的确认门禁。
 
+### 用 `dnakit-tool-generation` 补充缺少的工具
+
+`dnakit-tool-generation` 指导 Agent 为 DNAKit 新增可复用的工具。它先通过 DNAKit MCP 搜索、查看并调用已有工具，只有已有工具确实无法满足需求时才提出新工具。计划确认后，它在单独的、固定 commit 的候选代码目录中实现一个或多个候选工具，并运行公开检查。登记 manifest、重启 MCP 和提交代码由独立评测程序决定，Skill 本身不做这些操作。
+
+```bash
+dnakit skills install dnakit-tool-generation --agent codex
+```
+
+使用前需要连接 DNAKit MCP，并准备固定 commit 的候选代码目录和预先配置好的 `admet_ai` conda 环境；安装 Skill 不会配置这些环境。
+
 ## 3. 自己搜索并安装某个技能
 
 ```bash

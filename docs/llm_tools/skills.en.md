@@ -63,6 +63,16 @@ $dnakit-plan Download the hg38 reference genome and prepare training data.
 
 The skill requires Codex to search DNAKit MCP for the needed tools, inspect their schemas, and record the exact tool names, key arguments, inputs, outputs, and checks for each step in the Markdown plan. It also defines consequential questions, saving after confirmation, and stopping before execution. Answer its questions and confirm the final plan; in a mode that permits file writes, Codex saves it under `plans/` without another workflow prompt. In a later session, simply ask Codex to execute `plans/<task-name>.md`. `/plan` is an optional extra planning mode; if it prevents file writes, switch back to regular mode after confirming the plan. A skill guides this process; a program-level confirmation gate is needed when execution before approval must be impossible.
 
+## Build a missing tool with `dnakit-tool-generation`
+
+`dnakit-tool-generation` guides an Agent through adding a reusable tool to DNAKit. It first uses DNAKit MCP to search, describe and call existing tools, and proposes a new tool only when they cannot meet the request. After the plan is approved, it implements one or more candidate tools in a separate, pinned candidate worktree and runs the public checks. Registering the tool in the manifest, restarting MCP and committing code are left to an independent evaluation program; the skill never does them itself.
+
+```bash
+dnakit skills install dnakit-tool-generation --agent codex
+```
+
+It needs a connected DNAKit MCP, a pinned candidate worktree and the preconfigured `admet_ai` conda environment. Installing the skill does not set any of these up.
+
 ## Find and install an individual workflow
 
 ```bash

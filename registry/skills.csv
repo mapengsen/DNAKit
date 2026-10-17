@@ -173,6 +173,7 @@ dnakit-genomic-breeding,breeding,dnakit-genomic-breeding,dnakit,MIT,dnakit-genom
 dnakit-methylation-summary,epigenomics,dnakit-methylation-summary,dnakit,MIT,dnakit-genomics-2026-09-20,https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-methylation-summary
 dnakit-plan,workflows,dnakit-planning,dnakit,MIT,dnakit-plan-2026-09-25,https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-plan
 dnakit-prokaryotic-genes,annotation,dnakit-prokaryotic-genes,dnakit,MIT,dnakit-genomics-2026-09-20,https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-prokaryotic-genes
+dnakit-tool-generation,workflows,dnakit-tool-generation,dnakit,MIT,dnakit-tool-generation-2026-10-16,https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-tool-generation
 dnanexus-integration,workflows,dnanexus-integration,kdense,MIT,c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34,https://github.com/K-Dense-AI/scientific-agent-skills/tree/c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34/skills/dnanexus-integration
 dom-biosurfactant,metagenomics,dom-biosurfactant,pku-metagenomics,MIT,e0e19a600d9916736c0713e7659dec3782c51258,https://github.com/PKU-EMBL/Metagenomics-Skills/tree/e0e19a600d9916736c0713e7659dec3782c51258/skills/dom-biosurfactant
 draft-counseling-summary,clinical,draft-counseling-summary,genetic-counseling,MIT,eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4,https://github.com/muwenbo/genetic-counseling-skills/tree/eda3cc5dace5ebed128dd14fa0f12e5bf2e16ff4/plugins/rare-disease-genetic-counseling/skills/draft-counseling-summary

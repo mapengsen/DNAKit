@@ -50,7 +50,8 @@ REGISTRY = ROOT / "registry"
 WORK = ROOT / "temp" / "dnakit-skills-work"
 DATE = "2026-09-12"
 PLAN_DATE = "2026-09-25"
-OWNED_SKILLS = {"dnakit", "dnakit-plan"}
+TOOL_GENERATION_DATE = "2026-10-16"
+OWNED_SKILLS = {"dnakit", "dnakit-plan", "dnakit-tool-generation"}
 ENV = {**os.environ, "GIT_LFS_SKIP_SMUDGE": "1", "GIT_TERMINAL_PROMPT": "0"}
 EQUIVALENCE = {name: group for group, names in EQUIVALENT.items() for name in names}
 
@@ -811,6 +812,52 @@ def plan_entry_record():
     }
 
 
+def tool_generation_entry_record():
+    """Record DNAKit's skill for planning, implementing and checking new candidate tools."""
+    directory = ROOT / "skills" / "dnakit-tool-generation"
+    (directory / "LICENSE").write_bytes((ROOT / "LICENSE").read_bytes())
+    metadata, _, _ = parse_skill((directory / "SKILL.md").read_bytes())
+    return {
+        "id": "dnakit-tool-generation",
+        "description": metadata["description"],
+        "summary_zh": "确认已有能力后为 DNAKit 设计、实现和验证新工具",
+        "category": "workflows",
+        "capability": "dnakit-tool-generation",
+        "source_id": "dnakit",
+        "license": "MIT",
+        "upstream_name": "DNAKit tool generation skill",
+        "upstream_url": "https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-tool-generation",
+        "upstream_revision": "dnakit-tool-generation-" + TOOL_GENERATION_DATE,
+        "attribution": "DNAKit contributors",
+        "citation_guidance": (
+            "Cite the DNAKit software version and the data, tools, and papers used by "
+            "any generated tool. No paper DOI has been assigned to this skill."
+        ),
+        "aliases": [],
+        "keywords": [
+            "DNAKit",
+            "MCP",
+            "tool generation",
+            "new tool",
+            "candidate tool",
+            "工具生成",
+            "新工具",
+        ],
+        "runtime": {
+            "python_modules": ["dnakit"],
+            "commands": [],
+            "environment": [],
+            "manual_checks": [
+                "Connect DNAKit MCP for tool discovery and calls.",
+                "Prepare a pinned candidate worktree and the admet_ai conda environment.",
+            ],
+        },
+        "required_skills": [],
+        "validation": {"metadata": "passed", "resources": "checksummed", "execution": "not_run"},
+        "files": file_manifest(directory),
+    }
+
+
 def disambiguate_aliases(records):
     """A shared name is searchable metadata, never an arbitrary install redirect."""
     identifiers = {entry["id"] for entry in records}
@@ -903,7 +950,12 @@ def main():
         return
     old_catalog = REGISTRY / "catalog.json"
     preflight(json.loads(old_catalog.read_text())["skills"] if old_catalog.exists() else [])
-    records = [*import_selected(baseline_sources, selected), entry_record(), plan_entry_record()]
+    records = [
+        *import_selected(baseline_sources, selected),
+        entry_record(),
+        plan_entry_record(),
+        tool_generation_entry_record(),
+    ]
     apply_adaptations(records, decisions)
     records = merge_records(records)
     decisions = merge_decisions(decisions)

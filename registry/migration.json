@@ -5076,6 +5076,28 @@
       "execution_validation": "not_run"
     },
     {
+      "id": "dnakit-tool-generation",
+      "original_id": "dnakit-tool-generation",
+      "source": "dnakit",
+      "upstream_revision": "dnakit-tool-generation-2026-10-16",
+      "integration": "scientific-backend-retained",
+      "native_functions": [],
+      "scripts": [],
+      "retained_runtime": {
+        "python_modules": [
+          "dnakit"
+        ],
+        "commands": [],
+        "environment": [],
+        "manual_checks": [
+          "Connect DNAKit MCP for tool discovery and calls.",
+          "Prepare a pinned candidate worktree and the admet_ai conda environment."
+        ]
+      },
+      "changed_resources": [],
+      "execution_validation": "not_run"
+    },
+    {
       "id": "dnanexus-integration",
       "original_id": "dnanexus-integration",
       "source": "kdense",

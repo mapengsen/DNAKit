@@ -28535,6 +28535,73 @@
       ]
     },
     {
+      "id": "dnakit-tool-generation",
+      "description": "为 DNAKit 设计、实现和验证可复用的新工具。先检查现有工具和工作流能否满足需求，再实现一个或多个候选工具；适用于支持 DNAKit MCP 或等效工具接口的 Agent。",
+      "summary_zh": "确认已有能力后为 DNAKit 设计、实现和验证新工具",
+      "category": "workflows",
+      "capability": "dnakit-tool-generation",
+      "source_id": "dnakit",
+      "license": "MIT",
+      "upstream_name": "DNAKit tool generation skill",
+      "upstream_url": "https://github.com/mapengsen/DNAKit/tree/main/skills/dnakit-tool-generation",
+      "upstream_revision": "dnakit-tool-generation-2026-10-16",
+      "attribution": "DNAKit contributors",
+      "citation_guidance": "Cite the DNAKit software version and the data, tools, and papers used by any generated tool. No paper DOI has been assigned to this skill.",
+      "aliases": [],
+      "keywords": [
+        "DNAKit",
+        "MCP",
+        "tool generation",
+        "new tool",
+        "candidate tool",
+        "工具生成",
+        "新工具"
+      ],
+      "runtime": {
+        "python_modules": [
+          "dnakit"
+        ],
+        "commands": [],
+        "environment": [],
+        "manual_checks": [
+          "Connect DNAKit MCP for tool discovery and calls.",
+          "Prepare a pinned candidate worktree and the admet_ai conda environment."
+        ]
+      },
+      "required_skills": [],
+      "validation": {
+        "metadata": "passed",
+        "resources": "checksummed",
+        "execution": "not_run"
+      },
+      "files": [
+        {
+          "path": "DNAKIT.md",
+          "sha256": "19725f47758ed1b1464c5fe898d9a99bb7c84f852aabf619c77a32ad1497061b",
+          "bytes": 747,
+          "mode": 420
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "3c4df606fa5c7bc5210a737312742d8785c6fa9cae5c50b3dbb51a9918b6250c",
+          "bytes": 1067,
+          "mode": 420
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "3d211eedeb9bd180bb5543368cf5d267141cf7524de3748b3d85e96fe376868c",
+          "bytes": 9315,
+          "mode": 420
+        },
+        {
+          "path": "UPSTREAM.md",
+          "sha256": "0ff811903ba4fa01243484659fcfd58d5461c52d096e365682c78f9829322540",
+          "bytes": 355,
+          "mode": 420
+        }
+      ]
+    },
+    {
       "id": "dnanexus-integration",
       "role": "dna_workflow",
       "description": "Build and operate reproducible genomics workloads on DNAnexus with the dx CLI, dxpy, apps/applets, native workflows, dxCompiler, and Nextflow. Use for DNAnexus data transfers, dxapp.json development, execution monitoring, workflow import, and project automation.",

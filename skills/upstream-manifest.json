@@ -875,6 +875,11 @@
       "revision": "dnakit-genomics-2026-09-20"
     },
     {
+      "id": "dnakit-tool-generation",
+      "source": "dnakit",
+      "revision": "dnakit-tool-generation-2026-10-16"
+    },
+    {
       "id": "dnanexus-integration",
       "source": "kdense",
       "revision": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34"
