@@ -26673,14 +26673,14 @@
     {
       "capability_id": "CAP-0450",
       "module": "knowledge_graph",
-      "operation": "deidentify_genomic_metadata",
-      "api": "dnakit.knowledge_graph.deidentify_genomic_metadata",
+      "operation": "pseudonymize_genomic_metadata_fields",
+      "api": "dnakit.knowledge_graph.pseudonymize_genomic_metadata_fields",
       "effect": "local_adapter",
       "status": "adapter_candidate",
       "limitations": "Local adapter validates and normalizes the typed input and returns a structured dependency status; the scientific backend remains selectable through options.",
       "input_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "deidentify_genomic_metadata input",
+        "title": "pseudonymize_genomic_metadata_fields input",
         "type": "object",
         "properties": {
           "input": {},
@@ -26695,7 +26695,7 @@
       },
       "output_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "deidentify_genomic_metadata output",
+        "title": "pseudonymize_genomic_metadata_fields output",
         "description": "Candidate output; concrete scientific fields are operation-specific. Binary staging values require an explicit future MCP serialization policy.",
         "oneOf": [
           {
@@ -30001,14 +30001,14 @@
     {
       "capability_id": "CAP-0516",
       "module": "ml_models",
-      "operation": "export_uncertainty_model",
-      "api": "dnakit.ml_models.export_uncertainty_model",
+      "operation": "export_conformal_uncertainty_model",
+      "api": "dnakit.ml_models.export_conformal_uncertainty_model",
       "effect": "local_adapter",
       "status": "adapter_candidate",
       "limitations": "Local adapter validates and normalizes the typed input and returns a structured dependency status; the scientific backend remains selectable through options.",
       "input_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "export_uncertainty_model input",
+        "title": "export_conformal_uncertainty_model input",
         "type": "object",
         "properties": {
           "input": {},
@@ -30023,7 +30023,7 @@
       },
       "output_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "export_uncertainty_model output",
+        "title": "export_conformal_uncertainty_model output",
         "description": "Candidate output; concrete scientific fields are operation-specific. Binary staging values require an explicit future MCP serialization policy.",
         "oneOf": [
           {
@@ -44240,14 +44240,14 @@
     {
       "capability_id": "CAP-0774",
       "module": "variants",
-      "operation": "calculate_identity_by_descent",
-      "api": "dnakit.variants.calculate_identity_by_descent",
+      "operation": "calculate_kinship_king",
+      "api": "dnakit.variants.calculate_kinship_king",
       "effect": "local_adapter",
       "status": "adapter_candidate",
       "limitations": "Local adapter validates and normalizes the typed input and returns a structured dependency status; the scientific backend remains selectable through options.",
       "input_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "calculate_identity_by_descent input",
+        "title": "calculate_kinship_king input",
         "type": "object",
         "properties": {
           "input": {},
@@ -44262,7 +44262,7 @@
       },
       "output_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "calculate_identity_by_descent output",
+        "title": "calculate_kinship_king output",
         "description": "Candidate output; concrete scientific fields are operation-specific. Binary staging values require an explicit future MCP serialization policy.",
         "oneOf": [
           {
@@ -45696,14 +45696,14 @@
     {
       "capability_id": "CAP-0802",
       "module": "variants",
-      "operation": "impute_missing_genotypes",
-      "api": "dnakit.variants.impute_missing_genotypes",
+      "operation": "fill_missing_genotypes_with_mode",
+      "api": "dnakit.variants.fill_missing_genotypes_with_mode",
       "effect": "local_adapter",
       "status": "adapter_candidate",
       "limitations": "Local adapter validates and normalizes the typed input and returns a structured dependency status; the scientific backend remains selectable through options.",
       "input_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "impute_missing_genotypes input",
+        "title": "fill_missing_genotypes_with_mode input",
         "type": "object",
         "properties": {
           "input": {},
@@ -45718,7 +45718,7 @@
       },
       "output_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "impute_missing_genotypes output",
+        "title": "fill_missing_genotypes_with_mode output",
         "description": "Candidate output; concrete scientific fields are operation-specific. Binary staging values require an explicit future MCP serialization policy.",
         "oneOf": [
           {
@@ -47880,14 +47880,14 @@
     {
       "capability_id": "CAP-0846",
       "module": "workflow_security",
-      "operation": "remove_phi_from_metadata",
-      "api": "dnakit.workflow_security.remove_phi_from_metadata",
+      "operation": "pseudonymize_metadata_fields",
+      "api": "dnakit.workflow_security.pseudonymize_metadata_fields",
       "effect": "local_adapter",
       "status": "adapter_candidate",
       "limitations": "Local adapter validates and normalizes the typed input and returns a structured dependency status; the scientific backend remains selectable through options.",
       "input_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "remove_phi_from_metadata input",
+        "title": "pseudonymize_metadata_fields input",
         "type": "object",
         "properties": {
           "input": {},
@@ -47902,7 +47902,7 @@
       },
       "output_schema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "remove_phi_from_metadata output",
+        "title": "pseudonymize_metadata_fields output",
         "description": "Candidate output; concrete scientific fields are operation-specific. Binary staging values require an explicit future MCP serialization policy.",
         "oneOf": [
           {

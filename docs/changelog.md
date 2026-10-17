@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+- 将 615 个原先只返回输入摘要、状态却为 `ok` 的候选函数改为真实实现，涉及 `io_formats`、`variants`、`clinical`、`gwas`、`singlecell_spatial`、`transcriptomics`、`ml_models`、`knowledge_graph`、`sequencing_qc`、`assembly`、`microbiome` 等 29 个模块。约 518 个函数按各自文档定义计算结果或校验输入；97 个在不带选项的普通调用下返回 `status: "not_implemented"`，并附 `required_dependency` 和 `message` 说明缺少什么（外部数据库、训练好的模型、比对或变异检测软件、必要选项，或函数名没有确定含义），不再返回伪成功。启发式或近似算法（如基于规则的 CRISPR 打分、k-mer 近似 ANI、KING 亲缘系数）在函数说明里写明定义。
+- 重命名三个名字与实际行为不符的函数：`variants.impute_missing_genotypes` 改为 `fill_missing_genotypes_with_mode`（按位点取最常见基因型），`variants.calculate_identity_by_descent` 改为 `calculate_kinship_king`（KING 亲缘系数，不是 IBD 片段），`ml_models.export_uncertainty_model` 改为 `export_conformal_uncertainty_model`（split-conformal 区间）。旧名在 0.2.0 中只是不能工作的占位函数，不保留别名。
+- `design_crispr.calculate_primer_tm` 和 `evaluate_primer_pair` 改为真实现：前者长度不超过 13 nt 用 Wallace 规则（`ATGCATGCAT` 为 28 °C），更长的用 `dnakit.thermodynamics` 的最近邻法；后者给出正反向引物各自的 Tm、GC、GC 夹和两引物间的互补性，并按可调阈值给出标志。返回结构改为 `primers` / `forward` / `reverse`。`encode_data_into_dna` 对字节和文件按真实字节编码，不再编码成 JSON 文本。
+- 脱敏函数改名并重做：`workflow_security.remove_phi_from_metadata` 改为 `pseudonymize_metadata_fields`，`knowledge_graph.deidentify_genomic_metadata` 改为 `pseudonymize_genomic_metadata_fields`。旧实现只处理最外层的几个键，并用不加盐的 SHA-256 前缀，姓名可被猜出。新实现递归处理嵌套字段，默认整体替换（`redact`），可选 `drop` 或带盐的 HMAC（`hash`，必须提供盐），并扫描文本中的邮箱、电话和 SSN；输入不是映射时报错；返回结果不含明文或明文的哈希，始终警告“只按键名和模式匹配，不保证真正脱敏”。
+- `io_formats` 的 16 个 `compress_*` / `decompress_*` 改为对字节无损：文本、二进制、文件路径都能逐字节往返，zarr 目录先打成 tar 再 gzip，解压时拒绝绝对路径、`..` 和链接；gzip 结果固定（同样输入每次相同）；无效或损坏的载荷现在报错，不再返回 `ok`。`validate_map` / `validate_ped` / `validate_paf` 对每一行报告全部问题，不再泄露 Python 原始异常信息；`write_phylip` 按 `datatype` 校验字符；`index_map` 报告重复 ID；`convert_nexus` 转换矩阵并提示丢弃了树。
+- 修复若干与说明不符的行为：`epigenome.calculate` 的区间重叠不再把一个区间重复计数；`genome3d.annotate` 默认报告 TAD 边缘域（`include_edge_domains`）；`detect_de_novo_variants` 的 `rejected_by` 取固定顺序的第一个失败检查；`infer_parentage` 新增 `not_assessed`；`reconstruct` 的 `log_likelihood` 取最终频率；`experimental_design.check` / `export` / `validate` 接受 `design()` 的完整返回值；`external_adapters.build_command` 新增 `subcommand`；`extract_barcodes` 的 `n_extracted` 只计提取到的读段并新增 `n_unmatched`；`build_cell_peak_matrix` 的字段 `n_genes` 改为 `n_peaks`；遗传相关系数超出 [-1, 1]、遗传力超出 [0, 1]、缺少人群频率、分不开的亲缘关系都会给出警告；一批函数说明改为与实际行为一致。
+- 所有候选函数返回的 `input_summary` 按输入的真实格式统计：FASTQ 的质量字符、Newick 的标签和 `None` 不再被数成碱基。
+- 工具目录登记新实现函数的真实副作用：会写文件的 142 个函数（仅在传入输出路径时写入，默认不覆盖）需要文件系统授权，调用外部程序的 9 个和加载或训练模型的 4 个需要相应授权，Agent 须设置 `allow_side_effects` 才能调用。
+- 重写 `docs/api/features/candidate_catalog/` 中 29 个模块、约 640 个函数的中英文小节（含 615 个新实现的函数，以及压缩、解压、计数、引物 Tm、元数据脱敏等 24 个原本就可用但被写成“本地适配器”的函数）：给出真实的作用、方法、输入、输出，示例均实际运行并粘贴真实输出，并删去“只报告缺少依赖”的旧说明。其余约 200 个函数（如 `fasta_fastq`、`sequence`、`alignment`）原本就是真实现，小节保持原样。
 - MCP 目录新增 17 个第三方服务器（共 49 个），每个条目固定上游提交、记录许可证、环境变量和对外影响；12 个已通过 stdio 实际启动并核对工具名。未收录 10 个候选，原因见文档 110。
 
 ## [0.2.0] - 2026-10-13

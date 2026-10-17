@@ -262,6 +262,16 @@ _EXTERNAL_PROCESS_NAMES = frozenset(
         "dnakit.epigenome.extract_methylation_methyldackel",
     }
 )
+from ._candidate_effects import (  # noqa: E402  (extends the sets above with the implemented candidates)
+    CANDIDATE_EXTERNAL_PROCESS_NAMES,
+    CANDIDATE_FILESYSTEM_NAMES,
+    CANDIDATE_MODEL_NAMES,
+)
+
+_MODEL_NAMES = _MODEL_NAMES | CANDIDATE_MODEL_NAMES
+_EXTERNAL_PROCESS_NAMES = _EXTERNAL_PROCESS_NAMES | CANDIDATE_EXTERNAL_PROCESS_NAMES
+_FILESYSTEM_NAMES = _FILESYSTEM_NAMES | CANDIDATE_FILESYSTEM_NAMES
+
 _NETWORK_PREFIXES = (
     "dnakit.databases.",
     "dnakit.annotation.",

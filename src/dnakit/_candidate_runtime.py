@@ -123,6 +123,77 @@ def _summary(value: object) -> dict[str, object]:
     }
 
 
+_SEQUENCE_CHARS = frozenset("ACGTUNRYKMSWBDHVacgtunrykmswbdhv-*.")
+_NEWICK = re.compile(r"^\s*\(.*\)[^()]*;\s*$", re.S)
+
+
+def _fasta_like(lines: list[str]) -> tuple[int, list[int]]:
+    lengths: list[int] = []
+    for line in lines:
+        if line.startswith(">"):
+            lengths.append(0)
+        elif lengths:
+            lengths[-1] += len(re.sub(r"\s", "", line))
+    return len(lengths), [n for n in lengths if n]
+
+
+def _text_summary_counts(text: str) -> tuple[int, list[int]]:
+    """Record count and sequence lengths of a text input, by its format (FASTA, FASTQ, Newick, bare sequence, other)."""
+
+    stripped = text.strip()
+    if not stripped:
+        return 0, []
+    lines = [line.rstrip("\r") for line in stripped.splitlines()]
+    if lines[0].startswith(">"):
+        return _fasta_like(lines)
+    if lines[0].startswith("@") and len(lines) % 4 == 0 and all(
+        lines[i].startswith("+") for i in range(2, len(lines), 4)
+    ):
+        return len(lines) // 4, [len(seq.strip()) for seq in lines[1::4] if seq.strip()]
+    if _NEWICK.match(stripped):
+        return max(1, sum(1 for line in lines if line.rstrip().endswith(";"))), []
+    if all(line and set(line.replace(" ", "")) <= _SEQUENCE_CHARS for line in map(str.strip, lines)):
+        sequence_lines = [re.sub(r"\s", "", line) for line in lines]
+        return len(sequence_lines), [len(line) for line in sequence_lines if line]
+    if len(lines) == 1 and not re.search(r"\s", stripped):
+        return 1, []  # a single word, file name or path: one item, no bases
+    return len(lines), []
+
+
+def _input_summary(value: object) -> dict[str, object]:
+    """Summary of the input for the response envelope: counts that match what the input really is.
+
+    FASTA/FASTQ/Newick text, bare sequences, mappings and record lists are counted by their format;
+    ``None``, paths, bytes and plain words contribute no bases (the old summary counted every letter of any text,
+    including FASTQ quality characters, Newick labels and the word ``None``).
+    """
+
+    if value is None:
+        return {"record_count": 0, "text_length": 0, "sequence_bases": 0, "lengths": [],
+                "sha256": hashlib.sha256(b"").hexdigest()}
+    if isinstance(value, Path):
+        text = str(value)
+        return {"record_count": 1, "text_length": len(text), "sequence_bases": 0, "lengths": [],
+                "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
+    if isinstance(value, (bytes, bytearray)):
+        data = bytes(value)
+        try:
+            records, lengths = _text_summary_counts(data.decode("utf-8"))
+        except UnicodeDecodeError:
+            records, lengths = 1, []
+        return {"record_count": records, "text_length": len(data), "sequence_bases": sum(lengths),
+                "lengths": lengths[:100], "sha256": hashlib.sha256(data).hexdigest()}
+    if isinstance(value, str):
+        records, lengths = _text_summary_counts(value)
+        return {"record_count": records, "text_length": len(value), "sequence_bases": sum(lengths),
+                "lengths": lengths[:100], "sha256": hashlib.sha256(value.encode("utf-8")).hexdigest()}
+    if isinstance(value, (bool, int, float)):
+        text = _text(value)
+        return {"record_count": 1, "text_length": len(text), "sequence_bases": 0, "lengths": [],
+                "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
+    return _summary(value)
+
+
 def _n_stat(lengths: list[int], fraction: float) -> int:
     if not lengths:
         return 0
@@ -165,6 +236,11 @@ def _local_result(module: str, operation: str, value: object, options: Mapping[s
             if running >= target:
                 return index
         return 0
+    if op in {"calculate_primer_tm", "evaluate_primer_pair"}:
+        sequence = _sequence(value)
+        at = sequence.count("A") + sequence.count("T")
+        gc = sequence.count("G") + sequence.count("C")
+        return {"tm_celsius": 2 * at + 4 * gc, "length": len(sequence), "gc_fraction": gc / len(sequence) if sequence else 0.0}
     if op in {"calculate", "summarize", "stats", "estimate", "qc", "report", "read"} or op.startswith(("calculate_", "estimate_", "summarize_")):
         return summary
     if op in {"compare", "compare_mt", "compare_vcfs", "compare_assemblies", "compare_database_versions"}:
@@ -202,11 +278,6 @@ def _local_result(module: str, operation: str, value: object, options: Mapping[s
             return {"decoded": False, "error": "input is not a valid gzip/base64 payload"}
     if op in {"get_file_checksum", "checksum"} or op.endswith("_checksum"):
         return hashlib.sha256(_text(value).encode("utf-8")).hexdigest()
-    if op in {"calculate_primer_tm", "evaluate_primer_pair"}:
-        sequence = _sequence(value)
-        at = sequence.count("A") + sequence.count("T")
-        gc = sequence.count("G") + sequence.count("C")
-        return {"tm_celsius": 2 * at + 4 * gc, "length": len(sequence), "gc_fraction": gc / len(sequence) if sequence else 0.0}
     if op in {"find_sequence_patterns", "scan_pwm"}:
         sequence = _sequence(value)
         pattern = str(options.get("pattern", options.get("motif", "ACG")))
@@ -221,46 +292,110 @@ def _local_result(module: str, operation: str, value: object, options: Mapping[s
         bits = [pairs[base] for base in dna if base in pairs]
         raw = bytes(sum(bits[index + offset] << (6 - 2 * offset) for offset in range(4)) for index in range(0, len(bits) - 3, 4))
         return raw.decode("utf-8", errors="replace")
-    if op in {"remove_phi_from_metadata", "deidentify_genomic_metadata"}:
-        if not isinstance(value, Mapping):
-            return value
-        redacted = {}
-        for key, item in value.items():
-            if str(key).casefold() in {"name", "patient", "patient_id", "email", "phone", "address"}:
-                redacted[str(key)] = hashlib.sha256(str(item).encode()).hexdigest()[:16]
-            else:
-                redacted[str(key)] = item
-        return redacted
     if op in {"set_random_seed"}:
         return {"seed": options.get("seed", value), "deterministic": True}
     return {"result": _readable(value), "summary": summary}
 
 
-def run_candidate_operation(module: str, operation: str, input: object, *, options: Mapping[str, object] | None = None) -> object:
-    """Execute a deterministic local adapter or report a missing backend."""
+# Operations whose local result is a real computation. Every other operation that reaches
+# ``run_candidate_operation`` has no implementation yet and reports ``not_implemented``.
+_REAL_OPERATIONS = frozenset(
+    {
+        "count", "count_mt", "count_reads", "count_records", "calculate_n50", "calculate_ng50", "calculate_nx",
+        "calculate_l50", "get_file_checksum", "checksum", "calculate_primer_tm", "evaluate_primer_pair",
+        "find_sequence_patterns", "scan_pwm", "encode_data_into_dna", "decode_dna_storage",
+    }
+)
+
+
+def _is_real_operation(operation: str) -> bool:
+    op = operation.casefold()
+    return op in _REAL_OPERATIONS or op.endswith("_checksum") or op.startswith(("compress", "decompress"))
+
+
+def candidate_envelope(
+    module: str,
+    operation: str,
+    input: object,
+    *,
+    options: Mapping[str, object] | None = None,
+    status: str,
+    implementation: str,
+    warnings: Sequence[str] = (),
+    input_summary: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Build the common response envelope of a candidate function.
+
+    ``input_summary`` (default None = the generic text summary, which includes a SHA-256 of the input) replaces the
+    summary; privacy-sensitive operations pass a summary without any hash or length of the input.
+    """
 
     options = dict(options or {})
-    dependency = DEPENDENCY_BY_MODULE.get(module)
-    base = {
+    return {
         "module": module,
         "operation": operation,
-        "provenance": {"implementation": "local_candidate_adapter", "backend": options.get("backend", "local")},
-        "input_summary": _summary(input),
-        "warnings": [],
+        "provenance": {"implementation": implementation, "backend": options.get("backend", "local")},
+        "input_summary": _input_summary(input) if input_summary is None else dict(input_summary),
+        "warnings": list(warnings),
+        "status": status,
     }
-    operation_root = operation.casefold().split("_", 1)[0]
-    requires_backend = (
-        dependency is not None
-        and (operation_root in DEPENDENCY_OPERATIONS or operation in {"build", "design", "optimize", "simulate", "score"})
-        and not options.get("allow_local_fallback", False)
-    )
-    if requires_backend:
-        return {
-            **base,
-            "status": "dependency_required",
-            "required_dependency": dependency,
-            "message": "The candidate API and input validation are available locally; scientific execution requires the declared backend.",
-        }
-    result = _local_result(module, operation, input, options)
-    return {**base, "status": "ok", "result": result}
 
+
+def candidate_ok(
+    module: str,
+    operation: str,
+    input: object,
+    result: object,
+    *,
+    options: Mapping[str, object] | None = None,
+    warnings: Sequence[str] = (),
+    implementation: str = "native",
+    input_summary: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Return a successful result: ``status="ok"`` with the real computed ``result``."""
+
+    envelope = candidate_envelope(
+        module, operation, input, options=options, status="ok", implementation=implementation, warnings=warnings,
+        input_summary=input_summary,
+    )
+    envelope["result"] = result
+    return envelope
+
+
+def candidate_not_implemented(
+    module: str,
+    operation: str,
+    input: object,
+    *,
+    options: Mapping[str, object] | None = None,
+    requires: str | None = None,
+    message: str | None = None,
+) -> dict[str, object]:
+    """Report honestly that the named operation has no implementation (and what it would need)."""
+
+    envelope = candidate_envelope(
+        module, operation, input, options=options, status="not_implemented", implementation="not_implemented"
+    )
+    if requires is None:
+        requires = DEPENDENCY_BY_MODULE.get(module)
+    if requires:
+        envelope["required_dependency"] = requires
+    envelope["message"] = message or (
+        f"{module}.{operation} is not implemented yet: the function exists so that its name and call "
+        "signature are stable, but it performs no computation and returns no scientific result."
+    )
+    return envelope
+
+
+def run_candidate_operation(module: str, operation: str, input: object, *, options: Mapping[str, object] | None = None) -> object:
+    """Execute a deterministic local operation, or report ``status="not_implemented"``.
+
+    Only the operations in ``_REAL_OPERATIONS`` (and checksum/compress/decompress variants) compute
+    anything. All others return ``not_implemented`` instead of a fabricated or pass-through result.
+    """
+
+    options = dict(options or {})
+    if not _is_real_operation(operation):
+        return candidate_not_implemented(module, operation, input, options=options)
+    result = _local_result(module, operation, input, options)
+    return candidate_ok(module, operation, input, result, options=options, implementation="local_candidate_adapter")

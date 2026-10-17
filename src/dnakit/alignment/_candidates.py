@@ -13,7 +13,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Sequence
 
-from dnakit._candidate_runtime import run_candidate_operation
+from dnakit._candidate_runtime import candidate_ok
+from dnakit.exceptions import InputFormatError
 from dnakit.sequence import build_minimizer_index, normalize_dna_sequence
 
 
@@ -334,9 +335,58 @@ def split_bam_by_region(input: object, *, regions: Mapping[str, Sequence[Sequenc
 __all__ = ['align_long_reads', 'align_paired_reads', 'align_reads', 'align_to_graph', 'bam_to_cram', 'bam_to_sam', 'build_index', 'calculate_base_depth', 'calculate_clipping_profile', 'calculate_coverage', 'calculate_depth', 'calculate_insert_size', 'calculate_mapping_rate', 'calculate_mismatch_rate', 'calculate_read_group_stats', 'calculate_soft_clipping', 'calculate_strand_balance', 'calculate_strand_bias', 'call_consensus_from_pileup', 'filter_bam_by_flags', 'filter_bam_by_mapping_quality', 'generate_pileup', 'index_alignments', 'mark_duplicates', 'merge_bam_files', 'parse_bam_records', 'parse_cram_records', 'parse_sam_records', 'plot_alignment_view', 'plot_coverage_track', 'remove_duplicates', 'sam_to_bam', 'sort_alignments', 'split_bam_by_region']
 
 def calculate_clipping_profile(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
-    """Return a structured clipping-profile result for an alignment input."""
+    """Summarize soft- and hard-clipping at the 5'/3' ends of the mapped reads of SAM text or SAM-like records.
 
-    return run_candidate_operation("alignment", "calculate_clipping_profile", input, options=options)
+    ``input``: SAM text / path (``@`` headers are ignored), a list of record mappings (``query_name``, ``flag``,
+    ``reference``, ``position``, ``cigar``, ...) or a mapping with ``sam`` or ``records``.  Clipping is read from the
+    CIGAR: the ``S``/``H`` operations at the left and at the right end (left/right refer to reference orientation).
+    Unmapped reads (flag 4 or reference ``*``) are excluded.  Options: ``per_read`` (default true: include the
+    per-read table, at most 10,000 rows).  Result: ``reads``, ``mapped_reads``, ``clipped_reads`` (any S/H),
+    ``clipped_fraction`` (of mapped reads), base totals ``left_soft``/``right_soft``/``left_hard``/``right_hard``,
+    ``soft_clipped_bases``, ``hard_clipped_bases`` and ``clip_length_histogram`` (total clipped bases per read ->
+    number of mapped reads, zero included).
+    """
+
+    settings = dict(options or {})
+    try:
+        records = _records(_record_source(input))
+    except (ValueError, KeyError, TypeError) as exc:
+        raise InputFormatError(
+            f"Cannot read the alignment records: {exc}", code="INVALID_ALIGNMENT_INPUT",
+            hint="Pass SAM text/path or a list of record mappings with query_name, flag, reference, position and cigar.",
+        ) from exc
+    totals = {"left_soft": 0, "right_soft": 0, "left_hard": 0, "right_hard": 0}
+    histogram: Counter[int] = Counter()
+    rows: list[dict[str, object]] = []
+    mapped = clipped = 0
+    for record in records:
+        if record.is_unmapped:
+            continue
+        operations = [(int(length), operation) for length, operation in re.findall(r"(\d+)([MIDNSHP=X])", record.cigar)]
+        row = {"left_soft": 0, "right_soft": 0, "left_hard": 0, "right_hard": 0}
+        for side, sequence in (("left", operations), ("right", operations[::-1])):
+            for length, operation in sequence:
+                if operation not in "SH":
+                    break
+                row[f"{side}_{'soft' if operation == 'S' else 'hard'}"] += length
+        mapped += 1
+        total = sum(row.values())
+        clipped += total > 0
+        histogram[total] += 1
+        for key, value in row.items():
+            totals[key] += value
+        if len(rows) < 10_000:
+            rows.append({"query_name": record.query_name, **row})
+    result: dict[str, object] = {
+        "reads": len(records), "mapped_reads": mapped, "clipped_reads": clipped,
+        "clipped_fraction": clipped / mapped if mapped else 0.0, **totals,
+        "soft_clipped_bases": totals["left_soft"] + totals["right_soft"],
+        "hard_clipped_bases": totals["left_hard"] + totals["right_hard"],
+        "clip_length_histogram": dict(sorted(histogram.items())),
+    }
+    if settings.get("per_read", True) is not False:
+        result["per_read"] = rows
+    return candidate_ok("alignment", "calculate_clipping_profile", input, result, options=options)
 
 from dnakit._verbosity import register_public as _register_public_verbose
 _register_public_verbose(globals())

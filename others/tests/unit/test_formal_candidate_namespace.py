@@ -21,7 +21,10 @@ def test_candidate_categories_are_available_from_the_formal_namespace() -> None:
     assert n50["result"]["n50"] == 100
     figure = dnakit.visualization.plot({"records": ["ATGC"]})
     assert figure["status"] == "ok"
-    assert figure["result"].startswith("<svg")
+    # plot() now draws a real figure; the result holds the SVG document together with the plotted numbers.
+    assert figure["result"]["kind"] == "length_histogram"
+    assert figure["result"]["svg"].startswith("<svg")
+    assert figure["result"]["data"]["counts"] == [1]
 
 
 def test_candidate_functions_are_discoverable_by_the_agent_registry() -> None:
