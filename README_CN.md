@@ -78,6 +78,55 @@ DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA �
 6. **大语言模型工具：** 提供 [Python API](docs/llm_tools/python_api.md)、[MCP 接入](docs/llm_tools/mcp.md)、[Skills 工作流](docs/llm_tools/skills.md)与内置 [Agent](docs/llm_tools/agent.md)，支持通用大模型调用与自然语言任务执行。
 7. **图形界面与网页版：** [网页版](https://dnakit.mapengsen.asia)无需安装，打开浏览器即可使用；[桌面版](docs/gui.md)（`dnakit gui`）支持 Windows、macOS 和 Linux，提供序列与数据集工具、全部函数的检索与运行以及 Skills 目录。
 
+# 在 Python、AI Agent 和 Skills 中使用 DNAKit
+
+安装一次，同一套函数既能在 Python 代码中调用，也能交给支持 MCP 的 AI Agent 和 Agent Skills 使用。
+
+## Python 包（PyPI）
+
+```bash
+pip install dnakit
+```
+
+```python
+from dnakit.ops import reverse_complement
+
+print(reverse_complement("AACG"))  # CGTT
+```
+
+<p align="center">
+  <img alt="安装 DNAKit 并在 Python 中调用" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/python.png" width="60%">
+</p>
+
+## 面向 AI Agent 的 MCP 服务器
+
+```bash
+pip install "dnakit[agent]"
+codex mcp add dnakit -- dnakit-mcp     # Codex
+claude mcp add dnakit -- dnakit-mcp    # Claude Code
+```
+
+Agent 通过 `search_dnakit_tools` 找到函数，用 `describe_dnakit_tool` 查看参数，再用 `call_dnakit_tool`
+运行。同一个请求在 Codex、Claude Code 和 Gemini CLI 中得到相同的结果。详见 [MCP 教程](docs/llm_tools/mcp.md)。
+
+<p align="center">
+  <img alt="同一个 DNAKit MCP 调用在 Codex、Claude Code 和 Gemini CLI 中的结果" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/mcp.png" width="90%">
+</p>
+
+## Skills
+
+```bash
+dnakit skills install dnakit --agent codex    # 或 --agent claude-code、--agent cursor
+```
+
+DNAKit 内置 570 多个经过整理的 DNA 与基因组学工作流 Skills。收到问题后，Agent 会检索这些 Skills、选出合适的一个，
+并返回真实的查询结果。下图中，Agent 用 `ensembl-rest` Skill 注释变异 rs7903146，给出的 5 个字段与 ClinVar
+记录完全一致。详见 [Skills 教程](docs/llm_tools/skills.md)。
+
+<p align="center">
+  <img alt="Agent 通过 DNAKit Skill 回答变异问题，并与 ClinVar 记录核对" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/skills.png" width="100%">
+</p>
+
 # 网页版与桌面版
 
 不写代码也能使用 DNAKit。网页版和桌面版使用同一套界面：单序列工具（描述符、ORF、motif、序列比较）、

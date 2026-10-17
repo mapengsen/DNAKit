@@ -84,6 +84,58 @@ It provides:
 6. **Large language model tools:** a [Python API](docs/llm_tools/python_api.en.md), [MCP integration](docs/llm_tools/mcp.en.md), [Skills workflows](docs/llm_tools/skills.en.md), and a built-in [Agent](docs/llm_tools/agent.en.md) for general-purpose LLM calls and natural-language task execution.
 7. **Graphical interface and web app:** the [web app](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](docs/gui.en.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
 
+# Use DNAKit from Python, AI agents and Skills
+
+One installation gives the same functions to Python code, to MCP-capable AI agents and to agent
+Skills.
+
+## Python package (PyPI)
+
+```bash
+pip install dnakit
+```
+
+```python
+from dnakit.ops import reverse_complement
+
+print(reverse_complement("AACG"))  # CGTT
+```
+
+<p align="center">
+  <img alt="Installing DNAKit and calling it from Python" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/python.png" width="60%">
+</p>
+
+## MCP server for AI agents
+
+```bash
+pip install "dnakit[agent]"
+codex mcp add dnakit -- dnakit-mcp     # Codex
+claude mcp add dnakit -- dnakit-mcp    # Claude Code
+```
+
+The agent finds a function with `search_dnakit_tools`, reads its parameters with
+`describe_dnakit_tool` and runs it with `call_dnakit_tool`. The same request gives the same answer
+in Codex, Claude Code and Gemini CLI. See the [MCP guide](docs/llm_tools/mcp.en.md).
+
+<p align="center">
+  <img alt="The same DNAKit MCP call in Codex, Claude Code and Gemini CLI" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/mcp.png" width="90%">
+</p>
+
+## Skills
+
+```bash
+dnakit skills install dnakit --agent codex    # or --agent claude-code, --agent cursor
+```
+
+DNAKit bundles more than 570 curated DNA and genomics workflow Skills. Given a question, the agent
+searches them, picks a suitable Skill and returns the actual query results. In the example below it
+uses the `ensembl-rest` Skill to annotate variant rs7903146, and all five reported fields match
+the ClinVar record. See the [Skills guide](docs/llm_tools/skills.en.md).
+
+<p align="center">
+  <img alt="An agent answering a variant question through a DNAKit Skill, checked against ClinVar" src="https://raw.githubusercontent.com/mapengsen/DNAKit/main/docs/assets/images/readme/skills.png" width="100%">
+</p>
+
 # Web app and desktop app
 
 DNAKit also runs without writing code. The web app and the desktop app share one interface:
