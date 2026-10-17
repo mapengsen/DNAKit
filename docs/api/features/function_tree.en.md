@@ -34,7 +34,9 @@ DNAKit feature overview
 │   │   ├── FASTA / multiline FASTQ / gzip and Phred quality: Read / read_fastx / write_fastx
 │   │   ├── JASPAR / MEME / TRANSFAC reading: read_motifs (Biopython)
 │   │   ├── SnapGene / GenBank constructs: read_constructs (Biopython; optional permissive pydna parsing)
-│   │   └── ABI file reading and Mott trimming: read_sanger
+│   │   ├── ABI file reading and Mott trimming: read_sanger
+│   │   ├── Format Conversion, Compression and File Management (expanded catalog, 131): convert / compress / index / validate / stream (Newick / Nexus / PAF / PED / PHYLIP / 2bit / Zarr), ...
+│   │   └── FASTA and FASTQ Record Processing (expanded catalog, 66): filter_by_quality / trim_adapters / extract_regions_from_bed / split_by_chromosome / subsample / stats, ...
 │   ├── 3) Download
 │   │   ├── Common species names (download input assistance)
 │   │   ├── 1. complete genome
@@ -71,15 +73,16 @@ DNAKit feature overview
 │   │   ├── 7. Target, drug and association queries
 │   │   ├── 8. Literature, preprint and clinical study queries
 │   │   ├── 9. ENCODE experiment and file queries
-│   │   └── 10. Genetic Variation and Population Associations
-│   │       ├── 1) Variant Records and Population Frequencies
-│   │       ├── 2) Structural Variant Queries
-│   │       ├── 3) ClinVar Clinical Significance
-│   │       ├── 4) Gene–Disease Evidence, Dosage and Actionability
-│   │       ├── 5) Cancer Variants and Treatment Evidence
-│   │       ├── 6) GWAS Studies and Associations
-│   │       ├── 7) Cohort Phenotype Associations and Fine-mapping
-│   │       └── 8) Populations, Samples and Linkage Disequilibrium
+│   │   ├── 10. Genetic Variation and Population Associations
+│   │   │   ├── 1) Variant Records and Population Frequencies
+│   │   │   ├── 2) Structural Variant Queries
+│   │   │   ├── 3) ClinVar Clinical Significance
+│   │   │   ├── 4) Gene–Disease Evidence, Dosage and Actionability
+│   │   │   ├── 5) Cancer Variants and Treatment Evidence
+│   │   │   ├── 6) GWAS Studies and Associations
+│   │   │   ├── 7) Cohort Phenotype Associations and Fine-mapping
+│   │   │   └── 8) Populations, Samples and Linkage Disequilibrium
+│   │   └── 11. General Database Access: Download, Cache and ID Mapping (expanded catalog, 8): query / search / fetch / download / cache / map_ids, ...
 │   └── 5) Legality check
 │       └── 1. Unified sequence, record and data set legality check
 ├── 2. Data processing
@@ -124,12 +127,13 @@ DNAKit feature overview
 │   │   │   ├── Sequence-level assembly simulation: simulate_assembly
 │   │   │   └── Duplex end compatibility and ligation: Duplex.ligate
 │   │   ├── Circular Sequence Operation
-│   │   └── Sequence segmentation
-│   │       ├── 1) Fixed length, no overlap
-│   │       ├── 2) Fixed length, overlapping sliding windows
-│   │       ├── 3) Random interval
-│   │       ├── 4) Multi-scale
-│   │       └── 5) Short first and then long
+│   │   ├── Sequence segmentation
+│   │   │   ├── 1) Fixed length, no overlap
+│   │   │   ├── 2) Fixed length, overlapping sliding windows
+│   │   │   ├── 3) Random interval
+│   │   │   ├── 4) Multi-scale
+│   │   │   └── 5) Short first and then long
+│   │   └── General Sequence Operations, k-mers and Encoding (expanded catalog, 52): count_kmers / translate_six_frames / one_hot_encode_dna / tokenize_dna_kmer / simulate_point_mutations, ...
 │   ├── 3) Sequence deduplication
 │   │   ├── 1. Standard deduplication
 │   │   ├── 2. Reverse complementary deduplication
@@ -165,7 +169,8 @@ DNAKit feature overview
 │   │   ├── Pairing and damaged four-line FASTQ recovery: pair_reads / repair_fastq (recovery/discard statistics)
 │   │   ├── Sorting, shuffling, and common records: arrange_reads / common_reads
 │   │   ├── Regex renaming and order-sensitive, ID-independent sequence digests: rename_reads / sequence_digest
-│   │   └── BAM sorting, mate repair, optional duplicate marking, indexing, and statistics: prepare_bam (samtools)
+│   │   ├── BAM sorting, mate repair, optional duplicate marking, indexing, and statistics: prepare_bam (samtools)
+│   │   └── Sequencing Quality Control (expanded catalog, 50): run_fastp / run_fastqc / calculate_adapter_content / demultiplex_barcoded_reads / correct_umi_errors, ...
 │   └── 7) Sequence Optimization
 │       ├── Rules and custom evaluators: specification / Specification / SpecEvaluation
 │       ├── GC, pattern avoidance/counts, sequence/translation/length, locked positions: gc / avoid_pattern / pattern_count / sequence / translation / length / avoid_changes
@@ -370,22 +375,25 @@ DNAKit feature overview
 │   │   ├── 8. Molecular Relationships and Interactions
 │   │   │   ├── Trained nucleic-acid/protein downstream task: nucleic-acid/protein central-dogma relation
 │   │   │   └── Influenza A antigenic relationships, protein/protein and ncRNA/protein interactions
-│   │   └── 9. Protein Features and Structure
-│   │       ├── ESM protein features and sequence scores
-│   │       └── NVIDIA NIM: AlphaFold2 / ESMFold protein structure prediction
-│   ├── 9) Gene names and intervals
+│   │   ├── 9. Protein Features and Structure
+│   │   │   ├── ESM protein features and sequence scores
+│   │   │   └── NVIDIA NIM: AlphaFold2 / ESMFold protein structure prediction
+│   │   └── 10. Model Training, Evaluation, Interpretation and Export (expanded catalog, 48): train / finetune / evaluate / explain / calibrate / export_model_onnx, ...
+│   ├── 9) Gene Names, Intervals and Functional Annotation
 │   │   ├── Gene identifiers, transcripts, homology and database annotations
 │   │   ├── Genomic DNA + species → annotate_genes / GeneAnnotationConfig
 │   │   ├── Default RefSeq assembly resolution, explicit assembly, or local FASTA + GFF3
 │   │   ├── minimap2 reference alignment and existing annotation mapping (not de novo prediction)
 │   │   ├── Gene names, IDs, strands, overlapping genes, and gene/intergenic/unknown segments
 │   │   ├── Python: 0-based half-open intervals; JSON/CLI: 1-based closed intervals
-│   │   └── Pinned assembly/annotation cache, checksums, offline reuse, and provenance
+│   │   ├── Pinned assembly/annotation cache, checksums, offline reuse, and provenance
+│   │   └── Gene Models, Function and Pathway Annotation (expanded catalog, 18): annotate / build_gene_model / assign_gene_ontology / assign_pathways / make_promoter_regions, ...
 │   ├── 10) Phylogenetics and Molecular Evolution
 │   │   ├── Native trees and construction: TreeNode / build_tree (NJ / cluster-size-weighted UPGMA)
 │   │   ├── Native tree comparison, consensus, and pruning: robinson_foulds / consensus_tree / prune_tree
 │   │   ├── Native community phylogenetic distances: unifrac (weighted / unweighted; rooted trees)
-│   │   └── Nei–Gojobori dN/dS: selection-pressure APIs in comparative and database namespaces
+│   │   ├── Nei–Gojobori dN/dS: selection-pressure APIs in comparative and database namespaces
+│   │   └── Phylogenetic Inference, Tests and Plots (expanded catalog, 8): build / infer / compare / test / plot, ...
 │   ├── 11) Statistics, Differential Analysis and Enrichment
 │   │   ├── 1. Statistical and Differential Analysis
 │   │   │   ├── Distance validation and permutation tests: distance_matrix / distance_test (PERMANOVA / ANOSIM / centroid PERMDISP)
@@ -405,7 +413,8 @@ DNAKit feature overview
 │   │   ├── DNA-seq: dna_seq_workflow (QC → mapping → BAM → variants)
 │   │   ├── Single-sample RNA-seq: rna_seq_workflow (HISAT2 / StringTie / featureCounts)
 │   │   ├── ChIP-seq from prepared BAMs: chip_seq_workflow (MACS3 peaks + samtools coverage)
-│   │   └── Both-strand local alignment and reference-coordinate consensus: sanger_consensus
+│   │   ├── Both-strand local alignment and reference-coordinate consensus: sanger_consensus
+│   │   └── Read Alignment and BAM Statistics (expanded catalog, 34): align_reads / sort_alignments / mark_duplicates / calculate_coverage / calculate_insert_size, ...
 │   ├── 13) Variant Calling, Annotation and Scoring
 │   │   ├── 1. Variant Calling and Statistics
 │   │   │   ├── Variant calling, reference normalization, and VCF indexing: call_variants (bcftools)
@@ -415,16 +424,40 @@ DNAKit feature overview
 │   │   │   └── Coding-variant fraction: coding_variant_fraction
 │   │   ├── 2. Variant Annotation and Identifier Conversion
 │   │   │   └── Ensembl VEP / MyVariant / FAVOR / VariantValidator annotations and identifier conversion
-│   │   └── 3. Variant Effect Scores and Experimental Data
-│   │       └── AlphaMissense / CADD / EVE / MaveDB scores and experimental effect data
+│   │   ├── 3. Variant Effect Scores and Experimental Data
+│   │   │   └── AlphaMissense / CADD / EVE / MaveDB scores and experimental effect data
+│   │   └── 4. Variant Filtering, Normalization, Annotation and Statistics (expanded catalog, 63): normalize_vcf / filter_variants_by_quality / annotate_variant_consequence / calculate_ld_matrix / detect_repeat_expansions, ...
 │   ├── 14) Inheritance Simulation
 │   │   └── Simulate allele inheritance at independent loci: simulate_inheritance
-│   └── 15) Genomics and DNA Engineering
-│       ├── Genomic relationships and breeding prediction: genomic_relationship_matrix / genomic_prediction
-│       ├── Prokaryotic CDS prediction: predict_prokaryotic_genes (Pyrodigal)
-│       ├── Methylation summaries, DNA storage and nanostructure design
-│       ├── Genotype PCA: genotype_pca (NumPy; dosage-matrix input)
-│       └── Genome ANI: average_nucleotide_identity (PyFastANI; no FastANI executable)
+│   ├── 15) Genomics and DNA Engineering
+│   │   ├── Genomic relationships and breeding prediction: genomic_relationship_matrix / genomic_prediction
+│   │   ├── Prokaryotic CDS prediction: predict_prokaryotic_genes (Pyrodigal)
+│   │   ├── Methylation summaries, DNA storage and nanostructure design
+│   │   ├── Genotype PCA: genotype_pca (NumPy; dosage-matrix input)
+│   │   ├── Genome ANI: average_nucleotide_identity (PyFastANI; no FastANI executable)
+│   │   ├── CRISPR, Primer and DNA Design (expanded catalog, 19): design / scan_grna_offtargets / predict_editing_outcomes / check_primer_dimer / encode_data_into_dna, ...
+│   │   ├── Molecular Laboratory: Sanger and Protocols (expanded catalog, 10): assemble_sanger_reads / call_bases_from_sanger / plan / optimize / validate, ...
+│   │   └── Breeding Analysis (expanded catalog, 7): predict / select / optimize / simulate (GBLUP / GEBV / heterosis / mating), ...
+│   ├── 16) Genome Assembly and Pangenomes
+│   │   └── Expanded catalog (37): calculate_n50 / calculate_busco_completeness / detect_misassemblies / scaffold / build_pangenome, ...
+│   ├── 17) Population Genetics, Haplotypes and GWAS
+│   │   ├── 1. Population Genetics (expanded catalog, 8): calculate / estimate / infer / simulate / test, ...
+│   │   ├── 2. Haplotypes, Pedigrees and Parentage (expanded catalog, 17): phase / impute / infer_parentage / detect_compound_heterozygotes / calculate_pedigree_likelihood, ...
+│   │   └── 3. GWAS and Polygenic Risk Scores (expanded catalog, 29): run / select_lead_snps / build_credible_set / estimate_snp_heritability / clump_and_threshold_prs, ...
+│   ├── 18) Epigenome, Regulation and 3D Genome
+│   │   ├── 1. Epigenomics (expanded catalog, 13): call / build_chromatin_state_segments / link_enhancers_to_genes / normalize / qc, ...
+│   │   ├── 2. Gene Regulation (expanded catalog, 11): annotate / predict / score / link / perform_in_silico_mutagenesis, ...
+│   │   └── 3. Three-dimensional Genome (expanded catalog, 9): read / normalize / aggregate / calculate / compare, ...
+│   ├── 19) Transcriptomics, Single-cell and Spatial Omics
+│   │   ├── 1. Transcriptomics (expanded catalog, 18): run_salmon_quantification / run_kallisto_quantification / calculate_differential_expression / calculate_differential_splicing, ...
+│   │   └── 2. Single-cell and Spatial Omics (expanded catalog, 54): qc / normalize / cluster / annotate_cells / integrate / deconvolute_spots / infer_trajectory, ...
+│   ├── 20) Microbiome
+│   │   └── Expanded catalog (21): classify / bin / calculate_ani / calculate_differential_abundance / build_pathogen_transmission_tree, ...
+│   ├── 21) Clinical, Forensic and Reproductive Genomics
+│   │   ├── 1. Clinical Genomics (expanded catalog, 18): type_hla / detect_de_novo_variants / detect_circulating_tumor_dna / infer_tumor_clones / generate_clinical_variant_report, ...
+│   │   └── 2. Forensic and Reproductive Genomics (expanded catalog, 9): calculate / compare / deconvolute / infer / report, ...
+│   └── 22) DNA Replication, Recombination and Repair
+│       └── Expanded catalog (10): detect / map / build_recombination_map / classify_repair_pathway / simulate, ...
 ├── 4. Data evaluation
 │   ├── 1) Commonly used evaluation indicators
 │   │   ├── 1. Validity
@@ -484,7 +517,8 @@ DNAKit feature overview
 │   ├── Tree plots: plot_tree (Matplotlib)
 │   ├── Forward/reverse exact k-mer dotplots: dotplot (Matplotlib)
 │   ├── Sanger chromatograms: plot_chromatogram
-│   └── Qualitative gel simulation: simulate_gel (Matplotlib)
+│   ├── Qualitative gel simulation: simulate_gel (Matplotlib)
+│   └── Reports and Figure Export (expanded catalog, 6): save_figure / export_figure / generate_qc_html_report / generate_clinical_pdf_report, ...
 ├── 6. Large Language Model Tools
 │   ├── Python API: general-purpose LLM calls (dnakit.llm)
 │   │   ├── Configuration and results: LLMConfig / LLMResult
@@ -511,6 +545,11 @@ DNAKit feature overview
 │       ├── Tool discovery, parameter inspection, execution, and feedback
 │       ├── Optional Python execution, failure recovery, and run logs
 │       └── Keyword/semantic/hybrid search, permissions, and step limits
+├── 7. Experimental Design and Workflow Management
+│   ├── 1) Experimental Design (expanded catalog, 9): design / randomize / assign / generate / simulate (plate map / power analysis / sample sheet), ...
+│   ├── 2) Workflow Execution and Data Security (expanded catalog, 27): run / checkpoint / resume / submit_hpc_job / record_provenance / encrypt_genomic_file, ...
+│   ├── 3) External Tool Adapters (expanded catalog, 9): build_command / run / parse_output / parse_log / validate_output, ...
+│   └── 4) Knowledge Graphs and Data Lineage (expanded catalog, 18): build_knowledge_graph / query_graph_neighbors / build_data_lineage / snapshot_database_version, ...
 └── FAQ
     └── Engineering and Extensions
         ├── Bundled scripts, resource lookup, ENCODE credentials, notebooks and PDF reports
@@ -538,5 +577,48 @@ DNAKit feature overview
         ├── Development validation: unit tests and consistency checks
         └── DAG definitions, dependency/cycle checks, and failure propagation: Step / run_workflow
 ```
+
+## Expanded function catalog (837 capabilities)
+
+Tree entries marked "expanded catalog" come from the 837 candidate capability documents (410 `new_candidate`, 427 `review_needed`). Each catalog category now sits under the matching category above; categories with no existing match became 16)–22) under "3. Data Analysis" and the new "7. Experimental Design and Workflow Management".
+The documents record the formal DNAKit namespace, the Agent/MCP JSON call plan, and the state of the local adapter layer. An adapter that reports dependency status has not validated the underlying scientific backend.
+Differences in input type, backend, format, platform, provider, and biological entity are recorded as parameters.
+
+| Category | Count | Location on the site |
+|---|---:|---|
+| [Format Conversion, Compression and File Management](candidate_catalog/io-formats.md) | 131 | 1. Data Preparation › 2) File I/O |
+| [FASTA and FASTQ Record Processing](candidate_catalog/fasta-fastq.md) | 66 | 1. Data Preparation › 2) File I/O |
+| [General Database Access: Download, Cache and ID Mapping](candidate_catalog/databases.md) | 8 | 1. Data Preparation › 4) Data Queries |
+| [General Sequence Operations, k-mers and Encoding](candidate_catalog/sequence.md) | 52 | 2. Data Processing › 2) Intra-sequence Operations |
+| [Sequencing Quality Control](candidate_catalog/sequencing-qc.md) | 50 | 2. Data Processing › 6) Sequencing Data Processing |
+| [Model Training, Evaluation, Interpretation and Export](candidate_catalog/ml-models.md) | 48 | 3. Data Analysis › 8) Property Prediction |
+| [Gene Models, Function and Pathway Annotation](candidate_catalog/annotation.md) | 18 | 3. Data Analysis › 9) Gene Names, Intervals and Functional Annotation |
+| [Phylogenetic Inference, Tests and Plots](candidate_catalog/phylogeny.md) | 8 | 3. Data Analysis › 10) Phylogenetics and Molecular Evolution |
+| [Read Alignment and BAM Statistics](candidate_catalog/alignment.md) | 34 | 3. Data Analysis › 12) Sequencing Data Analysis |
+| [Variant Filtering, Normalization, Annotation and Statistics](candidate_catalog/variants.md) | 63 | 3. Data Analysis › 13) Variant Calling, Annotation and Scoring |
+| [CRISPR, Primer and DNA Design](candidate_catalog/design-crispr.md) | 19 | 3. Data Analysis › 15) Genomics and DNA Engineering |
+| [Molecular Laboratory: Sanger and Protocols](candidate_catalog/molecular-lab.md) | 10 | 3. Data Analysis › 15) Genomics and DNA Engineering |
+| [Breeding Analysis](candidate_catalog/breeding.md) | 7 | 3. Data Analysis › 15) Genomics and DNA Engineering |
+| [Genome Assembly and Pangenomes](candidate_catalog/assembly.md) | 37 | 3. Data Analysis › 16) Genome Assembly and Pangenomes |
+| [Population Genetics](candidate_catalog/population.md) | 8 | 3. Data Analysis › 17) Population Genetics, Haplotypes and GWAS |
+| [Haplotypes, Pedigrees and Parentage](candidate_catalog/haplotypes.md) | 17 | 3. Data Analysis › 17) Population Genetics, Haplotypes and GWAS |
+| [GWAS and Polygenic Risk Scores](candidate_catalog/gwas.md) | 29 | 3. Data Analysis › 17) Population Genetics, Haplotypes and GWAS |
+| [Epigenomics](candidate_catalog/epigenome.md) | 13 | 3. Data Analysis › 18) Epigenome, Regulation and 3D Genome |
+| [Gene Regulation](candidate_catalog/regulation.md) | 11 | 3. Data Analysis › 18) Epigenome, Regulation and 3D Genome |
+| [Three-dimensional Genome](candidate_catalog/genome3d.md) | 9 | 3. Data Analysis › 18) Epigenome, Regulation and 3D Genome |
+| [Transcriptomics](candidate_catalog/transcriptomics.md) | 18 | 3. Data Analysis › 19) Transcriptomics, Single-cell and Spatial Omics |
+| [Single-cell and Spatial Omics](candidate_catalog/singlecell-spatial.md) | 54 | 3. Data Analysis › 19) Transcriptomics, Single-cell and Spatial Omics |
+| [Microbiome](candidate_catalog/microbiome.md) | 21 | 3. Data Analysis › 20) Microbiome |
+| [Clinical Genomics](candidate_catalog/clinical.md) | 18 | 3. Data Analysis › 21) Clinical, Forensic and Reproductive Genomics |
+| [Forensic and Reproductive Genomics](candidate_catalog/forensic-reproductive.md) | 9 | 3. Data Analysis › 21) Clinical, Forensic and Reproductive Genomics |
+| [DNA Replication, Recombination and Repair](candidate_catalog/replication-repair.md) | 10 | 3. Data Analysis › 22) DNA Replication, Recombination and Repair |
+| [Reports and Figure Export](candidate_catalog/visualization.md) | 6 | 5. Visualization |
+| [Experimental Design](candidate_catalog/experimental-design.md) | 9 | 7. Experimental Design and Workflow Management |
+| [Workflow Execution and Data Security](candidate_catalog/workflow-security.md) | 27 | 7. Experimental Design and Workflow Management |
+| [External Tool Adapters](candidate_catalog/external-adapters.md) | 9 | 7. Experimental Design and Workflow Management |
+| [Knowledge Graphs and Data Lineage](candidate_catalog/knowledge-graph.md) | 18 | 7. Experimental Design and Workflow Management |
+
+Implementation status: `implemented_candidate` 189, `partial_candidate` 5, `native_facade` 4, `adapter_candidate` 639, `pending` 0.
+Production scientific use still needs concrete backend dependencies, an error contract, side effects, tests, resource limits, and an MCP exposure policy. Existing public functions and Skills remain the reference for workflow-specific backend guidance.
 
 See the [FAQ](../../faq/tutorial_overview.md) for catalog scope and counts.

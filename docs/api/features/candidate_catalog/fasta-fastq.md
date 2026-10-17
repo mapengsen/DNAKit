@@ -1,20 +1,20 @@
-# FASTA and FASTQ
+# FASTA 与 FASTQ 记录处理
 
-This category contains **66** documented candidate capabilities; 66 have a locally callable formal entry (0 partial due to binary-format dependencies; 0 bounded external backends; 0 dependency-adapter only). The documented functions are exported through the formal DNAKit namespace; functions with a compatible JSON call plan are also exposed through the Agent/MCP registry.
+本类收录 **66** 项有文档的候选功能，其中 66 项有可在本地调用的正式入口（0 项因依赖二进制格式仅部分实现；0 项为受限的外部后端；0 项仅为依赖适配层）。这些函数都通过正式的 DNAKit 命名空间导出；JSON 调用方案兼容的函数也会注册到 Agent/MCP 工具库。
 
 ## 1) build_fasta_index
 
-- **Purpose:** Document a reusable build fasta index capability for FASTA and FASTQ workflows. Candidate CAP-0176 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `build_fasta_index` 功能。候选编号 CAP-0176，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the build fasta index operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `generic_operation_name`. Existing-name evidence: `build_fasta_index|build_fastq_index|build_sketch_index|dnakit.io.build_fasta_index|load_fasta_index`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `build_fasta_index` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`generic_operation_name`。已有同名函数证据：`build_fasta_index|build_fastq_index|build_sketch_index|dnakit.io.build_fasta_index|load_fasta_index`。
 
-- **API:** `dnakit.fasta_fastq.build_fasta_index(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.build_fasta_index(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `build_fasta_index` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `build_fasta_index` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -27,7 +27,7 @@ result = build_fasta_index(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -45,17 +45,17 @@ print(result)
 
 ## 2) build_fastq_index
 
-- **Purpose:** Document a reusable build fastq index capability for FASTA and FASTQ workflows. Candidate CAP-0177 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `build_fastq_index` 功能。候选编号 CAP-0177，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the build fastq index operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `generic_operation_name`. Existing-name evidence: `build_fasta_index|build_fastq_index|build_sketch_index|dnakit.io.build_fastq_index|load_fastq_index`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `build_fastq_index` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`generic_operation_name`。已有同名函数证据：`build_fasta_index|build_fastq_index|build_sketch_index|dnakit.io.build_fastq_index|load_fastq_index`。
 
-- **API:** `dnakit.fasta_fastq.build_fastq_index(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.build_fastq_index(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `build_fastq_index` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `build_fastq_index` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -68,7 +68,7 @@ result = build_fastq_index(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -86,17 +86,17 @@ print(result)
 
 ## 3) calculate_gc_profile
 
-- **Purpose:** Document a reusable calculate gc profile capability for FASTA and FASTQ workflows. Candidate CAP-0178 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `calculate_gc_profile` 功能。候选编号 CAP-0178，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate gc profile operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_gc_profile` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.calculate_gc_profile(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.calculate_gc_profile(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `calculate_gc_profile` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `calculate_gc_profile` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -109,7 +109,7 @@ result = calculate_gc_profile(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -127,17 +127,17 @@ print(result)
 
 ## 4) calculate_length_distribution
 
-- **Purpose:** Document a reusable calculate length distribution capability for FASTA and FASTQ workflows. Candidate CAP-0179 comes from 2 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `calculate_length_distribution` 功能。候选编号 CAP-0179，来自 2 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate length distribution operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta, fastq). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_length_distribution` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta、fastq）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.calculate_length_distribution(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.calculate_length_distribution(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `calculate_length_distribution` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `calculate_length_distribution` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -150,7 +150,7 @@ result = calculate_length_distribution(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -168,17 +168,17 @@ print(result)
 
 ## 5) calculate_n_content_profile
 
-- **Purpose:** Document a reusable calculate n content profile capability for FASTA and FASTQ workflows. Candidate CAP-0180 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `calculate_n_content_profile` 功能。候选编号 CAP-0180，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate n content profile operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_n_content_profile` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.calculate_n_content_profile(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.calculate_n_content_profile(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `calculate_n_content_profile` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `calculate_n_content_profile` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -191,7 +191,7 @@ result = calculate_n_content_profile(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -209,17 +209,17 @@ print(result)
 
 ## 6) calculate_quality_distribution
 
-- **Purpose:** Document a reusable calculate quality distribution capability for FASTA and FASTQ workflows. Candidate CAP-0181 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `calculate_quality_distribution` 功能。候选编号 CAP-0181，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate quality distribution operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_quality_distribution` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.calculate_quality_distribution(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.calculate_quality_distribution(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `calculate_quality_distribution` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `calculate_quality_distribution` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -232,7 +232,7 @@ result = calculate_quality_distribution(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -250,17 +250,17 @@ print(result)
 
 ## 7) compare_fasta_files
 
-- **Purpose:** Document a reusable compare fasta files capability for FASTA and FASTQ workflows. Candidate CAP-0182 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `compare_fasta_files` 功能。候选编号 CAP-0182，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the compare fasta files operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `compare_fasta_files` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.compare_fasta_files(left[required], right[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.compare_fasta_files(left[required], right[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `left`, `right`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`left`、`right`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `compare_fasta_files` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `compare_fasta_files` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -274,7 +274,7 @@ result = compare_fasta_files(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -292,17 +292,17 @@ print(result)
 
 ## 8) convert_from_fasta
 
-- **Purpose:** Document a reusable convert from fasta capability for FASTA and FASTQ workflows. Candidate CAP-0183 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `convert_from_fasta` 功能。候选编号 CAP-0183，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the convert from fasta operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `convert_from_fasta` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.convert_from_fasta(source[required], quality[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.convert_from_fasta(source[required], quality[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `quality`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`quality`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `convert_from_fasta` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `convert_from_fasta` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -315,7 +315,7 @@ result = convert_from_fasta(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -333,17 +333,17 @@ print(result)
 
 ## 9) convert_from_tabular
 
-- **Purpose:** Document a reusable convert from tabular capability for FASTA and FASTQ workflows. Candidate CAP-0184 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `convert_from_tabular` 功能。候选编号 CAP-0184，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the convert from tabular operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `convert_from_tabular` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.convert_from_tabular(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.convert_from_tabular(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `convert_from_tabular` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `convert_from_tabular` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -356,7 +356,7 @@ result = convert_from_tabular(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -374,17 +374,17 @@ print(result)
 
 ## 10) convert_to_fasta
 
-- **Purpose:** Document a reusable convert to fasta capability for FASTA and FASTQ workflows. Candidate CAP-0185 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `convert_to_fasta` 功能。候选编号 CAP-0185，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the convert to fasta operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `convert_to_fasta` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.convert_to_fasta(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.convert_to_fasta(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `convert_to_fasta` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `convert_to_fasta` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -397,7 +397,7 @@ result = convert_to_fasta(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -415,17 +415,17 @@ print(result)
 
 ## 11) convert_to_tabular
 
-- **Purpose:** Document a reusable convert to tabular capability for FASTA and FASTQ workflows. Candidate CAP-0186 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `convert_to_tabular` 功能。候选编号 CAP-0186，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the convert to tabular operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `convert_to_tabular` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.convert_to_tabular(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.convert_to_tabular(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `convert_to_tabular` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `convert_to_tabular` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -438,7 +438,7 @@ result = convert_to_tabular(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -456,17 +456,17 @@ print(result)
 
 ## 12) count_reads
 
-- **Purpose:** Document a reusable count reads capability for FASTA and FASTQ workflows. Candidate CAP-0187 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `count_reads` 功能。候选编号 CAP-0187，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the count reads operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `count_reads` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.count_reads(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.count_reads(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `count_reads` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `count_reads` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -479,7 +479,7 @@ result = count_reads(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -497,17 +497,17 @@ print(result)
 
 ## 13) count_records
 
-- **Purpose:** Document a reusable count records capability for FASTA and FASTQ workflows. Candidate CAP-0188 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `count_records` 功能。候选编号 CAP-0188，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the count records operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `count_records` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.count_records(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.count_records(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `count_records` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `count_records` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -520,7 +520,7 @@ result = count_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -538,17 +538,17 @@ print(result)
 
 ## 14) deinterleave_pairs
 
-- **Purpose:** Document a reusable deinterleave pairs capability for FASTA and FASTQ workflows. Candidate CAP-0189 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `deinterleave_pairs` 功能。候选编号 CAP-0189，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the deinterleave pairs operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `deinterleave_pairs` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.deinterleave_pairs(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.deinterleave_pairs(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `deinterleave_pairs` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `deinterleave_pairs` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -561,7 +561,7 @@ result = deinterleave_pairs(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -579,17 +579,17 @@ print(result)
 
 ## 15) estimate_duplication
 
-- **Purpose:** Document a reusable estimate duplication capability for FASTA and FASTQ workflows. Candidate CAP-0190 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `estimate_duplication` 功能。候选编号 CAP-0190，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the estimate duplication operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `estimate_duplication` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.estimate_duplication(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.estimate_duplication(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `estimate_duplication` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `estimate_duplication` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -602,7 +602,7 @@ result = estimate_duplication(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -620,17 +620,17 @@ print(result)
 
 ## 16) estimate_error_rate
 
-- **Purpose:** Document a reusable estimate error rate capability for FASTA and FASTQ workflows. Candidate CAP-0191 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `estimate_error_rate` 功能。候选编号 CAP-0191，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the estimate error rate operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `estimate_error_rate` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.estimate_error_rate(source[required], expected_quality[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.estimate_error_rate(source[required], expected_quality[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `expected_quality`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`expected_quality`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `estimate_error_rate` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `estimate_error_rate` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -643,7 +643,7 @@ result = estimate_error_rate(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -661,17 +661,17 @@ print(result)
 
 ## 17) extract_cds
 
-- **Purpose:** Document a reusable extract cds capability for FASTA and FASTQ workflows. Candidate CAP-0192 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_cds` 功能。候选编号 CAP-0192，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract cds operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_cds` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_cds(source[required], identifier[required], intervals[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_cds(source[required], identifier[required], intervals[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `intervals`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`intervals`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_cds` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_cds` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -686,7 +686,7 @@ result = extract_cds(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -704,17 +704,17 @@ print(result)
 
 ## 18) extract_exon
 
-- **Purpose:** Document a reusable extract exon capability for FASTA and FASTQ workflows. Candidate CAP-0193 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_exon` 功能。候选编号 CAP-0193，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract exon operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_exon` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_exon(source[required], identifier[required], start[required], end[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_exon(source[required], identifier[required], start[required], end[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `start`, `end`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`start`、`end`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_exon` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_exon` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -730,7 +730,7 @@ result = extract_exon(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -748,17 +748,17 @@ print(result)
 
 ## 19) extract_flanking
 
-- **Purpose:** Document a reusable extract flanking capability for FASTA and FASTQ workflows. Candidate CAP-0194 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_flanking` 功能。候选编号 CAP-0194，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract flanking operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_flanking` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_flanking(source[required], identifier[required], start[required], end[required], flank[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_flanking(source[required], identifier[required], start[required], end[required], flank[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `start`, `end`; optional arguments: `flank`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`start`、`end`；可选参数：`flank`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_flanking` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_flanking` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -774,7 +774,7 @@ result = extract_flanking(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -792,17 +792,17 @@ print(result)
 
 ## 20) extract_introns
 
-- **Purpose:** Document a reusable extract introns capability for FASTA and FASTQ workflows. Candidate CAP-0195 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_introns` 功能。候选编号 CAP-0195，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract introns operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_introns` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_introns(source[required], identifier[required], exons[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_introns(source[required], identifier[required], exons[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `exons`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`exons`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_introns` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_introns` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -817,7 +817,7 @@ result = extract_introns(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -835,17 +835,17 @@ print(result)
 
 ## 21) extract_promoter
 
-- **Purpose:** Document a reusable extract promoter capability for FASTA and FASTQ workflows. Candidate CAP-0196 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_promoter` 功能。候选编号 CAP-0196，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract promoter operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_promoter` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_promoter(source[required], identifier[required], tss[required], upstream[optional], downstream[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_promoter(source[required], identifier[required], tss[required], upstream[optional], downstream[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `tss`; optional arguments: `upstream`, `downstream`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`tss`；可选参数：`upstream`、`downstream`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_promoter` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_promoter` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -860,7 +860,7 @@ result = extract_promoter(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -878,17 +878,17 @@ print(result)
 
 ## 22) extract_read_names
 
-- **Purpose:** Document a reusable extract read names capability for FASTA and FASTQ workflows. Candidate CAP-0197 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_read_names` 功能。候选编号 CAP-0197，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract read names operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_read_names` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_read_names(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_read_names(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_read_names` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_read_names` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -901,7 +901,7 @@ result = extract_read_names(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -919,17 +919,17 @@ print(result)
 
 ## 23) extract_region
 
-- **Purpose:** Document a reusable extract region capability for FASTA and FASTQ workflows. Candidate CAP-0198 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_region` 功能。候选编号 CAP-0198，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract region operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_region` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_region(source[required], identifier[required], start[required], end[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_region(source[required], identifier[required], start[required], end[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`, `start`, `end`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`、`start`、`end`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_region` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_region` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -945,7 +945,7 @@ result = extract_region(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -963,17 +963,17 @@ print(result)
 
 ## 24) extract_regions_from_bed
 
-- **Purpose:** Document a reusable extract regions from bed capability for FASTA and FASTQ workflows. Candidate CAP-0199 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `extract_regions_from_bed` 功能。候选编号 CAP-0199，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract regions from bed operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_regions_from_bed` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.extract_regions_from_bed(source[required], bed[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.extract_regions_from_bed(source[required], bed[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `bed`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`bed`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `extract_regions_from_bed` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_regions_from_bed` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -987,7 +987,7 @@ result = extract_regions_from_bed(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1005,17 +1005,17 @@ print(result)
 
 ## 25) filter
 
-- **Purpose:** Document a reusable filter capability for FASTA and FASTQ workflows. Candidate CAP-0200 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `filter` 功能。候选编号 CAP-0200，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the filter operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `filter` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.filter(source[required], min_length[optional], max_length[optional], ids[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.filter(source[required], min_length[optional], max_length[optional], ids[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `min_length`, `max_length`, `ids`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`min_length`、`max_length`、`ids`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `filter` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `filter` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1028,7 +1028,7 @@ result = filter(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1046,17 +1046,17 @@ print(result)
 
 ## 26) filter_by_length
 
-- **Purpose:** Document a reusable filter by length capability for FASTA and FASTQ workflows. Candidate CAP-0201 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `filter_by_length` 功能。候选编号 CAP-0201，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the filter by length operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `filter_by_length` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.filter_by_length(source[required], min_length[optional], max_length[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.filter_by_length(source[required], min_length[optional], max_length[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `min_length`, `max_length`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`min_length`、`max_length`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `filter_by_length` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `filter_by_length` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1069,7 +1069,7 @@ result = filter_by_length(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1087,17 +1087,17 @@ print(result)
 
 ## 27) filter_by_quality
 
-- **Purpose:** Document a reusable filter by quality capability for FASTA and FASTQ workflows. Candidate CAP-0202 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `filter_by_quality` 功能。候选编号 CAP-0202，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the filter by quality operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `filter_by_quality` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.filter_by_quality(source[required], min_quality[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.filter_by_quality(source[required], min_quality[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `min_quality`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`min_quality`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `filter_by_quality` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `filter_by_quality` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1111,7 +1111,7 @@ result = filter_by_quality(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1129,17 +1129,17 @@ print(result)
 
 ## 28) get_ids
 
-- **Purpose:** Document a reusable get ids capability for FASTA and FASTQ workflows. Candidate CAP-0203 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `get_ids` 功能。候选编号 CAP-0203，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the get ids operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `get_ids` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.get_ids(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.get_ids(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `get_ids` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `get_ids` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1152,7 +1152,7 @@ result = get_ids(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1170,17 +1170,17 @@ print(result)
 
 ## 29) get_lengths
 
-- **Purpose:** Document a reusable get lengths capability for FASTA and FASTQ workflows. Candidate CAP-0204 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `get_lengths` 功能。候选编号 CAP-0204，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the get lengths operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `get_lengths` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.get_lengths(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.get_lengths(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `get_lengths` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `get_lengths` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1193,7 +1193,7 @@ result = get_lengths(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1211,17 +1211,17 @@ print(result)
 
 ## 30) get_sequence_by_id
 
-- **Purpose:** Document a reusable get sequence by id capability for FASTA and FASTQ workflows. Candidate CAP-0205 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `get_sequence_by_id` 功能。候选编号 CAP-0205，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the get sequence by id operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. Existing-name evidence: `sequence_by_id`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `get_sequence_by_id` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。已有同名函数证据：`sequence_by_id`。
 
-- **API:** `dnakit.fasta_fastq.get_sequence_by_id(source[required], identifier[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.get_sequence_by_id(source[required], identifier[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `identifier`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`identifier`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `get_sequence_by_id` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `get_sequence_by_id` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1235,7 +1235,7 @@ result = get_sequence_by_id(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1253,17 +1253,17 @@ print(result)
 
 ## 31) interleave_pairs
 
-- **Purpose:** Document a reusable interleave pairs capability for FASTA and FASTQ workflows. Candidate CAP-0206 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `interleave_pairs` 功能。候选编号 CAP-0206，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the interleave pairs operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `interleave_pairs` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.interleave_pairs(first[required], second[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.interleave_pairs(first[required], second[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `first`, `second`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`first`、`second`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `interleave_pairs` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `interleave_pairs` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1277,7 +1277,7 @@ result = interleave_pairs(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1295,17 +1295,17 @@ print(result)
 
 ## 32) iterate
 
-- **Purpose:** Document a reusable iterate capability for FASTA and FASTQ workflows. Candidate CAP-0207 comes from 2 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `iterate` 功能。候选编号 CAP-0207，来自 2 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the iterate operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta, fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. Existing-name evidence: `literature`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `iterate` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta、fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。已有同名函数证据：`literature`。
 
-- **API:** `dnakit.fasta_fastq.iterate(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.iterate(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `iterate` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `iterate` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1318,7 +1318,7 @@ result = iterate(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1336,17 +1336,17 @@ print(result)
 
 ## 33) mask_regions
 
-- **Purpose:** Document a reusable mask regions capability for FASTA and FASTQ workflows. Candidate CAP-0208 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `mask_regions` 功能。候选编号 CAP-0208，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the mask regions operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `mask_regions` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.mask_regions(source[required], regions[required], symbol[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.mask_regions(source[required], regions[required], symbol[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `regions`; optional arguments: `symbol`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`regions`；可选参数：`symbol`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `mask_regions` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `mask_regions` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1360,7 +1360,7 @@ result = mask_regions(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1378,17 +1378,17 @@ print(result)
 
 ## 34) merge
 
-- **Purpose:** Document a reusable merge capability for FASTA and FASTQ workflows. Candidate CAP-0209 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `merge` 功能。候选编号 CAP-0209，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the merge operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `merge` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.merge(sources[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.merge(sources[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sources`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`sources`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `merge` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `merge` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1401,7 +1401,7 @@ result = merge(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1419,17 +1419,17 @@ print(result)
 
 ## 35) merge_lanes
 
-- **Purpose:** Document a reusable merge lanes capability for FASTA and FASTQ workflows. Candidate CAP-0210 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `merge_lanes` 功能。候选编号 CAP-0210，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the merge lanes operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `merge_lanes` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.merge_lanes(sources[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.merge_lanes(sources[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sources`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`sources`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `merge_lanes` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `merge_lanes` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1442,7 +1442,7 @@ result = merge_lanes(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1460,17 +1460,17 @@ print(result)
 
 ## 36) query_fasta_index
 
-- **Purpose:** Document a reusable query fasta index capability for FASTA and FASTQ workflows. Candidate CAP-0211 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `query_fasta_index` 功能。候选编号 CAP-0211，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the query fasta index operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `query_fasta_index` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.query_fasta_index(index[required], identifier[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.query_fasta_index(index[required], identifier[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `index`, `identifier`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`index`、`identifier`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `query_fasta_index` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `query_fasta_index` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1484,7 +1484,7 @@ result = query_fasta_index(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1502,17 +1502,17 @@ print(result)
 
 ## 37) remove_duplicate_ids
 
-- **Purpose:** Document a reusable remove duplicate ids capability for FASTA and FASTQ workflows. Candidate CAP-0212 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `remove_duplicate_ids` 功能。候选编号 CAP-0212，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove duplicate ids operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_duplicate_ids` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.remove_duplicate_ids(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.remove_duplicate_ids(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `remove_duplicate_ids` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `remove_duplicate_ids` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1525,7 +1525,7 @@ result = remove_duplicate_ids(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1543,17 +1543,17 @@ print(result)
 
 ## 38) remove_duplicate_sequences
 
-- **Purpose:** Document a reusable remove duplicate sequences capability for FASTA and FASTQ workflows. Candidate CAP-0213 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `remove_duplicate_sequences` 功能。候选编号 CAP-0213，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove duplicate sequences operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_duplicate_sequences` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.remove_duplicate_sequences(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.remove_duplicate_sequences(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `remove_duplicate_sequences` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `remove_duplicate_sequences` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1566,7 +1566,7 @@ result = remove_duplicate_sequences(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1584,17 +1584,17 @@ print(result)
 
 ## 39) remove_poly_a
 
-- **Purpose:** Document a reusable remove poly a capability for FASTA and FASTQ workflows. Candidate CAP-0214 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `remove_poly_a` 功能。候选编号 CAP-0214，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove poly a operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_poly_a` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.remove_poly_a(source[required], minimum[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.remove_poly_a(source[required], minimum[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `minimum`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`minimum`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `remove_poly_a` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `remove_poly_a` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1607,7 +1607,7 @@ result = remove_poly_a(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1625,17 +1625,17 @@ print(result)
 
 ## 40) remove_poly_g
 
-- **Purpose:** Document a reusable remove poly g capability for FASTA and FASTQ workflows. Candidate CAP-0215 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `remove_poly_g` 功能。候选编号 CAP-0215，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove poly g operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_poly_g` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.remove_poly_g(source[required], minimum[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.remove_poly_g(source[required], minimum[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `minimum`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`minimum`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `remove_poly_g` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `remove_poly_g` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1648,7 +1648,7 @@ result = remove_poly_g(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1666,17 +1666,17 @@ print(result)
 
 ## 41) rename_headers
 
-- **Purpose:** Document a reusable rename headers capability for FASTA and FASTQ workflows. Candidate CAP-0216 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `rename_headers` 功能。候选编号 CAP-0216，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the rename headers operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `rename_headers` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.rename_headers(source[required], prefix[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.rename_headers(source[required], prefix[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `prefix`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`prefix`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `rename_headers` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `rename_headers` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1689,7 +1689,7 @@ result = rename_headers(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1707,17 +1707,17 @@ print(result)
 
 ## 42) repair_fasta_headers
 
-- **Purpose:** Document a reusable repair fasta headers capability for FASTA and FASTQ workflows. Candidate CAP-0217 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `repair_fasta_headers` 功能。候选编号 CAP-0217，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the repair fasta headers operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `repair_fasta_headers` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.repair_fasta_headers(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.repair_fasta_headers(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `repair_fasta_headers` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `repair_fasta_headers` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1730,7 +1730,7 @@ result = repair_fasta_headers(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1748,17 +1748,17 @@ print(result)
 
 ## 43) repair_pairs
 
-- **Purpose:** Document a reusable repair pairs capability for FASTA and FASTQ workflows. Candidate CAP-0218 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `repair_pairs` 功能。候选编号 CAP-0218，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the repair pairs operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `repair_pairs` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.repair_pairs(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.repair_pairs(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `repair_pairs` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `repair_pairs` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1771,7 +1771,7 @@ result = repair_pairs(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1789,17 +1789,17 @@ print(result)
 
 ## 44) reverse_complement_records
 
-- **Purpose:** Document a reusable reverse complement records capability for FASTA and FASTQ workflows. Candidate CAP-0219 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `reverse_complement_records` 功能。候选编号 CAP-0219，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the reverse complement records operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. Existing-name evidence: `reverse_complement|reverse_complement_record|reverse_complement_search`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `reverse_complement_records` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。已有同名函数证据：`reverse_complement|reverse_complement_record|reverse_complement_search`。
 
-- **API:** `dnakit.fasta_fastq.reverse_complement_records(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.reverse_complement_records(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `reverse_complement_records` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `reverse_complement_records` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1812,7 +1812,7 @@ result = reverse_complement_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1830,17 +1830,17 @@ print(result)
 
 ## 45) sample_records
 
-- **Purpose:** Document a reusable sample records capability for FASTA and FASTQ workflows. Candidate CAP-0221 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `sample_records` 功能。候选编号 CAP-0221，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the sample records operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `sample_records` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.sample_records(source[required], size[required], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.sample_records(source[required], size[required], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `size`; optional arguments: `seed`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`size`；可选参数：`seed`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `sample_records` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `sample_records` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1855,7 +1855,7 @@ result = sample_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1873,17 +1873,17 @@ print(result)
 
 ## 46) sanitize_headers
 
-- **Purpose:** Document a reusable sanitize headers capability for FASTA and FASTQ workflows. Candidate CAP-0222 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `sanitize_headers` 功能。候选编号 CAP-0222，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the sanitize headers operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `sanitize_headers` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.sanitize_headers(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.sanitize_headers(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `sanitize_headers` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `sanitize_headers` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1896,7 +1896,7 @@ result = sanitize_headers(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1914,17 +1914,17 @@ print(result)
 
 ## 47) shuffle_reads
 
-- **Purpose:** Document a reusable shuffle reads capability for FASTA and FASTQ workflows. Candidate CAP-0223 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `shuffle_reads` 功能。候选编号 CAP-0223，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the shuffle reads operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `shuffle_reads` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.shuffle_reads(source[required], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.shuffle_reads(source[required], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `seed`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`seed`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `shuffle_reads` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `shuffle_reads` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1938,7 +1938,7 @@ result = shuffle_reads(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1956,17 +1956,17 @@ print(result)
 
 ## 48) shuffle_records
 
-- **Purpose:** Document a reusable shuffle records capability for FASTA and FASTQ workflows. Candidate CAP-0224 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `shuffle_records` 功能。候选编号 CAP-0224，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the shuffle records operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `shuffle_records` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.shuffle_records(source[required], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.shuffle_records(source[required], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `seed`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`seed`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `shuffle_records` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `shuffle_records` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1980,7 +1980,7 @@ result = shuffle_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1998,17 +1998,17 @@ print(result)
 
 ## 49) sort
 
-- **Purpose:** Document a reusable sort capability for FASTA and FASTQ workflows. Candidate CAP-0225 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `sort` 功能。候选编号 CAP-0225，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the sort operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `sort` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.sort(source[required], by[optional], reverse[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.sort(source[required], by[optional], reverse[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `by`, `reverse`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`by`、`reverse`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `sort` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `sort` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2021,7 +2021,7 @@ result = sort(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2039,17 +2039,17 @@ print(result)
 
 ## 50) split_by_barcode
 
-- **Purpose:** Document a reusable split by barcode capability for FASTA and FASTQ workflows. Candidate CAP-0226 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_barcode` 功能。候选编号 CAP-0226，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by barcode operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_barcode` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_barcode(source[required], barcodes[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_barcode(source[required], barcodes[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `barcodes`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`barcodes`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_barcode` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_barcode` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2063,7 +2063,7 @@ result = split_by_barcode(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2081,17 +2081,17 @@ print(result)
 
 ## 51) split_by_chromosome
 
-- **Purpose:** Document a reusable split by chromosome capability for FASTA and FASTQ workflows. Candidate CAP-0227 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_chromosome` 功能。候选编号 CAP-0227，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by chromosome operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_chromosome` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_chromosome(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_chromosome(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_chromosome` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_chromosome` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2104,7 +2104,7 @@ result = split_by_chromosome(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2122,17 +2122,17 @@ print(result)
 
 ## 52) split_by_length
 
-- **Purpose:** Document a reusable split by length capability for FASTA and FASTQ workflows. Candidate CAP-0228 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_length` 功能。候选编号 CAP-0228，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by length operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_length` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_length(source[required], threshold[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_length(source[required], threshold[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `threshold`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`threshold`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_length` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_length` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2146,7 +2146,7 @@ result = split_by_length(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2164,17 +2164,17 @@ print(result)
 
 ## 53) split_by_record
 
-- **Purpose:** Document a reusable split by record capability for FASTA and FASTQ workflows. Candidate CAP-0229 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_record` 功能。候选编号 CAP-0229，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by record operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_record` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_record(source[required], records_per_part[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_record(source[required], records_per_part[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `records_per_part`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`records_per_part`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_record` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_record` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2188,7 +2188,7 @@ result = split_by_record(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2206,17 +2206,17 @@ print(result)
 
 ## 54) split_by_size
 
-- **Purpose:** Document a reusable split by size capability for FASTA and FASTQ workflows. Candidate CAP-0230 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_size` 功能。候选编号 CAP-0230，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by size operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_size` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_size(source[required], bases_per_part[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_size(source[required], bases_per_part[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `bases_per_part`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`bases_per_part`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_size` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_size` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2230,7 +2230,7 @@ result = split_by_size(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2248,17 +2248,17 @@ print(result)
 
 ## 55) split_by_window
 
-- **Purpose:** Document a reusable split by window capability for FASTA and FASTQ workflows. Candidate CAP-0231 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `split_by_window` 功能。候选编号 CAP-0231，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split by window operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_by_window` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.split_by_window(source[required], window[required], step[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.split_by_window(source[required], window[required], step[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `window`; optional arguments: `step`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`window`；可选参数：`step`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `split_by_window` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_by_window` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2273,7 +2273,7 @@ result = split_by_window(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2291,17 +2291,17 @@ print(result)
 
 ## 56) stats
 
-- **Purpose:** Document a reusable stats capability for FASTA and FASTQ workflows. Candidate CAP-0232 comes from 2 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `stats` 功能。候选编号 CAP-0232，来自 2 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the stats operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta, fastq). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `stats` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta、fastq）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.stats(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.stats(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `stats` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `stats` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2314,7 +2314,7 @@ result = stats(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2332,17 +2332,17 @@ print(result)
 
 ## 57) subsample
 
-- **Purpose:** Document a reusable subsample capability for FASTA and FASTQ workflows. Candidate CAP-0233 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `subsample` 功能。候选编号 CAP-0233，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the subsample operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. Existing-name evidence: `sample`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `subsample` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。已有同名函数证据：`sample`。
 
-- **API:** `dnakit.fasta_fastq.subsample(source[required], fraction[required], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.subsample(source[required], fraction[required], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `fraction`; optional arguments: `seed`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`fraction`；可选参数：`seed`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `subsample` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `subsample` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2357,7 +2357,7 @@ result = subsample(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2375,17 +2375,17 @@ print(result)
 
 ## 58) subsample_records
 
-- **Purpose:** Document a reusable subsample records capability for FASTA and FASTQ workflows. Candidate CAP-0234 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `subsample_records` 功能。候选编号 CAP-0234，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the subsample records operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `subsample_records` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.subsample_records(source[required], fraction[required], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.subsample_records(source[required], fraction[required], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `fraction`; optional arguments: `seed`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`fraction`；可选参数：`seed`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `subsample_records` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `subsample_records` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2400,7 +2400,7 @@ result = subsample_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2418,17 +2418,17 @@ print(result)
 
 ## 59) synchronize_pairs
 
-- **Purpose:** Document a reusable synchronize pairs capability for FASTA and FASTQ workflows. Candidate CAP-0235 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `synchronize_pairs` 功能。候选编号 CAP-0235，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the synchronize pairs operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `synchronize_pairs` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.synchronize_pairs(first[required], second[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.synchronize_pairs(first[required], second[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `first`, `second`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`first`、`second`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `synchronize_pairs` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `synchronize_pairs` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2442,7 +2442,7 @@ result = synchronize_pairs(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2460,17 +2460,17 @@ print(result)
 
 ## 60) trim_adapters
 
-- **Purpose:** Document a reusable trim adapters capability for FASTA and FASTQ workflows. Candidate CAP-0236 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `trim_adapters` 功能。候选编号 CAP-0236，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the trim adapters operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `trim_adapters` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.trim_adapters(source[required], adapters[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.trim_adapters(source[required], adapters[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `adapters`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`adapters`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `trim_adapters` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `trim_adapters` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2484,7 +2484,7 @@ result = trim_adapters(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2502,17 +2502,17 @@ print(result)
 
 ## 61) trim_low_quality_ends
 
-- **Purpose:** Document a reusable trim low quality ends capability for FASTA and FASTQ workflows. Candidate CAP-0237 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `trim_low_quality_ends` 功能。候选编号 CAP-0237，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the trim low quality ends operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `trim_low_quality_ends` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.trim_low_quality_ends(source[required], minimum_quality[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.trim_low_quality_ends(source[required], minimum_quality[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `minimum_quality`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`minimum_quality`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `trim_low_quality_ends` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `trim_low_quality_ends` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2526,7 +2526,7 @@ result = trim_low_quality_ends(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2544,17 +2544,17 @@ print(result)
 
 ## 62) unmask_regions
 
-- **Purpose:** Document a reusable unmask regions capability for FASTA and FASTQ workflows. Candidate CAP-0238 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `unmask_regions` 功能。候选编号 CAP-0238，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the unmask regions operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `unmask_regions` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.unmask_regions(source[required], regions[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.unmask_regions(source[required], regions[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`, `regions`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`、`regions`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `unmask_regions` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `unmask_regions` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2568,7 +2568,7 @@ result = unmask_regions(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2586,17 +2586,17 @@ print(result)
 
 ## 63) unwrap_fasta_lines
 
-- **Purpose:** Document a reusable unwrap fasta lines capability for FASTA and FASTQ workflows. Candidate CAP-0239 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `unwrap_fasta_lines` 功能。候选编号 CAP-0239，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the unwrap fasta lines operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `unwrap_fasta_lines` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.unwrap_fasta_lines(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.unwrap_fasta_lines(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `unwrap_fasta_lines` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `unwrap_fasta_lines` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2609,7 +2609,7 @@ result = unwrap_fasta_lines(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2627,17 +2627,17 @@ print(result)
 
 ## 64) validate
 
-- **Purpose:** Document a reusable validate capability for FASTA and FASTQ workflows. Candidate CAP-0240 comes from 2 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `validate` 功能。候选编号 CAP-0240，来自 2 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the validate operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta, fastq). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `generic_operation_name`. Existing-name evidence: `dnakit.standardize.validate|validate|validate_set`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `validate` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta、fastq）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`generic_operation_name`。已有同名函数证据：`dnakit.standardize.validate|validate|validate_set`。
 
-- **API:** `dnakit.fasta_fastq.validate(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.validate(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `validate` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `validate` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2650,7 +2650,7 @@ result = validate(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2668,17 +2668,17 @@ print(result)
 
 ## 65) validate_sequence_ids
 
-- **Purpose:** Document a reusable validate sequence ids capability for FASTA and FASTQ workflows. Candidate CAP-0241 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `validate_sequence_ids` 功能。候选编号 CAP-0241，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the validate sequence ids operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The dependency-free implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit FASTA/FASTQ records or text and does not invoke an aligner, reference genome, or external database. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `validate_sequence_ids` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。无外部依赖的实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。它处理显式给出的 FASTA/FASTQ 记录或文本，不调用比对工具、参考基因组或外部数据库。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.validate_sequence_ids(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.validate_sequence_ids(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：无。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `validate_sequence_ids` function returns its native Python value (records, a mapping, or a list of summaries) from explicit FASTA/FASTQ input. It does not infer annotations or call an external backend.
+- **输出：** 本地函数 `validate_sequence_ids` 根据显式给出的 FASTA/FASTQ 输入返回 Python 原生值（记录、映射或摘要列表）。它不推断注释，也不调用外部后端。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2691,7 +2691,7 @@ result = validate_sequence_ids(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2709,17 +2709,17 @@ print(result)
 
 ## 66) wrap_fasta_lines
 
-- **Purpose:** Document a reusable wrap fasta lines capability for FASTA and FASTQ workflows. Candidate CAP-0242 comes from 1 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“FASTA 与 FASTQ 记录处理”类分析提供可复用的 `wrap_fasta_lines` 功能。候选编号 CAP-0242，来自 1 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the wrap fasta lines operation, and return structured results with provenance and diagnostics. The optional `format` parameter selects one supported variant (fasta). The implementation is available at `src/dnakit/fasta_fastq/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `wrap_fasta_lines` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `format` 用于选择一种支持的变体（fasta）。实现位于 `src/dnakit/fasta_fastq/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.fasta_fastq.wrap_fasta_lines(source[required], width[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.fasta_fastq.wrap_fasta_lines(source[required], width[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: `width`. FASTA/FASTQ arguments accept text, paths, or materialized records.
+- **输入：** 必填参数：`source`；可选参数：`width`。FASTA/FASTQ 参数接受文本、路径或已读入的记录。
 
-- **Output:** The local `wrap_fasta_lines` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `wrap_fasta_lines` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2733,7 +2733,7 @@ result = wrap_fasta_lines(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {

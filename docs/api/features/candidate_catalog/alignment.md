@@ -1,20 +1,20 @@
-# Alignment
+# 读段比对与 BAM 统计
 
-This category contains **34** documented candidate capabilities; 34 have a locally callable formal entry (5 partial due to binary-format dependencies; 0 bounded external backends; 1 dependency-adapter only). The documented functions are exported through the formal DNAKit namespace; functions with a compatible JSON call plan are also exposed through the Agent/MCP registry.
+本类收录 **34** 项有文档的功能，均已在本地实现（原先唯一的占位函数 `calculate_clipping_profile` 现在由 CIGAR 字符串计算结果）。其中 5 项为部分实现，因为二进制 BAM/CRAM 输入需要可选包 `pysam`，其余处理 SAM 文本或记录映射。示例输出均为真实运行结果；`input_summary` 简写为 `{...}`。
 
 ## 1) align_long_reads
 
-- **Purpose:** Document a reusable align long reads capability for Alignment workflows. Candidate CAP-0001 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `align_long_reads` 功能。候选编号 CAP-0001，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the align long reads operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `align_long_reads` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.align_long_reads(input[required], backend[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.align_long_reads(input[required], backend[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `backend`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`backend`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `align_long_reads` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `align_long_reads` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -27,7 +27,7 @@ result = align_long_reads(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -45,17 +45,17 @@ print(result)
 
 ## 2) align_paired_reads
 
-- **Purpose:** Document a reusable align paired reads capability for Alignment workflows. Candidate CAP-0002 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `align_paired_reads` 功能。候选编号 CAP-0002，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the align paired reads operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `align_paired_reads` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.align_paired_reads(input[required], backend[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.align_paired_reads(input[required], backend[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `backend`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`backend`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `align_paired_reads` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `align_paired_reads` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -68,7 +68,7 @@ result = align_paired_reads(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -86,17 +86,17 @@ print(result)
 
 ## 3) align_reads
 
-- **Purpose:** Document a reusable align reads capability for Alignment workflows. Candidate CAP-0003 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `align_reads` 功能。候选编号 CAP-0003，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the align reads operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `align_reads` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.align_reads(input[required], backend[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.align_reads(input[required], backend[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `backend`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`backend`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `align_reads` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `align_reads` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -109,7 +109,7 @@ result = align_reads(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -127,17 +127,17 @@ print(result)
 
 ## 4) align_to_graph
 
-- **Purpose:** Document a reusable align to graph capability for Alignment workflows. Candidate CAP-0004 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `align_to_graph` 功能。候选编号 CAP-0004，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the align to graph operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `align_to_graph` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.align_to_graph(input[required], backend[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.align_to_graph(input[required], backend[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `backend`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`backend`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `align_to_graph` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `align_to_graph` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -150,7 +150,7 @@ result = align_to_graph(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -168,17 +168,17 @@ print(result)
 
 ## 5) bam_to_cram
 
-- **Purpose:** Document a reusable bam to cram capability for Alignment workflows. Candidate CAP-0005 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `bam_to_cram` 功能。候选编号 CAP-0005，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the bam to cram operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This entry is partial: the local example handles SAM text; binary BAM/CRAM requires a validated pysam or equivalent backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `bam_to_cram` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/alignment/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。此条目仅部分实现：本地示例处理 SAM 文本；二进制 BAM/CRAM 需要经过验证的 pysam 或同等后端。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.bam_to_cram(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.bam_to_cram(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `bam_to_cram` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview. Binary BAM/CRAM parsing or conversion is not validated and remains pending.
+- **输出：** 本地函数 `bam_to_cram` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。二进制 BAM/CRAM 的解析或转换尚未验证，仍待完成。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -191,7 +191,7 @@ result = bam_to_cram(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -209,17 +209,17 @@ print(result)
 
 ## 6) bam_to_sam
 
-- **Purpose:** Document a reusable bam to sam capability for Alignment workflows. Candidate CAP-0006 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `bam_to_sam` 功能。候选编号 CAP-0006，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the bam to sam operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This entry is partial: the local example handles SAM text; binary BAM/CRAM requires a validated pysam or equivalent backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `bam_to_sam` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/alignment/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。此条目仅部分实现：本地示例处理 SAM 文本；二进制 BAM/CRAM 需要经过验证的 pysam 或同等后端。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.bam_to_sam(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.bam_to_sam(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `bam_to_sam` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview. Binary BAM/CRAM parsing or conversion is not validated and remains pending.
+- **输出：** 本地函数 `bam_to_sam` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。二进制 BAM/CRAM 的解析或转换尚未验证，仍待完成。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -232,7 +232,7 @@ result = bam_to_sam(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -250,17 +250,17 @@ print(result)
 
 ## 7) build_index
 
-- **Purpose:** Document a reusable build index capability for Alignment workflows. Candidate CAP-0007 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `build_index` 功能。候选编号 CAP-0007，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the build index operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `generic_operation_name`. Existing-name evidence: `build_index|dnakit.download.build_index`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `build_index` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`generic_operation_name`。已有同名函数证据：`build_index|dnakit.download.build_index`。
 
-- **API:** `dnakit.alignment.build_index(input[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.build_index(input[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `k`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`k`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `build_index` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `build_index` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -274,7 +274,7 @@ result = build_index(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -292,17 +292,17 @@ print(result)
 
 ## 8) calculate_base_depth
 
-- **Purpose:** Document a reusable calculate base depth capability for Alignment workflows. Candidate CAP-0008 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_base_depth` 功能。候选编号 CAP-0008，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate base depth operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_base_depth` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_base_depth(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_base_depth(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_base_depth` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_base_depth` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -315,7 +315,7 @@ result = calculate_base_depth(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -333,58 +333,102 @@ print(result)
 
 ## 9) calculate_clipping_profile
 
-- **Purpose:** Document a reusable calculate clipping profile capability for Alignment workflows. Candidate CAP-0009 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 汇总 SAM 文本或类 SAM 记录中已比对 reads 左右两端的软剪切和硬剪切。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate clipping profile operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This is a local adapter: it validates the typed input and reports the backend required for scientific execution; it does not claim to replace that backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 剪切信息取自 CIGAR 字符串：左端和右端连续的 `S`（软）与 `H`（硬）操作，其中左、右指参考序列方向（而不是 read 的 5'/3' 端）。未比对的 reads（flag 为 4 或参考为 `*`）被排除。`clipped_reads` 统计含任何 `S` 或 `H` 操作的已比对 reads，`clipped_fraction` 为其占已比对 reads 的比例。`clip_length_histogram` 把一条 read 的剪切碱基总数（软加硬、两端合计）映射到对应的已比对 reads 数，包含 0。只使用 CIGAR，不检查 read 序列。
 
-- **API:** `dnakit.alignment.calculate_clipping_profile(input[required], options[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_clipping_profile(input[required], options[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `options`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** `input`：SAM 文本或 SAM 文件路径（忽略 `@` 头部行）、记录映射列表（`query_name`、`flag`、`reference`、`position`、`cigar` 等），或带 `sam` 或 `records` 的映射。无法读取的记录会抛 `InputFormatError`（`INVALID_ALIGNMENT_INPUT`）。`options`：`per_read`（默认 true：包含逐 read 表，最多 10,000 行）。
 
-- **Output:** The local adapter `calculate_clipping_profile` returns a JSON-serializable envelope containing `status`, `module`, `operation`, `input_summary`, `provenance`, and either a local result or `required_dependency`. It does not fabricate a backend scientific result. The adapter returns a structured dependency status when its scientific backend is unavailable.
+- **输出：** 封装包含 `status: "ok"`、`module`、`operation`、`provenance`、`input_summary`、`warnings` 和 `result`；`result` 含 `reads`、`mapped_reads`、`clipped_reads`、`clipped_fraction`、碱基总数 `left_soft`、`right_soft`、`left_hard`、`right_hard`、`soft_clipped_bases`、`hard_clipped_bases`、`clip_length_histogram`（JSON 对象的键是字符串形式的剪切碱基数），以及（除非 `per_read` 为 false）`per_read`（`query_name` 与每条 read 的四个剪切长度）。示例中 `r3` 未比对，`r4` 没有剪切。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
-from pathlib import Path
+import json
 
 from dnakit.alignment import calculate_clipping_profile
 
-result = calculate_clipping_profile(
-    input='@HD\tVN:1.6\nr1\t0\tchr1\t1\t60\t4M\t*\t0\t0\tACGT\tIIII\n'
+sam = (
+    "@HD\tVN:1.6\n"
+    "r1\t0\tchr1\t10\t60\t3S10M2S\t*\t0\t0\tACGTACGTACGTACG\tIIIIIIIIIIIIIII\n"
+    "r2\t16\tchr1\t20\t60\t5H10M\t*\t0\t0\tACGTACGTAC\tIIIIIIIIII\n"
+    "r3\t4\t*\t0\t0\t*\t*\t0\t0\tACGT\tIIII\n"
+    "r4\t0\tchr1\t30\t60\t10M\t*\t0\t0\tACGTACGTAC\tIIIIIIIIII\n"
 )
-print(result)
+result = calculate_clipping_profile(sam)
+print(json.dumps(result, indent=2))
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
-  "status": "candidate_adapter",
-  "capability_id": "CAP-0009",
+  "module": "alignment",
   "operation": "calculate_clipping_profile",
-  "result_type": "dict",
-  "result_preview": "{'module': 'alignment', 'operation': 'calculate_clipping_profile', 'provenance': {'implementation': 'local_candidate_adapter', 'backend': 'local'}, 'input_summary': {'record_count': 2, 'text_length': 45, 'sequence_bases': 14, 'lengths': [14], 'sha256': 'b20b0e08c38e755055c23270535b5a3daa4dda96fa1...",
   "provenance": {
-    "schema": "candidate_registry",
-    "implementation": "formal_adapter"
+    "implementation": "native",
+    "backend": "local"
+  },
+  "input_summary": {...},
+  "warnings": [],
+  "status": "ok",
+  "result": {
+    "reads": 4,
+    "mapped_reads": 3,
+    "clipped_reads": 2,
+    "clipped_fraction": 0.6666666666666666,
+    "left_soft": 3,
+    "right_soft": 2,
+    "left_hard": 5,
+    "right_hard": 0,
+    "soft_clipped_bases": 5,
+    "hard_clipped_bases": 5,
+    "clip_length_histogram": {
+      "0": 1,
+      "5": 2
+    },
+    "per_read": [
+      {
+        "query_name": "r1",
+        "left_soft": 3,
+        "right_soft": 2,
+        "left_hard": 0,
+        "right_hard": 0
+      },
+      {
+        "query_name": "r2",
+        "left_soft": 0,
+        "right_soft": 0,
+        "left_hard": 5,
+        "right_hard": 0
+      },
+      {
+        "query_name": "r4",
+        "left_soft": 0,
+        "right_soft": 0,
+        "left_hard": 0,
+        "right_hard": 0
+      }
+    ]
   }
 }
 ```
 
 ## 10) calculate_coverage
 
-- **Purpose:** Document a reusable calculate coverage capability for Alignment workflows. Candidate CAP-0010 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_coverage` 功能。候选编号 CAP-0010，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate coverage operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_coverage` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_coverage(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_coverage(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_coverage` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_coverage` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -397,7 +441,7 @@ result = calculate_coverage(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -415,17 +459,17 @@ print(result)
 
 ## 11) calculate_depth
 
-- **Purpose:** Document a reusable calculate depth capability for Alignment workflows. Candidate CAP-0011 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_depth` 功能。候选编号 CAP-0011，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate depth operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_depth` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_depth(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_depth(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_depth` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_depth` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -438,7 +482,7 @@ result = calculate_depth(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -456,17 +500,17 @@ print(result)
 
 ## 12) calculate_insert_size
 
-- **Purpose:** Document a reusable calculate insert size capability for Alignment workflows. Candidate CAP-0012 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_insert_size` 功能。候选编号 CAP-0012，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate insert size operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_insert_size` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_insert_size(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_insert_size(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_insert_size` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_insert_size` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -479,7 +523,7 @@ result = calculate_insert_size(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -497,17 +541,17 @@ print(result)
 
 ## 13) calculate_mapping_rate
 
-- **Purpose:** Document a reusable calculate mapping rate capability for Alignment workflows. Candidate CAP-0013 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_mapping_rate` 功能。候选编号 CAP-0013，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate mapping rate operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_mapping_rate` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_mapping_rate(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_mapping_rate(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_mapping_rate` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_mapping_rate` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -520,7 +564,7 @@ result = calculate_mapping_rate(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -538,17 +582,17 @@ print(result)
 
 ## 14) calculate_mismatch_rate
 
-- **Purpose:** Document a reusable calculate mismatch rate capability for Alignment workflows. Candidate CAP-0014 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_mismatch_rate` 功能。候选编号 CAP-0014，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate mismatch rate operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_mismatch_rate` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_mismatch_rate(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_mismatch_rate(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_mismatch_rate` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_mismatch_rate` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -561,7 +605,7 @@ result = calculate_mismatch_rate(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -579,17 +623,17 @@ print(result)
 
 ## 15) calculate_read_group_stats
 
-- **Purpose:** Document a reusable calculate read group stats capability for Alignment workflows. Candidate CAP-0015 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_read_group_stats` 功能。候选编号 CAP-0015，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate read group stats operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_read_group_stats` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_read_group_stats(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_read_group_stats(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_read_group_stats` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_read_group_stats` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -602,7 +646,7 @@ result = calculate_read_group_stats(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -620,17 +664,17 @@ print(result)
 
 ## 16) calculate_soft_clipping
 
-- **Purpose:** Document a reusable calculate soft clipping capability for Alignment workflows. Candidate CAP-0016 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_soft_clipping` 功能。候选编号 CAP-0016，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate soft clipping operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_soft_clipping` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_soft_clipping(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_soft_clipping(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_soft_clipping` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_soft_clipping` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -643,7 +687,7 @@ result = calculate_soft_clipping(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -661,17 +705,17 @@ print(result)
 
 ## 17) calculate_strand_balance
 
-- **Purpose:** Document a reusable calculate strand balance capability for Alignment workflows. Candidate CAP-0017 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_strand_balance` 功能。候选编号 CAP-0017，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate strand balance operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_strand_balance` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_strand_balance(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_strand_balance(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_strand_balance` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_strand_balance` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -684,7 +728,7 @@ result = calculate_strand_balance(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -702,17 +746,17 @@ print(result)
 
 ## 18) calculate_strand_bias
 
-- **Purpose:** Document a reusable calculate strand bias capability for Alignment workflows. Candidate CAP-0018 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `calculate_strand_bias` 功能。候选编号 CAP-0018，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate strand bias operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_strand_bias` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.calculate_strand_bias(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.calculate_strand_bias(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `calculate_strand_bias` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `calculate_strand_bias` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -725,7 +769,7 @@ result = calculate_strand_bias(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -743,17 +787,17 @@ print(result)
 
 ## 19) call_consensus_from_pileup
 
-- **Purpose:** Document a reusable call consensus from pileup capability for Alignment workflows. Candidate CAP-0019 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `call_consensus_from_pileup` 功能。候选编号 CAP-0019，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the call consensus from pileup operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `call_consensus_from_pileup` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.call_consensus_from_pileup(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.call_consensus_from_pileup(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `call_consensus_from_pileup` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `call_consensus_from_pileup` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -766,7 +810,7 @@ result = call_consensus_from_pileup(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -784,17 +828,17 @@ print(result)
 
 ## 20) filter_bam_by_flags
 
-- **Purpose:** Document a reusable filter bam by flags capability for Alignment workflows. Candidate CAP-0020 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `filter_bam_by_flags` 功能。候选编号 CAP-0020，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the filter bam by flags operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `filter_bam_by_flags` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.filter_bam_by_flags(input[required], include_flags[optional], exclude_flags[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.filter_bam_by_flags(input[required], include_flags[optional], exclude_flags[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `include_flags`, `exclude_flags`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`include_flags`、`exclude_flags`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `filter_bam_by_flags` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `filter_bam_by_flags` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -807,7 +851,7 @@ result = filter_bam_by_flags(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -825,17 +869,17 @@ print(result)
 
 ## 21) filter_bam_by_mapping_quality
 
-- **Purpose:** Document a reusable filter bam by mapping quality capability for Alignment workflows. Candidate CAP-0021 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `filter_bam_by_mapping_quality` 功能。候选编号 CAP-0021，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the filter bam by mapping quality operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `filter_bam_by_mapping_quality` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.filter_bam_by_mapping_quality(input[required], minimum[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.filter_bam_by_mapping_quality(input[required], minimum[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `minimum`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`minimum`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `filter_bam_by_mapping_quality` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `filter_bam_by_mapping_quality` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -848,7 +892,7 @@ result = filter_bam_by_mapping_quality(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -866,17 +910,17 @@ print(result)
 
 ## 22) generate_pileup
 
-- **Purpose:** Document a reusable generate pileup capability for Alignment workflows. Candidate CAP-0022 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `generate_pileup` 功能。候选编号 CAP-0022，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the generate pileup operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `generate_pileup` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.generate_pileup(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.generate_pileup(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `generate_pileup` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `generate_pileup` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -889,7 +933,7 @@ result = generate_pileup(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -907,17 +951,17 @@ print(result)
 
 ## 23) index_alignments
 
-- **Purpose:** Document a reusable index alignments capability for Alignment workflows. Candidate CAP-0023 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `index_alignments` 功能。候选编号 CAP-0023，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the index alignments operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `index_alignments` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.index_alignments(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.index_alignments(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `index_alignments` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `index_alignments` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -930,7 +974,7 @@ result = index_alignments(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -948,17 +992,17 @@ print(result)
 
 ## 24) mark_duplicates
 
-- **Purpose:** Document a reusable mark duplicates capability for Alignment workflows. Candidate CAP-0024 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `mark_duplicates` 功能。候选编号 CAP-0024，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the mark duplicates operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `mark_duplicates` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.mark_duplicates(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.mark_duplicates(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `mark_duplicates` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `mark_duplicates` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -971,7 +1015,7 @@ result = mark_duplicates(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -989,17 +1033,17 @@ print(result)
 
 ## 25) merge_bam_files
 
-- **Purpose:** Document a reusable merge bam files capability for Alignment workflows. Candidate CAP-0025 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `merge_bam_files` 功能。候选编号 CAP-0025，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the merge bam files operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `merge_bam_files` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.merge_bam_files(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.merge_bam_files(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `merge_bam_files` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `merge_bam_files` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1012,7 +1056,7 @@ result = merge_bam_files(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1030,17 +1074,17 @@ print(result)
 
 ## 26) parse_bam_records
 
-- **Purpose:** Document a reusable parse bam records capability for Alignment workflows. Candidate CAP-0026 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `parse_bam_records` 功能。候选编号 CAP-0026，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the parse bam records operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This entry is partial: the local example handles SAM text; binary BAM/CRAM requires a validated pysam or equivalent backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `parse_bam_records` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/alignment/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。此条目仅部分实现：本地示例处理 SAM 文本；二进制 BAM/CRAM 需要经过验证的 pysam 或同等后端。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.parse_bam_records(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.parse_bam_records(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `parse_bam_records` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview. Binary BAM/CRAM parsing or conversion is not validated and remains pending.
+- **输出：** 本地函数 `parse_bam_records` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。二进制 BAM/CRAM 的解析或转换尚未验证，仍待完成。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1053,7 +1097,7 @@ result = parse_bam_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1071,17 +1115,17 @@ print(result)
 
 ## 27) parse_cram_records
 
-- **Purpose:** Document a reusable parse cram records capability for Alignment workflows. Candidate CAP-0027 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `parse_cram_records` 功能。候选编号 CAP-0027，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the parse cram records operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This entry is partial: the local example handles SAM text; binary BAM/CRAM requires a validated pysam or equivalent backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `parse_cram_records` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/alignment/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。此条目仅部分实现：本地示例处理 SAM 文本；二进制 BAM/CRAM 需要经过验证的 pysam 或同等后端。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.parse_cram_records(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.parse_cram_records(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `parse_cram_records` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview. Binary BAM/CRAM parsing or conversion is not validated and remains pending.
+- **输出：** 本地函数 `parse_cram_records` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。二进制 BAM/CRAM 的解析或转换尚未验证，仍待完成。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1094,7 +1138,7 @@ result = parse_cram_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1112,17 +1156,17 @@ print(result)
 
 ## 28) parse_sam_records
 
-- **Purpose:** Document a reusable parse sam records capability for Alignment workflows. Candidate CAP-0028 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `parse_sam_records` 功能。候选编号 CAP-0028，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the parse sam records operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `parse_sam_records` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.parse_sam_records(source[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.parse_sam_records(source[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `source`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`source`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `parse_sam_records` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `parse_sam_records` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1135,7 +1179,7 @@ result = parse_sam_records(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1153,17 +1197,17 @@ print(result)
 
 ## 29) plot_alignment_view
 
-- **Purpose:** Document a reusable plot alignment view capability for Alignment workflows. Candidate CAP-0029 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `plot_alignment_view` 功能。候选编号 CAP-0029，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the plot alignment view operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. Existing-name evidence: `plot_alignment`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `plot_alignment_view` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。已有同名函数证据：`plot_alignment`。
 
-- **API:** `dnakit.alignment.plot_alignment_view(input[required], width[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.plot_alignment_view(input[required], width[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `width`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`width`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `plot_alignment_view` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `plot_alignment_view` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1177,7 +1221,7 @@ result = plot_alignment_view(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1195,17 +1239,17 @@ print(result)
 
 ## 30) plot_coverage_track
 
-- **Purpose:** Document a reusable plot coverage track capability for Alignment workflows. Candidate CAP-0030 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `plot_coverage_track` 功能。候选编号 CAP-0030，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the plot coverage track operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `plot_coverage_track` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.plot_coverage_track(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.plot_coverage_track(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `plot_coverage_track` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `plot_coverage_track` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1218,7 +1262,7 @@ result = plot_coverage_track(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1236,17 +1280,17 @@ print(result)
 
 ## 31) remove_duplicates
 
-- **Purpose:** Document a reusable remove duplicates capability for Alignment workflows. Candidate CAP-0031 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `remove_duplicates` 功能。候选编号 CAP-0031，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove duplicates operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_duplicates` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.remove_duplicates(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.remove_duplicates(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `remove_duplicates` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `remove_duplicates` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1259,7 +1303,7 @@ result = remove_duplicates(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1277,17 +1321,17 @@ print(result)
 
 ## 32) sam_to_bam
 
-- **Purpose:** Document a reusable sam to bam capability for Alignment workflows. Candidate CAP-0032 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `sam_to_bam` 功能。候选编号 CAP-0032，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the sam to bam operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/alignment/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. This entry is partial: the local example handles SAM text; binary BAM/CRAM requires a validated pysam or equivalent backend. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `sam_to_bam` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/alignment/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。此条目仅部分实现：本地示例处理 SAM 文本；二进制 BAM/CRAM 需要经过验证的 pysam 或同等后端。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.sam_to_bam(input[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.sam_to_bam(input[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `sam_to_bam` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview. Binary BAM/CRAM parsing or conversion is not validated and remains pending.
+- **输出：** 本地函数 `sam_to_bam` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。二进制 BAM/CRAM 的解析或转换尚未验证，仍待完成。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1300,7 +1344,7 @@ result = sam_to_bam(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1318,17 +1362,17 @@ print(result)
 
 ## 33) sort_alignments
 
-- **Purpose:** Document a reusable sort alignments capability for Alignment workflows. Candidate CAP-0033 comes from 10 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `sort_alignments` 功能。候选编号 CAP-0033，来自 10 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the sort alignments operation, and return structured results with provenance and diagnostics. The optional `backend` parameter selects one supported variant (bowtie2, bwa, graphmap, hisat2, minimap2, ngmlr, pbmm2, star, vg, winnowmap). The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `merged_dimension`. Existing-name evidence: `plot_alignment`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `sort_alignments` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `backend` 用于选择一种支持的变体（bowtie2、bwa、graphmap、hisat2、minimap2、ngmlr、pbmm2、star、vg、winnowmap）。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`merged_dimension`。已有同名函数证据：`plot_alignment`。
 
-- **API:** `dnakit.alignment.sort_alignments(input[required], by[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.sort_alignments(input[required], by[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`; optional arguments: `by`. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`；可选参数：`by`。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `sort_alignments` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `sort_alignments` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1341,7 +1385,7 @@ result = sort_alignments(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1359,17 +1403,17 @@ print(result)
 
 ## 34) split_bam_by_region
 
-- **Purpose:** Document a reusable split bam by region capability for Alignment workflows. Candidate CAP-0034 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“读段比对与 BAM 统计”类分析提供可复用的 `split_bam_by_region` 功能。候选编号 CAP-0034，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split bam by region operation, and return structured results with provenance and diagnostics. The deterministic local implementation is available at `src/dnakit/alignment/_candidates.py` and is exported through the formal DNAKit namespace. It operates on SAM-like text or materialized records; binary BAM/CRAM parsing, reference-indexed alignment, and external aligners remain outside this boundary. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_bam_by_region` 操作，并返回附带来源与诊断信息的结构化结果。确定性的本地实现位于 `src/dnakit/alignment/_candidates.py`，并通过正式的 DNAKit 命名空间导出。它处理类 SAM 文本或已读入的记录；二进制 BAM/CRAM 解析、基于参考索引的比对和外部比对工具不在此范围内。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.alignment.split_bam_by_region(input[required], regions[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.alignment.split_bam_by_region(input[required], regions[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `input`, `regions`; optional arguments: no. Alignment input accepts SAM text, record mappings, or the local read/reference envelope.
+- **输入：** 必填参数：`input`、`regions`；可选参数：无。比对输入接受 SAM 文本、记录映射或本地的 read/reference 封装。
 
-- **Output:** The local `split_bam_by_region` function returns its deterministic Python result from SAM-like text or materialized records. It does not parse binary BAM/CRAM or invoke a reference-indexed external aligner.
+- **输出：** 本地函数 `split_bam_by_region` 根据类 SAM 文本或已读入的记录返回确定性的 Python 结果。它不解析二进制 BAM/CRAM，也不调用基于参考索引的外部比对工具。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1383,7 +1427,7 @@ result = split_bam_by_region(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {

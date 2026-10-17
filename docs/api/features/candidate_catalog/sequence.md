@@ -1,20 +1,20 @@
-# Sequence analysis
+# 通用序列操作、k-mer 与编码
 
-This category contains **52** documented candidate capabilities; 52 have a locally callable formal entry (0 partial due to binary-format dependencies; 0 bounded external backends; 0 dependency-adapter only). The documented functions are exported through the formal DNAKit namespace; functions with a compatible JSON call plan are also exposed through the Agent/MCP registry.
+本类收录 **52** 项有文档的候选功能，其中 52 项有可在本地调用的正式入口（0 项因依赖二进制格式仅部分实现；0 项为受限的外部后端；0 项仅为依赖适配层）。这些函数都通过正式的 DNAKit 命名空间导出；JSON 调用方案兼容的函数也会注册到 Agent/MCP 工具库。
 
 ## 1) apply_reverse_complement_augmentation
 
-- **Purpose:** Document a reusable apply reverse complement augmentation capability for Sequence analysis workflows. Candidate CAP-0583 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `apply_reverse_complement_augmentation` 功能。候选编号 CAP-0583，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the apply reverse complement augmentation operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `apply_reverse_complement_augmentation` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.apply_reverse_complement_augmentation(sequence[required], include_original[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.apply_reverse_complement_augmentation(sequence[required], include_original[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `include_original`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`include_original`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `apply_reverse_complement_augmentation` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `apply_reverse_complement_augmentation` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -27,7 +27,7 @@ result = apply_reverse_complement_augmentation(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -45,17 +45,17 @@ print(result)
 
 ## 2) back_transcribe_rna_to_dna
 
-- **Purpose:** Document a reusable back transcribe rna to dna capability for Sequence analysis workflows. Candidate CAP-0584 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `back_transcribe_rna_to_dna` 功能。候选编号 CAP-0584，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the back transcribe rna to dna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `back_transcribe_rna_to_dna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.back_transcribe_rna_to_dna(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.back_transcribe_rna_to_dna(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `back_transcribe_rna_to_dna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `back_transcribe_rna_to_dna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -68,7 +68,7 @@ result = back_transcribe_rna_to_dna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -86,17 +86,17 @@ print(result)
 
 ## 3) build_minimizer_index
 
-- **Purpose:** Document a reusable build minimizer index capability for Sequence analysis workflows. Candidate CAP-0585 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `build_minimizer_index` 功能。候选编号 CAP-0585，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the build minimizer index operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `build_minimizer_index` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.build_minimizer_index(sequence[required], k[optional], window[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.build_minimizer_index(sequence[required], k[optional], window[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `k`, `window`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`k`、`window`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `build_minimizer_index` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `build_minimizer_index` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -111,7 +111,7 @@ result = build_minimizer_index(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -129,17 +129,17 @@ print(result)
 
 ## 4) calculate_sequence_metrics
 
-- **Purpose:** Document a reusable calculate sequence metrics capability for Sequence analysis workflows. Candidate CAP-0586 comes from 27 source row(s) and is currently marked `review_needed`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `calculate_sequence_metrics` 功能。候选编号 CAP-0586，来自 27 条原始记录，当前标记为 `review_needed`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the calculate sequence metrics operation, and return structured results with provenance and diagnostics. The optional `metric` parameter selects one supported variant (the supported values recorded in the source catalog). The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `merged_dimension`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `calculate_sequence_metrics` 操作，并返回附带来源与诊断信息的结构化结果。可选参数 `metric` 用于选择一种支持的变体（取值见源目录记录）。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`merged_dimension`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.calculate_sequence_metrics(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.calculate_sequence_metrics(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `calculate_sequence_metrics` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `calculate_sequence_metrics` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -152,7 +152,7 @@ result = calculate_sequence_metrics(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -170,17 +170,17 @@ print(result)
 
 ## 5) cluster_sequences_by_identity
 
-- **Purpose:** Document a reusable cluster sequences by identity capability for Sequence analysis workflows. Candidate CAP-0587 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `cluster_sequences_by_identity` 功能。候选编号 CAP-0587，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the cluster sequences by identity operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `cluster_sequences_by_identity` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.cluster_sequences_by_identity(sequences[required], threshold[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.cluster_sequences_by_identity(sequences[required], threshold[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`; optional arguments: `threshold`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`；可选参数：`threshold`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `cluster_sequences_by_identity` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `cluster_sequences_by_identity` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -194,7 +194,7 @@ result = cluster_sequences_by_identity(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -212,17 +212,17 @@ print(result)
 
 ## 6) compare_motif_alleles
 
-- **Purpose:** Document a reusable compare motif alleles capability for Sequence analysis workflows. Candidate CAP-0588 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `compare_motif_alleles` 功能。候选编号 CAP-0588，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the compare motif alleles operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `compare_motif_alleles` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.compare_motif_alleles(left[required], right[required], motif[required], start[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.compare_motif_alleles(left[required], right[required], motif[required], start[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `left`, `right`, `motif`; optional arguments: `start`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`left`、`right`、`motif`；可选参数：`start`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `compare_motif_alleles` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `compare_motif_alleles` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -237,7 +237,7 @@ result = compare_motif_alleles(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -255,17 +255,17 @@ print(result)
 
 ## 7) compare_sequence_sketches
 
-- **Purpose:** Document a reusable compare sequence sketches capability for Sequence analysis workflows. Candidate CAP-0589 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `compare_sequence_sketches` 功能。候选编号 CAP-0589，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the compare sequence sketches operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `compare_sequence_sketches` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.compare_sequence_sketches(left[required], right[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.compare_sequence_sketches(left[required], right[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `left`, `right`; optional arguments: `k`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`left`、`right`；可选参数：`k`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `compare_sequence_sketches` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `compare_sequence_sketches` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -280,7 +280,7 @@ result = compare_sequence_sketches(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -298,17 +298,17 @@ print(result)
 
 ## 8) complement_dna
 
-- **Purpose:** Document a reusable complement dna capability for Sequence analysis workflows. Candidate CAP-0590 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `complement_dna` 功能。候选编号 CAP-0590，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the complement dna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `complement`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `complement_dna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`complement`。
 
-- **API:** `dnakit.sequence.complement_dna(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.complement_dna(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `complement_dna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `complement_dna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -321,7 +321,7 @@ result = complement_dna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -339,17 +339,17 @@ print(result)
 
 ## 9) count_canonical_kmers
 
-- **Purpose:** Document a reusable count canonical kmers capability for Sequence analysis workflows. Candidate CAP-0591 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `count_canonical_kmers` 功能。候选编号 CAP-0591，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the count canonical kmers operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. Existing-name evidence: `canonical_kmer`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `count_canonical_kmers` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。已有同名函数证据：`canonical_kmer`。
 
-- **API:** `dnakit.sequence.count_canonical_kmers(sequence[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.count_canonical_kmers(sequence[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `k`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`k`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `count_canonical_kmers` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `count_canonical_kmers` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -363,7 +363,7 @@ result = count_canonical_kmers(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -381,17 +381,17 @@ print(result)
 
 ## 10) count_kmers
 
-- **Purpose:** Document a reusable count kmers capability for Sequence analysis workflows. Candidate CAP-0592 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `count_kmers` 功能。候选编号 CAP-0592，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the count kmers operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `count_kmers` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.count_kmers(sequence[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.count_kmers(sequence[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `k`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`k`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `count_kmers` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `count_kmers` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -405,7 +405,7 @@ result = count_kmers(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -423,17 +423,17 @@ print(result)
 
 ## 11) count_kmers_batch
 
-- **Purpose:** Document a reusable count kmers batch capability for Sequence analysis workflows. Candidate CAP-0593 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `count_kmers_batch` 功能。候选编号 CAP-0593，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the count kmers batch operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `count_kmers_batch` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.count_kmers_batch(sequences[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.count_kmers_batch(sequences[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`; optional arguments: `k`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`；可选参数：`k`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `count_kmers_batch` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `count_kmers_batch` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -447,7 +447,7 @@ result = count_kmers_batch(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -465,17 +465,17 @@ print(result)
 
 ## 12) deduplicate_sequences
 
-- **Purpose:** Document a reusable deduplicate sequences capability for Sequence analysis workflows. Candidate CAP-0594 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `deduplicate_sequences` 功能。候选编号 CAP-0594，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the deduplicate sequences operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `deduplicate_sequences` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.deduplicate_sequences(sequences[required], canonical[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.deduplicate_sequences(sequences[required], canonical[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`; optional arguments: `canonical`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`；可选参数：`canonical`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `deduplicate_sequences` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `deduplicate_sequences` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -488,7 +488,7 @@ result = deduplicate_sequences(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -506,17 +506,17 @@ print(result)
 
 ## 13) digest_sequence_in_silico
 
-- **Purpose:** Document a reusable digest sequence in silico capability for Sequence analysis workflows. Candidate CAP-0595 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `digest_sequence_in_silico` 功能。候选编号 CAP-0595，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the digest sequence in silico operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `digest_sequence_in_silico` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.digest_sequence_in_silico(sequence[required], enzymes[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.digest_sequence_in_silico(sequence[required], enzymes[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `enzymes`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`enzymes`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `digest_sequence_in_silico` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `digest_sequence_in_silico` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -530,7 +530,7 @@ result = digest_sequence_in_silico(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -548,17 +548,17 @@ print(result)
 
 ## 14) extract_cds_from_transcript
 
-- **Purpose:** Document a reusable extract cds from transcript capability for Sequence analysis workflows. Candidate CAP-0596 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `extract_cds_from_transcript` 功能。候选编号 CAP-0596，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the extract cds from transcript operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `extract_cds_from_transcript` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.extract_cds_from_transcript(transcript[required], intervals[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.extract_cds_from_transcript(transcript[required], intervals[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `transcript`, `intervals`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`transcript`、`intervals`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `extract_cds_from_transcript` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `extract_cds_from_transcript` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -572,7 +572,7 @@ result = extract_cds_from_transcript(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -590,17 +590,17 @@ print(result)
 
 ## 15) generate_kmer_table
 
-- **Purpose:** Document a reusable generate kmer table capability for Sequence analysis workflows. Candidate CAP-0598 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `generate_kmer_table` 功能。候选编号 CAP-0598，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the generate kmer table operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `generate_kmer_table` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.generate_kmer_table(sequences[required], k[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.generate_kmer_table(sequences[required], k[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`; optional arguments: `k`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`；可选参数：`k`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `generate_kmer_table` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `generate_kmer_table` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -614,7 +614,7 @@ result = generate_kmer_table(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -632,17 +632,17 @@ print(result)
 
 ## 16) generate_markov_sequence
 
-- **Purpose:** Document a reusable generate markov sequence capability for Sequence analysis workflows. Candidate CAP-0599 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `generate_markov_sequence` 功能。候选编号 CAP-0599，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the generate markov sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `generate_markov_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.generate_markov_sequence(sequence[required], length[required], order[optional], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.generate_markov_sequence(sequence[required], length[required], order[optional], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `length`; optional arguments: `order`, `seed`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`length`；可选参数：`order`、`seed`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `generate_markov_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `generate_markov_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -657,7 +657,7 @@ result = generate_markov_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -675,17 +675,17 @@ print(result)
 
 ## 17) generate_random_dna
 
-- **Purpose:** Document a reusable generate random dna capability for Sequence analysis workflows. Candidate CAP-0600 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `generate_random_dna` 功能。候选编号 CAP-0600，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the generate random dna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `generate_random_dna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.generate_random_dna(length[required], seed[optional], alphabet[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.generate_random_dna(length[required], seed[optional], alphabet[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `length`; optional arguments: `seed`, `alphabet`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`length`；可选参数：`seed`、`alphabet`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `generate_random_dna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `generate_random_dna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -699,7 +699,7 @@ result = generate_random_dna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -717,17 +717,17 @@ print(result)
 
 ## 18) mask_low_complexity
 
-- **Purpose:** Document a reusable mask low complexity capability for Sequence analysis workflows. Candidate CAP-0601 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `mask_low_complexity` 功能。候选编号 CAP-0601，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the mask low complexity operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `mask_low_complexity` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.mask_low_complexity(sequence[required], window[optional], entropy_threshold[optional], mask[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.mask_low_complexity(sequence[required], window[optional], entropy_threshold[optional], mask[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `window`, `entropy_threshold`, `mask`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`window`、`entropy_threshold`、`mask`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `mask_low_complexity` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `mask_low_complexity` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -741,7 +741,7 @@ result = mask_low_complexity(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -759,17 +759,17 @@ print(result)
 
 ## 19) merge_overlapping_windows
 
-- **Purpose:** Document a reusable merge overlapping windows capability for Sequence analysis workflows. Candidate CAP-0602 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `merge_overlapping_windows` 功能。候选编号 CAP-0602，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the merge overlapping windows operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `merge_overlapping_windows` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.merge_overlapping_windows(windows[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.merge_overlapping_windows(windows[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `windows`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`windows`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `merge_overlapping_windows` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `merge_overlapping_windows` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -782,7 +782,7 @@ result = merge_overlapping_windows(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -800,17 +800,17 @@ print(result)
 
 ## 20) mutate_sequence_at_positions
 
-- **Purpose:** Document a reusable mutate sequence at positions capability for Sequence analysis workflows. Candidate CAP-0603 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `mutate_sequence_at_positions` 功能。候选编号 CAP-0603，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the mutate sequence at positions operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `mutate_sequence_at_positions` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.mutate_sequence_at_positions(sequence[required], mutations[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.mutate_sequence_at_positions(sequence[required], mutations[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `mutations`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`mutations`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `mutate_sequence_at_positions` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `mutate_sequence_at_positions` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -824,7 +824,7 @@ result = mutate_sequence_at_positions(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -842,17 +842,17 @@ print(result)
 
 ## 21) normalize_dna_sequence
 
-- **Purpose:** Document a reusable normalize dna sequence capability for Sequence analysis workflows. Candidate CAP-0604 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `normalize_dna_sequence` 功能。候选编号 CAP-0604，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the normalize dna sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `normalize_dna_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.normalize_dna_sequence(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.normalize_dna_sequence(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `normalize_dna_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `normalize_dna_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -865,7 +865,7 @@ result = normalize_dna_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -883,17 +883,17 @@ print(result)
 
 ## 22) normalize_protein_sequence
 
-- **Purpose:** Document a reusable normalize protein sequence capability for Sequence analysis workflows. Candidate CAP-0605 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `normalize_protein_sequence` 功能。候选编号 CAP-0605，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the normalize protein sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `normalize_protein_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.normalize_protein_sequence(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.normalize_protein_sequence(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `normalize_protein_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `normalize_protein_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -906,7 +906,7 @@ result = normalize_protein_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -924,17 +924,17 @@ print(result)
 
 ## 23) normalize_rna_sequence
 
-- **Purpose:** Document a reusable normalize rna sequence capability for Sequence analysis workflows. Candidate CAP-0606 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `normalize_rna_sequence` 功能。候选编号 CAP-0606，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the normalize rna sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `normalize_rna_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.normalize_rna_sequence(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.normalize_rna_sequence(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `normalize_rna_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `normalize_rna_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -947,7 +947,7 @@ result = normalize_rna_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -965,17 +965,17 @@ print(result)
 
 ## 24) one_hot_encode_dna
 
-- **Purpose:** Document a reusable one hot encode dna capability for Sequence analysis workflows. Candidate CAP-0607 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `one_hot_encode_dna` 功能。候选编号 CAP-0607，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the one hot encode dna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `one_hot_encode`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `one_hot_encode_dna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`one_hot_encode`。
 
-- **API:** `dnakit.sequence.one_hot_encode_dna(sequence[required], include_ambiguous[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.one_hot_encode_dna(sequence[required], include_ambiguous[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `include_ambiguous`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`include_ambiguous`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `one_hot_encode_dna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `one_hot_encode_dna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -988,7 +988,7 @@ result = one_hot_encode_dna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1006,17 +1006,17 @@ print(result)
 
 ## 25) one_hot_encode_rna
 
-- **Purpose:** Document a reusable one hot encode rna capability for Sequence analysis workflows. Candidate CAP-0608 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `one_hot_encode_rna` 功能。候选编号 CAP-0608，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the one hot encode rna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `one_hot_encode`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `one_hot_encode_rna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`one_hot_encode`。
 
-- **API:** `dnakit.sequence.one_hot_encode_rna(sequence[required], include_ambiguous[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.one_hot_encode_rna(sequence[required], include_ambiguous[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `include_ambiguous`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`include_ambiguous`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `one_hot_encode_rna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `one_hot_encode_rna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1029,7 +1029,7 @@ result = one_hot_encode_rna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1047,17 +1047,17 @@ print(result)
 
 ## 26) pad_sequence
 
-- **Purpose:** Document a reusable pad sequence capability for Sequence analysis workflows. Candidate CAP-0609 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `pad_sequence` 功能。候选编号 CAP-0609，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the pad sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `ena_sequence|plot_sequence|sequence`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `pad_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`ena_sequence|plot_sequence|sequence`。
 
-- **API:** `dnakit.sequence.pad_sequence(sequence[required], length[required], symbol[optional], side[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.pad_sequence(sequence[required], length[required], symbol[optional], side[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `length`; optional arguments: `symbol`, `side`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`length`；可选参数：`symbol`、`side`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `pad_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `pad_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1071,7 +1071,7 @@ result = pad_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1089,17 +1089,17 @@ print(result)
 
 ## 27) predict_coding_regions
 
-- **Purpose:** Document a reusable predict coding regions capability for Sequence analysis workflows. Candidate CAP-0610 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `predict_coding_regions` 功能。候选编号 CAP-0610，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the predict coding regions operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `predict_coding_regions` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.predict_coding_regions(sequence[required], min_aa[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.predict_coding_regions(sequence[required], min_aa[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `min_aa`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`min_aa`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `predict_coding_regions` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `predict_coding_regions` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1112,7 +1112,7 @@ result = predict_coding_regions(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1130,17 +1130,17 @@ print(result)
 
 ## 28) remove_sequence_gaps
 
-- **Purpose:** Document a reusable remove sequence gaps capability for Sequence analysis workflows. Candidate CAP-0611 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `remove_sequence_gaps` 功能。候选编号 CAP-0611，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove sequence gaps operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_sequence_gaps` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.remove_sequence_gaps(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.remove_sequence_gaps(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `remove_sequence_gaps` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `remove_sequence_gaps` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1153,7 +1153,7 @@ result = remove_sequence_gaps(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1171,17 +1171,17 @@ print(result)
 
 ## 29) remove_sequence_whitespace
 
-- **Purpose:** Document a reusable remove sequence whitespace capability for Sequence analysis workflows. Candidate CAP-0612 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `remove_sequence_whitespace` 功能。候选编号 CAP-0612，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the remove sequence whitespace operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `remove_sequence_whitespace` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.remove_sequence_whitespace(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.remove_sequence_whitespace(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `remove_sequence_whitespace` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `remove_sequence_whitespace` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1194,7 +1194,7 @@ result = remove_sequence_whitespace(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1212,17 +1212,17 @@ print(result)
 
 ## 30) replace_ambiguous_bases
 
-- **Purpose:** Document a reusable replace ambiguous bases capability for Sequence analysis workflows. Candidate CAP-0613 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `replace_ambiguous_bases` 功能。候选编号 CAP-0613，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the replace ambiguous bases operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `replace_ambiguous_bases` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.replace_ambiguous_bases(sequence[required], replacement[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.replace_ambiguous_bases(sequence[required], replacement[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `replacement`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`replacement`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `replace_ambiguous_bases` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `replace_ambiguous_bases` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1235,7 +1235,7 @@ result = replace_ambiguous_bases(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1253,17 +1253,17 @@ print(result)
 
 ## 31) reverse_complement_dna
 
-- **Purpose:** Document a reusable reverse complement dna capability for Sequence analysis workflows. Candidate CAP-0614 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `reverse_complement_dna` 功能。候选编号 CAP-0614，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the reverse complement dna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `reverse_complement|reverse_complement_record|reverse_complement_search`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `reverse_complement_dna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`reverse_complement|reverse_complement_record|reverse_complement_search`。
 
-- **API:** `dnakit.sequence.reverse_complement_dna(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.reverse_complement_dna(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `reverse_complement_dna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `reverse_complement_dna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1276,7 +1276,7 @@ result = reverse_complement_dna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1294,17 +1294,17 @@ print(result)
 
 ## 32) reverse_sequence
 
-- **Purpose:** Document a reusable reverse sequence capability for Sequence analysis workflows. Candidate CAP-0615 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `reverse_sequence` 功能。候选编号 CAP-0615，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the reverse sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `reverse_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.reverse_sequence(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.reverse_sequence(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `reverse_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `reverse_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1317,7 +1317,7 @@ result = reverse_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1335,17 +1335,17 @@ print(result)
 
 ## 33) scan_pwm_batch
 
-- **Purpose:** Document a reusable scan pwm batch capability for Sequence analysis workflows. Candidate CAP-0617 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `scan_pwm_batch` 功能。候选编号 CAP-0617，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the scan pwm batch operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `scan_pwm_batch` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.scan_pwm_batch(sequences[required], pwm[required], threshold[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.scan_pwm_batch(sequences[required], pwm[required], threshold[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`, `pwm`; optional arguments: `threshold`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`、`pwm`；可选参数：`threshold`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `scan_pwm_batch` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `scan_pwm_batch` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1360,7 +1360,7 @@ result = scan_pwm_batch(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1378,17 +1378,17 @@ print(result)
 
 ## 34) score_motif_hit
 
-- **Purpose:** Document a reusable score motif hit capability for Sequence analysis workflows. Candidate CAP-0618 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `score_motif_hit` 功能。候选编号 CAP-0618，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the score motif hit operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `score_motif_hit` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.score_motif_hit(sequence[required], motif[required], position[optional], match_score[optional], mismatch_score[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.score_motif_hit(sequence[required], motif[required], position[optional], match_score[optional], mismatch_score[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `motif`; optional arguments: `position`, `match_score`, `mismatch_score`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`motif`；可选参数：`position`、`match_score`、`mismatch_score`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `score_motif_hit` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `score_motif_hit` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1402,7 +1402,7 @@ result = score_motif_hit(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1420,17 +1420,17 @@ print(result)
 
 ## 35) select_representative_sequences
 
-- **Purpose:** Document a reusable select representative sequences capability for Sequence analysis workflows. Candidate CAP-0619 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `select_representative_sequences` 功能。候选编号 CAP-0619，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the select representative sequences operation, and return structured results with provenance and diagnostics. The dependency-free implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. It operates on explicit DNA strings without a reference database, trained model, or external executable. Review basis: `no_exact_public_match`. Existing-name evidence: `select_representatives`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `select_representative_sequences` 操作，并返回附带来源与诊断信息的结构化结果。无外部依赖的实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。它直接处理显式给出的 DNA 字符串，不依赖参考数据库、训练好的模型或外部可执行程序。审核依据：`no_exact_public_match`。已有同名函数证据：`select_representatives`。
 
-- **API:** `dnakit.sequence.select_representative_sequences(sequences[required], threshold[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.select_representative_sequences(sequences[required], threshold[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequences`; optional arguments: `threshold`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequences`；可选参数：`threshold`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `select_representative_sequences` function returns its deterministic Python result from explicit DNA strings. It does not query a reference database, load a trained model, or invoke an external executable.
+- **输出：** 本地函数 `select_representative_sequences` 根据显式给出的 DNA 字符串返回确定性的 Python 结果。它不查询参考数据库、不加载训练好的模型，也不调用外部可执行程序。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1444,7 +1444,7 @@ result = select_representative_sequences(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1462,17 +1462,17 @@ print(result)
 
 ## 36) simulate_indels
 
-- **Purpose:** Document a reusable simulate indels capability for Sequence analysis workflows. Candidate CAP-0620 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `simulate_indels` 功能。候选编号 CAP-0620，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the simulate indels operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `simulate_indels` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.simulate_indels(sequence[required], count[optional], seed[optional], max_length[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.simulate_indels(sequence[required], count[optional], seed[optional], max_length[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `count`, `seed`, `max_length`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`count`、`seed`、`max_length`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `simulate_indels` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `simulate_indels` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1486,7 +1486,7 @@ result = simulate_indels(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1504,17 +1504,17 @@ print(result)
 
 ## 37) simulate_point_mutations
 
-- **Purpose:** Document a reusable simulate point mutations capability for Sequence analysis workflows. Candidate CAP-0621 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `simulate_point_mutations` 功能。候选编号 CAP-0621，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the simulate point mutations operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `simulate_point_mutations` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.simulate_point_mutations(sequence[required], rate[optional], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.simulate_point_mutations(sequence[required], rate[optional], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `rate`, `seed`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`rate`、`seed`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `simulate_point_mutations` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `simulate_point_mutations` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1529,7 +1529,7 @@ result = simulate_point_mutations(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1547,17 +1547,17 @@ print(result)
 
 ## 38) simulate_recombination
 
-- **Purpose:** Document a reusable simulate recombination capability for Sequence analysis workflows. Candidate CAP-0622 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `simulate_recombination` 功能。候选编号 CAP-0622，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the simulate recombination operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `simulate_recombination` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.simulate_recombination(left[required], right[required], crossover[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.simulate_recombination(left[required], right[required], crossover[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `left`, `right`; optional arguments: `crossover`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`left`、`right`；可选参数：`crossover`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `simulate_recombination` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `simulate_recombination` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1571,7 +1571,7 @@ result = simulate_recombination(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1589,17 +1589,17 @@ print(result)
 
 ## 39) simulate_sequence_evolution
 
-- **Purpose:** Document a reusable simulate sequence evolution capability for Sequence analysis workflows. Candidate CAP-0623 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `simulate_sequence_evolution` 功能。候选编号 CAP-0623，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the simulate sequence evolution operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `simulate_sequence_evolution` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.simulate_sequence_evolution(sequence[required], generations[optional], mutation_rate[optional], seed[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.simulate_sequence_evolution(sequence[required], generations[optional], mutation_rate[optional], seed[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `generations`, `mutation_rate`, `seed`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`generations`、`mutation_rate`、`seed`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `simulate_sequence_evolution` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `simulate_sequence_evolution` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1613,7 +1613,7 @@ result = simulate_sequence_evolution(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1631,17 +1631,17 @@ print(result)
 
 ## 40) split_sequence_windows
 
-- **Purpose:** Document a reusable split sequence windows capability for Sequence analysis workflows. Candidate CAP-0624 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `split_sequence_windows` 功能。候选编号 CAP-0624，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the split sequence windows operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `split_sequence_windows` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.split_sequence_windows(sequence[required], window[required], step[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.split_sequence_windows(sequence[required], window[required], step[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`, `window`; optional arguments: `step`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`、`window`；可选参数：`step`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `split_sequence_windows` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `split_sequence_windows` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1656,7 +1656,7 @@ result = split_sequence_windows(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1674,17 +1674,17 @@ print(result)
 
 ## 41) tokenize_dna_bpe
 
-- **Purpose:** Document a reusable tokenize dna bpe capability for Sequence analysis workflows. Candidate CAP-0625 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `tokenize_dna_bpe` 功能。候选编号 CAP-0625，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the tokenize dna bpe operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `tokenize_dna_bpe` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.tokenize_dna_bpe(sequence[required], merges[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.tokenize_dna_bpe(sequence[required], merges[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `merges`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`merges`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `tokenize_dna_bpe` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `tokenize_dna_bpe` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1697,7 +1697,7 @@ result = tokenize_dna_bpe(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1715,17 +1715,17 @@ print(result)
 
 ## 42) tokenize_dna_kmer
 
-- **Purpose:** Document a reusable tokenize dna kmer capability for Sequence analysis workflows. Candidate CAP-0626 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `tokenize_dna_kmer` 功能。候选编号 CAP-0626，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the tokenize dna kmer operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `tokenize_dna_kmer` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.tokenize_dna_kmer(sequence[required], k[optional], stride[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.tokenize_dna_kmer(sequence[required], k[optional], stride[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `k`, `stride`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`k`、`stride`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `tokenize_dna_kmer` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `tokenize_dna_kmer` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1739,7 +1739,7 @@ result = tokenize_dna_kmer(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1757,17 +1757,17 @@ print(result)
 
 ## 43) transcribe_dna_to_rna
 
-- **Purpose:** Document a reusable transcribe dna to rna capability for Sequence analysis workflows. Candidate CAP-0627 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `transcribe_dna_to_rna` 功能。候选编号 CAP-0627，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the transcribe dna to rna operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `transcribe_dna_to_rna` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.transcribe_dna_to_rna(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.transcribe_dna_to_rna(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `transcribe_dna_to_rna` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `transcribe_dna_to_rna` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1780,7 +1780,7 @@ result = transcribe_dna_to_rna(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1798,17 +1798,17 @@ print(result)
 
 ## 44) translate_codon
 
-- **Purpose:** Document a reusable translate codon capability for Sequence analysis workflows. Candidate CAP-0628 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `translate_codon` 功能。候选编号 CAP-0628，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the translate codon operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `translate_codon` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.translate_codon(codon[required], unknown[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.translate_codon(codon[required], unknown[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `codon`; optional arguments: `unknown`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`codon`；可选参数：`unknown`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `translate_codon` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `translate_codon` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1821,7 +1821,7 @@ result = translate_codon(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1839,17 +1839,17 @@ print(result)
 
 ## 45) translate_dna_to_protein
 
-- **Purpose:** Document a reusable translate dna to protein capability for Sequence analysis workflows. Candidate CAP-0629 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `translate_dna_to_protein` 功能。候选编号 CAP-0629，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the translate dna to protein operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `translate_dna_to_protein` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.translate_dna_to_protein(sequence[required], frame[optional], stop_at_stop[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.translate_dna_to_protein(sequence[required], frame[optional], stop_at_stop[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `frame`, `stop_at_stop`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`frame`、`stop_at_stop`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `translate_dna_to_protein` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `translate_dna_to_protein` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1863,7 +1863,7 @@ result = translate_dna_to_protein(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1881,17 +1881,17 @@ print(result)
 
 ## 46) translate_orf
 
-- **Purpose:** Document a reusable translate orf capability for Sequence analysis workflows. Candidate CAP-0630 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `translate_orf` 功能。候选编号 CAP-0630，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the translate orf operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. Existing-name evidence: `translate`.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `translate_orf` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。已有同名函数证据：`translate`。
 
-- **API:** `dnakit.sequence.translate_orf(sequence[required], start_codon[optional], stop_codons[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.translate_orf(sequence[required], start_codon[optional], stop_codons[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `start_codon`, `stop_codons`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`start_codon`、`stop_codons`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `translate_orf` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `translate_orf` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1904,7 +1904,7 @@ result = translate_orf(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1922,17 +1922,17 @@ print(result)
 
 ## 47) translate_rna_to_protein
 
-- **Purpose:** Document a reusable translate rna to protein capability for Sequence analysis workflows. Candidate CAP-0631 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `translate_rna_to_protein` 功能。候选编号 CAP-0631，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the translate rna to protein operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `translate_rna_to_protein` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.translate_rna_to_protein(sequence[required], frame[optional], stop_at_stop[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.translate_rna_to_protein(sequence[required], frame[optional], stop_at_stop[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `frame`, `stop_at_stop`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`frame`、`stop_at_stop`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `translate_rna_to_protein` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `translate_rna_to_protein` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1946,7 +1946,7 @@ result = translate_rna_to_protein(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -1964,17 +1964,17 @@ print(result)
 
 ## 48) translate_six_frames
 
-- **Purpose:** Document a reusable translate six frames capability for Sequence analysis workflows. Candidate CAP-0632 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `translate_six_frames` 功能。候选编号 CAP-0632，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the translate six frames operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `translate_six_frames` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.translate_six_frames(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.translate_six_frames(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `translate_six_frames` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `translate_six_frames` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -1987,7 +1987,7 @@ result = translate_six_frames(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2005,17 +2005,17 @@ print(result)
 
 ## 49) trim_sequence
 
-- **Purpose:** Document a reusable trim sequence capability for Sequence analysis workflows. Candidate CAP-0633 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `trim_sequence` 功能。候选编号 CAP-0633，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the trim sequence operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `trim_sequence` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.trim_sequence(sequence[required], left[optional], right[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.trim_sequence(sequence[required], left[optional], right[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `left`, `right`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`left`、`right`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `trim_sequence` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `trim_sequence` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2028,7 +2028,7 @@ result = trim_sequence(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2046,17 +2046,17 @@ print(result)
 
 ## 50) validate_dna_alphabet
 
-- **Purpose:** Document a reusable validate dna alphabet capability for Sequence analysis workflows. Candidate CAP-0634 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `validate_dna_alphabet` 功能。候选编号 CAP-0634，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the validate dna alphabet operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `validate_dna_alphabet` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.validate_dna_alphabet(sequence[required], allow_ambiguous[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.validate_dna_alphabet(sequence[required], allow_ambiguous[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `allow_ambiguous`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`allow_ambiguous`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `validate_dna_alphabet` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `validate_dna_alphabet` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2069,7 +2069,7 @@ result = validate_dna_alphabet(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2087,17 +2087,17 @@ print(result)
 
 ## 51) validate_protein_alphabet
 
-- **Purpose:** Document a reusable validate protein alphabet capability for Sequence analysis workflows. Candidate CAP-0635 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `validate_protein_alphabet` 功能。候选编号 CAP-0635，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the validate protein alphabet operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `validate_protein_alphabet` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.validate_protein_alphabet(sequence[required])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.validate_protein_alphabet(sequence[required])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: no. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：无。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `validate_protein_alphabet` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `validate_protein_alphabet` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2110,7 +2110,7 @@ result = validate_protein_alphabet(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {
@@ -2128,17 +2128,17 @@ print(result)
 
 ## 52) validate_rna_alphabet
 
-- **Purpose:** Document a reusable validate rna alphabet capability for Sequence analysis workflows. Candidate CAP-0636 comes from 1 source row(s) and is currently marked `new_candidate`; the candidate keeps input-type, backend, format, platform, provider, assay, or biological-entity differences inside one typed interface rather than creating one function per variant.
+- **作用：** 为“通用序列操作、k-mer 与编码”类分析提供可复用的 `validate_rna_alphabet` 功能。候选编号 CAP-0636，来自 1 条原始记录，当前标记为 `new_candidate`；输入类型、后端、格式、平台、提供方、检测方法或生物学对象上的差异都放在同一个带类型的接口里，而不是为每个变体各建一个函数。
 
-- **Method:** Validate the typed input envelope, normalize records and metadata, perform the validate rna alphabet operation, and return structured results with provenance and diagnostics. The implementation is available at `src/dnakit/sequence/__init__.py` and is exported through the formal DNAKit namespace. Agent/MCP exposure is available when the function's JSON call plan is compatible. Review basis: `no_exact_public_match`. No exact public-function name was found in the comparison.
+- **处理方法：** 校验带类型的输入封装，规范化记录与元数据，执行 `validate_rna_alphabet` 操作，并返回附带来源与诊断信息的结构化结果。实现位于 `src/dnakit/sequence/__init__.py`，并通过正式的 DNAKit 命名空间导出。函数的 JSON 调用方案兼容时，也可以通过 Agent/MCP 调用。审核依据：`no_exact_public_match`。比对中未发现名称完全相同的公开函数。
 
-- **API:** `dnakit.sequence.validate_rna_alphabet(sequence[required], allow_ambiguous[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
+- **API：** `dnakit.sequence.validate_rna_alphabet(sequence[required], allow_ambiguous[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
-- **Input:** Required arguments: `sequence`; optional arguments: `allow_ambiguous`. Sequence arguments accept DNA, RNA, or protein text according to the operation.
+- **输入：** 必填参数：`sequence`；可选参数：`allow_ambiguous`。序列参数按操作接受 DNA、RNA 或蛋白质文本。
 
-- **Output:** The local `validate_rna_alphabet` function returns its native Python value (for example, a list, mapping, string, bytes, or record object) rather than a formal DNAKit result envelope. The concrete example output below shows the observed type and a bounded preview.
+- **输出：** 本地函数 `validate_rna_alphabet` 直接返回 Python 原生值（例如列表、映射、字符串、字节或记录对象），而不是正式的 DNAKit 结果封装。下方示例输出给出实际的返回类型和截断后的预览。
 
-- **Example code:**
+- **示例代码：**
 
 ```python
 from pathlib import Path
@@ -2151,7 +2151,7 @@ result = validate_rna_alphabet(
 print(result)
 ```
 
-- **Example output:**
+- **示例输出：**
 
 ```json
 {

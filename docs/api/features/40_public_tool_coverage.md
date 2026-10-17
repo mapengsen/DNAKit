@@ -1,24 +1,22 @@
-# public DNA tool coverage
+# 公开 DNA 工具覆盖
 
-`new_vision/2026-10-10/public_dna_tools.md` is a dated source survey.  DNAKit
-now keeps its project-by-project cross-reference in
-`new_vision/2026-10-10/public_dna_tools_coverage.{json,csv,md}` and ships the
-same records through `dnakit.integrations`.
+`new_vision/2026-10-10/public_dna_tools.md` 是一份标注日期的来源调研。DNAKit
+现在把逐项目的对照记录保存在
+`new_vision/2026-10-10/public_dna_tools_coverage.{json,csv,md}`，并通过
+`dnakit.integrations` 提供同样的记录。
 
-> `new_vision/` is a local audit directory kept by the author. It is not part of the repository, so the paths below point to files you will not find in a checkout. The results are summarised on this page and available through `dnakit.integrations`.
+> `new_vision/` 是作者本地保留的审计目录，不在仓库中，所以下面提到的路径在代码检出中找不到。结果已汇总在本页，也可以通过 `dnakit.integrations` 获取。
 
-The source text declares 282 spreadsheet records.  The Markdown that is
-available in this repository contains 425 explicit mentions, which collapse
-to 320 normalized source records. The survey itself declares 282 records;
-repeated classification, citation and provider-specific lists are retained as
-separate evidence, while spelling aliases are merged conservatively.  The report also
-records the source's declared 169 conditionally integrable records separately.
+来源文本声明有 282 条表格记录。仓库中可用的 Markdown 共有 425 处明确提及，
+归并后为 320 条规范化来源记录。调研本身声明 282 条；重复的分类、引用和
+特定提供方列表作为独立证据保留，拼写别名则保守合并。报告还单独记录了来源中
+声明的 169 条有条件可集成记录。
 
 每个纳入范围的候选能力都使用正式的 `dnakit.<module>.<function>()` 公开入口。
 `dnakit_candidates` 只是实现登记使用的内部暂存命名空间，不是公开 API。正式入口
 可能是本地实现、有限门面或带依赖检查的适配器，具体状态在下文单独记录。
 
-## Querying the coverage matrix
+## 查询覆盖矩阵
 
 ```python
 from dnakit.integrations import (
@@ -42,82 +40,69 @@ print(list_unified_capabilities(module="sequence")[0]["api"])
 print(run_unified_capability("CAP-0187", {"input": "@r1\\nACGT\\n+\\nIIII\\n"}))
 ```
 
-The route is intentionally explicit:
+路由是刻意显式给出的：
 
-- `analysis_adapter` maps to `dnakit.integrations.run_analysis` and still
-  requires the separately installed executable and reference data.
-- `mcp_registry` maps to the MCP bridge and still requires a configured local
-  server or author-documented endpoint.
-- `skill_registry` maps to the bundled Skill/workflow layer; the Skill's own
-  license, model and data conditions remain in force.
-- `pip_adapter` maps to an explicit optional Python backend such as Biopython,
-  pydna, seqme, DNA Chisel, Biotite, Edlib, PyRanges, pyfastx, dnaio, mappy, pyBigWig, pybedtools,
-  gffutils, pySBOL3, scadnano, polars-bio, DnaCauldron, DNA Features Viewer, gtars, GeneBlocks or sourmash; the package and any model extras must be
-  installed separately.
-- `native_facade` maps a surveyed tool to a focused DNAKit implementation,
-  such as the BWA/Bowtie2/SAMtools/BCFtools/SPAdes/Picard NGS facades, the NCBI
-  BLAST+/minimap2/BEDTools alignment facades, the MACS3 peak facade, the
-  SeqKit FASTA/FASTQ functions, the FastTree tree facade, the SPOA consensus,
-  vcfanno/SURVIVOR
-  variant facades and the NanoFilt/Filtlong/NanoPlot/Porechop/Trimmomatic/AfterQC/SeqMagick/GATK4/Shasta/Merqury/BUSCO/DeepVariant/cuteSV/Sniffles2/DELLY/HTSlib/seqtk/WhatsHap/BamTools/VSEARCH/BEDOPS/Flye/hifiasm/MEGAHIT/DIAMOND/MMseqs2/Kraken2/Prokka/Bakta/CheckM2/Bracken/Centrifuge/Kaiju/Unicycler/GTDB-Tk/HUMAnN/MethylDackel/GEMINI/Ensembl VEP
-  read-processing facades; it does not mean that the upstream command's complete CLI has
-  been reimplemented.
-- `project_evidence_only` and `no_local_match` are discovery records.  They
-  route to `dnakit.external_adapters.run` only as an explicit external-adapter
-  boundary; they are not claims that the upstream source has been copied or
-  that all of its functions are implemented.
+- `analysis_adapter` 对应 `dnakit.integrations.run_analysis`，仍需要单独安装
+  可执行程序和参考数据。
+- `mcp_registry` 对应 MCP 桥接，仍需要配置好的本地服务器或作者文档中给出的
+  服务端点。
+- `skill_registry` 对应随包提供的 Skill／工作流层；Skill 自身的许可证、模型和
+  数据条件依然适用。
+- `pip_adapter` 对应显式的可选 Python 后端，例如 Biopython、pydna、seqme、
+  DNA Chisel、Biotite、Edlib、PyRanges、pyfastx、dnaio、mappy、pyBigWig、pybedtools、
+  gffutils、pySBOL3、scadnano、polars-bio、DnaCauldron、DNA Features Viewer、gtars、
+  GeneBlocks 或 sourmash；对应的包和模型 extra 需要另行安装。
+- `native_facade` 把调研中的工具对应到聚焦的 DNAKit 实现，例如
+  BWA/Bowtie2/SAMtools/BCFtools/SPAdes/Picard NGS 门面、NCBI
+  BLAST+/minimap2/BEDTools 比对门面、MACS3 peak 门面、SeqKit FASTA/FASTQ 函数、
+  FastTree 建树门面、SPOA 共识、vcfanno/SURVIVOR 变异门面，以及
+  NanoFilt/Filtlong/NanoPlot/Porechop/Trimmomatic/AfterQC/SeqMagick/GATK4/Shasta/Merqury/BUSCO/DeepVariant/cuteSV/Sniffles2/DELLY/HTSlib/seqtk/WhatsHap/BamTools/VSEARCH/BEDOPS/Flye/hifiasm/MEGAHIT/DIAMOND/MMseqs2/Kraken2/Prokka/Bakta/CheckM2/Bracken/Centrifuge/Kaiju/Unicycler/GTDB-Tk/HUMAnN/MethylDackel/GEMINI/Ensembl VEP
+  读段处理门面；这并不表示已经重新实现了上游命令的完整命令行。
+- `project_evidence_only` 和 `no_local_match` 是发现记录。它们只作为显式的
+  外部适配边界路由到 `dnakit.external_adapters.run`，并不表示已复制上游源码，
+  也不表示其全部功能都已实现。
 
-`local_match` means a name, repository, dependency, Skill notice, MCP entry or
-analysis entry was found in DNAKit.  It is not a scientific validation result.
+`local_match` 表示在 DNAKit 中找到了名称、仓库、依赖、Skill 声明、MCP 条目或
+分析入口，并不是科学验证结果。
 
-Call `integration_inventory()` for current surface counts. It reports Python
-functions, Agent-compatible Python functions, MCP server recipes, registered
-Skills, surveyed projects and candidate schemas as separate units; these
-categories must not be added together as if they were interchangeable tools.
-The current raw surface sum is **2,432** (1,826 public Python functions + 32
-MCP server recipes + 574 registered Skills); it is a surface count rather than
-a deduplicated biological-tool count because one capability may appear in
-several surfaces.
-The inventory also includes `unified_candidate_statuses`, separating
-implemented, partial and adapter candidates.
-It also keeps the survey's `records_by_kind` and integration-status counts so
-the 103 surveyed MCP records are not mistaken for 103 locally connected servers.
-At this snapshot the 320 survey records contain 62 `native_facade`, 2
-`analysis_adapter`, 26 `pip_adapter`, 13 `mcp_registry`, 2 `skill_registry`,
-44 `project_evidence_only` and 171 `no_local_match` records.
+调用 `integration_inventory()` 可获取当前各接口面的数量。它把 Python 函数、
+兼容 Agent 的 Python 函数、MCP 服务器配置、已注册 Skills、调研项目和候选
+Schema 作为不同单位分别统计；这些类别不能当作可互换的工具直接相加。
+当前原始接口面合计为 **3,669**（3,045 个公开 Python 函数 + 49 个 MCP 服务器
+配置 + 575 个已注册 Skills）；这是接口面计数，而不是去重后的生物学工具数，
+因为同一能力可能出现在多个接口面中。
+清单还包含 `unified_candidate_statuses`，区分已实现、部分实现和适配层候选。
+它还保留了调研的 `records_by_kind` 和集成状态计数，避免把调研中的 103 条
+MCP 记录误认为 103 个已在本地连接的服务器。
+在此快照中，320 条调研记录包括 62 条 `native_facade`、2 条
+`analysis_adapter`、26 条 `pip_adapter`、13 条 `mcp_registry`、2 条 `skill_registry`、
+44 条 `project_evidence_only` 和 171 条 `no_local_match`。
 
-The shipped `unified_capabilities.json` also records 837 formal candidate API
-names and their input/output JSON Schemas. `list_unified_capabilities()` and
-`describe_unified_capability()` make this catalog available through the same
-Python and MCP discovery layer. Thirty-two project records currently have a
-conservative name/schema match to one or more capabilities; these are review
-links, not evidence that the upstream project's complete API is implemented.
+随包提供的 `unified_capabilities.json` 还记录了 837 个正式候选 API 名称及其
+输入／输出 JSON Schema。`list_unified_capabilities()` 和
+`describe_unified_capability()` 通过同一套 Python 与 MCP 发现层提供这份目录。
+目前有 32 条项目记录与一个或多个能力存在保守的名称／Schema 匹配；这些只是
+待审核的关联，并不证明上游项目的完整 API 已经实现。
 
-`run_unified_capability()` is the execution bridge for a catalog capability. It
-resolves the formal `dnakit.<module>.<operation>` entry through the existing
-Agent/MCP registry, applies its JSON argument schema and serialization limits,
-and requires explicit `allow_side_effects=True` for file writes, downloads,
-external programs or model operations. It does not install an upstream package
-or silently execute an unverified project.
+`run_unified_capability()` 是目录能力的执行桥接。它通过现有的 Agent/MCP
+注册表解析正式的 `dnakit.<module>.<operation>` 入口，应用其 JSON 参数 Schema
+和序列化限制；涉及写文件、下载、外部程序或模型操作时，必须显式传入
+`allow_side_effects=True`。它不会安装上游包，也不会在后台执行未经验证的项目。
 
-The survey's permissively licensed pip tools have explicit bounded adapters:
+调研中采用宽松许可证的 pip 工具都有显式的受限适配器：
 
-- Existing `dnakit.bioinformatics` format/alignment functions use Biopython
-  when `dnakit[bio-formats]` is installed, reads functions use pysam when
-  `dnakit[bio-reads]` is installed, and cloning functions use pydna when
-  `dnakit[bio-assembly]` is installed. These are focused DNAKit facades, not
-  re-exports of the complete upstream namespaces.
+- 现有的 `dnakit.bioinformatics` 格式／比对函数在安装 `dnakit[bio-formats]`
+  后使用 Biopython，读段函数在安装 `dnakit[bio-reads]` 后使用 pysam，克隆
+  函数在安装 `dnakit[bio-assembly]` 后使用 pydna。这些是聚焦的 DNAKit 门面，
+  不是对上游完整命名空间的重导出。
 
-- `dnakit.integrations.beta_diversity_scikit_bio()` and
-  `dnakit.integrations.permanova_scikit_bio()` expose bounded scikit-bio
-  statistics. Install `dnakit[bio-skibio]`; the full scikit-bio namespace is
-  not re-exported.
-- `dnakit.integrations.evaluate_seqme()` constructs allow-listed
-  `seqme.metrics` classes and serializes the evaluation table. Install
-  `dnakit[bio-seqme]`; model extras and weights remain separate.
-- `dnakit.integrations.optimize_with_dnachisel()` constructs an allow-listed
-  set of DNA Chisel specifications and returns the optimized sequence. Install
-  `dnakit[bio-dnachisel]`; it does not copy DNA Chisel source code.
+- `dnakit.integrations.beta_diversity_scikit_bio()` 和
+  `dnakit.integrations.permanova_scikit_bio()` 提供受限的 scikit-bio 统计。
+  安装 `dnakit[bio-skibio]`；不会重导出完整的 scikit-bio 命名空间。
+- `dnakit.integrations.evaluate_seqme()` 构造白名单内的 `seqme.metrics` 类，
+  并序列化评价结果表。安装 `dnakit[bio-seqme]`；模型 extra 和权重需另行处理。
+- `dnakit.integrations.optimize_with_dnachisel()` 构造白名单内的一组 DNA Chisel
+  约束规范并返回优化后的序列。安装 `dnakit[bio-dnachisel]`；不复制 DNA Chisel 源码。
 - `dnakit.integrations.fetch_pyfaidx_region()` 提供有界 FASTA 区间读取，使用
   `dnakit[bio-pyfaidx]`；`summarize_vcf_vcfpy()` 和 `summarize_vcf_cyvcf2()`
   提供有界 VCF 汇总，分别使用对应的可选 extra。
@@ -164,42 +149,41 @@ The survey's permissively licensed pip tools have explicit bounded adapters:
 DNAKit 核心源码已经复制。`third_party_route()` 会返回对应的外部入口和
 许可证/引用证据。
 
-## Citation and license evidence
+## 引用与许可证证据
 
-The survey provides paper identifiers for the following central tools; use the
-DOI in the paper and retain the upstream software notice in any distribution:
+调研为以下核心工具提供了论文标识；请引用论文中的 DOI，并在任何分发中保留上游软件声明：
 
-| Tool | Citation | DNAKit boundary |
+| 工具 | 引用 | DNAKit 边界 |
 | --- | --- | --- |
-| Biopython | Cock et al. (2009), [10.1093/bioinformatics/btp163](https://doi.org/10.1093/bioinformatics/btp163) | `dnakit.bioinformatics` adapters; Biopython's own license and third-party notices apply. |
-| SeqKit | Shen, Sipos & Zhao (2024), SeqKit2, [10.1002/imt2.191](https://doi.org/10.1002/imt2.191); the earlier SeqKit paper is [10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962) | Use a separately installed CLI through an external-analysis adapter. |
-| scikit-bio | Aton et al. (2026), [10.1038/s41592-025-02981-z](https://doi.org/10.1038/s41592-025-02981-z) | Optional Python dependency; the BSD-3-Clause notice remains with the dependency. |
-| UGENE | Okonechnikov et al. (2012), [10.1093/bioinformatics/bts091](https://doi.org/10.1093/bioinformatics/bts091) | External GPLv2 program; it is not copied into the core package. |
-| pydna | Pereira et al. (2015), [10.1186/s12859-015-0544-x](https://doi.org/10.1186/s12859-015-0544-x) | Optional DNA-assembly dependency; retain the BSD notice. |
-| DNA Chisel | Zulkower & Rosser (2020), [10.1093/bioinformatics/btaa558](https://doi.org/10.1093/bioinformatics/btaa558) | Optional MIT dependency; model and data terms are separate. |
-| seqme | Møller-Larsen et al. (2025), [arXiv:2511.04239](https://arxiv.org/abs/2511.04239) | Optional BSD-3-Clause adapter; model extras and weights are separate. |
-| Biotite | Kunzmann & Hamacher (2018), [10.1186/s12859-018-2367-z](https://doi.org/10.1186/s12859-018-2367-z) | Optional BSD-3-Clause adapter; bounded nucleotide alignment only. |
-| Edlib | Šošić & Šikić (2017), [10.1093/bioinformatics/btw753](https://doi.org/10.1093/bioinformatics/btw753) | Optional MIT adapter; bounded edit-distance alignment only. |
-| PyRanges | Stovner & Sætrom (2020), [10.1093/bioinformatics/btz615](https://doi.org/10.1093/bioinformatics/btz615) | Optional MIT adapter; bounded BED interval operations only. |
-| pyfastx | Du et al. (2021), [10.1093/bib/bbaa368](https://doi.org/10.1093/bib/bbaa368) | Optional MIT adapter; bounded FASTA/FASTQ summary only. |
-| pyfaidx | Shirley et al. (2015), [10.7287/peerj.preprints.970v1](https://doi.org/10.7287/peerj.preprints.970v1); source code BSD-3-Clause | Optional BSD-3-Clause adapter; bounded read-only FASTA interval fetching. |
-| dnaio | dnaio software archive, [10.5281/zenodo.10548864](https://doi.org/10.5281/zenodo.10548864); MIT | Optional MIT adapter; bounded read-only FASTA/FASTQ stream summary. |
-| mappy/minimap2 | Li (2018), [10.1093/bioinformatics/bty191](https://doi.org/10.1093/bioinformatics/bty191); [official Python binding README](https://github.com/lh3/minimap2/blob/master/python/README.rst); MIT | Optional MIT adapter; bounded local mapping with allow-listed presets. |
-| pyBigWig | pyBigWig software release, [10.5281/zenodo.45238](https://doi.org/10.5281/zenodo.45238) | Optional MIT adapter; bounded local bigWig statistics only. |
-| pybedtools | Dale et al. (2011), [10.1093/bioinformatics/btr539](https://doi.org/10.1093/bioinformatics/btr539); BEDTools: [10.1093/bioinformatics/btq033](https://doi.org/10.1093/bioinformatics/btq033) | Optional MIT wrapper; a separately installed BEDTools executable remains required. |
-| gffutils | gffutils documentation and daler contributors | Optional MIT adapter; read-only queries against an existing FeatureDB; no DOI was supplied by the survey. |
-| pySBOL3 | Mitchell, Beal & Bartley (2022), [10.1021/acssynbio.2c00164](https://doi.org/10.1021/acssynbio.2c00164) | Optional MIT adapter; bounded read-only SBOL3 inventory. |
-| scadnano | Doty, Lee & Stérin (2020), [arXiv:2005.11841](https://arxiv.org/abs/2005.11841) | Optional MIT adapter; bounded read-only `.sc` design inventory. |
-| polars-bio | polars-bio, [10.1093/bioinformatics/btaf640](https://doi.org/10.1093/bioinformatics/btaf640) | Optional Apache-2.0 adapter; bounded local interval overlap. |
-| DnaCauldron | DnaCauldron documentation and Edinburgh Genome Foundry contributors; the survey supplied no DOI | Optional MIT adapter; bounded Gibson/Type IIS simulation only. |
-| DNA Features Viewer | [official documentation](https://edinburgh-genome-foundry.github.io/DnaFeaturesViewer/) and [Edinburgh Genome Foundry repository](https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer); the survey supplied no DOI | Optional MIT adapter; bounded read-only GenBank/GFF feature inventory. |
-| gtars | [official documentation](https://docs.bedbase.org/gtars/python-overview/) and [databio repository](https://github.com/databio/gtars); the survey supplied no DOI | Optional BSD-2-Clause adapter; bounded read-only local BED RegionSet inventory. |
-| GeneBlocks | [official documentation](https://edinburgh-genome-foundry.github.io/Geneblocks/) and [Edinburgh Genome Foundry repository](https://github.com/Edinburgh-Genome-Foundry/Geneblocks); the survey supplied no DOI | Optional MIT adapter; deterministic bounded sequence diff. |
-| sourmash | [JOSS paper](https://doi.org/10.21105/joss.06830) and [official documentation](https://sourmash.readthedocs.io/); BSD-3-Clause | Optional BSD-3-Clause adapter; local bounded MinHash comparison. |
-| Cutadapt | Martin (2011), [10.14806/ej.17.1.200](https://doi.org/10.14806/ej.17.1.200); [official guide](https://cutadapt.readthedocs.io/en/stable/guide.html); MIT | Bounded external executable adapter for FASTQ adapter trimming. |
-| fastp | Chen (2025), [10.1002/imt2.70078](https://doi.org/10.1002/imt2.70078); [official repository](https://github.com/OpenGene/fastp); MIT | Bounded external executable adapter for FASTQ preprocessing and QC. |
-| FastQC | [official project page](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/); GPL-3.0; the survey supplied no DOI | Bounded external executable adapter for HTML/ZIP read-QC reports. |
-| MultiQC | Ewels et al. (2016), [10.1093/bioinformatics/btw354](https://doi.org/10.1093/bioinformatics/btw354); [official repository](https://github.com/MultiQC/MultiQC); GPL-3.0-or-later | Bounded external executable adapter for aggregated QC reports. |
+| Biopython | Cock et al. (2009), [10.1093/bioinformatics/btp163](https://doi.org/10.1093/bioinformatics/btp163) | `dnakit.bioinformatics` 适配器；适用 Biopython 自身的许可证和第三方声明。 |
+| SeqKit | Shen, Sipos & Zhao (2024), SeqKit2, [10.1002/imt2.191](https://doi.org/10.1002/imt2.191); 早期 SeqKit 论文为 [10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962) | 通过外部分析适配器调用单独安装的命令行工具。 |
+| scikit-bio | Aton et al. (2026), [10.1038/s41592-025-02981-z](https://doi.org/10.1038/s41592-025-02981-z) | 可选 Python 依赖；BSD-3-Clause 声明随依赖保留。 |
+| UGENE | Okonechnikov et al. (2012), [10.1093/bioinformatics/bts091](https://doi.org/10.1093/bioinformatics/bts091) | 外部 GPLv2 程序；不复制进核心包。 |
+| pydna | Pereira et al. (2015), [10.1186/s12859-015-0544-x](https://doi.org/10.1186/s12859-015-0544-x) | 可选 DNA 组装依赖；保留 BSD 声明。 |
+| DNA Chisel | Zulkower & Rosser (2020), [10.1093/bioinformatics/btaa558](https://doi.org/10.1093/bioinformatics/btaa558) | 可选 MIT 依赖；模型和数据条款另行适用。 |
+| seqme | Møller-Larsen et al. (2025), [arXiv:2511.04239](https://arxiv.org/abs/2511.04239) | 可选 BSD-3-Clause 适配器；模型 extra 和权重另行处理。 |
+| Biotite | Kunzmann & Hamacher (2018), [10.1186/s12859-018-2367-z](https://doi.org/10.1186/s12859-018-2367-z) | 可选 BSD-3-Clause 适配器；仅限受限的核苷酸比对。 |
+| Edlib | Šošić & Šikić (2017), [10.1093/bioinformatics/btw753](https://doi.org/10.1093/bioinformatics/btw753) | 可选 MIT 适配器；仅限受限的编辑距离比对。 |
+| PyRanges | Stovner & Sætrom (2020), [10.1093/bioinformatics/btz615](https://doi.org/10.1093/bioinformatics/btz615) | 可选 MIT 适配器；仅限受限的 BED 区间操作。 |
+| pyfastx | Du et al. (2021), [10.1093/bib/bbaa368](https://doi.org/10.1093/bib/bbaa368) | 可选 MIT 适配器；仅限受限的 FASTA/FASTQ 汇总。 |
+| pyfaidx | Shirley et al. (2015), [10.7287/peerj.preprints.970v1](https://doi.org/10.7287/peerj.preprints.970v1)；源码 BSD-3-Clause | 可选 BSD-3-Clause 适配器；受限的只读 FASTA 区间提取。 |
+| dnaio | dnaio 软件存档, [10.5281/zenodo.10548864](https://doi.org/10.5281/zenodo.10548864); MIT | 可选 MIT 适配器；受限的只读 FASTA/FASTQ 流汇总。 |
+| mappy/minimap2 | Li (2018), [10.1093/bioinformatics/bty191](https://doi.org/10.1093/bioinformatics/bty191); [官方 Python 绑定 README](https://github.com/lh3/minimap2/blob/master/python/README.rst); MIT | 可选 MIT 适配器；使用白名单预设的受限本地映射。 |
+| pyBigWig | pyBigWig 软件发布版本, [10.5281/zenodo.45238](https://doi.org/10.5281/zenodo.45238) | 可选 MIT 适配器；仅限受限的本地 bigWig 统计。 |
+| pybedtools | Dale et al. (2011), [10.1093/bioinformatics/btr539](https://doi.org/10.1093/bioinformatics/btr539); BEDTools： [10.1093/bioinformatics/btq033](https://doi.org/10.1093/bioinformatics/btq033) | 可选 MIT 封装；仍需单独安装 BEDTools 可执行程序。 |
+| gffutils | gffutils 文档与 daler 贡献者 | 可选 MIT 适配器；只读查询已有的 FeatureDB；调研未提供 DOI。 |
+| pySBOL3 | Mitchell, Beal & Bartley (2022), [10.1021/acssynbio.2c00164](https://doi.org/10.1021/acssynbio.2c00164) | 可选 MIT 适配器；受限的只读 SBOL3 清单。 |
+| scadnano | Doty, Lee & Stérin (2020), [arXiv:2005.11841](https://arxiv.org/abs/2005.11841) | 可选 MIT 适配器；受限的只读 `.sc` 设计清单。 |
+| polars-bio | polars-bio, [10.1093/bioinformatics/btaf640](https://doi.org/10.1093/bioinformatics/btaf640) | 可选 Apache-2.0 适配器；受限的本地区间交集。 |
+| DnaCauldron | DnaCauldron 文档与 Edinburgh Genome Foundry 贡献者；调研未提供 DOI | 可选 MIT 适配器；仅限受限的 Gibson/Type IIS 模拟。 |
+| DNA Features Viewer | [官方文档](https://edinburgh-genome-foundry.github.io/DnaFeaturesViewer/) 与 [Edinburgh Genome Foundry 仓库](https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer)；调研未提供 DOI | 可选 MIT 适配器；受限的只读 GenBank/GFF 特征清单。 |
+| gtars | [官方文档](https://docs.bedbase.org/gtars/python-overview/) 与 [databio 仓库](https://github.com/databio/gtars)；调研未提供 DOI | 可选 BSD-2-Clause 适配器；受限的只读本地 BED RegionSet 清单。 |
+| GeneBlocks | [官方文档](https://edinburgh-genome-foundry.github.io/Geneblocks/) 与 [Edinburgh Genome Foundry 仓库](https://github.com/Edinburgh-Genome-Foundry/Geneblocks)；调研未提供 DOI | 可选 MIT 适配器；确定性的受限序列差异比较。 |
+| sourmash | [JOSS 论文](https://doi.org/10.21105/joss.06830) 与 [官方文档](https://sourmash.readthedocs.io/); BSD-3-Clause | 可选 BSD-3-Clause 适配器；受限的本地 MinHash 比较。 |
+| Cutadapt | Martin (2011), [10.14806/ej.17.1.200](https://doi.org/10.14806/ej.17.1.200); [官方指南](https://cutadapt.readthedocs.io/en/stable/guide.html); MIT | 受限的外部可执行程序适配器，用于 FASTQ 接头修剪。 |
+| fastp | Chen (2025), [10.1002/imt2.70078](https://doi.org/10.1002/imt2.70078); [官方仓库](https://github.com/OpenGene/fastp); MIT | 受限的外部可执行程序适配器，用于 FASTQ 预处理和质控。 |
+| FastQC | [官方项目页](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/); GPL-3.0；调研未提供 DOI | 受限的外部可执行程序适配器，生成 HTML/ZIP 读段质控报告。 |
+| MultiQC | Ewels et al. (2016), [10.1093/bioinformatics/btw354](https://doi.org/10.1093/bioinformatics/btw354); [官方仓库](https://github.com/MultiQC/MultiQC); GPL-3.0-or-later | 受限的外部可执行程序适配器，生成汇总质控报告。 |
 
 截图中的十个项目当前逐项路由如下：
 
@@ -240,16 +224,13 @@ DOI in the paper and retain the upstream software notice in any distribution:
 | vcfpy | `dnakit.integrations.summarize_vcf_vcfpy` | 可选 MIT 后端；有界 VCF 汇总 |
 | cyvcf2 | `dnakit.integrations.summarize_vcf_cyvcf2` | 可选 MIT 后端；有界 VCF 汇总 |
 
-The record's `citation_status` is `missing_in_survey` when the source file did
-not provide a DOI or preferred citation.  That status is a publication gap to
-resolve from the upstream `CITATION.cff`, paper or documentation before a
-paper claims to have used that tool.  A permissive code license does not grant
-rights to redistribute a hosted API, model weights, reference database or
-user data.  Restricted, non-commercial and unverified projects stay in the
-audit matrix and are not copied into DNAKit.
+记录的 `citation_status` 为 `missing_in_survey` 时，表示来源文件没有提供 DOI
+或推荐引用格式。这是发表前需要补齐的引用缺口：在论文声称使用该工具之前，
+应先从上游的 `CITATION.cff`、论文或文档中确认。宽松的代码许可证并不授予再分发
+托管 API、模型权重、参考数据库或用户数据的权利。受限、非商业和未经验证的项目
+只保留在审计矩阵中，不会复制进 DNAKit。
 
-Regenerate the evidence after editing the dated source file with
-`new_vision/2026-10-10/build_public_tool_coverage.py`.  The command is offline;
-it does not verify current upstream licenses or execute scientific backends.
-The implementation-pass file list is recorded in
-`new_vision/2026-10-10/implementation_files_manifest.txt`.
+编辑带日期的来源文件后，用
+`new_vision/2026-10-10/build_public_tool_coverage.py` 重新生成证据。该命令离线运行，
+不会核实上游当前的许可证，也不会执行科学计算后端。实现阶段的文件清单记录在
+`new_vision/2026-10-10/implementation_files_manifest.txt`。

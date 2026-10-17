@@ -71,8 +71,8 @@ Call `integration_inventory()` for current surface counts. It reports Python
 functions, Agent-compatible Python functions, MCP server recipes, registered
 Skills, surveyed projects and candidate schemas as separate units; these
 categories should not be added together as if they were interchangeable tools.
-The current raw surface sum is **2,432** (1,826 public Python functions + 32
-MCP server recipes + 574 registered Skills). This is a surface count rather
+The current raw surface sum is **3,669** (3,045 public Python functions + 49
+MCP server recipes + 575 registered Skills). This is a surface count rather
 than a deduplicated biological-tool count because one capability can appear in
 several surfaces.
 The inventory also includes `unified_candidate_statuses`, separating

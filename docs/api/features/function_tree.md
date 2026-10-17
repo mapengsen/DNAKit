@@ -34,7 +34,9 @@ DNAKit 功能总览
 │   │   ├── FASTA / 多行 FASTQ / gzip 与 Phred 质量：Read / read_fastx / write_fastx
 │   │   ├── JASPAR / MEME / TRANSFAC 读取：read_motifs（Biopython）
 │   │   ├── SnapGene / GenBank 构建文件：read_constructs（Biopython；宽容解析可选 pydna）
-│   │   └── ABI 文件读取与 Mott 修剪：read_sanger
+│   │   ├── ABI 文件读取与 Mott 修剪：read_sanger
+│   │   ├── 格式转换、压缩与文件管理（扩展目录 131 项）：convert / compress / index / validate / stream（Newick / Nexus / PAF / PED / PHYLIP / 2bit / Zarr）等
+│   │   └── FASTA 与 FASTQ 记录处理（扩展目录 66 项）：filter_by_quality / trim_adapters / extract_regions_from_bed / split_by_chromosome / subsample / stats 等
 │   ├── 3) 下载
 │   │   ├── 常见物种名称（下载输入辅助）
 │   │   ├── 1. 完整基因组
@@ -71,15 +73,16 @@ DNAKit 功能总览
 │   │   ├── 7. 靶点、药物与关联证据查询
 │   │   ├── 8. 文献、预印本与临床研究查询
 │   │   ├── 9. ENCODE 实验与文件查询
-│   │   └── 10. 遗传变异与人群关联查询
-│   │       ├── 1) 变异记录与群体频率查询
-│   │       ├── 2) 结构变异查询
-│   │       ├── 3) ClinVar 临床意义查询
-│   │       ├── 4) 遗传病关联、剂量与可干预性
-│   │       ├── 5) 肿瘤变异与治疗证据查询
-│   │       ├── 6) GWAS 研究与关联查询
-│   │       ├── 7) 队列表型关联与精细定位查询
-│   │       └── 8) 人群、样本与连锁查询
+│   │   ├── 10. 遗传变异与人群关联查询
+│   │   │   ├── 1) 变异记录与群体频率查询
+│   │   │   ├── 2) 结构变异查询
+│   │   │   ├── 3) ClinVar 临床意义查询
+│   │   │   ├── 4) 遗传病关联、剂量与可干预性
+│   │   │   ├── 5) 肿瘤变异与治疗证据查询
+│   │   │   ├── 6) GWAS 研究与关联查询
+│   │   │   ├── 7) 队列表型关联与精细定位查询
+│   │   │   └── 8) 人群、样本与连锁查询
+│   │   └── 11. 通用数据库接口：下载、缓存与 ID 映射（扩展目录 8 项）：query / search / fetch / download / cache / map_ids 等
 │   └── 5) DNA序列合法性检查
 │       └── 1. 统一序列、记录与数据集合法性检查
 ├── 2. 数据处理
@@ -124,12 +127,13 @@ DNAKit 功能总览
 │   │   │   ├── 序列级组装模拟：simulate_assembly
 │   │   │   └── 双链末端兼容性与连接：Duplex.ligate
 │   │   ├── 环状序列操作
-│   │   └── 序列切分
-│   │       ├── 1) 固定长度、不重叠
-│   │       ├── 2) 固定长度、重叠滑窗
-│   │       ├── 3) 随机区间
-│   │       ├── 4) 多尺度
-│   │       └── 5) 先短后长
+│   │   ├── 序列切分
+│   │   │   ├── 1) 固定长度、不重叠
+│   │   │   ├── 2) 固定长度、重叠滑窗
+│   │   │   ├── 3) 随机区间
+│   │   │   ├── 4) 多尺度
+│   │   │   └── 5) 先短后长
+│   │   └── 通用序列操作、k-mer 与编码（扩展目录 52 项）：count_kmers / translate_six_frames / one_hot_encode_dna / tokenize_dna_kmer / simulate_point_mutations 等
 │   ├── 3) 序列去重
 │   │   ├── 1. 标准去重
 │   │   ├── 2. 反向互补去重
@@ -165,7 +169,8 @@ DNAKit 功能总览
 │   │   ├── 配对与损坏四行 FASTQ 记录恢复：pair_reads / repair_fastq（保留恢复/丢弃统计）
 │   │   ├── 排序、打乱与公共记录：arrange_reads / common_reads
 │   │   ├── 正则重命名与顺序敏感、ID 无关的序列摘要：rename_reads / sequence_digest
-│   │   └── BAM 排序、mate 修复、可选重复标记、索引与统计：prepare_bam（samtools）
+│   │   ├── BAM 排序、mate 修复、可选重复标记、索引与统计：prepare_bam（samtools）
+│   │   └── 测序质量控制（扩展目录 50 项）：run_fastp / run_fastqc / calculate_adapter_content / demultiplex_barcoded_reads / correct_umi_errors 等
 │   └── 7) 序列优化
 │       ├── 规则构建与自定义评价：specification / Specification / SpecEvaluation
 │       ├── GC、模式避免/计数、序列/翻译/长度、保留位置：gc / avoid_pattern / pattern_count / sequence / translation / length / avoid_changes
@@ -370,22 +375,25 @@ DNAKit 功能总览
 │   │   ├── 8. 分子关系与互作预测
 │   │   │   ├── 已训练核酸/蛋白下游任务：核酸–蛋白中心法则关系
 │   │   │   └── 甲型流感抗原关系、蛋白–蛋白互作、ncRNA–蛋白互作
-│   │   └── 9. 蛋白质特征与结构预测
-│   │       ├── ESM 蛋白质特征与序列评分
-│   │       └── NVIDIA NIM：AlphaFold2 / ESMFold 蛋白质结构预测
-│   ├── 9) 基因名称与区间注释
+│   │   ├── 9. 蛋白质特征与结构预测
+│   │   │   ├── ESM 蛋白质特征与序列评分
+│   │   │   └── NVIDIA NIM：AlphaFold2 / ESMFold 蛋白质结构预测
+│   │   └── 10. 模型训练、评估、解释与导出（扩展目录 48 项）：train / finetune / evaluate / explain / calibrate / export_model_onnx 等
+│   ├── 9) 基因名称、区间与功能注释
 │   │   ├── 基因标识、转录本、同源关系与数据库注释查询
 │   │   ├── 基因组 DNA + 物种 → annotate_genes / GeneAnnotationConfig
 │   │   ├── 默认 RefSeq 组装解析、显式组装或本地 FASTA + GFF3
 │   │   ├── minimap2 参考比对与已有基因注释映射（非从头基因预测）
 │   │   ├── 基因名称、ID、方向、重叠基因与 gene/intergenic/unknown 分段
 │   │   ├── Python 0-based 半开区间；JSON/CLI 1-based 闭区间
-│   │   └── 组装与注释固定缓存、文件校验、离线复用及来源记录
+│   │   ├── 组装与注释固定缓存、文件校验、离线复用及来源记录
+│   │   └── 基因模型、功能与通路注释（扩展目录 18 项）：annotate / build_gene_model / assign_gene_ontology / assign_pathways / make_promoter_regions 等
 │   ├── 10) 系统发育与分子进化
 │   │   ├── 原生树对象与建树：TreeNode / build_tree（NJ / 按簇大小加权 UPGMA）
 │   │   ├── 原生树比较、共识与剪枝：robinson_foulds / consensus_tree / prune_tree
 │   │   ├── 原生群落系统发育距离：unifrac（weighted / unweighted，要求定根树）
-│   │   └── Nei–Gojobori dN/dS：比较分析与数据库命名空间的选择压力接口
+│   │   ├── Nei–Gojobori dN/dS：比较分析与数据库命名空间的选择压力接口
+│   │   └── 系统发育推断、检验与绘图（扩展目录 8 项）：build / infer / compare / test / plot 等
 │   ├── 11) 统计、差异与富集分析
 │   │   ├── 1. 统计与差异分析
 │   │   │   ├── 距离矩阵校验与置换检验：distance_matrix / distance_test（PERMANOVA / ANOSIM / centroid PERMDISP）
@@ -405,7 +413,8 @@ DNAKit 功能总览
 │   │   ├── DNA-seq：dna_seq_workflow（质控→比对→BAM→变异）
 │   │   ├── 单样本 RNA-seq：rna_seq_workflow（HISAT2 / StringTie / featureCounts）
 │   │   ├── 已处理 BAM 的 ChIP-seq：chip_seq_workflow（MACS3 peaks + samtools coverage）
-│   │   └── 双向局部比对与参考坐标共识：sanger_consensus
+│   │   ├── 双向局部比对与参考坐标共识：sanger_consensus
+│   │   └── 读段比对与 BAM 统计（扩展目录 34 项）：align_reads / sort_alignments / mark_duplicates / calculate_coverage / calculate_insert_size 等
 │   ├── 13) 变异检测、注释与评分
 │   │   ├── 1. 变异检测与统计
 │   │   │   ├── 变异调用、参考规范化与 VCF 索引：call_variants（bcftools）
@@ -415,16 +424,40 @@ DNAKit 功能总览
 │   │   │   └── 编码区变异比例：coding_variant_fraction
 │   │   ├── 2. 变异注释与标识转换
 │   │   │   └── Ensembl VEP / MyVariant / FAVOR / VariantValidator 注释与标识转换
-│   │   └── 3. 变异效应评分与实验数据
-│   │       └── AlphaMissense / CADD / EVE / MaveDB 评分与实验效应数据
+│   │   ├── 3. 变异效应评分与实验数据
+│   │   │   └── AlphaMissense / CADD / EVE / MaveDB 评分与实验效应数据
+│   │   └── 4. 变异过滤、规范化、注释与统计（扩展目录 63 项）：normalize_vcf / filter_variants_by_quality / annotate_variant_consequence / calculate_ld_matrix / detect_repeat_expansions 等
 │   ├── 14) 遗传模拟
 │   │   └── 模拟独立位点的等位基因遗传：simulate_inheritance
-│   └── 15) 基因组与 DNA 工程
-│       ├── 基因组关系与育种预测：genomic_relationship_matrix / genomic_prediction
-│       ├── 原核 CDS 预测：predict_prokaryotic_genes（Pyrodigal）
-│       ├── 甲基化汇总、DNA 存储与纳米结构设计
-│       ├── 基因型 PCA：genotype_pca（NumPy；剂量矩阵输入）
-│       └── 基因组 ANI：average_nucleotide_identity（PyFastANI；无需 FastANI 命令）
+│   ├── 15) 基因组与 DNA 工程
+│   │   ├── 基因组关系与育种预测：genomic_relationship_matrix / genomic_prediction
+│   │   ├── 原核 CDS 预测：predict_prokaryotic_genes（Pyrodigal）
+│   │   ├── 甲基化汇总、DNA 存储与纳米结构设计
+│   │   ├── 基因型 PCA：genotype_pca（NumPy；剂量矩阵输入）
+│   │   ├── 基因组 ANI：average_nucleotide_identity（PyFastANI；无需 FastANI 命令）
+│   │   ├── CRISPR、引物与 DNA 设计（扩展目录 19 项）：design / scan_grna_offtargets / predict_editing_outcomes / check_primer_dimer / encode_data_into_dna 等
+│   │   ├── 分子实验：Sanger 与实验方案（扩展目录 10 项）：assemble_sanger_reads / call_bases_from_sanger / plan / optimize / validate 等
+│   │   └── 育种分析（扩展目录 7 项）：predict / select / optimize / simulate（GBLUP / GEBV / heterosis / mating）等
+│   ├── 16) 基因组组装与泛基因组
+│   │   └── 扩展目录 37 项：calculate_n50 / calculate_busco_completeness / detect_misassemblies / scaffold / build_pangenome 等
+│   ├── 17) 群体遗传、单倍型与 GWAS
+│   │   ├── 1. 群体遗传学（扩展目录 8 项）：calculate / estimate / infer / simulate / test 等
+│   │   ├── 2. 单倍型、家系与亲缘（扩展目录 17 项）：phase / impute / infer_parentage / detect_compound_heterozygotes / calculate_pedigree_likelihood 等
+│   │   └── 3. GWAS 与多基因风险评分（扩展目录 29 项）：run / select_lead_snps / build_credible_set / estimate_snp_heritability / clump_and_threshold_prs 等
+│   ├── 18) 表观、调控与三维基因组
+│   │   ├── 1. 表观基因组学（扩展目录 13 项）：call / build_chromatin_state_segments / link_enhancers_to_genes / normalize / qc 等
+│   │   ├── 2. 基因调控（扩展目录 11 项）：annotate / predict / score / link / perform_in_silico_mutagenesis 等
+│   │   └── 3. 三维基因组（扩展目录 9 项）：read / normalize / aggregate / calculate / compare 等
+│   ├── 19) 转录组、单细胞与空间组学
+│   │   ├── 1. 转录组学（扩展目录 18 项）：run_salmon_quantification / run_kallisto_quantification / calculate_differential_expression / calculate_differential_splicing 等
+│   │   └── 2. 单细胞与空间组学（扩展目录 54 项）：qc / normalize / cluster / annotate_cells / integrate / deconvolute_spots / infer_trajectory 等
+│   ├── 20) 微生物组
+│   │   └── 扩展目录 21 项：classify / bin / calculate_ani / calculate_differential_abundance / build_pathogen_transmission_tree 等
+│   ├── 21) 临床、法医与生殖基因组学
+│   │   ├── 1. 临床基因组学（扩展目录 18 项）：type_hla / detect_de_novo_variants / detect_circulating_tumor_dna / infer_tumor_clones / generate_clinical_variant_report 等
+│   │   └── 2. 法医与生殖基因组学（扩展目录 9 项）：calculate / compare / deconvolute / infer / report 等
+│   └── 22) DNA 复制、重组与修复
+│       └── 扩展目录 10 项：detect / map / build_recombination_map / classify_repair_pathway / simulate 等
 ├── 4. 数据评价
 │   ├── 1) 常用评价指标
 │   │   ├── 1. Validity
@@ -484,7 +517,8 @@ DNAKit 功能总览
 │   ├── 树图：plot_tree（Matplotlib）
 │   ├── 正反链精确 k-mer dotplot：dotplot（Matplotlib）
 │   ├── Sanger 色谱图：plot_chromatogram
-│   └── 定性凝胶模拟：simulate_gel（Matplotlib）
+│   ├── 定性凝胶模拟：simulate_gel（Matplotlib）
+│   └── 报告与图片导出（扩展目录 6 项）：save_figure / export_figure / generate_qc_html_report / generate_clinical_pdf_report 等
 ├── 6. 大语言模型工具
 │   ├── Python API：通用大模型调用（dnakit.llm）
 │   │   ├── 配置与结果：LLMConfig / LLMResult
@@ -511,6 +545,11 @@ DNAKit 功能总览
 │       ├── 自动检索工具、查看参数、调用与结果反馈
 │       ├── 可选 Python 补充执行、失败恢复与运行日志
 │       └── 关键词／语义／混合检索、执行权限与步数限制
+├── 7. 实验设计与工作流管理
+│   ├── 1) 实验设计（扩展目录 9 项）：design / randomize / assign / generate / simulate（plate map / power analysis / sample sheet）等
+│   ├── 2) 工作流运行与数据安全（扩展目录 27 项）：run / checkpoint / resume / submit_hpc_job / record_provenance / encrypt_genomic_file 等
+│   ├── 3) 外部工具适配（扩展目录 9 项）：build_command / run / parse_output / parse_log / validate_output 等
+│   └── 4) 知识图谱与数据溯源（扩展目录 18 项）：build_knowledge_graph / query_graph_neighbors / build_data_lineage / snapshot_database_version 等
 └── FAQ
     └── 工程与扩展
         ├── 随包脚本执行与资源定位、ENCODE 凭据、Notebook 结果与 PDF 报告
@@ -538,5 +577,48 @@ DNAKit 功能总览
         ├── 开发验证：单元测试与一致性检查
         └── DAG 定义、依赖/环检查与失败传播：Step / run_workflow
 ```
+
+## 扩展功能目录（837 项）
+
+功能树中标注“扩展目录”的条目来自 837 项候选功能设计文档：410 个 `new_candidate` 和 427 个 `review_needed`，已按功能归入上面的各个类别；无法归入原有类别的，新开为“3. 数据分析”下的 16)–22) 和“7. 实验设计与工作流管理”。
+这些文档记录正式 DNAKit 命名空间、Agent/MCP JSON 调用计划和本地适配层状态；适配层返回依赖状态时不等于已经完成底层科学后端验证。
+不同输入类型、后端、格式、平台、提供方和生物学对象统一作为参数维度记录。
+
+| 类别 | 数量 | 网页位置 |
+|---|---:|---|
+| [格式转换、压缩与文件管理](candidate_catalog/io-formats.md) | 131 | 1. 数据准备 › 2) 文件读写 |
+| [FASTA 与 FASTQ 记录处理](candidate_catalog/fasta-fastq.md) | 66 | 1. 数据准备 › 2) 文件读写 |
+| [通用数据库接口：下载、缓存与 ID 映射](candidate_catalog/databases.md) | 8 | 1. 数据准备 › 4) 数据查询 |
+| [通用序列操作、k-mer 与编码](candidate_catalog/sequence.md) | 52 | 2. 数据处理 › 2) 序列内操作 |
+| [测序质量控制](candidate_catalog/sequencing-qc.md) | 50 | 2. 数据处理 › 6) 测序数据整理 |
+| [模型训练、评估、解释与导出](candidate_catalog/ml-models.md) | 48 | 3. 数据分析 › 8) 性质预测 |
+| [基因模型、功能与通路注释](candidate_catalog/annotation.md) | 18 | 3. 数据分析 › 9) 基因名称、区间与功能注释 |
+| [系统发育推断、检验与绘图](candidate_catalog/phylogeny.md) | 8 | 3. 数据分析 › 10) 系统发育与分子进化 |
+| [读段比对与 BAM 统计](candidate_catalog/alignment.md) | 34 | 3. 数据分析 › 12) 测序数据分析 |
+| [变异过滤、规范化、注释与统计](candidate_catalog/variants.md) | 63 | 3. 数据分析 › 13) 变异检测、注释与评分 |
+| [CRISPR、引物与 DNA 设计](candidate_catalog/design-crispr.md) | 19 | 3. 数据分析 › 15) 基因组与 DNA 工程 |
+| [分子实验：Sanger 与实验方案](candidate_catalog/molecular-lab.md) | 10 | 3. 数据分析 › 15) 基因组与 DNA 工程 |
+| [育种分析](candidate_catalog/breeding.md) | 7 | 3. 数据分析 › 15) 基因组与 DNA 工程 |
+| [基因组组装与泛基因组](candidate_catalog/assembly.md) | 37 | 3. 数据分析 › 16) 基因组组装与泛基因组 |
+| [群体遗传学](candidate_catalog/population.md) | 8 | 3. 数据分析 › 17) 群体遗传、单倍型与 GWAS |
+| [单倍型、家系与亲缘](candidate_catalog/haplotypes.md) | 17 | 3. 数据分析 › 17) 群体遗传、单倍型与 GWAS |
+| [GWAS 与多基因风险评分](candidate_catalog/gwas.md) | 29 | 3. 数据分析 › 17) 群体遗传、单倍型与 GWAS |
+| [表观基因组学](candidate_catalog/epigenome.md) | 13 | 3. 数据分析 › 18) 表观、调控与三维基因组 |
+| [基因调控](candidate_catalog/regulation.md) | 11 | 3. 数据分析 › 18) 表观、调控与三维基因组 |
+| [三维基因组](candidate_catalog/genome3d.md) | 9 | 3. 数据分析 › 18) 表观、调控与三维基因组 |
+| [转录组学](candidate_catalog/transcriptomics.md) | 18 | 3. 数据分析 › 19) 转录组、单细胞与空间组学 |
+| [单细胞与空间组学](candidate_catalog/singlecell-spatial.md) | 54 | 3. 数据分析 › 19) 转录组、单细胞与空间组学 |
+| [微生物组](candidate_catalog/microbiome.md) | 21 | 3. 数据分析 › 20) 微生物组 |
+| [临床基因组学](candidate_catalog/clinical.md) | 18 | 3. 数据分析 › 21) 临床、法医与生殖基因组学 |
+| [法医与生殖基因组学](candidate_catalog/forensic-reproductive.md) | 9 | 3. 数据分析 › 21) 临床、法医与生殖基因组学 |
+| [DNA 复制、重组与修复](candidate_catalog/replication-repair.md) | 10 | 3. 数据分析 › 22) DNA 复制、重组与修复 |
+| [报告与图片导出](candidate_catalog/visualization.md) | 6 | 5. 可视化 |
+| [实验设计](candidate_catalog/experimental-design.md) | 9 | 7. 实验设计与工作流管理 |
+| [工作流运行与数据安全](candidate_catalog/workflow-security.md) | 27 | 7. 实验设计与工作流管理 |
+| [外部工具适配](candidate_catalog/external-adapters.md) | 9 | 7. 实验设计与工作流管理 |
+| [知识图谱与数据溯源](candidate_catalog/knowledge-graph.md) | 18 | 7. 实验设计与工作流管理 |
+
+实现状态：`implemented_candidate` 189 项、`partial_candidate` 5 项、`native_facade` 4 项、`adapter_candidate` 639 项、`pending` 0 项。
+用于正式科学计算前，仍需明确具体后端依赖、错误约定、副作用、测试、资源限制和 MCP 暴露策略；具体工作流的后端说明仍以现有公开函数和 Skills 为准。
 
 目录核对范围与数量见 [FAQ](../../faq/tutorial_overview.md)。

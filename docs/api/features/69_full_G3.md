@@ -8,7 +8,7 @@
 
 下面的示例共用这些文件，每个文件的用途如下。pyBigWig 的示例在运行时把 bedGraph 写成临时 bigWig，因此无需额外文件。
 
-BED6 intervals for bioframe, pybedtools, and pyranges1 examples.
+bioframe、pybedtools 和 pyranges1 示例使用的 BED6 区间。
 
 **示例文件：** `bf_a.bed`
 
@@ -19,7 +19,7 @@ chr1	40	50	c	1	-
 chr2	5	9	d	2	+
 ```
 
-BED4 intervals used as the second input of overlap-type examples.
+重叠类示例的第二个输入，BED4 区间。
 
 **示例文件：** `bf_b.bed`
 
@@ -29,7 +29,7 @@ chr1	45	60	y
 chr2	100	120	z
 ```
 
-One BEDPE record (10 columns) for the tagging example.
+标记示例使用的一条 BEDPE 记录（10 列）。
 
 **示例文件：** `pbt_pairs.bedpe`
 
@@ -37,7 +37,7 @@ One BEDPE record (10 columns) for the tagging example.
 chr1	10	20	chr1	100	110	p1	0	+	-
 ```
 
-BED4 query intervals named q1 and q2.
+名为 q1 和 q2 的 BED4 查询区间。
 
 **示例文件：** `pbt_q.bed`
 
@@ -46,7 +46,7 @@ chr1	12	18	q1
 chr1	101	105	q2
 ```
 
-Small GFF3 file: one gene with one mRNA and two exons, and one more gene.
+小型 GFF3 文件：一个基因含一个 mRNA 和两个外显子，另有一个基因。
 
 **示例文件：** `gff_genes.gff3`
 
@@ -59,7 +59,7 @@ chr1	src	exon	300	500	.	+	.	ID=exon2;Parent=tx1
 chr2	src	gene	50	90	.	-	.	ID=gene2
 ```
 
-Small GTF file: gene, transcript, and one exon.
+小型 GTF 文件：基因、转录本和一个外显子。
 
 **示例文件：** `gtp_genes.gtf`
 
@@ -69,7 +69,7 @@ chr1	src	transcript	100	500	.	+	.	gene_id "g1"; transcript_id "t1";
 chr1	src	exon	100	200	.	+	.	gene_id "g1"; transcript_id "t1"; exon_number 1;
 ```
 
-bedGraph rows (chrom, start, end, value) for the bigWig examples.
+bigWig 示例使用的 bedGraph 行（chrom、start、end、value）。
 
 **示例文件：** `bw_cov.bedgraph`
 
