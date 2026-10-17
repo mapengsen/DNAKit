@@ -71,7 +71,8 @@ DNA." It covers standardization, sequence and annotation formats, basic operatio
 pattern scanning, thermodynamics, fingerprints, similarity analysis, clustering and dataset
 splitting, comprehensive evaluation, molecular-biology simulation, and visualization. DNA
 foundation models can optionally be used for direct property prediction or to extract
-representations for k-means clustering.
+representations for k-means clustering. Full documentation, tutorials and API references are at
+[mapengsen.github.io/DNAKit](https://mapengsen.github.io/DNAKit/en/).
 
 It provides:
 

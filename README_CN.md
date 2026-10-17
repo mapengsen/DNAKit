@@ -66,7 +66,7 @@
 
 # DNAKit 是什么？
 
-DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA 领域的 RDKit”。它覆盖标准化、文件与注释格式、基础操作、描述符、模式扫描、热力学、指纹、相似度、聚类与数据划分、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型直接预测性质或提取 rep 后进行 k-means 聚类等各种各样的操作。
+DNAKit 是面向 DNA 序列的可复现 Python 工具包，定位类似“DNA 领域的 RDKit”。它覆盖标准化、文件与注释格式、基础操作、描述符、模式扫描、热力学、指纹、相似度、聚类与数据划分、综合评价、分子生物学模拟和可视化，并可选用 DNA 基础模型直接预测性质或提取 rep 后进行 k-means 聚类等各种各样的操作。完整的文档、教程和 API 说明见 [mapengsen.github.io/DNAKit](https://mapengsen.github.io/DNAKit/)。
 
 它提供：
 
