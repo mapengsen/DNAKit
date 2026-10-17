@@ -1462,6 +1462,9 @@ def integration_inventory(*, verbose: bool = True) -> dict[str, Any]:
     candidate_statuses = dict(
         Counter(str(item.get("status", "")) for item in candidate_data.get("capabilities", []))
     )
+    from .mcp_index import mcp_tool_index_summary
+
+    mcp_index = mcp_tool_index_summary(verbose=False)
     python_functions = python_stats["total"]
     mcp_server_recipes = len(mcp_servers)
     registered_skills = len(skills)
@@ -1471,6 +1474,9 @@ def integration_inventory(*, verbose: bool = True) -> dict[str, Any]:
         "python_only_functions": python_stats["python_only"],
         "python_categories": python_stats["categories"],
         "mcp_server_recipes": mcp_server_recipes,
+        "mcp_listed_servers": mcp_index["listed_servers"],
+        "mcp_listed_tools": mcp_index["listed_tools"],
+        "mcp_indexed_dna_gene_tools": mcp_index["indexed_tools"],
         "registered_skills": registered_skills,
         "tool_surface_total": python_functions + mcp_server_recipes + registered_skills,
         "tool_surface_definition": (
@@ -1488,6 +1494,7 @@ def integration_inventory(*, verbose: bool = True) -> dict[str, Any]:
         "source": {
             "python": "dnakit.tools.catalog / AgentToolRegistry",
             "mcp": str(_MCP_CATALOG),
+            "mcp_tools": "dnakit/integrations/mcp_tool_index.json",
             "skills": str(_SKILL_CATALOG),
             "survey": _data().get("source"),
             "candidates": candidate_data.get("source"),

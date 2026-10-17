@@ -13,6 +13,8 @@
 - 重写 `docs/api/features/candidate_catalog/` 中 29 个模块、约 640 个函数的中英文小节（含 615 个新实现的函数，以及压缩、解压、计数、引物 Tm、元数据脱敏等 24 个原本就可用但被写成“本地适配器”的函数）：给出真实的作用、方法、输入、输出，示例均实际运行并粘贴真实输出，并删去“只报告缺少依赖”的旧说明。其余约 200 个函数（如 `fasta_fastq`、`sequence`、`alignment`）原本就是真实现，小节保持原样。
 - 新增图形界面：`pip install "dnakit[gui]"` 后运行 `dnakit gui` 打开桌面窗口（pywebview；无窗口组件时改用浏览器），也可用 `dnakit.gui.build_app(GuiSettings.public_demo())` 部署网页演示。两者共用同一套界面代码，包含单序列工具、数据集工具、全部 Agent 可调用函数的检索与运行，以及 Skills 检索；桌面版不限时，写文件等有副作用的函数经确认后执行，网页版限时且不执行这类函数。Linux 的 Qt 窗口后端为可选依赖组 `gui-qt`。
 - `dnakit compare --help` 中的方法名由 `levenshtein` 更正为实际可用的 `edit`。
+- 注册 `dnakit-tool-generation` Skill（确认已有能力后为 DNAKit 设计、实现和验证新工具），Skills 由 574 个增至 575 个。
+- 新增第三方 MCP 工具离线索引：49 个服务器共列出 4,005 个工具（含 ToolUniverse 与 genomi 通过分发工具调用的底层工具），逐个筛选后保留 1,402 个 DNA/基因相关工具。新增 `search_mcp_tools()`、`describe_mcp_tool()` 和 `mcp_tool_index_summary()`；Agent 服务器的 `search_dnakit_tools` 返回新增 `mcp_tools` 字段（`mcp_limit` 控制条数）。说明见文档 111。
 - MCP 目录新增 17 个第三方服务器（共 49 个），每个条目固定上游提交、记录许可证、环境变量和对外影响；12 个已通过 stdio 实际启动并核对工具名。未收录 10 个候选，原因见文档 110。
 
 ## [0.2.0] - 2026-10-13

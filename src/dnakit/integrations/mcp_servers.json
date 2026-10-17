@@ -207,7 +207,7 @@
       ],
       "license": "MIT",
       "attribution": "Nate Costello and GeneChat contributors",
-      "installation": "Install and initialize GeneChat and its local genome/annotation databases separately. GENECHAT_CONFIG optionally selects an existing TOML configuration.",
+      "installation": "Install and initialize GeneChat and its local genome/annotation databases separately. GENECHAT_CONFIG optionally selects an existing TOML configuration. Pin 'mcp<2' (upstream declares mcp>=1.0.0; under mcp 2.x the server fails to import), and configure at least one genome: serve exits without one.",
       "required_environment": [],
       "optional_environment": [
         "GENECHAT_CONFIG"
@@ -478,7 +478,7 @@
       ],
       "license": "MIT",
       "attribution": "Henry Lydecker (hlydecker) and contributors; community UCSC wrapper",
-      "installation": "Prepare the pinned source checkout and its requirements in Python >=3.10, set workdir to the checkout and executable_path to that Python. Use the existing hyphenated ucsc-genome-mcp.py script; upstream README/packaging also mention nonexistent underscore filenames.",
+      "installation": "Prepare the pinned source checkout and its requirements in Python >=3.10, set workdir to the checkout and executable_path to that Python. Use the existing hyphenated ucsc-genome-mcp.py script; upstream README/packaging also mention nonexistent underscore filenames. Pin 'mcp<2': under mcp 2.x the script fails to import.",
       "required_environment": [],
       "optional_environment": [],
       "secret_environment": [],
@@ -710,7 +710,7 @@
       ],
       "license": "MIT",
       "attribution": "ZaEyAsa (upstream package/LICENSE attribution) and muslus repository contributors",
-      "installation": "Prepare the pinned muslus/gwas-mcp source and its dependencies in an isolated Python >=3.10 environment, then point executable_path at that interpreter. Avoid assuming that the separately published gwas-mcp distribution has identical code.",
+      "installation": "Prepare the pinned muslus/gwas-mcp source and its dependencies in an isolated Python >=3.10 environment, then point executable_path at that interpreter. Avoid assuming that the separately published gwas-mcp distribution has identical code. Pin 'mcp<2': under mcp 2.x the server fails at start ('Server' has no list_tools).",
       "required_environment": [],
       "optional_environment": [],
       "secret_environment": [],
@@ -767,7 +767,8 @@
         "stdio"
       ],
       "limitations": [
-        "MIT is a project metadata declaration; no standalone LICENSE file was found at the pinned revision."
+        "MIT is a project metadata declaration; no standalone LICENSE file was found at the pinned revision.",
+        "At the pinned commit the script passes initialization_options as a plain dict, so the MCP initialize handshake fails under mcp 1.x ('dict' object has no attribute 'capabilities'); its four tools were read from the source on 2026-10-16."
       ]
     },
     {
@@ -843,7 +844,7 @@
       ],
       "license": "AGPL-3.0",
       "attribution": "Dr. Alex M. Mawla and contributors",
-      "installation": "Install the Python encode-toolkit distribution separately and set executable_path to its interpreter. DNAKit invokes the verified Python module directly; it does not use the npm shim which can bootstrap uv/Python.",
+      "installation": "Install the Python encode-toolkit distribution separately and set executable_path to its interpreter. DNAKit invokes the verified Python module directly; it does not use the npm shim which can bootstrap uv/Python. Pin 'mcp<2': under mcp 2.x the server fails to import.",
       "required_environment": [],
       "optional_environment": [],
       "secret_environment": [],

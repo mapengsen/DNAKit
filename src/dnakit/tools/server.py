@@ -100,6 +100,9 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
             " Search defaults to keyword matching; bm25 is also local. Semantic, hybrid, "
             "bm25_hybrid and rerank require server-side embedding configuration; rerank "
             "additionally requires a reranker. Search/describe never execute the candidates."
+            " search_dnakit_tools also returns mcp_tools: DNA/gene tools of separately"
+            " installed third-party MCP servers, called through"
+            " dnakit.integrations.call_mcp_tool."
             " For DNA workflow guidance, use search_dnakit_skills, then read_dnakit_skill."
             " Read each skill's DNAKIT.md for native database/ENCODE functions and bundled"
             " workflow entrypoints. Actual scientific libraries, tools, data and models keep"
@@ -193,6 +196,10 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
             "bm25_hybrid combines BM25 and semantic ranks with RRF. rerank additionally "
             "sends a fixed pool of bm25_hybrid candidates to a configured reranker API. "
             "Returns candidates without executing them. "
+            "Unless category is set, mcp_tools also lists up to mcp_limit DNA/gene tools of "
+            "third-party MCP servers, ranked by local BM25 over an offline index; call one with "
+            "call_dnakit_tool('dnakit.integrations.call_mcp_tool', ...) after installing its "
+            "server (describe it with dnakit.integrations.describe_mcp_tool). "
             f"Cloud embedding search configured: {resolved_registry.embedding_config is not None}. "
             f"Reranker configured: {resolved_registry.reranker_config is not None}."
         ),
@@ -212,8 +219,17 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
         limit: int = 20,
         include_python_only: bool = False,
         mode: ToolSearchMode = "keyword",
+        mcp_limit: int = 5,
     ) -> dict[str, object]:
         try:
+            if (
+                isinstance(mcp_limit, bool)
+                or not isinstance(mcp_limit, int)
+                or not 0 <= mcp_limit <= 50
+            ):
+                raise ConfigurationError(
+                    "mcp_limit must be an integer in [0, 50].", code="AGENT_TOOL_LIMIT_INVALID"
+                )
             matches = resolved_registry.search(
                 query,
                 category=category,
@@ -221,11 +237,17 @@ def create_server(registry: AgentToolRegistry | None = None, *, verbose: bool = 
                 include_python_only=include_python_only,
                 mode=mode,
             )
-            return {
+            payload: dict[str, object] = {
                 "ok": True,
                 "count": len(matches),
                 "tools": [tool.to_summary() for tool in matches],
             }
+            if mcp_limit and category is None and query.strip():
+                from dnakit.integrations.mcp_index import search_mcp_tools
+
+                found = search_mcp_tools(query, limit=mcp_limit, verbose=False)
+                payload["mcp_tools"] = found["tools"]
+            return payload
         except Exception as exc:
             return _error_payload(None, exc)
 

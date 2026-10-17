@@ -5,6 +5,7 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from .catalog import describe_analysis, list_analyses, search_projects
 from .execution import plan_analysis, run_analysis
 from .mcp import call_mcp_tool, call_mcp_workflow, list_mcp_servers, list_mcp_tools
+from .mcp_index import describe_mcp_tool, mcp_tool_index_summary, search_mcp_tools
 from .pip_tools import (
     align_biotite,
     align_edlib,
@@ -66,6 +67,7 @@ __all__ = [
     "call_mcp_workflow",
     "compare_sourmash_sequences",
     "describe_analysis",
+    "describe_mcp_tool",
     "describe_publication_record",
     "describe_publication_audit",
     "describe_third_party_tool",
@@ -82,6 +84,7 @@ __all__ = [
     "list_third_party_tools",
     "list_unified_capabilities",
     "map_mappy_sequences",
+    "mcp_tool_index_summary",
     "merge_pyranges_bed",
     "optimize_with_dnachisel",
     "overlap_polars_bio_bed",
@@ -93,6 +96,7 @@ __all__ = [
     "query_gffutils_database",
     "run_analysis",
     "run_unified_capability",
+    "search_mcp_tools",
     "search_projects",
     "simulate_dnacauldron_assembly",
     "summarize_dna_features_viewer",
