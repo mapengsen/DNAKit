@@ -20,6 +20,8 @@ __all__ = ["genomic_prediction", "genomic_relationship_matrix"]
 _VANRADEN = "https://doi.org/10.3168/jds.2007-0980"
 _ENDELMAN = "https://doi.org/10.3835/plantgenome2011.08.0024"
 _RELATIONSHIP = "https://doi.org/10.1534/g3.112.004259"
+_GCTA = "https://doi.org/10.1016/j.ajhg.2010.11.011"
+_SNPRELATE = "https://doi.org/10.1093/bioinformatics/bts606"
 
 
 def _settings(ploidy: int, missing: str, verbose: bool) -> None:
@@ -100,9 +102,11 @@ def genomic_relationship_matrix(
     *,
     ploidy: int = 2,
     missing: str = "mean",
+    method: str = "vanraden",
+    eigenvectors: int = 0,
     verbose: bool = True,
 ) -> dict[str, Any]:
-    """Calculate the VanRaden method-1 additive genomic relationship matrix.
+    """Calculate an additive genomic relationship matrix (VanRaden method 1 or GCTA).
 
     Rows are samples (at least two), columns are biallelic markers, and entries
     are alternate-allele dosages in [0, 2]; fractional dosages are accepted.
@@ -118,20 +122,42 @@ def genomic_relationship_matrix(
     relative to this sample's frequencies, not an inferred base population.
     No shrinkage, pedigree blending, or polyploid generalization is applied.
 
+    ``method='gcta'`` gives the GCTA-style GRM exactly as R SNPRelate
+    ``snpgdsGRM(method="GCTA")``: each marker is standardized,
+    z = (x - 2p) / sqrt(p (1-p)), a missing dosage contributes z = 0, and
+    G_jk = sum_m z_jm z_km / (2 L_jk), where L_jk counts the retained markers observed
+    in both samples j and k (diagonal: observed in j). There is no separate GCTA
+    diagonal formula and ``missing`` only decides whether NaN is allowed.
+
+    ``eigenvectors=k`` (k >= 1) also returns the GRM eigendecomposition used for
+    PCA plots: all ``eigenvalues`` (descending), the first k unit-length
+    ``eigenvectors`` (samples x k) and ``explained_variance_ratio`` (eigenvalue /
+    sum of eigenvalues). It uses LAPACK dsyevr, the routine behind R ``eigen()``,
+    so eigenvector signs normally match R; a sign is otherwise arbitrary.
+
     Returns a JSON-compatible dictionary including ``relationship_matrix``,
     full-width frequencies (None for entirely missing markers), and filtering
     metadata. Uses O(samples**2) memory for the resulting dense matrix.
 
     References: P. M. VanRaden (2008), doi:10.3168/jds.2007-0980;
-    J. B. Endelman and J.-L. Jannink (2012), doi:10.1534/g3.112.004259.
+    J. B. Endelman and J.-L. Jannink (2012), doi:10.1534/g3.112.004259;
+    J. Yang et al. (2011), doi:10.1016/j.ajhg.2010.11.011 (GCTA);
+    X. Zheng et al. (2012), doi:10.1093/bioinformatics/bts606 (SNPRelate).
     """
     _settings(ploidy, missing, verbose)
+    if method not in ("vanraden", "gcta"):
+        raise ConfigurationError("method must be 'vanraden' or 'gcta'.")
+    if isinstance(eigenvectors, bool) or not isinstance(eigenvectors, int) or eigenvectors < 0:
+        raise ConfigurationError("eigenvectors must be a non-negative integer.")
     np = require("numpy", "bio-analysis")
     with Progress(disable=not verbose) as progress:
         task = progress.add_task("Genomic relationship matrix", total=3)
         data = _dosages(np, genotypes, "genotypes", min_rows=2, missing=missing)
         means, keep, absent, monomorphic = _reference(np, data)
         progress.advance(task)
+        if method == "gcta":
+            result = _gcta_relationship(np, data, means, keep, absent, monomorphic, progress, task)
+            return _with_eigen(np, result, eigenvectors)
         centered = _center(np, data, means, keep)
         frequencies = means[keep] / 2
         denominator = float(2 * np.sum(frequencies * (1 - frequencies)))
@@ -150,6 +176,54 @@ def genomic_relationship_matrix(
             "citations": [_VANRADEN, _RELATIONSHIP],
         }
         progress.advance(task)
+    return _with_eigen(np, result, eigenvectors)
+
+
+def _with_eigen(np: Any, result: dict[str, Any], count: int) -> dict[str, Any]:
+    """Append the dsyevr eigendecomposition (R eigen()) of the relationship matrix."""
+    if count == 0:
+        return result
+    matrix = np.asarray(result["relationship_matrix"])
+    if count > matrix.shape[0]:
+        raise ConfigurationError("eigenvectors cannot exceed the number of samples.")
+    linalg = require("scipy.linalg", "bio-analysis")
+    values, vectors = linalg.eigh(matrix, driver="evr")
+    values, vectors = values[::-1], vectors[:, ::-1]
+    result["eigenvalues"] = values.tolist()
+    result["eigenvectors"] = vectors[:, :count].tolist()
+    result["explained_variance_ratio"] = (values[:count] / values.sum()).tolist()
+    return result
+
+
+def _gcta_relationship(
+    np: Any, data: Any, means: Any, keep: Any, absent: Any, monomorphic: Any, progress: Any, task: Any
+) -> dict[str, Any]:
+    """SNPRelate snpgdsGRM(method='GCTA'): standardized markers, pairwise valid-marker counts."""
+    selected = data[:, keep]
+    observed = ~np.isnan(selected)
+    frequencies = means[keep] / 2
+    scaled = np.where(observed, (selected - means[keep]) / np.sqrt(frequencies * (1 - frequencies)), 0.0)
+    missing = (~observed).astype(float)
+    per_sample = missing.sum(axis=1)
+    invalid = per_sample[:, None] + per_sample[None, :] - missing @ missing.T
+    valid = int(np.sum(keep)) - invalid
+    if (valid <= 0).any():
+        raise ConfigurationError("Some sample pairs share no observed polymorphic marker.")
+    relationship = (scaled @ scaled.T) / (2 * valid)
+    if not np.isfinite(relationship).all():
+        raise ConfigurationError("Relationship calculation produced non-finite values.")
+    progress.advance(task)
+    result = {
+        "method": "gcta_snprelate",
+        "ploidy": 2,
+        "relationship_matrix": relationship.tolist(),
+        "n_samples": int(data.shape[0]),
+        "pairwise_valid_markers": {"min": int(valid.min()), "max": int(valid.max())},
+        "missing_value_count": int((~observed).sum()),
+        **_metadata(np, means, keep, absent, monomorphic),
+        "citations": [_GCTA, _SNPRELATE],
+    }
+    progress.advance(task)
     return result
 
 

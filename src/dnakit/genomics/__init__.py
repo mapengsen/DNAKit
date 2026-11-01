@@ -3,6 +3,7 @@
 from dnakit._verbosity import register_public as _register_public_verbose
 
 from .ani import average_nucleotide_identity
+from .association import mixed_model_gwas, read_plink_ped
 from .breeding import genomic_prediction, genomic_relationship_matrix
 from .genes import GenePredictionResult, PredictedGene, predict_prokaryotic_genes
 from .methylation import read_bedmethyl, summarize_methylation
@@ -21,8 +22,10 @@ __all__ = [
     "genomic_prediction",
     "genomic_relationship_matrix",
     "genotype_pca",
+    "mixed_model_gwas",
     "predict_prokaryotic_genes",
     "read_bedmethyl",
+    "read_plink_ped",
     "summarize_methylation",
 ]
 
