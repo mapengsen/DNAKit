@@ -48,48 +48,6 @@ def _gui_released() -> bool:
     return parts > (0, 2, 0)
 
 
-def _agent_guide(settings: GuiSettings) -> str:
-    desktop = ""
-    if settings.is_public and _gui_released():
-        desktop = (
-            "\n**Desktop app.** Run this interface on your own computer, without the demo limits:\n"
-            '```bash\npip install "dnakit[gui]"\ndnakit gui\n```\n'
-        )
-    return f"""
-### Use the same functions from an AI agent
-
-Everything in this interface also runs from Python, the command line, or an MCP-capable agent
-(Claude Code, Codex, Cursor and others). The agent finds functions with `search_dnakit_tools`,
-reads the schema with `describe_dnakit_tool` and runs them with `call_dnakit_tool`, exactly like
-the *Function explorer* tab.
-{desktop}
-**1. Install**
-```bash
-python3 -m venv ~/.venvs/dnakit-mcp
-~/.venvs/dnakit-mcp/bin/python -m pip install "dnakit[agent]=={dnakit.__version__}"
-```
-
-**2. Connect the MCP server**
-```bash
-claude mcp add dnakit -- ~/.venvs/dnakit-mcp/bin/dnakit-mcp     # Claude Code
-codex mcp add dnakit -- ~/.venvs/dnakit-mcp/bin/dnakit-mcp      # Codex
-```
-Other clients use the `mcpServers` JSON format:
-```json
-{{"mcpServers": {{"dnakit": {{"command": "/absolute/path/to/dnakit-mcp"}}}}}}
-```
-
-**3. Optional: install the planning and workflow Skills**
-```bash
-dnakit skills install dnakit --agent claude-code
-dnakit skills install dnakit-plan --agent codex
-```
-
-Documentation: <https://mapengsen.github.io/DNAKit/en/> ·
-Source: <https://github.com/mapengsen/DNAKit>
-"""
-
-
 def logo_path() -> Path:
     """Return the bundled DNAKit logo (also the window and browser-tab icon)."""
 
@@ -131,12 +89,21 @@ def _hero(backend: GuiBackend) -> str:
         "A unified DNA toolkit for Python, the command line and AI agents: "
         f"{summary}. Version {dnakit.__version__}. "
     )
+    links = f" [Documentation]({DOCS_URL}) · [Source](https://github.com/mapengsen/DNAKit)"
     if settings.is_public:
+        desktop = (
+            ' Run it on your own computer with `pip install "dnakit[gui]"` and `dnakit gui`.'
+            if _gui_released()
+            else ""
+        )
         return head + (
             "This public demo runs on a shared CPU; install DNAKit locally for large data, model "
-            "training and file-writing tools."
+            f"training and file-writing tools.{desktop}{links}"
         )
-    return head + f"Running on this computer; inputs and results are saved in `{settings.workdir}`."
+    return (
+        head + f"Running on this computer; inputs and results are saved in `{settings.workdir}`."
+        f"{links}"
+    )
 
 
 def build_app(settings: GuiSettings) -> gr.Blocks:
@@ -403,7 +370,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                     "below and click a row for its arguments, source and how to call it; *docs* "
                     "opens its entry in the [MCP tool catalogue ↗]"
                     f"({DOCS_URL}llm_tools/mcp_tools/). They run once their server is installed "
-                    "locally (see *Use with agents*), not in this demo."
+                    f"locally (see the [MCP guide ↗]({DOCS_URL}llm_tools/mcp/)), not in this demo."
                 )
             with gr.Row():
                 mcp_query = gr.Textbox(label="Search third-party MCP tools", value="gwas", scale=4)
@@ -424,8 +391,8 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                     max_height=300,
                     interactive=False,
                 )
-            mcp_btn.click(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
-            mcp_query.submit(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
+            mcp_btn.click(backend.mcp_search, [mcp_query], [mcp_head, mcp_table, mcp_detail])
+            mcp_query.submit(backend.mcp_search, [mcp_query], [mcp_head, mcp_table, mcp_detail])
             mcp_table.select(backend.mcp_select, [mcp_table], [mcp_detail])
 
         with gr.Tab(f"Skills ({backend.skill_total})"):
@@ -453,12 +420,9 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
             sk_table.select(pick_first_column, [sk_table], [sk_name])
             sk_name.change(backend.sk_read, [sk_name], [sk_doc])
 
-        with gr.Tab("Use with agents"):
-            gr.Markdown(_agent_guide(settings))
-
         demo.load(backend.fx_search, [fx_query, fx_cat], [fx_head, fx_table, fx_name])
         demo.load(backend.sk_search, [sk_query], [sk_head, sk_table, sk_name])
-        demo.load(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
+        demo.load(backend.mcp_search, [mcp_query], [mcp_head, mcp_table, mcp_detail])
 
     return demo
 

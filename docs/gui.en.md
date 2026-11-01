@@ -43,7 +43,6 @@ forwarding.
 | Function explorer | Search every Agent-callable function, open its section of this documentation, read its schema, run it with JSON arguments |
 | MCP tools | Search the DNA and gene tools of third-party MCP servers; a clicked tool shows its arguments, source repository and the `call_mcp_tool` call, and *docs* opens its entry in the MCP tool catalogue |
 | Skills | Search and read the bundled DNA workflow Skills; *docs* opens a Skill's entry in the Skills catalogue |
-| Use with agents | Connect the same functions to Claude Code, Codex or other MCP clients |
 
 Every result shows the equivalent command line, Python call and, in the function explorer, the
 MCP request an agent sends, so a task tried in the interface can be scripted directly.

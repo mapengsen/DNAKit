@@ -231,8 +231,9 @@ def test_mcp_tab_reports_the_catalogue_tool_count_and_searches_bridged_tools(
     assert f"MCP tools ({counts['mcp_tools']:,})" in labels
     demo.close()
     backend = GuiBackend(GuiSettings.public_demo(tmp_path))
-    head, rows = backend.mcp_search("gwas")
+    head, rows, detail = backend.mcp_search("gwas")
     assert rows and "matching third-party tools" in head
+    assert detail.startswith(f"### `{rows[0][0]}`")
     assert backend.mcp_servers()
 
 
@@ -289,7 +290,8 @@ def test_mcp_tab_describes_a_clicked_third_party_tool(
     link = backend.docs.mcp_tools["gwas-mcp/query_gwas_catalog"]
     assert link.endswith("llm_tools/mcp_tools/gwas-mcp/#query_gwas_catalog")
     assert f"[documentation ↗]({link})" in detail
-    _, rows = backend.mcp_search("query_gwas_catalog")
+    _, rows, first = backend.mcp_search("query_gwas_catalog")
+    assert first == backend.mcp_describe(rows[0][2], rows[0][0])  # shown before any click
     row = next(r for r in rows if r[0] == "query_gwas_catalog" and r[2] == "gwas-mcp")
     assert row[1] == f"[docs ↗]({link})"
 

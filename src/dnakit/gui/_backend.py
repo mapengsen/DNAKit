@@ -788,12 +788,14 @@ class GuiBackend:
         return sorted(rows, key=lambda row: (-row[1], row[0]))
 
     def mcp_search(self, query: str) -> tuple[Any, ...]:
+        """Return the summary line, the result rows and the description of the first result."""
+
         if not (query or "").strip():
-            return "Enter a search term.", []
+            return "Enter a search term.", [], ""
         try:
             found = search_mcp_tools(query, limit=40, verbose=False)
         except Exception as exc:  # invalid query
-            return fail(exc), []
+            return fail(exc), [], ""
         rows = [
             [
                 t["tool_name"],
@@ -804,10 +806,12 @@ class GuiBackend:
             ]
             for t in found["tools"]
         ]
+        first = found["tools"][0] if found["tools"] else None
         return (
             f"{found['total_matches']} matching third-party tools "
             f"(showing {len(rows)} of {found['indexed_tools']:,} indexed)",
             rows,
+            self.mcp_describe(first["server_id"], first["tool_name"]) if first else "",
         )
 
     def mcp_select(self, evt: gr.SelectData, table: Any) -> str:
