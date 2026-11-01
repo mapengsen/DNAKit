@@ -29,4 +29,14 @@ __all__ = [
     "get_embedding_model",
 ]
 
+# Public integration of the reviewed P00–P45 operation packs.
+from .lucaonetasks_p16_functions import (
+    embed_dna_with_dnabert,
+)
+
+__all__ = [
+    *__all__,
+    "embed_dna_with_dnabert",
+]
+
 _register_public_verbose(globals())

@@ -70,7 +70,7 @@ print(json.dumps(result, indent=2))
 
 - **作用：** 为接触矩阵的 bin 标注 TAD 边界（绝缘分数极小值）或 A/B 区室标签（`options["entity"]`）。
 
-- **处理方法：** `tad`（默认）使用绝缘分数极小值规则，不是带统计检验的 TAD 调用程序。绝缘分数的算法同 `calculate`（窗口 `window` w，默认 5）：S(i) = M[a][b] 的均值，a 取 [i-w, i-1]、b 取 [i, i+w-1]，score = log2(S(i) / 有定义 bin 上 S 的均值)。bin i 是边界，当且仅当其得分低于 `threshold`（默认 0.0，即绝缘度低于整个矩阵的平均水平），并且在其两侧 `boundary_radius` 个 bin（默认 = `window`）内是最小值，并列时取最左侧的 bin。`tads` 是 bin 区间 [`start_bin`, `end_bin`)（右端不含）。设矩阵有 n 个 bin、边界为 b_1 < ... < b_m，则内部结构域为 [b_k, b_k+1)（`edge: false`）；`include_edge_domains`（默认 true）时还会报告两个边缘结构域，标记为 `edge: true`：[0, b_1)（b_1 = 0 时省略）和 [b_m, n)（最后一个边界开启最后一个结构域）。因此只有一个边界时最多得到两个边缘结构域，完全没有边界时整个矩阵 [0, n) 是一个边缘结构域。边缘结构域被矩阵边界截断，其大小与内部结构域不可比；`include_edge_domains: false` 则只返回内部结构域（边界少于两个时为空列表）。不提供 p 值或边界强度。`compartment`：对观测/期望接触（期望 = 非空 bin 上每条对角线的平均接触）的 Pearson 相关矩阵取首个特征向量，按符号标注 A/B；特征向量 >= 0 为 A，< 0 为 B。特征向量的符号本身是任意的：未给 `reference` 时取绝对值最大的元素为正，所以哪个区室叫 A 本身没有意义；给定逐 bin 的 `reference` 轨道（例如 GC 含量）时，会翻转符号使特征向量与之正相关。至少需要 3 个非空 bin。需要 numpy；缺少时函数返回 `status: "not_implemented"`，`required_dependency` 为 `pip install numpy`。
+- **处理方法：** `tad`（默认）使用绝缘分数极小值规则，不是带统计检验的 TAD 调用程序。绝缘分数的算法同 `calculate`（窗口 `window` w，默认 5）：S(i) = `M[a][b]` 的均值，a 取 [i-w, i-1]、b 取 [i, i+w-1]，score = log2(S(i) / 有定义 bin 上 S 的均值)。bin i 是边界，当且仅当其得分低于 `threshold`（默认 0.0，即绝缘度低于整个矩阵的平均水平），并且在其两侧 `boundary_radius` 个 bin（默认 = `window`）内是最小值，并列时取最左侧的 bin。`tads` 是 bin 区间 [`start_bin`, `end_bin`)（右端不含）。设矩阵有 n 个 bin、边界为 b_1 < ... < b_m，则内部结构域为 [b_k, b_k+1)（`edge: false`）；`include_edge_domains`（默认 true）时还会报告两个边缘结构域，标记为 `edge: true`：[0, b_1)（b_1 = 0 时省略）和 [b_m, n)（最后一个边界开启最后一个结构域）。因此只有一个边界时最多得到两个边缘结构域，完全没有边界时整个矩阵 [0, n) 是一个边缘结构域。边缘结构域被矩阵边界截断，其大小与内部结构域不可比；`include_edge_domains: false` 则只返回内部结构域（边界少于两个时为空列表）。不提供 p 值或边界强度。`compartment`：对观测/期望接触（期望 = 非空 bin 上每条对角线的平均接触）的 Pearson 相关矩阵取首个特征向量，按符号标注 A/B；特征向量 >= 0 为 A，< 0 为 B。特征向量的符号本身是任意的：未给 `reference` 时取绝对值最大的元素为正，所以哪个区室叫 A 本身没有意义；给定逐 bin 的 `reference` 轨道（例如 GC 含量）时，会翻转符号使特征向量与之正相关。至少需要 3 个非空 bin。需要 numpy；缺少时函数返回 `status: "not_implemented"`，`required_dependency` 为 `pip install numpy`。
 
 - **API：** `dnakit.genome3d.annotate(input[required], options[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 
@@ -148,7 +148,7 @@ print(json.dumps(result, indent=2))
 
 - **作用：** 根据接触矩阵计算距离衰减曲线、绝缘分数或 A/B 区室特征向量（`options["entity"]`）。
 
-- **处理方法：** `distance_decay`（默认）：P(s) = 对角线 s = |i - j| 上所有有效 bin 对的平均接触（行和为零的空 bin 被排除）；`slope` 是 `s_min` <= s <= `s_max` 时 log10 P(s) 对 log10 s 的最小二乘斜率。`insulation`：S(i) = M[a][b] 的均值，a 取 [i-w, i-1]、b 取 [i, i+w-1]（对角线上、角点位于 bin i 起点的方块；w <= i <= n-w 时有定义，否则为 `null`），score = log2(S(i) / 有定义 bin 上 S 的均值)；低分表示绝缘位置。`compartment`：对观测/期望矩阵（期望 = 每条对角线的平均值）的 Pearson 相关矩阵取首个特征向量（numpy `eigh`）；符号给出 A（>= 0）或 B（< 0），除非提供逐 bin 的 `reference`（如 GC），否则方向是任意的，此时取绝对值最大的元素为正。需要 numpy；缺少时函数返回 `status: "not_implemented"`，`required_dependency` 为 `pip install numpy`。
+- **处理方法：** `distance_decay`（默认）：P(s) = 对角线 s = |i - j| 上所有有效 bin 对的平均接触（行和为零的空 bin 被排除）；`slope` 是 `s_min` <= s <= `s_max` 时 log10 P(s) 对 log10 s 的最小二乘斜率。`insulation`：S(i) = `M[a][b]` 的均值，a 取 [i-w, i-1]、b 取 [i, i+w-1]（对角线上、角点位于 bin i 起点的方块；w <= i <= n-w 时有定义，否则为 `null`），score = log2(S(i) / 有定义 bin 上 S 的均值)；低分表示绝缘位置。`compartment`：对观测/期望矩阵（期望 = 每条对角线的平均值）的 Pearson 相关矩阵取首个特征向量（numpy `eigh`）；符号给出 A（>= 0）或 B（< 0），除非提供逐 bin 的 `reference`（如 GC），否则方向是任意的，此时取绝对值最大的元素为正。需要 numpy；缺少时函数返回 `status: "not_implemented"`，`required_dependency` 为 `pip install numpy`。
 
 - **API：** `dnakit.genome3d.calculate(input[required], options[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 

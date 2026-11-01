@@ -2763,7 +2763,7 @@ print(result)
 
 - **Purpose:** Flags sample pairs that share an unexpectedly large part of their k-mers (possible cross-sample contamination).
 
-- **Method:** For every sample the set of canonical k-mers is built, and containment[a][b] = |K(a) intersect K(b)| / |K(a)| is computed for each ordered pair. Pairs with containment at or above `threshold` are flagged. Heuristic: it is only meaningful when the samples are expected to be unrelated (different organisms or individuals); related samples share k-mers legitimately. Pure Python.
+- **Method:** For every sample the set of canonical k-mers is built, and `containment[a][b] = |K(a) intersect K(b)| / |K(a)|` is computed for each ordered pair. Pairs with containment at or above `threshold` are flagged. Heuristic: it is only meaningful when the samples are expected to be unrelated (different organisms or individuals); related samples share k-mers legitimately. Pure Python.
 
 - **API:** `dnakit.sequencing_qc.detect_cross_sample_contamination(input[required], options[optional])` (formal DNAKit namespace; Agent/MCP exposure depends on the JSON call plan).
 

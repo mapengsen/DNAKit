@@ -16,6 +16,14 @@
 `dnakit_candidates` 只是实现登记使用的内部暂存命名空间，不是公开 API。正式入口
 可能是本地实现、有限门面或带依赖检查的适配器，具体状态在下文单独记录。
 
+## P00–P45 操作批次接入
+
+46 批清单共 3,512 项操作：1,473 项实现、866 项通过参数合并、1,043 项已有对应、130 项保留跳过原因。清单声明的 2,041 个函数已公开导出并可由 Agent/MCP 发现；另公开 10 个被历史记录引用的已有函数。操作行数与函数数口径不同。
+
+这次接入新增 2,051 个公开入口，当前共有 5,795 个公开 Python 函数，其中 5,792 个兼容 Agent。既有同名入口保留；新增 `dnakit.sequence.biopython_trim_sequence` 与 `dnakit.databases.ensembl_vep_region_query` 用于避免覆盖原 API。可选后端按需安装，外部程序、数据库与模型仍需各自准备。Biotite 2/pyranges1 1.5 要求 Python 3.12，旧 TensorFlow Addons 后端需独立的 Python 3.10/3.11 环境。
+
+原始 `dedup_clusters_all.csv` 和 `dedup_summary.json` 继续作为历史快照，不代表当前公开接口数量。逐项接入与跳过记录位于仓库 `paper/write_paper/figure/fig2/task_coverage/integration/`，全量验证命令见该目录的 `PUBLIC_INTEGRATION_REPORT.md`。
+
 ## 查询覆盖矩阵
 
 ```python
@@ -68,7 +76,7 @@ print(run_unified_capability("CAP-0187", {"input": "@r1\\nACGT\\n+\\nIIII\\n"}))
 调用 `integration_inventory()` 可获取当前各接口面的数量。它把 Python 函数、
 兼容 Agent 的 Python 函数、MCP 服务器配置、已注册 Skills、调研项目和候选
 Schema 作为不同单位分别统计；这些类别不能当作可互换的工具直接相加。
-当前原始接口面合计为 **3,669**（3,045 个公开 Python 函数 + 49 个 MCP 服务器
+当前原始接口面合计为 **6,419**（5,795 个公开 Python 函数 + 49 个 MCP 服务器
 配置 + 575 个已注册 Skills）；这是接口面计数，而不是去重后的生物学工具数，
 因为同一能力可能出现在多个接口面中。
 清单还包含 `unified_candidate_statuses`，区分已实现、部分实现和适配层候选。

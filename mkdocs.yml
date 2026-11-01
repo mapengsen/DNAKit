@@ -243,6 +243,205 @@ plugins:
                 - 95) parasail kernels by name parts, and SSW with a reusable profile: api/features/109_family_parasail.en.md
                 - 96) MCP catalog - 17 more third-party servers: api/features/110_mcp_catalog_expansion.en.md
                 - 97) MCP tool index - search DNA and gene tools inside third-party servers: api/features/111_mcp_tool_index.en.md
+                - "98) Integrated genomics tools":
+                    - "P00: GATK":
+                        - "GATK command-line facades: Illumina runs, read metrics, fingerprints and file checks": api/features/300_gatk_p00_metrics.md
+                        - "GATK command-line facades: copy number, read counts, coverage and pileups": api/features/301_gatk_p00_copynumber.md
+                        - "GATK command-line facades: interval lists, genotyping arrays, flow reads and PathSeq": api/features/302_gatk_p00_intervals.md
+                    - "P01: GATK":
+                        - "GATK alignment and read-file tools (GATK, pack P01)": api/features/303_gatk_p01_alignment_cli.md
+                        - "GATK reference, FASTA and interval tools (GATK, pack P01)": api/features/304_gatk_p01_reference_cli.md
+                        - "GATK variant, GVCF and structural-variant tools (GATK, pack P01)": api/features/305_gatk_p01_variants_cli.md
+                    - "P02: GATK":
+                        - "GATK VCF validation, filtering, annotation and recalibration": api/features/306_gatk_validation_filtering_recalibration.md
+                        - "GATK annotation-score models and somatic/mitochondrial filters": api/features/307_gatk_annotation_models_somatic_filters.md
+                        - "GATK VCF utilities: header, dictionary, liftover, split and convert": api/features/308_gatk_vcf_utilities.md
+                    - "P03: VCFtools":
+                        - "VCFtools: filtering and site, depth and quality reports": api/features/309_vcftools_filters_site_reports.md
+                        - "VCFtools: individual statistics, linkage disequilibrium, PCA, export and comparison": api/features/310_vcftools_samples_ld_export.md
+                        - "VCFtools Perl scripts: vcf-annotate, vcf-subset, vcf-compare and the other vcf-* tools": api/features/311_vcftools_perl_scripts.md
+                    - "P04: AUGUSTUS":
+                        - "AUGUSTUS: gene prediction, training and pipelines": api/features/312_augustus_p04_prediction.md
+                        - "AUGUSTUS: hints, alignment filters and coverage tracks": api/features/313_augustus_p04_hints.md
+                        - "AUGUSTUS: gene-model, sequence and masking conversions": api/features/314_augustus_p04_conversion.md
+                    - "P05: BEDOPS":
+                        - "BEDOPS interval operations: set operations, bedextract, closest-features, sort-bed": api/features/315_bedops_interval_operations.md
+                        - "BEDOPS bedmap: statistics and listings of overlapping elements": api/features/316_bedops_bedmap.md
+                        - "BEDOPS Starch archives and convert2bed": api/features/317_bedops_starch_convert.md
+                    - "P06: samtools/bcftools/HTSlib":
+                        - "samtools and bcftools command-line facades: FASTQ regions, coverage histograms, checksums, convert, index, norm, polysomy": api/features/318_samtools_bcftools_core.md
+                        - "bcftools plugin facades: statistics, reports and annotation": api/features/319_bcftools_plugins_reports.md
+                        - "bcftools plugin facades: VCF editing, splitting and trio analysis": api/features/320_bcftools_plugins_vcf_trio.md
+                    - "P07: MMseqs2":
+                        - "MMseqs2 database, search, clustering and export workflows": api/features/321_mmseqs2_workflows.md
+                        - "MMseqs2 taxonomy assignment and multi-hit search": api/features/322_mmseqs2_taxonomy_multihit.md
+                        - "MMseqs2 prefilters, alignment modules and ORF utilities": api/features/323_mmseqs2_prefilter_align_orf.md
+                    - "P08: GCTA, Picard":
+                        - "Picard metrics, quality-control and fingerprint tools": api/features/324_picard_metrics_fingerprint.md
+                        - "Picard SAM/BAM, Illumina-run, VCF and interval tools": api/features/325_picard_alignment_vcf_intervals.md
+                        - "GCTA: relationship matrices, REML, association and summary-statistics analyses": api/features/326_gcta_cli_functions.md
+                    - "P09: Ensembl VEP, VSEARCH, minimap2":
+                        - "Ensembl VEP: variant consequences, filtering, haplotypes and cache tools": api/features/327_ensembl_vep_commands.md
+                        - "VSEARCH: search, clustering, chimeras, dereplication, read filtering and merging": api/features/328_vsearch_commands.md
+                        - "minimap2 and paftools: mapping, alignment conversion, assembly and annotation evaluation": api/features/329_minimap2_paftools.md
+                    - "P10: GEMINI, Merqury, modkit":
+                        - "GEMINI: queries, exports, statistics, inheritance models and gene-level tools": api/features/330_gemini_commands.md
+                        - "Merqury: k-mer based assembly evaluation, trio hap-mers and k-mer database tools": api/features/331_merqury_commands.md
+                        - "modkit: modified-base pileups, modBAM tools, motifs and differential methylation": api/features/332_modkit_commands.md
+                    - "P11: Bakta, IQ-TREE, RepeatMasker, minigraph":
+                        - "Bakta and RepeatMasker: genome annotation, repeat masking and repeat-annotation tools": api/features/333_bakta_repeatmasker_commands.md
+                        - "IQ-TREE 3: model selection, branch support, tree tests, simulation and dating": api/features/334_iqtree_commands.md
+                        - "minigraph: sequence-to-graph mapping, graph construction, bubble calls and SV scripts": api/features/335_minigraph_commands.md
+                    - "P12: Centrifuge, DeepVariant, HUMAnN, NanoPlot, seqtk":
+                        - "seqtk and NanoPlot: sequence-file and long-read command-line operations": api/features/336_seqtk_nanoplot.md
+                        - "Centrifuge and HUMAnN: metagenomic reference and functional-profile command-line operations": api/features/337_centrifuge_humann.md
+                        - "DeepVariant: variant-calling runners, pipeline stages, training and helper tools": api/features/338_deepvariant.md
+                    - "P13: BEDTools, BWA, CRISPResso, MAFFT, SURVIVOR, hifiasm":
+                        - "BWA, MAFFT and hifiasm command-line facades": api/features/339_bwa_mafft_hifiasm_p13.md
+                        - "BEDTools interval operations and SURVIVOR structural-variant tools": api/features/340_bedtools_survivor_p13.md
+                        - "CRISPResso2 genome-editing analysis facades and helper-script ports": api/features/341_crispresso_p13.md
+                    - "P14: BLAST+, BamTools, HISAT2, Kraken 2, Primer3, SPAdes, WhatsHap, fastp":
+                        - "Alignment and search programs: BLAST+, BamTools, HISAT2": api/features/342_blast_bamtools_hisat2.md
+                        - "Primer3 design tasks, the SPAdes toolkit and WhatsHap phasing": api/features/343_primer3_spades_whatshap.md
+                        - "fastp read processing and Kraken 2 taxonomic classification": api/features/344_fastp_kraken2.md
+                    - "P15: AfterQC, BUSCO, DELLY, GEMMA, GTDB-Tk, MEGAHIT, QUAST, SeqKit, Trimmomatic, seqmagick, spoa":
+                        - "FASTA/FASTQ command-line facades: seqmagick, SeqKit, AfterQC and Trimmomatic": api/features/345_fastx_cli_facades.md
+                        - "Assembly, variant and GWAS command-line facades: GEMMA, QUAST, BUSCO and DELLY": api/features/346_assembly_variant_gwas_cli_facades.md
+                        - "MEGAHIT, GTDB-Tk and SPOA command-line facades": api/features/347_megahit_gtdbtk_spoa_cli_facades.md
+                    - "P16: AMRFinderPlus, Bracken, Cas-OFFinder, DIAMOND, DrugZ, FastQC, FastTree, Filtlong, Flye, FreeBayes, Kaiju, Liftoff, LucaOneTasks, MAGeCK, MethylDackel, NanoFilt, Porechop, Prokka, Shasta, Sniffles2, abricate, cuteSV, eggNOG-mapper, fastANI, geNomad, miniprot, mlst, mosdepth, vcfanno":
+                        - "Metagenome classification, AMR screening and microbial typing facades": api/features/348_p16_metagenome_amr_typing_facades.md
+                        - "Long-read QC, assembly, structural variants, depth, methylation and FastTree facades": api/features/349_p16_longread_variant_methylation_facades.md
+                        - "CRISPR screen analysis, off-target search and DNABERT embeddings": api/features/350_p16_crispr_screens_offtargets_dnabert.md
+                    - "P17: FIMO (MEME suite), barrnap":
+                        - "FIMO motif scan with position-specific priors": api/features/351_fimo_position_priors.md
+                        - "Barrnap messenger-RNA feature prediction": api/features/352_barrnap_mrna_features.md
+                    - "P18: biopython":
+                        - "Biopython sequence formats and Seq helpers: QUAL, IMGT, GFA, nib, PIR, SeqXML, SFF, Xdna, Entrez XML and BGZF offsets": api/features/354_biopython_sequence_formats.md
+                        - "Biopython alignment formats, MAF index, HMMER and Infernal reports and alignment analysis": api/features/355_biopython_alignment_search.md
+                        - "Biopython tree files, PHYLIP distances, motif files and gene-data files (GEO, CEL, UniGene, Cluster)": api/features/356_biopython_trees_motifs_data.md
+                    - "P19: biopython":
+                        - "Biopython phylogeny, NEXUS, tree queries, dN/dS and PAML": api/features/357_biopython_phylogeny_nexus_paml.md
+                        - "Biopython GenePop editing, clustering and motif scoring": api/features/358_biopython_genepop_cluster_motifs.md
+                        - "Biopython restriction analysis, CAPS, BioSQL and genome figures": api/features/359_biopython_restriction_biosql_graphics.md
+                    - "P20: scikit-bio":
+                        - "scikit-bio file formats, sequence queries and alignment helpers": api/features/360_skbio_p20_io_sequences.md
+                    - "P21: scikit-bio":
+                        - "scikit-bio trees, distances and ordination": api/features/361_skbio_p20_trees_distance_ordination.md
+                        - "scikit-bio composition and alpha diversity": api/features/362_skbio_p20_composition_alpha.md
+                        - "scikit-bio diversity, resampling and cospeciation tests": api/features/363_skbio_p21_diversity_resampling.md
+                        - "scikit-bio table augmentation and embedding ordination": api/features/364_skbio_p21_table_augmentation.md
+                        - "scikit-bio sample metadata and interval metadata": api/features/365_skbio_p21_metadata.md
+                    - "P22: dadi":
+                        - "dadi DFE-integrated and triallelic spectra": api/features/366_dadi_dfe_triallelic_spectra.md
+                        - "dadi two-locus spectra and spectrum files": api/features/367_dadi_two_locus_spectra.md
+                        - "dadi spectrum operations, statistics, low coverage and diffusion": api/features/368_dadi_spectrum_operations.md
+                    - "P23: dadi":
+                        - "dadi population densities: construct and split": api/features/369_dadi_phi_densities.md
+                        - "dadi population densities: admixture and population selection": api/features/370_dadi_phi_events.md
+                        - "dadi spectrum construction": api/features/371_dadi_spectrum_construction.md
+                    - "P24: gtars":
+                        - "gtars refget stores: sequences, collections and aliases": api/features/372_gtars_refget_stores.md
+                        - "gtars region sets, gene annotation, signal matrices, tokenizers and LOLA databases": api/features/373_gtars_regions_annotation_tokens.md
+                        - "gtars transcript stores: coordinate conversion and lookup": api/features/374_gtars_transcript_stores.md
+                    - "P25: parasail":
+                        - "parasail alignment rendering: three-line text view and SAM CIGAR": api/features/375_parasail_render_alignment.md
+                    - "P26: scadnano":
+                        - "scadnano designs: files, exports, sequences and modifications": api/features/378_scadnano_design_io_sequences.md
+                        - "scadnano designs: strand and domain editing": api/features/379_scadnano_strand_editing.md
+                        - "scadnano designs: overlaps, crossovers, helix geometry and DNA origami": api/features/380_scadnano_crossovers_origami.md
+                    - "P27: khmer":
+                        - "khmer k-mer queries: hashes, abundances, de Bruijn graph neighbourhoods and paths": api/features/381_khmer_kmer_queries.md
+                        - "khmer tags, partitions and stop tags: splitting reads into connected components": api/features/382_khmer_tags_partitions.md
+                        - "khmer labelled graphs, HyperLogLog merging, read alignment and read-file tools": api/features/383_khmer_labels_reads.md
+                        - "khmer bounded read parsing": api/features/383_khmer_read_parser_completion.md
+                    - "P28: gimmemotifs":
+                        - "GimmeMotifs motif comparison, matrix transformation and scans": api/features/384_gimmemotifs_p28_motifs.md
+                        - "GimmeMotifs FASTA tools, statistics, thresholds, match counts and motif databases": api/features/385_gimmemotifs_p28_inputs_databases.md
+                        - "GimmeMotifs maelstrom motif-activity predictors, rank aggregation and heatmap": api/features/386_gimmemotifs_p28_maelstrom.md
+                    - "P29: Shasta":
+                        - "Shasta long-read assembly (command-line facade)": api/features/387_shasta_p29_assembly.md
+                    - "P30: biotite":
+                        - "Biotite sequence and nucleic-acid operations": api/features/390_biotite_sequence_alignment.md
+                        - "Biotite external applications (P30)": api/features/391_biotite_application_operations.md
+                        - "Biotite sequence and nucleic-acid operations": api/features/392_biotite_nucleic_acid_structure.md
+                    - "P31: tskit":
+                        - "tskit tree-sequence editing and mutation tables": api/features/393_tskit_tree_sequence_editing.md
+                        - "tskit listings, genotypes, sequences, IBD and recombination maps": api/features/394_tskit_genotypes_sequences_maps.md
+                        - "tskit sample-set, relatedness, trait and coalescence statistics": api/features/395_tskit_statistics.md
+                    - "P32: scikit-allel, varcode":
+                        - "scikit-allel genotype and allele calls": api/features/396_allel_p32_genotype_calls.md
+                        - "scikit-allel positions, spectra and state blocks": api/features/397_allel_p32_positions_spectra.md
+                        - "varcode collections, phasing and haplotypes": api/features/398_varcode_p32_collections_haplotypes.md
+                    - "P33: pybedtools, pyranges1":
+                        - "pybedtools: conversions, format checks and interval transforms": api/features/399_pybedtools_p33_conversion_transforms.md
+                        - "pybedtools: interval statistics, randomisation and reports": api/features/400_pybedtools_p33_statistics_reports.md
+                        - "PyRanges 1.5 interval operations": api/features/401_pyranges1_p33_interval_operations.md
+                    - "P34: alphagenome, pydna":
+                        - "pydna molecule ends and cloning history": api/features/402_pydna_p34_molecules_cloning.md
+                        - "pydna primer screening and sequence annotation": api/features/403_pydna_p34_primers_expression.md
+                        - "AlphaGenome intervals, junctions and tracks": api/features/404_alphagenome_p34_intervals_tracks.md
+                    - "P35: dnacauldron, hgvs":
+                        - "DNA Cauldron records and assembly graphs": api/features/405_dnacauldron_p35_records_assemblies.md
+                        - "DNA Cauldron plans and backbone results": api/features/406_dnacauldron_p35_plans_backbones.md
+                        - "HGVS validation, mapping and data providers": api/features/407_hgvs_p35_validation_mapping.md
+                    - "P36: gReLU, pyensembl, pysam":
+                        - "gReLU sequence datasets, models and metrics": api/features/408_grelu_p36_sequence_models.md
+                        - "PyEnsembl local annotation queries": api/features/409_pyensembl_p36_local_annotations.md
+                        - "pysam alignment and variant records": api/features/410_pysam_p36_records_variants.md
+                    - "P37: chamaeleo, gffutils, pygenomeviz, seqme":
+                        - "pyGenomeViz sequences, alignments and promoters": api/features/411_pygenomeviz_p37_sequences_promoters.md
+                        - "Chamaeleo DNA storage coding": api/features/412_chamaeleo_p37_dna_storage.md
+                        - "seqme sequence metrics and gffutils annotations": api/features/413_seqme_gffutils_p37_metrics_annotations.md
+                    - "P38: DendroPy, cooler/cooltools, dnachisel, selene-sdk, snapatac2":
+                        - "cooler and cooltools contact-map operations": api/features/414_cooler_cooltools_p38_contact_operations.md
+                        - "DnaChisel rules and DendroPy population models": api/features/415_dnachisel_dendropy_p38_design_population.md
+                        - "Selene genome windows and SnapATAC2 accessibility": api/features/416_selene_snapatac2_p38_windows_accessibility.md
+                    - "P39: cutadapt, geneblocks, nupack, pyhmmer, sourmash, toytree":
+                        - "NUPACK and DNA blocks": api/features/417_p39_ensemble_blocks.md
+                        - "DNA sketches and HMMs": api/features/418_p39_sketches_hmms.md
+                        - "Reads and phylogenetic trees": api/features/419_p39_reads_trees.md
+                    - "P40: SPAdes, bioframe, dnaio, enformer-pytorch, genomepy, genomicranges, polars-bio, pyfaidx, pyfastx, pyrodigal":
+                        - "Sequence files and genome annotation": api/features/420_p40_sequences_genomes.md
+                        - "Genomic intervals and assembly": api/features/421_p40_intervals.md
+                        - "Enformer predictions and metrics": api/features/422_p40_enformer.md
+                    - "P41: MACS3, Prokka, SURVIVOR, cyvcf2, deeptools, dna_features_viewer, edlib, evo2, genomic_benchmarks, gget, kipoi, methylpy, ncls, pairtools, py2bit, pyBigWig, pyfastani, pyslow5, pyvolve, sbol3, screed, tangermeme, vcfpy":
+                        - "P41 sequence operations": api/features/423_p41_sequence_operations.md
+                        - "P41 tracks and annotations": api/features/424_p41_tracks_annotations.md
+                        - "P41 model operations": api/features/425_p41_model_operations.md
+                    - "P42: NCBI FTP":
+                        - "P42 Public database operations": api/features/426_ncbi_ftp_p42_functions.md
+                    - "P43: NCBI E-utilities":
+                        - "P43 Public database operations": api/features/429_ncbi_eutils_p43_functions.md
+                    - "P44: ENA, Ensembl REST, NCBI Datasets":
+                        - "P44 Public database operations": api/features/432_public_apis_p44_functions.md
+                        - "P44 Public database operations": api/features/433_ena_p44_functions.md
+                    - "P45: ENCODE, NCBI BLAST, RCSB PDB, UCSC":
+                        - "P45 Public database operations": api/features/435_public_apis_p45_functions.md
+                - "99) Additional package operations":
+                    - "sourmash: sketch, compare, search and index DNA signatures": api/features/112_sourmash_sketch_search.md
+                    - "sourmash: lineage databases, taxonomy reports and signature utilities": api/features/113_sourmash_lca_taxonomy.md
+                    - "Kipoi: run, validate and describe local model-zoo models": api/features/114_kipoi_models.md
+                    - "GimmeMotifs: motif scanning, clustering, background sets and de novo discovery": api/features/115_gimmemotifs_motifs.md
+                    - "genomepy and gget: genome catalogues, annotations and database queries": api/features/116_genomepy_gget.md
+                    - "deepTools: coverage, comparison, summaries and read filtering": api/features/117_deeptools_commands.md
+                    - "deepTools: matrix operations and plots": api/features/118_deeptools_matrix_plots.md
+                    - "cooler and cooltools: Hi-C contact matrices": api/features/119_cooler_cooltools.md
+                    - "MACS3 and pairtools: peak calling and Hi-C pair processing": api/features/120_macs3_pairtools.md
+                    - "methylpy: bisulfite alignment, methylation calling and DMR finding": api/features/121_methylpy.md
+                    - "SnapATAC2: datasets and single-cell chromatin plots": api/features/122_snapatac2.md
+                    - "tskit and toytree: tree sequences and tree drawing": api/features/123_tskit_toytree.md
+                    - "DendroPy and khmer: tree formats, PAUP*, and k-mer tables": api/features/124_dendropy_khmer.md
+                    - "varcode: variant effects, fusions and splice outcomes": api/features/125_varcode.md
+                    - "scikit-allel: population-genetic plots and genotype stores": api/features/126_allel.md
+                    - "dadi: demographic inference and spectrum plots": api/features/127_dadi.md
+                    - "gReLU: model zoo, datasets, plots and motif tools": api/features/128_grelu.md
+                    - "DNA model toolkits: AlphaGenome, Enformer, Selene, tangermeme and genomic-benchmarks": api/features/129_dna_model_tools.md
+                    - "Biopython: NCBI, KEGG and TogoWS services, trees and plots": api/features/130_biopython_services.md
+                    - "Genomic intervals and annotation: pybedtools, bioframe, pyranges, genomicranges, gtars and pyGenomeViz": api/features/131_intervals_annotation.md
+                    - "SeqKit and screed: FASTA and FASTQ command-line operations": api/features/132_seqkit_screed.md
+                    - "Read tools: pysam, pyfaidx, cutadapt and UMI-tools": api/features/133_read_tools.md
+                    - "Design tools: pydna, DNA Chisel and DnaCauldron": api/features/134_design_tools.md
+                    - "Variant and annotation I/O: bed-reader, bgen-reader, hgvs, polars-bio and pyensembl": api/features/135_variant_io_tools.md
             - 4. Data Evaluation:
                 - 1) Common Evaluation Metrics: api/features/12_evaluation.md
                 - 2) Similarity Calculation: api/features/09_similarity_alignment.md
@@ -554,6 +753,205 @@ nav:
       - 95) 按名称部件选择的 parasail 内核，及可复用查询 profile 的 SSW: api/features/109_family_parasail.md
       - 96) MCP 目录 - 新增 17 个第三方服务器: api/features/110_mcp_catalog_expansion.md
       - 97) MCP 工具索引 - 搜索第三方服务器中的 DNA 与基因工具: api/features/111_mcp_tool_index.md
+      - "98) 已整合的基因组工具":
+          - "P00: GATK":
+              - "GATK 命令行封装：Illumina 运行、读段指标、指纹与文件检查": api/features/300_gatk_p00_metrics.md
+              - "GATK 命令行封装：拷贝数、读段计数、覆盖度与 pileup": api/features/301_gatk_p00_copynumber.md
+              - "GATK 命令行封装：区间列表、基因分型芯片、flow 读段与 PathSeq": api/features/302_gatk_p00_intervals.md
+          - "P01: GATK":
+              - "GATK 比对与读段文件工具（GATK，P01 包）": api/features/303_gatk_p01_alignment_cli.md
+              - "GATK 参考序列、FASTA 与区间工具（GATK，P01 包）": api/features/304_gatk_p01_reference_cli.md
+              - "GATK 变异、GVCF 与结构变异工具（GATK，P01 包）": api/features/305_gatk_p01_variants_cli.md
+          - "P02: GATK":
+              - "GATK 的 VCF 校验、过滤、注释与重校准": api/features/306_gatk_validation_filtering_recalibration.md
+              - "GATK 注释评分模型与体细胞/线粒体过滤": api/features/307_gatk_annotation_models_somatic_filters.md
+              - "GATK 的 VCF 工具：头部、字典、liftover、拆分与转换": api/features/308_gatk_vcf_utilities.md
+          - "P03: VCFtools":
+              - "VCFtools：过滤与位点、深度、质量报告": api/features/309_vcftools_filters_site_reports.md
+              - "VCFtools：个体统计、连锁不平衡、PCA、格式导出与比较": api/features/310_vcftools_samples_ld_export.md
+              - "VCFtools Perl 脚本：vcf-annotate、vcf-subset、vcf-compare 及其他 vcf-* 工具": api/features/311_vcftools_perl_scripts.md
+          - "P04: AUGUSTUS":
+              - "AUGUSTUS：基因预测、训练与流水线": api/features/312_augustus_p04_prediction.md
+              - "AUGUSTUS：hints、比对过滤与覆盖度轨道": api/features/313_augustus_p04_hints.md
+              - "AUGUSTUS：基因模型、序列与屏蔽转换": api/features/314_augustus_p04_conversion.md
+          - "P05: BEDOPS":
+              - "BEDOPS 区间操作：集合运算、bedextract、closest-features、sort-bed": api/features/315_bedops_interval_operations.md
+              - "BEDOPS bedmap：重叠元素的统计与列表": api/features/316_bedops_bedmap.md
+              - "BEDOPS Starch 归档与 convert2bed": api/features/317_bedops_starch_convert.md
+          - "P06: samtools/bcftools/HTSlib":
+              - "samtools 与 bcftools 命令行封装：FASTQ 区域、覆盖度直方图、校验和、convert、index、norm、polysomy": api/features/318_samtools_bcftools_core.md
+              - "bcftools 插件封装：统计、报告与注释": api/features/319_bcftools_plugins_reports.md
+              - "bcftools 插件封装：VCF 编辑、拆分与三联体分析": api/features/320_bcftools_plugins_vcf_trio.md
+          - "P07: MMseqs2":
+              - "MMseqs2 数据库、搜索、聚类与导出流程": api/features/321_mmseqs2_workflows.md
+              - "MMseqs2 分类学归类与多命中搜索": api/features/322_mmseqs2_taxonomy_multihit.md
+              - "MMseqs2 预过滤、比对模块与 ORF 工具": api/features/323_mmseqs2_prefilter_align_orf.md
+          - "P08: GCTA, Picard":
+              - "Picard 指标、质控与指纹工具": api/features/324_picard_metrics_fingerprint.md
+              - "Picard 的 SAM/BAM、Illumina 运行目录、VCF 与区间工具": api/features/325_picard_alignment_vcf_intervals.md
+              - "GCTA：关系矩阵、REML、关联分析与汇总统计分析": api/features/326_gcta_cli_functions.md
+          - "P09: Ensembl VEP, VSEARCH, minimap2":
+              - "Ensembl VEP：变异后果、过滤、单倍型与缓存工具": api/features/327_ensembl_vep_commands.md
+              - "VSEARCH：搜索、聚类、嵌合体、去冗余、读段过滤与合并": api/features/328_vsearch_commands.md
+              - "minimap2 与 paftools：比对、比对格式转换、组装与注释评估": api/features/329_minimap2_paftools.md
+          - "P10: GEMINI, Merqury, modkit":
+              - "GEMINI：查询、导出、统计、遗传模式与基因水平工具": api/features/330_gemini_commands.md
+              - "Merqury：基于 k-mer 的组装评估、trio hap-mer 与 k-mer 数据库工具": api/features/331_merqury_commands.md
+              - "modkit：修饰碱基 pileup、modBAM 工具、motif 与差异甲基化": api/features/332_modkit_commands.md
+          - "P11: Bakta, IQ-TREE, RepeatMasker, minigraph":
+              - "Bakta 与 RepeatMasker：基因组注释、重复掩蔽与重复注释工具": api/features/333_bakta_repeatmasker_commands.md
+              - "IQ-TREE 3：模型选择、分支支持度、树检验、模拟与定年": api/features/334_iqtree_commands.md
+              - "minigraph：序列到图的映射、图构建、气泡调用与结构变异脚本": api/features/335_minigraph_commands.md
+          - "P12: Centrifuge, DeepVariant, HUMAnN, NanoPlot, seqtk":
+              - "seqtk 与 NanoPlot：序列文件和长读长命令行操作": api/features/336_seqtk_nanoplot.md
+              - "Centrifuge 与 HUMAnN：宏基因组参考库与功能谱命令行操作": api/features/337_centrifuge_humann.md
+              - "DeepVariant：变异调用、流程各阶段、训练与辅助工具": api/features/338_deepvariant.md
+          - "P13: BEDTools, BWA, CRISPResso, MAFFT, SURVIVOR, hifiasm":
+              - "BWA、MAFFT 与 hifiasm 命令行封装": api/features/339_bwa_mafft_hifiasm_p13.md
+              - "BEDTools 区间操作与 SURVIVOR 结构变异工具": api/features/340_bedtools_survivor_p13.md
+              - "CRISPResso2 基因组编辑分析封装与辅助脚本移植": api/features/341_crispresso_p13.md
+          - "P14: BLAST+, BamTools, HISAT2, Kraken 2, Primer3, SPAdes, WhatsHap, fastp":
+              - "比对与搜索程序：BLAST+、BamTools、HISAT2": api/features/342_blast_bamtools_hisat2.md
+              - "Primer3 设计任务、SPAdes 工具集与 WhatsHap 定相": api/features/343_primer3_spades_whatshap.md
+              - "fastp 读段处理与 Kraken 2 物种分类": api/features/344_fastp_kraken2.md
+          - "P15: AfterQC, BUSCO, DELLY, GEMMA, GTDB-Tk, MEGAHIT, QUAST, SeqKit, Trimmomatic, seqmagick, spoa":
+              - "FASTA/FASTQ 命令行适配器：seqmagick、SeqKit、AfterQC 与 Trimmomatic": api/features/345_fastx_cli_facades.md
+              - "组装、变异与 GWAS 命令行适配器：GEMMA、QUAST、BUSCO 与 DELLY": api/features/346_assembly_variant_gwas_cli_facades.md
+              - "MEGAHIT、GTDB-Tk 与 SPOA 命令行适配器": api/features/347_megahit_gtdbtk_spoa_cli_facades.md
+          - "P16: AMRFinderPlus, Bracken, Cas-OFFinder, DIAMOND, DrugZ, FastQC, FastTree, Filtlong, Flye, FreeBayes, Kaiju, Liftoff, LucaOneTasks, MAGeCK, MethylDackel, NanoFilt, Porechop, Prokka, Shasta, Sniffles2, abricate, cuteSV, eggNOG-mapper, fastANI, geNomad, miniprot, mlst, mosdepth, vcfanno":
+              - "宏基因组分类、耐药筛查与微生物分型封装": api/features/348_p16_metagenome_amr_typing_facades.md
+              - "长读长质控、组装、结构变异、深度、甲基化与 FastTree 封装": api/features/349_p16_longread_variant_methylation_facades.md
+              - "CRISPR 筛选分析、脱靶搜索与 DNABERT 嵌入": api/features/350_p16_crispr_screens_offtargets_dnabert.md
+          - "P17: FIMO (MEME suite), barrnap":
+              - "FIMO 位置特异先验的基序扫描": api/features/351_fimo_position_priors.md
+              - "Barrnap 信使 RNA 特征预测": api/features/352_barrnap_mrna_features.md
+          - "P18: biopython":
+              - "Biopython 序列格式与 Seq 辅助函数：QUAL、IMGT、GFA、nib、PIR、SeqXML、SFF、Xdna、Entrez XML 与 BGZF 偏移": api/features/354_biopython_sequence_formats.md
+              - "Biopython 比对格式、MAF 索引、HMMER 与 Infernal 报告及比对分析": api/features/355_biopython_alignment_search.md
+              - "Biopython 树文件、PHYLIP 距离、基序文件与基因数据文件（GEO、CEL、UniGene、Cluster）": api/features/356_biopython_trees_motifs_data.md
+          - "P19: biopython":
+              - "Biopython 系统发育、NEXUS、树查询、dN/dS 与 PAML": api/features/357_biopython_phylogeny_nexus_paml.md
+              - "Biopython GenePop 编辑、聚类与基序打分": api/features/358_biopython_genepop_cluster_motifs.md
+              - "Biopython 限制性酶切分析、CAPS、BioSQL 与基因组图": api/features/359_biopython_restriction_biosql_graphics.md
+          - "P20: scikit-bio":
+              - "scikit-bio 文件格式、序列查询与比对辅助函数": api/features/360_skbio_p20_io_sequences.md
+          - "P21: scikit-bio":
+              - "scikit-bio 树、距离矩阵与排序": api/features/361_skbio_p20_trees_distance_ordination.md
+              - "scikit-bio 组成数据与 Alpha 多样性": api/features/362_skbio_p20_composition_alpha.md
+              - "scikit-bio 多样性、重采样与协同进化检验": api/features/363_skbio_p21_diversity_resampling.md
+              - "scikit-bio 表增强与嵌入排序": api/features/364_skbio_p21_table_augmentation.md
+              - "scikit-bio 样本元数据与区间元数据": api/features/365_skbio_p21_metadata.md
+          - "P22: dadi":
+              - "dadi 选择效应分布积分谱与三等位基因频谱": api/features/366_dadi_dfe_triallelic_spectra.md
+              - "dadi 双位点频谱与频谱文件": api/features/367_dadi_two_locus_spectra.md
+              - "dadi 频谱操作、统计量、低覆盖度模型与扩散积分": api/features/368_dadi_spectrum_operations.md
+          - "P23: dadi":
+              - "dadi 群体密度：构建与分裂": api/features/369_dadi_phi_densities.md
+              - "dadi 群体密度：混合与群体选择": api/features/370_dadi_phi_events.md
+              - "dadi 频谱构建": api/features/371_dadi_spectrum_construction.md
+          - "P24: gtars":
+              - "gtars refget 存储：序列、集合与别名": api/features/372_gtars_refget_stores.md
+              - "gtars 区间集合、基因注释、信号矩阵、分词器与 LOLA 数据库": api/features/373_gtars_regions_annotation_tokens.md
+              - "gtars 转录本存储：坐标转换与查询": api/features/374_gtars_transcript_stores.md
+          - "P25: parasail":
+              - "parasail 比对结果渲染：三行文本视图与 SAM CIGAR": api/features/375_parasail_render_alignment.md
+          - "P26: scadnano":
+              - "scadnano 设计：文件读写、导出、序列与修饰": api/features/378_scadnano_design_io_sequences.md
+              - "scadnano 设计：链与结构域编辑": api/features/379_scadnano_strand_editing.md
+              - "scadnano 设计：重叠、交叉、螺旋几何与 DNA 折纸": api/features/380_scadnano_crossovers_origami.md
+          - "P27: khmer":
+              - "khmer k-mer 查询：哈希、丰度、de Bruijn 图邻域与路径": api/features/381_khmer_kmer_queries.md
+              - "khmer 标签、分区与停止标签：把读段拆分为连通分量": api/features/382_khmer_tags_partitions.md
+              - "khmer 带标签图、HyperLogLog 合并、读段比对与读段文件工具": api/features/383_khmer_labels_reads.md
+              - "khmer 有界读段解析": api/features/383_khmer_read_parser_completion.md
+          - "P28: gimmemotifs":
+              - "GimmeMotifs 基序比较、矩阵转换与扫描": api/features/384_gimmemotifs_p28_motifs.md
+              - "GimmeMotifs FASTA 工具、统计、阈值、匹配计数与基序数据库": api/features/385_gimmemotifs_p28_inputs_databases.md
+              - "GimmeMotifs maelstrom 基序活性预测、排名聚合与热图": api/features/386_gimmemotifs_p28_maelstrom.md
+          - "P29: Shasta":
+              - "Shasta 长读长组装（命令行封装）": api/features/387_shasta_p29_assembly.md
+          - "P30: biotite":
+              - "Biotite 序列与核酸结构操作": api/features/390_biotite_sequence_alignment.md
+              - "Biotite 外部程序操作（P30）": api/features/391_biotite_application_operations.md
+              - "Biotite 序列与核酸结构操作": api/features/392_biotite_nucleic_acid_structure.md
+          - "P31: tskit":
+              - "tskit 树序列编辑与突变表": api/features/393_tskit_tree_sequence_editing.md
+              - "tskit 列表、基因型、序列、IBD 与重组图": api/features/394_tskit_genotypes_sequences_maps.md
+              - "tskit 样本集、相关度、性状与溯祖统计": api/features/395_tskit_statistics.md
+          - "P32: scikit-allel, varcode":
+              - "scikit-allel 基因型与等位基因操作": api/features/396_allel_p32_genotype_calls.md
+              - "scikit-allel 坐标、频谱与状态区块": api/features/397_allel_p32_positions_spectra.md
+              - "varcode 集合、定相与单倍型": api/features/398_varcode_p32_collections_haplotypes.md
+          - "P33: pybedtools, pyranges1":
+              - "pybedtools：格式转换、格式检测与区间变换": api/features/399_pybedtools_p33_conversion_transforms.md
+              - "pybedtools：区间统计、随机化检验与报告": api/features/400_pybedtools_p33_statistics_reports.md
+              - "PyRanges 1.5 区间操作": api/features/401_pyranges1_p33_interval_operations.md
+          - "P34: alphagenome, pydna":
+              - "pydna 分子末端与克隆历史": api/features/402_pydna_p34_molecules_cloning.md
+              - "pydna 引物筛选与序列注释": api/features/403_pydna_p34_primers_expression.md
+              - "AlphaGenome 区间、剪接与信号轨道": api/features/404_alphagenome_p34_intervals_tracks.md
+          - "P35: dnacauldron, hgvs":
+              - "DNA Cauldron 记录与组装图": api/features/405_dnacauldron_p35_records_assemblies.md
+              - "DNA Cauldron 计划与骨架结果": api/features/406_dnacauldron_p35_plans_backbones.md
+              - "HGVS 校验、映射与数据提供方": api/features/407_hgvs_p35_validation_mapping.md
+          - "P36: gReLU, pyensembl, pysam":
+              - "gReLU 序列数据集、模型与指标": api/features/408_grelu_p36_sequence_models.md
+              - "PyEnsembl 本地注释查询": api/features/409_pyensembl_p36_local_annotations.md
+              - "pysam 比对与变异记录": api/features/410_pysam_p36_records_variants.md
+          - "P37: chamaeleo, gffutils, pygenomeviz, seqme":
+              - "pyGenomeViz 序列、比对与启动子": api/features/411_pygenomeviz_p37_sequences_promoters.md
+              - "Chamaeleo DNA 存储编码": api/features/412_chamaeleo_p37_dna_storage.md
+              - "seqme 序列指标与 gffutils 注释": api/features/413_seqme_gffutils_p37_metrics_annotations.md
+          - "P38: DendroPy, cooler/cooltools, dnachisel, selene-sdk, snapatac2":
+              - "cooler 与 cooltools 接触图操作": api/features/414_cooler_cooltools_p38_contact_operations.md
+              - "DnaChisel 设计规则与 DendroPy 群体模型": api/features/415_dnachisel_dendropy_p38_design_population.md
+              - "Selene 基因组窗口与 SnapATAC2 可及性": api/features/416_selene_snapatac2_p38_windows_accessibility.md
+          - "P39: cutadapt, geneblocks, nupack, pyhmmer, sourmash, toytree":
+              - "NUPACK 与 DNA 共享块": api/features/417_p39_ensemble_blocks.md
+              - "DNA 草图与 HMM": api/features/418_p39_sketches_hmms.md
+              - "读段处理与系统树": api/features/419_p39_reads_trees.md
+          - "P40: SPAdes, bioframe, dnaio, enformer-pytorch, genomepy, genomicranges, polars-bio, pyfaidx, pyfastx, pyrodigal":
+              - "序列文件与基因组注释": api/features/420_p40_sequences_genomes.md
+              - "基因组区间与组装": api/features/421_p40_intervals.md
+              - "Enformer 预测与指标": api/features/422_p40_enformer.md
+          - "P41: MACS3, Prokka, SURVIVOR, cyvcf2, deeptools, dna_features_viewer, edlib, evo2, genomic_benchmarks, gget, kipoi, methylpy, ncls, pairtools, py2bit, pyBigWig, pyfastani, pyslow5, pyvolve, sbol3, screed, tangermeme, vcfpy":
+              - "P41 序列操作": api/features/423_p41_sequence_operations.md
+              - "P41 轨道与注释": api/features/424_p41_tracks_annotations.md
+              - "P41 模型操作": api/features/425_p41_model_operations.md
+          - "P42: NCBI FTP":
+              - "P42 公共数据库操作": api/features/426_ncbi_ftp_p42_functions.md
+          - "P43: NCBI E-utilities":
+              - "P43 公共数据库操作": api/features/429_ncbi_eutils_p43_functions.md
+          - "P44: ENA, Ensembl REST, NCBI Datasets":
+              - "P44 公共数据库操作": api/features/432_public_apis_p44_functions.md
+              - "P44 公共数据库操作": api/features/433_ena_p44_functions.md
+          - "P45: ENCODE, NCBI BLAST, RCSB PDB, UCSC":
+              - "P45 公共数据库操作": api/features/435_public_apis_p45_functions.md
+      - "99) 其他软件包操作补全":
+          - "sourmash：生成、比较、搜索和索引 DNA 签名": api/features/112_sourmash_sketch_search.md
+          - "sourmash：谱系数据库、分类学报告与签名工具": api/features/113_sourmash_lca_taxonomy.md
+          - "Kipoi：运行、验证和描述本地模型库中的模型": api/features/114_kipoi_models.md
+          - "GimmeMotifs：基序扫描、聚类、背景集合与从头发现": api/features/115_gimmemotifs_motifs.md
+          - "genomepy 与 gget：基因组目录、注释与数据库查询": api/features/116_genomepy_gget.md
+          - "deepTools：覆盖度、比较、汇总与 reads 过滤": api/features/117_deeptools_commands.md
+          - "deepTools：矩阵操作与绘图": api/features/118_deeptools_matrix_plots.md
+          - "cooler 与 cooltools：Hi-C 接触矩阵": api/features/119_cooler_cooltools.md
+          - "MACS3 与 pairtools：峰识别与 Hi-C pair 处理": api/features/120_macs3_pairtools.md
+          - "methylpy：亚硫酸氢盐比对、甲基化位点检出与差异甲基化区域查找": api/features/121_methylpy.md
+          - "SnapATAC2：数据集与单细胞染色质绘图": api/features/122_snapatac2.md
+          - "tskit 与 toytree：树序列与树的绘制": api/features/123_tskit_toytree.md
+          - "DendroPy 与 khmer：树格式、PAUP* 与 k-mer 表": api/features/124_dendropy_khmer.md
+          - "varcode：变异效应、融合与剪接结果": api/features/125_varcode.md
+          - "scikit-allel：群体遗传绘图与基因型存储": api/features/126_allel.md
+          - "dadi：群体历史推断与频谱绘图": api/features/127_dadi.md
+          - "gReLU：模型库、数据集、绘图与基序工具": api/features/128_grelu.md
+          - "DNA 模型工具包：AlphaGenome、Enformer、Selene、tangermeme 与 genomic-benchmarks": api/features/129_dna_model_tools.md
+          - "Biopython：NCBI、KEGG 与 TogoWS 服务、系统发育树与绘图": api/features/130_biopython_services.md
+          - "基因组区间与注释：pybedtools、bioframe、pyranges、genomicranges、gtars 和 pyGenomeViz": api/features/131_intervals_annotation.md
+          - "SeqKit 与 screed：FASTA 和 FASTQ 命令行操作": api/features/132_seqkit_screed.md
+          - "读段工具：pysam、pyfaidx、cutadapt 与 UMI-tools": api/features/133_read_tools.md
+          - "设计工具：pydna、DNA Chisel 与 DnaCauldron": api/features/134_design_tools.md
+          - "变异与注释 I/O：bed-reader、bgen-reader、hgvs、polars-bio 和 pyensembl": api/features/135_variant_io_tools.md
   - 4. 数据评价:
       - 1) 常用评价指标: api/features/12_evaluation.md
       - 2) 相似度计算: api/features/09_similarity_alignment.md

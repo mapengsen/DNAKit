@@ -459,4 +459,162 @@ from .tangermeme_family_functions import (
 
 __all__ = [*__all__, "calculate_partial_motif_roc_auc", "count_motif_matches_at_fpr", "normalize_peak_widths", "design_beam_substitution", "insert_motif"]
 
+
+# Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
+from .tangermeme_gap_functions import (
+    plot_attribution_logo,
+    plot_categorical_attribution_scatter,
+    plot_pwm_logo,
+    plot_sequence_attributions,
+    render_interactive_logo_png,
+)
+
+__all__ = [*__all__, "plot_attribution_logo", "plot_categorical_attribution_scatter", "plot_pwm_logo", "plot_sequence_attributions", "render_interactive_logo_png"]
+
+# Public integration of the reviewed P00–P45 operation packs.
+from .biopython_p18_motif_data_functions import (
+    cluster_expression_data,
+    motif_gc_content,
+    read_affymetrix_cel,
+    read_cluster_expression_data,
+    read_geo_soft,
+    read_motif_collection,
+    read_unigene,
+)
+from .biopython_p19_motif_functions import (
+    jaspar_pseudocounts,
+    motif_anticonsensus,
+    motif_matrices,
+    pssm_score_distribution,
+    pssm_score_statistics,
+    pssm_search,
+    pssm_threshold,
+    weblogo_service_logo,
+)
+from .fimo_p17_cli_functions import (
+    scan_motifs_with_position_priors,
+)
+from .gimmemotifs_p28_data_functions import (
+    gimmemotifs_annotate_motif_factors,
+    gimmemotifs_count_motif_matches,
+    gimmemotifs_download_motif_database,
+    gimmemotifs_hardmask_fasta,
+    gimmemotifs_motif_thresholds,
+    gimmemotifs_narrowpeak_to_bed,
+    gimmemotifs_prepare_denovo_input,
+    gimmemotifs_random_fasta_subset,
+    gimmemotifs_rank_motif_stats,
+    gimmemotifs_sequence_dict,
+    gimmemotifs_write_motif_stats,
+)
+from .gimmemotifs_p28_maelstrom_functions import (
+    gimmemotifs_aggregate_motif_ranks,
+    gimmemotifs_plot_maelstrom_heatmap,
+    gimmemotifs_predict_motif_activity,
+)
+from .gimmemotifs_p28_motif_functions import (
+    gimmemotifs_average_motifs,
+    gimmemotifs_compare_motif_pair,
+    gimmemotifs_consensus_scan,
+    gimmemotifs_format_motif,
+    gimmemotifs_motif_consensus,
+    gimmemotifs_motif_ic_similarity,
+    gimmemotifs_motif_pcc,
+    gimmemotifs_motif_reverse_complement,
+    gimmemotifs_motif_score_distribution,
+    gimmemotifs_motif_score_range,
+    gimmemotifs_motif_shuffle,
+    gimmemotifs_pfm_to_ppm,
+    gimmemotifs_ppm_pseudocount,
+    gimmemotifs_pwm_scan,
+    gimmemotifs_sample_motif_sequences,
+)
+from .snapatac2_p38_functions import (
+    aggregate_atac_profiles,
+    compute_atac_spectral_embedding,
+    filter_atac_cells,
+    find_atac_marker_regions,
+    import_atac_fragments,
+    link_tf_to_gene_network,
+    read_meme_motifs,
+    scan_dna_with_motif,
+    score_atac_doublets,
+    score_regulatory_network_edges,
+    select_atac_features,
+    test_atac_differential_accessibility,
+    test_dna_motif_enrichment,
+)
+from .tangermeme_p41_functions import (
+    tangermeme_extract_signal,
+    tangermeme_hypothetical_attributions,
+    tangermeme_position_entropy,
+    tangermeme_unchunk,
+)
+
+__all__ = [
+    *__all__,
+    "aggregate_atac_profiles",
+    "cluster_expression_data",
+    "compute_atac_spectral_embedding",
+    "filter_atac_cells",
+    "find_atac_marker_regions",
+    "gimmemotifs_aggregate_motif_ranks",
+    "gimmemotifs_annotate_motif_factors",
+    "gimmemotifs_average_motifs",
+    "gimmemotifs_compare_motif_pair",
+    "gimmemotifs_consensus_scan",
+    "gimmemotifs_count_motif_matches",
+    "gimmemotifs_download_motif_database",
+    "gimmemotifs_format_motif",
+    "gimmemotifs_hardmask_fasta",
+    "gimmemotifs_motif_consensus",
+    "gimmemotifs_motif_ic_similarity",
+    "gimmemotifs_motif_pcc",
+    "gimmemotifs_motif_reverse_complement",
+    "gimmemotifs_motif_score_distribution",
+    "gimmemotifs_motif_score_range",
+    "gimmemotifs_motif_shuffle",
+    "gimmemotifs_motif_thresholds",
+    "gimmemotifs_narrowpeak_to_bed",
+    "gimmemotifs_pfm_to_ppm",
+    "gimmemotifs_plot_maelstrom_heatmap",
+    "gimmemotifs_ppm_pseudocount",
+    "gimmemotifs_predict_motif_activity",
+    "gimmemotifs_prepare_denovo_input",
+    "gimmemotifs_pwm_scan",
+    "gimmemotifs_random_fasta_subset",
+    "gimmemotifs_rank_motif_stats",
+    "gimmemotifs_sample_motif_sequences",
+    "gimmemotifs_sequence_dict",
+    "gimmemotifs_write_motif_stats",
+    "import_atac_fragments",
+    "jaspar_pseudocounts",
+    "link_tf_to_gene_network",
+    "motif_anticonsensus",
+    "motif_gc_content",
+    "motif_matrices",
+    "pssm_score_distribution",
+    "pssm_score_statistics",
+    "pssm_search",
+    "pssm_threshold",
+    "read_affymetrix_cel",
+    "read_cluster_expression_data",
+    "read_geo_soft",
+    "read_meme_motifs",
+    "read_motif_collection",
+    "read_unigene",
+    "scan_dna_with_motif",
+    "scan_motifs_with_position_priors",
+    "score_atac_doublets",
+    "score_regulatory_network_edges",
+    "select_atac_features",
+    "tangermeme_extract_signal",
+    "tangermeme_hypothetical_attributions",
+    "tangermeme_position_entropy",
+    "tangermeme_unchunk",
+    "test_atac_differential_accessibility",
+    "test_dna_motif_enrichment",
+    "weblogo_service_logo",
+]
+
 _register_public_verbose(globals())

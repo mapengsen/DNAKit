@@ -705,4 +705,120 @@ calculate_stats = _calculate_stats_native
 __all__ = ['add_genome_to_pangenome', 'assemble_flye', 'assemble_hifiasm', 'assemble_megahit', 'assemble_shasta', 'assemble_unicycler', 'build_chromosome_level_assembly', 'build_command', 'build_graph_genome', 'build_haplotype_assembly', 'build_pangenome', 'calculate_assembly_completeness', 'calculate_busco_completeness', 'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_pangenome_openness', 'calculate_stats', 'check_input', 'compare_assemblies', 'compare_assembly_graphs', 'detect_assembly_contamination', 'detect_chimeric_contigs', 'detect_misassemblies', 'estimate_heterozygosity', 'estimate_repeats', 'estimate_size', 'extract_accessory_pangenome', 'extract_core_pangenome', 'evaluate_merqury', 'identify_centromeres', 'identify_repeats_in_assembly', 'identify_telomeres', 'parse_log', 'parse_output', 'phase_assembly', 'plot_graph', 'polish', 'purge_haplotigs', 'remove_contamination', 'run', 'run_busco', 'scaffold']
 
 __candidate_adapter_operations__ = set(['add_genome_to_pangenome', 'build_chromosome_level_assembly', 'build_command', 'build_graph_genome', 'build_haplotype_assembly', 'build_pangenome', 'calculate_assembly_completeness', 'calculate_busco_completeness', 'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_pangenome_openness', 'calculate_stats', 'check_input', 'compare_assemblies', 'compare_assembly_graphs', 'detect_assembly_contamination', 'detect_chimeric_contigs', 'detect_misassemblies', 'estimate_heterozygosity', 'estimate_repeats', 'estimate_size', 'extract_accessory_pangenome', 'extract_core_pangenome', 'identify_centromeres', 'identify_repeats_in_assembly', 'identify_telomeres', 'parse_log', 'parse_output', 'phase_assembly', 'plot_graph', 'polish', 'purge_haplotigs', 'remove_contamination', 'run', 'run_busco', 'scaffold']) - {'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_stats'}
+# Public integration of the reviewed P00–P45 operation packs.
+from .busco_p15_cli_functions import (
+    busco_assess_completeness,
+)
+from .hifiasm_p13_cli_functions import (
+    hifiasm_assemble,
+)
+from .megahit_p15_cli_functions import (
+    megahit_contigs_to_fastg,
+    megahit_local_assembly,
+    megahit_read_statistics,
+)
+from .merqury_p10_functions import (
+    merqury_assign_reads,
+    merqury_bed_to_bigwig,
+    merqury_best_k,
+    merqury_block_n_stats,
+    merqury_combine_kmer_dbs,
+    merqury_exclude_reads,
+    merqury_false_duplications,
+    merqury_false_duplications_track,
+    merqury_filter_solid_kmers,
+    merqury_hamming_error,
+    merqury_hapmer_counts,
+    merqury_hapmer_spectra,
+    merqury_hapmers,
+    merqury_kmer_histogram_table,
+    merqury_kmer_multiplicity_track,
+    merqury_mash_qv,
+    merqury_per_sequence_qv,
+    merqury_phase_blocks,
+    merqury_plot_blob,
+    merqury_plot_block_n,
+    merqury_plot_spectra_cn,
+    merqury_split_10x_fastq,
+)
+from .quast_p15_cli_functions import (
+    metaquast_assess_metagenome,
+    quast_assess_assembly,
+    quast_map_reads,
+    quast_predict_genes,
+)
+from .shasta_p29_cli_functions import (
+    shasta_assemble,
+    shasta_read_assembly_output,
+    shasta_read_run_table,
+)
+from .spades_p14_cli_functions import (
+    binspreader_refine_bins,
+    pathracer_align_hmm_to_sequences,
+    pathracer_search_graph,
+    spades_build_assembly_graph,
+    spades_correct_reads,
+    spades_estimate_kmer_count,
+    spades_filter_reads_by_kmer_coverage,
+    spades_map_reads_to_graph,
+    spades_simplify_assembly_graph,
+    spades_split_assembly_graph,
+    spaligner_align_long_reads,
+    splitter_resolve_repeats,
+)
+from .spades_p40_cli_functions import (
+    spades_assemble,
+)
+
+__all__ = [
+    *__all__,
+    "binspreader_refine_bins",
+    "busco_assess_completeness",
+    "hifiasm_assemble",
+    "megahit_contigs_to_fastg",
+    "megahit_local_assembly",
+    "megahit_read_statistics",
+    "merqury_assign_reads",
+    "merqury_bed_to_bigwig",
+    "merqury_best_k",
+    "merqury_block_n_stats",
+    "merqury_combine_kmer_dbs",
+    "merqury_exclude_reads",
+    "merqury_false_duplications",
+    "merqury_false_duplications_track",
+    "merqury_filter_solid_kmers",
+    "merqury_hamming_error",
+    "merqury_hapmer_counts",
+    "merqury_hapmer_spectra",
+    "merqury_hapmers",
+    "merqury_kmer_histogram_table",
+    "merqury_kmer_multiplicity_track",
+    "merqury_mash_qv",
+    "merqury_per_sequence_qv",
+    "merqury_phase_blocks",
+    "merqury_plot_blob",
+    "merqury_plot_block_n",
+    "merqury_plot_spectra_cn",
+    "merqury_split_10x_fastq",
+    "metaquast_assess_metagenome",
+    "pathracer_align_hmm_to_sequences",
+    "pathracer_search_graph",
+    "quast_assess_assembly",
+    "quast_map_reads",
+    "quast_predict_genes",
+    "shasta_assemble",
+    "shasta_read_assembly_output",
+    "shasta_read_run_table",
+    "spades_assemble",
+    "spades_build_assembly_graph",
+    "spades_correct_reads",
+    "spades_estimate_kmer_count",
+    "spades_filter_reads_by_kmer_coverage",
+    "spades_map_reads_to_graph",
+    "spades_simplify_assembly_graph",
+    "spades_split_assembly_graph",
+    "spaligner_align_long_reads",
+    "splitter_resolve_repeats",
+]
+
 _register_public_verbose(globals())

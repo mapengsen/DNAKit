@@ -2763,7 +2763,7 @@ print(result)
 
 - **作用：** 标记共享 k-mer 比例异常高的样本对（可能的样本间交叉污染）。
 
-- **处理方法：** 为每个样本建立规范化 k-mer 集合，对每个有序样本对计算 containment[a][b] = |K(a) 与 K(b) 的交集| / |K(a)|，containment 不低于 `threshold` 的样本对被标记。启发式：仅当样本预期互不相关（不同物种或不同个体）时才有意义；相关样本本来就会共享 k-mer。纯 Python 实现。
+- **处理方法：** 为每个样本建立规范化 k-mer 集合，对每个有序样本对计算 `containment[a][b] = |K(a) 与 K(b) 的交集| / |K(a)|`，containment 不低于 `threshold` 的样本对被标记。启发式：仅当样本预期互不相关（不同物种或不同个体）时才有意义；相关样本本来就会共享 k-mer。纯 Python 实现。
 
 - **API：** `dnakit.sequencing_qc.detect_cross_sample_contamination(input[required], options[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 

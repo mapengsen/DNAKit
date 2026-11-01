@@ -11,6 +11,7 @@ from typing import Literal, cast
 
 from dnakit._verbosity import register_public as _register_public_verbose
 
+from ._integration_effects import FUNCTION_EFFECTS, MODULE_EFFECTS
 from .adapters import CallPlan, analyze_callable
 
 ToolEffect = Literal["local", "network", "filesystem", "model", "external_process"]
@@ -22,6 +23,7 @@ PUBLIC_TOOL_MODULES: tuple[str, ...] = (
     "dnakit.assembly",
     "dnakit.backends",
     "dnakit.batch",
+    "dnakit.bioinformatics",
     "dnakit.breeding",
     "dnakit.clinical",
     "dnakit.chunking",
@@ -89,6 +91,7 @@ CATEGORY_LABELS: dict[str, tuple[str, str]] = {
     "assembly": ("基因组组装", "genome assembly"),
     "backends": ("计算后端", "computational backends"),
     "batch": ("批量处理", "batch processing"),
+    "bioinformatics": ("生物信息学", "bioinformatics"),
     "breeding": ("育种分析", "breeding genomics"),
     "clinical": ("临床基因组学", "clinical genomics"),
     "chunking": ("序列切分", "sequence chunking"),
@@ -398,7 +401,13 @@ def _build_spec(
     incompatibilities = list(plan.incompatibilities)
     if denied_reason is not None:
         incompatibilities.insert(0, denied_reason)
-    effect = _effect(name)
+    implementation = f"{function.__module__}.{function.__name__}"
+    effect = cast(
+        ToolEffect,
+        FUNCTION_EFFECTS.get(
+            implementation, MODULE_EFFECTS.get(function.__module__, _effect(name))
+        ),
+    )
     short_description, full_description = _description(function)
     if module_name == "dnakit.generated":
         from dnakit.generated import _entries

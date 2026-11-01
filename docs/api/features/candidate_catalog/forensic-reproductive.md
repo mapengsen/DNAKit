@@ -6,7 +6,7 @@
 
 - **作用：** 由等位基因频率计算法医统计量：随机匹配概率、似然比、父权指数或亲缘指数。
 
-- **处理方法：** `random_match_probability`：对位点连乘的乘积法则，纯合子 p^2，杂合子 2pq；`theta` > 0 时采用 NRC II 建议 4.10 公式 [2θ+(1-θ)p][3θ+(1-θ)p]/[(1+θ)(1+2θ)] 与 2[θ+(1-θ)pi][θ+(1-θ)pj]/[(1+θ)(1+2θ)]。`likelihood_ratio`：Hp 为嫌疑人是来源，Hd 为无关随机个体是来源；匹配位点的 LR = 1/P(基因型)，不匹配时为 0，对位点连乘（支持 `theta`）。`paternity_index`：PI = P(子代 | 母亲, 待检父亲) / P(子代 | 母亲, 随机男性)，每个亲本以 1/2 概率传递任一等位基因，累计父权指数 CPI 为各 PI 之积，父权概率 W = CPI*prior/(CPI*prior + 1 - prior)；二联体（无母亲）或三联体；无突变模型，出现一次排除则 CPI = 0；theta = 0。`kinship_index`：LR = P(g2 | g1, 亲缘关系)/P(g2)，P(g2 | g1) = k0 P(g2) + k1 P(g2 | 一个 IBD 等位基因) + k2 [g2 = g1]，其中 (k0, k1, k2) 为该亲缘关系的 Cotterman IBD 概率（theta = 0，无突变）。文字等价说明采用 ENFSI 2015 量表。仅依赖标准库。
+- **处理方法：** `random_match_probability`：对位点连乘的乘积法则，纯合子 p^2，杂合子 2pq；`theta` > 0 时采用 NRC II 建议 4.10 公式 `[2θ+(1-θ)p][3θ+(1-θ)p]/[(1+θ)(1+2θ)]` 与 `2[θ+(1-θ)pi][θ+(1-θ)pj]/[(1+θ)(1+2θ)]`。`likelihood_ratio`：Hp 为嫌疑人是来源，Hd 为无关随机个体是来源；匹配位点的 LR = 1/P(基因型)，不匹配时为 0，对位点连乘（支持 `theta`）。`paternity_index`：PI = P(子代 | 母亲, 待检父亲) / P(子代 | 母亲, 随机男性)，每个亲本以 1/2 概率传递任一等位基因，累计父权指数 CPI 为各 PI 之积，父权概率 W = CPI*prior/(CPI*prior + 1 - prior)；二联体（无母亲）或三联体；无突变模型，出现一次排除则 CPI = 0；theta = 0。`kinship_index`：LR = P(g2 | g1, 亲缘关系)/P(g2)，P(g2 | g1) = k0 P(g2) + k1 P(g2 | 一个 IBD 等位基因) + k2 [g2 = g1]，其中 (k0, k1, k2) 为该亲缘关系的 Cotterman IBD 概率（theta = 0，无突变）。文字等价说明采用 ENFSI 2015 量表。仅依赖标准库。
 
 - **API：** `dnakit.forensic_reproductive.calculate(input[required], options[optional])`（正式 DNAKit 命名空间；能否通过 Agent/MCP 调用取决于 JSON 调用方案）。
 

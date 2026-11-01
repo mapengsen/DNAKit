@@ -59,4 +59,40 @@ __all__ = [
     "virus_package",
 ]
 
+# Public integration of the reviewed P00–P45 operation packs.
+from .ena_p44_functions import (
+    ena_count_keyword_results,
+    ena_download_cram_reference,
+    ena_download_keyword_results,
+    ena_download_linked_records,
+    ena_download_record,
+    ena_download_search,
+    ena_linked_accessions,
+    ena_search_cross_references,
+)
+from .ncbi_ftp_p42_functions import (
+    download_ncbi_ftp_collection,
+    list_ncbi_ftp_collection,
+)
+from .sra_p30_cli_functions import (
+    extract_sra_reads,
+    prefetch_sra_run,
+)
+
+__all__ = [
+    *__all__,
+    "download_ncbi_ftp_collection",
+    "ena_count_keyword_results",
+    "ena_download_cram_reference",
+    "ena_download_keyword_results",
+    "ena_download_linked_records",
+    "ena_download_record",
+    "ena_download_search",
+    "ena_linked_accessions",
+    "ena_search_cross_references",
+    "extract_sra_reads",
+    "list_ncbi_ftp_collection",
+    "prefetch_sra_run",
+]
+
 _register_public_verbose(globals())

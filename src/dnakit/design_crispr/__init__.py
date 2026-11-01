@@ -725,4 +725,54 @@ __candidate_adapter_operations__ = set(['assemble_dna_fragments', 'calculate_pri
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+# Public integration of the reviewed P00–P45 operation packs.
+from .crispresso_p13_cli_functions import (
+    crispresso_aggregate,
+    crispresso_batch,
+    crispresso_compare,
+    crispresso_count_high_quality_bases,
+    crispresso_count_sgrna_specific_edits,
+    crispresso_filter_reads_by_sequence,
+    crispresso_plot_allele_window,
+    crispresso_plot_ambiguous_alleles,
+    crispresso_pooled,
+    crispresso_pooled_wgs_compare,
+    crispresso_quantify_editing,
+    crispresso_reconstitute_reads,
+    crispresso_wgs,
+)
+from .p16_crispr_screen_cli_functions import (
+    count_sgrnas_mageck,
+    enrich_pathways_mageck,
+    estimate_gene_essentiality_mageck,
+    plot_screen_results_mageck,
+    rank_genes_mageck,
+    score_drug_gene_interactions_drugz,
+    search_offtargets_cas_offinder,
+)
+
+__all__ = [
+    *__all__,
+    "count_sgrnas_mageck",
+    "crispresso_aggregate",
+    "crispresso_batch",
+    "crispresso_compare",
+    "crispresso_count_high_quality_bases",
+    "crispresso_count_sgrna_specific_edits",
+    "crispresso_filter_reads_by_sequence",
+    "crispresso_plot_allele_window",
+    "crispresso_plot_ambiguous_alleles",
+    "crispresso_pooled",
+    "crispresso_pooled_wgs_compare",
+    "crispresso_quantify_editing",
+    "crispresso_reconstitute_reads",
+    "crispresso_wgs",
+    "enrich_pathways_mageck",
+    "estimate_gene_essentiality_mageck",
+    "plot_screen_results_mageck",
+    "rank_genes_mageck",
+    "score_drug_gene_interactions_drugz",
+    "search_offtargets_cas_offinder",
+]
+
 _register_public_verbose(globals())

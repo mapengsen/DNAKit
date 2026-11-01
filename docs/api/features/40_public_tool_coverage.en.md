@@ -21,6 +21,14 @@ The formal entry may be a native implementation, a bounded facade, or an
 explicit dependency-checked adapter; the implementation status is recorded
 separately below.
 
+## P00–P45 operation pack integration
+
+The 46 packs contain 3,512 operation rows: 1,473 implemented, 866 merged through parameters, 1,043 already covered, and 130 skipped with recorded reasons. All 2,041 functions declared by these manifests are publicly exported and discoverable through Agent/MCP. Ten existing functions referenced by historical dispositions are also exported. Operation rows and functions are different counting units.
+
+This integration adds 2,051 public entries, bringing the Python catalog to 5,795 functions, including 5,792 Agent-compatible functions. Existing colliding APIs retain their behavior; the new aliases are `dnakit.sequence.biopython_trim_sequence` and `dnakit.databases.ensembl_vep_region_query`. Optional backends, external programs, databases and model assets remain separate prerequisites. Biotite 2/pyranges1 1.5 require Python 3.12; the legacy TensorFlow Addons backend needs a separate Python 3.10/3.11 environment.
+
+The original `dedup_clusters_all.csv` and `dedup_summary.json` remain historical snapshots. Per-operation dispositions and the verification command are recorded under `paper/write_paper/figure/fig2/task_coverage/integration/PUBLIC_INTEGRATION_REPORT.md` in the repository.
+
 ## Query the coverage matrix
 
 ```python
@@ -71,7 +79,7 @@ Call `integration_inventory()` for current surface counts. It reports Python
 functions, Agent-compatible Python functions, MCP server recipes, registered
 Skills, surveyed projects and candidate schemas as separate units; these
 categories should not be added together as if they were interchangeable tools.
-The current raw surface sum is **3,669** (3,045 public Python functions + 49
+The current raw surface sum is **6,419** (5,795 public Python functions + 49
 MCP server recipes + 575 registered Skills). This is a surface count rather
 than a deduplicated biological-tool count because one capability can appear in
 several surfaces.

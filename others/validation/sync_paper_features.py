@@ -27,7 +27,7 @@ from others.validation.audit_table1 import (
 )
 
 INVENTORY = ROOT / "docs/planning/table1_dnakit_capabilities.csv"
-DEFAULT_DOCUMENT = ROOT / "write_paper/手稿+提示词.md"
+DEFAULT_DOCUMENT = ROOT / "paper/write_paper/手稿+提示词.md"
 TITLE = "## DNAKit 网页功能清单"
 
 # (display name, public API references, repository paths, scope description)
