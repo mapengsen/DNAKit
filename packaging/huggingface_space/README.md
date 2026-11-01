@@ -19,8 +19,8 @@ the same functions through Python, the `dnakit` command line and an MCP server f
 
 | Tab | What it does |
 |---|---|
-| Sequence | Reverse complement, 240 descriptors, six-frame ORFs, IUPAC/regex motif search, sequence comparison, validation |
-| Dataset | Deduplication (exact or reverse complement), train/valid/test split, format conversion, a 240-column descriptor feature table |
+| Sequence (Example) | Reverse complement, 240 descriptors, six-frame ORFs, IUPAC/regex motif search, sequence comparison, validation |
+| Dataset (Example) | Deduplication (exact or reverse complement), train/valid/test split, format conversion, a 240-column descriptor feature table |
 | Function explorer | Search every Agent-callable function, open its documentation, read its schema, run it with JSON arguments, and copy the equivalent Python and MCP call |
 | MCP tools | Search the DNA and gene tools of third-party MCP servers and read their arguments, source and call |
 | Skills | Search and read the bundled DNA workflow Skills |

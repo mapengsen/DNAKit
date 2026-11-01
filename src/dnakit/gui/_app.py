@@ -132,7 +132,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
         state = gr.State(None)
         gr.Markdown(_hero(backend), elem_id="hero")
 
-        with gr.Tab("Sequence"):
+        with gr.Tab("Sequence (Example)"):
             seq_in = gr.Textbox(
                 label="DNA sequence (plain text or one FASTA record)",
                 value=EXAMPLE_SEQUENCE,
@@ -222,7 +222,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                     v_code = gr.Markdown()
                     b.click(backend.seq_validate, [seq_in, state], [state, v_head, v_json, v_code])
 
-        with gr.Tab("Dataset"):
+        with gr.Tab("Dataset (Example)"):
             gr.Markdown(
                 f"Upload FASTA, FASTQ, GenBank, CSV, TSV or JSON(L){limit}, or use the example "
                 "(26 sequences including one exact and one reverse-complement duplicate)."
