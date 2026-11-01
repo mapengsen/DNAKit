@@ -231,7 +231,10 @@ def test_mcp_tab_reports_the_catalogue_tool_count_and_searches_bridged_tools(
     assert f"MCP tools ({counts['mcp_tools']:,})" in labels
     demo.close()
     backend = GuiBackend(GuiSettings.public_demo(tmp_path))
-    head, rows, detail = backend.mcp_search("gwas")
+    from dnakit.gui._backend import table_rows
+
+    head, table, detail = backend.mcp_search("gwas")
+    rows = table_rows(table)
     assert rows and "matching third-party tools" in head
     assert detail.startswith(f"### `{rows[0][0]}`")
     assert backend.mcp_servers()
@@ -242,8 +245,10 @@ def test_function_explorer_links_functions_to_their_documentation(
 ) -> None:
     backend = make_backend("public")
 
-    _, rows, _ = backend.fx_search("reverse complement", "")
-    by_name = {row[0]: row[1] for row in rows}
+    from dnakit.gui._backend import table_rows
+
+    _, table, _ = backend.fx_search("reverse complement", "")
+    by_name = {row[0]: row[1] for row in table_rows(table)}
     link = backend.docs.functions["dnakit.ops.reverse_complement"]
     assert link.startswith("https://mapengsen.github.io/DNAKit/en/api/features/")
     assert by_name["dnakit.ops.reverse_complement"] == f"[docs ↗]({link})"
@@ -290,7 +295,10 @@ def test_mcp_tab_describes_a_clicked_third_party_tool(
     link = backend.docs.mcp_tools["gwas-mcp/query_gwas_catalog"]
     assert link.endswith("llm_tools/mcp_tools/gwas-mcp/#query_gwas_catalog")
     assert f"[documentation ↗]({link})" in detail
-    _, rows, first = backend.mcp_search("query_gwas_catalog")
+    from dnakit.gui._backend import table_rows
+
+    _, table, first = backend.mcp_search("query_gwas_catalog")
+    rows = table_rows(table)
     assert first == backend.mcp_describe(rows[0][2], rows[0][0])  # shown before any click
     row = next(r for r in rows if r[0] == "query_gwas_catalog" and r[2] == "gwas-mcp")
     assert row[1] == f"[docs ↗]({link})"
@@ -301,9 +309,33 @@ def test_skills_tab_links_skills_to_the_skills_catalogue(
 ) -> None:
     backend = make_backend("public")
 
-    _, rows, _ = backend.sk_search("variant annotation")
+    from dnakit.gui._backend import table_rows
+
+    _, table, _ = backend.sk_search("variant annotation")
+    rows = table_rows(table)
     skill, docs = rows[0][0], rows[0][1]
     link = backend.docs.skills[skill]
     assert "/llm_tools/skills_catalog/" in link and link.endswith(f"/#{skill}")
     assert docs == f"[docs ↗]({link})"
     assert f"[documentation ↗]({link})" in backend.sk_read(skill)
+
+
+def test_tables_highlight_the_row_shown_below_them(make_backend: Callable[[str], Any]) -> None:
+    import gradio as gr
+
+    from dnakit.gui._backend import mark_selected, table_rows
+
+    backend = make_backend("public")
+
+    def highlighted(table: Any) -> list[int]:
+        styling = gr.Dataframe(interactive=False).postprocess(table).metadata["styling"]
+        return [i for i, row in enumerate(styling) if any(row)]
+
+    _, table, _ = backend.fx_search("cpg island", "")
+    assert highlighted(table) == [0]
+    name = table_rows(table)[2][0]
+    assert highlighted(mark_selected(table.data, name)) == [2]
+    _, table, _ = backend.sk_search("variant annotation")
+    assert highlighted(table) == [0]
+    _, table, _ = backend.mcp_search("gwas")
+    assert highlighted(table) == [0]

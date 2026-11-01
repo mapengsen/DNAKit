@@ -12,7 +12,16 @@ from typing import Any
 import gradio as gr
 
 import dnakit
-from dnakit.gui._backend import DOCS_URL, EXAMPLE_SEQUENCE, GuiBackend, pick_first_column
+from dnakit.gui._backend import (
+    DOCS_URL,
+    EXAMPLE_SEQUENCE,
+    FX_HEADERS,
+    MCP_HEADERS,
+    SK_HEADERS,
+    GuiBackend,
+    mark_selected,
+    pick_first_column,
+)
 from dnakit.gui._settings import GuiSettings
 
 # System fonts only: available on every platform, and no web-font download (Google Fonts is
@@ -312,7 +321,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 fx_btn = gr.Button("Search", variant="primary", scale=1)
             fx_head = gr.Markdown()
             fx_table = gr.Dataframe(
-                headers=["function", "docs", "module", "effect", "description"],
+                headers=FX_HEADERS,
                 datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
@@ -350,6 +359,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 [fx_name],
                 [fx_doc, fx_args, fx_schema, fx_run_btn, fx_consent],
             )
+            fx_name.change(mark_selected, [fx_table, fx_name], [fx_table])
             fx_file.upload(backend.fx_upload, [fx_file, state], [state, fx_file_note])
             run_event = fx_run_btn.click(
                 backend.fx_run,
@@ -377,7 +387,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 mcp_btn = gr.Button("Search", variant="primary", scale=1)
             mcp_head = gr.Markdown()
             mcp_table = gr.Dataframe(
-                headers=["tool", "docs", "server", "category", "summary"],
+                headers=MCP_HEADERS,
                 datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
@@ -393,7 +403,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 )
             mcp_btn.click(backend.mcp_search, [mcp_query], [mcp_head, mcp_table, mcp_detail])
             mcp_query.submit(backend.mcp_search, [mcp_query], [mcp_head, mcp_table, mcp_detail])
-            mcp_table.select(backend.mcp_select, [mcp_table], [mcp_detail])
+            mcp_table.select(backend.mcp_select, [mcp_table], [mcp_detail, mcp_table])
 
         with gr.Tab(f"Skills ({backend.skill_total})"):
             gr.Markdown(
@@ -407,7 +417,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 sk_btn = gr.Button("Search", variant="primary", scale=1)
             sk_head = gr.Markdown()
             sk_table = gr.Dataframe(
-                headers=["skill", "docs", "category", "source", "description"],
+                headers=SK_HEADERS,
                 datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
@@ -419,6 +429,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
             sk_query.submit(backend.sk_search, [sk_query], [sk_head, sk_table, sk_name])
             sk_table.select(pick_first_column, [sk_table], [sk_name])
             sk_name.change(backend.sk_read, [sk_name], [sk_doc])
+            sk_name.change(mark_selected, [sk_table, sk_name], [sk_table])
 
         demo.load(backend.fx_search, [fx_query, fx_cat], [fx_head, fx_table, fx_name])
         demo.load(backend.sk_search, [sk_query], [sk_head, sk_table, sk_name])

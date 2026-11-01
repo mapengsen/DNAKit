@@ -54,6 +54,10 @@ EFFECT_NOTE = {
 }
 SAFE_EFFECTS = frozenset({"local", "network"})
 DOCS_URL = "https://mapengsen.github.io/DNAKit/en/"
+FX_HEADERS = ["function", "docs", "module", "effect", "description"]
+MCP_HEADERS = ["tool", "docs", "server", "category", "summary"]
+SK_HEADERS = ["skill", "docs", "category", "source", "description"]
+SELECTED_ROW = "background-color: #dbeafe; font-weight: 600"
 MCP_CALL_DOCS = DOCS_URL + "api/features/111_mcp_tool_index/#4-calling-a-tool-that-was-found"
 CLI_BOOTSTRAP = "import sys; from dnakit.cli.app import run; sys.argv[0] = 'dnakit'; run()"
 
@@ -84,6 +88,27 @@ def doc_links() -> DocLinks:
     return DocLinks(
         urls("links"), frozenset(data.get("mentions", [])), urls("mcp_tools"), urls("skills")
     )
+
+
+def highlight_row(table: Any, headers: list[str], index: int | None) -> Any:
+    """Table value with row ``index`` highlighted, marking the item shown below the table."""
+
+    import pandas as pd
+
+    frame = table if isinstance(table, pd.DataFrame) else pd.DataFrame(table, columns=headers)
+    frame = frame.reset_index(drop=True)
+    if index is None or not 0 <= index < len(frame):
+        return frame
+    return frame.style.apply(
+        lambda row: [SELECTED_ROW if row.name == index else "" for _ in row], axis=1
+    )
+
+
+def table_rows(value: Any) -> list[list[Any]]:
+    """Plain rows of a table value (list of lists, DataFrame or highlighted Styler)."""
+
+    frame = getattr(value, "data", value)
+    return frame.values.tolist() if hasattr(frame, "values") else list(frame)
 
 
 def docs_cell(url: str | None) -> str:
@@ -672,7 +697,7 @@ class GuiBackend:
         hint = "" if rows else " (try e.g. 'cpg island', 'primer', 'kmer')"
         return (
             f"{len(rows)} functions{hint}",
-            rows,
+            highlight_row(rows, FX_HEADERS, 0 if rows else None),
             gr.update(choices=names, value=names[0] if names else None),
         )
 
@@ -810,19 +835,20 @@ class GuiBackend:
         return (
             f"{found['total_matches']} matching third-party tools "
             f"(showing {len(rows)} of {found['indexed_tools']:,} indexed)",
-            rows,
+            highlight_row(rows, MCP_HEADERS, 0 if rows else None),
             self.mcp_describe(first["server_id"], first["tool_name"]) if first else "",
         )
 
-    def mcp_select(self, evt: gr.SelectData, table: Any) -> str:
-        """Describe the third-party MCP tool in the clicked row."""
+    def mcp_select(self, evt: gr.SelectData, table: Any) -> tuple[Any, ...]:
+        """Describe the third-party MCP tool in the clicked row and highlight that row."""
 
         try:
-            row = evt.index[0]
-            values = table.iloc[row].tolist() if hasattr(table, "iloc") else table[row]
-        except (IndexError, KeyError, TypeError):
-            return ""
-        return self.mcp_describe(str(values[2]), str(values[0]))
+            row = int(evt.index[0])
+            values = table_rows(table)[row]
+        except (IndexError, KeyError, TypeError, ValueError):
+            return "", gr.update()
+        detail = self.mcp_describe(str(values[2]), str(values[0]))
+        return detail, highlight_row(table_rows(table), MCP_HEADERS, row)
 
     def mcp_describe(self, server_id: str, tool_name: str) -> str:
         try:
@@ -895,7 +921,7 @@ class GuiBackend:
         names = [s["id"] for s in items]
         return (
             f"{found.get('total', len(rows))} matching Skills (showing {len(rows)})",
-            rows,
+            highlight_row(rows, SK_HEADERS, 0 if rows else None),
             gr.update(choices=names, value=names[0] if names else None),
         )
 
@@ -923,6 +949,17 @@ class GuiBackend:
             f"(or `--agent codex`, `--agent cursor`)\n\n---\n"
         )
         return head + text + more
+
+
+def mark_selected(table: Any, name: str | None) -> Any:
+    """Highlight the table row whose first column is ``name`` (the item shown below the table)."""
+
+    rows = table_rows(table)
+    headers = list(getattr(getattr(table, "data", table), "columns", [])) or None
+    index = next((i for i, row in enumerate(rows) if row and row[0] == name), None)
+    if headers is None or index is None:
+        return gr.update()
+    return highlight_row(rows, headers, index)
 
 
 def pick_first_column(evt: gr.SelectData, table: Any) -> Any:
