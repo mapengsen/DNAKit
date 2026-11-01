@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-21",
+  "operations_total": 6698,
+  "own_functions": 5270,
+  "mcp_bridge": 853,
+  "agent_skills": 575,
+  "mcp_tools": 6120,
+  "source": "Deduplicated catalogue counts of the paper (Figs. 1 and 2): paper/write_paper/figure/fig1/recount_2026-10-21/summary.json and paper/write_paper/figure/fig2/output/fig2b_agent_tools.source_data.csv. Regenerate after a recount."
+}

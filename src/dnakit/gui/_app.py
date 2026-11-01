@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import re
 from importlib import resources
 from pathlib import Path
@@ -11,7 +12,7 @@ from typing import Any
 import gradio as gr
 
 import dnakit
-from dnakit.gui._backend import EXAMPLE_SEQUENCE, GuiBackend, pick_first_column
+from dnakit.gui._backend import DOCS_URL, EXAMPLE_SEQUENCE, GuiBackend, pick_first_column
 from dnakit.gui._settings import GuiSettings
 
 # System fonts only: available on every platform, and no web-font download (Google Fonts is
@@ -100,13 +101,35 @@ def _logo_html() -> str:
     return f'<img class="dk-logo" src="data:image/png;base64,{data}" alt="DNAKit logo">'
 
 
+def catalog_counts() -> dict[str, Any] | None:
+    """Deduplicated catalogue counts (operations, MCP tools, Skills) shipped with the interface."""
+
+    path = resources.files("dnakit.gui").joinpath("assets/catalog_counts.json")
+    if not path.is_file():
+        return None
+    counts: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return counts
+
+
 def _hero(backend: GuiBackend) -> str:
     settings = backend.settings
+    counts = catalog_counts()
+    if counts:
+        summary = (
+            f"**{counts['operations_total']:,} DNA operations** ({counts['own_functions']:,} own "
+            f"functions, {counts['mcp_bridge']:,} via the MCP bridge and "
+            f"{counts['agent_skills']:,} Agent Skills), with **{counts['mcp_tools']:,} tools** "
+            "callable through MCP"
+        )
+    else:
+        summary = (
+            f"**{backend.stats['agent_compatible']:,} functions** in {backend.stats['categories']} "
+            f"modules and **{backend.skill_total} workflow Skills**"
+        )
     head = (
         f"# {_logo_html()} DNAKit\n"
         "A unified DNA toolkit for Python, the command line and AI agents: "
-        f"**{backend.stats['agent_compatible']:,} functions** in {backend.stats['categories']} "
-        f"modules and **{backend.skill_total} workflow Skills**. Version {dnakit.__version__}. "
+        f"{summary}. Version {dnakit.__version__}. "
     )
     if settings.is_public:
         return head + (
@@ -140,6 +163,19 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 lines=4,
             )
             with gr.Tabs():
+                with gr.Tab("Reverse complement"):
+                    b = gr.Button("Reverse-complement", variant="primary")
+                    rc_head = gr.Markdown()
+                    rc_out = gr.Textbox(
+                        label="Reverse complement (5'→3')", lines=4, buttons=["copy"]
+                    )
+                    rc_file = gr.File(label="Download FASTA")
+                    rc_code = gr.Markdown()
+                    b.click(
+                        backend.seq_reverse_complement,
+                        [seq_in, state],
+                        [state, rc_head, rc_out, rc_file, rc_code],
+                    )
                 with gr.Tab("Descriptors (240)"):
                     b = gr.Button("Compute descriptors", variant="primary")
                     d_head = gr.Markdown()
@@ -287,10 +323,21 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                         [state, ft_head, ft_table, ft_files, ft_code],
                     )
 
-        with gr.Tab(f"Function explorer ({backend.stats['agent_compatible']:,})"):
+        counts = catalog_counts()
+        listed = backend.stats["agent_compatible"]
+        with gr.Tab(f"Function explorer ({counts['own_functions'] if counts else listed:,})"):
+            note = (
+                f" It lists all {listed:,} Agent-callable function names; names that implement the "
+                f"same operation (aliases, batch versions) count once in the "
+                f"{counts['own_functions']:,} functions."
+                if counts
+                else ""
+            )
             gr.Markdown(
                 "Search every Agent-callable DNAKit function (the same catalog an AI agent sees "
                 "through the MCP server), then inspect its schema and run it with JSON arguments."
+                + note
+                + " Click a row to show the function below; *docs* opens its documentation page."
             )
             with gr.Row():
                 fx_query = gr.Textbox(label="What do you want to do?", value="cpg island", scale=3)
@@ -298,7 +345,8 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                 fx_btn = gr.Button("Search", variant="primary", scale=1)
             fx_head = gr.Markdown()
             fx_table = gr.Dataframe(
-                headers=["function", "module", "effect", "description"],
+                headers=["function", "docs", "module", "effect", "description"],
+                datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
                 interactive=False,
@@ -343,9 +391,46 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
             )
             fx_stop_btn.click(backend.fx_stop, None, [fx_status], cancels=[run_event])
 
+        mcp_total = counts["mcp_tools"] if counts else None
+        with gr.Tab(f"MCP tools ({mcp_total:,})" if mcp_total else "MCP tools"):
+            if counts:
+                own = counts["mcp_tools"] - counts["mcp_bridge"]
+                gr.Markdown(
+                    f"An AI agent connected to the DNAKit MCP server can call **{mcp_total:,} "
+                    f"tools**: {own:,} DNAKit functions (searchable in the *Function explorer*) "
+                    f"and {counts['mcp_bridge']:,} operations of third-party MCP servers that "
+                    "DNAKit reaches through its MCP bridge. Search the indexed third-party tools "
+                    "below and click a row for its arguments, source and how to call it; they run "
+                    "once their server is installed locally (see *Use with agents*), not in this "
+                    "demo."
+                )
+            with gr.Row():
+                mcp_query = gr.Textbox(label="Search third-party MCP tools", value="gwas", scale=4)
+                mcp_btn = gr.Button("Search", variant="primary", scale=1)
+            mcp_head = gr.Markdown()
+            mcp_table = gr.Dataframe(
+                headers=["tool", "server", "category", "summary"],
+                max_height=300,
+                wrap=True,
+                interactive=False,
+            )
+            mcp_detail = gr.Markdown(max_height=640, container=True, padding=True)
+            with gr.Accordion("Indexed MCP servers", open=False):
+                gr.Dataframe(
+                    value=backend.mcp_servers(),
+                    headers=["server", "DNA/gene tools"],
+                    max_height=300,
+                    interactive=False,
+                )
+            mcp_btn.click(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
+            mcp_query.submit(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
+            mcp_table.select(backend.mcp_select, [mcp_table], [mcp_detail])
+
         with gr.Tab(f"Skills ({backend.skill_total})"):
             gr.Markdown(
-                "Curated DNA workflow Skills that guide an AI agent through multi-step analyses."
+                "Curated DNA workflow Skills that guide an AI agent through multi-step analyses. "
+                "Click a row to read the Skill below; see the [Skills guide ↗]"
+                f"({DOCS_URL}llm_tools/skills/) for installing them."
             )
             with gr.Row():
                 sk_query = gr.Textbox(label="Search Skills", value="variant annotation", scale=4)
@@ -369,6 +454,7 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
 
         demo.load(backend.fx_search, [fx_query, fx_cat], [fx_head, fx_table, fx_name])
         demo.load(backend.sk_search, [sk_query], [sk_head, sk_table, sk_name])
+        demo.load(backend.mcp_search, [mcp_query], [mcp_head, mcp_table])
 
     return demo
 

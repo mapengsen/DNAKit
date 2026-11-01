@@ -22,8 +22,10 @@ from typing import Any
 
 import gradio as gr
 
+from dnakit.core import DNASequence
 from dnakit.gui._settings import GuiSettings
 from dnakit.gui._worker import ToolWorker
+from dnakit.integrations import describe_mcp_tool, mcp_tool_index_summary, search_mcp_tools
 from dnakit.skills import read_skill_file, search_skills, skill_catalog_stats
 from dnakit.tools.registry import default_tool_registry
 
@@ -50,7 +52,24 @@ EFFECT_NOTE = {
     "external_process": "runs an external program",
 }
 SAFE_EFFECTS = frozenset({"local", "network"})
+DOCS_URL = "https://mapengsen.github.io/DNAKit/en/"
+MCP_CALL_DOCS = DOCS_URL + "api/features/111_mcp_tool_index/#4-calling-a-tool-that-was-found"
 CLI_BOOTSTRAP = "import sys; from dnakit.cli.app import run; sys.argv[0] = 'dnakit'; run()"
+
+
+def doc_links() -> tuple[dict[str, str], frozenset[str]]:
+    """Documentation URL of each function, and the functions the docs only mention in passing.
+
+    Read from ``assets/doc_links.json`` (built by ``others/docs/build_gui_doc_links.py``).
+    """
+
+    path = resources.files("dnakit.gui").joinpath("assets/doc_links.json")
+    if not path.is_file():
+        return {}, frozenset()
+    data = json.loads(path.read_text(encoding="utf-8"))
+    base = str(data.get("base_url", DOCS_URL))
+    links = {name: base + link for name, link in data.get("links", {}).items()}
+    return links, frozenset(data.get("mentions", []))
 
 
 def example_fasta() -> Path:
@@ -147,10 +166,11 @@ def quote(value: str) -> str:
     return "'" + value.replace("'", "'\\''") + "'"
 
 
-def code_block(cli: str, python: str) -> str:
-    """Render the equivalent command line and Python code."""
+def code_block(cli: str | None, python: str) -> str:
+    """Render the equivalent command line (when there is one) and Python code."""
 
-    return f"**Command line**\n```bash\n{cli}\n```\n**Python**\n```python\n{python}\n```"
+    shown = f"**Command line**\n```bash\n{cli}\n```\n" if cli else ""
+    return f"{shown}**Python**\n```python\n{python}\n```"
 
 
 def fail(message: Any) -> str:
@@ -171,6 +191,7 @@ class GuiBackend:
             for c in self.registry.categories()
         ]
         self.skill_total = int(skill_catalog_stats()["count"])
+        self.doc_links, self.doc_mentions = doc_links()
         self.worker = ToolWorker()
         settings.workdir.mkdir(parents=True, exist_ok=True)
 
@@ -297,6 +318,27 @@ class GuiBackend:
             csv.writer(fh).writerows([["field", "value"], *rows])
         summary = f"**{len(values)} descriptor fields** for a {len(sequence):,} nt sequence."
         return state, summary, rows, str(path), code
+
+    def seq_reverse_complement(self, text: str, state: str | None) -> tuple[Any, ...]:
+        state, folder = self.session(state)
+        sequence = self.clean_sequence(text)
+        code = code_block(
+            None,
+            "from dnakit.ops import reverse_complement\n"
+            "result = reverse_complement(sequence)  # IUPAC-aware, 5'->3'",
+        )
+        try:
+            # Build the sequence object directly: the text form of reverse_complement
+            # treats strings containing '.' or '/' as file paths.
+            result = DNASequence(sequence.upper(), alphabet="iupac").reverse_complement()
+        except Exception as exc:  # invalid symbols
+            return state, fail(exc), None, None, code
+        reverse = result.to_string()
+        path = folder / "reverse_complement.fasta"
+        lines = [reverse[i : i + 60] for i in range(0, len(reverse), 60)]
+        path.write_text(">reverse_complement\n" + "\n".join(lines) + "\n", encoding="utf-8")
+        summary = f"**Reverse complement** (5'→3') of a {len(sequence):,} nt sequence."
+        return state, summary, reverse, str(path), code
 
     def seq_orfs(self, text: str, min_length: float, state: str | None) -> tuple[Any, ...]:
         state, folder = self.session(state)
@@ -597,7 +639,13 @@ class GuiBackend:
                 query or "", category=category or None, limit=40, mode="bm25"
             )
         rows = [
-            [t.name, t.category, EFFECT_NOTE.get(t.effect, t.effect), t.description[:160]]
+            [
+                t.name,
+                f"[docs ↗]({self.doc_links[t.name]})" if t.name in self.doc_links else "",
+                t.category,
+                EFFECT_NOTE.get(t.effect, t.effect),
+                t.description[:160],
+            ]
             for t in matches
         ]
         names = [t.name for t in matches]
@@ -625,8 +673,15 @@ class GuiBackend:
         else:
             badge = "✅ runs here"
         doc = tool.get("full_description") or tool["description"]
+        url = self.doc_links.get(name)
+        if url is None:
+            docs = " · no documentation page yet"
+        elif name in self.doc_mentions:
+            docs = f" · [where the documentation mentions it ↗]({url})"
+        else:
+            docs = f" · [documentation ↗]({url})"
         md = (
-            f"### `{tool['name']}`\n{badge} · category **{tool['category']}**\n\n"
+            f"### `{tool['name']}`\n{badge} · category **{tool['category']}**{docs}\n\n"
             f"```python\n{tool['function']}{str(tool['signature'])[:600]}\n```\n\n{doc[:2500]}"
         )
         consent = gr.update(visible=needs_consent and self.runnable(effect), value=False)
@@ -704,6 +759,90 @@ class GuiBackend:
     def fx_stop(self) -> str:
         self.worker.stop()
         return fail("Stopped by the user.")
+
+    # ------------------------------------------------------------------ MCP tab
+    def mcp_servers(self) -> list[list[Any]]:
+        """Indexed third-party MCP servers with their DNA/gene tool counts, largest first."""
+        servers = mcp_tool_index_summary(verbose=False)["servers"]
+        rows = [[s["server_id"], s["indexed_tools"]] for s in servers if s["indexed_tools"]]
+        return sorted(rows, key=lambda row: (-row[1], row[0]))
+
+    def mcp_search(self, query: str) -> tuple[Any, ...]:
+        if not (query or "").strip():
+            return "Enter a search term.", []
+        try:
+            found = search_mcp_tools(query, limit=40, verbose=False)
+        except Exception as exc:  # invalid query
+            return fail(exc), []
+        rows = [
+            [t["tool_name"], t["server_id"], t["category"], str(t["summary"])[:200]]
+            for t in found["tools"]
+        ]
+        return (
+            f"{found['total_matches']} matching third-party tools "
+            f"(showing {len(rows)} of {found['indexed_tools']:,} indexed)",
+            rows,
+        )
+
+    def mcp_select(self, evt: gr.SelectData, table: Any) -> str:
+        """Describe the third-party MCP tool in the clicked row."""
+
+        try:
+            row = evt.index[0]
+            values = table.iloc[row].tolist() if hasattr(table, "iloc") else table[row]
+        except (IndexError, KeyError, TypeError):
+            return ""
+        return self.mcp_describe(str(values[1]), str(values[0]))
+
+    def mcp_describe(self, server_id: str, tool_name: str) -> str:
+        try:
+            tool = describe_mcp_tool(server_id, tool_name, verbose=False)
+        except Exception as exc:  # unknown server or tool
+            return fail(exc)
+        server = tool["server"]
+        repository = str(server.get("repository") or "")
+        commit = str(server.get("source_commit") or "")
+        source = (
+            f"[{repository.removeprefix('https://github.com/')} @ {commit[:7]} ↗]"
+            f"({repository}/tree/{commit})"
+            if repository and commit
+            else f"[{repository} ↗]({repository})"
+            if repository
+            else "source not recorded"
+        )
+        schema = tool.get("input_schema") or {}
+        properties = schema.get("properties", {})
+        required = tool.get("required_arguments", [])
+        own = {name: example_value(name, properties.get(name, {})) for name in required}
+        call = tool["call"]
+        arguments = call["arguments"]
+        if isinstance(arguments, dict):  # dispatched through a generic tool of the server
+            arguments = {
+                key: own if isinstance(value, str) and "arguments" in value else value
+                for key, value in arguments.items()
+            }
+        else:
+            arguments = own
+        schema_text = json.dumps(schema, indent=2, ensure_ascii=False)
+        if len(schema_text) > 4000:
+            schema_text = schema_text[:4000] + "\n..."
+        environment = ", ".join(f"`{e}`" for e in server.get("required_environment") or [])
+        return (
+            f"### `{tool['tool_name']}`\n"
+            f"Server **{server.get('name') or server_id}** (`{server_id}`) · source {source} · "
+            f"license {server.get('license') or '?'} · category **{tool['category']}**\n\n"
+            f"{tool.get('description') or tool['summary']}\n\n"
+            "**Required arguments:** "
+            + (", ".join(f"`{name}`" for name in required) or "none")
+            + f"\n\n**Input schema**\n```json\n{schema_text}\n```\n"
+            f"**Install the server:** {server.get('installation') or 'see its repository.'}"
+            + (f" Required environment: {environment}." if environment else "")
+            + "\n\n**Call it through DNAKit** once the server is installed "
+            f"([how this works ↗]({MCP_CALL_DOCS})):\n```python\n"
+            "from dnakit.integrations import call_mcp_tool\n\n"
+            f"result = call_mcp_tool({server_id!r}, {call['tool_name']!r}, "
+            f"{pprint.pformat(arguments, width=60, sort_dicts=False)})\n```"
+        )
 
     # ------------------------------------------------------------------ Skills tab
     def sk_search(self, query: str) -> tuple[Any, ...]:

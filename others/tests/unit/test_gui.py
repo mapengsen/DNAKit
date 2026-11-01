@@ -110,6 +110,21 @@ def test_sequence_tab_rejects_sequences_beyond_the_command_line_limit(
         backend.clean_sequence("A" * (backend.settings.max_sequence_length + 1))
 
 
+def test_sequence_tab_reverse_complements_iupac_text_and_saves_fasta(
+    make_backend: Callable[[str], Any],
+) -> None:
+    backend = make_backend("public")
+
+    state, head, reverse, path, code = backend.seq_reverse_complement(">id\nacgRN\nTTA", None)
+
+    assert reverse == "TAANYCGT"
+    assert "8 nt" in head
+    assert Path(path).read_text(encoding="utf-8") == ">reverse_complement\nTAANYCGT\n"
+    assert "reverse_complement(sequence)" in code and "Command line" not in code
+    _, head, reverse, path, _ = backend.seq_reverse_complement("../etc/hosts", state)
+    assert head.startswith("⚠️") and reverse is None and path is None
+
+
 def test_dataset_deduplication_saves_results_in_the_local_folder(
     make_backend: Callable[[str], Any],
 ) -> None:
@@ -171,3 +186,103 @@ def test_both_modes_build_the_same_page(tmp_path: Path) -> None:
         demo = build_app(settings)
         assert isinstance(demo, gr.Blocks)
         demo.close()
+
+
+def test_page_header_reports_the_shipped_catalogue_counts(tmp_path: Path) -> None:
+    pytest.importorskip("gradio")
+    from dnakit.gui._app import _hero, catalog_counts
+    from dnakit.gui._backend import GuiBackend
+
+    counts = catalog_counts()
+    assert counts is not None
+    assert counts["operations_total"] == (
+        counts["own_functions"] + counts["mcp_bridge"] + counts["agent_skills"]
+    )
+    header = _hero(GuiBackend(GuiSettings.public_demo(tmp_path)))
+    assert f"{counts['operations_total']:,} DNA operations" in header
+    assert f"{counts['mcp_tools']:,} tools" in header
+
+
+def test_function_explorer_tab_uses_the_catalogue_function_count(tmp_path: Path) -> None:
+    pytest.importorskip("gradio")
+    from dnakit.gui import build_app
+    from dnakit.gui._app import catalog_counts
+
+    counts = catalog_counts()
+    assert counts is not None
+    demo = build_app(GuiSettings.public_demo(tmp_path))
+    labels = [getattr(block, "label", None) for block in demo.blocks.values()]
+    assert f"Function explorer ({counts['own_functions']:,})" in labels
+    demo.close()
+
+
+def test_mcp_tab_reports_the_catalogue_tool_count_and_searches_bridged_tools(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("gradio")
+    from dnakit.gui import build_app
+    from dnakit.gui._app import catalog_counts
+    from dnakit.gui._backend import GuiBackend
+
+    counts = catalog_counts()
+    assert counts is not None
+    demo = build_app(GuiSettings.public_demo(tmp_path))
+    labels = [getattr(block, "label", None) for block in demo.blocks.values()]
+    assert f"MCP tools ({counts['mcp_tools']:,})" in labels
+    demo.close()
+    backend = GuiBackend(GuiSettings.public_demo(tmp_path))
+    head, rows = backend.mcp_search("gwas")
+    assert rows and "matching third-party tools" in head
+    assert backend.mcp_servers()
+
+
+def test_function_explorer_links_functions_to_their_documentation(
+    make_backend: Callable[[str], Any],
+) -> None:
+    backend = make_backend("public")
+
+    _, rows, _ = backend.fx_search("reverse complement", "")
+    by_name = {row[0]: row[1] for row in rows}
+    link = backend.doc_links["dnakit.ops.reverse_complement"]
+    assert link.startswith("https://mapengsen.github.io/DNAKit/en/api/features/")
+    assert by_name["dnakit.ops.reverse_complement"] == f"[docs ↗]({link})"
+    doc = backend.fx_describe("dnakit.ops.reverse_complement")[0]
+    assert f"[documentation ↗]({link})" in doc
+
+
+def test_shipped_documentation_links_match_the_docs_folder() -> None:
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[3]
+    script = root / "others/docs/build_gui_doc_links.py"
+    if not (root / "docs").is_dir():
+        pytest.skip("documentation sources are not available")
+    spec = importlib.util.spec_from_file_location("build_gui_doc_links", script)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    shipped = json.loads(module.OUTPUT.read_text(encoding="utf-8"))
+    rebuilt = module.build(module.registry_tools())
+    assert shipped == rebuilt, "run python others/docs/build_gui_doc_links.py"
+    pages = module.pages()
+    anchors: dict[str, set[str]] = {}
+    for link in shipped["links"].values():
+        page, _, anchor = link.partition("#")
+        assert page in pages, link
+        if page not in anchors:
+            anchors[page] = module.page_anchors(pages[page])
+        assert not anchor or anchor in anchors[page], link
+
+
+def test_mcp_tab_describes_a_clicked_third_party_tool(
+    make_backend: Callable[[str], Any],
+) -> None:
+    backend = make_backend("public")
+
+    detail = backend.mcp_describe("gwas-mcp", "query_gwas_catalog")
+
+    assert detail.startswith("### `query_gwas_catalog`")
+    assert "https://github.com/" in detail and "/tree/" in detail
+    assert "call_mcp_tool('gwas-mcp', 'query_gwas_catalog'" in detail
+    assert backend.mcp_describe("gwas-mcp", "no_such_tool").startswith("⚠️")

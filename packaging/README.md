@@ -152,5 +152,16 @@ systemctl enable nginx dnakit-web  # 服务文件由下面的 deploy.sh 写入
 packaging/huggingface_space/deploy.sh root@<服务器>
 ```
 
+加 `--full` 时用本机源码的整个 `src/dnakit`（按 `setup.py` 的方式打包 Skills）替换服务器上安装的
+DNAKit，用于在发布新版本前展示未发布的函数；第一次替换时原安装包保留为同目录下的
+`dnakit.pypi-backup`，可用它还原：
+
+```bash
+packaging/huggingface_space/deploy.sh --full root@<服务器>
+```
+
+页头的操作数、MCP 工具数和 Skills 数读自 `src/dnakit/gui/assets/catalog_counts.json`（论文 Fig. 1、2
+的去重计数）；重新计数后要同步更新这个文件。
+
 升级 gradio 后重新执行上面的 `ln -sfn` 一行，使 nginx 发送新版前端文件。在中国大陆服务器上用域名对外
 提供网站需先完成 ICP 备案。

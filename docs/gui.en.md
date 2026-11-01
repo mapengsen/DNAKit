@@ -38,9 +38,10 @@ forwarding.
 
 | Tab | Contents |
 |---|---|
-| Sequence | 240 descriptors, six-frame ORFs, IUPAC/regex motif search, sequence comparison, validation |
+| Sequence | Reverse complement, 240 descriptors, six-frame ORFs, IUPAC/regex motif search, sequence comparison, validation |
 | Dataset | Deduplication (exact or reverse complement), train/valid/test split, format conversion, a descriptor feature table for every record |
-| Function explorer | Search every Agent-callable function, read its schema, run it with JSON arguments |
+| Function explorer | Search every Agent-callable function, open its section of this documentation, read its schema, run it with JSON arguments |
+| MCP tools | Search the DNA and gene tools of third-party MCP servers; a clicked tool shows its arguments, source repository and the `call_mcp_tool` call |
 | Skills | Search and read the bundled DNA workflow Skills |
 | Use with agents | Connect the same functions to Claude Code, Codex or other MCP clients |
 
