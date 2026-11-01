@@ -597,9 +597,12 @@ def inventory() -> list[dict]:
         module: group for group, values in GROUPS.items() for module in values[2].split()
     }
     records = []
-    assert len(databases.__all__) == 455 and len(encode.__all__) == 20
-    assert set(databases.__all__) == set(entries) | set(HELPERS)
-    for name in databases.__all__:
+    # dnakit.databases also re-exports backend functions documented in their own tutorials;
+    # this inventory covers the registry query operations and the five dispatch helpers.
+    native = [name for name in databases.__all__ if name in entries or name in HELPERS]
+    assert len(native) == 455 and len(encode.__all__) == 20
+    assert set(native) == set(entries) | set(HELPERS)
+    for name in native:
         entry = entries.get(name)
         group = (
             "execution" if entry is None else OVERRIDES.get(name) or module_group[entry["module"]]

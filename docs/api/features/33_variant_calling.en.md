@@ -74,7 +74,7 @@ print(result["result"]["output"])
 
 - **Citation and license:** The official Ensembl VEP repository records Apache-2.0; cite McLaren et al. (2016), [10.1186/s13059-016-0974-4](https://doi.org/10.1186/s13059-016-0974-4). DNAKit does not download caches, reference sequences or plugins.
 
-## 1) Call variants from BAM {#bio-17}
+## 7) Call variants from BAM {#bio-17}
 
 - **Purpose:** Produce normalized, indexed VCF variants.
 - **Method:** Run bcftools mpileup, call and norm.
@@ -102,7 +102,7 @@ Dependencies and details: [FAQ](../../faq/bioinformatics.md#reads).
 
 <span id="vcf"></span>
 
-## 2) Count filtered variants in a VCF or BCF file {#dnakit.databases.vcf_count_variants}
+## 8) Count filtered variants in a VCF or BCF file {#dnakit.databases.vcf_count_variants}
 
 - **Purpose:** Count filtered variants in a VCF or BCF file.
 - **Method:** Filter with bcftools view, then count variant records with bcftools stats.
@@ -137,7 +137,7 @@ Response-shape excerpt; `<…>` denotes type placeholders, not a captured query 
 
 [Full parameters and usage notes](../../faq/api/33_variant_calling.md#dnakit.databases.vcf_count_variants-parameters)
 
-## 3) Normalize VCF variants and multiallelic sites {#dnakit.databases.vcf_normalize}
+## 9) Normalize VCF variants and multiallelic sites {#dnakit.databases.vcf_normalize}
 
 - **Purpose:** Normalize VCF variants and multiallelic sites.
 - **Method:** Use bcftools norm to split or join multiallelic sites, left-align when a reference is supplied, and compare counts.
@@ -177,7 +177,7 @@ Response-shape excerpt; `<…>` denotes type placeholders, not a captured query 
 
 [Full parameters and usage notes](../../faq/api/33_variant_calling.md#dnakit.databases.vcf_normalize-parameters)
 
-## 4) Summarize VCF variant types and sample genotype statistics {#dnakit.databases.vcf_summary_stats}
+## 10) Summarize VCF variant types and sample genotype statistics {#dnakit.databases.vcf_summary_stats}
 
 - **Purpose:** Summarize VCF variant types and sample genotype statistics.
 - **Method:** Run bcftools stats on the filtered VCF and parse variant types and sample statistics.
@@ -218,7 +218,7 @@ Response-shape excerpt; `<…>` denotes type placeholders, not a captured query 
 
 <span id="variant-statistics"></span>
 
-## 5) Calculate the fraction of coding variants matching filters {#dnakit.databases.coding_variant_fraction}
+## 11) Calculate the fraction of coding variants matching filters {#dnakit.databases.coding_variant_fraction}
 
 - **Purpose:** Calculate the fraction of coding variants matching filters.
 - **Method:** Use coding variants as the denominator and count those meeting the annotation and VAF threshold.
