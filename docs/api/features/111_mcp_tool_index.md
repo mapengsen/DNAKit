@@ -4,6 +4,8 @@
 
 `list_mcp_servers()` 列出 49 个第三方 MCP 服务器，但以前 Agent 只能看到每个服务器的名称和能力标签，服务器里有哪些工具，要先安装并启动它才知道。现在 DNAKit 随包提供这些工具的离线索引，只保留处理 DNA 或基因的工具，`search_mcp_tools()` 和 Agent 服务器的 `search_dnakit_tools` 不用启动任何服务器就能搜到它们。
 
+每个收录工具的参数和通过 DNAKit 调用的写法见 [第三方 MCP 工具目录](../../llm_tools/mcp_tools/index.md)。
+
 ## 索引的建立方式
 
 - **列出工具。** 2026-10-16，49 个服务器都按固定提交安装，并请求 `tools/list`。46 个实际启动后列出（stdio 或官方托管的 HTTP 端点）。`ncbi-database`、`seqeron-sequence` 和 `grebi` 从固定提交的源码读取：第一个在该提交下 MCP 握手失败，本机没有 .NET，grebi 的托管端点返回 404。

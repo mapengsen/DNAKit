@@ -4,6 +4,8 @@ Written for: DNAKit users and Agent builders who want to find functions that onl
 
 `list_mcp_servers()` lists 49 third-party MCP servers, but until now an Agent could only see each server's name and capability tags. The tools inside a server became visible only after installing and starting it. DNAKit now ships an offline index of those tools, reduced to the ones that work on DNA or genes, so `search_mcp_tools()` and the Agent server's `search_dnakit_tools` can find them without starting anything.
 
+Every indexed tool, with its arguments and the call through DNAKit, is listed in the [third-party MCP tool catalogue](../../llm_tools/mcp_tools/index.md).
+
 ## How the index was built
 
 - **Listing.** Each of the 49 servers was installed from its pinned commit and asked for `tools/list` on 2026-10-16. 46 were listed live (stdio or the hosted HTTP endpoint). `ncbi-database`, `seqeron-sequence` and `grebi` were read from the pinned source: the first fails the MCP handshake at that commit, .NET is not installed here, and grebi's hosted endpoint returned 404.

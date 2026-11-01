@@ -400,16 +400,18 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                     f"tools**: {own:,} DNAKit functions (searchable in the *Function explorer*) "
                     f"and {counts['mcp_bridge']:,} operations of third-party MCP servers that "
                     "DNAKit reaches through its MCP bridge. Search the indexed third-party tools "
-                    "below and click a row for its arguments, source and how to call it; they run "
-                    "once their server is installed locally (see *Use with agents*), not in this "
-                    "demo."
+                    "below and click a row for its arguments, source and how to call it; *docs* "
+                    "opens its entry in the [MCP tool catalogue ↗]"
+                    f"({DOCS_URL}llm_tools/mcp_tools/). They run once their server is installed "
+                    "locally (see *Use with agents*), not in this demo."
                 )
             with gr.Row():
                 mcp_query = gr.Textbox(label="Search third-party MCP tools", value="gwas", scale=4)
                 mcp_btn = gr.Button("Search", variant="primary", scale=1)
             mcp_head = gr.Markdown()
             mcp_table = gr.Dataframe(
-                headers=["tool", "server", "category", "summary"],
+                headers=["tool", "docs", "server", "category", "summary"],
+                datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
                 interactive=False,
@@ -429,15 +431,17 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
         with gr.Tab(f"Skills ({backend.skill_total})"):
             gr.Markdown(
                 "Curated DNA workflow Skills that guide an AI agent through multi-step analyses. "
-                "Click a row to read the Skill below; see the [Skills guide ↗]"
-                f"({DOCS_URL}llm_tools/skills/) for installing them."
+                "Click a row to read the Skill below; *docs* opens its entry in the "
+                f"[Skills catalogue ↗]({DOCS_URL}llm_tools/skills_catalog/), and the "
+                f"[Skills guide ↗]({DOCS_URL}llm_tools/skills/) explains installing them."
             )
             with gr.Row():
                 sk_query = gr.Textbox(label="Search Skills", value="variant annotation", scale=4)
                 sk_btn = gr.Button("Search", variant="primary", scale=1)
             sk_head = gr.Markdown()
             sk_table = gr.Dataframe(
-                headers=["skill", "category", "source", "description"],
+                headers=["skill", "docs", "category", "source", "description"],
+                datatype=["str", "markdown", "str", "str", "str"],
                 max_height=300,
                 wrap=True,
                 interactive=False,

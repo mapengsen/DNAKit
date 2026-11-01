@@ -1,5 +1,7 @@
 # MCP
 
+DNAKit 可以通过 MCP 桥接调用的第三方 MCP 服务器中的 DNA 与基因工具，列在 [第三方 MCP 工具目录](mcp_tools/index.md)。
+
 ## 推荐：一句话安装
 
 先安装并登录一个支持 MCP、能读取文档和执行本地命令的 Agent，例如 Codex、Claude Code 或

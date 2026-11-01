@@ -2,6 +2,8 @@
 
 DNAKit collects DNA/genomics workflows with offline discovery, selective installation, provenance, and MCP access. A Skill contains instructions and supporting resources. Its analysis software, reference data, and APIs remain separate dependencies.
 
+All bundled Skills are listed by category in the [Skills catalogue](skills_catalog/index.md).
+
 Start with the **`dnakit` discovery skill**. Describe your task; the Agent searches the catalog, reads a suitable workflow, and uses the available tools to perform it.
 
 ## Install DNAKit and the discovery skill

@@ -243,7 +243,7 @@ def test_function_explorer_links_functions_to_their_documentation(
 
     _, rows, _ = backend.fx_search("reverse complement", "")
     by_name = {row[0]: row[1] for row in rows}
-    link = backend.doc_links["dnakit.ops.reverse_complement"]
+    link = backend.docs.functions["dnakit.ops.reverse_complement"]
     assert link.startswith("https://mapengsen.github.io/DNAKit/en/api/features/")
     assert by_name["dnakit.ops.reverse_complement"] == f"[docs ↗]({link})"
     doc = backend.fx_describe("dnakit.ops.reverse_complement")[0]
@@ -263,11 +263,11 @@ def test_shipped_documentation_links_match_the_docs_folder() -> None:
     spec.loader.exec_module(module)
 
     shipped = json.loads(module.OUTPUT.read_text(encoding="utf-8"))
-    rebuilt = module.build(module.registry_tools())
+    rebuilt = module.build(module.registry_tools(), module.catalog_targets())
     assert shipped == rebuilt, "run python others/docs/build_gui_doc_links.py"
-    pages = module.pages()
+    pages = module.pages(skip=False)
     anchors: dict[str, set[str]] = {}
-    for link in shipped["links"].values():
+    for link in module.all_links(shipped).values():
         page, _, anchor = link.partition("#")
         assert page in pages, link
         if page not in anchors:
@@ -286,3 +286,22 @@ def test_mcp_tab_describes_a_clicked_third_party_tool(
     assert "https://github.com/" in detail and "/tree/" in detail
     assert "call_mcp_tool('gwas-mcp', 'query_gwas_catalog'" in detail
     assert backend.mcp_describe("gwas-mcp", "no_such_tool").startswith("⚠️")
+    link = backend.docs.mcp_tools["gwas-mcp/query_gwas_catalog"]
+    assert link.endswith("llm_tools/mcp_tools/gwas-mcp/#query_gwas_catalog")
+    assert f"[documentation ↗]({link})" in detail
+    _, rows = backend.mcp_search("query_gwas_catalog")
+    row = next(r for r in rows if r[0] == "query_gwas_catalog" and r[2] == "gwas-mcp")
+    assert row[1] == f"[docs ↗]({link})"
+
+
+def test_skills_tab_links_skills_to_the_skills_catalogue(
+    make_backend: Callable[[str], Any],
+) -> None:
+    backend = make_backend("public")
+
+    _, rows, _ = backend.sk_search("variant annotation")
+    skill, docs = rows[0][0], rows[0][1]
+    link = backend.docs.skills[skill]
+    assert "/llm_tools/skills_catalog/" in link and link.endswith(f"/#{skill}")
+    assert docs == f"[docs ↗]({link})"
+    assert f"[documentation ↗]({link})" in backend.sk_read(skill)

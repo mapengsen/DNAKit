@@ -1,5 +1,7 @@
 # MCP
 
+The DNA and gene tools of third-party MCP servers that DNAKit can call through its bridge are listed in the [third-party MCP tool catalogue](mcp_tools/index.md).
+
 ## Recommended: install with one prompt
 
 First install and sign in to an MCP-capable Agent that can read documentation and run local commands,

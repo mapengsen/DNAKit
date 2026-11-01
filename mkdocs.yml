@@ -454,6 +454,87 @@ plugins:
                 - 2) MCP: llm_tools/mcp.md
                 - 3) Skills: llm_tools/skills.md
                 - 4) Agent: llm_tools/agent.md
+                - 5) Third-party MCP Tool Catalogue:
+                    # BEGIN GENERATED NAV: mcp-tools-en
+                    - "Overview": llm_tools/mcp_tools/index.md
+                    - "10x Genomics Cloud MCP (3)": llm_tools/mcp_tools/10x-genomics.md
+                    - "Addgene MCP (4)": llm_tools/mcp_tools/addgene.md
+                    - "AlphaGenome MCP (JoLab) (23)": llm_tools/mcp_tools/alphagenome-jolab.md
+                    - "AWS Kiro Life Sciences: agriculture (4)": llm_tools/mcp_tools/kiro-agriculture.md
+                    - "AWS Kiro Life Sciences: clinical (3)": llm_tools/mcp_tools/kiro-clinical.md
+                    - "AWS Kiro Life Sciences: ecology (3)": llm_tools/mcp_tools/kiro-ecology.md
+                    - "AWS Kiro Life Sciences: epigenomics (3)": llm_tools/mcp_tools/kiro-epigenomics.md
+                    - "AWS Kiro Life Sciences: genomics (17)": llm_tools/mcp_tools/kiro-genomics.md
+                    - "AWS Kiro Life Sciences: model-organisms (5)": llm_tools/mcp_tools/kiro-model-organisms.md
+                    - "BioContextAI Knowledgebase MCP (7)": llm_tools/mcp_tools/biocontext-kb.md
+                    - "Bioinformatics MCP Server (NCBI and UniProt) (4)": llm_tools/mcp_tools/bioinformatics-ncbi-uniprot.md
+                    - "bioinformatics-mcp (33)": llm_tools/mcp_tools/bioinformatics-mcp.md
+                    - "BioMCP (5)": llm_tools/mcp_tools/biomcp.md
+                    - "BioThings MCP (10)": llm_tools/mcp_tools/biothings.md
+                    - "BrAPI MCP (6)": llm_tools/mcp_tools/brapi.md
+                    - "Chorus (17)": llm_tools/mcp_tools/chorus.md
+                    - "DNALLM MCP Server (11)": llm_tools/mcp_tools/dnallm.md
+                    - "EBI Tools MCP (QuentinCody) (1)": llm_tools/mcp_tools/ebi-tools.md
+                    - "ENCODE Toolkit (9)": llm_tools/mcp_tools/encode-toolkit.md
+                    - "Ensembl MCP (cyanheads) (7)": llm_tools/mcp_tools/ensembl.md
+                    - "GeneChat MCP (10)": llm_tools/mcp_tools/genechat.md
+                    - "Genomi (57)": llm_tools/mcp_tools/genomi.md
+                    - "gget MCP (15)": llm_tools/mcp_tools/gget.md
+                    - "Gigwa MCP (27)": llm_tools/mcp_tools/gigwa-mcp.md
+                    - "gnomAD MCP (11)": llm_tools/mcp_tools/gnomad.md
+                    - "GrEBI (15)": llm_tools/mcp_tools/grebi.md
+                    - "GWAS MCP (muslus) (33)": llm_tools/mcp_tools/gwas-mcp.md
+                    - "Juicebox MCP (6)": llm_tools/mcp_tools/juicebox.md
+                    - "just-dna-agents MCP (2)": llm_tools/mcp_tools/just-dna-agents.md
+                    - "just-prs MCP (16)": llm_tools/mcp_tools/just-prs.md
+                    - "Locus (21)": llm_tools/mcp_tools/locus.md
+                    - "MaveDB-Link (13)": llm_tools/mcp_tools/mavedb-link.md
+                    - "MCP Sequence Simulation (5)": llm_tools/mcp_tools/sequence-simulation.md
+                    - "NCBI Database MCP (hpend2373) (4)": llm_tools/mcp_tools/ncbi-database.md
+                    - "NCBI SRA MCP Server (4)": llm_tools/mcp_tools/ncbi-sra.md
+                    - "Open Targets MCP (30)": llm_tools/mcp_tools/opentargets.md
+                    - "Open Targets Platform official MCP (2)": llm_tools/mcp_tools/opentargets-platform.md
+                    - "Plant Genomics MCP (40)": llm_tools/mcp_tools/plant-genomics.md
+                    - "Rewire Genomics MCP (20)": llm_tools/mcp_tools/rewire-genomics.md
+                    - "Seqeron Sequence MCP (30)": llm_tools/mcp_tools/seqeron-sequence.md
+                    - "SmartAPI MCP (BioThings core) (3)": llm_tools/mcp_tools/smartapi-biothings.md
+                    - "ToolUniverse: sequence (44)": llm_tools/mcp_tools/tooluniverse-sequence.md
+                    - "ToolUniverse: genome_annotation (253)": llm_tools/mcp_tools/tooluniverse-genome_annotation.md
+                    - "ToolUniverse: variant (155)": llm_tools/mcp_tools/tooluniverse-variant.md
+                    - "ToolUniverse: association (138)": llm_tools/mcp_tools/tooluniverse-association.md
+                    - "ToolUniverse: expression (56)": llm_tools/mcp_tools/tooluniverse-expression.md
+                    - "ToolUniverse: regulation_epigenome (54)": llm_tools/mcp_tools/tooluniverse-regulation_epigenome.md
+                    - "ToolUniverse: sequencing_data (91)": llm_tools/mcp_tools/tooluniverse-sequencing_data.md
+                    - "ToolUniverse: prediction_model (17)": llm_tools/mcp_tools/tooluniverse-prediction_model.md
+                    - "ToolUniverse: molecular_tools (23)": llm_tools/mcp_tools/tooluniverse-molecular_tools.md
+                    - "ToolUniverse: breeding_population (14)": llm_tools/mcp_tools/tooluniverse-breeding_population.md
+                    - "UCSC Genome MCP (11)": llm_tools/mcp_tools/ucsc-genome.md
+                    - "UniProt MCP Server (smaniches) (7)": llm_tools/mcp_tools/uniprot-provenance.md
+                    # END GENERATED NAV: mcp-tools-en
+                - 6) Skills Catalogue:
+                    # BEGIN GENERATED NAV: skills-en
+                    - "Overview": llm_tools/skills_catalog/index.md
+                    - "DNA sequence processing (24)": llm_tools/skills_catalog/sequence.md
+                    - "Sequencing and quality control (20)": llm_tools/skills_catalog/sequencing.md
+                    - "Alignment and alignment files (20)": llm_tools/skills_catalog/alignment.md
+                    - "Genomic intervals (14)": llm_tools/skills_catalog/intervals.md
+                    - "Genome assembly (11)": llm_tools/skills_catalog/assembly.md
+                    - "Genome annotation (15)": llm_tools/skills_catalog/annotation.md
+                    - "Variant calling and processing (33)": llm_tools/skills_catalog/variants.md
+                    - "Variant interpretation and disease research (53)": llm_tools/skills_catalog/clinical.md
+                    - "GWAS and causal genetics (26)": llm_tools/skills_catalog/gwas.md
+                    - "Population and evolutionary genetics (21)": llm_tools/skills_catalog/population.md
+                    - "Regulatory and epigenomics (66)": llm_tools/skills_catalog/epigenomics.md
+                    - "CRISPR and molecular design (37)": llm_tools/skills_catalog/crispr.md
+                    - "Comparative genomics and phylogenetics (30)": llm_tools/skills_catalog/comparative.md
+                    - "Microbial and environmental genomics (67)": llm_tools/skills_catalog/metagenomics.md
+                    - "Genomic databases (43)": llm_tools/skills_catalog/databases.md
+                    - "DNA models and acceleration (15)": llm_tools/skills_catalog/models.md
+                    - "Composite workflows and skill discovery (77)": llm_tools/skills_catalog/workflows.md
+                    - "Genomic breeding and agriculture (1)": llm_tools/skills_catalog/breeding.md
+                    - "DNA data storage (1)": llm_tools/skills_catalog/dna-storage.md
+                    - "DNA nanotechnology (1)": llm_tools/skills_catalog/nanotechnology.md
+                    # END GENERATED NAV: skills-en
             - 7. Experimental Design and Workflow Management:
                 - "1) Experimental Design": api/features/candidate_catalog/experimental-design.md
                 - "2) Workflow Execution and Data Security": api/features/candidate_catalog/workflow-security.md
@@ -964,6 +1045,87 @@ nav:
       - 2) MCP: llm_tools/mcp.md
       - 3) Skills: llm_tools/skills.md
       - 4) Agent: llm_tools/agent.md
+      - 5) 第三方 MCP 工具目录:
+          # BEGIN GENERATED NAV: mcp-tools-zh
+          - "总览": llm_tools/mcp_tools/index.md
+          - "10x Genomics Cloud MCP (3)": llm_tools/mcp_tools/10x-genomics.md
+          - "Addgene MCP (4)": llm_tools/mcp_tools/addgene.md
+          - "AlphaGenome MCP (JoLab) (23)": llm_tools/mcp_tools/alphagenome-jolab.md
+          - "AWS Kiro Life Sciences: agriculture (4)": llm_tools/mcp_tools/kiro-agriculture.md
+          - "AWS Kiro Life Sciences: clinical (3)": llm_tools/mcp_tools/kiro-clinical.md
+          - "AWS Kiro Life Sciences: ecology (3)": llm_tools/mcp_tools/kiro-ecology.md
+          - "AWS Kiro Life Sciences: epigenomics (3)": llm_tools/mcp_tools/kiro-epigenomics.md
+          - "AWS Kiro Life Sciences: genomics (17)": llm_tools/mcp_tools/kiro-genomics.md
+          - "AWS Kiro Life Sciences: model-organisms (5)": llm_tools/mcp_tools/kiro-model-organisms.md
+          - "BioContextAI Knowledgebase MCP (7)": llm_tools/mcp_tools/biocontext-kb.md
+          - "Bioinformatics MCP Server (NCBI and UniProt) (4)": llm_tools/mcp_tools/bioinformatics-ncbi-uniprot.md
+          - "bioinformatics-mcp (33)": llm_tools/mcp_tools/bioinformatics-mcp.md
+          - "BioMCP (5)": llm_tools/mcp_tools/biomcp.md
+          - "BioThings MCP (10)": llm_tools/mcp_tools/biothings.md
+          - "BrAPI MCP (6)": llm_tools/mcp_tools/brapi.md
+          - "Chorus (17)": llm_tools/mcp_tools/chorus.md
+          - "DNALLM MCP Server (11)": llm_tools/mcp_tools/dnallm.md
+          - "EBI Tools MCP (QuentinCody) (1)": llm_tools/mcp_tools/ebi-tools.md
+          - "ENCODE Toolkit (9)": llm_tools/mcp_tools/encode-toolkit.md
+          - "Ensembl MCP (cyanheads) (7)": llm_tools/mcp_tools/ensembl.md
+          - "GeneChat MCP (10)": llm_tools/mcp_tools/genechat.md
+          - "Genomi (57)": llm_tools/mcp_tools/genomi.md
+          - "gget MCP (15)": llm_tools/mcp_tools/gget.md
+          - "Gigwa MCP (27)": llm_tools/mcp_tools/gigwa-mcp.md
+          - "gnomAD MCP (11)": llm_tools/mcp_tools/gnomad.md
+          - "GrEBI (15)": llm_tools/mcp_tools/grebi.md
+          - "GWAS MCP (muslus) (33)": llm_tools/mcp_tools/gwas-mcp.md
+          - "Juicebox MCP (6)": llm_tools/mcp_tools/juicebox.md
+          - "just-dna-agents MCP (2)": llm_tools/mcp_tools/just-dna-agents.md
+          - "just-prs MCP (16)": llm_tools/mcp_tools/just-prs.md
+          - "Locus (21)": llm_tools/mcp_tools/locus.md
+          - "MaveDB-Link (13)": llm_tools/mcp_tools/mavedb-link.md
+          - "MCP Sequence Simulation (5)": llm_tools/mcp_tools/sequence-simulation.md
+          - "NCBI Database MCP (hpend2373) (4)": llm_tools/mcp_tools/ncbi-database.md
+          - "NCBI SRA MCP Server (4)": llm_tools/mcp_tools/ncbi-sra.md
+          - "Open Targets MCP (30)": llm_tools/mcp_tools/opentargets.md
+          - "Open Targets Platform official MCP (2)": llm_tools/mcp_tools/opentargets-platform.md
+          - "Plant Genomics MCP (40)": llm_tools/mcp_tools/plant-genomics.md
+          - "Rewire Genomics MCP (20)": llm_tools/mcp_tools/rewire-genomics.md
+          - "Seqeron Sequence MCP (30)": llm_tools/mcp_tools/seqeron-sequence.md
+          - "SmartAPI MCP (BioThings core) (3)": llm_tools/mcp_tools/smartapi-biothings.md
+          - "ToolUniverse: sequence (44)": llm_tools/mcp_tools/tooluniverse-sequence.md
+          - "ToolUniverse: genome_annotation (253)": llm_tools/mcp_tools/tooluniverse-genome_annotation.md
+          - "ToolUniverse: variant (155)": llm_tools/mcp_tools/tooluniverse-variant.md
+          - "ToolUniverse: association (138)": llm_tools/mcp_tools/tooluniverse-association.md
+          - "ToolUniverse: expression (56)": llm_tools/mcp_tools/tooluniverse-expression.md
+          - "ToolUniverse: regulation_epigenome (54)": llm_tools/mcp_tools/tooluniverse-regulation_epigenome.md
+          - "ToolUniverse: sequencing_data (91)": llm_tools/mcp_tools/tooluniverse-sequencing_data.md
+          - "ToolUniverse: prediction_model (17)": llm_tools/mcp_tools/tooluniverse-prediction_model.md
+          - "ToolUniverse: molecular_tools (23)": llm_tools/mcp_tools/tooluniverse-molecular_tools.md
+          - "ToolUniverse: breeding_population (14)": llm_tools/mcp_tools/tooluniverse-breeding_population.md
+          - "UCSC Genome MCP (11)": llm_tools/mcp_tools/ucsc-genome.md
+          - "UniProt MCP Server (smaniches) (7)": llm_tools/mcp_tools/uniprot-provenance.md
+          # END GENERATED NAV: mcp-tools-zh
+      - 6) Skills 目录:
+          # BEGIN GENERATED NAV: skills-zh
+          - "总览": llm_tools/skills_catalog/index.md
+          - "DNA 序列处理 (24)": llm_tools/skills_catalog/sequence.md
+          - "测序与质控 (20)": llm_tools/skills_catalog/sequencing.md
+          - "比对与比对文件 (20)": llm_tools/skills_catalog/alignment.md
+          - "基因组区间 (14)": llm_tools/skills_catalog/intervals.md
+          - "基因组组装 (11)": llm_tools/skills_catalog/assembly.md
+          - "基因组注释 (15)": llm_tools/skills_catalog/annotation.md
+          - "变异检测与处理 (33)": llm_tools/skills_catalog/variants.md
+          - "遗传变异与疾病研究 (53)": llm_tools/skills_catalog/clinical.md
+          - "GWAS 与因果遗传学 (26)": llm_tools/skills_catalog/gwas.md
+          - "群体与进化遗传学 (21)": llm_tools/skills_catalog/population.md
+          - "调控与表观基因组 (66)": llm_tools/skills_catalog/epigenomics.md
+          - "CRISPR 与分子设计 (37)": llm_tools/skills_catalog/crispr.md
+          - "比较基因组与系统发育 (30)": llm_tools/skills_catalog/comparative.md
+          - "微生物与环境基因组 (67)": llm_tools/skills_catalog/metagenomics.md
+          - "基因组数据库 (43)": llm_tools/skills_catalog/databases.md
+          - "DNA 模型与加速 (15)": llm_tools/skills_catalog/models.md
+          - "组合流程与技能入口 (77)": llm_tools/skills_catalog/workflows.md
+          - "基因组育种与农业 (1)": llm_tools/skills_catalog/breeding.md
+          - "DNA 数据存储 (1)": llm_tools/skills_catalog/dna-storage.md
+          - "DNA 纳米技术 (1)": llm_tools/skills_catalog/nanotechnology.md
+          # END GENERATED NAV: skills-zh
   - 7. 实验设计与工作流管理:
       - "1) 实验设计": api/features/candidate_catalog/experimental-design.md
       - "2) 工作流运行与数据安全": api/features/candidate_catalog/workflow-security.md

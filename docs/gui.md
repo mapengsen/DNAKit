@@ -37,8 +37,8 @@ Linux（glibc 2.28 及以上）和系统库 `libxcb-cursor0`。没有显示器�
 | Sequence | 反向互补链、240 个描述符、六框 ORF、IUPAC/正则 motif 搜索、序列比较、序列校验 |
 | Dataset | 去重（完全相同或反向互补）、训练/验证/测试集划分、格式转换、每条记录的描述符特征表 |
 | Function explorer | 检索全部 Agent 可调用函数，跳转到本文档中对应的章节，查看参数说明，用 JSON 参数直接运行 |
-| MCP tools | 检索第三方 MCP 服务器中的 DNA 与基因工具；点击某个工具可查看参数、源码仓库和 `call_mcp_tool` 调用写法 |
-| Skills | 检索和阅读内置 DNA 工作流 Skills |
+| MCP tools | 检索第三方 MCP 服务器中的 DNA 与基因工具；点击某个工具可查看参数、源码仓库和 `call_mcp_tool` 调用写法，*docs* 链接打开它在 MCP 工具目录中的条目 |
+| Skills | 检索和阅读内置 DNA 工作流 Skills；*docs* 链接打开它在 Skills 目录中的条目 |
 | Use with agents | 把同一套函数接入 Claude Code、Codex 等 MCP 客户端 |
 
 每个结果都会给出等价的命令行和 Python 调用；函数检索页还给出 agent 发送的 MCP 请求，

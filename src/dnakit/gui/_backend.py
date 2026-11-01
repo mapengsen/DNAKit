@@ -16,6 +16,7 @@ import subprocess
 import sys
 import time
 import uuid
+from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
 from typing import Any
@@ -57,19 +58,38 @@ MCP_CALL_DOCS = DOCS_URL + "api/features/111_mcp_tool_index/#4-calling-a-tool-th
 CLI_BOOTSTRAP = "import sys; from dnakit.cli.app import run; sys.argv[0] = 'dnakit'; run()"
 
 
-def doc_links() -> tuple[dict[str, str], frozenset[str]]:
-    """Documentation URL of each function, and the functions the docs only mention in passing.
+@dataclass(frozen=True)
+class DocLinks:
+    """Documentation URLs of functions, third-party MCP tools (``server/tool``) and Skills.
 
-    Read from ``assets/doc_links.json`` (built by ``others/docs/build_gui_doc_links.py``).
+    ``mentions`` are the functions whose page only mentions them in passing.
     """
 
+    functions: dict[str, str]
+    mentions: frozenset[str]
+    mcp_tools: dict[str, str]
+    skills: dict[str, str]
+
+
+def doc_links() -> DocLinks:
+    """Read ``assets/doc_links.json`` (built by ``others/docs/build_gui_doc_links.py``)."""
+
     path = resources.files("dnakit.gui").joinpath("assets/doc_links.json")
-    if not path.is_file():
-        return {}, frozenset()
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
     base = str(data.get("base_url", DOCS_URL))
-    links = {name: base + link for name, link in data.get("links", {}).items()}
-    return links, frozenset(data.get("mentions", []))
+
+    def urls(key: str) -> dict[str, str]:
+        return {name: base + link for name, link in data.get(key, {}).items()}
+
+    return DocLinks(
+        urls("links"), frozenset(data.get("mentions", [])), urls("mcp_tools"), urls("skills")
+    )
+
+
+def docs_cell(url: str | None) -> str:
+    """Markdown table cell linking to a documentation page."""
+
+    return f"[docs ↗]({url})" if url else ""
 
 
 def example_fasta() -> Path:
@@ -191,7 +211,7 @@ class GuiBackend:
             for c in self.registry.categories()
         ]
         self.skill_total = int(skill_catalog_stats()["count"])
-        self.doc_links, self.doc_mentions = doc_links()
+        self.docs = doc_links()
         self.worker = ToolWorker()
         settings.workdir.mkdir(parents=True, exist_ok=True)
 
@@ -641,7 +661,7 @@ class GuiBackend:
         rows = [
             [
                 t.name,
-                f"[docs ↗]({self.doc_links[t.name]})" if t.name in self.doc_links else "",
+                docs_cell(self.docs.functions.get(t.name)),
                 t.category,
                 EFFECT_NOTE.get(t.effect, t.effect),
                 t.description[:160],
@@ -673,10 +693,10 @@ class GuiBackend:
         else:
             badge = "✅ runs here"
         doc = tool.get("full_description") or tool["description"]
-        url = self.doc_links.get(name)
+        url = self.docs.functions.get(name)
         if url is None:
             docs = " · no documentation page yet"
-        elif name in self.doc_mentions:
+        elif name in self.docs.mentions:
             docs = f" · [where the documentation mentions it ↗]({url})"
         else:
             docs = f" · [documentation ↗]({url})"
@@ -775,7 +795,13 @@ class GuiBackend:
         except Exception as exc:  # invalid query
             return fail(exc), []
         rows = [
-            [t["tool_name"], t["server_id"], t["category"], str(t["summary"])[:200]]
+            [
+                t["tool_name"],
+                docs_cell(self.docs.mcp_tools.get(f"{t['server_id']}/{t['tool_name']}")),
+                t["server_id"],
+                t["category"],
+                str(t["summary"])[:200],
+            ]
             for t in found["tools"]
         ]
         return (
@@ -792,7 +818,7 @@ class GuiBackend:
             values = table.iloc[row].tolist() if hasattr(table, "iloc") else table[row]
         except (IndexError, KeyError, TypeError):
             return ""
-        return self.mcp_describe(str(values[1]), str(values[0]))
+        return self.mcp_describe(str(values[2]), str(values[0]))
 
     def mcp_describe(self, server_id: str, tool_name: str) -> str:
         try:
@@ -827,10 +853,12 @@ class GuiBackend:
         if len(schema_text) > 4000:
             schema_text = schema_text[:4000] + "\n..."
         environment = ", ".join(f"`{e}`" for e in server.get("required_environment") or [])
+        url = self.docs.mcp_tools.get(f"{server_id}/{tool['tool_name']}")
+        docs = f" · [documentation ↗]({url})" if url else ""
         return (
             f"### `{tool['tool_name']}`\n"
             f"Server **{server.get('name') or server_id}** (`{server_id}`) · source {source} · "
-            f"license {server.get('license') or '?'} · category **{tool['category']}**\n\n"
+            f"license {server.get('license') or '?'} · category **{tool['category']}**{docs}\n\n"
             f"{tool.get('description') or tool['summary']}\n\n"
             "**Required arguments:** "
             + (", ".join(f"`{name}`" for name in required) or "none")
@@ -851,7 +879,13 @@ class GuiBackend:
         found = search_skills(query, limit=40)
         items = found.get("skills", [])
         rows = [
-            [s["id"], s.get("category", ""), s.get("source_id", ""), s.get("description", "")[:200]]
+            [
+                s["id"],
+                docs_cell(self.docs.skills.get(s["id"])),
+                s.get("category", ""),
+                s.get("source_id", ""),
+                s.get("description", "")[:200],
+            ]
             for s in items
         ]
         names = [s["id"] for s in items]
@@ -876,9 +910,11 @@ class GuiBackend:
             else ""
         )
         source = doc.get("attribution", meta.get("source_id", ""))
+        url = self.docs.skills.get(str(meta.get("id") or skill_id))
+        docs = f" · [documentation ↗]({url})" if url else ""
         head = (
             f"**{skill_id}** · {meta.get('category', '')} · license {meta.get('license', '?')} · "
-            f"source [{source}]({doc.get('upstream_url', '')})\n\n"
+            f"source [{source}]({doc.get('upstream_url', '')}){docs}\n\n"
             f"> Install for an agent: `dnakit skills install {skill_id} --agent claude-code` "
             f"(or `--agent codex`, `--agent cursor`)\n\n---\n"
         )
