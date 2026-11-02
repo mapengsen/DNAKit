@@ -12,13 +12,15 @@ Package page: [pypi.org/project/dnakit](https://pypi.org/project/dnakit/)
 
 ## Other platforms
 
-The project repository has provided the following platform adaptation files:
+DNAKit is also available from the following platforms:
 
-- [Bioconda Formula](https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda);
-- [GNU Guix package definition](https://github.com/mapengsen/DNAKit/tree/main/packaging/guix);
-- [Galaxy Tool Shed wrapper](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit).
+- [Bioconda](https://anaconda.org/bioconda/dnakit) (`0.2.0`):
 
-These adaptation files are pinned to `0.1.1`, and the official installation command needs to be reviewed and released by the corresponding platform before it can be used.
+    ```bash
+    conda install -c conda-forge -c bioconda dnakit
+    ```
+
+- [Galaxy Main Tool Shed](https://toolshed.g2.bx.psu.edu/view/mapengsen/dnakit/9f6dc4f3006b): four tools pinned to `0.1.1` ([wrapper source](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)).
 
 ## Development environment
 

@@ -12,13 +12,15 @@ pip install dnakit==0.2.0
 
 ## 其他平台
 
-项目仓库已提供以下平台适配文件：
+DNAKit 也可以通过以下平台获取：
 
-- [Bioconda 配方](https://github.com/mapengsen/DNAKit/tree/main/packaging/bioconda)；
-- [GNU Guix 包定义](https://github.com/mapengsen/DNAKit/tree/main/packaging/guix)；
-- [Galaxy Tool Shed 包装器](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)。
+- [Bioconda](https://anaconda.org/bioconda/dnakit)（`0.2.0`）：
 
-这些适配文件固定对应 `0.1.1`，正式安装命令需要等相应平台审核并发布后才能使用。
+    ```bash
+    conda install -c conda-forge -c bioconda dnakit
+    ```
+
+- [Galaxy Main Tool Shed](https://toolshed.g2.bx.psu.edu/view/mapengsen/dnakit/9f6dc4f3006b)：4 个工具，固定对应 `0.1.1`（[包装器源码](https://github.com/mapengsen/DNAKit/tree/main/galaxy/dnakit)）。
 
 ## 开发环境
 
