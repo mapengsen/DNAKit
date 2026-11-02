@@ -49,11 +49,6 @@ DNAKit is a reproducible analysis toolkit that makes DNA and gene operations con
 
 **GitHub repository:** [github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
 
-<div id="wechat-community" class="wechat-community" aria-labelledby="wechat-title">
-  <strong id="wechat-title">WeChat community:</strong>
-  <img src="../assets/images/community/wechat-community-qr.png" alt="QR code for the DNAKit WeChat community contact" loading="lazy">
-</div>
-
 # Cite DNAKit {#citing-dnakit}
 
 DNAKit does not yet have a published paper or DOI. The current citation information is

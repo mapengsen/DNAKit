@@ -49,11 +49,6 @@ DNAKit 是面向 DNA/基因方便操作的可复现分析工具包。它提供�
 
 **Github仓库：**[github.com/mapengsen/DNAKit](https://github.com/mapengsen/DNAKit)
 
-<div id="wechat-community" class="wechat-community" aria-labelledby="wechat-title">
-  <strong id="wechat-title">微信社区：</strong>
-  <img src="assets/images/community/wechat-community-qr.png" alt="DNAKit 微信社区联系人二维码" loading="lazy">
-</div>
-
 # 引用 DNAKit
 
 DNAKit 尚未发布论文或 DOI；当前版本的中文引用信息保存在仓库 `README_CN.md` 中，可引用为：
