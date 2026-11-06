@@ -37,7 +37,12 @@ def _whatshap(
     stdout_file: Path | None = None,
 ) -> dict[str, Any]:
     return _p14_cli.run(
-        "whatshap", [sub, *arguments], cwd=cwd, expected=expected, explicit=whatshap_path, hint=_HINT,
+        "whatshap",
+        [sub, *arguments],
+        cwd=cwd,
+        expected=expected,
+        explicit=whatshap_path,
+        hint=_HINT,
         stdout_file=stdout_file,
     )
 
@@ -73,7 +78,11 @@ def _common(
 
 
 def _reference(reference: str | None) -> list[str]:
-    return [] if reference is None else ["--reference", str(_gap_cli.existing_file(reference, "reference"))]
+    return (
+        []
+        if reference is None
+        else ["--reference", str(_gap_cli.existing_file(reference, "reference"))]
+    )
 
 
 def whatshap_phase_with_pedigree(
@@ -114,7 +123,10 @@ def whatshap_phase_with_pedigree(
     if genetic_map is not None:
         arguments += ["--genmap", str(_gap_cli.existing_file(genetic_map, "genetic_map"))]
     if recombination_rate is not None:
-        arguments += ["--recombrate", str(_gap_cli.number(recombination_rate, "recombination_rate", minimum=0.0))]
+        arguments += [
+            "--recombrate",
+            str(_gap_cli.number(recombination_rate, "recombination_rate", minimum=0.0)),
+        ]
     if recombination_list is not None:
         listing = _gap_cli.new_file(recombination_list, "recombination_list")
         arguments += ["--recombination-list", str(listing)]
@@ -128,10 +140,15 @@ def whatshap_phase_with_pedigree(
     if algorithm is not None:
         arguments += ["--algorithm", _gap_cli.choice(algorithm, _ALGORITHMS, "algorithm")]
     if mapping_quality is not None:
-        arguments += ["--mapping-quality", str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255))]
+        arguments += [
+            "--mapping-quality",
+            str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255)),
+        ]
     arguments += _common(sample, chromosome, None, tag, only_snvs, distrust_genotypes)
     arguments += [str(vcf_path), *_files(alignments, "alignments")]
-    return _whatshap("phase", arguments, cwd=output_path.parent, expected=expected, whatshap_path=whatshap_path)
+    return _whatshap(
+        "phase", arguments, cwd=output_path.parent, expected=expected, whatshap_path=whatshap_path
+    )
 
 
 def whatshap_polyphase(
@@ -165,9 +182,21 @@ def whatshap_polyphase(
     """
     vcf_path = _gap_cli.existing_file(vcf, "vcf")
     output_path = _gap_cli.new_file(output, "output")
-    arguments = ["-o", str(output_path), "--ploidy", str(_gap_cli.integer(ploidy, "ploidy", minimum=2, maximum=16))] + _reference(reference)
+    arguments = [
+        "-o",
+        str(output_path),
+        "--ploidy",
+        str(_gap_cli.integer(ploidy, "ploidy", minimum=2, maximum=16)),
+    ] + _reference(reference)
     if block_cut_sensitivity is not None:
-        arguments += ["--block-cut-sensitivity", str(_gap_cli.integer(block_cut_sensitivity, "block_cut_sensitivity", minimum=0, maximum=5))]
+        arguments += [
+            "--block-cut-sensitivity",
+            str(
+                _gap_cli.integer(
+                    block_cut_sensitivity, "block_cut_sensitivity", minimum=0, maximum=5
+                )
+            ),
+        ]
     if min_overlap is not None:
         arguments += ["--min-overlap", str(_gap_cli.integer(min_overlap, "min_overlap", minimum=1))]
     for value, flag_name, name in (
@@ -178,12 +207,24 @@ def whatshap_polyphase(
         if _p14_cli.flag(value, name):
             arguments.append(flag_name)
     if mapping_quality is not None:
-        arguments += ["--mapping-quality", str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255))]
+        arguments += [
+            "--mapping-quality",
+            str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255)),
+        ]
     if threads is not None:
-        arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     arguments += _common(sample, chromosome, None, tag, only_snvs, distrust_genotypes)
     arguments += [str(vcf_path), *_files(alignments, "alignments")]
-    return _whatshap("polyphase", arguments, cwd=output_path.parent, expected=[output_path], whatshap_path=whatshap_path)
+    return _whatshap(
+        "polyphase",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_polyphase_with_progeny(
@@ -212,16 +253,33 @@ def whatshap_polyphase_with_progeny(
     vcf_path = _gap_cli.existing_file(vcf, "vcf")
     ped = _gap_cli.existing_file(pedigree, "pedigree")
     output_path = _gap_cli.new_file(output, "output")
-    arguments = ["-o", str(output_path), "--ploidy", str(_gap_cli.integer(ploidy, "ploidy", minimum=2, maximum=16))]
+    arguments = [
+        "-o",
+        str(output_path),
+        "--ploidy",
+        str(_gap_cli.integer(ploidy, "ploidy", minimum=2, maximum=16)),
+    ]
     if progeny_file is not None:
         arguments += ["-P", str(_gap_cli.existing_file(progeny_file, "progeny_file"))]
     if scoring_window is not None:
-        arguments += ["--scoring-window", str(_gap_cli.integer(scoring_window, "scoring_window", minimum=1))]
+        arguments += [
+            "--scoring-window",
+            str(_gap_cli.integer(scoring_window, "scoring_window", minimum=1)),
+        ]
     if complexity_support is not None:
-        arguments += ["--complexity-support", str(_gap_cli.integer(complexity_support, "complexity_support", minimum=1))]
+        arguments += [
+            "--complexity-support",
+            str(_gap_cli.integer(complexity_support, "complexity_support", minimum=1)),
+        ]
     arguments += _common(sample, chromosome, None, tag, only_snvs, distrust_genotypes)
     arguments += [str(vcf_path), str(ped)]
-    return _whatshap("polyphasegenetic", arguments, cwd=output_path.parent, expected=[output_path], whatshap_path=whatshap_path)
+    return _whatshap(
+        "polyphasegenetic",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_phasing_statistics(
@@ -247,20 +305,30 @@ def whatshap_phasing_statistics(
     tsv_path = _gap_cli.new_file(tsv, "tsv")
     arguments = ["--tsv", str(tsv_path)]
     expected = [tsv_path]
-    for value, flag_name, name in ((gtf, "--gtf", "gtf"), (block_list, "--block-list", "block_list")):
+    for value, flag_name, name in (
+        (gtf, "--gtf", "gtf"),
+        (block_list, "--block-list", "block_list"),
+    ):
         if value is not None:
             target = _gap_cli.new_file(value, name)
             arguments += [flag_name, str(target)]
             expected.append(target)
     if chromosome_lengths is not None:
-        arguments += ["--chr-lengths", str(_gap_cli.existing_file(chromosome_lengths, "chromosome_lengths"))]
+        arguments += [
+            "--chr-lengths",
+            str(_gap_cli.existing_file(chromosome_lengths, "chromosome_lengths")),
+        ]
     arguments += _common(sample, chromosome, None, None, only_snvs, False) + [str(vcf_path)]
-    result = _whatshap("stats", arguments, cwd=tsv_path.parent, expected=expected, whatshap_path=whatshap_path)
+    result = _whatshap(
+        "stats", arguments, cwd=tsv_path.parent, expected=expected, whatshap_path=whatshap_path
+    )
     if result["status"] == "completed":
         lines = tsv_path.read_text(encoding="utf-8").lstrip("#").splitlines()
         if len(lines) >= 2:
             names = lines[0].split("\t")
-            result["statistics"] = [dict(zip(names, row.split("\t"), strict=False)) for row in lines[1:] if row.strip()]
+            result["statistics"] = [
+                dict(zip(names, row.split("\t"), strict=False)) for row in lines[1:] if row.strip()
+            ]
     return result
 
 
@@ -289,16 +357,29 @@ def whatshap_compare_phasing(
     files = _files(vcfs, "vcfs")
     if len(files) < 2:
         raise ConfigurationError("vcfs must list at least two VCF files.")
-    if tsv_pairwise is None and tsv_multiway is None and switch_error_bed is None and longest_block_tsv is None:
-        raise ConfigurationError("Request at least one output file (tsv_pairwise, tsv_multiway, switch_error_bed, longest_block_tsv).")
-    folders = {Path(item).expanduser().resolve().parent for item in (tsv_pairwise, tsv_multiway, switch_error_bed, longest_block_tsv) if item is not None}
+    if (
+        tsv_pairwise is None
+        and tsv_multiway is None
+        and switch_error_bed is None
+        and longest_block_tsv is None
+    ):
+        raise ConfigurationError(
+            "Request at least one output file (tsv_pairwise, tsv_multiway, switch_error_bed, longest_block_tsv)."
+        )
+    folders = {
+        Path(item).expanduser().resolve().parent
+        for item in (tsv_pairwise, tsv_multiway, switch_error_bed, longest_block_tsv)
+        if item is not None
+    }
     if len(folders) != 1:
         raise ConfigurationError("All requested output files must be in the same folder.")
     arguments: list[str] = []
     expected: list[Path] = []
     for value, flag_name, name in (
-        (tsv_pairwise, "--tsv-pairwise", "tsv_pairwise"), (tsv_multiway, "--tsv-multiway", "tsv_multiway"),
-        (switch_error_bed, "--switch-error-bed", "switch_error_bed"), (longest_block_tsv, "--longest-block-tsv", "longest_block_tsv"),
+        (tsv_pairwise, "--tsv-pairwise", "tsv_pairwise"),
+        (tsv_multiway, "--tsv-multiway", "tsv_multiway"),
+        (switch_error_bed, "--switch-error-bed", "switch_error_bed"),
+        (longest_block_tsv, "--longest-block-tsv", "longest_block_tsv"),
     ):
         if value is not None:
             target = _gap_cli.new_file(value, name)
@@ -311,12 +392,29 @@ def whatshap_compare_phasing(
     if ploidy is not None:
         arguments += ["--ploidy", str(_gap_cli.integer(ploidy, "ploidy", minimum=2, maximum=16))]
     arguments += _common(sample, None, None, None, only_snvs, False) + files
-    result = _whatshap("compare", arguments, cwd=next(iter(folders)), expected=expected, whatshap_path=whatshap_path)
+    result = _whatshap(
+        "compare",
+        arguments,
+        cwd=next(iter(folders)),
+        expected=expected,
+        whatshap_path=whatshap_path,
+    )
     if result["status"] == "completed" and tsv_pairwise is not None:
-        lines = Path(tsv_pairwise).expanduser().resolve().read_text(encoding="utf-8").lstrip("#").splitlines()
+        lines = (
+            Path(tsv_pairwise)
+            .expanduser()
+            .resolve()
+            .read_text(encoding="utf-8")
+            .lstrip("#")
+            .splitlines()
+        )
         if len(lines) >= 2:
             names_row = lines[0].split("\t")
-            result["pairwise"] = [dict(zip(names_row, row.split("\t"), strict=False)) for row in lines[1:] if row.strip()]
+            result["pairwise"] = [
+                dict(zip(names_row, row.split("\t"), strict=False))
+                for row in lines[1:]
+                if row.strip()
+            ]
     return result
 
 
@@ -331,7 +429,14 @@ def whatshap_unphase_vcf(
     PS, HP and related fields are dropped. Writes a new VCF."""
     vcf_path = _gap_cli.existing_file(vcf, "vcf")
     output_path = _gap_cli.new_file(output, "output")
-    return _whatshap("unphase", [str(vcf_path)], cwd=output_path.parent, expected=[], whatshap_path=whatshap_path, stdout_file=output_path)
+    return _whatshap(
+        "unphase",
+        [str(vcf_path)],
+        cwd=output_path.parent,
+        expected=[],
+        whatshap_path=whatshap_path,
+        stdout_file=output_path,
+    )
 
 
 def whatshap_haplotag_reads(
@@ -385,13 +490,32 @@ def whatshap_haplotag_reads(
         if _p14_cli.flag(value, name):
             arguments.append(flag_name)
     if linked_read_distance_cutoff is not None:
-        arguments += ["--linked-read-distance-cutoff", str(_gap_cli.integer(linked_read_distance_cutoff, "linked_read_distance_cutoff", minimum=1))]
+        arguments += [
+            "--linked-read-distance-cutoff",
+            str(
+                _gap_cli.integer(
+                    linked_read_distance_cutoff, "linked_read_distance_cutoff", minimum=1
+                )
+            ),
+        ]
     if tag_supplementary is not None:
-        arguments += ["--tag-supplementary", _gap_cli.choice(tag_supplementary, _SUPPLEMENTARY, "tag_supplementary")]
+        arguments += [
+            "--tag-supplementary",
+            _gap_cli.choice(tag_supplementary, _SUPPLEMENTARY, "tag_supplementary"),
+        ]
     if threads is not None:
-        arguments += ["--output-threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--output-threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     arguments += [str(vcf_path), str(alignment)]
-    return _whatshap("haplotag", arguments, cwd=output_path.parent, expected=expected, whatshap_path=whatshap_path)
+    return _whatshap(
+        "haplotag",
+        arguments,
+        cwd=output_path.parent,
+        expected=expected,
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_genotype_variants(
@@ -430,19 +554,37 @@ def whatshap_genotype_variants(
     if pedigree is not None:
         arguments += ["--ped", str(_gap_cli.existing_file(pedigree, "pedigree"))]
     elif genetic_map is not None or recombination_rate is not None or use_ped_samples:
-        raise ConfigurationError("genetic_map, recombination_rate and use_ped_samples need pedigree.")
+        raise ConfigurationError(
+            "genetic_map, recombination_rate and use_ped_samples need pedigree."
+        )
     if genetic_map is not None:
         arguments += ["--genmap", str(_gap_cli.existing_file(genetic_map, "genetic_map"))]
     if recombination_rate is not None:
-        arguments += ["--recombrate", str(_gap_cli.number(recombination_rate, "recombination_rate", minimum=0.0))]
+        arguments += [
+            "--recombrate",
+            str(_gap_cli.number(recombination_rate, "recombination_rate", minimum=0.0)),
+        ]
     if _p14_cli.flag(use_ped_samples, "use_ped_samples"):
         arguments.append("--use-ped-samples")
     if max_coverage is not None:
-        arguments += ["--max-coverage", str(_gap_cli.integer(max_coverage, "max_coverage", minimum=1))]
+        arguments += [
+            "--max-coverage",
+            str(_gap_cli.integer(max_coverage, "max_coverage", minimum=1)),
+        ]
     if mapping_quality is not None:
-        arguments += ["--mapping-quality", str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255))]
+        arguments += [
+            "--mapping-quality",
+            str(_gap_cli.integer(mapping_quality, "mapping_quality", minimum=0, maximum=255)),
+        ]
     if genotype_quality_threshold is not None:
-        arguments += ["--gt-qual-threshold", str(_gap_cli.number(genotype_quality_threshold, "genotype_quality_threshold", minimum=0.0))]
+        arguments += [
+            "--gt-qual-threshold",
+            str(
+                _gap_cli.number(
+                    genotype_quality_threshold, "genotype_quality_threshold", minimum=0.0
+                )
+            ),
+        ]
     if _p14_cli.flag(no_priors, "no_priors"):
         arguments.append("--no-priors")
     if prior_output is not None:
@@ -451,7 +593,13 @@ def whatshap_genotype_variants(
         expected.append(prior)
     arguments += _common(sample, chromosome, None, None, only_snvs, False)
     arguments += [str(vcf_path), *_files(alignments, "alignments")]
-    return _whatshap("genotype", arguments, cwd=output_path.parent, expected=expected, whatshap_path=whatshap_path)
+    return _whatshap(
+        "genotype",
+        arguments,
+        cwd=output_path.parent,
+        expected=expected,
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_find_snv_candidates(
@@ -483,12 +631,21 @@ def whatshap_find_snv_candidates(
     if min_alt_depth is not None:
         arguments += ["--minabs", str(_gap_cli.integer(min_alt_depth, "min_alt_depth", minimum=1))]
     if min_alt_fraction is not None:
-        arguments += ["--minrel", str(_gap_cli.number(min_alt_fraction, "min_alt_fraction", minimum=0.0, maximum=1.0))]
+        arguments += [
+            "--minrel",
+            str(_gap_cli.number(min_alt_fraction, "min_alt_fraction", minimum=0.0, maximum=1.0)),
+        ]
     if _p14_cli.flag(multi_allelic, "multi_allelic"):
         arguments.append("--multi-allelics")
     arguments += _common(sample, chromosome, None, None, False, False)
     arguments += [str(ref), str(bam)]
-    return _whatshap("find_snv_candidates", arguments, cwd=output_path.parent, expected=[output_path], whatshap_path=whatshap_path)
+    return _whatshap(
+        "find_snv_candidates",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_split_reads(
@@ -515,7 +672,12 @@ def whatshap_split_reads(
     """
     source = _gap_cli.existing_file(reads, "reads")
     listing = _gap_cli.existing_file(haplotype_list, "haplotype_list")
-    targets = [(output_h1, "--output-h1", "output_h1"), (output_h2, "--output-h2", "output_h2"), (output_untagged, "--output-untagged", "output_untagged"), (read_lengths_histogram, "--read-lengths-histogram", "read_lengths_histogram")]
+    targets = [
+        (output_h1, "--output-h1", "output_h1"),
+        (output_h2, "--output-h2", "output_h2"),
+        (output_untagged, "--output-untagged", "output_untagged"),
+        (read_lengths_histogram, "--read-lengths-histogram", "read_lengths_histogram"),
+    ]
     if all(item[0] is None for item in targets):
         raise ConfigurationError("Give at least one output file.")
     arguments: list[str] = []
@@ -526,7 +688,8 @@ def whatshap_split_reads(
             arguments += [flag_name, str(target)]
             expected.append(target)
     for value, flag_name, name in (
-        (add_untagged, "--add-untagged", "add_untagged"), (only_largest_block, "--only-largest-block", "only_largest_block"),
+        (add_untagged, "--add-untagged", "add_untagged"),
+        (only_largest_block, "--only-largest-block", "only_largest_block"),
         (discard_unknown_reads, "--discard-unknown-reads", "discard_unknown_reads"),
     ):
         if _p14_cli.flag(value, name):
@@ -535,7 +698,9 @@ def whatshap_split_reads(
     folders = {path.parent for path in expected}
     if len(folders) != 1:
         raise ConfigurationError("All output files must be in the same folder.")
-    return _whatshap("split", arguments, cwd=next(iter(folders)), expected=expected, whatshap_path=whatshap_path)
+    return _whatshap(
+        "split", arguments, cwd=next(iter(folders)), expected=expected, whatshap_path=whatshap_path
+    )
 
 
 def whatshap_learn_error_profile(
@@ -564,7 +729,13 @@ def whatshap_learn_error_profile(
     if window is not None:
         arguments += ["--window", str(_gap_cli.integer(window, "window", minimum=1))]
     arguments += [str(bam), str(vcf_path)]
-    return _whatshap("learn", arguments, cwd=output_path.parent, expected=[output_path], whatshap_path=whatshap_path)
+    return _whatshap(
+        "learn",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        whatshap_path=whatshap_path,
+    )
 
 
 def whatshap_phase_from_haplotags(
@@ -595,18 +766,28 @@ def whatshap_phase_from_haplotags(
     output_path = _gap_cli.new_file(output, "output")
     arguments = ["-o", str(output_path)] + _reference(reference)
     if gap_threshold is not None:
-        arguments += ["--gap-threshold", str(_gap_cli.number(gap_threshold, "gap_threshold", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "--gap-threshold",
+            str(_gap_cli.number(gap_threshold, "gap_threshold", minimum=0.0, maximum=100.0)),
+        ]
     if cut_poly is not None:
         arguments += ["--cut-poly", str(_gap_cli.integer(cut_poly, "cut_poly", minimum=1))]
     for value, flag_name, name in (
-        (only_indels, "--only-indels", "only_indels"), (no_multi_allelic, "--no-mav", "no_multi_allelic"),
+        (only_indels, "--only-indels", "only_indels"),
+        (no_multi_allelic, "--no-mav", "no_multi_allelic"),
         (ignore_read_groups, "--ignore-read-groups", "ignore_read_groups"),
     ):
         if _p14_cli.flag(value, name):
             arguments.append(flag_name)
     arguments += _common(sample, chromosome, None, None, False, False)
     arguments += [str(vcf_path), str(alignment)]
-    return _whatshap("haplotagphase", arguments, cwd=output_path.parent, expected=[output_path], whatshap_path=whatshap_path)
+    return _whatshap(
+        "haplotagphase",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        whatshap_path=whatshap_path,
+    )
 
 
 __all__ = [

@@ -22,7 +22,9 @@ _ANNOTATIONS = ("refGene", "ensGene", "knownGene", "ncbiRefSeq")
 
 def _annotation(value: str) -> str:
     if value not in _ANNOTATIONS:
-        raise ConfigurationError(f"annotation must be one of {', '.join(_ANNOTATIONS)}; got {value!r}.")
+        raise ConfigurationError(
+            f"annotation must be one of {', '.join(_ANNOTATIONS)}; got {value!r}."
+        )
     return value
 
 
@@ -72,7 +74,9 @@ def read_ucsc_gtf(
             raise ConfigurationError(f"local_gtf must be an existing file: {source}")
         source_text = str(source)
         compressed = source.suffix == ".gz"
-        retrieved = datetime.datetime.fromtimestamp(source.stat().st_mtime, tz=datetime.timezone.utc).date()
+        retrieved = datetime.datetime.fromtimestamp(
+            source.stat().st_mtime, tz=datetime.timezone.utc
+        ).date()
         table = parse_gtf(str(source), compressed=compressed)
     else:
         source_text = ucsc_gtf_url(code, kind)
@@ -87,7 +91,7 @@ def read_ucsc_gtf(
         "annotation": kind,
         "source": source_text,
         "source_date": retrieved.isoformat(),
-        "row_count": int(len(table)),
+        "row_count": len(table),
         "columns": [str(column) for column in table.columns],
         "rows_per_chromosome": {str(name): int(count) for name, count in counts.items()},
         "output_table": str(target),

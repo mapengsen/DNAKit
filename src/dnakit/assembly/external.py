@@ -24,8 +24,10 @@ def _input_directory(value: str | Path, name: str) -> Path:
 
 
 def _validate_program(program: str) -> str:
-    if not isinstance(program, str) or not program.strip() or any(
-        character in program for character in ("\x00", "\n", "\r")
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(character in program for character in ("\x00", "\n", "\r"))
     ):
         raise ConfigurationError("program must be a non-empty executable name without newlines.")
     return program.strip()
@@ -56,7 +58,9 @@ def assemble_shasta(
     if any(character.isspace() for character in config) or any(
         character in config for character in (";", "|", "&", "\x00")
     ):
-        raise ConfigurationError("config must be one Shasta configuration name without shell characters.")
+        raise ConfigurationError(
+            "config must be one Shasta configuration name without shell characters."
+        )
     program = _validate_program(program)
     if threads is not None and (
         isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256
@@ -185,13 +189,17 @@ def run_busco(
     if any(character.isspace() for character in lineage) or any(
         character in lineage for character in (";", "|", "&", "\x00")
     ):
-        raise ConfigurationError("lineage must be a BUSCO dataset name or path without shell characters.")
+        raise ConfigurationError(
+            "lineage must be a BUSCO dataset name or path without shell characters."
+        )
     if mode not in {"genome", "transcriptome", "proteins"}:
         raise ConfigurationError("mode must be genome, transcriptome or proteins.")
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
-    if not isinstance(output_name, str) or not output_name.strip() or any(
-        character in output_name for character in ("/", "\\", "\x00", "\n", "\r")
+    if (
+        not isinstance(output_name, str)
+        or not output_name.strip()
+        or any(character in output_name for character in ("/", "\\", "\x00", "\n", "\r"))
     ):
         raise ConfigurationError("output_name must be a simple directory name.")
     config = ExecutionConfig(
@@ -202,8 +210,18 @@ def run_busco(
     )
     directory = workspace(output_directory)
     arguments = [
-        "-i", str(input_path_value), "-l", lineage.strip(), "-m", mode,
-        "-o", output_name.strip(), "--out_path", str(directory), "-c", str(threads),
+        "-i",
+        str(input_path_value),
+        "-l",
+        lineage.strip(),
+        "-m",
+        mode,
+        "-o",
+        output_name.strip(),
+        "--out_path",
+        str(directory),
+        "-c",
+        str(threads),
     ]
     log = run(program, arguments, directory, config)
     return serialize_for_agent(
@@ -265,7 +283,16 @@ def assemble_flye(
     )
     directory = workspace(output_directory)
     assembly = directory / "assembly.fasta"
-    arguments = [f"--{platform}", str(reads_path), "--genome-size", genome_size.strip(), "--out-dir", str(directory), "--threads", str(threads)]
+    arguments = [
+        f"--{platform}",
+        str(reads_path),
+        "--genome-size",
+        genome_size.strip(),
+        "--out-dir",
+        str(directory),
+        "--threads",
+        str(threads),
+    ]
     log = run(program, arguments, directory, config, outputs=(assembly,))
     return serialize_for_agent(
         {
@@ -376,8 +403,10 @@ def assemble_hifiasm(
     program = _validate_program(program)
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
-    if not isinstance(prefix, str) or not prefix.strip() or any(
-        character in prefix for character in ("/", "\\", "\x00", "\n", "\r")
+    if (
+        not isinstance(prefix, str)
+        or not prefix.strip()
+        or any(character in prefix for character in ("/", "\\", "\x00", "\n", "\r"))
     ):
         raise ConfigurationError("prefix must be a simple output stem.")
     config = ExecutionConfig(
@@ -489,6 +518,8 @@ def assemble_unicycler(
         },
         verbose=verbose,
     )
+
+
 __all__ = [
     "assemble_flye",
     "assemble_hifiasm",

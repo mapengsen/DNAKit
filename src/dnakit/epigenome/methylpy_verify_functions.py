@@ -83,7 +83,9 @@ def _input_files(values: object) -> list[Path]:
     return paths
 
 
-def _output_files(values: object, compress: bool, inputs: Sequence[Path]) -> tuple[list[Path], list[Path]]:
+def _output_files(
+    values: object, compress: bool, inputs: Sequence[Path]
+) -> tuple[list[Path], list[Path]]:
     """Return the names given to methylpy and the final names (methylpy appends .gz when compressing)."""
 
     if isinstance(values, (str, bytes, Path)) or not isinstance(values, Sequence):
@@ -105,9 +107,13 @@ def _output_files(values: object, compress: bool, inputs: Sequence[Path]) -> tup
         final = name + ".gz" if compress and not name.endswith(".gz") else name
         final_path = Path(final)
         if final_path.exists():
-            raise ConfigurationError(f"{final_path.name} already exists and will not be overwritten.")
+            raise ConfigurationError(
+                f"{final_path.name} already exists and will not be overwritten."
+            )
         if str(final_path.resolve()) in taken:
-            raise ConfigurationError(f"output {final_path.name} would overwrite an input or another output.")
+            raise ConfigurationError(
+                f"output {final_path.name} would overwrite an input or another output."
+            )
         taken.add(str(final_path.resolve()))
         given.append(path)
         finals.append(final_path)
@@ -258,7 +264,7 @@ def methylpy_filter_allc_files(
         "inputs": [str(path) for path in inputs],
         "outputs": [
             {"input": str(src), "output": str(dst), "records_in": before, "records_out": after}
-            for src, dst, before, after in zip(inputs, finals, counts_in, counts_out)
+            for src, dst, before, after in zip(inputs, finals, counts_in, counts_out, strict=False)
         ],
         "filters": {"mc_type": contexts, "chroms": chrom_list, "min_cov": low, "max_cov": high},
         "compressed": compress,

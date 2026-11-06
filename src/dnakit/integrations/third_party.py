@@ -37,6 +37,7 @@ def _name_key(value: str) -> str:
         "pysbol3": "sbol3",
     }.get(normalized, normalized)
 
+
 _NATIVE_FACADES: dict[str, dict[str, Any]] = {
     "mafft": {
         "api": "dnakit.alignment.align_sequences",
@@ -55,9 +56,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.alignment.align_sequences"],
         "sources": ["https://github.com/rcedgar/muscle"],
         "citation_dois": ["10.1038/s41467-022-34630-w"],
-        "citation_references": [
-            "Edgar (2022), DOI 10.1038/s41467-022-34630-w"
-        ],
+        "citation_references": ["Edgar (2022), DOI 10.1038/s41467-022-34630-w"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs a caller-installed MUSCLE 5 executable through the bounded multiple-"
@@ -85,9 +84,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         ],
         "sources": ["https://blast.ncbi.nlm.nih.gov/doc/blast-help/"],
         "citation_dois": ["10.1186/1471-2105-10-421"],
-        "citation_references": [
-            "Camacho et al. (2009), DOI 10.1186/1471-2105-10-421"
-        ],
+        "citation_references": ["Camacho et al. (2009), DOI 10.1186/1471-2105-10-421"],
         "license_evidence": ["Public domain (NCBI BLAST+ software)"],
         "boundary": (
             "Builds a local nucleotide BLAST database and runs fixed-format blastn XML; "
@@ -125,9 +122,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.alignment.sort_bed_bedops"],
         "sources": ["https://github.com/bedops/bedops"],
         "citation_dois": ["10.1093/bioinformatics/bts277"],
-        "citation_references": [
-            "Neph et al. (2012), DOI 10.1093/bioinformatics/bts277"
-        ],
+        "citation_references": ["Neph et al. (2012), DOI 10.1093/bioinformatics/bts277"],
         "license_evidence": ["GPL-2.0"],
         "boundary": (
             "Runs caller-installed BEDOPS sort-bed for a bounded BED sort operation; "
@@ -151,9 +146,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.ngs.map_reads"],
         "sources": ["https://github.com/bwa-mem2/bwa-mem2"],
         "citation_dois": ["10.1109/IPDPS.2019.00041"],
-        "citation_references": [
-            "Vasimuddin et al. (2019), DOI 10.1109/IPDPS.2019.00041"
-        ],
+        "citation_references": ["Vasimuddin et al. (2019), DOI 10.1109/IPDPS.2019.00041"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs a caller-installed BWA-MEM2 executable through the bounded map_reads facade; "
@@ -165,9 +158,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.phylogeny.infer_ml_tree"],
         "sources": ["https://github.com/iqtree/iqtree2"],
         "citation_dois": ["10.1093/molbev/msaa015"],
-        "citation_references": [
-            "Minh et al. (2020), DOI 10.1093/molbev/msaa015"
-        ],
+        "citation_references": ["Minh et al. (2020), DOI 10.1093/molbev/msaa015"],
         "license_evidence": ["GPL-2.0"],
         "boundary": (
             "Runs caller-installed IQ-TREE 2 for bounded maximum-likelihood tree inference; "
@@ -179,9 +170,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.phylogeny.infer_fast_tree"],
         "sources": ["https://github.com/morgannprice/fasttree"],
         "citation_dois": ["10.1371/journal.pone.0009490"],
-        "citation_references": [
-            "Price, Dehal & Arkin (2010), DOI 10.1371/journal.pone.0009490"
-        ],
+        "citation_references": ["Price, Dehal & Arkin (2010), DOI 10.1371/journal.pone.0009490"],
         "license_evidence": ["GPL-3.0"],
         "boundary": (
             "Runs a caller-installed FastTree executable for bounded approximate maximum-"
@@ -193,9 +182,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.assemble_shasta"],
         "sources": ["https://github.com/paoloshasta/shasta"],
         "citation_dois": ["10.1038/s41587-020-0503-6"],
-        "citation_references": [
-            "Shafin et al. (2020), DOI 10.1038/s41587-020-0503-6"
-        ],
+        "citation_references": ["Shafin et al. (2020), DOI 10.1038/s41587-020-0503-6"],
         "license_evidence": ["MIT (current Shasta source LICENSE)"],
         "boundary": (
             "Runs a caller-installed Shasta long-read assembler with bounded input, "
@@ -208,9 +195,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.evaluate_merqury"],
         "sources": ["https://github.com/marbl/merqury"],
         "citation_dois": ["10.1186/s13059-020-02134-9"],
-        "citation_references": [
-            "Rhie et al. (2020), DOI 10.1186/s13059-020-02134-9"
-        ],
+        "citation_references": ["Rhie et al. (2020), DOI 10.1186/s13059-020-02134-9"],
         "license_evidence": ["Public domain / United States Government Work"],
         "boundary": (
             "Runs a caller-installed Merqury evaluation with an existing Meryl read database "
@@ -223,9 +208,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.run_busco"],
         "sources": ["https://gitlab.com/ezlab/busco"],
         "citation_dois": ["10.1093/molbev/msab199"],
-        "citation_references": [
-            "Manni et al. (2021), DOI 10.1093/molbev/msab199"
-        ],
+        "citation_references": ["Manni et al. (2021), DOI 10.1093/molbev/msab199"],
         "license_evidence": ["MIT (BUSCO software; lineage datasets have separate terms)"],
         "boundary": (
             "Runs a caller-installed BUSCO completeness assessment with bounded input, lineage, "
@@ -238,9 +221,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.assemble_flye"],
         "sources": ["https://github.com/mikolmogorov/Flye"],
         "citation_dois": ["10.1038/s41587-019-0072-8"],
-        "citation_references": [
-            "Kolmogorov et al. (2019), DOI 10.1038/s41587-019-0072-8"
-        ],
+        "citation_references": ["Kolmogorov et al. (2019), DOI 10.1038/s41587-019-0072-8"],
         "license_evidence": ["BSD-3-Clause"],
         "boundary": (
             "Runs caller-installed Flye for bounded long-read assembly with fixed platform, "
@@ -253,9 +234,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.assemble_hifiasm"],
         "sources": ["https://github.com/chhylp123/hifiasm"],
         "citation_dois": ["10.1038/s41592-020-01056-5"],
-        "citation_references": [
-            "Cheng et al. (2021), DOI 10.1038/s41592-020-01056-5"
-        ],
+        "citation_references": ["Cheng et al. (2021), DOI 10.1038/s41592-020-01056-5"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed hifiasm for bounded HiFi assembly graph generation; "
@@ -267,9 +246,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.assembly.assemble_megahit"],
         "sources": ["https://github.com/voutcn/megahit"],
         "citation_dois": ["10.1093/bioinformatics/btv033"],
-        "citation_references": [
-            "Li et al. (2015), DOI 10.1093/bioinformatics/btv033"
-        ],
+        "citation_references": ["Li et al. (2015), DOI 10.1093/bioinformatics/btv033"],
         "license_evidence": ["GPL-3.0"],
         "boundary": (
             "Runs caller-installed MEGAHIT for bounded single-end or paired-end assembly; "
@@ -280,9 +257,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.variants.call_freebayes",
         "functions": ["dnakit.variants.call_freebayes"],
         "sources": ["https://github.com/freebayes/freebayes"],
-        "citation_references": [
-            "Garrison & Marth (2012), arXiv:1207.3907"
-        ],
+        "citation_references": ["Garrison & Marth (2012), arXiv:1207.3907"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed FreeBayes against caller-prepared BAM/CRAM inputs with "
@@ -301,9 +276,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
             "https://gemini.readthedocs.io/en/latest/content/quick_start.html",
         ],
         "citation_dois": ["10.1371/journal.pcbi.1003153"],
-        "citation_references": [
-            "Paila et al. (2013), DOI 10.1371/journal.pcbi.1003153"
-        ],
+        "citation_references": ["Paila et al. (2013), DOI 10.1371/journal.pcbi.1003153"],
         "license_evidence": ["MIT (upstream repository)"],
         "boundary": (
             "Loads caller-prepared VCF files into a local GEMINI database and executes a "
@@ -316,9 +289,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.annotate_vcf_ensembl_vep"],
         "sources": ["https://github.com/Ensembl/ensembl-vep"],
         "citation_dois": ["10.1186/s13059-016-0974-4"],
-        "citation_references": [
-            "McLaren et al. (2016), DOI 10.1186/s13059-016-0974-4"
-        ],
+        "citation_references": ["McLaren et al. (2016), DOI 10.1186/s13059-016-0974-4"],
         "license_evidence": ["Apache-2.0 (upstream repository)"],
         "boundary": (
             "Runs caller-installed Ensembl VEP on a caller-prepared VCF with bounded species, "
@@ -331,9 +302,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.call_gatk_haplotypecaller"],
         "sources": ["https://github.com/broadinstitute/gatk"],
         "citation_dois": ["10.1101/gr.107524.110"],
-        "citation_references": [
-            "McKenna et al. (2010), DOI 10.1101/gr.107524.110"
-        ],
+        "citation_references": ["McKenna et al. (2010), DOI 10.1101/gr.107524.110"],
         "license_evidence": ["Apache-2.0 (current GATK source LICENSE.TXT)"],
         "boundary": (
             "Runs a caller-installed GATK4 HaplotypeCaller with bounded reference, BAM/CRAM, "
@@ -346,9 +315,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.call_deepvariant"],
         "sources": ["https://github.com/google/deepvariant"],
         "citation_dois": ["10.1038/nbt.4235"],
-        "citation_references": [
-            "Poplin et al. (2018), DOI 10.1038/nbt.4235"
-        ],
+        "citation_references": ["Poplin et al. (2018), DOI 10.1038/nbt.4235"],
         "license_evidence": ["BSD-3-Clause"],
         "boundary": (
             "Runs a caller-installed DeepVariant variant-calling entry point with bounded "
@@ -361,9 +328,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.call_cutesv"],
         "sources": ["https://github.com/tjiangHIT/cuteSV"],
         "citation_dois": ["10.1186/s13059-020-02107-y"],
-        "citation_references": [
-            "Jiang et al. (2020), DOI 10.1186/s13059-020-02107-y"
-        ],
+        "citation_references": ["Jiang et al. (2020), DOI 10.1186/s13059-020-02107-y"],
         "license_evidence": ["MIT (upstream repository)"],
         "boundary": (
             "Runs caller-installed cuteSV with fixed long-read alignment, reference, VCF, "
@@ -376,9 +341,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.call_sniffles2"],
         "sources": ["https://github.com/fritzsedlazeck/Sniffles"],
         "citation_dois": ["10.1038/s41587-023-02024-y"],
-        "citation_references": [
-            "Smolka et al. (2024), DOI 10.1038/s41587-023-02024-y"
-        ],
+        "citation_references": ["Smolka et al. (2024), DOI 10.1038/s41587-023-02024-y"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed Sniffles2 with bounded BAM/CRAM, VCF, reference, thread, "
@@ -391,9 +354,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.call_delly"],
         "sources": ["https://github.com/dellytools/delly"],
         "citation_dois": ["10.1093/bioinformatics/bts378"],
-        "citation_references": [
-            "Rausch et al. (2012), DOI 10.1093/bioinformatics/bts378"
-        ],
+        "citation_references": ["Rausch et al. (2012), DOI 10.1093/bioinformatics/bts378"],
         "license_evidence": ["BSD-3-Clause"],
         "boundary": (
             "Runs caller-installed DELLY short-read or long-read SV discovery with a bounded "
@@ -406,9 +367,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.filter_vcf_vcftools"],
         "sources": ["https://github.com/vcftools/vcftools"],
         "citation_dois": ["10.1093/bioinformatics/btr330"],
-        "citation_references": [
-            "Danecek et al. (2011), DOI 10.1093/bioinformatics/btr330"
-        ],
+        "citation_references": ["Danecek et al. (2011), DOI 10.1093/bioinformatics/btr330"],
         "license_evidence": ["LGPL-3.0"],
         "boundary": (
             "Runs caller-installed VCFtools for a fixed recoding and filtering subset; "
@@ -420,9 +379,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.annotate_vcf_vcfanno"],
         "sources": ["https://github.com/brentp/vcfanno"],
         "citation_dois": ["10.1186/s13059-016-0973-5"],
-        "citation_references": [
-            "Pedersen et al. (2016), DOI 10.1186/s13059-016-0973-5"
-        ],
+        "citation_references": ["Pedersen et al. (2016), DOI 10.1186/s13059-016-0973-5"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed vcfanno with a caller-provided TOML configuration and "
@@ -435,9 +392,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.alignment.consensus_spoa"],
         "sources": ["https://github.com/rvaser/spoa"],
         "citation_dois": ["10.1093/bioinformatics/btg109"],
-        "citation_references": [
-            "Lee (2003), DOI 10.1093/bioinformatics/btg109"
-        ],
+        "citation_references": ["Lee (2003), DOI 10.1093/bioinformatics/btg109"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed SPOA for a bounded consensus-FASTA operation; its full "
@@ -449,9 +404,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.variants.merge_structural_variants_survivor"],
         "sources": ["https://github.com/fritzsedlazeck/SURVIVOR"],
         "citation_dois": ["10.1038/ncomms14061"],
-        "citation_references": [
-            "Jeffares et al. (2017), DOI 10.1038/NCOMMS14061"
-        ],
+        "citation_references": ["Jeffares et al. (2017), DOI 10.1038/NCOMMS14061"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed SURVIVOR's bounded VCF merge mode; simulation, conversion, "
@@ -510,9 +463,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.ngs.compress_index_vcf_htslib"],
         "sources": ["https://github.com/samtools/htslib"],
         "citation_dois": ["10.1093/gigascience/giab007"],
-        "citation_references": [
-            "Bonfield et al. (2021), DOI 10.1093/gigascience/giab007"
-        ],
+        "citation_references": ["Bonfield et al. (2021), DOI 10.1093/gigascience/giab007"],
         "license_evidence": ["MIT/BSD (HTSlib distribution)"],
         "boundary": (
             "Runs caller-installed HTSlib bgzip and tabix utilities for bounded VCF compression "
@@ -551,9 +502,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.ngs.sort_bam_bamtools"],
         "sources": ["https://github.com/pezmaster31/bamtools"],
         "citation_dois": ["10.1093/bioinformatics/btr174"],
-        "citation_references": [
-            "Barnett et al. (2011), DOI 10.1093/bioinformatics/btr174"
-        ],
+        "citation_references": ["Barnett et al. (2011), DOI 10.1093/bioinformatics/btr174"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs caller-installed BamTools for bounded BAM sorting; filtering, merging, "
@@ -565,9 +514,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.fasta_fastq.cluster_vsearch"],
         "sources": ["https://github.com/torognes/vsearch"],
         "citation_dois": ["10.7717/peerj.2584"],
-        "citation_references": [
-            "Rognes et al. (2016), DOI 10.7717/peerj.2584"
-        ],
+        "citation_references": ["Rognes et al. (2016), DOI 10.7717/peerj.2584"],
         "license_evidence": ["BSD-2-Clause or GPL-3.0 (dual license)"],
         "boundary": (
             "Runs caller-installed VSEARCH greedy FASTA clustering with bounded identity, "
@@ -833,9 +780,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.sequencing_qc.filter_nanopore_reads"],
         "sources": ["https://github.com/wdecoster/nanofilt"],
         "citation_dois": ["10.1093/bioinformatics/bty149"],
-        "citation_references": [
-            "De Coster et al. (2018), DOI 10.1093/bioinformatics/bty149"
-        ],
+        "citation_references": ["De Coster et al. (2018), DOI 10.1093/bioinformatics/bty149"],
         "license_evidence": ["GPL-3.0"],
         "boundary": (
             "Runs a caller-installed NanoFilt executable for bounded quality, length and "
@@ -847,9 +792,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.sequencing_qc.filter_long_reads",
         "functions": ["dnakit.sequencing_qc.filter_long_reads"],
         "sources": ["https://github.com/rrwick/Filtlong"],
-        "citation_references": [
-            "Filtlong project authors; the official project supplies no DOI"
-        ],
+        "citation_references": ["Filtlong project authors; the official project supplies no DOI"],
         "license_evidence": ["GPL-3.0"],
         "boundary": (
             "Runs a caller-installed Filtlong executable with bounded numeric length and "
@@ -877,9 +820,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.sequencing_qc.trim_porechop"],
         "sources": ["https://github.com/rrwick/Porechop"],
         "citation_dois": ["10.1099/mgen.0.000132"],
-        "citation_references": [
-            "Wick et al. (2017), DOI 10.1099/mgen.0.000132"
-        ],
+        "citation_references": ["Wick et al. (2017), DOI 10.1099/mgen.0.000132"],
         "license_evidence": ["GPL-3.0"],
         "boundary": (
             "Runs a caller-installed Porechop executable for bounded adapter trimming and "
@@ -892,9 +833,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.sequencing_qc.trim_trimmomatic"],
         "sources": ["https://github.com/usadellab/Trimmomatic"],
         "citation_dois": ["10.1093/bioinformatics/btu170"],
-        "citation_references": [
-            "Bolger, Lohse & Usadel (2014), DOI 10.1093/bioinformatics/btu170"
-        ],
+        "citation_references": ["Bolger, Lohse & Usadel (2014), DOI 10.1093/bioinformatics/btu170"],
         "license_evidence": ["GPL-3.0 (adapter sequences have separate Illumina terms)"],
         "boundary": (
             "Runs a caller-installed Trimmomatic executable through fixed single-end or "
@@ -907,9 +846,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.sequencing_qc.run_afterqc"],
         "sources": ["https://github.com/OpenGene/AfterQC"],
         "citation_dois": ["10.1186/s12859-017-1469-3"],
-        "citation_references": [
-            "Chen et al. (2017), DOI 10.1186/s12859-017-1469-3"
-        ],
+        "citation_references": ["Chen et al. (2017), DOI 10.1186/s12859-017-1469-3"],
         "license_evidence": ["MIT"],
         "boundary": (
             "Runs a caller-installed AfterQC script for bounded single-end or paired-end "
@@ -1031,8 +968,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
     },
     "pyranges": {
         "api": (
-            "dnakit.integrations.summarize_pyranges_bed / "
-            "dnakit.integrations.merge_pyranges_bed"
+            "dnakit.integrations.summarize_pyranges_bed / dnakit.integrations.merge_pyranges_bed"
         ),
         "functions": [
             "dnakit.integrations.summarize_pyranges_bed",
@@ -1079,9 +1015,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.integrations.summarize_pyfastx",
         "functions": ["dnakit.integrations.summarize_pyfastx"],
         "citation_dois": ["10.1093/bib/bbaa368"],
-        "citation_references": [
-            "Du et al. (2021), DOI 10.1093/bib/bbaa368"
-        ],
+        "citation_references": ["Du et al. (2021), DOI 10.1093/bib/bbaa368"],
         "license_evidence": ["MIT"],
         "boundary": (
             "The optional MIT backend exposes bounded FASTA/FASTQ aggregate statistics and a "
@@ -1108,9 +1042,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "functions": ["dnakit.integrations.map_mappy_sequences"],
         "sources": ["https://github.com/lh3/minimap2"],
         "citation_dois": ["10.1093/bioinformatics/bty191"],
-        "citation_references": [
-            "Li (2018), minimap2, DOI 10.1093/bioinformatics/bty191"
-        ],
+        "citation_references": ["Li (2018), minimap2, DOI 10.1093/bioinformatics/bty191"],
         "license_evidence": ["MIT (minimap2/mappy upstream)"],
         "boundary": (
             "The optional MIT mappy binding exposes bounded local mapping of a FASTA/FASTQ stream "
@@ -1120,9 +1052,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
     "gffutils": {
         "api": "dnakit.integrations.query_gffutils_database",
         "functions": ["dnakit.integrations.query_gffutils_database"],
-        "citation_references": [
-            "gffutils documentation and daler contributors (MIT)"
-        ],
+        "citation_references": ["gffutils documentation and daler contributors (MIT)"],
         "license_evidence": ["MIT"],
         "boundary": (
             "The optional MIT backend exposes read-only queries against an existing gffutils "
@@ -1133,9 +1063,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.integrations.summarize_sbol3_document",
         "functions": ["dnakit.integrations.summarize_sbol3_document"],
         "citation_dois": ["10.1021/acssynbio.2c00164"],
-        "citation_references": [
-            "Mitchell, Beal & Bartley (2022), DOI 10.1021/acssynbio.2c00164"
-        ],
+        "citation_references": ["Mitchell, Beal & Bartley (2022), DOI 10.1021/acssynbio.2c00164"],
         "license_evidence": ["MIT"],
         "boundary": (
             "The optional MIT backend exposes a bounded, read-only inventory of a "
@@ -1145,9 +1073,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
     "scadnano": {
         "api": "dnakit.integrations.summarize_scadnano_design",
         "functions": ["dnakit.integrations.summarize_scadnano_design"],
-        "citation_references": [
-            "Doty, Lee & Stérin (2020), scadnano, arXiv:2005.11841"
-        ],
+        "citation_references": ["Doty, Lee & Stérin (2020), scadnano, arXiv:2005.11841"],
         "license_evidence": ["MIT"],
         "boundary": (
             "The optional MIT backend exposes a bounded, read-only inventory of a local "
@@ -1158,9 +1084,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.integrations.overlap_polars_bio_bed",
         "functions": ["dnakit.integrations.overlap_polars_bio_bed"],
         "citation_dois": ["10.1093/bioinformatics/btaf640"],
-        "citation_references": [
-            "polars-bio, Bioinformatics, DOI 10.1093/bioinformatics/btaf640"
-        ],
+        "citation_references": ["polars-bio, Bioinformatics, DOI 10.1093/bioinformatics/btaf640"],
         "license_evidence": ["Apache-2.0"],
         "boundary": (
             "The optional Apache-2.0 backend exposes bounded overlap of local BED/CSV interval "
@@ -1226,9 +1150,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
         "api": "dnakit.integrations.compare_sourmash_sequences",
         "functions": ["dnakit.integrations.compare_sourmash_sequences"],
         "citation_dois": ["10.21105/joss.06830"],
-        "citation_references": [
-            "Pierce-Ward et al. (2024), sourmash v4, DOI 10.21105/joss.06830"
-        ],
+        "citation_references": ["Pierce-Ward et al. (2024), sourmash v4, DOI 10.21105/joss.06830"],
         "license_evidence": ["BSD-3-Clause"],
         "boundary": (
             "The optional BSD-3-Clause backend exposes a bounded, local in-memory DNA "
@@ -1244,9 +1166,7 @@ _NATIVE_FACADES: dict[str, dict[str, Any]] = {
             "https://github.com/mdshw5/pyfaidx",
         ],
         "citation_dois": ["10.7287/peerj.preprints.970v1"],
-        "citation_references": [
-            "Shirley et al. (2015), DOI 10.7287/peerj.preprints.970v1"
-        ],
+        "citation_references": ["Shirley et al. (2015), DOI 10.7287/peerj.preprints.970v1"],
         "license_evidence": ["BSD-3-Clause"],
         "boundary": (
             "The optional BSD-3-Clause backend exposes bounded, read-only FASTA interval "

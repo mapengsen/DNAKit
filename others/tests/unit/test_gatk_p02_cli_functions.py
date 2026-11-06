@@ -1,5 +1,4 @@
 """Tests of the GATK P02 facades: argument mapping with a fake launcher, real GATK runs when it is installed."""
-# ruff: noqa: E501
 
 from __future__ import annotations
 
@@ -1125,7 +1124,9 @@ def test_real_cnn_scoring_with_the_gatk_python_archive(
         handle.extractall(packages)
     monkeypatch.setenv("PYTHONPATH", f"{packages}{os.pathsep}{os.environ.get('PYTHONPATH', '')}")
     monkeypatch.setenv("TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD", "1")
-    monkeypatch.setenv("PATH", f"{Path(sys.executable).parent}{os.pathsep}{os.environ.get('PATH', '')}")
+    monkeypatch.setenv(
+        "PATH", f"{Path(sys.executable).parent}{os.pathsep}{os.environ.get('PATH', '')}"
+    )
     lines = real_scored.vcf.read_text().splitlines()
     header = [line for line in lines if line.startswith("##")]
     header += [
@@ -1135,7 +1136,8 @@ def test_real_cnn_scoring_with_the_gatk_python_archive(
     records = [line for line in lines if not line.startswith("#")][:30]
     source = tmp_path / "cnn_in.vcf"
     source.write_text(
-        "\n".join([*header, next(line for line in lines if line.startswith("#CHROM")), *records]) + "\n"
+        "\n".join([*header, next(line for line in lines if line.startswith("#CHROM")), *records])
+        + "\n"
     )
     result = gp.score_variants_with_cnn(
         str(source),

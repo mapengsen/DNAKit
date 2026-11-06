@@ -95,7 +95,12 @@ def _table_rows(tskit: Any, ts: Any) -> dict[str, Any]:
         {"time": float(n.time), "sample": bool(n.flags & tskit.NODE_IS_SAMPLE)} for n in ts.nodes()
     ]
     edges = [
-        {"left": float(e.left), "right": float(e.right), "parent": int(e.parent), "child": int(e.child)}
+        {
+            "left": float(e.left),
+            "right": float(e.right),
+            "parent": int(e.parent),
+            "child": int(e.child),
+        }
         for e in ts.edges()
     ]
     sites = [
@@ -203,8 +208,12 @@ def _intervals(value: object, name: str = "intervals") -> list[list[float]]:
     for pair in value:
         if isinstance(pair, (str, bytes)) or not isinstance(pair, Sequence) or len(pair) != 2:
             raise ConfigurationError(f"each entry of {name} must be a [left, right] pair.")
-        result.append([_number(pair[0], "interval left", minimum=0.0),
-                       _number(pair[1], "interval right", minimum=0.0)])
+        result.append(
+            [
+                _number(pair[0], "interval left", minimum=0.0),
+                _number(pair[1], "interval right", minimum=0.0),
+            ]
+        )
     return result
 
 
@@ -241,7 +250,9 @@ def _stat_options(
     }
 
 
-def _stat_result(op: str, ts: Any, values: Any, options: Mapping[str, Any], note: str, **extra: Any):
+def _stat_result(
+    op: str, ts: Any, values: Any, options: Mapping[str, Any], note: str, **extra: Any
+):
     windows = options["windows"]
     return _report(
         op,
@@ -285,7 +296,12 @@ def tskit_link_ancestors(
 
     edges = _guard(run, "link_ancestors")
     rows = [
-        {"left": float(e.left), "right": float(e.right), "parent": int(e.parent), "child": int(e.child)}
+        {
+            "left": float(e.left),
+            "right": float(e.right),
+            "parent": int(e.parent),
+            "child": int(e.child),
+        }
         for e in edges
     ]
     return _report(
@@ -415,7 +431,13 @@ def tskit_delete_sites(
     ts = _load(tskit, tables, max_rows)
     ids = _site_ids(ts, site_ids)
     out = _guard(lambda: ts.delete_sites(ids, record_provenance=False), "delete_sites")
-    return _edited("tskit_delete_sites", tskit, out, "site IDs renumbered after deletion", deleted=sorted(set(ids)))
+    return _edited(
+        "tskit_delete_sites",
+        tskit,
+        out,
+        "site IDs renumbered after deletion",
+        deleted=sorted(set(ids)),
+    )
 
 
 def tskit_select_intervals(
@@ -440,8 +462,12 @@ def tskit_select_intervals(
     pairs = _intervals(intervals)
     ts = _load(tskit, tables, max_rows)
     method = ts.delete_intervals if action == "delete" else ts.keep_intervals
-    out = _guard(lambda: method(pairs, simplify=flag, record_provenance=False), f"{action}_intervals")
-    return _edited("tskit_select_intervals", tskit, out, f"action={action}; half-open intervals", action=action)
+    out = _guard(
+        lambda: method(pairs, simplify=flag, record_provenance=False), f"{action}_intervals"
+    )
+    return _edited(
+        "tskit_select_intervals", tskit, out, f"action={action}; half-open intervals", action=action
+    )
 
 
 def tskit_remove_older_genealogy(
@@ -466,6 +492,7 @@ def tskit_remove_older_genealogy(
     if roots:
         out = _guard(lambda: ts.decapitate(moment), "decapitate")
     else:
+
         def run() -> Any:
             tc = ts.dump_tables()
             tc.delete_older(moment)
@@ -474,7 +501,9 @@ def tskit_remove_older_genealogy(
             return tc.tree_sequence()
 
         out = _guard(run, "delete_older")
-    return _edited("tskit_remove_older_genealogy", tskit, out, f"time={moment}; add_roots={roots}", time=moment)
+    return _edited(
+        "tskit_remove_older_genealogy", tskit, out, f"time={moment}; add_roots={roots}", time=moment
+    )
 
 
 def tskit_trim_genome(
@@ -514,7 +543,11 @@ def tskit_shift_coordinates(
 
     tskit = _tskit()
     shift = _number(value, "value", minimum=-math.inf)
-    length = None if sequence_length is None else _number(sequence_length, "sequence_length", positive=True)
+    length = (
+        None
+        if sequence_length is None
+        else _number(sequence_length, "sequence_length", positive=True)
+    )
     ts = _load(tskit, tables, max_rows)
     out = _guard(lambda: ts.shift(shift, sequence_length=length, record_provenance=False), "shift")
     return _edited("tskit_shift_coordinates", tskit, out, f"shift={shift}", value=shift)
@@ -551,8 +584,12 @@ def tskit_simplify(
         lambda: ts.simplify(chosen, map_nodes=True, record_provenance=False, **options), "simplify"
     )
     return _edited(
-        "tskit_simplify", tskit, out, "node_map maps old node IDs to new IDs (-1 removed)",
-        node_map=_plain(node_map), options=options,
+        "tskit_simplify",
+        tskit,
+        out,
+        "node_map maps old node IDs to new IDs (-1 removed)",
+        node_map=_plain(node_map),
+        options=options,
     )
 
 
@@ -582,7 +619,9 @@ def tskit_subset(
         ),
         "subset",
     )
-    return _edited("tskit_subset", tskit, out, "nodes renumbered in the order given", kept_nodes=ids)
+    return _edited(
+        "tskit_subset", tskit, out, "nodes renumbered in the order given", kept_nodes=ids
+    )
 
 
 def tskit_union(
@@ -702,8 +741,12 @@ def tskit_map_mutations(
         lambda: tree.map_mutations(values, names, ancestral_state=ancestral_state), "map_mutations"
     )
     rows = [
-        {"node": int(m.node), "derived_state": m.derived_state, "parent": int(m.parent),
-         "time": None if tskit.is_unknown_time(m.time) else float(m.time)}
+        {
+            "node": int(m.node),
+            "derived_state": m.derived_state,
+            "parent": int(m.parent),
+            "time": None if tskit.is_unknown_time(m.time) else float(m.time),
+        }
         for m in muts
     ]
     return _report(
@@ -741,18 +784,30 @@ def tskit_list_mutations(
     if tree_index is None:
         source = ts.mutations()
     else:
-        source = ts.at_index(_integer(tree_index, "tree_index", minimum=0, maximum=ts.num_trees - 1)).mutations()
+        source = ts.at_index(
+            _integer(tree_index, "tree_index", minimum=0, maximum=ts.num_trees - 1)
+        ).mutations()
     rows = []
     for m in source:
-        rows.append({
-            "id": int(m.id), "site": int(m.site), "node": int(m.node),
-            "derived_state": m.derived_state, "parent": int(m.parent),
-            "time": None if tskit.is_unknown_time(m.time) else float(m.time),
-            "position": float(ts.site(m.site).position),
-        })
+        rows.append(
+            {
+                "id": int(m.id),
+                "site": int(m.site),
+                "node": int(m.node),
+                "derived_state": m.derived_state,
+                "parent": int(m.parent),
+                "time": None if tskit.is_unknown_time(m.time) else float(m.time),
+                "position": float(ts.site(m.site).position),
+            }
+        )
     _check_listing_size(len(rows), max_rows, "mutations")
-    return _report("tskit_list_mutations", "position is the position of the mutation's site",
-                   tree_index=tree_index, num_mutations=len(rows), mutations=rows)
+    return _report(
+        "tskit_list_mutations",
+        "position is the position of the mutation's site",
+        tree_index=tree_index,
+        num_mutations=len(rows),
+        mutations=rows,
+    )
 
 
 def tskit_list_sites(
@@ -769,15 +824,26 @@ def tskit_list_sites(
     if tree_index is None:
         source = ts.sites()
     else:
-        source = ts.at_index(_integer(tree_index, "tree_index", minimum=0, maximum=ts.num_trees - 1)).sites()
+        source = ts.at_index(
+            _integer(tree_index, "tree_index", minimum=0, maximum=ts.num_trees - 1)
+        ).sites()
     rows = [
-        {"id": int(s.id), "position": float(s.position), "ancestral_state": s.ancestral_state,
-         "num_mutations": len(s.mutations)}
+        {
+            "id": int(s.id),
+            "position": float(s.position),
+            "ancestral_state": s.ancestral_state,
+            "num_mutations": len(s.mutations),
+        }
         for s in source
     ]
     _check_listing_size(len(rows), max_rows, "sites")
-    return _report("tskit_list_sites", "positions are in genome coordinates",
-                   tree_index=tree_index, num_sites=len(rows), sites=rows)
+    return _report(
+        "tskit_list_sites",
+        "positions are in genome coordinates",
+        tree_index=tree_index,
+        num_sites=len(rows),
+        sites=rows,
+    )
 
 
 def tskit_genotype_matrix(
@@ -809,9 +875,12 @@ def tskit_genotype_matrix(
     )
     _check_listing_size(int(matrix.size), max_rows * 10, "genotype cells")
     return _report(
-        "tskit_genotype_matrix", "rows are sites in order, columns are samples in sample order",
-        num_sites=int(matrix.shape[0]), num_samples=int(matrix.shape[1]),
-        positions=_plain(ts.tables.sites.position), matrix=_plain(matrix),
+        "tskit_genotype_matrix",
+        "rows are sites in order, columns are samples in sample order",
+        num_sites=int(matrix.shape[0]),
+        num_samples=int(matrix.shape[1]),
+        positions=_plain(ts.tables.sites.position),
+        matrix=_plain(matrix),
     )
 
 
@@ -842,22 +911,33 @@ def tskit_variants(
     def run() -> list[dict[str, Any]]:
         out = []
         for v in ts.variants(
-            samples=chosen, isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
-            alleles=fixed, left=lo, right=hi,
+            samples=chosen,
+            isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
+            alleles=fixed,
+            left=lo,
+            right=hi,
         ):
-            out.append({
-                "site": int(v.site.id), "position": float(v.site.position),
-                "alleles": list(v.alleles), "genotypes": _plain(v.genotypes),
-                "states": list(v.states()),
-                "counts": {("missing" if k is None else k): int(c) for k, c in v.counts().items()},
-            })
+            out.append(
+                {
+                    "site": int(v.site.id),
+                    "position": float(v.site.position),
+                    "alleles": list(v.alleles),
+                    "genotypes": _plain(v.genotypes),
+                    "states": list(v.states()),
+                    "counts": {
+                        ("missing" if k is None else k): int(c) for k, c in v.counts().items()
+                    },
+                }
+            )
         return out
 
     records = _guard(run, "variants")
     _check_listing_size(len(records), max_rows, "variants")
     return _report(
-        "tskit_variants", "genotype -1 and state null mean missing; counts use allele strings",
-        num_variants=len(records), variants=records,
+        "tskit_variants",
+        "genotype -1 and state null mean missing; counts use allele strings",
+        num_variants=len(records),
+        variants=records,
     )
 
 
@@ -889,17 +969,24 @@ def tskit_alignments(
     lo = None if left is None else _integer(left, "left")
     hi = None if right is None else _integer(right, "right")
     sequences = _guard(
-        lambda: list(ts.alignments(
-            reference_sequence=ref, missing_data_character=miss,
-            isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
-            samples=chosen, left=lo, right=hi,
-        )),
+        lambda: list(
+            ts.alignments(
+                reference_sequence=ref,
+                missing_data_character=miss,
+                isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
+                samples=chosen,
+                left=lo,
+                right=hi,
+            )
+        ),
         "alignments",
     )
     ids = chosen if chosen is not None else [int(n) for n in ts.samples()]
     return _report(
-        "tskit_alignments", "one string per sample over [left, right); positions without a site come from the reference",
-        num_samples=len(sequences), sample_nodes=ids,
+        "tskit_alignments",
+        "one string per sample over [left, right); positions without a site come from the reference",
+        num_samples=len(sequences),
+        sample_nodes=ids,
         alignments=[{"node": n, "sequence": s} for n, s in zip(ids, sequences, strict=True)],
     )
 
@@ -927,16 +1014,23 @@ def tskit_haplotypes(
     lo = None if left is None else _number(left, "left", minimum=0.0)
     hi = None if right is None else _number(right, "right", minimum=0.0)
     out = _guard(
-        lambda: list(ts.haplotypes(
-            isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
-            missing_data_character=miss, samples=chosen, left=lo, right=hi,
-        )),
+        lambda: list(
+            ts.haplotypes(
+                isolated_as_missing=_flag(isolated_as_missing, "isolated_as_missing"),
+                missing_data_character=miss,
+                samples=chosen,
+                left=lo,
+                right=hi,
+            )
+        ),
         "haplotypes",
     )
     ids = chosen if chosen is not None else [int(n) for n in ts.samples()]
     return _report(
-        "tskit_haplotypes", "one character per site, in site order",
-        num_samples=len(out), haplotypes=[{"node": n, "haplotype": h} for n, h in zip(ids, out, strict=True)],
+        "tskit_haplotypes",
+        "one character per site, in site order",
+        num_samples=len(out),
+        haplotypes=[{"node": n, "haplotype": h} for n, h in zip(ids, out, strict=True)],
     )
 
 
@@ -948,8 +1042,12 @@ def tskit_breakpoints(
     tskit = _tskit()
     ts = _load(tskit, tables, max_rows)
     points = _plain(ts.breakpoints(as_array=True))
-    return _report("tskit_breakpoints", "first value 0, last value the sequence length",
-                   num_trees=int(ts.num_trees), breakpoints=points)
+    return _report(
+        "tskit_breakpoints",
+        "first value 0, last value the sequence length",
+        num_trees=int(ts.num_trees),
+        breakpoints=points,
+    )
 
 
 def tskit_map_to_vcf_model(
@@ -970,10 +1068,15 @@ def tskit_map_to_vcf_model(
     tskit = _tskit()
     ts = _load(tskit, tables, max_rows)
     ploid = None if ploidy is None else _integer(ploidy, "ploidy", minimum=1, maximum=64)
-    model = _guard(lambda: ts.map_to_vcf_model(ploidy=ploid, contig_id=_text(contig_id, "contig_id")), "map_to_vcf_model")
+    model = _guard(
+        lambda: ts.map_to_vcf_model(ploidy=ploid, contig_id=_text(contig_id, "contig_id")),
+        "map_to_vcf_model",
+    )
     return _report(
-        "tskit_map_to_vcf_model", "VCF positions are integer genome coordinates",
-        contig_id=model.contig_id, contig_length=int(model.contig_length),
+        "tskit_map_to_vcf_model",
+        "VCF positions are integer genome coordinates",
+        contig_id=model.contig_id,
+        contig_length=int(model.contig_length),
         individual_names=list(model.individuals_name),
         individual_nodes=_plain(model.individuals_nodes),
     )
@@ -992,7 +1095,12 @@ def tskit_sample_nodes_by_ploidy(
     ts = _load(tskit, tables, max_rows)
     p = _integer(ploidy, "ploidy", minimum=1, maximum=64)
     groups = _guard(lambda: ts.sample_nodes_by_ploidy(p), "sample_nodes_by_ploidy")
-    return _report("tskit_sample_nodes_by_ploidy", "each row is one individual", ploidy=p, groups=_plain(groups))
+    return _report(
+        "tskit_sample_nodes_by_ploidy",
+        "each row is one individual",
+        ploidy=p,
+        groups=_plain(groups),
+    )
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1028,28 +1136,49 @@ def tskit_ld_r2(
     calc = tskit.LdCalculator(ts)
     if output == "matrix":
         values = _guard(calc.r2_matrix, "r2_matrix")
-        return _report("tskit_ld_r2", "r2 matrix over all sites, 1.0 on the diagonal",
-                       output=output, num_sites=int(ts.num_sites), values=_plain(values))
+        return _report(
+            "tskit_ld_r2",
+            "r2 matrix over all sites, 1.0 on the diagonal",
+            output=output,
+            num_sites=int(ts.num_sites),
+            values=_plain(values),
+        )
     if output == "pair":
         if site_a is None or site_b is None:
             raise ConfigurationError("output='pair' needs site_a and site_b.")
         a = _integer(site_a, "site_a", maximum=max(ts.num_sites - 1, 0))
         b = _integer(site_b, "site_b", maximum=max(ts.num_sites - 1, 0))
-        return _report("tskit_ld_r2", "r2 of two sites", output=output, site_a=a, site_b=b,
-                       values=_plain(_guard(lambda: calc.r2(a, b), "r2")))
+        return _report(
+            "tskit_ld_r2",
+            "r2 of two sites",
+            output=output,
+            site_a=a,
+            site_b=b,
+            values=_plain(_guard(lambda: calc.r2(a, b), "r2")),
+        )
     if focal_site is None:
         raise ConfigurationError("output='array' needs focal_site.")
     focal = _integer(focal_site, "focal_site", maximum=max(ts.num_sites - 1, 0))
     if direction not in (1, -1):
         raise ConfigurationError("direction must be 1 or -1.")
     options = {
-        "max_mutations": None if max_mutations is None else _integer(max_mutations, "max_mutations", minimum=1),
-        "max_distance": None if max_distance is None else _number(max_distance, "max_distance", minimum=0.0),
+        "max_mutations": None
+        if max_mutations is None
+        else _integer(max_mutations, "max_mutations", minimum=1),
+        "max_distance": None
+        if max_distance is None
+        else _number(max_distance, "max_distance", minimum=0.0),
         "max_sites": None if max_sites is None else _integer(max_sites, "max_sites", minimum=1),
     }
     values = _guard(lambda: calc.r2_array(focal, direction=direction, **options), "r2_array")
-    return _report("tskit_ld_r2", "r2 between the focal site and the sites in the chosen direction",
-                   output=output, focal_site=focal, direction=direction, values=_plain(values))
+    return _report(
+        "tskit_ld_r2",
+        "r2 between the focal site and the sites in the chosen direction",
+        output=output,
+        focal_site=focal,
+        direction=direction,
+        values=_plain(values),
+    )
 
 
 def tskit_sample_set_statistic(
@@ -1084,9 +1213,15 @@ def tskit_sample_set_statistic(
     else:
         idx = _indexes(indexes, width, len(sets))
         values = _guard(lambda: method(sets, indexes=idx, **options), statistic)
-    return _stat_result("tskit_sample_set_statistic", ts, values, options,
-                        f"statistic={statistic}; one column per sample set or index tuple",
-                        statistic=statistic, indexes=idx)
+    return _stat_result(
+        "tskit_sample_set_statistic",
+        ts,
+        values,
+        options,
+        f"statistic={statistic}; one column per sample set or index tuple",
+        statistic=statistic,
+        indexes=idx,
+    )
 
 
 def tskit_segregating_sites(
@@ -1109,7 +1244,9 @@ def tskit_segregating_sites(
     sets = _node_sets(ts, sample_sets)
     options = _stat_options(windows, mode, span_normalise)
     values = _guard(lambda: ts.segregating_sites(sets, **options), "segregating_sites")
-    return _stat_result("tskit_segregating_sites", ts, values, options, "one value per window and sample set")
+    return _stat_result(
+        "tskit_segregating_sites", ts, values, options, "one value per window and sample set"
+    )
 
 
 def tskit_general_stat(
@@ -1153,15 +1290,28 @@ def tskit_general_stat(
     if weights is not None:
         w = np.array(_matrix(weights, "weights", rows=ts.num_samples), dtype=float)
         dim = 1 if summary == "product" else w.shape[1]
-        values = _guard(lambda: ts.general_stat(w, func, dim, polarised=pol, strict=strict, **options), "general_stat")
+        values = _guard(
+            lambda: ts.general_stat(w, func, dim, polarised=pol, strict=strict, **options),
+            "general_stat",
+        )
         source = "weights"
     else:
         sets = _node_sets(ts, sample_sets)
         dim = 1 if summary == "product" else len(sets)
-        values = _guard(lambda: ts.sample_count_stat(sets, func, dim, polarised=pol, strict=strict, **options), "sample_count_stat")
+        values = _guard(
+            lambda: ts.sample_count_stat(sets, func, dim, polarised=pol, strict=strict, **options),
+            "sample_count_stat",
+        )
         source = "sample_sets"
-    return _stat_result("tskit_general_stat", ts, values, options,
-                        f"input={source}; summary={summary}; polarised={pol}", input=source, summary=summary)
+    return _stat_result(
+        "tskit_general_stat",
+        ts,
+        values,
+        options,
+        f"input={source}; summary={summary}; polarised={pol}",
+        input=source,
+        summary=summary,
+    )
 
 
 def tskit_genetic_relatedness(
@@ -1190,20 +1340,39 @@ def tskit_genetic_relatedness(
     sets = _node_sets(ts, sample_sets) if indexes is not None or sample_sets is not None else None
     options = _stat_options(windows, mode, span_normalise)
     if indexes is None:
-        values = _guard(lambda: ts.genetic_relatedness_matrix(sets, **options), "genetic_relatedness_matrix")
-        return _stat_result("tskit_genetic_relatedness", ts, values, options, "matrix over sample sets",
-                            output="matrix", indexes=None)
+        values = _guard(
+            lambda: ts.genetic_relatedness_matrix(sets, **options), "genetic_relatedness_matrix"
+        )
+        return _stat_result(
+            "tskit_genetic_relatedness",
+            ts,
+            values,
+            options,
+            "matrix over sample sets",
+            output="matrix",
+            indexes=None,
+        )
     idx = _indexes(indexes, 2, len(sets))
     values = _guard(
         lambda: ts.genetic_relatedness(
-            sets, indexes=idx, centre=_flag(centre, "centre"),
-            proportion=_flag(proportion, "proportion"), polarised=_flag(polarised, "polarised"), **options,
+            sets,
+            indexes=idx,
+            centre=_flag(centre, "centre"),
+            proportion=_flag(proportion, "proportion"),
+            polarised=_flag(polarised, "polarised"),
+            **options,
         ),
         "genetic_relatedness",
     )
-    return _stat_result("tskit_genetic_relatedness", ts, values, options,
-                        f"centre={centre}; proportion={proportion}; polarised={polarised}",
-                        output="pairs", indexes=idx)
+    return _stat_result(
+        "tskit_genetic_relatedness",
+        ts,
+        values,
+        options,
+        f"centre={centre}; proportion={proportion}; polarised={polarised}",
+        output="pairs",
+        indexes=idx,
+    )
 
 
 def tskit_genetic_relatedness_vector(
@@ -1227,8 +1396,10 @@ def tskit_genetic_relatedness_vector(
     ts = _load(tskit, tables, max_rows)
     w = np.array(_matrix(weights, "weights", rows=ts.num_samples), dtype=float)
     options = _stat_options(windows, "branch", span_normalise)
-    values = _guard(lambda: ts.genetic_relatedness_vector(w, centre=_flag(centre, "centre"), **options),
-                    "genetic_relatedness_vector")
+    values = _guard(
+        lambda: ts.genetic_relatedness_vector(w, centre=_flag(centre, "centre"), **options),
+        "genetic_relatedness_vector",
+    )
     return _stat_result("tskit_genetic_relatedness_vector", ts, values, options, f"centre={centre}")
 
 
@@ -1259,11 +1430,22 @@ def tskit_genetic_relatedness_weighted(
     options = _stat_options(windows, mode, span_normalise)
     values = _guard(
         lambda: ts.genetic_relatedness_weighted(
-            w, indexes=idx, polarised=_flag(polarised, "polarised"), centre=_flag(centre, "centre"), **options),
+            w,
+            indexes=idx,
+            polarised=_flag(polarised, "polarised"),
+            centre=_flag(centre, "centre"),
+            **options,
+        ),
         "genetic_relatedness_weighted",
     )
-    return _stat_result("tskit_genetic_relatedness_weighted", ts, values, options,
-                        f"polarised={polarised}; centre={centre}", indexes=idx)
+    return _stat_result(
+        "tskit_genetic_relatedness_weighted",
+        ts,
+        values,
+        options,
+        f"polarised={polarised}; centre={centre}",
+        indexes=idx,
+    )
 
 
 def tskit_trait_statistic(
@@ -1292,14 +1474,20 @@ def tskit_trait_statistic(
     w = np.array(_matrix(weights, "weights", rows=ts.num_samples), dtype=float)
     options = _stat_options(windows, mode, span_normalise)
     if statistic == "linear_model":
-        z = None if covariates is None else np.array(_matrix(covariates, "covariates", rows=ts.num_samples), dtype=float)
+        z = (
+            None
+            if covariates is None
+            else np.array(_matrix(covariates, "covariates", rows=ts.num_samples), dtype=float)
+        )
         values = _guard(lambda: ts.trait_linear_model(w, Z=z, **options), "trait_linear_model")
     else:
         if covariates is not None:
             raise ConfigurationError("covariates are only used by statistic='linear_model'.")
         method = ts.trait_correlation if statistic == "correlation" else ts.trait_covariance
         values = _guard(lambda: method(w, **options), f"trait_{statistic}")
-    return _stat_result("tskit_trait_statistic", ts, values, options, f"statistic={statistic}", statistic=statistic)
+    return _stat_result(
+        "tskit_trait_statistic", ts, values, options, f"statistic={statistic}", statistic=statistic
+    )
 
 
 def tskit_mean_descendants(
@@ -1318,8 +1506,12 @@ def tskit_mean_descendants(
     ts = _load(tskit, tables, max_rows)
     sets = _node_sets(ts, sample_sets)
     values = _guard(lambda: ts.mean_descendants(sets), "mean_descendants")
-    return _report("tskit_mean_descendants", "rows are nodes, columns are sample sets, averaged over the genome",
-                   num_nodes=int(ts.num_nodes), values=_plain(values))
+    return _report(
+        "tskit_mean_descendants",
+        "rows are nodes, columns are sample sets, averaged over the genome",
+        num_nodes=int(ts.num_nodes),
+        values=_plain(values),
+    )
 
 
 def tskit_genealogical_nearest_neighbours(
@@ -1341,8 +1533,12 @@ def tskit_genealogical_nearest_neighbours(
     nodes = _nodes(focal, "focal", minimum=1)
     sets = _node_sets(ts, sample_sets)
     values = _guard(lambda: ts.genealogical_nearest_neighbours(nodes, sets, num_threads=0), "gnn")
-    return _report("tskit_genealogical_nearest_neighbours", "rows sum to 1 where neighbours exist",
-                   focal=nodes, values=_plain(values))
+    return _report(
+        "tskit_genealogical_nearest_neighbours",
+        "rows sum to 1 where neighbours exist",
+        focal=nodes,
+        values=_plain(values),
+    )
 
 
 def tskit_pair_coalescence(
@@ -1380,30 +1576,64 @@ def tskit_pair_coalescence(
         if quantiles is None:
             raise ConfigurationError("output='quantiles' needs quantiles.")
         q = [_number(v, "quantile", minimum=0.0) for v in quantiles]
-        values = _guard(lambda: ts.pair_coalescence_quantiles(np.array(q), sample_sets=sets, indexes=idx, windows=win),
-                        "pair_coalescence_quantiles")
-        return _report("tskit_pair_coalescence", "output=quantiles; times of the requested coalescence quantiles",
-                       output=output, quantiles=q, values=_plain(values))
+        values = _guard(
+            lambda: ts.pair_coalescence_quantiles(
+                np.array(q), sample_sets=sets, indexes=idx, windows=win
+            ),
+            "pair_coalescence_quantiles",
+        )
+        return _report(
+            "tskit_pair_coalescence",
+            "output=quantiles; times of the requested coalescence quantiles",
+            output=output,
+            quantiles=q,
+            values=_plain(values),
+        )
     if output == "rates":
         if isinstance(time_windows, str):
-            raise ConfigurationError("output='rates' needs time_windows as an increasing list of times.")
+            raise ConfigurationError(
+                "output='rates' needs time_windows as an increasing list of times."
+            )
         tw = [_number(v, "time window breakpoint", minimum=0.0) for v in time_windows]
         tw.append(math.inf)  # tskit requires the last time window to end at infinity
-        values = _guard(lambda: ts.pair_coalescence_rates(np.array(tw), sample_sets=sets, indexes=idx, windows=win),
-                        "pair_coalescence_rates")
-        return _report("tskit_pair_coalescence", "output=rates; rate per time window, shape windows x time windows x pairs",
-                       output=output, time_windows=tw[:-1] + ["inf"], values=_plain(values))
-    tw2: Any = time_windows if isinstance(time_windows, str) else [_number(v, "time window breakpoint", minimum=0.0) for v in time_windows]
+        values = _guard(
+            lambda: ts.pair_coalescence_rates(
+                np.array(tw), sample_sets=sets, indexes=idx, windows=win
+            ),
+            "pair_coalescence_rates",
+        )
+        return _report(
+            "tskit_pair_coalescence",
+            "output=rates; rate per time window, shape windows x time windows x pairs",
+            output=output,
+            time_windows=tw[:-1] + ["inf"],
+            values=_plain(values),
+        )
+    tw2: Any = (
+        time_windows
+        if isinstance(time_windows, str)
+        else [_number(v, "time window breakpoint", minimum=0.0) for v in time_windows]
+    )
     if isinstance(tw2, str) and tw2 != "nodes":
         raise ConfigurationError("time_windows must be 'nodes' or a list of times.")
     values = _guard(
         lambda: ts.pair_coalescence_counts(
-            sample_sets=sets, indexes=idx, windows=win, span_normalise=_flag(span_normalise, "span_normalise"),
-            pair_normalise=_flag(pair_normalise, "pair_normalise"), time_windows=tw2 if isinstance(tw2, str) else np.array(tw2)),
+            sample_sets=sets,
+            indexes=idx,
+            windows=win,
+            span_normalise=_flag(span_normalise, "span_normalise"),
+            pair_normalise=_flag(pair_normalise, "pair_normalise"),
+            time_windows=tw2 if isinstance(tw2, str) else np.array(tw2),
+        ),
         "pair_coalescence_counts",
     )
-    return _report("tskit_pair_coalescence", "output=counts; coalescing pairs per time window",
-                   output=output, time_windows=tw2, values=_plain(values))
+    return _report(
+        "tskit_pair_coalescence",
+        "output=counts; coalescing pairs per time window",
+        output=output,
+        time_windows=tw2,
+        values=_plain(values),
+    )
 
 
 def tskit_ibd_segments(
@@ -1435,18 +1665,31 @@ def tskit_ibd_segments(
     }
 
     def run() -> list[dict[str, Any]]:
-        result = ts.ibd_segments(within=inside, between=across, store_pairs=True, store_segments=True, **options)
+        result = ts.ibd_segments(
+            within=inside, between=across, store_pairs=True, store_segments=True, **options
+        )
         rows = []
         for pair, segs in result.items():
             for seg in segs:
-                rows.append({"node_a": int(pair[0]), "node_b": int(pair[1]), "left": float(seg.left),
-                             "right": float(seg.right), "mrca": int(seg.node)})
+                rows.append(
+                    {
+                        "node_a": int(pair[0]),
+                        "node_b": int(pair[1]),
+                        "left": float(seg.left),
+                        "right": float(seg.right),
+                        "mrca": int(seg.node),
+                    }
+                )
         return rows
 
     rows = _guard(run, "ibd_segments")
     _check_listing_size(len(rows), max_rows, "IBD segments")
-    return _report("tskit_ibd_segments", "segments are half-open [left, right); mrca is the common ancestor node",
-                   num_segments=len(rows), segments=rows)
+    return _report(
+        "tskit_ibd_segments",
+        "segments are half-open [left, right); mrca is the common ancestor node",
+        num_segments=len(rows),
+        segments=rows,
+    )
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1456,20 +1699,36 @@ def tskit_ibd_segments(
 
 def _rate_rows(rate_map: Any) -> list[dict[str, Any]]:
     return [
-        {"left": float(l), "right": float(r), "rate": None if not math.isfinite(float(v)) else float(v)}
-        for l, r, v in zip(rate_map.left, rate_map.right, rate_map.rate, strict=True)
+        {
+            "left": float(left),
+            "right": float(r),
+            "rate": None if not math.isfinite(float(v)) else float(v),
+        }
+        for left, r, v in zip(rate_map.left, rate_map.right, rate_map.rate, strict=True)
     ]
 
 
-def _hapmap(tskit: Any, source: object, sequence_length: float | None, has_header: bool,
-            position_col: int | None, rate_col: int | None, map_col: int | None) -> Any:
+def _hapmap(
+    tskit: Any,
+    source: object,
+    sequence_length: float | None,
+    has_header: bool,
+    position_col: int | None,
+    rate_col: int | None,
+    map_col: int | None,
+) -> Any:
     path = input_path(source)
 
     def run() -> Any:
         with open(path) as handle:
             return tskit.RateMap.read_hapmap(
-                handle, sequence_length=sequence_length, has_header=has_header,
-                position_col=position_col, rate_col=rate_col, map_col=map_col)
+                handle,
+                sequence_length=sequence_length,
+                has_header=has_header,
+                position_col=position_col,
+                rate_col=rate_col,
+                map_col=map_col,
+            )
 
     return _guard(run, f"read_hapmap on {path.name}")
 
@@ -1492,12 +1751,21 @@ def tskit_read_hapmap(
     """
 
     tskit = _tskit()
-    length = None if sequence_length is None else _number(sequence_length, "sequence_length", positive=True)
-    rm = _hapmap(tskit, source, length, _flag(has_header, "has_header"), position_col, rate_col, map_col)
+    length = (
+        None
+        if sequence_length is None
+        else _number(sequence_length, "sequence_length", positive=True)
+    )
+    rm = _hapmap(
+        tskit, source, length, _flag(has_header, "has_header"), position_col, rate_col, map_col
+    )
     return _report(
-        "tskit_read_hapmap", "rates are per base pair per generation as in tskit; NaN (missing) is null",
-        sequence_length=float(rm.sequence_length), total_mass=float(rm.total_mass),
-        mean_rate=float(rm.mean_rate), intervals=_rate_rows(rm),
+        "tskit_read_hapmap",
+        "rates are per base pair per generation as in tskit; NaN (missing) is null",
+        sequence_length=float(rm.sequence_length),
+        total_mass=float(rm.total_mass),
+        mean_rate=float(rm.mean_rate),
+        intervals=_rate_rows(rm),
     )
 
 
@@ -1528,13 +1796,19 @@ def tskit_recombination_map_lookup(
         raise ConfigurationError("positions must not be empty.")
     if (hapmap_file is None) == (map_positions is None):
         raise ConfigurationError("give exactly one of hapmap_file and map_positions/map_rates.")
-    length = None if sequence_length is None else _number(sequence_length, "sequence_length", positive=True)
+    length = (
+        None
+        if sequence_length is None
+        else _number(sequence_length, "sequence_length", positive=True)
+    )
     if hapmap_file is not None:
         rm = _hapmap(tskit, hapmap_file, length, _flag(has_header, "has_header"), None, None, None)
     else:
         if map_rates is None:
             raise ConfigurationError("map_rates is required with map_positions.")
-        pos = np.array([_number(p, "map position", minimum=0.0) for p in map_positions], dtype=float)
+        pos = np.array(
+            [_number(p, "map position", minimum=0.0) for p in map_positions], dtype=float
+        )
         rates = np.array([_number(r, "map rate", minimum=0.0) for r in map_rates], dtype=float)
         rm = _guard(lambda: tskit.RateMap(position=pos, rate=rates), "RateMap")
     getter = rm.get_rate if quantity == "rate" else rm.get_cumulative_mass
@@ -1542,7 +1816,9 @@ def tskit_recombination_map_lookup(
     return _report(
         "tskit_recombination_map_lookup",
         "rate per base pair per generation; cumulative_mass is the integral of rate from 0",
-        quantity=quantity, positions=x, values=_plain(values),
+        quantity=quantity,
+        positions=x,
+        values=_plain(values),
     )
 
 

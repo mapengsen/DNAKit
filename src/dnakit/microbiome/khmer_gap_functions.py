@@ -49,7 +49,9 @@ def _table_size(value: object) -> int:
 
 
 def _limits(max_reads: object, max_bases: object) -> tuple[int, int]:
-    return _integer(max_reads, "max_reads", 1, _COUNT_LIMIT), _integer(max_bases, "max_bases", 1, _COUNT_LIMIT)
+    return _integer(max_reads, "max_reads", 1, _COUNT_LIMIT), _integer(
+        max_bases, "max_bases", 1, _COUNT_LIMIT
+    )
 
 
 def _new_output(value: str | Path) -> Path:
@@ -69,10 +71,14 @@ def _reads(khmer: Any, path: Path, max_reads: int, max_bases: int) -> Iterator[t
         for read in khmer.ReadParser(str(path)):
             reads += 1
             if reads > max_reads:
-                raise ConfigurationError(f"read input exceeds max_reads={max_reads}; increase the explicit limit.")
+                raise ConfigurationError(
+                    f"read input exceeds max_reads={max_reads}; increase the explicit limit."
+                )
             bases += len(read.sequence)
             if bases > max_bases:
-                raise ConfigurationError(f"read input exceeds max_bases={max_bases}; increase the explicit limit.")
+                raise ConfigurationError(
+                    f"read input exceeds max_bases={max_bases}; increase the explicit limit."
+                )
             yield read.name, read.sequence.upper()
     except ConfigurationError:
         raise
@@ -103,7 +109,11 @@ def khmer_table_size_from_memory(
     khmer = require("khmer", _KHMER_EXTRA)
     buckets_per_byte = int(khmer._buckets_per_byte[graph_type])
     if max_memory_bytes is not None:
-        if isinstance(max_memory_bytes, bool) or not isinstance(max_memory_bytes, (int, float)) or max_memory_bytes <= 0:
+        if (
+            isinstance(max_memory_bytes, bool)
+            or not isinstance(max_memory_bytes, (int, float))
+            or max_memory_bytes <= 0
+        ):
             raise ConfigurationError("max_memory_bytes must be a positive number.")
         if multiplier <= 0:
             raise ConfigurationError("multiplier must be positive.")
@@ -191,10 +201,18 @@ def khmer_build_countgraph(
     ``small_count=True`` uses khmer's SmallCountgraph (smaller counters, saturating counts). The saved file can be
     loaded with khmer.load_countgraph or queried with ``query_saved_countgraph``.
     """
-    kind: Literal["countgraph", "smallcountgraph"] = "smallcountgraph" if small_count else "countgraph"
+    kind: Literal["countgraph", "smallcountgraph"] = (
+        "smallcountgraph" if small_count else "countgraph"
+    )
     return _build(
-        source, output_path, kind=kind, ksize=ksize, table_size=table_size, n_tables=n_tables,
-        max_reads=max_reads, max_bases=max_bases,
+        source,
+        output_path,
+        kind=kind,
+        ksize=ksize,
+        table_size=table_size,
+        n_tables=n_tables,
+        max_reads=max_reads,
+        max_bases=max_bases,
     )
 
 
@@ -216,8 +234,14 @@ def khmer_build_nodegraph(
     khmer.load_nodegraph.
     """
     return _build(
-        source, output_path, kind="nodegraph", ksize=ksize, table_size=table_size, n_tables=n_tables,
-        max_reads=max_reads, max_bases=max_bases,
+        source,
+        output_path,
+        kind="nodegraph",
+        ksize=ksize,
+        table_size=table_size,
+        n_tables=n_tables,
+        max_reads=max_reads,
+        max_bases=max_bases,
     )
 
 

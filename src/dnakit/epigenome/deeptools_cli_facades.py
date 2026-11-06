@@ -10,8 +10,9 @@ backend, command, outputs and a bounded log tail. Verified against deepTools 4.0
 from __future__ import annotations
 
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import execute_bounded_command
@@ -25,7 +26,9 @@ def _program(tool: str, deeptools_path: str | None) -> str:
     if deeptools_path is not None:
         candidate = Path(deeptools_path).expanduser()
         if not candidate.is_file():
-            raise BackendUnavailableError(f"deeptools_path does not exist: {candidate}", hint=_TOOL_HINT)
+            raise BackendUnavailableError(
+                f"deeptools_path does not exist: {candidate}", hint=_TOOL_HINT
+            )
         return str(candidate)
     found = shutil.which(tool)
     if found is None:
@@ -49,11 +52,19 @@ def _new(path: str | Path, name: str) -> Path:
     return resolved
 
 
-def _run(tool: str, arguments: list[str], outputs: Sequence[Path], deeptools_path: str | None) -> dict[str, Any]:
+def _run(
+    tool: str, arguments: list[str], outputs: Sequence[Path], deeptools_path: str | None
+) -> dict[str, Any]:
     program = _program(tool, deeptools_path)
     cwd = outputs[0].parent
-    result = execute_bounded_command(program, arguments, backend_id=f"deeptools:{tool}", cwd=cwd, verbose=False)
-    status = "completed" if result.return_code == 0 and all(path.is_file() for path in outputs) else "failed"
+    result = execute_bounded_command(
+        program, arguments, backend_id=f"deeptools:{tool}", cwd=cwd, verbose=False
+    )
+    status = (
+        "completed"
+        if result.return_code == 0 and all(path.is_file() for path in outputs)
+        else "failed"
+    )
     return {
         "status": status,
         "backend": "deeptools",
@@ -65,7 +76,9 @@ def _run(tool: str, arguments: list[str], outputs: Sequence[Path], deeptools_pat
     }
 
 
-_OPERATIONS = Literal["log2", "ratio", "subtract", "add", "mean", "reciprocal_ratio", "first", "second"]
+_OPERATIONS = Literal[
+    "log2", "ratio", "subtract", "add", "mean", "reciprocal_ratio", "first", "second"
+]
 _NORMALIZATION = Literal["RPGC", "CPM", "BPM", "RPKM", "None"]
 
 
@@ -89,8 +102,20 @@ def bam_coverage(
     out = _new(output, "output")
     if bin_size < 1:
         raise ConfigurationError("bin_size must be a positive integer.")
-    args = ["-b", str(bam_path), "-o", str(out), "-of", output_format, "--binSize", str(bin_size),
-            "--normalizeUsing", normalize_using, "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        str(bam_path),
+        "-o",
+        str(out),
+        "-of",
+        output_format,
+        "--binSize",
+        str(bin_size),
+        "--normalizeUsing",
+        normalize_using,
+        "-p",
+        str(number_of_processors),
+    ]
     if effective_genome_size is not None:
         args += ["--effectiveGenomeSize", str(effective_genome_size)]
     if extend_reads is not None:
@@ -118,8 +143,24 @@ def bam_compare(
     """Compare two BAM files bin by bin (deepTools bamCompare)."""
     b1, b2 = _existing(bam1, "bam1"), _existing(bam2, "bam2")
     out = _new(output, "output")
-    args = ["-b1", str(b1), "-b2", str(b2), "-o", str(out), "-of", output_format, "--binSize", str(bin_size),
-            "--operation", operation, "--pseudocount", str(pseudocount), "-p", str(number_of_processors)]
+    args = [
+        "-b1",
+        str(b1),
+        "-b2",
+        str(b2),
+        "-o",
+        str(out),
+        "-of",
+        output_format,
+        "--binSize",
+        str(bin_size),
+        "--operation",
+        operation,
+        "--pseudocount",
+        str(pseudocount),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("bamCompare", args, [out], deeptools_path)
 
 
@@ -138,8 +179,22 @@ def bigwig_compare(
     """Compare two bigWig tracks bin by bin (deepTools bigwigCompare)."""
     b1, b2 = _existing(bigwig1, "bigwig1"), _existing(bigwig2, "bigwig2")
     out = _new(output, "output")
-    args = ["-b1", str(b1), "-b2", str(b2), "-o", str(out), "--binSize", str(bin_size),
-            "--operation", operation, "--pseudocount", str(pseudocount), "-p", str(number_of_processors)]
+    args = [
+        "-b1",
+        str(b1),
+        "-b2",
+        str(b2),
+        "-o",
+        str(out),
+        "--binSize",
+        str(bin_size),
+        "--operation",
+        operation,
+        "--pseudocount",
+        str(pseudocount),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("bigwigCompare", args, [out], deeptools_path)
 
 
@@ -185,7 +240,9 @@ def alignment_sieve(
     args = ["--bam", str(bam_path), "-o", str(out), "-p", str(number_of_processors)]
     if shift is not None:
         if len(shift) != 4 or not all(isinstance(value, int) for value in shift):
-            raise ConfigurationError("shift must be four integers: forward start, reverse start, forward end, reverse end.")
+            raise ConfigurationError(
+                "shift must be four integers: forward start, reverse start, forward end, reverse end."
+            )
         args += ["--shift", *[str(value) for value in shift]]
     if bed_output:
         args.append("--BED")
@@ -204,13 +261,30 @@ def estimate_scale_factor(
 ) -> dict[str, Any]:
     """Estimate scale factors from sampled read counts (deepTools estimateScaleFactor). Prints the factors."""
     if len(bams) < 2:
-        raise ConfigurationError("estimateScaleFactor needs at least two BAM files (scale factors are defined per pair).")
+        raise ConfigurationError(
+            "estimateScaleFactor needs at least two BAM files (scale factors are defined per pair)."
+        )
     paths = [str(_existing(bam, "bam")) for bam in bams]
-    args = ["-b", *paths, "-l", str(sample_window_length), "-n", str(number_of_samples),
-            "-nl", str(normalization_length), "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        *paths,
+        "-l",
+        str(sample_window_length),
+        "-n",
+        str(number_of_samples),
+        "-nl",
+        str(normalization_length),
+        "-p",
+        str(number_of_processors),
+    ]
     program = _program("estimateScaleFactor", deeptools_path)
-    result = execute_bounded_command(program, args, backend_id="deeptools:estimateScaleFactor",
-                                     cwd=Path(paths[0]).parent, verbose=False)
+    result = execute_bounded_command(
+        program,
+        args,
+        backend_id="deeptools:estimateScaleFactor",
+        cwd=Path(paths[0]).parent,
+        verbose=False,
+    )
     return {
         "status": "completed" if result.return_code == 0 else "failed",
         "backend": "deeptools",

@@ -1,6 +1,6 @@
 """Line-oriented format engines: PLINK ``.map``, PLINK ``.ped`` and PAF alignments."""
 
-# ruff: noqa: E501, RUF012
+# ruff: noqa: RUF012
 
 from __future__ import annotations
 
@@ -217,7 +217,15 @@ class MapFormat(Format):
                     f"map record {number} has an empty/whitespace name or negative position."
                 )
             rows.append(
-                {"chrom": chrom, "id": ident, "cm": cm, "pos": pos, "_line": number, "_offset": None, "_length": None}
+                {
+                    "chrom": chrom,
+                    "id": ident,
+                    "cm": cm,
+                    "pos": pos,
+                    "_line": number,
+                    "_offset": None,
+                    "_length": None,
+                }
             )
         return rows
 
@@ -998,9 +1006,7 @@ class PafFormat(Format):
                         row[key] = value
             for position, raw in enumerate(fields[12:], 13):
                 if not _TAG.match(raw):
-                    problems.append(
-                        _field_problem("optional", position, raw, "not TAG:TYPE:VALUE")
-                    )
+                    problems.append(_field_problem("optional", position, raw, "not TAG:TYPE:VALUE"))
                     continue
                 try:
                     _paf_tag_value(raw)

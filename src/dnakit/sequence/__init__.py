@@ -8,11 +8,11 @@ batch can be validated in a clean local environment.
 
 from __future__ import annotations
 
+import itertools
 import math
 import random
 from collections import Counter, defaultdict
-from typing import Iterable, Mapping, Sequence
-
+from collections.abc import Iterable, Mapping, Sequence
 
 DNA_BASES = "ACGT"
 RNA_BASES = "ACGU"
@@ -42,22 +42,70 @@ DNA_COMPLEMENT = str.maketrans(
 CODON_TABLE = {
     codon: amino_acid
     for codon, amino_acid in (
-        ("TTT", "F"), ("TTC", "F"), ("TTA", "L"), ("TTG", "L"),
-        ("TCT", "S"), ("TCC", "S"), ("TCA", "S"), ("TCG", "S"),
-        ("TAT", "Y"), ("TAC", "Y"), ("TAA", "*"), ("TAG", "*"),
-        ("TGT", "C"), ("TGC", "C"), ("TGA", "*"), ("TGG", "W"),
-        ("CTT", "L"), ("CTC", "L"), ("CTA", "L"), ("CTG", "L"),
-        ("CCT", "P"), ("CCC", "P"), ("CCA", "P"), ("CCG", "P"),
-        ("CAT", "H"), ("CAC", "H"), ("CAA", "Q"), ("CAG", "Q"),
-        ("CGT", "R"), ("CGC", "R"), ("CGA", "R"), ("CGG", "R"),
-        ("ATT", "I"), ("ATC", "I"), ("ATA", "I"), ("ATG", "M"),
-        ("ACT", "T"), ("ACC", "T"), ("ACA", "T"), ("ACG", "T"),
-        ("AAT", "N"), ("AAC", "N"), ("AAA", "K"), ("AAG", "K"),
-        ("AGT", "S"), ("AGC", "S"), ("AGA", "R"), ("AGG", "R"),
-        ("GTT", "V"), ("GTC", "V"), ("GTA", "V"), ("GTG", "V"),
-        ("GCT", "A"), ("GCC", "A"), ("GCA", "A"), ("GCG", "A"),
-        ("GAT", "D"), ("GAC", "D"), ("GAA", "E"), ("GAG", "E"),
-        ("GGT", "G"), ("GGC", "G"), ("GGA", "G"), ("GGG", "G"),
+        ("TTT", "F"),
+        ("TTC", "F"),
+        ("TTA", "L"),
+        ("TTG", "L"),
+        ("TCT", "S"),
+        ("TCC", "S"),
+        ("TCA", "S"),
+        ("TCG", "S"),
+        ("TAT", "Y"),
+        ("TAC", "Y"),
+        ("TAA", "*"),
+        ("TAG", "*"),
+        ("TGT", "C"),
+        ("TGC", "C"),
+        ("TGA", "*"),
+        ("TGG", "W"),
+        ("CTT", "L"),
+        ("CTC", "L"),
+        ("CTA", "L"),
+        ("CTG", "L"),
+        ("CCT", "P"),
+        ("CCC", "P"),
+        ("CCA", "P"),
+        ("CCG", "P"),
+        ("CAT", "H"),
+        ("CAC", "H"),
+        ("CAA", "Q"),
+        ("CAG", "Q"),
+        ("CGT", "R"),
+        ("CGC", "R"),
+        ("CGA", "R"),
+        ("CGG", "R"),
+        ("ATT", "I"),
+        ("ATC", "I"),
+        ("ATA", "I"),
+        ("ATG", "M"),
+        ("ACT", "T"),
+        ("ACC", "T"),
+        ("ACA", "T"),
+        ("ACG", "T"),
+        ("AAT", "N"),
+        ("AAC", "N"),
+        ("AAA", "K"),
+        ("AAG", "K"),
+        ("AGT", "S"),
+        ("AGC", "S"),
+        ("AGA", "R"),
+        ("AGG", "R"),
+        ("GTT", "V"),
+        ("GTC", "V"),
+        ("GTA", "V"),
+        ("GTG", "V"),
+        ("GCT", "A"),
+        ("GCC", "A"),
+        ("GCA", "A"),
+        ("GCG", "A"),
+        ("GAT", "D"),
+        ("GAC", "D"),
+        ("GAA", "E"),
+        ("GAG", "E"),
+        ("GGT", "G"),
+        ("GGC", "G"),
+        ("GGA", "G"),
+        ("GGG", "G"),
     )
 }
 STOP_CODONS = {codon for codon, amino_acid in CODON_TABLE.items() if amino_acid == "*"}
@@ -67,7 +115,7 @@ def _text(sequence: object, *, uppercase: bool = True) -> str:
     """Coerce a DNAKit sequence value or text without changing whitespace."""
 
     if hasattr(sequence, "symbols"):
-        value = str(getattr(sequence, "symbols"))
+        value = str(sequence.symbols)
     elif isinstance(sequence, str):
         value = sequence
     else:
@@ -100,7 +148,7 @@ def _kmers(sequence: str, k: int) -> Iterable[tuple[int, str]]:
 def _identity(left: str, right: str) -> float:
     if not left or not right:
         return 0.0
-    return sum(a == b for a, b in zip(left, right)) / max(len(left), len(right))
+    return sum(a == b for a, b in zip(left, right, strict=False)) / max(len(left), len(right))
 
 
 def _entropy(value: str) -> float:
@@ -111,7 +159,9 @@ def _entropy(value: str) -> float:
     return -sum((count / total) * math.log2(count / total) for count in counts.values())
 
 
-def apply_reverse_complement_augmentation(sequence: str, *, include_original: bool = True) -> list[str]:
+def apply_reverse_complement_augmentation(
+    sequence: str, *, include_original: bool = True
+) -> list[str]:
     """Return an optional original sequence and its reverse complement."""
 
     value = normalize_dna_sequence(sequence)
@@ -164,7 +214,9 @@ def calculate_sequence_metrics(sequence: str) -> dict[str, object]:
     }
 
 
-def cluster_sequences_by_identity(sequences: Sequence[str], *, threshold: float = 0.9) -> list[list[int]]:
+def cluster_sequences_by_identity(
+    sequences: Sequence[str], *, threshold: float = 0.9
+) -> list[list[int]]:
     """Greedily group sequences by identity to the first sequence in each cluster."""
 
     if not 0.0 <= threshold <= 1.0:
@@ -183,7 +235,9 @@ def cluster_sequences_by_identity(sequences: Sequence[str], *, threshold: float 
     return clusters
 
 
-def compare_motif_alleles(left: str, right: str, motif: str, *, start: int = 0) -> dict[str, object]:
+def compare_motif_alleles(
+    left: str, right: str, motif: str, *, start: int = 0
+) -> dict[str, object]:
     """Compare a motif interval between two allele sequences."""
 
     motif_value = normalize_dna_sequence(motif)
@@ -237,7 +291,9 @@ def count_canonical_kmers(sequence: str, *, k: int = 5) -> dict[str, int]:
 def count_kmers(sequence: str, *, k: int = 5) -> dict[str, int]:
     """Count overlapping DNA k-mers."""
 
-    return dict(sorted(Counter(kmer for _, kmer in _kmers(normalize_dna_sequence(sequence), k)).items()))
+    return dict(
+        sorted(Counter(kmer for _, kmer in _kmers(normalize_dna_sequence(sequence), k)).items())
+    )
 
 
 def count_kmers_batch(sequences: Sequence[str], *, k: int = 5) -> list[dict[str, int]]:
@@ -268,11 +324,19 @@ def digest_sequence_in_silico(sequence: str, enzymes: Mapping[str, str]) -> dict
     cuts: list[int] = [0, len(value)]
     for name, motif in enzymes.items():
         motif_value = normalize_dna_sequence(motif)
-        positions = [index for index, _ in _kmers(value, len(motif_value)) if value[index : index + len(motif_value)] == motif_value]
+        positions = [
+            index
+            for index, _ in _kmers(value, len(motif_value))
+            if value[index : index + len(motif_value)] == motif_value
+        ]
         sites[name] = positions
         cuts.extend(positions)
     ordered = sorted(set(cuts))
-    return {"sites": sites, "cut_positions": ordered, "fragment_lengths": [b - a for a, b in zip(ordered, ordered[1:])]}
+    return {
+        "sites": sites,
+        "cut_positions": ordered,
+        "fragment_lengths": [b - a for a, b in itertools.pairwise(ordered)],
+    }
 
 
 def extract_cds_from_transcript(transcript: str, intervals: Sequence[Sequence[int]]) -> str:
@@ -290,14 +354,20 @@ def extract_cds_from_transcript(transcript: str, intervals: Sequence[Sequence[in
     return "".join(pieces)
 
 
-def find_sequence_patterns(sequence: str, *, motif: str | None = None, min_repeat: int = 3) -> dict[str, object]:
+def find_sequence_patterns(
+    sequence: str, *, motif: str | None = None, min_repeat: int = 3
+) -> dict[str, object]:
     """Find motif hits, homopolymers and simple tandem repeats."""
 
     value = normalize_dna_sequence(sequence)
     result: dict[str, object] = {"motif_hits": [], "homopolymers": [], "tandem_repeats": []}
     if motif:
         motif_value = normalize_dna_sequence(motif)
-        result["motif_hits"] = [index for index, _ in _kmers(value, len(motif_value)) if value[index : index + len(motif_value)] == motif_value]
+        result["motif_hits"] = [
+            index
+            for index, _ in _kmers(value, len(motif_value))
+            if value[index : index + len(motif_value)] == motif_value
+        ]
     homopolymers = []
     index = 0
     while index < len(value):
@@ -305,7 +375,9 @@ def find_sequence_patterns(sequence: str, *, motif: str | None = None, min_repea
         while end < len(value) and value[end] == value[index]:
             end += 1
         if end - index >= min_repeat:
-            homopolymers.append({"start": index, "end": end, "base": value[index], "length": end - index})
+            homopolymers.append(
+                {"start": index, "end": end, "base": value[index], "length": end - index}
+            )
         index = end
     result["homopolymers"] = homopolymers
     for unit_length in range(1, min(6, len(value) + 1)):
@@ -315,7 +387,14 @@ def find_sequence_patterns(sequence: str, *, motif: str | None = None, min_repea
             while value[start + count * unit_length : start + (count + 1) * unit_length] == unit:
                 count += 1
             if count >= min_repeat:
-                result["tandem_repeats"].append({"start": start, "end": start + count * unit_length, "unit": unit, "count": count})
+                result["tandem_repeats"].append(
+                    {
+                        "start": start,
+                        "end": start + count * unit_length,
+                        "unit": unit,
+                        "count": count,
+                    }
+                )
     return result
 
 
@@ -329,7 +408,9 @@ def generate_kmer_table(sequences: Sequence[str], *, k: int = 5) -> list[dict[st
     return rows
 
 
-def generate_markov_sequence(sequence: str, *, length: int, order: int = 1, seed: int | None = None) -> str:
+def generate_markov_sequence(
+    sequence: str, *, length: int, order: int = 1, seed: int | None = None
+) -> str:
     """Generate a sequence from an order-n empirical Markov model."""
 
     value = normalize_dna_sequence(sequence)
@@ -357,7 +438,9 @@ def generate_random_dna(*, length: int, seed: int | None = None, alphabet: str =
     return "".join(_seeded(seed).choice(alphabet) for _ in range(length))
 
 
-def mask_low_complexity(sequence: str, *, window: int = 10, entropy_threshold: float = 1.2, mask: str = "N") -> str:
+def mask_low_complexity(
+    sequence: str, *, window: int = 10, entropy_threshold: float = 1.2, mask: str = "N"
+) -> str:
     """Mask windows whose Shannon entropy is below a threshold."""
 
     value = normalize_dna_sequence(sequence)
@@ -478,7 +561,9 @@ def predict_coding_regions(sequence: str, *, min_aa: int = 1) -> list[dict[str, 
             if stop + 3 <= len(value):
                 protein = translate_dna_to_protein(value[index : stop + 3])
                 if len(protein.rstrip("*")) >= min_aa:
-                    result.append({"start": index, "end": stop + 3, "frame": frame, "protein": protein})
+                    result.append(
+                        {"start": index, "end": stop + 3, "frame": frame, "protein": protein}
+                    )
                 index = stop + 3
             else:
                 break
@@ -518,7 +603,9 @@ def reverse_sequence(sequence: str) -> str:
     return normalize_dna_sequence(sequence)[::-1]
 
 
-def scan_pwm(sequence: str, pwm: Sequence[Mapping[str, float]], *, threshold: float = 0.0) -> list[dict[str, object]]:
+def scan_pwm(
+    sequence: str, pwm: Sequence[Mapping[str, float]], *, threshold: float = 0.0
+) -> list[dict[str, object]]:
     """Scan a position-weight matrix represented by base-score mappings."""
 
     value = normalize_dna_sequence(sequence)
@@ -528,36 +615,60 @@ def scan_pwm(sequence: str, pwm: Sequence[Mapping[str, float]], *, threshold: fl
     width = len(pwm)
     for start in range(len(value) - width + 1):
         window = value[start : start + width]
-        score = sum(float(pwm[offset].get(base, float("-inf"))) for offset, base in enumerate(window))
+        score = sum(
+            float(pwm[offset].get(base, float("-inf"))) for offset, base in enumerate(window)
+        )
         if score >= threshold:
             hits.append({"start": start, "end": start + width, "sequence": window, "score": score})
     return hits
 
 
-def scan_pwm_batch(sequences: Sequence[str], pwm: Sequence[Mapping[str, float]], *, threshold: float = 0.0) -> list[list[dict[str, object]]]:
+def scan_pwm_batch(
+    sequences: Sequence[str], pwm: Sequence[Mapping[str, float]], *, threshold: float = 0.0
+) -> list[list[dict[str, object]]]:
     """Scan one PWM across multiple sequences."""
 
     return [scan_pwm(sequence, pwm, threshold=threshold) for sequence in sequences]
 
 
-def score_motif_hit(sequence: str, motif: str, *, position: int = 0, match_score: float = 1.0, mismatch_score: float = 0.0) -> dict[str, object]:
+def score_motif_hit(
+    sequence: str,
+    motif: str,
+    *,
+    position: int = 0,
+    match_score: float = 1.0,
+    mismatch_score: float = 0.0,
+) -> dict[str, object]:
     """Score a motif at a zero-based sequence position."""
 
     value = normalize_dna_sequence(sequence)
     pattern = normalize_dna_sequence(motif)
     observed = value[position : position + len(pattern)]
-    score = sum(match_score if left == right else mismatch_score for left, right in zip(observed, pattern))
-    return {"position": position, "motif": pattern, "observed": observed, "score": score, "matches": observed == pattern}
+    score = sum(
+        match_score if left == right else mismatch_score
+        for left, right in zip(observed, pattern, strict=False)
+    )
+    return {
+        "position": position,
+        "motif": pattern,
+        "observed": observed,
+        "score": score,
+        "matches": observed == pattern,
+    }
 
 
-def select_representative_sequences(sequences: Sequence[str], *, threshold: float = 0.9) -> list[int]:
+def select_representative_sequences(
+    sequences: Sequence[str], *, threshold: float = 0.9
+) -> list[int]:
     """Return indices of greedy identity-cluster representatives."""
 
     clusters = cluster_sequences_by_identity(sequences, threshold=threshold)
     return [cluster[0] for cluster in clusters]
 
 
-def simulate_indels(sequence: str, *, count: int = 1, seed: int | None = None, max_length: int | None = None) -> str:
+def simulate_indels(
+    sequence: str, *, count: int = 1, seed: int | None = None, max_length: int | None = None
+) -> str:
     """Apply reproducible single-base insertions or deletions."""
 
     value = list(normalize_dna_sequence(sequence))
@@ -600,17 +711,25 @@ def simulate_recombination(left: str, right: str, *, crossover: int | None = Non
     return first[:point] + second[point:]
 
 
-def simulate_sequence_evolution(sequence: str, *, generations: int = 1, mutation_rate: float = 0.01, seed: int | None = None) -> list[str]:
+def simulate_sequence_evolution(
+    sequence: str, *, generations: int = 1, mutation_rate: float = 0.01, seed: int | None = None
+) -> list[str]:
     """Return the starting sequence and each seeded mutation generation."""
 
     rng = _seeded(seed)
     generations_out = [normalize_dna_sequence(sequence)]
     for _ in range(generations):
-        generations_out.append(simulate_point_mutations(generations_out[-1], rate=mutation_rate, seed=rng.randrange(2**32)))
+        generations_out.append(
+            simulate_point_mutations(
+                generations_out[-1], rate=mutation_rate, seed=rng.randrange(2**32)
+            )
+        )
     return generations_out
 
 
-def split_sequence_windows(sequence: str, *, window: int, step: int | None = None) -> list[dict[str, object]]:
+def split_sequence_windows(
+    sequence: str, *, window: int, step: int | None = None
+) -> list[dict[str, object]]:
     """Split a sequence into overlapping or adjacent windows."""
 
     value = normalize_dna_sequence(sequence)
@@ -619,7 +738,15 @@ def split_sequence_windows(sequence: str, *, window: int, step: int | None = Non
     step = window if step is None else step
     if step < 1:
         raise ValueError("step must be positive")
-    return [{"start": start, "end": min(start + window, len(value)), "sequence": value[start : start + window]} for start in range(0, len(value), step) if start < len(value)]
+    return [
+        {
+            "start": start,
+            "end": min(start + window, len(value)),
+            "sequence": value[start : start + window],
+        }
+        for start in range(0, len(value), step)
+        if start < len(value)
+    ]
 
 
 def tokenize_dna_bpe(sequence: str, *, merges: Sequence[Sequence[str]] = ()) -> list[str]:
@@ -683,7 +810,9 @@ def translate_dna_to_protein(sequence: str, *, frame: int = 0, stop_at_stop: boo
     return "".join(amino_acids)
 
 
-def translate_orf(sequence: str, *, start_codon: str = "ATG", stop_codons: Iterable[str] = STOP_CODONS) -> list[dict[str, object]]:
+def translate_orf(
+    sequence: str, *, start_codon: str = "ATG", stop_codons: Iterable[str] = STOP_CODONS
+) -> list[dict[str, object]]:
     """Translate all in-frame ORFs on the forward strand."""
 
     value = normalize_dna_sequence(sequence)
@@ -695,7 +824,16 @@ def translate_orf(sequence: str, *, start_codon: str = "ATG", stop_codons: Itera
             continue
         for end in range(start + 3, len(value) - 2, 3):
             if value[end : end + 3] in stops:
-                result.append({"start": start, "end": end + 3, "sequence": value[start : end + 3], "protein": translate_dna_to_protein(value[start : end + 3], stop_at_stop=True)})
+                result.append(
+                    {
+                        "start": start,
+                        "end": end + 3,
+                        "sequence": value[start : end + 3],
+                        "protein": translate_dna_to_protein(
+                            value[start : end + 3], stop_at_stop=True
+                        ),
+                    }
+                )
                 break
     return result
 
@@ -703,7 +841,9 @@ def translate_orf(sequence: str, *, start_codon: str = "ATG", stop_codons: Itera
 def translate_rna_to_protein(sequence: str, *, frame: int = 0, stop_at_stop: bool = False) -> str:
     """Translate RNA text through the DNA codon table."""
 
-    return translate_dna_to_protein(back_transcribe_rna_to_dna(sequence), frame=frame, stop_at_stop=stop_at_stop)
+    return translate_dna_to_protein(
+        back_transcribe_rna_to_dna(sequence), frame=frame, stop_at_stop=stop_at_stop
+    )
 
 
 def translate_six_frames(sequence: str) -> dict[str, str]:
@@ -712,7 +852,9 @@ def translate_six_frames(sequence: str) -> dict[str, str]:
     value = normalize_dna_sequence(sequence)
     reverse = reverse_complement_dna(value)
     result = {f"+{frame + 1}": translate_dna_to_protein(value, frame=frame) for frame in range(3)}
-    result.update({f"-{frame + 1}": translate_dna_to_protein(reverse, frame=frame) for frame in range(3)})
+    result.update(
+        {f"-{frame + 1}": translate_dna_to_protein(reverse, frame=frame) for frame in range(3)}
+    )
     return result
 
 
@@ -731,7 +873,12 @@ def validate_dna_alphabet(sequence: str, *, allow_ambiguous: bool = True) -> dic
     value = "".join(_text(sequence).split())
     alphabet = IUPAC_DNA if allow_ambiguous else set(DNA_BASES)
     invalid = sorted(set(value) - alphabet)
-    return {"valid": not invalid, "length": len(value), "invalid_symbols": invalid, "alphabet": "iupac" if allow_ambiguous else "strict"}
+    return {
+        "valid": not invalid,
+        "length": len(value),
+        "invalid_symbols": invalid,
+        "alphabet": "iupac" if allow_ambiguous else "strict",
+    }
 
 
 def validate_protein_alphabet(sequence: str) -> dict[str, object]:
@@ -739,7 +886,12 @@ def validate_protein_alphabet(sequence: str) -> dict[str, object]:
 
     value = "".join(_text(sequence).split())
     invalid = sorted(set(value) - PROTEIN_BASES)
-    return {"valid": not invalid, "length": len(value), "invalid_symbols": invalid, "alphabet": "protein"}
+    return {
+        "valid": not invalid,
+        "length": len(value),
+        "invalid_symbols": invalid,
+        "alphabet": "protein",
+    }
 
 
 def validate_rna_alphabet(sequence: str, *, allow_ambiguous: bool = True) -> dict[str, object]:
@@ -748,33 +900,76 @@ def validate_rna_alphabet(sequence: str, *, allow_ambiguous: bool = True) -> dic
     value = "".join(_text(sequence).split())
     alphabet = IUPAC_RNA if allow_ambiguous else set(RNA_BASES)
     invalid = sorted(set(value) - alphabet)
-    return {"valid": not invalid, "length": len(value), "invalid_symbols": invalid, "alphabet": "iupac" if allow_ambiguous else "strict"}
+    return {
+        "valid": not invalid,
+        "length": len(value),
+        "invalid_symbols": invalid,
+        "alphabet": "iupac" if allow_ambiguous else "strict",
+    }
 
 
 __all__ = [
-    "apply_reverse_complement_augmentation", "back_transcribe_rna_to_dna", "build_minimizer_index",
-    "calculate_sequence_metrics", "cluster_sequences_by_identity", "compare_motif_alleles",
-    "compare_sequence_sketches", "complement_dna", "count_canonical_kmers", "count_kmers",
-    "count_kmers_batch", "deduplicate_sequences", "digest_sequence_in_silico",
-    "extract_cds_from_transcript", "find_sequence_patterns", "generate_kmer_table",
-    "generate_markov_sequence", "generate_random_dna", "mask_low_complexity", "merge_overlapping_windows",
-    "mutate_sequence_at_positions", "normalize_dna_sequence", "normalize_protein_sequence",
-    "normalize_rna_sequence", "one_hot_encode_dna", "one_hot_encode_rna", "pad_sequence",
-    "predict_coding_regions", "remove_sequence_gaps", "remove_sequence_whitespace",
-    "replace_ambiguous_bases", "reverse_complement_dna", "reverse_sequence", "scan_pwm",
-    "scan_pwm_batch", "score_motif_hit", "select_representative_sequences", "simulate_indels",
-    "simulate_point_mutations", "simulate_recombination", "simulate_sequence_evolution",
-    "split_sequence_windows", "sequence_length_gc_summary", "tokenize_dna_bpe", "tokenize_dna_kmer", "transcribe_dna_to_rna",
-    "translate_codon", "translate_dna_to_protein", "translate_orf", "translate_rna_to_protein",
-    "translate_six_frames", "trim_sequence", "validate_dna_alphabet", "validate_protein_alphabet",
+    "apply_reverse_complement_augmentation",
+    "back_transcribe_rna_to_dna",
+    "build_minimizer_index",
+    "calculate_sequence_metrics",
+    "cluster_sequences_by_identity",
+    "compare_motif_alleles",
+    "compare_sequence_sketches",
+    "complement_dna",
+    "count_canonical_kmers",
+    "count_kmers",
+    "count_kmers_batch",
+    "deduplicate_sequences",
+    "digest_sequence_in_silico",
+    "extract_cds_from_transcript",
+    "find_sequence_patterns",
+    "generate_kmer_table",
+    "generate_markov_sequence",
+    "generate_random_dna",
+    "mask_low_complexity",
+    "merge_overlapping_windows",
+    "mutate_sequence_at_positions",
+    "normalize_dna_sequence",
+    "normalize_protein_sequence",
+    "normalize_rna_sequence",
+    "one_hot_encode_dna",
+    "one_hot_encode_rna",
+    "pad_sequence",
+    "predict_coding_regions",
+    "remove_sequence_gaps",
+    "remove_sequence_whitespace",
+    "replace_ambiguous_bases",
+    "reverse_complement_dna",
+    "reverse_sequence",
+    "scan_pwm",
+    "scan_pwm_batch",
+    "score_motif_hit",
+    "select_representative_sequences",
+    "sequence_length_gc_summary",
+    "simulate_indels",
+    "simulate_point_mutations",
+    "simulate_recombination",
+    "simulate_sequence_evolution",
+    "split_sequence_windows",
+    "tokenize_dna_bpe",
+    "tokenize_dna_kmer",
+    "transcribe_dna_to_rna",
+    "translate_codon",
+    "translate_dna_to_protein",
+    "translate_orf",
+    "translate_rna_to_protein",
+    "translate_six_frames",
+    "trim_sequence",
+    "validate_dna_alphabet",
+    "validate_protein_alphabet",
     "validate_rna_alphabet",
 ]
 
 
-from .local import sequence_length_gc_summary
-
 from dnakit._verbosity import register_public as _register_public_verbose
-# Optional-backend exports (see docs/api/features) 
+
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     build_screed_database,
     calculate_kmer_frequencies,
@@ -788,8 +983,22 @@ from .backends import (
     summarize_twobit,
     translate_dna_with_genetic_code,
 )
+from .local import sequence_length_gc_summary
 
-__all__ = [*__all__, "build_screed_database", "calculate_kmer_frequencies", "convert_sequence_file", "detect_fastq_quality_encoding", "expand_degenerate_sequences", "extract_feature_sequences", "fetch_screed_records", "fetch_twobit_region", "read_sequence_records", "summarize_twobit", "translate_dna_with_genetic_code"]
+__all__ = [
+    *__all__,
+    "build_screed_database",
+    "calculate_kmer_frequencies",
+    "convert_sequence_file",
+    "detect_fastq_quality_encoding",
+    "expand_degenerate_sequences",
+    "extract_feature_sequences",
+    "fetch_screed_records",
+    "fetch_twobit_region",
+    "read_sequence_records",
+    "summarize_twobit",
+    "translate_dna_with_genetic_code",
+]
 
 # Full-pass exports (see docs/api/features)
 from .Bio_functions import (
@@ -814,24 +1023,20 @@ from .Bio_functions import (
     read_psl_alignments,
     sequence_checksum,
 )
-
 from .dnaio_functions import (
     check_read_mates,
     read_fastx_records,
 )
-
 from .pyfaidx_functions import (
     split_bed_entry,
     split_ucsc_region,
     translate_chromosome_names,
 )
-
 from .screed_functions import (
     export_screed_database,
     format_fastx_records,
     read_screed_fastx_records,
 )
-
 from .skbio_functions import (
     alignment_distance_matrix,
     alignment_score,
@@ -841,7 +1046,43 @@ from .skbio_functions import (
     sniff_sequence_format,
 )
 
-__all__ = [*__all__, "ambiguous_codon_amino_acids", "bootstrap_consensus_tree", "build_codon_alignment", "convert_quality_score", "expand_ambiguous_codons", "gc_content_by_codon_position", "gc_skew_windows", "load_substitution_matrix", "local_composition_complexity", "mcdonald_kreitman_test", "pairwise_dn_ds_matrix", "parse_kegg_gene_entries", "parse_primer3_output", "parse_primersearch_output", "read_ace_assembly", "read_gaf_annotations", "read_genepop_genotypes", "read_phd_sequence", "read_psl_alignments", "sequence_checksum", "check_read_mates", "read_fastx_records", "split_bed_entry", "split_ucsc_region", "translate_chromosome_names", "export_screed_database", "format_fastx_records", "read_screed_fastx_records", "alignment_distance_matrix", "alignment_score", "multiple_nucleotide_alignment", "nucleotide_distance", "nucleotide_transition_matrix", "sniff_sequence_format"]
+__all__ = [
+    *__all__,
+    "ambiguous_codon_amino_acids",
+    "bootstrap_consensus_tree",
+    "build_codon_alignment",
+    "convert_quality_score",
+    "expand_ambiguous_codons",
+    "gc_content_by_codon_position",
+    "gc_skew_windows",
+    "load_substitution_matrix",
+    "local_composition_complexity",
+    "mcdonald_kreitman_test",
+    "pairwise_dn_ds_matrix",
+    "parse_kegg_gene_entries",
+    "parse_primer3_output",
+    "parse_primersearch_output",
+    "read_ace_assembly",
+    "read_gaf_annotations",
+    "read_genepop_genotypes",
+    "read_phd_sequence",
+    "read_psl_alignments",
+    "sequence_checksum",
+    "check_read_mates",
+    "read_fastx_records",
+    "split_bed_entry",
+    "split_ucsc_region",
+    "translate_chromosome_names",
+    "export_screed_database",
+    "format_fastx_records",
+    "read_screed_fastx_records",
+    "alignment_distance_matrix",
+    "alignment_score",
+    "multiple_nucleotide_alignment",
+    "nucleotide_distance",
+    "nucleotide_transition_matrix",
+    "sniff_sequence_format",
+]
 
 # Review-pass exports (see docs/api/features)
 from .Bio_review_functions import (
@@ -860,7 +1101,6 @@ from .Bio_review_functions import (
     write_pairwise_alignment_file,
     write_qual_file,
 )
-
 from .skbio_review_functions import (
     build_bme_tree,
     build_gme_tree,
@@ -869,7 +1109,28 @@ from .skbio_review_functions import (
     weighted_robinson_foulds_distances,
 )
 
-__all__ = [*__all__, "adam_consensus_tree", "bootstrap_branch_support", "codon_back_table", "complement_rna_sequence", "convert_search_results", "melting_temperature_gc", "read_fasta_qual_pairs", "read_mast_report", "reverse_complement_rna_sequence", "tree_to_graph_edges", "write_gaf_file", "write_motifs", "write_pairwise_alignment_file", "write_qual_file", "build_bme_tree", "build_gme_tree", "improve_tree_nni", "tree_path_distances", "weighted_robinson_foulds_distances"]
+__all__ = [
+    *__all__,
+    "adam_consensus_tree",
+    "bootstrap_branch_support",
+    "codon_back_table",
+    "complement_rna_sequence",
+    "convert_search_results",
+    "melting_temperature_gc",
+    "read_fasta_qual_pairs",
+    "read_mast_report",
+    "reverse_complement_rna_sequence",
+    "tree_to_graph_edges",
+    "write_gaf_file",
+    "write_motifs",
+    "write_pairwise_alignment_file",
+    "write_qual_file",
+    "build_bme_tree",
+    "build_gme_tree",
+    "improve_tree_nni",
+    "tree_path_distances",
+    "weighted_robinson_foulds_distances",
+]
 
 # Family-pass exports (see docs/api/features)
 from .Bio_family_functions import (
@@ -884,12 +1145,24 @@ from .Bio_family_functions import (
     read_phylogeny_collection,
     read_substitution_matrix_file,
 )
-
 from .skbio_family_functions import (
     correct_jc69_distance,
 )
 
-__all__ = [*__all__, "bootstrap_replicate_trees", "parse_primer3_records", "read_alignment_blocks", "read_alignment_file", "read_blast_records", "read_genbank_record_fields", "read_goa_gene_product_file", "read_phd_records", "read_phylogeny_collection", "read_substitution_matrix_file", "correct_jc69_distance"]
+__all__ = [
+    *__all__,
+    "bootstrap_replicate_trees",
+    "parse_primer3_records",
+    "read_alignment_blocks",
+    "read_alignment_file",
+    "read_blast_records",
+    "read_genbank_record_fields",
+    "read_goa_gene_product_file",
+    "read_phd_records",
+    "read_phylogeny_collection",
+    "read_substitution_matrix_file",
+    "correct_jc69_distance",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -975,7 +1248,80 @@ from .pyfaidx_gap2_functions import (
     faidx_write_sequences,
 )
 
-__all__ = [*__all__, "blast_qblast_search", "gc_skew_window_plot", "kegg_convert_identifiers", "kegg_database_info", "kegg_find_entries", "kegg_get_entries", "kegg_link_entries", "kegg_list_entries", "ncbi_efetch", "ncbi_einfo", "ncbi_elink", "ncbi_epost", "ncbi_esearch", "ncbi_esummary", "ncbiwww_qblast_search", "phylo_draw_ascii_text", "phylo_draw_newick_png", "togows_convert_data", "togows_count_matches", "togows_fetch_entry", "togows_iterate_ids", "togows_search_ids", "gimmemotifs_cluster_motif_report", "gimmemotifs_cluster_pfm", "gimmemotifs_combine_peak_summits", "gimmemotifs_coverage_table", "gimmemotifs_create_background", "gimmemotifs_denovo_motifs", "gimmemotifs_denovo_predict", "gimmemotifs_gc_bin_bed", "gimmemotifs_gc_bin_index", "gimmemotifs_histogram_plot", "gimmemotifs_jaspar_motif_info", "gimmemotifs_logo_images", "gimmemotifs_match_motifs", "gimmemotifs_match_plot", "gimmemotifs_matched_gc_bed", "gimmemotifs_motif_image_series", "gimmemotifs_motif_localization", "gimmemotifs_motif_location_plots", "gimmemotifs_parallel_denovo_predict", "gimmemotifs_pfm_scan", "gimmemotifs_roc_curve_plot", "gimmemotifs_gimme_motifs", "gimmemotifs_maelstrom_html_report", "gimmemotifs_predict_motifs", "gimmemotifs_annot2primpep", "gimmemotifs_best_motif_in_cluster", "gimmemotifs_denovo_create_background", "gimmemotifs_denovo_create_backgrounds", "gimmemotifs_denovo_motif_report", "gimmemotifs_diff_motifs", "gimmemotifs_diff_plot", "gimmemotifs_factor2orthogroups", "gimmemotifs_filter_significant_motifs", "gimmemotifs_load_orthogroups_in_db", "gimmemotifs_make_motif2factors", "gimmemotifs_motif2factor_from_orthologs", "gimmemotifs_motif_tree_plot", "gimmemotifs_roc_html_report", "gimmemotifs_roc_plots", "gimmemotifs_select_nonredundant_motifs", "faidx_check_default_seq", "faidx_fetch_sequences", "faidx_mask_sequences", "faidx_parse_bed_entry", "faidx_parse_ucsc_region", "faidx_split_regions", "faidx_transform_sequences", "faidx_wrap_sequence", "faidx_write_sequences"]
+__all__ = [
+    *__all__,
+    "blast_qblast_search",
+    "gc_skew_window_plot",
+    "kegg_convert_identifiers",
+    "kegg_database_info",
+    "kegg_find_entries",
+    "kegg_get_entries",
+    "kegg_link_entries",
+    "kegg_list_entries",
+    "ncbi_efetch",
+    "ncbi_einfo",
+    "ncbi_elink",
+    "ncbi_epost",
+    "ncbi_esearch",
+    "ncbi_esummary",
+    "ncbiwww_qblast_search",
+    "phylo_draw_ascii_text",
+    "phylo_draw_newick_png",
+    "togows_convert_data",
+    "togows_count_matches",
+    "togows_fetch_entry",
+    "togows_iterate_ids",
+    "togows_search_ids",
+    "gimmemotifs_cluster_motif_report",
+    "gimmemotifs_cluster_pfm",
+    "gimmemotifs_combine_peak_summits",
+    "gimmemotifs_coverage_table",
+    "gimmemotifs_create_background",
+    "gimmemotifs_denovo_motifs",
+    "gimmemotifs_denovo_predict",
+    "gimmemotifs_gc_bin_bed",
+    "gimmemotifs_gc_bin_index",
+    "gimmemotifs_histogram_plot",
+    "gimmemotifs_jaspar_motif_info",
+    "gimmemotifs_logo_images",
+    "gimmemotifs_match_motifs",
+    "gimmemotifs_match_plot",
+    "gimmemotifs_matched_gc_bed",
+    "gimmemotifs_motif_image_series",
+    "gimmemotifs_motif_localization",
+    "gimmemotifs_motif_location_plots",
+    "gimmemotifs_parallel_denovo_predict",
+    "gimmemotifs_pfm_scan",
+    "gimmemotifs_roc_curve_plot",
+    "gimmemotifs_gimme_motifs",
+    "gimmemotifs_maelstrom_html_report",
+    "gimmemotifs_predict_motifs",
+    "gimmemotifs_annot2primpep",
+    "gimmemotifs_best_motif_in_cluster",
+    "gimmemotifs_denovo_create_background",
+    "gimmemotifs_denovo_create_backgrounds",
+    "gimmemotifs_denovo_motif_report",
+    "gimmemotifs_diff_motifs",
+    "gimmemotifs_diff_plot",
+    "gimmemotifs_factor2orthogroups",
+    "gimmemotifs_filter_significant_motifs",
+    "gimmemotifs_load_orthogroups_in_db",
+    "gimmemotifs_make_motif2factors",
+    "gimmemotifs_motif2factor_from_orthologs",
+    "gimmemotifs_motif_tree_plot",
+    "gimmemotifs_roc_html_report",
+    "gimmemotifs_roc_plots",
+    "gimmemotifs_select_nonredundant_motifs",
+    "faidx_check_default_seq",
+    "faidx_fetch_sequences",
+    "faidx_mask_sequences",
+    "faidx_parse_bed_entry",
+    "faidx_parse_ucsc_region",
+    "faidx_split_regions",
+    "faidx_transform_sequences",
+    "faidx_wrap_sequence",
+    "faidx_write_sequences",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .bio_gap_functions import (
@@ -994,8 +1340,10 @@ from .biopython_p18_functions import (
     read_sff_manifest,
     search_subsequences,
     split_sequence,
-    trim_sequence as biopython_trim_sequence,
     write_sequence_file,
+)
+from .biopython_p18_functions import (
+    trim_sequence as biopython_trim_sequence,
 )
 from .biopython_p19_restriction_functions import (
     caps_differential_cut_sites,

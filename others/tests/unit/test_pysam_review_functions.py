@@ -114,7 +114,9 @@ def test_fixed_tview_arguments_and_outputs(tmp_path: Path) -> None:
     assert result["position"] == "chr1:10"
     assert result["width"] == 60
     assert result["reference"] == str(reference.resolve())
-    assert result["lines"] == [f"ARGS: tview -d T -p chr1:10 -w 60 {bam.resolve()} {reference.resolve()}"]
+    assert result["lines"] == [
+        f"ARGS: tview -d T -p chr1:10 -w 60 {bam.resolve()} {reference.resolve()}"
+    ]
     assert result["line_count"] == 1
     assert "stub-log" in result["log"]
     assert (tmp_path / "view.txt").read_text(encoding="utf-8").splitlines() == result["lines"]
@@ -152,8 +154,6 @@ def test_real_samtools_matches_direct_tview(tmp_path: Path) -> None:
         capture_output=True,
         text=True,
     )
-    result = pysam_tview_text(
-        bam, "chr1:20", output=tmp_path / "view.txt", width=40, verbose=False
-    )
+    result = pysam_tview_text(bam, "chr1:20", output=tmp_path / "view.txt", width=40, verbose=False)
     assert result["lines"] == direct.stdout.splitlines()
     assert result["version"] and result["version"].startswith("samtools")

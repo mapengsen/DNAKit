@@ -7,8 +7,8 @@ import pytest
 dadi = pytest.importorskip("dadi")
 np = pytest.importorskip("numpy")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.population import dadi_p23_phi_functions as m  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.population import dadi_p23_phi_functions as m
 
 PTS = 16
 XX = dadi.Numerics.default_grid(PTS)
@@ -50,36 +50,58 @@ def test_events_match_dadi_and_shapes():
     three = m.phi_split_population(two["phi"], grid_points=PTS, event="2_to_3_split_2")
     assert three["shape"] == [PTS] * 3
     ref = dadi.PhiManip.phi_2D_to_3D_split_1(XX, np.array(two["phi"]))
-    assert np.allclose(m.phi_split_population(two["phi"], grid_points=PTS, event="2_to_3_split_1")["phi"], ref)
-    adm = m.phi_admix_into_population(three["phi"], grid_points=PTS, target_population=2, proportions=[0.3, 0.2])
+    assert np.allclose(
+        m.phi_split_population(two["phi"], grid_points=PTS, event="2_to_3_split_1")["phi"], ref
+    )
+    adm = m.phi_admix_into_population(
+        three["phi"], grid_points=PTS, target_population=2, proportions=[0.3, 0.2]
+    )
     ref = dadi.PhiManip.phi_3D_admix_1_and_3_into_2(np.array(three["phi"]), 0.3, 0.2, XX, XX, XX)
     assert np.allclose(adm["phi"], ref)
-    two_adm = m.phi_admix_into_population(two["phi"], grid_points=PTS, target_population=1, proportions=[0.4])
-    assert np.allclose(two_adm["phi"], dadi.PhiManip.phi_2D_admix_2_into_1(np.array(two["phi"]), 0.4, XX, XX))
+    two_adm = m.phi_admix_into_population(
+        two["phi"], grid_points=PTS, target_population=1, proportions=[0.4]
+    )
+    assert np.allclose(
+        two_adm["phi"], dadi.PhiManip.phi_2D_admix_2_into_1(np.array(two["phi"]), 0.4, XX, XX)
+    )
     new = m.phi_create_admixed_population(two["phi"], grid_points=PTS, proportions=[0.4])
-    assert np.allclose(new["phi"], dadi.PhiManip.phi_2D_to_3D_admix(np.array(two["phi"]), 0.4, XX, XX, XX))
+    assert np.allclose(
+        new["phi"], dadi.PhiManip.phi_2D_to_3D_admix(np.array(two["phi"]), 0.4, XX, XX, XX)
+    )
     four = m.phi_create_admixed_population(three["phi"], grid_points=PTS, proportions=[0.2, 0.3])
     assert four["num_populations"] == 4
-    into4 = m.phi_admix_into_population(four["phi"], grid_points=PTS, target_population=1, proportions=[0.1, 0.2, 0.3])
+    into4 = m.phi_admix_into_population(
+        four["phi"], grid_points=PTS, target_population=1, proportions=[0.1, 0.2, 0.3]
+    )
     assert into4["shape"] == [PTS] * 4
 
 
 def test_select_populations(tmp_path):
     phi1 = dadi.PhiManip.phi_1D(XX)
     two = np.array(m.phi_split_population(phi1.tolist(), grid_points=PTS, event="1_to_2")["phi"])
-    three = np.array(m.phi_split_population(two.tolist(), grid_points=PTS, event="2_to_3_split_2")["phi"])
+    three = np.array(
+        m.phi_split_population(two.tolist(), grid_points=PTS, event="2_to_3_split_2")["phi"]
+    )
     out = tmp_path / "phi.npy"
-    removed = m.phi_select_populations(three.tolist(), grid_points=PTS, operation="remove", populations=[2], output_path=out)
+    removed = m.phi_select_populations(
+        three.tolist(), grid_points=PTS, operation="remove", populations=[2], output_path=out
+    )
     assert np.allclose(np.load(out), dadi.PhiManip.remove_pop(three, XX, 2))
     assert removed["phi_path"] == str(out)
     kept = m.phi_select_populations(str(out), grid_points=PTS, operation="keep", populations=[1])
     assert kept["num_populations"] == 1
-    re = m.phi_select_populations(three.tolist(), grid_points=PTS, operation="reorder", populations=[3, 1, 2])
+    re = m.phi_select_populations(
+        three.tolist(), grid_points=PTS, operation="reorder", populations=[3, 1, 2]
+    )
     assert np.allclose(re["phi"], dadi.PhiManip.reorder_pops(three, [3, 1, 2]))
     with pytest.raises(ConfigurationError):
-        m.phi_select_populations(three.tolist(), grid_points=PTS, operation="reorder", populations=[1, 2])
+        m.phi_select_populations(
+            three.tolist(), grid_points=PTS, operation="reorder", populations=[1, 2]
+        )
     with pytest.raises(ConfigurationError):  # existing output is never overwritten
-        m.phi_select_populations(three.tolist(), grid_points=PTS, operation="remove", populations=[1], output_path=out)
+        m.phi_select_populations(
+            three.tolist(), grid_points=PTS, operation="remove", populations=[1], output_path=out
+        )
 
 
 def test_spectrum_from_phi_and_inbreeding():
@@ -112,12 +134,21 @@ def test_spectrum_from_snp_data(tmp_path):
     snp.write_text(SNP_TEXT)
     data = dadi.Misc.make_data_dict(str(snp))
     for polarized in (True, False):
-        got = m.spectrum_from_snp_data(snp, pop_ids=["A", "B"], projections=[4, 4], polarized=polarized)
+        got = m.spectrum_from_snp_data(
+            snp, pop_ids=["A", "B"], projections=[4, 4], polarized=polarized
+        )
         ref = dadi.Spectrum.from_data_dict(data, ["A", "B"], [4, 4], polarized=polarized)
         assert got["folded"] == (not polarized)
         assert got["segregating_sites"] == pytest.approx(float(ref.S()))
     fux = tmp_path / "fux.txt"
-    lines = [f"{a}{b}{c} {u} 0.01" for a in "ACGT" for b in "ACGT" for c in "ACGT" for u in "ACGT" if u != b]
+    lines = [
+        f"{a}{b}{c} {u} 0.01"
+        for a in "ACGT"
+        for b in "ACGT"
+        for c in "ACGT"
+        for u in "ACGT"
+        if u != b
+    ]
     fux.write_text("\n".join(lines) + "\n")
     cor = m.spectrum_from_snp_data(snp, pop_ids=["A"], projections=[6], misidentification_path=fux)
     ref = dadi.Spectrum.from_data_dict_corrected(data, ["A"], [6], str(fux))

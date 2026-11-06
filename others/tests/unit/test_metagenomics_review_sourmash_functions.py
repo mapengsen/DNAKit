@@ -42,14 +42,43 @@ def data(tmp_path_factory: pytest.TempPathFactory) -> Path:
     (root / "all.csv").write_text(header + "".join(rows[i] for i in (1, 2, 3)))
     (root / "ab.csv").write_text(header + rows[1] + rows[2])
     (root / "c.csv").write_text(header + rows[3])
-    _sm("sketch", "fromfile", str(root / "all.csv"), "--output-signatures", str(root / "all.zip"),
-        "-p", "dna,k=31,scaled=100")
-    _sm("sketch", "fromfile", str(root / "ab.csv"), "--output-signatures", str(root / "ab.zip"),
-        "-p", "dna,k=31,scaled=100")
-    _sm("sketch", "fromfile", str(root / "c.csv"), "--output-signatures", str(root / "c.zip"),
-        "-p", "dna,k=31,scaled=100")
+    _sm(
+        "sketch",
+        "fromfile",
+        str(root / "all.csv"),
+        "--output-signatures",
+        str(root / "all.zip"),
+        "-p",
+        "dna,k=31,scaled=100",
+    )
+    _sm(
+        "sketch",
+        "fromfile",
+        str(root / "ab.csv"),
+        "--output-signatures",
+        str(root / "ab.zip"),
+        "-p",
+        "dna,k=31,scaled=100",
+    )
+    _sm(
+        "sketch",
+        "fromfile",
+        str(root / "c.csv"),
+        "--output-signatures",
+        str(root / "c.zip"),
+        "-p",
+        "dna,k=31,scaled=100",
+    )
     # reference with abundances for sig inflate
-    _sm("sketch", "dna", str(root / "g1.fa"), "-p", "k=31,scaled=100,abund", "-o", str(root / "g1_abund.sig"))
+    _sm(
+        "sketch",
+        "dna",
+        str(root / "g1.fa"),
+        "-p",
+        "k=31,scaled=100,abund",
+        "-o",
+        str(root / "g1_abund.sig"),
+    )
     _sm("index", str(root / "ab.sbt.zip"), str(root / "ab.zip"), "-k", "31", "--scaled", "100")
     _sm("index", str(root / "c.sbt.zip"), str(root / "c.zip"), "-k", "31", "--scaled", "100")
     _sm("index", str(root / "all.sbt.zip"), str(root / "all.zip"), "-k", "31", "--scaled", "100")
@@ -79,11 +108,15 @@ def test_sketch_fromfile_needs_existing_csv(tmp_path: Path) -> None:
 
 def test_grep_keeps_matching_names_and_inverts(data: Path, tmp_path: Path) -> None:
     matched = tmp_path / "g2.zip"
-    result = review.grep_signatures("^g2$", [str(data / "all.zip")], str(matched), ksize=31, moltype="DNA")
+    result = review.grep_signatures(
+        "^g2$", [str(data / "all.zip")], str(matched), ksize=31, moltype="DNA"
+    )
     assert result["status"] == "completed", result["log_tail"]
     assert _names(matched) == ["g2"]
     inverted = tmp_path / "not_g2.zip"
-    result = review.grep_signatures("^g2$", [str(data / "all.zip")], str(inverted), invert_match=True)
+    result = review.grep_signatures(
+        "^g2$", [str(data / "all.zip")], str(inverted), invert_match=True
+    )
     assert result["status"] == "completed", result["log_tail"]
     assert _names(inverted) == ["g1", "g3"]
 
@@ -101,7 +134,9 @@ def test_grep_ignore_case_and_csv_manifest(data: Path, tmp_path: Path) -> None:
 
 def test_grep_rejects_unknown_moltype(data: Path, tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
-        review.grep_signatures("g", [str(data / "all.zip")], str(tmp_path / "x.zip"), moltype="codon")
+        review.grep_signatures(
+            "g", [str(data / "all.zip")], str(tmp_path / "x.zip"), moltype="codon"
+        )
 
 
 def test_inflate_gives_abundances_to_other_signatures(data: Path, tmp_path: Path) -> None:
@@ -157,9 +192,7 @@ def test_convert_sbt_storage_to_zip_backend(data: Path, tmp_path: Path) -> None:
 
     out = tmp_path / "converted.sbt.json"
     storage = tmp_path / "converted_data.zip"
-    result = review.convert_sbt_storage(
-        str(data / "ab.sbt.zip"), str(out), f"zip({storage})"
-    )
+    result = review.convert_sbt_storage(str(data / "ab.sbt.zip"), str(out), f"zip({storage})")
     assert result["status"] == "completed", result["log_tail"]
     assert storage.is_file()
     index = sourmash.load_file_as_index(str(out))
@@ -174,14 +207,20 @@ def test_convert_rejects_unknown_backend(data: Path, tmp_path: Path) -> None:
 def test_missing_sourmash_path_is_reported(data: Path, tmp_path: Path) -> None:
     with pytest.raises(BackendUnavailableError):
         review.sketch_fromfile_signatures(
-            [str(data / "all.csv")], str(tmp_path / "o.zip"), sourmash_path=str(tmp_path / "no_such_sourmash")
+            [str(data / "all.csv")],
+            str(tmp_path / "o.zip"),
+            sourmash_path=str(tmp_path / "no_such_sourmash"),
         )
 
 
 def test_public_functions_take_keyword_only_verbose() -> None:
     public = [
-        review.sketch_fromfile_signatures, review.grep_signatures, review.inflate_signatures,
-        review.combine_sbt_indexes, review.migrate_sbt_index, review.convert_sbt_storage,
+        review.sketch_fromfile_signatures,
+        review.grep_signatures,
+        review.inflate_signatures,
+        review.combine_sbt_indexes,
+        review.migrate_sbt_index,
+        review.convert_sbt_storage,
     ]
     for function in public:
         parameter = inspect.signature(function).parameters["verbose"]

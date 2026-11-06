@@ -85,8 +85,12 @@ def _enzyme(name: object) -> Any:
     if not isinstance(name, str) or not _ENZYME_NAME.fullmatch(name):
         raise ConfigurationError(f"{name!r} is not a restriction enzyme name.")
     candidate = getattr(restriction, name, None)
-    if candidate is None or not isinstance(candidate, _bio("Bio.Restriction.Restriction").RestrictionType):
-        raise ConfigurationError(f"{name!r} is not a restriction enzyme in the Biopython REBASE data.")
+    if candidate is None or not isinstance(
+        candidate, _bio("Bio.Restriction.Restriction").RestrictionType
+    ):
+        raise ConfigurationError(
+            f"{name!r} is not a restriction enzyme in the Biopython REBASE data."
+        )
     return candidate
 
 
@@ -225,13 +229,18 @@ def restriction_enzymes_by_supplier(
             "status": "completed",
             "operation": "restriction_enzymes_by_supplier",
             "suppliers": [
-                {"code": code, "name": name, "enzyme_count": counts[code]} for code, name in table.items()
+                {"code": code, "name": name, "enzyme_count": counts[code]}
+                for code, name in table.items()
             ],
             "provenance": _provenance(parser="Bio.Restriction.RestrictionBatch.suppl_codes"),
         }
     if not isinstance(supplier, str) or not supplier:
         raise ConfigurationError("supplier must be a supplier code or name.")
-    code = supplier if supplier in table else next((k for k, v in table.items() if v == supplier), None)
+    code = (
+        supplier
+        if supplier in table
+        else next((k for k, v in table.items() if v == supplier), None)
+    )
     if code is None:
         raise ConfigurationError(
             f"{supplier!r} is not a supplier; codes are {sorted(table)} (names: {sorted(table.values())})."
@@ -275,11 +284,23 @@ def filter_restriction_enzymes(
     pool = _enzymes(enzymes) if enzymes is not None else list(restriction.AllEnzymes)
     if end_type is not None:
         _choice(end_type, _END_TYPES, "end_type")
-    for value, label in ((commercial, "commercial"), (palindromic, "palindromic"), (defined_site, "defined_site")):
+    for value, label in (
+        (commercial, "commercial"),
+        (palindromic, "palindromic"),
+        (defined_site, "defined_site"),
+    ):
         if value is not None:
             _flag(value, label)
-    low = None if min_site_size is None else _integer(min_site_size, "min_site_size", minimum=1, maximum=100)
-    high = None if max_site_size is None else _integer(max_site_size, "max_site_size", minimum=1, maximum=100)
+    low = (
+        None
+        if min_site_size is None
+        else _integer(min_site_size, "min_site_size", minimum=1, maximum=100)
+    )
+    high = (
+        None
+        if max_site_size is None
+        else _integer(max_site_size, "max_site_size", minimum=1, maximum=100)
+    )
     if supplier is not None and supplier not in restriction.RestrictionBatch.suppl_codes():
         raise ConfigurationError(
             f"supplier must be one of the REBASE codes {sorted(restriction.RestrictionBatch.suppl_codes())}."
@@ -321,7 +342,10 @@ def _analysis(sequence: str, enzymes: Sequence[str], linear: bool) -> Any:
 
 
 def _cuts(result: Mapping[Any, Sequence[int]]) -> dict[str, list[int]]:
-    return {str(enzyme): [int(position) for position in positions] for enzyme, positions in sorted(result.items(), key=lambda item: str(item[0]))}
+    return {
+        str(enzyme): [int(position) for position in positions]
+        for enzyme, positions in sorted(result.items(), key=lambda item: str(item[0]))
+    }
 
 
 def restriction_analysis_report(
@@ -359,7 +383,9 @@ def restriction_analysis_report(
         "cuts": _cuts({enzyme: positions for enzyme, positions in found.items() if positions}),
         "no_cut": sorted(str(enzyme) for enzyme, positions in found.items() if not positions),
         "report": text,
-        "provenance": _provenance(parser="Bio.Restriction.Restriction.Analysis.print_as / print_that"),
+        "provenance": _provenance(
+            parser="Bio.Restriction.Restriction.Analysis.print_as / print_that"
+        ),
     }
 
 
@@ -415,16 +441,28 @@ def filter_restriction_results(
             if isinstance(cut_count, int) and not isinstance(cut_count, bool):
                 number = _integer(cut_count, "cut_count", minimum=0, maximum=10**6)
                 current = analysis.with_N_sites(number, current) if current else {}
-            elif isinstance(cut_count, Sequence) and not isinstance(cut_count, (str, bytes)) and cut_count:
-                values = [_integer(item, "cut_count", minimum=0, maximum=10**6) for item in cut_count]
+            elif (
+                isinstance(cut_count, Sequence)
+                and not isinstance(cut_count, (str, bytes))
+                and cut_count
+            ):
+                values = [
+                    _integer(item, "cut_count", minimum=0, maximum=10**6) for item in cut_count
+                ]
                 current = analysis.with_number_list(values, current) if current else {}
             else:
-                raise ConfigurationError("cut_count must be an integer or a non-empty list of integers.")
+                raise ConfigurationError(
+                    "cut_count must be an integer or a non-empty list of integers."
+                )
             applied.append("cut_count")
         if cuts is not None:
             kind = _choice(cuts, ("cutting", "non_cutting"), "cuts")
             if current:
-                current = analysis.with_sites(current) if kind == "cutting" else analysis.without_site(current)
+                current = (
+                    analysis.with_sites(current)
+                    if kind == "cutting"
+                    else analysis.without_site(current)
+                )
             applied.append(f"cuts={kind}")
         if names is not None:
             if isinstance(names, (str, bytes)) or not isinstance(names, Sequence) or not names:
@@ -433,7 +471,11 @@ def filter_restriction_results(
             current = {key: value for key, value in current.items() if str(key) in wanted}
             applied.append("names")
         if site_sizes is not None:
-            if isinstance(site_sizes, (str, bytes)) or not isinstance(site_sizes, Sequence) or not site_sizes:
+            if (
+                isinstance(site_sizes, (str, bytes))
+                or not isinstance(site_sizes, Sequence)
+                or not site_sizes
+            ):
                 raise ConfigurationError("site_sizes must be a non-empty list of integers.")
             sizes = {_integer(item, "site_sizes", minimum=1, maximum=100) for item in site_sizes}
             current = {key: value for key, value in current.items() if key.size in sizes}
@@ -481,8 +523,14 @@ def caps_differential_cut_sites(
     rows = []
     for name in names:
         text = alignment[name]
-        if not isinstance(text, str) or not text or re.search(r"[^ACGTRYMKSWBDHVNacgtrymkswbdhvn]", text):
-            raise ConfigurationError(f"sequence {name!r} must be DNA text of IUPAC letters (no gap characters).")
+        if (
+            not isinstance(text, str)
+            or not text
+            or re.search(r"[^ACGTRYMKSWBDHVNacgtrymkswbdhvn]", text)
+        ):
+            raise ConfigurationError(
+                f"sequence {name!r} must be DNA text of IUPAC letters (no gap characters)."
+            )
         if len(text) > _MAX_SEQUENCE:
             raise ConfigurationError("alignment sequences are too long.")
         rows.append(text.upper())
@@ -496,7 +544,10 @@ def caps_differential_cut_sites(
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         msa = align.MultipleSeqAlignment(
-            [record.SeqRecord(seq.Seq(text), id=name) for name, text in zip(names, rows)]
+            [
+                record.SeqRecord(seq.Seq(text), id=name)
+                for name, text in zip(names, rows, strict=False)
+            ]
         )
         marker_map = caps.CAPSMap(msa, objects)
     sites = [

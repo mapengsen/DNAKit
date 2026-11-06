@@ -26,9 +26,22 @@ def direct(*args):
 
 def test_missing_program_and_validation(files):
     with pytest.raises(BackendUnavailableError):
-        b.bedtools_window(str(files / "a.bed"), str(files / "b.bed"), str(files / "o"), bedtools_path=str(files / "nope"), verbose=False)
+        b.bedtools_window(
+            str(files / "a.bed"),
+            str(files / "b.bed"),
+            str(files / "o"),
+            bedtools_path=str(files / "nope"),
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        b.bedtools_window(str(files / "a.bed"), str(files / "b.bed"), str(files / "o"), window=5, left=1, verbose=False)
+        b.bedtools_window(
+            str(files / "a.bed"),
+            str(files / "b.bed"),
+            str(files / "o"),
+            window=5,
+            left=1,
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
         b.bedtools_bam_to_bedpe(str(files / "a.bed"), str(files / "a.bed"), verbose=False)
 
@@ -36,43 +49,90 @@ def test_missing_program_and_validation(files):
 @needs
 def test_window_count_matches_bedtools(files):
     out = files / "w.bed"
-    result = b.bedtools_window(str(files / "a.bed"), str(files / "b.bed"), str(out), window=100, report="count", verbose=False)
+    result = b.bedtools_window(
+        str(files / "a.bed"),
+        str(files / "b.bed"),
+        str(out),
+        window=100,
+        report="count",
+        verbose=False,
+    )
     assert result["status"] == "completed" and result["version"]
-    assert out.read_text() == direct("window", "-a", str(files / "a.bed"), "-b", str(files / "b.bed"), "-w", "100", "-c")
+    assert out.read_text() == direct(
+        "window", "-a", str(files / "a.bed"), "-b", str(files / "b.bed"), "-w", "100", "-c"
+    )
     with pytest.raises(ConfigurationError):  # never overwrites
         b.bedtools_window(str(files / "a.bed"), str(files / "b.bed"), str(out), verbose=False)
 
 
 @needs
 def test_random_shuffle_sample_are_seeded(files):
-    r = b.bedtools_random(str(files / "g.sizes"), str(files / "r.bed"), count=7, length=50, seed=3, verbose=False)
+    r = b.bedtools_random(
+        str(files / "g.sizes"), str(files / "r.bed"), count=7, length=50, seed=3, verbose=False
+    )
     assert r["record_count"] == 7
-    assert (files / "r.bed").read_text() == direct("random", "-g", str(files / "g.sizes"), "-l", "50", "-n", "7", "-seed", "3")
-    s = b.bedtools_shuffle(str(files / "a.bed"), str(files / "g.sizes"), str(files / "s.bed"), seed=2, verbose=False)
+    assert (files / "r.bed").read_text() == direct(
+        "random", "-g", str(files / "g.sizes"), "-l", "50", "-n", "7", "-seed", "3"
+    )
+    s = b.bedtools_shuffle(
+        str(files / "a.bed"), str(files / "g.sizes"), str(files / "s.bed"), seed=2, verbose=False
+    )
     assert s["record_count"] == 3
-    m = b.bedtools_sample(str(files / "a.bed"), str(files / "m.bed"), count=2, seed=2, verbose=False)
+    m = b.bedtools_sample(
+        str(files / "a.bed"), str(files / "m.bed"), count=2, seed=2, verbose=False
+    )
     assert m["record_count"] == 2
 
 
 @needs
 def test_multiinter_unionbedg_pairtopair_reldist_coverage_split(files):
-    res = b.bedtools_multiinter([str(files / "a.bed"), str(files / "b.bed")], str(files / "mi.txt"), names=["a", "b"], header=True, verbose=False)
+    res = b.bedtools_multiinter(
+        [str(files / "a.bed"), str(files / "b.bed")],
+        str(files / "mi.txt"),
+        names=["a", "b"],
+        header=True,
+        verbose=False,
+    )
     assert res["status"] == "completed" and (files / "mi.txt").read_text().startswith("chrom")
     (files / "x.bg").write_text("chr1\t0\t100\t1\nchr1\t200\t300\t2\n")
     (files / "y.bg").write_text("chr1\t50\t250\t4\n")
-    u = b.bedtools_unionbedg([str(files / "x.bg"), str(files / "y.bg")], str(files / "u.txt"), verbose=False)
+    u = b.bedtools_unionbedg(
+        [str(files / "x.bg"), str(files / "y.bg")], str(files / "u.txt"), verbose=False
+    )
     assert u["record_count"] >= 3
     (files / "a.bedpe").write_text("chr1\t10\t20\tchr1\t100\t110\tp1\t1\t+\t-\n")
-    pp = b.bedtools_pairtopair(str(files / "a.bedpe"), str(files / "a.bedpe"), str(files / "pp.txt"), verbose=False)
+    pp = b.bedtools_pairtopair(
+        str(files / "a.bedpe"), str(files / "a.bedpe"), str(files / "pp.txt"), verbose=False
+    )
     assert pp["record_count"] == 1
-    rd = b.bedtools_reldist(str(files / "a.bed"), str(files / "b.bed"), str(files / "rd.txt"), verbose=False)
-    assert rd["summary"] and sum(row["fraction"] for row in rd["summary"]) == pytest.approx(1.0, abs=0.05)
-    det = b.bedtools_reldist(str(files / "a.bed"), str(files / "b.bed"), str(files / "rdd.txt"), detail=True, verbose=False)
+    rd = b.bedtools_reldist(
+        str(files / "a.bed"), str(files / "b.bed"), str(files / "rd.txt"), verbose=False
+    )
+    assert rd["summary"] and sum(row["fraction"] for row in rd["summary"]) == pytest.approx(
+        1.0, abs=0.05
+    )
+    det = b.bedtools_reldist(
+        str(files / "a.bed"),
+        str(files / "b.bed"),
+        str(files / "rdd.txt"),
+        detail=True,
+        verbose=False,
+    )
     assert det["summary"] == [] and det["record_count"] >= 1
-    h = b.bedtools_coverage_profile(str(files / "a.bed"), str(files / "b.bed"), str(files / "h.txt"), verbose=False)
-    d = b.bedtools_coverage_profile(str(files / "a.bed"), str(files / "b.bed"), str(files / "d.txt"), report="depth", verbose=False)
+    h = b.bedtools_coverage_profile(
+        str(files / "a.bed"), str(files / "b.bed"), str(files / "h.txt"), verbose=False
+    )
+    d = b.bedtools_coverage_profile(
+        str(files / "a.bed"),
+        str(files / "b.bed"),
+        str(files / "d.txt"),
+        report="depth",
+        verbose=False,
+    )
     assert d["record_count"] == 100 + 100 + 80 and h["report"] == "histogram"
-    sp = b.bedtools_split(str(files / "a.bed"), str(files / "split"), 2, algorithm="simple", verbose=False)
+    sp = b.bedtools_split(
+        str(files / "a.bed"), str(files / "split"), 2, algorithm="simple", verbose=False
+    )
     assert sum(f["record_count"] for f in sp["files"]) == 3 and len(sp["outputs"]) == 2
 
 

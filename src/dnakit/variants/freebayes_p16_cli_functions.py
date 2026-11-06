@@ -81,7 +81,9 @@ def partition_reference_into_regions(
     index = _index_path(reference, "reference")
     size = cli.integer(region_size, "region_size", minimum=1)
     by_chunks = cli.flag(chunks, "chunks")
-    wanted = None if chromosomes is None else {cli.text(name, "chromosomes") for name in chromosomes}
+    wanted = (
+        None if chromosomes is None else {cli.text(name, "chromosomes") for name in chromosomes}
+    )
     target = None if output_path is None else cli.new_file(output_path, "output_path")
     prefix = None if bed_prefix is None else cli.text(bed_prefix, "bed_prefix")
     if target is not None and prefix is not None:
@@ -150,10 +152,14 @@ def partition_reference_by_coverage(
                 continue
             fields = line.strip().split("\t")
             if len(fields) != 3:
-                raise ConfigurationError(f"coverage lines need 3 tab-separated columns (chrom, pos, depth): {line!r}")
+                raise ConfigurationError(
+                    f"coverage lines need 3 tab-separated columns (chrom, pos, depth): {line!r}"
+                )
             chrom, pos, depth = fields[0], int(fields[1]), int(fields[2])
             if chrom not in lengths:
-                raise ConfigurationError(f"Sequence {chrom!r} of the coverage file is not in the FASTA index.")
+                raise ConfigurationError(
+                    f"Sequence {chrom!r} of the coverage file is not in the FASTA index."
+                )
             positions.append((chrom, pos, depth))
             total += depth
     if not positions:
@@ -211,7 +217,9 @@ def _bai_interval_offsets(path: Path, chromosome_count: int) -> list[list[int]]:
                 (n_chunk,) = struct.unpack("<i", handle.read(4))
                 handle.seek(n_chunk * 16, 1)
             (n_intv,) = struct.unpack("<i", handle.read(4))
-            offsets.append(list(struct.unpack(f"<{n_intv}Q", handle.read(n_intv * 8))) if n_intv > 0 else [])
+            offsets.append(
+                list(struct.unpack(f"<{n_intv}Q", handle.read(n_intv * 8))) if n_intv > 0 else []
+            )
     return offsets
 
 
@@ -282,7 +290,10 @@ def partition_reference_by_bam_size(
         "region_count": len(regions),
         "regions": [list(row) for row in regions[:_MAX_LISTED_REGIONS]],
         "outputs": [str(target)] if target is not None else [],
-        "provenance": {"tool": "FreeBayes split_ref_by_bai_datasize.py", "reimplemented_in": "dnakit"},
+        "provenance": {
+            "tool": "FreeBayes split_ref_by_bai_datasize.py",
+            "reimplemented_in": "dnakit",
+        },
     }
 
 
@@ -358,9 +369,17 @@ def left_align_bam_indels(
     if cli.flag(compressed, "compressed"):
         arguments.append("--compressed")
     if max_iterations is not None:
-        arguments += ["--max-iterations", str(cli.integer(max_iterations, "max_iterations", minimum=1))]
+        arguments += [
+            "--max-iterations",
+            str(cli.integer(max_iterations, "max_iterations", minimum=1)),
+        ]
     record = cli.invoke(
-        _FREEBAYES, arguments, cwd=target.parent, stdout_to=target, stdin_from=bam, explicit=bamleftalign_path
+        _FREEBAYES,
+        arguments,
+        cwd=target.parent,
+        stdout_to=target,
+        stdin_from=bam,
+        explicit=bamleftalign_path,
     )
     return cli.finish(record, "left_align_bam_indels", alignment=str(bam), output=str(target))
 

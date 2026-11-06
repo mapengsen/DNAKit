@@ -44,19 +44,26 @@ def _no_network(monkeypatch):
 
 
 def _write_record(path):
+    from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqFeature import FeatureLocation, SeqFeature
     from Bio.SeqRecord import SeqRecord
-    from Bio import SeqIO
 
     rng = random.Random(7)
     sequence = "".join(rng.choice("ACGT") for _ in range(300))
     sequence = sequence[:50] + "GGTCTC" + sequence[56:150] + "GGTCTC" + sequence[156:]
-    record = SeqRecord(Seq(sequence), id="fixture", name="fixture", description="fixture",
-                       annotations={"molecule_type": "DNA"})
+    record = SeqRecord(
+        Seq(sequence),
+        id="fixture",
+        name="fixture",
+        description="fixture",
+        annotations={"molecule_type": "DNA"},
+    )
     for label in ("@AvoidPattern(GGTCTC)", "@EnforceGCContent(mini=0.4, maxi=0.6, window=50)"):
         record.features.append(
-            SeqFeature(FeatureLocation(0, 300, 1), type="misc_feature", qualifiers={"label": [label]})
+            SeqFeature(
+                FeatureLocation(0, 300, 1), type="misc_feature", qualifiers={"label": [label]}
+            )
         )
     SeqIO.write(record, str(path), "genbank")
 

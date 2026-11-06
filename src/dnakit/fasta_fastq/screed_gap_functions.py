@@ -94,7 +94,9 @@ def create_screed_database(
     }
 
 
-def _dump(database: str, output: str, *, fields_required: tuple[str, ...], writer: str) -> dict[str, Any]:
+def _dump(
+    database: str, output: str, *, fields_required: tuple[str, ...], writer: str
+) -> dict[str, Any]:
     conversion = require("screed.conversion", _EXTRA)
     source = _existing(database, "database")
     target = _new(output, "output")
@@ -128,7 +130,9 @@ def dump_screed_fastq(database: str, output_fastq: str, *, verbose: bool = True)
 
     Needs a database built from FASTQ input, because the quality values are part of the record.
     """
-    return _dump(database, output_fastq, fields_required=("name", "sequence", "quality"), writer="FASTQ")
+    return _dump(
+        database, output_fastq, fields_required=("name", "sequence", "quality"), writer="FASTQ"
+    )
 
 
 __all__ = [

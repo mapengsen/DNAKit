@@ -71,17 +71,23 @@ def _seed(value: object) -> int | None:
     return _int(value, "seed", minimum=0, maximum=2**32 - 1)
 
 
-def _number(value: object, name: str, *, minimum: float | None = None, exclusive: bool = False) -> float:
+def _number(
+    value: object, name: str, *, minimum: float | None = None, exclusive: bool = False
+) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
         raise ConfigurationError(f"{name} must be a finite number.")
     if minimum is not None and (value <= minimum if exclusive else value < minimum):
-        raise ConfigurationError(f"{name} must be {'greater than' if exclusive else 'at least'} {minimum}.")
+        raise ConfigurationError(
+            f"{name} must be {'greater than' if exclusive else 'at least'} {minimum}."
+        )
     return float(value)
 
 
 def _text(value: object, name: str, *, maximum: int = _MAX_TEXT) -> str:
     if not isinstance(value, str) or not value.strip() or len(value) > maximum:
-        raise ConfigurationError(f"{name} must be a non-empty string of at most {maximum} characters.")
+        raise ConfigurationError(
+            f"{name} must be a non-empty string of at most {maximum} characters."
+        )
     return value
 
 
@@ -105,7 +111,9 @@ def _vector(values: object, name: str, *, integer: bool = False, minimum: int = 
     return out  # type: ignore[return-value]
 
 
-def _matrix(rows: object, name: str, *, integer: bool = False, min_rows: int = 1) -> list[list[float]]:
+def _matrix(
+    rows: object, name: str, *, integer: bool = False, min_rows: int = 1
+) -> list[list[float]]:
     if isinstance(rows, (str, bytes)) or not isinstance(rows, Sequence):
         raise ConfigurationError(f"{name} must be a list of rows (samples x features).")
     if not min_rows <= len(rows) <= _MAX_SAMPLES:
@@ -133,8 +141,10 @@ def _tree(newick: object) -> Any:
     import io
 
     try:
-        return tree_module.TreeNode.read(io.StringIO(text if text.rstrip().endswith(";") else text + ";"))
-    except Exception as exc:  # noqa: BLE001 - parser errors vary
+        return tree_module.TreeNode.read(
+            io.StringIO(text if text.rstrip().endswith(";") else text + ";")
+        )
+    except Exception as exc:
         raise ConfigurationError(f"tree_newick could not be parsed: {exc}") from exc
 
 
@@ -238,7 +248,7 @@ def calculate_alpha_diversity(
     except (ValueError, TypeError, RuntimeError) as exc:
         raise ConfigurationError(f"scikit-bio {chosen} failed: {exc}") from exc
     if chosen == "osd":
-        value = dict(zip(("observed", "singles", "doubles"), (int(v) for v in value)))
+        value = dict(zip(("observed", "singles", "doubles"), (int(v) for v in value), strict=False))
     else:
         value = float(value)
     return {
@@ -317,7 +327,9 @@ def rarefy_count_vector(
     import numpy as np
 
     try:
-        result = stats.subsample_counts(np.asarray(vector, dtype=int), n, replace=replace_flag, seed=seed_value)
+        result = stats.subsample_counts(
+            np.asarray(vector, dtype=int), n, replace=replace_flag, seed=seed_value
+        )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"scikit-bio subsample_counts failed: {exc}") from exc
     return {
@@ -346,7 +358,11 @@ def subsample_items_per_bin(
     without it all items share one bin. Returns ``selected`` as [bin, item] pairs.
     """
 
-    if isinstance(items, (str, bytes)) or not isinstance(items, Sequence) or len(items) > _MAX_ITEMS:
+    if (
+        isinstance(items, (str, bytes))
+        or not isinstance(items, Sequence)
+        or len(items) > _MAX_ITEMS
+    ):
         raise ConfigurationError("items must be a list of strings.")
     values = [_text(item, "items item", maximum=10_000) for item in items]
     top = _int(maximum, "maximum", minimum=1)
@@ -362,7 +378,7 @@ def subsample_items_per_bin(
         stream: Any = values
         bin_f = None
     else:
-        stream = list(zip(bin_labels, values))
+        stream = list(zip(bin_labels, values, strict=False))
 
         def bin_f(pair: tuple[str, str]) -> str:
             return pair[0]
@@ -516,7 +532,9 @@ def calculate_gradient_anova(
         output.append(
             {
                 "category": item.category,
-                "probability": None if item.probability is None or item.probability != item.probability else float(item.probability),
+                "probability": None
+                if item.probability is None or item.probability != item.probability
+                else float(item.probability),
                 "message": item.message,
                 "groups": groups,
             }
@@ -532,13 +550,19 @@ def calculate_gradient_anova(
 
 
 def _vector_any(values: object, name: str) -> list[float]:
-    if isinstance(values, (str, bytes)) or not isinstance(values, Sequence) or not 1 <= len(values) <= 1000:
+    if (
+        isinstance(values, (str, bytes))
+        or not isinstance(values, Sequence)
+        or not 1 <= len(values) <= 1000
+    ):
         raise ConfigurationError(f"{name} must be a list of 1 to 1000 numbers.")
     return [_number(v, f"{name} item") for v in values]
 
 
 # ---------------------------------------------------------------------------- table augmentation
-def _augment_inputs(table: object, n: int, labels: object, seed: object) -> tuple[Any, int, Any, int | None]:
+def _augment_inputs(
+    table: object, n: int, labels: object, seed: object
+) -> tuple[Any, int, Any, int | None]:
     import numpy as np
 
     matrix = _matrix(table, "table", min_rows=2)
@@ -564,8 +588,13 @@ def mixup_table(
     skbio_table = require("skbio.table", _EXTRA)
     try:
         aug, aug_labels = skbio_table.mixup(
-            matrix, count, labels=label_array, intra_class=_flag(intra_class, "intra_class"),
-            alpha=shape, append=_flag(append, "append"), seed=seed_value,
+            matrix,
+            count,
+            labels=label_array,
+            intra_class=_flag(intra_class, "intra_class"),
+            alpha=shape,
+            append=_flag(append, "append"),
+            seed=seed_value,
         )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"scikit-bio mixup failed: {exc}") from exc
@@ -591,8 +620,14 @@ def aitchison_mixup_table(
     skbio_table = require("skbio.table", _EXTRA)
     try:
         aug, aug_labels = skbio_table.aitchison_mixup(
-            matrix, count, labels=label_array, intra_class=_flag(intra_class, "intra_class"), alpha=shape,
-            normalize=_flag(normalize, "normalize"), append=_flag(append, "append"), seed=seed_value,
+            matrix,
+            count,
+            labels=label_array,
+            intra_class=_flag(intra_class, "intra_class"),
+            alpha=shape,
+            normalize=_flag(normalize, "normalize"),
+            append=_flag(append, "append"),
+            seed=seed_value,
         )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"scikit-bio aitchison_mixup failed: {exc}") from exc
@@ -615,8 +650,12 @@ def compositional_cutmix_table(
     skbio_table = require("skbio.table", _EXTRA)
     try:
         aug, aug_labels = skbio_table.compos_cutmix(
-            matrix, count, labels=label_array, normalize=_flag(normalize, "normalize"),
-            append=_flag(append, "append"), seed=seed_value,
+            matrix,
+            count,
+            labels=label_array,
+            normalize=_flag(normalize, "normalize"),
+            append=_flag(append, "append"),
+            seed=seed_value,
         )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"scikit-bio compos_cutmix failed: {exc}") from exc
@@ -645,9 +684,15 @@ def phylomix_table(
     skbio_table = require("skbio.table", _EXTRA)
     try:
         aug, aug_labels = skbio_table.phylomix(
-            matrix, count, tree, taxa=names, labels=label_array,
-            intra_class=_flag(intra_class, "intra_class"), alpha=shape,
-            append=_flag(append, "append"), seed=seed_value,
+            matrix,
+            count,
+            tree,
+            taxa=names,
+            labels=label_array,
+            intra_class=_flag(intra_class, "intra_class"),
+            alpha=shape,
+            append=_flag(append, "append"),
+            seed=seed_value,
         )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"scikit-bio phylomix failed: {exc}") from exc
@@ -657,7 +702,9 @@ def phylomix_table(
 # ---------------------------------------------------------------------------- metadata
 def _sample_metadata(table: object, name: str) -> Any:
     if not isinstance(table, Mapping) or not table or len(table) > _MAX_SAMPLES:
-        raise ConfigurationError(f"{name} must map 1 to {_MAX_SAMPLES} sample ids to {{column: value}} mappings.")
+        raise ConfigurationError(
+            f"{name} must map 1 to {_MAX_SAMPLES} sample ids to {{column: value}} mappings."
+        )
     pd = require("pandas", _EXTRA)
     skbio = require("skbio", _EXTRA)
     rows = {}
@@ -684,7 +731,11 @@ def merge_sample_metadata(
     and column names must differ between tables.
     """
 
-    if isinstance(tables, (str, bytes)) or not isinstance(tables, Sequence) or not 2 <= len(tables) <= 20:
+    if (
+        isinstance(tables, (str, bytes))
+        or not isinstance(tables, Sequence)
+        or not 2 <= len(tables) <= 20
+    ):
         raise ConfigurationError("tables must be a list of 2 to 20 metadata mappings.")
     objects = [_sample_metadata(t, "tables item") for t in tables]
     try:
@@ -693,7 +744,8 @@ def merge_sample_metadata(
         raise ConfigurationError(f"scikit-bio SampleMetadata.merge failed: {exc}") from exc
     frame = merged.to_dataframe()
     records = {
-        str(idx): {c: _plain(v) for c, v in row.items()} for idx, row in frame.to_dict(orient="index").items()
+        str(idx): {c: _plain(v) for c, v in row.items()}
+        for idx, row in frame.to_dict(orient="index").items()
     }
     return {
         "status": "completed",
@@ -721,7 +773,7 @@ def query_sample_ids(
     clause = None if where is None else _text(where, "where", maximum=2_000)
     try:
         found = obj.get_ids(clause)
-    except Exception as exc:  # noqa: BLE001 - sqlite errors are wrapped by scikit-bio
+    except Exception as exc:
         raise ConfigurationError(f"scikit-bio SampleMetadata.get_ids failed: {exc}") from exc
     return {
         "status": "completed",
@@ -738,13 +790,21 @@ def _interval_metadata(spec: object, name: str) -> Any:
     metadata_module = require("skbio.metadata", _EXTRA)
     upper = _int(spec.get("upper_bound"), f"{name}.upper_bound", minimum=0)
     intervals = spec.get("intervals", [])
-    if isinstance(intervals, (str, bytes)) or not isinstance(intervals, Sequence) or len(intervals) > 100_000:
+    if (
+        isinstance(intervals, (str, bytes))
+        or not isinstance(intervals, Sequence)
+        or len(intervals) > 100_000
+    ):
         raise ConfigurationError(f"{name}.intervals must be a list.")
     obj = metadata_module.IntervalMetadata(upper)
     for item in intervals:
         if not isinstance(item, Mapping):
-            raise ConfigurationError(f"{name}.intervals items must be mappings with bounds and metadata.")
-        bounds = [tuple(_int(v, "bound", minimum=0) for v in pair) for pair in item.get("bounds", [])]
+            raise ConfigurationError(
+                f"{name}.intervals items must be mappings with bounds and metadata."
+            )
+        bounds = [
+            tuple(_int(v, "bound", minimum=0) for v in pair) for pair in item.get("bounds", [])
+        ]
         if not bounds or any(len(b) != 2 for b in bounds):
             raise ConfigurationError("each interval needs bounds as a list of [start, end] pairs.")
         attrs = item.get("metadata") or {}
@@ -792,7 +852,10 @@ def query_interval_metadata(
         "operation": "query_interval_metadata",
         "n_matches": len(hits),
         "matches": [
-            {"bounds": [list(map(int, b)) for b in iv.bounds], "metadata": _plain(dict(iv.metadata))}
+            {
+                "bounds": [list(map(int, b)) for b in iv.bounds],
+                "metadata": _plain(dict(iv.metadata)),
+            }
             for iv in hits
         ],
         "provenance": _provenance(method="skbio.metadata.IntervalMetadata.query"),
@@ -810,8 +873,11 @@ def concat_interval_metadata(
     ones. Input objects use the format of :func:`query_interval_metadata`.
     """
 
-    if isinstance(interval_metadata, (str, bytes)) or not isinstance(interval_metadata, Sequence) \
-            or not 1 <= len(interval_metadata) <= 1000:
+    if (
+        isinstance(interval_metadata, (str, bytes))
+        or not isinstance(interval_metadata, Sequence)
+        or not 1 <= len(interval_metadata) <= 1000
+    ):
         raise ConfigurationError("interval_metadata must be a list of 1 to 1000 objects.")
     objects = [_interval_metadata(spec, "interval_metadata item") for spec in interval_metadata]
     metadata_module = require("skbio.metadata", _EXTRA)
@@ -847,7 +913,12 @@ def ordinate_embedding_vectors(
     import numpy as np
 
     try:
-        items = [embedding.EmbeddingVector(np.asarray(row, dtype=float).reshape(1, -1), [ident.encode('ascii', 'replace')]) for row, ident in zip(rows, ids)]
+        items = [
+            embedding.EmbeddingVector(
+                np.asarray(row, dtype=float).reshape(1, -1), [ident.encode("ascii", "replace")]
+            )
+            for row, ident in zip(rows, ids, strict=False)
+        ]
         result = embedding.embed_vec_to_ordination(items)
     except (ValueError, TypeError, AttributeError) as exc:
         raise ConfigurationError(f"scikit-bio embedding ordination failed: {exc}") from exc
@@ -865,21 +936,21 @@ def ordinate_embedding_vectors(
 
 
 __all__ = [
-    "calculate_alpha_diversity",
-    "calculate_unifrac_distance",
-    "rarefy_count_vector",
-    "subsample_items_per_bin",
-    "run_hommola_cospeciation_test",
-    "calculate_gradient_anova",
-    "mixup_table",
     "aitchison_mixup_table",
+    "calculate_alpha_diversity",
+    "calculate_gradient_anova",
+    "calculate_unifrac_distance",
     "compositional_cutmix_table",
-    "phylomix_table",
-    "merge_sample_metadata",
-    "query_sample_ids",
-    "query_interval_metadata",
     "concat_interval_metadata",
+    "merge_sample_metadata",
+    "mixup_table",
     "ordinate_embedding_vectors",
+    "phylomix_table",
+    "query_interval_metadata",
+    "query_sample_ids",
+    "rarefy_count_vector",
+    "run_hommola_cospeciation_test",
+    "subsample_items_per_bin",
 ]
 
 _register_public_verbose(globals(), tuple(__all__))

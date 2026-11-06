@@ -35,8 +35,17 @@ def test_requires_explicit_remote_code_opt_in() -> None:
 def test_matrix_vector_and_mean(tmp_path: Path) -> None:
     pytest.importorskip("numpy")
     checkpoint = _checkpoint()
-    sequences = {"a": "ACGTACGTACGTAGCTAGCTAGCTAGCATCGATCGATCGA", "b": "ttttggggccccaaaattttggggccccaaaa"}
-    common = {"model": "dnabert2", "checkpoint_path": checkpoint, "allow_remote_code": True, "device": "cpu", "verbose": False}
+    sequences = {
+        "a": "ACGTACGTACGTAGCTAGCTAGCTAGCATCGATCGATCGA",
+        "b": "ttttggggccccaaaattttggggccccaaaa",
+    }
+    common = {
+        "model": "dnabert2",
+        "checkpoint_path": checkpoint,
+        "allow_remote_code": True,
+        "device": "cpu",
+        "verbose": False,
+    }
     matrix = luca.embed_dna_with_dnabert(sequences, output_path=str(tmp_path / "m.npz"), **common)
     with_special = luca.embed_dna_with_dnabert(sequences, include_special_tokens=True, **common)
     vector = luca.embed_dna_with_dnabert(sequences, embedding_type="vector", **common)
@@ -47,4 +56,6 @@ def test_matrix_vector_and_mean(tmp_path: Path) -> None:
     import numpy as np
 
     saved = np.load(tmp_path / "m.npz")
-    assert saved["a"].shape == (rows["a"], 768) and not np.allclose(vector["embeddings"]["a"], mean["embeddings"]["a"])
+    assert saved["a"].shape == (rows["a"], 768) and not np.allclose(
+        vector["embeddings"]["a"], mean["embeddings"]["a"]
+    )

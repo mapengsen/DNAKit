@@ -51,14 +51,19 @@ def _run(call: Any) -> Any:
 def _chrom_sizes(value: Mapping[str, int]) -> dict[str, int]:
     if not isinstance(value, Mapping) or not value:
         raise ConfigurationError("chrom_sizes must be a non-empty mapping of chromosome to length.")
-    return {h.text(k, "chromosome"): h.integer(v, "chromosome length", 1, 10**12) for k, v in value.items()}
+    return {
+        h.text(k, "chromosome"): h.integer(v, "chromosome length", 1, 10**12)
+        for k, v in value.items()
+    }
 
 
 def _open(snap: Any, path: Path, *, write: bool) -> Any:
     return _run(lambda: snap.read(str(path), backed="r+" if write else "r"))
 
 
-def _copy_for_edit(source: object, target: object, source_name: str, target_name: str) -> tuple[Path, Path]:
+def _copy_for_edit(
+    source: object, target: object, source_name: str, target_name: str
+) -> tuple[Path, Path]:
     src = h.existing(source, source_name)
     dst = h.new_path(target, target_name)
     if dst.suffix != ".h5ad":
@@ -67,7 +72,9 @@ def _copy_for_edit(source: object, target: object, source_name: str, target_name
     return src, dst
 
 
-def _obs_records(adata: Any, limit: int, columns: Sequence[str] | None = None) -> list[dict[str, Any]]:
+def _obs_records(
+    adata: Any, limit: int, columns: Sequence[str] | None = None
+) -> list[dict[str, Any]]:
     frame = adata.obs[:]
     names = list(adata.obs_names)
     use = [c for c in frame.columns if columns is None or c in columns]
@@ -115,16 +122,28 @@ def import_atac_fragments(
     barcode_sorted = h.flag(sorted_by_barcode, "sorted_by_barcode")
     keep = None if whitelist is None else [h.text(b, "barcode") for b in whitelist]
     mito = [h.text(c, "mitochondrial chromosome") for c in mitochondrial_chromosomes]
-    bins = None if tile_bin_size is None else h.integer(tile_bin_size, "tile_bin_size", 1, 100_000_000)
+    bins = (
+        None if tile_bin_size is None else h.integer(tile_bin_size, "tile_bin_size", 1, 100_000_000)
+    )
     cap = h.integer(limit, "limit", 0, 100_000)
     snap = _snap()
     import tempfile
 
     with tempfile.TemporaryDirectory(prefix="dnakit-snapatac2-") as scratch:
-        adata = _run(lambda: snap.pp.import_fragments(
-            source, sizes, is_paired=paired, file=target, min_num_fragments=minimum,
-            sorted_by_barcode=barcode_sorted, whitelist=keep, chrM=mito, tempdir=Path(scratch), n_jobs=1,
-        ))
+        adata = _run(
+            lambda: snap.pp.import_fragments(
+                source,
+                sizes,
+                is_paired=paired,
+                file=target,
+                min_num_fragments=minimum,
+                sorted_by_barcode=barcode_sorted,
+                whitelist=keep,
+                chrM=mito,
+                tempdir=Path(scratch),
+                n_jobs=1,
+            )
+        )
         try:
             if bins is not None:
                 _run(lambda: snap.pp.add_tile_matrix(adata, bin_size=bins, n_jobs=1))
@@ -174,9 +193,15 @@ def filter_atac_cells(
         before = int(adata.n_obs)
         if (lo_t is not None or hi_t is not None) and "tsse" not in adata.obs[:].columns:
             if gtf is None:
-                raise ConfigurationError("obs has no tsse column; give gene_gtf to compute it or set min_tsse/max_tsse to null.")
+                raise ConfigurationError(
+                    "obs has no tsse column; give gene_gtf to compute it or set min_tsse/max_tsse to null."
+                )
             _run(lambda: snap.metrics.tsse(adata, gtf, n_jobs=1))
-        _run(lambda: snap.pp.filter_cells(adata, min_counts=lo, min_tsse=lo_t, max_counts=hi, max_tsse=hi_t, n_jobs=1))
+        _run(
+            lambda: snap.pp.filter_cells(
+                adata, min_counts=lo, min_tsse=lo_t, max_counts=hi, max_tsse=hi_t, n_jobs=1
+            )
+        )
         after = int(adata.n_obs)
     finally:
         adata.close()
@@ -222,10 +247,19 @@ def select_atac_features(
     snap = _snap()
     adata = _open(snap, dst, write=True)
     try:
-        _run(lambda: snap.pp.select_features(
-            adata, n_features=keep, filter_lower_quantile=low, filter_upper_quantile=high,
-            whitelist=white, blacklist=black, max_iter=rounds, n_jobs=1, verbose=False,
-        ))
+        _run(
+            lambda: snap.pp.select_features(
+                adata,
+                n_features=keep,
+                filter_lower_quantile=low,
+                filter_upper_quantile=high,
+                whitelist=white,
+                blacklist=black,
+                max_iter=rounds,
+                n_jobs=1,
+                verbose=False,
+            )
+        )
         mask = list(adata.var["selected"][:])
         names = list(adata.var_names)
         chosen = [names[i] for i, flag in enumerate(mask) if flag]
@@ -274,11 +308,21 @@ def score_atac_doublets(
     adata = _open(snap, dst, write=True)
     try:
         if use_mask and "selected" not in adata.var[:].columns:
-            raise ConfigurationError("var has no 'selected' mask; run select_atac_features first or set use_selected_features to false.")
-        _run(lambda: snap.pp.scrublet(
-            adata, features="selected" if use_mask else None, n_comps=comps, sim_doublet_ratio=ratio,
-            expected_doublet_rate=rate, random_state=seed, n_jobs=1, verbose=False,
-        ))
+            raise ConfigurationError(
+                "var has no 'selected' mask; run select_atac_features first or set use_selected_features to false."
+            )
+        _run(
+            lambda: snap.pp.scrublet(
+                adata,
+                features="selected" if use_mask else None,
+                n_comps=comps,
+                sim_doublet_ratio=ratio,
+                expected_doublet_rate=rate,
+                random_state=seed,
+                n_jobs=1,
+                verbose=False,
+            )
+        )
         records = _obs_records(adata, cap, ("doublet_score", "doublet_probability"))
         probabilities = [float(v) for v in adata.obs["doublet_probability"][:]]
     finally:
@@ -337,23 +381,40 @@ def compute_atac_spectral_embedding(
             raise ConfigurationError("All input files must hold the same cells in the same order.")
         mask = "selected" if use_mask else None
         if len(adatas) == 1:
-            result = _run(lambda: snap.tl.spectral(
-                adatas[0], n_comps=comps, features=mask, random_state=seed, distance_metric=metric,
-                weighted_by_sd=sd, inplace=False, num_threads=1,
-            ))
+            result = _run(
+                lambda: snap.tl.spectral(
+                    adatas[0],
+                    n_comps=comps,
+                    features=mask,
+                    random_state=seed,
+                    distance_metric=metric,
+                    weighted_by_sd=sd,
+                    inplace=False,
+                    num_threads=1,
+                )
+            )
             kind = "spectral"
         else:
-            result = _run(lambda: snap.tl.multi_spectral(
-                adatas, n_comps=comps, features=mask, weights=wts, random_state=seed, weighted_by_sd=sd,
-            ))
+            result = _run(
+                lambda: snap.tl.multi_spectral(
+                    adatas,
+                    n_comps=comps,
+                    features=mask,
+                    weights=wts,
+                    random_state=seed,
+                    weighted_by_sd=sd,
+                )
+            )
             kind = "multi_spectral"
     finally:
         for a in adatas:
             a.close()
     eigenvalues, vectors = np.asarray(result[0]), np.asarray(result[1])
     with target.open("x", encoding="utf-8") as handle:
-        handle.write("barcode\t" + "\t".join(f"comp{i + 1}" for i in range(vectors.shape[1])) + "\n")
-        for name, row in zip(names, vectors):
+        handle.write(
+            "barcode\t" + "\t".join(f"comp{i + 1}" for i in range(vectors.shape[1])) + "\n"
+        )
+        for name, row in zip(names, vectors, strict=False):
             handle.write(name + "\t" + "\t".join(repr(float(v)) for v in row) + "\n")
     return {
         "status": "completed",
@@ -387,7 +448,9 @@ def find_atac_marker_regions(
     adata = _open(snap, path, write=False)
     try:
         if key not in adata.obs[:].columns:
-            raise ConfigurationError(f"obs has no column {key!r}; columns are {list(adata.obs[:].columns)}.")
+            raise ConfigurationError(
+                f"obs has no column {key!r}; columns are {list(adata.obs[:].columns)}."
+            )
         markers = _run(lambda: snap.tl.marker_regions(adata, groupby=key, pvalue=cutoff))
     finally:
         adata.close()
@@ -447,12 +510,22 @@ def test_atac_differential_accessibility(
         rows = sorted(index[b] for b in first + second)
         matrix = adata.X[rows, :]
         detected = np.asarray((matrix > 0).sum(axis=0)).ravel()
-        testable = [str(n) for n, c in zip(adata.var_names, detected) if 0 < c < len(rows)]
+        testable = [
+            str(n) for n, c in zip(adata.var_names, detected, strict=False) if 0 < c < len(rows)
+        ]
         if not testable:
             raise ConfigurationError("No region varies between the cells of the two groups.")
-        table = _run(lambda: snap.tl.diff_test(
-            adata, first, second, features=testable, direction=way, min_log_fc=fc, min_pct=pct,
-        ))
+        table = _run(
+            lambda: snap.tl.diff_test(
+                adata,
+                first,
+                second,
+                features=testable,
+                direction=way,
+                min_log_fc=fc,
+                min_pct=pct,
+            )
+        )
     finally:
         adata.close()
     frame = table.to_pandas() if hasattr(table, "to_pandas") else table
@@ -463,7 +536,7 @@ def test_atac_differential_accessibility(
         "operation": "test_atac_differential_accessibility",
         "group_sizes": [len(first), len(second)],
         "tested_regions": len(testable),
-        "reported_regions": int(len(frame)),
+        "reported_regions": len(frame),
         "columns": [str(c) for c in frame.columns],
         "results": h.records(frame, cap),
         "output_tsv": None if target is None else str(target),
@@ -474,13 +547,17 @@ def test_atac_differential_accessibility(
 def _edge_rows(network: Any) -> list[dict[str, Any]]:
     rows = []
     for src, dst, data in network.edge_index_map().values():
-        rows.append({
-            "source": str(network[src].id), "source_type": str(network[src].type),
-            "target": str(network[dst].id), "target_type": str(network[dst].type),
-            "distance": h.plain(getattr(data, "distance", None)),
-            "cor_score": h.plain(getattr(data, "cor_score", None)),
-            "regr_score": h.plain(getattr(data, "regr_score", None)),
-        })
+        rows.append(
+            {
+                "source": str(network[src].id),
+                "source_type": str(network[src].type),
+                "target": str(network[dst].id),
+                "target_type": str(network[dst].type),
+                "distance": h.plain(getattr(data, "distance", None)),
+                "cor_score": h.plain(getattr(data, "cor_score", None)),
+                "regr_score": h.plain(getattr(data, "regr_score", None)),
+            }
+        )
     rows.sort(key=lambda r: (r["target"], r["source"]))
     return rows
 
@@ -528,17 +605,38 @@ def score_regulatory_network_edges(
     genes = _open(snap, gene_path, write=False)
     try:
         if list(peaks.obs_names) != list(genes.obs_names):
-            raise ConfigurationError("peak_h5ad and gene_h5ad must hold the same cells in the same order.")
+            raise ConfigurationError(
+                "peak_h5ad and gene_h5ad must hold the same cells in the same order."
+            )
         regions = [str(v) for v in peaks.var_names]
-        network = _run(lambda: snap.tl.init_network_from_annotation(
-            regions, str(gtf), upstream=up, downstream=down, id_type="gene_name", coding_gene_only=coding,
-        ))
+        network = _run(
+            lambda: snap.tl.init_network_from_annotation(
+                regions,
+                str(gtf),
+                upstream=up,
+                downstream=down,
+                id_type="gene_name",
+                coding_gene_only=coding,
+            )
+        )
         if how == "correlation":
-            _run(lambda: snap.tl.add_cor_scores(network, gene_mat=genes, peak_mat=peaks, select=chosen))
+            _run(
+                lambda: snap.tl.add_cor_scores(
+                    network, gene_mat=genes, peak_mat=peaks, select=chosen
+                )
+            )
         else:
-            _run(lambda: snap.tl.add_regr_scores(
-                network, peak_mat=peaks, gene_mat=genes, select=chosen, method=how, alpha=a, l1_ratio=l1,
-            ))
+            _run(
+                lambda: snap.tl.add_regr_scores(
+                    network,
+                    peak_mat=peaks,
+                    gene_mat=genes,
+                    select=chosen,
+                    method=how,
+                    alpha=a,
+                    l1_ratio=l1,
+                )
+            )
         rows = _edge_rows(network)
     finally:
         peaks.close()
@@ -593,10 +691,21 @@ def link_tf_to_gene_network(
     motifs = _run(lambda: snap.read_motifs(str(motifs_path)))
     if not motifs:
         raise ConfigurationError("The motif file holds no motifs.")
-    network = _run(lambda: snap.tl.init_network_from_annotation(
-        region_list, str(gtf), upstream=up, downstream=down, id_type="gene_name", coding_gene_only=coding,
-    ))
-    _run(lambda: snap.tl.add_tf_binding(network, motifs=motifs, genome_fasta=str(fasta), pvalue=cutoff))
+    network = _run(
+        lambda: snap.tl.init_network_from_annotation(
+            region_list,
+            str(gtf),
+            upstream=up,
+            downstream=down,
+            id_type="gene_name",
+            coding_gene_only=coding,
+        )
+    )
+    _run(
+        lambda: snap.tl.add_tf_binding(
+            network, motifs=motifs, genome_fasta=str(fasta), pvalue=cutoff
+        )
+    )
     tf_network = _run(lambda: snap.tl.link_tf_to_gene(network))
     rows = [r for r in _edge_rows(tf_network)]
     return {
@@ -643,7 +752,7 @@ def aggregate_atac_profiles(
         adata.close()
     with target.open("x", encoding="utf-8") as handle:
         handle.write("group\t" + "\t".join(regions) + "\n")
-        for name, row in zip(groups, matrix):
+        for name, row in zip(groups, matrix, strict=False):
             handle.write(name + "\t" + "\t".join(repr(float(v)) for v in row) + "\n")
     return {
         "status": "completed",
@@ -657,7 +766,9 @@ def aggregate_atac_profiles(
     }
 
 
-def _motif_scanner(snap: Any, path: Path, motif_id: str | None, base_probabilities: Sequence[float] | None) -> tuple[Any, Any]:
+def _motif_scanner(
+    snap: Any, path: Path, motif_id: str | None, base_probabilities: Sequence[float] | None
+) -> tuple[Any, Any]:
     motifs = _run(lambda: snap.read_motifs(str(path)))
     if not motifs:
         raise ConfigurationError("The motif file holds no motifs.")
@@ -667,13 +778,17 @@ def _motif_scanner(snap: Any, path: Path, motif_id: str | None, base_probabiliti
         wanted = h.text(motif_id, "motif_id")
         matches = [m for m in motifs if wanted in (m.id, m.name)]
         if not matches:
-            raise ConfigurationError(f"No motif with id or name {wanted!r}; first ids: {[m.id for m in motifs[:5]]}.")
+            raise ConfigurationError(
+                f"No motif with id or name {wanted!r}; first ids: {[m.id for m in motifs[:5]]}."
+            )
         chosen = matches[0]
     if base_probabilities is None:
         return chosen, chosen.with_nucl_prob()
     probs = [h.number(p, "base probability", 0.0, 1.0) for p in base_probabilities]
     if len(probs) != 4 or abs(sum(probs) - 1.0) > 1e-6:
-        raise ConfigurationError("base_probabilities must be four numbers (A, C, G, T) that sum to 1.")
+        raise ConfigurationError(
+            "base_probabilities must be four numbers (A, C, G, T) that sum to 1."
+        )
     return chosen, chosen.with_nucl_prob(*probs)
 
 
@@ -703,8 +818,12 @@ def read_meme_motifs(motif_file: str, *, verbose: bool = True) -> dict[str, Any]
         "operation": "read_meme_motifs",
         "motif_count": len(motifs),
         "motifs": [
-            {"id": str(m.id), "name": str(m.name), "family": None if m.family is None else str(m.family),
-             "information_content": h.plain(float(m.info_content))}
+            {
+                "id": str(m.id),
+                "name": str(m.name),
+                "family": None if m.family is None else str(m.family),
+                "information_content": h.plain(float(m.info_content)),
+            }
             for m in motifs
         ],
         "provenance": h.provenance("snapatac2", "snapatac2.read_motifs"),
@@ -742,9 +861,16 @@ def scan_dna_with_motif(
     results: list[Any]
     if kind == "find":
         results = [
-            [{"position": int(pos), "score": h.plain(float(score)),
-              "log10_pvalue": None if lp is None else h.plain(float(lp))}
-             for pos, score, lp in _run(lambda s=s: scanner.find(s, pvalue=cutoff, report_pvalue=with_p))]
+            [
+                {
+                    "position": int(pos),
+                    "score": h.plain(float(score)),
+                    "log10_pvalue": None if lp is None else h.plain(float(lp)),
+                }
+                for pos, score, lp in _run(
+                    lambda s=s: scanner.find(s, pvalue=cutoff, report_pvalue=with_p)
+                )
+            ]
             for s in seqs
         ]
     else:

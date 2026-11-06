@@ -36,7 +36,10 @@ _CONVERT_INPUT: Mapping[str, tuple[str, Mapping[str, bool]]] = {
     "newick": ("newick", {}),
     "nexml": ("nexml", {}),
     "nexus": ("nexus", {}),
-    "phylip-strict": ("phylip", {"strict": True, "multispace_delimiter": False, "interleaved": False}),
+    "phylip-strict": (
+        "phylip",
+        {"strict": True, "multispace_delimiter": False, "interleaved": False},
+    ),
     "phylip-relaxed-singlespace": (
         "phylip",
         {"strict": False, "multispace_delimiter": False, "interleaved": False},

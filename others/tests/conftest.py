@@ -4,9 +4,80 @@ from __future__ import annotations
 
 import logging
 import shutil
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+
+from dnakit.exceptions import BackendUnavailableError
+
+
+def _missing_optional_dependency(error: BaseException) -> str | None:
+    """Return a skip reason when ``error`` means an optional package or program is absent.
+
+    The core test job installs only ``.[dev]``, so tests that exercise an optional
+    backend must skip there instead of failing. DNAKit reports a missing backend as
+    ``BackendUnavailableError``; a direct import reports ``ModuleNotFoundError``
+    (``importlib.metadata.PackageNotFoundError`` is a subclass). A missing ``dnakit``
+    module is a real failure and is never skipped.
+    """
+
+    if isinstance(error, BackendUnavailableError):
+        return f"optional backend unavailable: {error}"
+    if isinstance(error, ModuleNotFoundError) and error.name:
+        if error.name.split(".")[0] == "dnakit":
+            return None
+        return f"optional dependency not installed: {error.name}"
+    return None
+
+
+@pytest.hookimpl(wrapper=True)
+def pytest_runtest_makereport(
+    item: pytest.Item, call: pytest.CallInfo[None]
+) -> Generator[None, pytest.TestReport, pytest.TestReport]:
+    """Report a missing optional dependency in setup or the test body as a skip."""
+
+    report = yield
+    if report.failed and call.when in ("setup", "call") and call.excinfo is not None:
+        reason = _missing_optional_dependency(call.excinfo.value)
+        if reason is not None:
+            path, line, _ = item.location
+            report.outcome = "skipped"
+            report.longrepr = (path, (line or 0) + 1, f"Skipped: {reason}")
+    return report
+
+
+# paper/write_paper/ is a local, git-ignored folder. Some tests reuse its synthetic Fig. 2
+# data; a fresh checkout (such as CI) does not have it.
+_PAPER_FOLDER = Path(__file__).resolve().parents[2] / "paper" / "write_paper"
+
+
+def _uses_paper_folder(module: object) -> bool:
+    """Return whether a test module holds a module-level path inside the paper folder."""
+
+    for value in vars(module).values():
+        if isinstance(value, (str, Path)):
+            path = Path(value)
+            if path.is_absolute() and path.is_relative_to(_PAPER_FOLDER):
+                return True
+    return False
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Skip tests that read the local paper folder when it is absent."""
+
+    if _PAPER_FOLDER.is_dir():
+        return
+    skip = pytest.mark.skip(reason="needs the git-ignored local paper/write_paper data")
+    checked: dict[int, bool] = {}
+    for item in items:
+        module = getattr(item, "module", None)
+        if module is None:
+            continue
+        if id(module) not in checked:
+            checked[id(module)] = _uses_paper_folder(module)
+        if checked[id(module)]:
+            item.add_marker(skip)
 
 
 def _snapshot() -> tuple[type[logging.Logger], list[logging.Handler], int]:

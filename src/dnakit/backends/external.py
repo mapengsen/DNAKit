@@ -202,7 +202,9 @@ def execute_bounded_command(
             or "\x00" in value
             for key, value in environment_overrides.items()
         ):
-            raise ConfigurationError("environment_overrides keys and values must be NUL-free strings.")
+            raise ConfigurationError(
+                "environment_overrides keys and values must be NUL-free strings."
+            )
 
     environment = os.environ.copy()
     environment.update({"LANG": "C", "LC_ALL": "C", "PYTHONDONTWRITEBYTECODE": "1"})

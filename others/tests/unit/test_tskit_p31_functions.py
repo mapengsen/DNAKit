@@ -9,16 +9,23 @@ import pytest
 pytest.importorskip("tskit")
 pytest.importorskip("numpy")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.population import tskit_p31_functions as m  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.population import tskit_p31_functions as m
 
 # 4 samples, two trees: [0,50) ((0,1)4,(2,3)5)6 ; [50,100) ((0,2)4',(1,3)5')6'
 TABLES = {
     "sequence_length": 100,
     "nodes": [
-        {"time": 0, "sample": True}, {"time": 0, "sample": True},
-        {"time": 0, "sample": True}, {"time": 0, "sample": True},
-        {"time": 1}, {"time": 2}, {"time": 4}, {"time": 1}, {"time": 3}, {"time": 5},
+        {"time": 0, "sample": True},
+        {"time": 0, "sample": True},
+        {"time": 0, "sample": True},
+        {"time": 0, "sample": True},
+        {"time": 1},
+        {"time": 2},
+        {"time": 4},
+        {"time": 1},
+        {"time": 3},
+        {"time": 5},
     ],
     "edges": [
         {"left": 0, "right": 50, "parent": 4, "child": 0},
@@ -100,8 +107,9 @@ def test_statistics_match_tskit(ts):
     sets = [[0, 1], [2, 3]]
     seg = m.tskit_segregating_sites(TABLES, sample_sets=sets, span_normalise=False)
     assert seg["values"] == ts.segregating_sites(sets, span_normalise=False).tolist()
-    f4 = m.tskit_sample_set_statistic(TABLES, statistic="f4", sample_sets=[[0], [1], [2], [3]],
-                                      indexes=[[0, 1, 2, 3]])
+    f4 = m.tskit_sample_set_statistic(
+        TABLES, statistic="f4", sample_sets=[[0], [1], [2], [3]], indexes=[[0, 1, 2, 3]]
+    )
     assert f4["values"] == ts.f4([[0], [1], [2], [3]], indexes=[(0, 1, 2, 3)]).tolist()
     y1 = m.tskit_sample_set_statistic(TABLES, statistic="Y1", sample_sets=[[0, 1, 2]])
     assert y1["values"] == ts.Y1([[0, 1, 2]]).tolist()
@@ -116,12 +124,24 @@ def test_statistics_match_tskit(ts):
     w = [[1.0], [2.0], [0.5], [3.0]]
     wa = np.array(w)
     for stat, ref in (("correlation", ts.trait_correlation), ("covariance", ts.trait_covariance)):
-        assert m.tskit_trait_statistic(TABLES, statistic=stat, weights=w)["values"] == ref(wa).tolist()
-    assert m.tskit_trait_statistic(TABLES, statistic="linear_model", weights=w)["values"] == ts.trait_linear_model(wa).tolist()
-    assert m.tskit_genetic_relatedness_vector(TABLES, weights=w)["values"] == ts.genetic_relatedness_vector(wa, mode="branch").tolist()
-    gs = m.tskit_general_stat(TABLES, weights=[[1.0], [-1.0], [2.0], [-2.0]], summary="square", polarised=True)
+        assert (
+            m.tskit_trait_statistic(TABLES, statistic=stat, weights=w)["values"] == ref(wa).tolist()
+        )
+    assert (
+        m.tskit_trait_statistic(TABLES, statistic="linear_model", weights=w)["values"]
+        == ts.trait_linear_model(wa).tolist()
+    )
+    assert (
+        m.tskit_genetic_relatedness_vector(TABLES, weights=w)["values"]
+        == ts.genetic_relatedness_vector(wa, mode="branch").tolist()
+    )
+    gs = m.tskit_general_stat(
+        TABLES, weights=[[1.0], [-1.0], [2.0], [-2.0]], summary="square", polarised=True
+    )
     assert len(gs["values"]) == 1
-    sc = m.tskit_general_stat(TABLES, sample_sets=sets, summary="product", polarised=True, strict=False)
+    sc = m.tskit_general_stat(
+        TABLES, sample_sets=sets, summary="product", polarised=True, strict=False
+    )
     assert sc["input"] == "sample_sets"
     md = m.tskit_mean_descendants(TABLES, sample_sets=sets)
     assert md["values"] == ts.mean_descendants(sets).tolist()
@@ -136,14 +156,19 @@ def test_pair_coalescence_and_ibd(ts):
     counts = m.tskit_pair_coalescence(TABLES, output="counts", sample_sets=sets)
     assert counts["values"] == ts.pair_coalescence_counts(sample_sets=sets).tolist()
     rates = m.tskit_pair_coalescence(TABLES, output="rates", time_windows=[0, 2], sample_sets=sets)
-    assert rates["values"] == ts.pair_coalescence_rates(np.array([0, 2, np.inf]), sample_sets=sets).tolist()
+    assert (
+        rates["values"]
+        == ts.pair_coalescence_rates(np.array([0, 2, np.inf]), sample_sets=sets).tolist()
+    )
     q = m.tskit_pair_coalescence(TABLES, output="quantiles", quantiles=[0.5, 1.0], sample_sets=sets)
     assert len(q["values"]) == 2
     with pytest.raises(ConfigurationError):
         m.tskit_pair_coalescence(TABLES, output="rates", time_windows="nodes")
     ibd = m.tskit_ibd_segments(TABLES)
-    assert ibd["num_segments"] == len(list(ts.ibd_segments(store_segments=True, store_pairs=True).values()) and
-                                      [s for v in ts.ibd_segments(store_segments=True, store_pairs=True).values() for s in v])
+    assert ibd["num_segments"] == len(
+        list(ts.ibd_segments(store_segments=True, store_pairs=True).values())
+        and [s for v in ts.ibd_segments(store_segments=True, store_pairs=True).values() for s in v]
+    )
 
 
 def test_ld_and_relatedness_inputs(ts):
@@ -152,7 +177,9 @@ def test_ld_and_relatedness_inputs(ts):
     calc = tskit.LdCalculator(ts)
     assert m.tskit_ld_r2(TABLES)["values"] == calc.r2_matrix().tolist()
     assert m.tskit_ld_r2(TABLES, output="pair", site_a=0, site_b=1)["values"] == calc.r2(0, 1)
-    assert m.tskit_ld_r2(TABLES, output="array", focal_site=0)["values"] == calc.r2_array(0).tolist()
+    assert (
+        m.tskit_ld_r2(TABLES, output="array", focal_site=0)["values"] == calc.r2_array(0).tolist()
+    )
     with pytest.raises(ConfigurationError):
         m.tskit_ld_r2(TABLES, output="pair")
 
@@ -172,7 +199,9 @@ def test_editing_functions(ts):
     assert all(old["tables"]["nodes"][e["parent"]]["time"] < 3.5 for e in old["tables"]["edges"])
     shifted = m.tskit_shift_coordinates(TABLES, value=10)
     assert shifted["tables"]["sequence_length"] == 110.0
-    trimmed = m.tskit_trim_genome(m.tskit_shift_coordinates(TABLES, value=10)["tables"], side="left")
+    trimmed = m.tskit_trim_genome(
+        m.tskit_shift_coordinates(TABLES, value=10)["tables"], side="left"
+    )
     assert trimmed["tables"]["sequence_length"] == 100.0
     assert m.tskit_split_edges(TABLES, time=1.5)["result_summary"]["num_nodes"] > 10
     ext = m.tskit_extend_haplotypes(m.tskit_compute_mutation_times(TABLES)["tables"])

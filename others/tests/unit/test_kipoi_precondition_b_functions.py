@@ -188,7 +188,9 @@ def test_public_functions_have_keyword_only_verbose() -> None:
     assert set(kb.__all__) == set(PUBLIC)
 
 
-def test_missing_singularity_raises_backend_unavailable(toy: dict[str, Path], no_singularity: None) -> None:
+def test_missing_singularity_raises_backend_unavailable(
+    toy: dict[str, Path], no_singularity: None
+) -> None:
     with pytest.raises(BackendUnavailableError) as info:
         kb.predict_kipoi_model_in_singularity(
             str(toy["image"]), str(toy["model"]), str(toy["root"] / "out.tsv"), verbose=False
@@ -198,7 +200,9 @@ def test_missing_singularity_raises_backend_unavailable(toy: dict[str, Path], no
         kb.test_kipoi_model_in_singularity(str(toy["image"]), str(toy["model"]), verbose=False)
 
 
-def test_dry_run_returns_the_command_without_singularity(toy: dict[str, Path], no_singularity: None) -> None:
+def test_dry_run_returns_the_command_without_singularity(
+    toy: dict[str, Path], no_singularity: None
+) -> None:
     out = toy["root"] / "dry.tsv"
     result = kb.predict_kipoi_model_in_singularity(
         str(toy["image"]),
@@ -223,13 +227,15 @@ def test_dry_run_returns_the_command_without_singularity(toy: dict[str, Path], n
         str(toy["image"]), str(toy["model"]), dry_run=True, verbose=False
     )
     assert test_result["status"] == "dry_run"
-    inner = test_result["command"][test_result["command"].index("kipoi"):]
+    inner = test_result["command"][test_result["command"].index("kipoi") :]
     assert inner[:2] == ["kipoi", "test"]
     assert inner[inner.index("--batch_size") + 1] == "32"
     assert inner[-1] == str(toy["model"])
 
 
-def test_predict_in_singularity_matches_predict_kipoi_model(toy: dict[str, Path], shim_on_path: Path) -> None:
+def test_predict_in_singularity_matches_predict_kipoi_model(
+    toy: dict[str, Path], shim_on_path: Path
+) -> None:
     direct = toy["root"] / "direct.tsv"
     contained = toy["root"] / "contained.tsv"
     kipoi_gap.predict_kipoi_model(
@@ -256,7 +262,9 @@ def test_predict_in_singularity_matches_predict_kipoi_model(toy: dict[str, Path]
     assert "preds" in contained.read_text(encoding="utf-8").splitlines()[0]
 
 
-def test_predict_in_singularity_rejects_bad_output_name(toy: dict[str, Path], shim_on_path: Path) -> None:
+def test_predict_in_singularity_rejects_bad_output_name(
+    toy: dict[str, Path], shim_on_path: Path
+) -> None:
     with pytest.raises(ConfigurationError):
         kb.predict_kipoi_model_in_singularity(
             str(toy["image"]), str(toy["model"]), str(toy["root"] / "out.h5"), verbose=False
@@ -269,7 +277,9 @@ def test_predict_in_singularity_rejects_bad_output_name(toy: dict[str, Path], sh
         )
 
 
-def test_test_in_singularity_runs_kipoi_test_through_shim(toy: dict[str, Path], shim_on_path: Path) -> None:
+def test_test_in_singularity_runs_kipoi_test_through_shim(
+    toy: dict[str, Path], shim_on_path: Path
+) -> None:
     result = kb.test_kipoi_model_in_singularity(
         str(toy["image"]), str(toy["model"]), batch_size=2, verbose=False
     )
@@ -279,7 +289,9 @@ def test_test_in_singularity_runs_kipoi_test_through_shim(toy: dict[str, Path], 
     assert str(toy["model"]) in result["command"]
 
 
-def test_test_in_singularity_nonzero_exit_raises(toy: dict[str, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_test_in_singularity_nonzero_exit_raises(
+    toy: dict[str, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     bin_dir = tmp_path / "failing_bin"
     _install_shim(bin_dir, FAILING_SHIM)
     monkeypatch.setenv("PATH", str(bin_dir))
@@ -296,7 +308,9 @@ def test_current_env_test_passes_on_toy_model(toy: dict[str, Path]) -> None:
     assert result["provenance"]["backend"] == "kipoi"
 
 
-def test_current_env_test_fails_on_logged_warning(toy: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_current_env_test_fails_on_logged_warning(
+    toy: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     import logging
 
     import kipoi.cli.main as kmain
@@ -311,7 +325,9 @@ def test_current_env_test_fails_on_logged_warning(toy: dict[str, Path], monkeypa
     assert "probe warning" in str(info.value)
 
 
-def test_current_env_test_reports_kipoi_failures(toy: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_current_env_test_reports_kipoi_failures(
+    toy: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     import kipoi.cli.main as kmain
 
     def broken(command: str, raw_args: list[str]) -> None:

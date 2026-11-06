@@ -34,21 +34,38 @@ _TOOL = _cli.Tool(
 
 
 def _listing(folder: Path) -> list[str]:
-    return sorted(str(path) for path in folder.rglob("*") if path.is_file()) if folder.is_dir() else []
+    return (
+        sorted(str(path) for path in folder.rglob("*") if path.is_file()) if folder.is_dir() else []
+    )
 
 
 def _quality_options(
-    trim_front: int, trim_tail: int, qualified_quality_phred: int, unqualified_base_limit: int, poly_size_limit: int,
-    n_base_limit: int, seq_len_req: int, gzip_output: bool,
+    trim_front: int,
+    trim_tail: int,
+    qualified_quality_phred: int,
+    unqualified_base_limit: int,
+    poly_size_limit: int,
+    n_base_limit: int,
+    seq_len_req: int,
+    gzip_output: bool,
 ) -> list[str]:
     arguments = [
-        "-f", str(_cli.integer(trim_front, "trim_front", minimum=-1)),
-        "-t", str(_cli.integer(trim_tail, "trim_tail", minimum=-1)),
-        "-q", str(_cli.integer(qualified_quality_phred, "qualified_quality_phred", minimum=0, maximum=93)),
-        "-u", str(_cli.integer(unqualified_base_limit, "unqualified_base_limit", minimum=0)),
-        "-p", str(_cli.integer(poly_size_limit, "poly_size_limit", minimum=0)),
-        "-n", str(_cli.integer(n_base_limit, "n_base_limit", minimum=0)),
-        "-s", str(_cli.integer(seq_len_req, "seq_len_req", minimum=0)),
+        "-f",
+        str(_cli.integer(trim_front, "trim_front", minimum=-1)),
+        "-t",
+        str(_cli.integer(trim_tail, "trim_tail", minimum=-1)),
+        "-q",
+        str(
+            _cli.integer(qualified_quality_phred, "qualified_quality_phred", minimum=0, maximum=93)
+        ),
+        "-u",
+        str(_cli.integer(unqualified_base_limit, "unqualified_base_limit", minimum=0)),
+        "-p",
+        str(_cli.integer(poly_size_limit, "poly_size_limit", minimum=0)),
+        "-n",
+        str(_cli.integer(n_base_limit, "n_base_limit", minimum=0)),
+        "-s",
+        str(_cli.integer(seq_len_req, "seq_len_req", minimum=0)),
     ]
     if _cli.flag(gzip_output, "gzip_output"):
         arguments.append("--gzip")
@@ -92,9 +109,26 @@ def afterqc_overlap_analysis(
     if first == second:
         raise ConfigurationError("read1 and read2 must be different files.")
     out = _cli.new_directory(output_directory, "output_directory")
-    arguments = ["-1", str(first), "-2", str(second), "-g", str(out / "good"), "-b", str(out / "bad"), "-r", str(out / "QC")]
+    arguments = [
+        "-1",
+        str(first),
+        "-2",
+        str(second),
+        "-g",
+        str(out / "good"),
+        "-b",
+        str(out / "bad"),
+        "-r",
+        str(out / "QC"),
+    ]
     arguments += _quality_options(
-        trim_front, trim_tail, qualified_quality_phred, unqualified_base_limit, poly_size_limit, n_base_limit, seq_len_req,
+        trim_front,
+        trim_tail,
+        qualified_quality_phred,
+        unqualified_base_limit,
+        poly_size_limit,
+        n_base_limit,
+        seq_len_req,
         gzip_output,
     )
     if not _cli.flag(analyse_overlap, "analyse_overlap"):
@@ -105,11 +139,25 @@ def afterqc_overlap_analysis(
         arguments.append("--mask_mismatch")
     if _cli.flag(store_overlap, "store_overlap"):
         arguments += ["--store_overlap", "on", "--overlap_output_folder", str(out / "overlap")]
-    record = _cli.invoke(_TOOL, arguments, cwd=out, expected=[out / "good"], explicit=afterqc_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _TOOL,
+        arguments,
+        cwd=out,
+        expected=[out / "good"],
+        explicit=afterqc_path,
+        timeout_seconds=timeout_seconds,
+    )
     return _cli.finish(
-        record, "overlap_analysis_of_read_pairs", output_directory=str(out), good_files=_listing(out / "good"),
-        bad_files=_listing(out / "bad"), qc_files=_listing(out / "QC"), overlap_files=_listing(out / "overlap"),
-        analyse_overlap=analyse_overlap, correct_mismatches=correct_mismatches, store_overlap=store_overlap,
+        record,
+        "overlap_analysis_of_read_pairs",
+        output_directory=str(out),
+        good_files=_listing(out / "good"),
+        bad_files=_listing(out / "bad"),
+        qc_files=_listing(out / "QC"),
+        overlap_files=_listing(out / "overlap"),
+        analyse_overlap=analyse_overlap,
+        correct_mismatches=correct_mismatches,
+        store_overlap=store_overlap,
     )
 
 
@@ -141,18 +189,46 @@ def afterqc_debubble(
     source = _cli.existing_directory(input_directory, "input_directory")
     out = _cli.new_directory(output_directory, "output_directory")
     arguments = [
-        "-d", str(source), "-g", str(out / "good"), "-b", str(out / "bad"), "-r", str(out / "QC"), "--debubble",
-        "--debubble_dir", str(out / "debubble"), "--draw", "on" if _cli.flag(draw, "draw") else "off",
+        "-d",
+        str(source),
+        "-g",
+        str(out / "good"),
+        "-b",
+        str(out / "bad"),
+        "-r",
+        str(out / "QC"),
+        "--debubble",
+        "--debubble_dir",
+        str(out / "debubble"),
+        "--draw",
+        "on" if _cli.flag(draw, "draw") else "off",
     ]
     arguments += _quality_options(
-        trim_front, trim_tail, qualified_quality_phred, unqualified_base_limit, poly_size_limit, n_base_limit, seq_len_req,
+        trim_front,
+        trim_tail,
+        qualified_quality_phred,
+        unqualified_base_limit,
+        poly_size_limit,
+        n_base_limit,
+        seq_len_req,
         gzip_output,
     )
-    record = _cli.invoke(_TOOL, arguments, cwd=out, expected=[out / "good"], explicit=afterqc_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _TOOL,
+        arguments,
+        cwd=out,
+        expected=[out / "good"],
+        explicit=afterqc_path,
+        timeout_seconds=timeout_seconds,
+    )
     circles = out / "debubble" / "circles.csv"
     return _cli.finish(
-        record, "remove_sequencer_bubble_reads", output_directory=str(out), good_files=_listing(out / "good"),
-        bad_files=_listing(out / "bad"), debubble_files=_listing(out / "debubble"),
+        record,
+        "remove_sequencer_bubble_reads",
+        output_directory=str(out),
+        good_files=_listing(out / "good"),
+        bad_files=_listing(out / "bad"),
+        debubble_files=_listing(out / "debubble"),
         circles=_cli.read_table(circles, delimiter=",", header=False) if circles.is_file() else [],
     )
 
@@ -186,21 +262,58 @@ def afterqc_move_barcodes_to_read_names(
     first = _cli.existing_file(read1, "read1")
     flag = _cli.text(barcode_flag, "barcode_flag")
     if flag not in first.name:
-        raise ConfigurationError(f"AfterQC treats a file as barcoded only when its name contains {flag!r}: {first.name}")
+        raise ConfigurationError(
+            f"AfterQC treats a file as barcoded only when its name contains {flag!r}: {first.name}"
+        )
     out = _cli.new_directory(output_directory, "output_directory")
     arguments = ["-1", str(first)]
     if read2 is not None:
         arguments += ["-2", str(_cli.existing_file(read2, "read2"))]
-    arguments += ["-g", str(out / "good"), "-b", str(out / "bad"), "-r", str(out / "QC"), "--barcode", "on"]
-    arguments += ["--barcode_length", str(_cli.integer(barcode_length, "barcode_length", minimum=1))]
-    arguments += ["--barcode_verify", _cli.text(barcode_verify, "barcode_verify"), "--barcode_flag", flag]
+    arguments += [
+        "-g",
+        str(out / "good"),
+        "-b",
+        str(out / "bad"),
+        "-r",
+        str(out / "QC"),
+        "--barcode",
+        "on",
+    ]
+    arguments += [
+        "--barcode_length",
+        str(_cli.integer(barcode_length, "barcode_length", minimum=1)),
+    ]
+    arguments += [
+        "--barcode_verify",
+        _cli.text(barcode_verify, "barcode_verify"),
+        "--barcode_flag",
+        flag,
+    ]
     arguments += _quality_options(
-        -1, -1, qualified_quality_phred, unqualified_base_limit, poly_size_limit, n_base_limit, seq_len_req, gzip_output
+        -1,
+        -1,
+        qualified_quality_phred,
+        unqualified_base_limit,
+        poly_size_limit,
+        n_base_limit,
+        seq_len_req,
+        gzip_output,
     )
-    record = _cli.invoke(_TOOL, arguments, cwd=out, expected=[out / "good"], explicit=afterqc_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _TOOL,
+        arguments,
+        cwd=out,
+        expected=[out / "good"],
+        explicit=afterqc_path,
+        timeout_seconds=timeout_seconds,
+    )
     return _cli.finish(
-        record, "move_barcodes_to_read_names", output_directory=str(out), good_files=_listing(out / "good"),
-        bad_files=_listing(out / "bad"), qc_files=_listing(out / "QC"),
+        record,
+        "move_barcodes_to_read_names",
+        output_directory=str(out),
+        good_files=_listing(out / "good"),
+        bad_files=_listing(out / "bad"),
+        qc_files=_listing(out / "QC"),
     )
 
 

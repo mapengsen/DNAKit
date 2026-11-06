@@ -134,8 +134,7 @@ def _fake_sniffles(path: Path) -> Path:
 
 def _fake_delly(path: Path) -> Path:
     path.write_text(
-        f"#!{sys.executable}\n"
-        "print('##fileformat=VCFv4.2')\n",
+        f"#!{sys.executable}\nprint('##fileformat=VCFv4.2')\n",
         encoding="ascii",
     )
     path.chmod(0o755)

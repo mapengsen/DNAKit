@@ -142,7 +142,9 @@ def annotate_bakta_features(
     genome_file = _p.file_path(genome, "genome")
     database_path = Path(database).expanduser().resolve()
     if not database_path.is_dir():
-        raise ConfigurationError(f"database must be an existing Bakta database folder: {database_path}")
+        raise ConfigurationError(
+            f"database must be an existing Bakta database folder: {database_path}"
+        )
     if features is None:
         selected = list(_FEATURE_SWITCHES)
     elif isinstance(features, str) or not features:
@@ -161,13 +163,23 @@ def annotate_bakta_features(
     _p.switch(arguments, "--complete", complete, "complete")
     _p.opt_file(arguments, "--prodigal-tf", prodigal_training_file, "prodigal_training_file")
     if translation_table is not None:
-        arguments.extend(("--translation-table", str(_cli.choice(translation_table, (4, 11, 25), "translation_table"))))  # type: ignore[arg-type]
+        arguments.extend(
+            (
+                "--translation-table",
+                str(_cli.choice(translation_table, (4, 11, 25), "translation_table")),
+            )
+        )  # type: ignore[arg-type]
     if gram is not None:
         arguments.extend(("--gram", _cli.choice(gram, _GRAM, "gram")))
     _p.opt_text(arguments, "--locus", locus, "locus")
     _p.opt_text(arguments, "--locus-tag", locus_tag, "locus_tag")
     if locus_tag_increment is not None:
-        arguments.extend(("--locus-tag-increment", str(_cli.choice(locus_tag_increment, (1, 5, 10), "locus_tag_increment"))))  # type: ignore[arg-type]
+        arguments.extend(
+            (
+                "--locus-tag-increment",
+                str(_cli.choice(locus_tag_increment, (1, 5, 10), "locus_tag_increment")),
+            )
+        )  # type: ignore[arg-type]
     _p.switch(arguments, "--keep-contig-headers", keep_contig_headers, "keep_contig_headers")
     _p.switch(arguments, "--compliant", compliant, "compliant")
     _p.opt_file(arguments, "--replicons", replicons, "replicons")
@@ -185,9 +197,15 @@ def annotate_bakta_features(
     directory = _cli.new_directory(output_directory, "output_directory")
     annotation = directory / "annotation"
     command = [*arguments, "--output", str(annotation), genome_file]
-    _p.run_checked("annotate_bakta_features", executable, command, directory, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        "annotate_bakta_features", executable, command, directory, timeout_seconds=timeout_seconds
+    )
     files = _annotation_files(annotation, stem)
-    _p.require_outputs("annotate_bakta_features", directory, {name: annotation / f"{stem}.{name}" for name in ("json", "tsv", "gff3")})
+    _p.require_outputs(
+        "annotate_bakta_features",
+        directory,
+        {name: annotation / f"{stem}.{name}" for name in ("json", "tsv", "gff3")},
+    )
     return _p.result(
         "annotate_bakta_features",
         "bakta",
@@ -225,14 +243,24 @@ def export_bakta_annotation(
     keys: ``export_directory``, ``outputs`` (keyed by extension) and ``summary`` (the report).
     """
     source = Path(_p.file_path(annotation_json, "annotation_json"))
-    stem = _p.file_stem(prefix, "prefix") if prefix is not None else _p.file_stem(source.stem, "annotation_json")
+    stem = (
+        _p.file_stem(prefix, "prefix")
+        if prefix is not None
+        else _p.file_stem(source.stem, "annotation_json")
+    )
     executable = _cli.program("bakta_io", explicit=bakta_io_path, hint=_IO_HINT)
     directory = _cli.new_directory(output_directory, "output_directory")
     export = directory / "export"
     command = ["--prefix", stem, "--output", str(export), str(source)]
-    _p.run_checked("export_bakta_annotation", executable, command, directory, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        "export_bakta_annotation", executable, command, directory, timeout_seconds=timeout_seconds
+    )
     files = _annotation_files(export, stem)
-    _p.require_outputs("export_bakta_annotation", directory, {name: export / f"{stem}.{name}" for name in ("tsv", "gff3", "gbff", "embl", "txt")})
+    _p.require_outputs(
+        "export_bakta_annotation",
+        directory,
+        {name: export / f"{stem}.{name}" for name in ("tsv", "gff3", "gbff", "embl", "txt")},
+    )
     return _p.result(
         "export_bakta_annotation",
         "bakta_io",
@@ -273,11 +301,17 @@ def plot_bakta_genome(
     """
     source = Path(_p.file_path(annotation_json, "annotation_json"))
     kind = _cli.choice(plot_type, ("features", "cog"), "plot_type")
-    stem = _p.file_stem(prefix, "prefix") if prefix is not None else _p.file_stem(source.stem, "annotation_json")
+    stem = (
+        _p.file_stem(prefix, "prefix")
+        if prefix is not None
+        else _p.file_stem(source.stem, "annotation_json")
+    )
     arguments = ["--type", kind, "--prefix", stem]
     if sequences is not None:
         if isinstance(sequences, str) or not sequences:
-            raise ConfigurationError("sequences must be a non-empty list of sequence numbers or names.")
+            raise ConfigurationError(
+                "sequences must be a non-empty list of sequence numbers or names."
+            )
         names = [_cli.text(str(item), "sequences") for item in sequences]
         if any("," in item for item in names):
             raise ConfigurationError("sequence names must not contain commas.")
@@ -292,9 +326,13 @@ def plot_bakta_genome(
     directory = _cli.new_directory(output_directory, "output_directory")
     plots = directory / "plots"
     command = [*arguments, "--output", str(plots), str(source)]
-    _p.run_checked("plot_bakta_genome", executable, command, directory, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        "plot_bakta_genome", executable, command, directory, timeout_seconds=timeout_seconds
+    )
     files = _annotation_files(plots, stem)
-    _p.require_outputs("plot_bakta_genome", directory, {name: plots / f"{stem}.{name}" for name in ("png", "svg")})
+    _p.require_outputs(
+        "plot_bakta_genome", directory, {name: plots / f"{stem}.{name}" for name in ("png", "svg")}
+    )
     return _p.result(
         "plot_bakta_genome",
         "bakta_plot",

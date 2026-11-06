@@ -57,14 +57,20 @@ def _installed(name: str) -> bool:
     return shutil.which(name) is not None or (Path(sys.executable).parent / name).is_file()
 
 
-requires_vcftools = pytest.mark.skipif(not _installed("vcftools"), reason="vcftools is not installed")
+requires_vcftools = pytest.mark.skipif(
+    not _installed("vcftools"), reason="vcftools is not installed"
+)
 requires_scripts = pytest.mark.skipif(
-    not (_installed("vcf-annotate") and shutil.which("perl")), reason="the VCFtools Perl scripts are not installed"
+    not (_installed("vcf-annotate") and shutil.which("perl")),
+    reason="the VCFtools Perl scripts are not installed",
 )
 requires_htslib = pytest.mark.skipif(
-    not (shutil.which("bgzip") and shutil.which("tabix")), reason="bgzip and tabix (htslib) are not installed"
+    not (shutil.which("bgzip") and shutil.which("tabix")),
+    reason="bgzip and tabix (htslib) are not installed",
 )
-requires_samtools = pytest.mark.skipif(shutil.which("samtools") is None, reason="samtools is not installed")
+requires_samtools = pytest.mark.skipif(
+    shutil.which("samtools") is None, reason="samtools is not installed"
+)
 
 
 @pytest.fixture()
@@ -89,7 +95,9 @@ def _toy_lines() -> tuple[list[str], list[str]]:
 
 
 def _records(path: str | Path) -> list[list[str]]:
-    return [x.split("\t") for x in Path(path).read_text().splitlines() if x and not x.startswith("#")]
+    return [
+        x.split("\t") for x in Path(path).read_text().splitlines() if x and not x.startswith("#")
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -99,38 +107,70 @@ def _records(path: str | Path) -> list[list[str]]:
 
 def test_missing_program_raises_backend_unavailable(toy, tmp_path):
     with pytest.raises(BackendUnavailableError):
-        m.vcftools_depth(str(toy), str(tmp_path / "x"), vcftools_path=str(tmp_path / "no_vcftools"), verbose=False)
+        m.vcftools_depth(
+            str(toy),
+            str(tmp_path / "x"),
+            vcftools_path=str(tmp_path / "no_vcftools"),
+            verbose=False,
+        )
     with pytest.raises(BackendUnavailableError):
-        m.vcf_to_tab(str(toy), str(tmp_path / "x.tab"), script_path=str(tmp_path / "no_script"), verbose=False)
+        m.vcf_to_tab(
+            str(toy),
+            str(tmp_path / "x.tab"),
+            script_path=str(tmp_path / "no_script"),
+            verbose=False,
+        )
 
 
 def test_argument_validation(toy, tmp_path):
     with pytest.raises(ConfigurationError):
         m.vcftools_depth(str(toy), str(tmp_path / "x"), level="bogus", verbose=False)
     with pytest.raises(ConfigurationError):
-        m.vcftools_list_sites(str(toy), str(tmp_path / "x"), filters={"not_a_filter": 1}, verbose=False)
+        m.vcftools_list_sites(
+            str(toy), str(tmp_path / "x"), filters={"not_a_filter": 1}, verbose=False
+        )
     with pytest.raises(ConfigurationError):
         m.vcftools_list_sites(
-            str(toy), str(tmp_path / "x"), filters={"bed_file": str(toy), "exclude_bed_file": str(toy)}, verbose=False
+            str(toy),
+            str(tmp_path / "x"),
+            filters={"bed_file": str(toy), "exclude_bed_file": str(toy)},
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         m.vcftools_filter_vcf(str(toy), str(tmp_path / "x"), output_format="vcf.gz", verbose=False)
     with pytest.raises(ConfigurationError):
         m.vcftools_filter_vcf(str(toy), str(tmp_path / "x"), min_maf=True, verbose=False)
     with pytest.raises(ConfigurationError):
-        m.vcftools_transition_transversion(str(toy), str(tmp_path / "x"), verbose=False)  # bin_size is required
+        m.vcftools_transition_transversion(
+            str(toy), str(tmp_path / "x"), verbose=False
+        )  # bin_size is required
     with pytest.raises(ConfigurationError):
         m.vcftools_linkage_disequilibrium(
-            str(toy), str(tmp_path / "x"), statistic="geno_chisq", interchromosomal=True, verbose=False
+            str(toy),
+            str(tmp_path / "x"),
+            statistic="geno_chisq",
+            interchromosomal=True,
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
-        m.vcftools_export_genotypes(str(toy), str(tmp_path / "x"), export_format="ldhat", verbose=False)  # needs chr
+        m.vcftools_export_genotypes(
+            str(toy), str(tmp_path / "x"), export_format="ldhat", verbose=False
+        )  # needs chr
     with pytest.raises(ConfigurationError):
         m.vcftools_pca(str(toy), str(tmp_path / "x"), output="snp_loadings", verbose=False)
     with pytest.raises(ConfigurationError):
-        m.vcftools_pca(str(toy), str(tmp_path / "x"), output="snp_loadings", snp_loadings=2, normalise=False, verbose=False)
+        m.vcftools_pca(
+            str(toy),
+            str(tmp_path / "x"),
+            output="snp_loadings",
+            snp_loadings=2,
+            normalise=False,
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        m.vcftools_extract_fields(str(toy), str(tmp_path / "x"), ["DP", "GQ"], source="format", verbose=False)
+        m.vcftools_extract_fields(
+            str(toy), str(tmp_path / "x"), ["DP", "GQ"], source="format", verbose=False
+        )
     with pytest.raises(ConfigurationError):
         m.vcftools_depth(str(tmp_path / "missing.vcf"), str(tmp_path / "x"), verbose=False)
     with pytest.raises(ConfigurationError):
@@ -138,7 +178,9 @@ def test_argument_validation(toy, tmp_path):
     with pytest.raises(ConfigurationError):
         m.vcf_annotate(str(toy), str(tmp_path / "a.vcf"), filters="+; rm", verbose=False)
     with pytest.raises(ConfigurationError):
-        m.vcf_subset(str(toy), str(tmp_path / "s.vcf"), samples=["S1"], samples_file=str(toy), verbose=False)
+        m.vcf_subset(
+            str(toy), str(tmp_path / "s.vcf"), samples=["S1"], samples_file=str(toy), verbose=False
+        )
     with pytest.raises(ConfigurationError):
         m.vcf_subset(str(toy), str(tmp_path / "s.vcf"), variant_types=["bogus"], verbose=False)
     with pytest.raises(ConfigurationError):
@@ -146,7 +188,9 @@ def test_argument_validation(toy, tmp_path):
     with pytest.raises(ConfigurationError):
         m.vcf_compare([str(toy)], str(tmp_path / "c.txt"), verbose=False)
     with pytest.raises(ConfigurationError):
-        m.vcf_fill_reference_md5(str(toy), str(tmp_path / "o.vcf.gz"), str(toy), verbose=False)  # not compressed
+        m.vcf_fill_reference_md5(
+            str(toy), str(tmp_path / "o.vcf.gz"), str(toy), verbose=False
+        )  # not compressed
 
 
 def test_existing_output_is_never_overwritten(toy, tmp_path):
@@ -177,7 +221,12 @@ def test_public_names_follow_the_verbosity_contract():
 @requires_vcftools
 def test_filter_vcf_applies_site_individual_and_genotype_filters(toy, tmp_path):
     result = m.vcftools_filter_vcf(
-        str(toy), str(tmp_path / "f"), min_maf=0.2, remove_filtered_all=True, min_genotype_quality=20, verbose=False
+        str(toy),
+        str(tmp_path / "f"),
+        min_maf=0.2,
+        remove_filtered_all=True,
+        min_genotype_quality=20,
+        verbose=False,
     )
     assert result["status"] == "completed"
     assert result["version"].startswith("0.1.")
@@ -185,14 +234,27 @@ def test_filter_vcf_applies_site_individual_and_genotype_filters(toy, tmp_path):
     assert len(_records(result["outputs"][0])) == 14
 
     subset = m.vcftools_filter_vcf(
-        str(toy), str(tmp_path / "g"), keep_individuals=["S1", "S2"], remove_indels=True, recode_info=["DP"], verbose=False
+        str(toy),
+        str(tmp_path / "g"),
+        keep_individuals=["S1", "S2"],
+        remove_indels=True,
+        recode_info=["DP"],
+        verbose=False,
     )
     assert (subset["sites_kept"], subset["individuals_kept"]) == (17, 2)
     first = _records(subset["outputs"][0])[0]
-    assert first[7] == "DP=91" and len(first) == 11  # only the requested INFO key, two sample columns
+    assert (
+        first[7] == "DP=91" and len(first) == 11
+    )  # only the requested INFO key, two sample columns
 
     window = m.vcftools_filter_vcf(
-        str(toy), str(tmp_path / "w"), chromosomes=["chr2"], from_bp=1000, to_bp=4000, thin=1000, verbose=False
+        str(toy),
+        str(tmp_path / "w"),
+        chromosomes=["chr2"],
+        from_bp=1000,
+        to_bp=4000,
+        thin=1000,
+        verbose=False,
     )
     assert window["sites_kept"] == 2
     indels = m.vcftools_filter_vcf(str(toy), str(tmp_path / "i"), only_indels=True, verbose=False)
@@ -201,7 +263,9 @@ def test_filter_vcf_applies_site_individual_and_genotype_filters(toy, tmp_path):
 
 @requires_vcftools
 def test_filter_vcf_writes_bcf(toy, tmp_path):
-    result = m.vcftools_filter_vcf(str(toy), str(tmp_path / "b"), output_format="bcf", max_alleles=2, verbose=False)
+    result = m.vcftools_filter_vcf(
+        str(toy), str(tmp_path / "b"), output_format="bcf", max_alleles=2, verbose=False
+    )
     assert result["status"] == "completed"
     path = Path(result["outputs"][0])
     assert path.name.endswith(".recode.bcf") and path.stat().st_size > 0
@@ -212,9 +276,18 @@ def test_filter_vcf_writes_bcf(toy, tmp_path):
 
 @requires_vcftools
 def test_list_sites_kept_and_removed(toy, tmp_path):
-    kept = m.vcftools_list_sites(str(toy), str(tmp_path / "k"), filters={"min_maf": 0.2, "remove_filtered_all": True}, verbose=False)
+    kept = m.vcftools_list_sites(
+        str(toy),
+        str(tmp_path / "k"),
+        filters={"min_maf": 0.2, "remove_filtered_all": True},
+        verbose=False,
+    )
     removed = m.vcftools_list_sites(
-        str(toy), str(tmp_path / "r"), which="removed", filters={"min_maf": 0.2, "remove_filtered_all": True}, verbose=False
+        str(toy),
+        str(tmp_path / "r"),
+        which="removed",
+        filters={"min_maf": 0.2, "remove_filtered_all": True},
+        verbose=False,
     )
     assert kept["table"]["columns"] == ["CHROM", "POS"]
     assert kept["table"]["row_count"] + removed["table"]["row_count"] == 20
@@ -232,8 +305,14 @@ def test_depth_levels(toy, tmp_path):
     assert site_mean["table"]["rows"][1][:3] == ["chr1", 800, 20]
     site_sum = m.vcftools_depth(str(toy), str(tmp_path / "s"), level="site_sum", verbose=False)
     assert site_sum["table"]["columns"] == ["CHROM", "POS", "SUM_DEPTH", "SUMSQ_DEPTH"]
-    genotype = m.vcftools_depth(str(toy), str(tmp_path / "g"), level="genotype", max_rows=3, verbose=False)
-    assert genotype["table"]["row_count"] == 20 and len(genotype["table"]["rows"]) == 3 and genotype["table"]["truncated"]
+    genotype = m.vcftools_depth(
+        str(toy), str(tmp_path / "g"), level="genotype", max_rows=3, verbose=False
+    )
+    assert (
+        genotype["table"]["row_count"] == 20
+        and len(genotype["table"]["rows"]) == 3
+        and genotype["table"]["truncated"]
+    )
 
 
 @requires_vcftools
@@ -257,18 +336,30 @@ def test_singletons_indel_histogram_and_snp_density(toy, tmp_path):
     histogram = m.vcftools_indel_length_histogram(str(toy), str(tmp_path / "h"), verbose=False)
     assert histogram["table"]["rows"] == [[-2, 1, 5], [0, 17, 85], [2, 2, 10]]
     density = m.vcftools_snp_density(str(toy), str(tmp_path / "d"), 5000, verbose=False)
-    assert density["table"]["rows"] == [["chr1", 0, 7, 1.4], ["chr1", 5000, 7, 1.4], ["chr2", 0, 6, 1.2]]
+    assert density["table"]["rows"] == [
+        ["chr1", 0, 7, 1.4],
+        ["chr1", 5000, 7, 1.4],
+        ["chr2", 0, 6, 1.2],
+    ]
 
 
 @requires_vcftools
 def test_transition_transversion_modes(toy, tmp_path):
-    bins = m.vcftools_transition_transversion(str(toy), str(tmp_path / "b"), bin_size=5000, verbose=False)
+    bins = m.vcftools_transition_transversion(
+        str(toy), str(tmp_path / "b"), bin_size=5000, verbose=False
+    )
     assert bins["table"]["rows"][0] == ["chr1", 0, 6, 5]
-    by_filter = m.vcftools_transition_transversion(str(toy), str(tmp_path / "f"), mode="filter_category", verbose=False)
+    by_filter = m.vcftools_transition_transversion(
+        str(toy), str(tmp_path / "f"), mode="filter_category", verbose=False
+    )
     assert by_filter["table"]["rows"][0][:4] == ["PASS", 18, 8, 7]
-    by_count = m.vcftools_transition_transversion(str(toy), str(tmp_path / "c"), mode="alt_allele_count", verbose=False)
+    by_count = m.vcftools_transition_transversion(
+        str(toy), str(tmp_path / "c"), mode="alt_allele_count", verbose=False
+    )
     assert by_count["table"]["columns"][0] == "ALT_ALLELE_COUNT"
-    by_qual = m.vcftools_transition_transversion(str(toy), str(tmp_path / "q"), mode="qual_threshold", verbose=False)
+    by_qual = m.vcftools_transition_transversion(
+        str(toy), str(tmp_path / "q"), mode="qual_threshold", verbose=False
+    )
     assert by_qual["table"]["columns"][0] == "QUAL_THRESHOLD"
 
 
@@ -276,15 +367,24 @@ def test_transition_transversion_modes(toy, tmp_path):
 def test_burden_diversity_relatedness(toy, tmp_path):
     burden = m.vcftools_individual_burden(str(toy), str(tmp_path / "b"), verbose=False)
     assert burden["table"]["rows"][0] == ["S1", 9, 10, 1, 0]
-    frequency = m.vcftools_individual_burden(str(toy), str(tmp_path / "f"), burden="frequency_classes", verbose=False)
-    once = m.vcftools_individual_burden(str(toy), str(tmp_path / "o"), burden="frequency_classes_hom_once", verbose=False)
-    assert sum(sum(row[1:]) for row in frequency["table"]["rows"]) > sum(sum(row[1:]) for row in once["table"]["rows"])
+    frequency = m.vcftools_individual_burden(
+        str(toy), str(tmp_path / "f"), burden="frequency_classes", verbose=False
+    )
+    once = m.vcftools_individual_burden(
+        str(toy), str(tmp_path / "o"), burden="frequency_classes_hom_once", verbose=False
+    )
+    assert sum(sum(row[1:]) for row in frequency["table"]["rows"]) > sum(
+        sum(row[1:]) for row in once["table"]["rows"]
+    )
     pi = m.vcftools_site_nucleotide_diversity(str(toy), str(tmp_path / "p"), verbose=False)
     assert pi["table"]["rows"][0] == ["chr1", 100, 0.530303]
     yang = m.vcftools_relatedness(str(toy), str(tmp_path / "y"), verbose=False)
     assert yang["table"]["columns"][-1] == "RELATEDNESS_AJK" and yang["table"]["row_count"] == 21
     phi = m.vcftools_relatedness(str(toy), str(tmp_path / "m"), method="manichaikul", verbose=False)
-    assert phi["table"]["columns"][-1] == "RELATEDNESS_PHI" and phi["table"]["rows"][0][:2] == ["S1", "S1"]
+    assert phi["table"]["columns"][-1] == "RELATEDNESS_PHI" and phi["table"]["rows"][0][:2] == [
+        "S1",
+        "S1",
+    ]
 
 
 @requires_vcftools
@@ -295,37 +395,57 @@ def test_linkage_disequilibrium_forms(toy, tmp_path):
     assert genotype["table"]["columns"] == ["CHR", "POS1", "POS2", "N_INDV", "R^2"]
     assert genotype["table"]["rows"][0] == ["chr1", 100, 800, 6, 0.0857143]
     assert genotype["table"]["row_count"] == 106
-    windowed = m.vcftools_linkage_disequilibrium(str(toy), str(tmp_path / "w"), ld_window_bp=1500, min_r2=0.1, verbose=False)
+    windowed = m.vcftools_linkage_disequilibrium(
+        str(toy), str(tmp_path / "w"), ld_window_bp=1500, min_r2=0.1, verbose=False
+    )
     assert 0 < windowed["table"]["row_count"] < 106
-    haplotype = m.vcftools_linkage_disequilibrium(str(toy), str(tmp_path / "h"), statistic="hap_r2", verbose=False)
+    haplotype = m.vcftools_linkage_disequilibrium(
+        str(toy), str(tmp_path / "h"), statistic="hap_r2", verbose=False
+    )
     assert haplotype["table"]["columns"] == ["CHR", "POS1", "POS2", "N_CHR", "R^2", "D", "Dprime"]
-    chisq = m.vcftools_linkage_disequilibrium(str(toy), str(tmp_path / "c"), statistic="geno_chisq", verbose=False)
+    chisq = m.vcftools_linkage_disequilibrium(
+        str(toy), str(tmp_path / "c"), statistic="geno_chisq", verbose=False
+    )
     assert chisq["table"]["columns"][:3] == ["CHR", "POS1", "POS2"]
-    listed = m.vcftools_linkage_disequilibrium(str(toy), str(tmp_path / "l"), positions_file=str(positions), verbose=False)
+    listed = m.vcftools_linkage_disequilibrium(
+        str(toy), str(tmp_path / "l"), positions_file=str(positions), verbose=False
+    )
     assert listed["outputs"][0].endswith(".list.geno.ld")
-    inter = m.vcftools_linkage_disequilibrium(str(toy), str(tmp_path / "i"), interchromosomal=True, verbose=False)
+    inter = m.vcftools_linkage_disequilibrium(
+        str(toy), str(tmp_path / "i"), interchromosomal=True, verbose=False
+    )
     assert inter["outputs"][0].endswith(".interchrom.geno.ld")
     assert {row[0] for row in inter["table"]["rows"]} == {"chr1"}
 
 
 @requires_vcftools
 def test_long_runs_haplotype_count_and_field_extraction(toy, tmp_path):
-    lroh = m.vcftools_long_runs_of_homozygosity(str(toy), str(tmp_path / "r"), "chr1", verbose=False)
+    lroh = m.vcftools_long_runs_of_homozygosity(
+        str(toy), str(tmp_path / "r"), "chr1", verbose=False
+    )
     assert lroh["status"] == "completed" and lroh["outputs"][0].endswith(".LROH")
     bed = tmp_path / "win.bed"
     bed.write_text("#CHROM\tSTART\tEND\nchr1\t0\t5000\nchr1\t5000\t12000\nchr2\t0\t4000\n")
     counts = m.vcftools_haplotype_count(str(toy), str(tmp_path / "h"), str(bed), verbose=False)
-    assert [row[:4] for row in counts["table"]["rows"]] == [["chr1", 0, 5000, 8], ["chr1", 5000, 12000, 5], ["chr2", 0, 4000, 5]]
+    assert [row[:4] for row in counts["table"]["rows"]] == [
+        ["chr1", 0, 5000, 8],
+        ["chr1", 5000, 12000, 5],
+        ["chr2", 0, 4000, 5],
+    ]
     assert counts["table"]["rows"][0][4] == 11
     assert counts["warnings"]
     headerless = tmp_path / "headerless.bed"
     headerless.write_text("chr1\t0\t5000\nchr1\t5000\t12000\n")
-    dropped = m.vcftools_haplotype_count(str(toy), str(tmp_path / "d"), str(headerless), verbose=False)
+    dropped = m.vcftools_haplotype_count(
+        str(toy), str(tmp_path / "d"), str(headerless), verbose=False
+    )
     assert len(dropped["warnings"]) == 2
     info = m.vcftools_extract_fields(str(toy), str(tmp_path / "i"), ["DP", "AF"], verbose=False)
     assert info["table"]["columns"] == ["CHROM", "POS", "REF", "ALT", "DP", "AF"]
     assert info["table"]["rows"][0] == ["chr1", 100, "G", "T", 91, 0.1]
-    fmt = m.vcftools_extract_fields(str(toy), str(tmp_path / "f"), ["GQ"], source="format", verbose=False)
+    fmt = m.vcftools_extract_fields(
+        str(toy), str(tmp_path / "f"), ["GQ"], source="format", verbose=False
+    )
     assert fmt["outputs"][0].endswith(".GQ.FORMAT")
     assert fmt["table"]["rows"][0] == ["chr1", 100, 45, 60, 30, 99, 12, 99]
 
@@ -338,7 +458,9 @@ def test_pca_components_and_loadings(toy, tmp_path):
     assert result["table"]["columns"][:2] == ["INDV", "EIG_0"]
     plain = m.vcftools_pca(str(toy), str(tmp_path / "n"), normalise=False, verbose=False)
     assert plain["status"] == "completed"
-    loadings = m.vcftools_pca(str(toy), str(tmp_path / "l"), output="snp_loadings", snp_loadings=2, verbose=False)
+    loadings = m.vcftools_pca(
+        str(toy), str(tmp_path / "l"), output="snp_loadings", snp_loadings=2, verbose=False
+    )
     assert loadings["table"]["columns"] == ["CHROM", "POS", "GAMMA_0", "GAMMA_1"]
 
 
@@ -351,16 +473,22 @@ def test_export_formats(toy, tmp_path):
         "plink_tped": 2,
     }
     for fmt, count in expected.items():
-        result = m.vcftools_export_genotypes(str(toy), str(tmp_path / fmt), export_format=fmt, verbose=False)
+        result = m.vcftools_export_genotypes(
+            str(toy), str(tmp_path / fmt), export_format=fmt, verbose=False
+        )
         assert result["status"] == "completed", fmt
         assert len(result["outputs"]) == count
     for fmt in ("ldhat", "ldhelmet", "ldhat_geno", "beagle_pl"):
-        result = m.vcftools_export_genotypes(str(toy), str(tmp_path / fmt), export_format=fmt, chromosome="chr1", verbose=False)
+        result = m.vcftools_export_genotypes(
+            str(toy), str(tmp_path / fmt), export_format=fmt, chromosome="chr1", verbose=False
+        )
         assert result["status"] == "completed", fmt
     ped = Path(tmp_path / "plink.ped").read_text().splitlines()[0].split("\t")
     assert ped[:2] == ["S1", "S1"] and ped[6:8] == ["T", "G"]
     # the toy has no GL tag, so BEAGLE genotype likelihoods from GL fail cleanly
-    failed = m.vcftools_export_genotypes(str(toy), str(tmp_path / "gl"), export_format="beagle_gl", chromosome="chr1", verbose=False)
+    failed = m.vcftools_export_genotypes(
+        str(toy), str(tmp_path / "gl"), export_format="beagle_gl", chromosome="chr1", verbose=False
+    )
     assert failed["status"] == "failed" and "GL or PL" in failed["log_tail"]
 
 
@@ -372,9 +500,15 @@ def test_compare_vcfs_modes(toy, tmp_path):
     other.write_text("\n".join(changed) + "\n")
     individuals = m.vcftools_compare_vcfs(str(toy), str(other), str(tmp_path / "i"), verbose=False)
     assert individuals["table"]["rows"][0] == ["S1", "B"]
-    discordance = m.vcftools_compare_vcfs(str(toy), str(other), str(tmp_path / "d"), mode="site_discordance", verbose=False)
-    assert [row for row in discordance["table"]["rows"] if row[5] > 0] == [["chr1", 800, "B", 1, 6, 1, 0.166667]]
-    switch = m.vcftools_compare_vcfs(str(toy), str(other), str(tmp_path / "s"), mode="switch_error", verbose=False)
+    discordance = m.vcftools_compare_vcfs(
+        str(toy), str(other), str(tmp_path / "d"), mode="site_discordance", verbose=False
+    )
+    assert [row for row in discordance["table"]["rows"] if row[5] > 0] == [
+        ["chr1", 800, "B", 1, 6, 1, 0.166667]
+    ]
+    switch = m.vcftools_compare_vcfs(
+        str(toy), str(other), str(tmp_path / "s"), mode="switch_error", verbose=False
+    )
     assert switch["status"] == "completed" and len(switch["outputs"]) == 2
 
 
@@ -382,7 +516,11 @@ def test_compare_vcfs_modes(toy, tmp_path):
 def test_pass_through_of_a_failing_run(toy, tmp_path):
     # --hap-r2 needs phased data with enough sites; a position filter that leaves one site fails cleanly
     result = m.vcftools_linkage_disequilibrium(
-        str(toy), str(tmp_path / "x"), statistic="hap_r2", filters={"chromosomes": ["chr2"], "from_bp": 300, "to_bp": 300}, verbose=False
+        str(toy),
+        str(tmp_path / "x"),
+        statistic="hap_r2",
+        filters={"chromosomes": ["chr2"], "from_bp": 300, "to_bp": 300},
+        verbose=False,
     )
     assert result["status"] == "failed"
 
@@ -394,36 +532,59 @@ def test_pass_through_of_a_failing_run(toy, tmp_path):
 
 @requires_scripts
 def test_vcf_annotate_operations(toy, tmp_path):
-    filtered = m.vcf_annotate(str(toy), str(tmp_path / "a1.vcf"), filters="+/Qual=40", hard_filter=True, verbose=False)
+    filtered = m.vcf_annotate(
+        str(toy), str(tmp_path / "a1.vcf"), filters="+/Qual=40", hard_filter=True, verbose=False
+    )
     assert filtered["status"] == "completed" and filtered["records"] == 12
-    typed = m.vcf_annotate(str(toy), str(tmp_path / "a2.vcf"), fill_type=True, fill_ac_an=True, verbose=False)
+    typed = m.vcf_annotate(
+        str(toy), str(tmp_path / "a2.vcf"), fill_type=True, fill_ac_an=True, verbose=False
+    )
     info = _records(typed["output_path"])[0][7].split(";")
     assert {"AC=5", "AN=12", "TYPE=snp"} <= set(info)
     hwe = m.vcf_annotate(str(toy), str(tmp_path / "a3.vcf"), fill_hwe=True, verbose=False)
     assert any(item.startswith("HWE=") for item in _records(hwe["output_path"])[0][7].split(";"))
-    removed = m.vcf_annotate(str(toy), str(tmp_path / "a4.vcf"), remove_tags=["INFO/AF", "QUAL"], verbose=False)
+    removed = m.vcf_annotate(
+        str(toy), str(tmp_path / "a4.vcf"), remove_tags=["INFO/AF", "QUAL"], verbose=False
+    )
     row = _records(removed["output_path"])[0]
     assert row[5] == "." and row[7] == "DP=91"
     flagged = m.vcf_annotate(str(toy), str(tmp_path / "a5.vcf"), filters="+/Qual=40", verbose=False)
     assert [r[6] for r in _records(flagged["output_path"])][:4] == ["Qual", "PASS", "PASS", "Qual"]
-    normalized = m.vcf_annotate(str(toy), str(tmp_path / "a6.vcf"), normalize_alleles=True, verbose=False)
+    normalized = m.vcf_annotate(
+        str(toy), str(tmp_path / "a6.vcf"), normalize_alleles=True, verbose=False
+    )
     assert normalized["records"] == 20
 
 
 @requires_scripts
 def test_vcf_subset_samples_and_classes(toy, tmp_path):
     columns = m.vcf_subset(str(toy), str(tmp_path / "s1.vcf"), samples=["S1", "S2"], verbose=False)
-    header = next(x for x in Path(columns["output_path"]).read_text().splitlines() if x.startswith("#CHROM"))
+    header = next(
+        x for x in Path(columns["output_path"]).read_text().splitlines() if x.startswith("#CHROM")
+    )
     assert header.split("\t")[9:] == ["S1", "S2"]
     indels = m.vcf_subset(
-        str(toy), str(tmp_path / "s2.vcf"), samples=["S1", "S2"], variant_types=["indels"], exclude_ref_only=True, verbose=False
+        str(toy),
+        str(tmp_path / "s2.vcf"),
+        samples=["S1", "S2"],
+        variant_types=["indels"],
+        exclude_ref_only=True,
+        verbose=False,
     )
     assert indels["records"] == 3
-    private = m.vcf_subset(str(toy), str(tmp_path / "s3.vcf"), samples=["S3"], private_only=True, verbose=False)
+    private = m.vcf_subset(
+        str(toy), str(tmp_path / "s3.vcf"), samples=["S3"], private_only=True, verbose=False
+    )
     assert private["records"] == 2
     listing = tmp_path / "samples.txt"
     listing.write_text("S5\nS6\n")
-    from_file = m.vcf_subset(str(toy), str(tmp_path / "s4.vcf"), samples_file=str(listing), trim_alt_alleles=True, verbose=False)
+    from_file = m.vcf_subset(
+        str(toy),
+        str(tmp_path / "s4.vcf"),
+        samples_file=str(listing),
+        trim_alt_alleles=True,
+        verbose=False,
+    )
     assert from_file["status"] == "completed"
 
 
@@ -434,7 +595,9 @@ def test_vcf_to_tab_and_indel_statistics(toy, tmp_path):
     first = Path(table["output_path"]).read_text().splitlines()[1].split("\t")
     assert first[:3] == ["chr1", "100", "G"] and first[3] == "T/G"
     iupac = m.vcf_to_tab(str(toy), str(tmp_path / "t2.tab"), iupac=True, verbose=False)
-    assert iupac["status"] == "failed" and "IUPAC" in iupac["log_tail"]  # the toy has indels; IUPAC output is for SNPs
+    assert (
+        iupac["status"] == "failed" and "IUPAC" in iupac["log_tail"]
+    )  # the toy has indels; IUPAC output is for SNPs
     exons = tmp_path / "exons.txt"
     exons.write_text("chr1\t2000\t3000\nchr1\t5600\t6000\n")
     stats = m.vcf_indel_stats(str(toy), str(tmp_path / "i.txt"), str(exons), verbose=False)
@@ -447,12 +610,16 @@ def test_vcf_compare_contrast_and_shuffle(tmp_path):
     header, body = _toy_lines()
     full = _indexed(tmp_path, "a.vcf", header + body)
     half = _indexed(tmp_path, "b.vcf", header + body[::2])
-    compared = m.vcf_compare([full, half], str(tmp_path / "cmp.txt"), compare_genotypes=True, verbose=False)
+    compared = m.vcf_compare(
+        [full, half], str(tmp_path / "cmp.txt"), compare_genotypes=True, verbose=False
+    )
     assert compared["status"] == "completed"
     assert [row["sites"] for row in compared["venn"]] == [10, 10]
     assert compared["summary"]["Number of REF matches"] == 10
     assert compared["summary"]["Number of samples in GT comparison"] == 6
-    contrast = m.vcf_contrast(full, str(tmp_path / "ct.vcf"), ["S1"], ["S2", "S3"], novel_sites_only=True, verbose=False)
+    contrast = m.vcf_contrast(
+        full, str(tmp_path / "ct.vcf"), ["S1"], ["S2", "S3"], novel_sites_only=True, verbose=False
+    )
     assert contrast["records"] == 5
     assert "NOVELGT=S1" in _records(contrast["output_path"])[0][7]
     columns = header[-1].split("\t")
@@ -460,10 +627,16 @@ def test_vcf_compare_contrast_and_shuffle(tmp_path):
     template = _indexed(
         tmp_path,
         "t.vcf",
-        [*header[:-1], "\t".join(columns[i] for i in order), *("\t".join(row.split("\t")[i] for i in order) for row in body)],
+        [
+            *header[:-1],
+            "\t".join(columns[i] for i in order),
+            *("\t".join(row.split("\t")[i] for i in order) for row in body),
+        ],
     )
     shuffled = m.vcf_shuffle_columns(full, template, str(tmp_path / "sh.vcf"), verbose=False)
-    line = next(x for x in Path(shuffled["output_path"]).read_text().splitlines() if x.startswith("#CHROM"))
+    line = next(
+        x for x in Path(shuffled["output_path"]).read_text().splitlines() if x.startswith("#CHROM")
+    )
     assert line.split("\t")[9:] == ["S6", "S5", "S4", "S3", "S2", "S1"]
 
 
@@ -489,7 +662,9 @@ def test_vcf_fix_ploidy_sets_male_x_haploid(tmp_path):
     fixed = m.vcf_fix_ploidy(str(source), str(tmp_path / "fixed.vcf"), str(sexes), verbose=False)
     assert fixed["status"] == "completed"
     row = _records(fixed["output_path"])[0]
-    assert row[9].split(":")[0] == "1" and row[10].split(":")[0] == "0|1"  # male S1 is haploid, female S2 stays diploid
+    assert (
+        row[9].split(":")[0] == "1" and row[10].split(":")[0] == "0|1"
+    )  # male S1 is haploid, female S2 stays diploid
 
 
 def _reference(tmp_path: Path) -> Path:
@@ -512,19 +687,33 @@ def test_vcf_convert_flanking_sequence_and_ancestral_allele(toy, tmp_path):
     reference = _reference(tmp_path)
     without = m.vcf_convert(str(toy), str(tmp_path / "c0.vcf"), verbose=False)
     assert without["status"] == "failed" and "-r" in without["log_tail"]  # indels need a reference
-    converted = m.vcf_convert(str(toy), str(tmp_path / "c1.vcf"), target_version="4.1", reference_fasta=str(reference), verbose=False)
+    converted = m.vcf_convert(
+        str(toy),
+        str(tmp_path / "c1.vcf"),
+        target_version="4.1",
+        reference_fasta=str(reference),
+        verbose=False,
+    )
     assert converted["status"] == "completed"
     assert Path(converted["output_path"]).read_text().startswith("##fileformat=VCFv4.1")
-    flanks = m.vcf_fill_flanking_sequence(str(toy), str(tmp_path / "fs.vcf"), str(reference), length=5, verbose=False)
+    flanks = m.vcf_fill_flanking_sequence(
+        str(toy), str(tmp_path / "fs.vcf"), str(reference), length=5, verbose=False
+    )
     assert "FS=AAAAA[G/A]AAAAA" in _records(flanks["output_path"])[1][7]
     for chrom in ("chr1", "chr2"):
         bases = reference.read_text().split(">")
         sequence = "".join(next(b for b in bases if b.startswith(chrom + "\n")).split("\n")[1:])
         fasta = tmp_path / f"anc_{chrom}.fa"
-        fasta.write_text(f">{chrom}\n" + "\n".join(sequence[i : i + 70] for i in range(0, len(sequence), 70)) + "\n")
+        fasta.write_text(
+            f">{chrom}\n"
+            + "\n".join(sequence[i : i + 70] for i in range(0, len(sequence), 70))
+            + "\n"
+        )
         subprocess.run(["bgzip", str(fasta)], check=True)
         subprocess.run(["samtools", "faidx", str(fasta) + ".gz"], check=True)
-    ancestral = m.vcf_fill_ancestral_allele(str(toy), str(tmp_path / "aa.vcf"), str(tmp_path / "anc_"), verbose=False)
+    ancestral = m.vcf_fill_ancestral_allele(
+        str(toy), str(tmp_path / "aa.vcf"), str(tmp_path / "anc_"), verbose=False
+    )
     assert ancestral["status"] == "completed" and ancestral["records"] == 20
     assert "AA=G" in _records(ancestral["output_path"])[0][7]
 
@@ -536,10 +725,15 @@ def test_vcf_fill_reference_md5_adds_contig_lines(tmp_path):
     reference = _reference(tmp_path)
     header, body = _toy_lines()
     source = _indexed(tmp_path, "m.vcf", header + body)
-    result = m.vcf_fill_reference_md5(source, str(tmp_path / "md5.vcf.gz"), str(reference), assembly="toy", verbose=False)
+    result = m.vcf_fill_reference_md5(
+        source, str(tmp_path / "md5.vcf.gz"), str(reference), assembly="toy", verbose=False
+    )
     if result["status"] != "completed":
         pytest.skip("tabix -r (reheader) failed in this htslib build: " + result["log_tail"][-200:])
     import gzip
 
-    text = gzip.open(result["output_path"], "rt").read()
-    assert "##contig=<ID=chr1,assembly=toy,length=20000,md5=" in text and "##reference=file:" in text
+    with gzip.open(result["output_path"], "rt") as handle:
+        text = handle.read()
+    assert (
+        "##contig=<ID=chr1,assembly=toy,length=20000,md5=" in text and "##reference=file:" in text
+    )

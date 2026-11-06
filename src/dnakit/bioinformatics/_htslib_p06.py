@@ -269,7 +269,15 @@ def invoke(
             context={"command": [tool, *command][:12], "log_tail": stderr_tail[-LOG_TAIL_CHARS:]},
         )
     return Completed(
-        tool, executable, version, (tool, *command), return_code, stdout_path, text, stderr_tail, stderr_text
+        tool,
+        executable,
+        version,
+        (tool, *command),
+        return_code,
+        stdout_path,
+        text,
+        stderr_tail,
+        stderr_text,
     )
 
 

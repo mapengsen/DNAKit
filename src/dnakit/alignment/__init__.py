@@ -38,7 +38,7 @@ __all__ = [
     *_candidate_all,
 ]
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     align_dna_edlib,
     align_dna_parasail,
@@ -54,13 +54,30 @@ from .backends import (
     search_dna_hmm,
 )
 
-__all__ = [*__all__, "align_dna_edlib", "align_dna_parasail", "build_dna_hmm", "build_minimap2_index", "calculate_edit_distance_matrix", "fetch_minimap2_reference_region", "locate_approximate_pattern", "map_query_sequences_paf", "read_hmm_profile", "score_dna_parasail", "score_dna_parasail_matrix", "search_dna_hmm"]
+__all__ = [
+    *__all__,
+    "align_dna_edlib",
+    "align_dna_parasail",
+    "build_dna_hmm",
+    "build_minimap2_index",
+    "calculate_edit_distance_matrix",
+    "fetch_minimap2_reference_region",
+    "locate_approximate_pattern",
+    "map_query_sequences_paf",
+    "read_hmm_profile",
+    "score_dna_parasail",
+    "score_dna_parasail_matrix",
+    "search_dna_hmm",
+]
 
 # Full-pass exports (see docs/api/features)
 from .edlib_functions import (
     edlib_nice_alignment,
 )
-
+from .parasail_family_functions import (
+    parasail_dp_variant,
+    parasail_ssw_profile_align,
+)
 from .parasail_functions import (
     parasail_nw_banded_score,
     parasail_sg_db_align,
@@ -75,24 +92,31 @@ from .parasail_functions import (
     parasail_sg_qx_align,
     parasail_ssw_align,
 )
-
-from .parasail_family_functions import (
-    parasail_dp_variant,
-    parasail_ssw_profile_align,
-)
-
 from .pyhmmer_functions import (
     pyhmmer_align_to_hmm,
 )
 
-__all__ = [*__all__, "edlib_nice_alignment", "parasail_nw_banded_score", "parasail_sg_db_align", "parasail_sg_de_align", "parasail_sg_dx_align", "parasail_sg_qb_align", "parasail_sg_qb_db_align", "parasail_sg_qb_de_align", "parasail_sg_qe_align", "parasail_sg_qe_db_align", "parasail_sg_qe_de_align", "parasail_sg_qx_align", "parasail_ssw_align", "pyhmmer_align_to_hmm"]
+__all__ = [
+    *__all__,
+    "edlib_nice_alignment",
+    "parasail_nw_banded_score",
+    "parasail_sg_db_align",
+    "parasail_sg_de_align",
+    "parasail_sg_dx_align",
+    "parasail_sg_qb_align",
+    "parasail_sg_qb_db_align",
+    "parasail_sg_qb_de_align",
+    "parasail_sg_qe_align",
+    "parasail_sg_qe_db_align",
+    "parasail_sg_qe_de_align",
+    "parasail_sg_qx_align",
+    "parasail_ssw_align",
+    "pyhmmer_align_to_hmm",
+]
 __all__ = [*__all__, "parasail_dp_variant", "parasail_ssw_profile_align"]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
-from .pysam_review_functions import (
-    pysam_tview_text,
-)
 from dnakit.bioinformatics.pysam_gap2_functions import (
     array_to_qualitystring,
     bam_to_fastq,
@@ -111,7 +135,27 @@ from dnakit.bioinformatics.pysam_gap3_functions import (
     pad_to_unpad_alignments,
 )
 
-__all__ = [*__all__, "pysam_tview_text", "array_to_qualitystring", "bam_to_fastq", "cram_container_sizes", "pad_to_unpadded", "qualities_to_qualitystring", "qualitystring_to_array", "remove_padding", "shuffle_bam", "tabix_records", "target_cut", "call_copy_number_states", "depad_alignments", "pad_to_unpad_alignments"]
+from .pysam_review_functions import (
+    pysam_tview_text,
+)
+
+__all__ = [
+    *__all__,
+    "pysam_tview_text",
+    "array_to_qualitystring",
+    "bam_to_fastq",
+    "cram_container_sizes",
+    "pad_to_unpadded",
+    "qualities_to_qualitystring",
+    "qualitystring_to_array",
+    "remove_padding",
+    "shuffle_bam",
+    "tabix_records",
+    "target_cut",
+    "call_copy_number_states",
+    "depad_alignments",
+    "pad_to_unpad_alignments",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .bamtools_p14_cli_functions import (

@@ -336,8 +336,16 @@ def raw_graph(value: object, options: Mapping[str, object], *, what: str = "inpu
                         raise bad_input(f"invalid JSON on line {number} of {path.name}.") from exc
             if any(isinstance(i, Mapping) and "_kind" in i for i in items):
                 # files written by knowledge_graph.export(format="jsonl"): one object per node or edge
-                nodes = [{k: v for k, v in i.items() if k != "_kind"} for i in items if i.get("_kind") == "node"]
-                edges = [{k: v for k, v in i.items() if k != "_kind"} for i in items if i.get("_kind") == "edge"]
+                nodes = [
+                    {k: v for k, v in i.items() if k != "_kind"}
+                    for i in items
+                    if i.get("_kind") == "node"
+                ]
+                edges = [
+                    {k: v for k, v in i.items() if k != "_kind"}
+                    for i in items
+                    if i.get("_kind") == "edge"
+                ]
                 raw = raw_graph({"nodes": nodes, "edges": edges}, options, what=what)
             else:
                 raw = raw_graph(items, options, what=what)

@@ -15,7 +15,7 @@ from dnakit.exceptions import BackendExecutionError, ConfigurationError
 
 pysam = pytest.importorskip("pysam")
 
-from dnakit.bioinformatics import pysam_gap3_functions as facades  # noqa: E402
+from dnakit.bioinformatics import pysam_gap3_functions as facades
 
 PADDED_REFERENCE = "ACG*TTA*CG"
 READ_SEQUENCE = "ACGTTACG"
@@ -26,7 +26,10 @@ def padded_inputs(tmp_path: Path) -> dict[str, str]:
     reference = tmp_path / "padded.fa"
     reference.write_text(f">chr1\n{PADDED_REFERENCE}\n", encoding="utf-8")
     pysam.faidx(str(reference))
-    header = {"HD": {"VN": "1.6", "SO": "coordinate"}, "SQ": [{"SN": "chr1", "LN": len(PADDED_REFERENCE)}]}
+    header = {
+        "HD": {"VN": "1.6", "SO": "coordinate"},
+        "SQ": [{"SN": "chr1", "LN": len(PADDED_REFERENCE)}],
+    }
     alignment = tmp_path / "padded.bam"
     read = pysam.AlignedSegment()
     read.query_name = "r1"
@@ -58,7 +61,11 @@ def cnv_vcf(tmp_path: Path) -> Path:
         if 20 <= index < 40:
             genotype, baf, lrr = "0/0", 0.0, -0.6
         else:
-            genotype, baf, lrr = "0/1", rng.choice([0.5, 0.48, 0.52]), round(rng.uniform(-0.05, 0.05), 3)
+            genotype, baf, lrr = (
+                "0/1",
+                rng.choice([0.5, 0.48, 0.52]),
+                round(rng.uniform(-0.05, 0.05), 3),
+            )
         lines.append(f"chr1\t{position}\t.\tA\tG\t50\tPASS\t.\tGT:BAF:LRR\t{genotype}:{baf}:{lrr}")
     path = tmp_path / "cnv.vcf"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -89,7 +96,11 @@ def test_depad_alignments_removes_pad_columns(padded_inputs):
 def test_depad_alignments_can_write_sam(padded_inputs):
     out = Path(padded_inputs["root"]) / "depad.sam"
     result = facades.depad_alignments(
-        padded_inputs["alignment"], padded_inputs["reference"], str(out), output_sam=True, verbose=False
+        padded_inputs["alignment"],
+        padded_inputs["reference"],
+        str(out),
+        output_sam=True,
+        verbose=False,
     )
     assert result["output_format"] == "SAM"
     assert out.read_text(encoding="utf-8").startswith("@HD")
@@ -112,9 +123,13 @@ def test_depad_rejects_existing_output_and_missing_inputs(padded_inputs):
     existing = root / "exists.bam"
     existing.write_bytes(b"x")
     with pytest.raises(ConfigurationError):
-        facades.depad_alignments(padded_inputs["alignment"], padded_inputs["reference"], str(existing), verbose=False)
+        facades.depad_alignments(
+            padded_inputs["alignment"], padded_inputs["reference"], str(existing), verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facades.depad_alignments(str(root / "none.bam"), padded_inputs["reference"], str(root / "o.bam"), verbose=False)
+        facades.depad_alignments(
+            str(root / "none.bam"), padded_inputs["reference"], str(root / "o.bam"), verbose=False
+        )
 
 
 def test_depad_reports_samtools_failure(padded_inputs, tmp_path):
@@ -143,9 +158,13 @@ def test_call_copy_number_states_needs_new_output_directory(cnv_vcf, tmp_path):
     existing = tmp_path / "already"
     existing.mkdir()
     with pytest.raises(ConfigurationError):
-        facades.call_copy_number_states(str(cnv_vcf), str(existing), query_sample="S1", verbose=False)
+        facades.call_copy_number_states(
+            str(cnv_vcf), str(existing), query_sample="S1", verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facades.call_copy_number_states(str(cnv_vcf), str(tmp_path / "x"), query_sample="-S1", verbose=False)
+        facades.call_copy_number_states(
+            str(cnv_vcf), str(tmp_path / "x"), query_sample="-S1", verbose=False
+        )
 
 
 def test_missing_pysam_gives_install_hint(monkeypatch, padded_inputs, tmp_path):
@@ -163,6 +182,9 @@ def test_missing_pysam_gives_install_hint(monkeypatch, padded_inputs, tmp_path):
 
     with pytest.raises(BackendUnavailableError) as info:
         facades.depad_alignments(
-            padded_inputs["alignment"], padded_inputs["reference"], str(tmp_path / "o.bam"), verbose=False
+            padded_inputs["alignment"],
+            padded_inputs["reference"],
+            str(tmp_path / "o.bam"),
+            verbose=False,
         )
     assert "bio-reads" in (info.value.hint or "")

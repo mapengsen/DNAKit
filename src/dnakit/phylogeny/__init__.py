@@ -9,14 +9,18 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 from . import _impl_phylo as _impl
-
 from .external import infer_fast_tree, infer_ml_tree
-
 
 _MODULE = "phylogeny"
 
 
-def _ok(operation: str, input: object, result: object, options: Mapping[str, object] | None, warnings: tuple[str, ...] = ()) -> object:
+def _ok(
+    operation: str,
+    input: object,
+    result: object,
+    options: Mapping[str, object] | None,
+    warnings: tuple[str, ...] = (),
+) -> object:
     return candidate_ok(_MODULE, operation, input, result, options=options, warnings=warnings)
 
 
@@ -35,7 +39,9 @@ def _saturation(settings: Mapping[str, object]) -> float | None:
     if value is None:
         return None
     if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
-        raise ConfigurationError("options.saturation_distance must be a positive number.", code="PHYLOGENY_OPTION")
+        raise ConfigurationError(
+            "options.saturation_distance must be a positive number.", code="PHYLOGENY_OPTION"
+        )
     return float(value)
 
 
@@ -43,7 +49,9 @@ def _matrix_result(names: list[str], matrix: list[list[float]], kind: str) -> di
     return {"names": names, "matrix": matrix, "distance": kind}
 
 
-def _tree_result(root: _impl.Node, method: str, names: list[str], matrix: list[list[float]]) -> dict[str, object]:
+def _tree_result(
+    root: _impl.Node, method: str, names: list[str], matrix: list[list[float]]
+) -> dict[str, object]:
     stats = _impl.tree_statistics(root)
     return {
         "newick": _impl.to_newick(root),
@@ -68,7 +76,9 @@ def annotate(input: object, *, options: Mapping[str, object] | None = None) -> o
     settings = _impl.options_dict(options)
     metadata = settings.get("metadata")
     if metadata is not None and not isinstance(metadata, Mapping):
-        raise ConfigurationError("options.metadata must map leaf names to values.", code="PHYLOGENY_OPTION")
+        raise ConfigurationError(
+            "options.metadata must map leaf names to values.", code="PHYLOGENY_OPTION"
+        )
     max_clade = _impl.get_int(settings, "max_clade", 50, low=1, high=1_000_000)
     root = _impl.load_tree(input)
     return _ok("annotate", input, _impl.annotate_tree(root, metadata, max_clade), options)
@@ -103,14 +113,23 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
     """
 
     settings = _impl.options_dict(options)
-    what = _impl.get_choice(settings, "what", "auto", ("auto", "tree_statistics", "patristic_matrix", "distance_matrix"))
+    what = _impl.get_choice(
+        settings, "what", "auto", ("auto", "tree_statistics", "patristic_matrix", "distance_matrix")
+    )
     if what == "auto":
         what = "tree_statistics" if _is_tree_text(input) else "distance_matrix"
     if what == "distance_matrix":
         kind = _distance_kind(settings)
         names, seqs = _impl.parse_alignment(input)
-        matrix, compared = _impl.distance_matrix_from_alignment(names, seqs, kind, _saturation(settings))
-        result = {"what": what, **_matrix_result(names, matrix, kind), "compared_sites": compared, "alignment_length": len(seqs[0])}
+        matrix, compared = _impl.distance_matrix_from_alignment(
+            names, seqs, kind, _saturation(settings)
+        )
+        result = {
+            "what": what,
+            **_matrix_result(names, matrix, kind),
+            "compared_sites": compared,
+            "alignment_length": len(seqs[0]),
+        }
     else:
         root = _impl.load_tree(input)
         if what == "tree_statistics":
@@ -130,7 +149,11 @@ def _tree_pair(input: object, settings: Mapping[str, object]) -> tuple[object, o
                 return input[left], input[right]
     if isinstance(input, (list, tuple)) and len(input) == 2:
         return input[0], input[1]
-    raise InputFormatError("compare needs two trees.", code="TREE_COMPARE_INPUT", hint="Pass [newick_a, newick_b], {'a': .., 'b': ..} or options={'other': newick_b}.")
+    raise InputFormatError(
+        "compare needs two trees.",
+        code="TREE_COMPARE_INPUT",
+        hint="Pass [newick_a, newick_b], {'a': .., 'b': ..} or options={'other': newick_b}.",
+    )
 
 
 def compare(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -144,7 +167,11 @@ def compare(input: object, *, options: Mapping[str, object] | None = None) -> ob
 
     settings = _impl.options_dict(options)
     first, second = _tree_pair(input, settings)
-    result = _impl.robinson_foulds(_impl.load_tree(first, "first tree"), _impl.load_tree(second, "second tree"), bool(settings.get("rooted", False)))
+    result = _impl.robinson_foulds(
+        _impl.load_tree(first, "first tree"),
+        _impl.load_tree(second, "second tree"),
+        bool(settings.get("rooted", False)),
+    )
     return _ok("compare", input, result, options)
 
 
@@ -173,7 +200,12 @@ def export(input: object, *, options: Mapping[str, object] | None = None) -> obj
     else:
         payload = _impl.edge_list(root)
         text = json.dumps(payload, indent=2)
-    return _ok("export", input, {"format": fmt, "content": payload, "output_path": _impl.write_output(settings, text)}, options)
+    return _ok(
+        "export",
+        input,
+        {"format": fmt, "content": payload, "output_path": _impl.write_output(settings, text)},
+        options,
+    )
 
 
 def infer(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -189,14 +221,23 @@ def infer(input: object, *, options: Mapping[str, object] | None = None) -> obje
     requested = str(settings.get("method", "nj")).lower()
     if requested not in ("nj", "upgma"):
         return candidate_not_implemented(
-            _MODULE, "infer", input, options=options, requires="an external phylogenetic program (FastTree, IQ-TREE, RAxML, MrBayes)",
+            _MODULE,
+            "infer",
+            input,
+            options=options,
+            requires="an external phylogenetic program (FastTree, IQ-TREE, RAxML, MrBayes)",
             message=f"Method {requested!r} is not available natively; use infer_fast_tree or infer_ml_tree. Native methods: nj, upgma.",
         )
     kind = _distance_kind(settings)
     names, seqs = _impl.parse_alignment(input)
     matrix, _ = _impl.distance_matrix_from_alignment(names, seqs, kind, _saturation(settings))
     root = _impl.build_tree(names, matrix, requested)
-    result = {**_tree_result(root, requested, names, matrix), "distance": kind, "distance_matrix": matrix, "names": names}
+    result = {
+        **_tree_result(root, requested, names, matrix),
+        "distance": kind,
+        "distance_matrix": matrix,
+        "names": names,
+    }
     return _ok("infer", input, result, options)
 
 
@@ -213,7 +254,17 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     root = _impl.load_tree(input)
     use_lengths = bool(settings.get("branch_lengths", True))
     svg, leaf_count = _impl.tree_svg(root, use_lengths, width)
-    return _ok("plot", input, {"svg": svg, "leaf_count": leaf_count, "branch_lengths": use_lengths, "output_path": _impl.write_output(settings, svg)}, options)
+    return _ok(
+        "plot",
+        input,
+        {
+            "svg": svg,
+            "leaf_count": leaf_count,
+            "branch_lengths": use_lengths,
+            "output_path": _impl.write_output(settings, svg),
+        },
+        options,
+    )
 
 
 def test(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -252,16 +303,24 @@ def test(input: object, *, options: Mapping[str, object] | None = None) -> objec
 
 
 __all__ = [
-    'annotate', 'build', 'calculate', 'compare', 'export', 'infer',
-    'infer_fast_tree', 'infer_ml_tree', 'plot', 'test'
+    "annotate",
+    "build",
+    "calculate",
+    "compare",
+    "export",
+    "infer",
+    "infer_fast_tree",
+    "infer_ml_tree",
+    "plot",
+    "test",
 ]
 
-__candidate_adapter_operations__ = set([
-    'annotate', 'build', 'calculate', 'compare', 'export', 'infer', 'plot', 'test'
-])
+__candidate_adapter_operations__ = set(
+    ["annotate", "build", "calculate", "compare", "export", "infer", "plot", "test"]
+)
 
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     calculate_branch_length_distance,
     calculate_node_coordinates,
@@ -274,7 +333,18 @@ from .backends import (
     simulate_substitution_counts,
 )
 
-__all__ = [*__all__, "calculate_branch_length_distance", "calculate_node_coordinates", "calculate_patristic_distances", "calculate_quartet_distance", "read_tree_summary", "root_tree_on_outgroup", "simulate_nucleotide_alignment", "simulate_nucleotide_sequences", "simulate_substitution_counts"]
+__all__ = [
+    *__all__,
+    "calculate_branch_length_distance",
+    "calculate_node_coordinates",
+    "calculate_patristic_distances",
+    "calculate_quartet_distance",
+    "read_tree_summary",
+    "root_tree_on_outgroup",
+    "simulate_nucleotide_alignment",
+    "simulate_nucleotide_sequences",
+    "simulate_substitution_counts",
+]
 
 # Full-pass exports (see docs/api/features)
 from .dendropy_functions import (
@@ -296,7 +366,6 @@ from .dendropy_functions import (
     count_false_positive_and_negative_splits,
     count_segregating_sites,
 )
-
 from .toytree_functions import (
     calculate_equal_splits,
     calculate_information_rf_distance,
@@ -319,7 +388,45 @@ from .toytree_functions import (
     unroot_tree,
 )
 
-__all__ = [*__all__, "build_derived_state_matrix", "calculate_b1_index", "calculate_colless_tree_imbalance", "calculate_mean_pairwise_differences", "calculate_monophyletic_partition_discordance", "calculate_nucleotide_diversity", "calculate_parsimony_score", "calculate_pybus_harvey_gamma", "calculate_reconciliation_discordance", "calculate_sackin_index", "calculate_tajimas_d", "calculate_treeness", "calculate_unfolded_site_frequency_spectrum", "calculate_wattersons_theta", "calculate_weighted_robinson_foulds_distance", "count_false_positive_and_negative_splits", "count_segregating_sites", "calculate_equal_splits", "calculate_information_rf_distance", "calculate_matching_split_distance", "calculate_matching_split_information_distance", "calculate_mutual_clustering_information_distance", "calculate_relative_evolutionary_divergence", "calculate_shared_phylogenetic_information_distance", "calculate_tree_correlation_matrix", "calculate_tree_vcv_matrix", "collapse_weak_nodes", "extract_subtree", "ladderize_tree", "list_tree_bipartitions", "remove_unary_nodes", "root_tree_on_balanced_midpoint", "root_tree_on_midpoint", "root_tree_on_minimal_ancestor_deviation", "scale_tree_to_root_height", "unroot_tree"]
+__all__ = [
+    *__all__,
+    "build_derived_state_matrix",
+    "calculate_b1_index",
+    "calculate_colless_tree_imbalance",
+    "calculate_mean_pairwise_differences",
+    "calculate_monophyletic_partition_discordance",
+    "calculate_nucleotide_diversity",
+    "calculate_parsimony_score",
+    "calculate_pybus_harvey_gamma",
+    "calculate_reconciliation_discordance",
+    "calculate_sackin_index",
+    "calculate_tajimas_d",
+    "calculate_treeness",
+    "calculate_unfolded_site_frequency_spectrum",
+    "calculate_wattersons_theta",
+    "calculate_weighted_robinson_foulds_distance",
+    "count_false_positive_and_negative_splits",
+    "count_segregating_sites",
+    "calculate_equal_splits",
+    "calculate_information_rf_distance",
+    "calculate_matching_split_distance",
+    "calculate_matching_split_information_distance",
+    "calculate_mutual_clustering_information_distance",
+    "calculate_relative_evolutionary_divergence",
+    "calculate_shared_phylogenetic_information_distance",
+    "calculate_tree_correlation_matrix",
+    "calculate_tree_vcv_matrix",
+    "collapse_weak_nodes",
+    "extract_subtree",
+    "ladderize_tree",
+    "list_tree_bipartitions",
+    "remove_unary_nodes",
+    "root_tree_on_balanced_midpoint",
+    "root_tree_on_midpoint",
+    "root_tree_on_minimal_ancestor_deviation",
+    "scale_tree_to_root_height",
+    "unroot_tree",
+]
 
 # Review-pass exports (see docs/api/features)
 from .dendropy_review_functions import (
@@ -330,7 +437,6 @@ from .dendropy_review_functions import (
     calculate_node_depths,
     list_missing_bipartitions,
 )
-
 from .toytree_review_functions import (
     add_tree_child_node,
     add_tree_internal_node,
@@ -360,7 +466,41 @@ from .toytree_review_functions import (
     set_tree_node_heights,
 )
 
-__all__ = [*__all__, "calculate_coalescence_ages", "calculate_divergence_times", "calculate_n_bar_index", "calculate_node_ages", "calculate_node_depths", "list_missing_bipartitions", "add_tree_child_node", "add_tree_internal_node", "add_tree_internal_node_and_child", "add_tree_internal_node_and_subtree", "add_tree_sister_node", "bisect_tree", "calculate_all_node_distance_matrix", "calculate_descendant_distances", "calculate_farthest_node_distance", "calculate_internal_node_distance_matrix", "calculate_tip_distance_matrix_from_vcv", "calculate_tip_diversification_rates", "calculate_tree_node_distance", "drop_tree_tips", "extend_tree_tips_to_align", "find_tree_farthest_node", "list_tree_node_path", "list_tree_quadripartitions", "list_tree_quartets", "map_consensus_tree_features", "merge_tree_nodes", "parse_tree_network", "remove_tree_nodes", "resolve_tree_polytomies", "rotate_tree_node", "set_tree_node_heights"]
+__all__ = [
+    *__all__,
+    "calculate_coalescence_ages",
+    "calculate_divergence_times",
+    "calculate_n_bar_index",
+    "calculate_node_ages",
+    "calculate_node_depths",
+    "list_missing_bipartitions",
+    "add_tree_child_node",
+    "add_tree_internal_node",
+    "add_tree_internal_node_and_child",
+    "add_tree_internal_node_and_subtree",
+    "add_tree_sister_node",
+    "bisect_tree",
+    "calculate_all_node_distance_matrix",
+    "calculate_descendant_distances",
+    "calculate_farthest_node_distance",
+    "calculate_internal_node_distance_matrix",
+    "calculate_tip_distance_matrix_from_vcv",
+    "calculate_tip_diversification_rates",
+    "calculate_tree_node_distance",
+    "drop_tree_tips",
+    "extend_tree_tips_to_align",
+    "find_tree_farthest_node",
+    "list_tree_node_path",
+    "list_tree_quadripartitions",
+    "list_tree_quartets",
+    "map_consensus_tree_features",
+    "merge_tree_nodes",
+    "parse_tree_network",
+    "remove_tree_nodes",
+    "resolve_tree_polytomies",
+    "rotate_tree_node",
+    "set_tree_node_heights",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -390,10 +530,38 @@ from .toytree_gap_functions import (
     export_tree_node_data,
     map_node_feature_values,
     prune_tree_tips,
+)
+from .toytree_gap_functions import (
     root_tree_on_outgroup as root_toytree_on_outgroup,
 )
 
-__all__ = [*__all__, "align_with_muscle", "convert_format", "fetch_entrez_records", "format_to_fasta", "format_to_newick", "format_to_nexml", "format_to_nexus", "format_to_phylip", "paup_estimate_model", "paup_estimate_tree", "paup_estimate_ultrametric_tree", "paup_prune_taxa", "paup_pscore_trees", "run_dendropy_format", "summarize_tree_samples", "transfer_tree_labels", "draw_tree_cloud_figure", "draw_tree_figure", "draw_tree_grid_figure", "draw_tree_node_feature_figure", "export_tree_node_data", "map_node_feature_values", "prune_tree_tips", "root_toytree_on_outgroup"]
+__all__ = [
+    *__all__,
+    "align_with_muscle",
+    "convert_format",
+    "fetch_entrez_records",
+    "format_to_fasta",
+    "format_to_newick",
+    "format_to_nexml",
+    "format_to_nexus",
+    "format_to_phylip",
+    "paup_estimate_model",
+    "paup_estimate_tree",
+    "paup_estimate_ultrametric_tree",
+    "paup_prune_taxa",
+    "paup_pscore_trees",
+    "run_dendropy_format",
+    "summarize_tree_samples",
+    "transfer_tree_labels",
+    "draw_tree_cloud_figure",
+    "draw_tree_figure",
+    "draw_tree_grid_figure",
+    "draw_tree_node_feature_figure",
+    "export_tree_node_data",
+    "map_node_feature_values",
+    "prune_tree_tips",
+    "root_toytree_on_outgroup",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .biopython_p18_tree_functions import (

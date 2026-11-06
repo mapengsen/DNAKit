@@ -29,7 +29,15 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 _EXTRA = "bio-pyranges1"
 _INPUT_FORMATS = (
-    "bed", "bedgraph", "gtf", "gff3", "narrowPeak", "broadPeak", "gappedPeak", "parquet", "pairs",
+    "bed",
+    "bedgraph",
+    "gtf",
+    "gff3",
+    "narrowPeak",
+    "broadPeak",
+    "gappedPeak",
+    "parquet",
+    "pairs",
 )
 _STRAND = ("auto", "yes", "no")
 _STRAND_BEHAVIOR = ("auto", "same", "opposite", "ignore")
@@ -117,7 +125,7 @@ def _frame_result(
         "status": "completed",
         "operation": operation,
         "columns": [str(name) for name in frame.columns],
-        "n_rows": int(len(frame)),
+        "n_rows": len(frame),
         "rows": _records(frame, limit),
         "truncated": len(frame) > limit,
         "output_path": str(output_path) if output_path else None,
@@ -149,7 +157,9 @@ def read_pyranges1_intervals(
     """
 
     file = input_path(path)
-    kind = _c.choice(file_format, ("wig", "broadPeak", "gappedPeak", "parquet", "chain"), "file_format")
+    kind = _c.choice(
+        file_format, ("wig", "broadPeak", "gappedPeak", "parquet", "chain"), "file_format"
+    )
     limit = _c.rows_limit(max_rows)
     pr = _pyranges()
     readers = {
@@ -427,7 +437,7 @@ def interval_lengths_pyranges1(
     return {
         "status": "completed",
         "operation": "interval_lengths_pyranges1",
-        "n_intervals": int(len(lengths)),
+        "n_intervals": len(lengths),
         "lengths": [int(value) for value in lengths.head(limit).tolist()],
         "truncated": len(lengths) > limit,
         "min": _c.plain(lengths.min()) if len(lengths) else None,
@@ -668,7 +678,7 @@ def write_pyranges1_intervals(
         "status": "completed",
         "operation": "write_pyranges1_intervals",
         "output_format": fmt,
-        "n_rows": int(len(gr)),
+        "n_rows": len(gr),
         "output_path": str(out),
         "provenance": _provenance(),
     }
@@ -761,7 +771,7 @@ def coverage_to_bigwig_pyranges1(
     return {
         "status": "completed",
         "operation": "coverage_to_bigwig_pyranges1",
-        "n_rows": int(len(gr)),
+        "n_rows": len(gr),
         "output_path": str(out),
         "provenance": _provenance(),
     }
@@ -939,9 +949,7 @@ def interval_metrics_pyranges1(
     limit = _c.rows_limit(max_rows)
     first = _load(pr, first_path, fmt_a)
     second = _load(pr, second_path, fmt_b)
-    joined = _guard(
-        "join_overlaps", lambda: first.join_overlaps(second, strand_behavior=behavior)
-    )
+    joined = _guard("join_overlaps", lambda: first.join_overlaps(second, strand_behavior=behavior))
     result = _guard(
         "compute_interval_metrics", lambda: joined.compute_interval_metrics(names, denom=denom)
     )
@@ -980,9 +988,7 @@ def combine_pyranges1_interval_columns(
     limit = _c.rows_limit(max_rows)
     first = _load(pr, first_path, fmt_a)
     second = _load(pr, second_path, fmt_b)
-    joined = _guard(
-        "join_overlaps", lambda: first.join_overlaps(second, strand_behavior=behavior)
-    )
+    joined = _guard("join_overlaps", lambda: first.join_overlaps(second, strand_behavior=behavior))
     result = _guard(
         "combine_interval_columns",
         lambda: joined.combine_interval_columns(how, drop_old_columns=drop),
@@ -1021,7 +1027,7 @@ def liftover_pyranges1_ranges(
     extra: dict[str, Any] = {}
     if unmapped_wanted:
         mapped, unmapped = outcome
-        extra = {"n_unmapped": int(len(unmapped)), "unmapped_rows": _records(unmapped, limit)}
+        extra = {"n_unmapped": len(unmapped), "unmapped_rows": _records(unmapped, limit)}
     else:
         mapped = outcome
     return _frame_result("liftover_pyranges1_ranges", mapped, limit, out, **extra)

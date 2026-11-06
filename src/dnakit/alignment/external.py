@@ -327,9 +327,17 @@ def _diamond_search(
 ) -> dict[str, object]:
     query_path = input_path(query)
     reference_path = input_path(reference_proteins)
-    if isinstance(evalue, bool) or not isinstance(evalue, (int, float)) or not 1e-100 <= evalue <= 1000:
+    if (
+        isinstance(evalue, bool)
+        or not isinstance(evalue, (int, float))
+        or not 1e-100 <= evalue <= 1000
+    ):
         raise ConfigurationError("evalue must be a number in [1e-100, 1000].")
-    if isinstance(max_target_sequences, bool) or not isinstance(max_target_sequences, int) or not 1 <= max_target_sequences <= 10_000:
+    if (
+        isinstance(max_target_sequences, bool)
+        or not isinstance(max_target_sequences, int)
+        or not 1 <= max_target_sequences <= 10_000
+    ):
         raise ConfigurationError("max_target_sequences must be an integer in [1, 10000].")
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
@@ -340,7 +348,15 @@ def _diamond_search(
     hits = directory / "hits.tsv"
     run(
         program,
-        ("makedb", "--in", str(reference_path), "--db", str(database_prefix), "--threads", str(threads)),
+        (
+            "makedb",
+            "--in",
+            str(reference_path),
+            "--db",
+            str(database_prefix),
+            "--threads",
+            str(threads),
+        ),
         directory,
         config,
         outputs=(database,),
@@ -350,13 +366,20 @@ def _diamond_search(
         program,
         (
             mode,
-            "--query", str(query_path),
-            "--db", str(database),
-            "--out", str(hits),
-            "--outfmt", "6",
-            "--evalue", str(evalue),
-            "--max-target-seqs", str(max_target_sequences),
-            "--threads", str(threads),
+            "--query",
+            str(query_path),
+            "--db",
+            str(database),
+            "--out",
+            str(hits),
+            "--outfmt",
+            "6",
+            "--evalue",
+            str(evalue),
+            "--max-target-seqs",
+            str(max_target_sequences),
+            "--threads",
+            str(threads),
         ),
         directory,
         config,
@@ -402,10 +425,23 @@ def search_mmseqs_protein(
     config = _config(threads, timeout_seconds, max_output_bytes, max_artifact_bytes)
     hits = directory / "hits.tsv"
     arguments = (
-        "easy-search", str(query_path), str(reference_path), str(hits), str(directory / "tmp"),
-        "--search-type", "1", "--threads", str(threads), "-e", str(evalue),
-        "--split-memory-limit", f"{memory_megabytes}M", "--remove-tmp-files", "1",
-        "--createdb-mode", "0",
+        "easy-search",
+        str(query_path),
+        str(reference_path),
+        str(hits),
+        str(directory / "tmp"),
+        "--search-type",
+        "1",
+        "--threads",
+        str(threads),
+        "-e",
+        str(evalue),
+        "--split-memory-limit",
+        f"{memory_megabytes}M",
+        "--remove-tmp-files",
+        "1",
+        "--createdb-mode",
+        "0",
     )
     run(program, arguments, directory, config, outputs=(hits,))
     return _result(
@@ -443,9 +479,17 @@ def cluster_mmseqs_protein(
 
     proteins_path = input_path(proteins)
     _validate_mmseqs_options(1e-5, memory_megabytes, threads)
-    if isinstance(identity, bool) or not isinstance(identity, (int, float)) or not 0.1 <= identity <= 1:
+    if (
+        isinstance(identity, bool)
+        or not isinstance(identity, (int, float))
+        or not 0.1 <= identity <= 1
+    ):
         raise ConfigurationError("identity must be a number in [0.1, 1].")
-    if isinstance(coverage, bool) or not isinstance(coverage, (int, float)) or not 0.01 <= coverage <= 1:
+    if (
+        isinstance(coverage, bool)
+        or not isinstance(coverage, (int, float))
+        or not 0.01 <= coverage <= 1
+    ):
         raise ConfigurationError("coverage must be a number in [0.01, 1].")
     directory = workspace(output_directory)
     config = _config(threads, timeout_seconds, max_output_bytes, max_artifact_bytes)
@@ -456,10 +500,24 @@ def cluster_mmseqs_protein(
         Path(str(prefix) + "_all_seqs.fasta"),
     )
     arguments = (
-        "easy-cluster", str(proteins_path), str(prefix), str(directory / "tmp"),
-        "--min-seq-id", str(identity), "-c", str(coverage), "--cov-mode", "1",
-        "--threads", str(threads), "--split-memory-limit", f"{memory_megabytes}M",
-        "--remove-tmp-files", "1", "--createdb-mode", "0",
+        "easy-cluster",
+        str(proteins_path),
+        str(prefix),
+        str(directory / "tmp"),
+        "--min-seq-id",
+        str(identity),
+        "-c",
+        str(coverage),
+        "--cov-mode",
+        "1",
+        "--threads",
+        str(threads),
+        "--split-memory-limit",
+        f"{memory_megabytes}M",
+        "--remove-tmp-files",
+        "1",
+        "--createdb-mode",
+        "0",
     )
     run(program, arguments, directory, config, outputs=outputs)
     return _result(
@@ -482,12 +540,22 @@ def cluster_mmseqs_protein(
 
 
 def _validate_mmseqs_options(evalue: float, memory_megabytes: int, threads: int) -> None:
-    if isinstance(evalue, bool) or not isinstance(evalue, (int, float)) or not 1e-100 <= evalue <= 1000:
+    if (
+        isinstance(evalue, bool)
+        or not isinstance(evalue, (int, float))
+        or not 1e-100 <= evalue <= 1000
+    ):
         raise ConfigurationError("evalue must be a number in [1e-100, 1000].")
-    if isinstance(memory_megabytes, bool) or not isinstance(memory_megabytes, int) or not 128 <= memory_megabytes <= 32_768:
+    if (
+        isinstance(memory_megabytes, bool)
+        or not isinstance(memory_megabytes, int)
+        or not 128 <= memory_megabytes <= 32_768
+    ):
         raise ConfigurationError("memory_megabytes must be an integer in [128, 32768].")
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
+
+
 def consensus_spoa(
     source: str | Path,
     output_directory: str | Path,
@@ -504,7 +572,9 @@ def consensus_spoa(
 
     source_path = input_path(source)
     if isinstance(algorithm, bool) or not isinstance(algorithm, int) or algorithm not in {0, 1, 2}:
-        raise ConfigurationError("algorithm must be one of 0 (local), 1 (global), or 2 (semi-global).")
+        raise ConfigurationError(
+            "algorithm must be one of 0 (local), 1 (global), or 2 (semi-global)."
+        )
     if not isinstance(strand_ambiguous, bool):
         raise ConfigurationError("strand_ambiguous must be a boolean.")
     directory = workspace(output_directory)

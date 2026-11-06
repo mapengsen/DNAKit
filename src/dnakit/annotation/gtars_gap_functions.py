@@ -59,7 +59,9 @@ def hgvs_to_vrs_allele_id(
         raise ConfigurationError(f"transcript_store could not be opened: {exc}") from exc
     sequences = refget.RefgetStore.open_local(str(store_dir))
     try:
-        vrs_id = hgvs_module.hgvs_to_vrs_id(hgvs.strip(), provider, sequences, collection_digest.strip())
+        vrs_id = hgvs_module.hgvs_to_vrs_id(
+            hgvs.strip(), provider, sequences, collection_digest.strip()
+        )
     except hgvs_module.HgvsError as exc:
         raise ConfigurationError(f"{hgvs!r} could not be mapped: {exc}") from exc
     return {

@@ -78,7 +78,9 @@ def _array(np: Any, value: object, name: str, dims: tuple[int, ...], *, signed: 
     """A nested list as a masked array; None marks an entry that dadi masks."""
 
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value:
-        raise ConfigurationError(f"{name} must be a non-empty nested list; masked entries are None.")
+        raise ConfigurationError(
+            f"{name} must be a non-empty nested list; masked entries are None."
+        )
     try:
         raw = np.array(_fill(value, name), dtype=float)
     except ValueError as exc:
@@ -226,7 +228,11 @@ def plot_sfs_1d_comparison(
         image_path,
         "plot_sfs_1d_comparison",
         lambda plt: function(
-            model_fs, data_fs, residual=resid, plot_masked=_flag(plot_masked, "plot_masked"), show=False
+            model_fs,
+            data_fs,
+            residual=resid,
+            plot_masked=_flag(plot_masked, "plot_masked"),
+            show=False,
         ),
     )
     return _plot_result(
@@ -567,7 +573,7 @@ def plot_trispectrum(
     spectrum before drawing, as dadi's ``plot_single_trispectrum`` does.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     tri = _dadi_module("dadi.Triallele.TriSpectrum_mod").TriSpectrum
     plotting = _dadi_module("dadi.Triallele.plotting")
     array = _array(np, spectrum, "spectrum", (2,), signed=False)
@@ -616,7 +622,7 @@ def plot_trispectrum_comparison(
     ``title1``, ``title2`` and ``title3``.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     tri = _dadi_module("dadi.Triallele.TriSpectrum_mod").TriSpectrum
     plotting = _dadi_module("dadi.Triallele.plotting")
     sfs1 = tri(_array(np, first, "first", (2,), signed=False))
@@ -672,7 +678,7 @@ def plot_two_locus_spectrum(
     entries that many steps from an axis plane.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     tl = _dadi_module("dadi.TwoLocus.TLSpectrum_mod").TLSpectrum
     plotting = _dadi_module("dadi.TwoLocus.plotting")
     fs = tl(_array(np, spectrum, "spectrum", (3,), signed=False))
@@ -720,7 +726,7 @@ def plot_two_locus_comparison(
     spectra as in ``plot_two_locus_spectrum``.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     tl = _dadi_module("dadi.TwoLocus.TLSpectrum_mod").TLSpectrum
     plotting = _dadi_module("dadi.TwoLocus.plotting")
     model_fs = tl(_array(np, model, "model", (3,), signed=False))
@@ -761,7 +767,7 @@ def plot_dfe_bivariate(
     from ``gamma_min`` to ``gamma_max`` on both axes, drawn as negative values as dadi expects.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     name = _choice(distribution, _DFE_DISTRIBUTIONS, "distribution")
     values = _numbers(params, "params")
     pdfs = _dadi_module("dadi.DFE.PDFs")
@@ -807,7 +813,7 @@ def plot_dfe_bivariate_point_pos(
     or ``biv_ind_gamma``.
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     name = _choice(distribution, _DFE_DISTRIBUTIONS, "distribution")
     values = _numbers(params, "params", minimum=5)
     correlation = _number(rho, "rho", minimum=-1.0)
@@ -865,7 +871,7 @@ def dfe_mixture_spectrum(
     bivariate gamma: alpha, beta, ppos_wild, gamma_pos, pchange, pchange_pos).
     """
 
-    dadi, np = _dadi_and_numpy()
+    _dadi, np = _dadi_and_numpy()
     name = _choice(variant, _DFE_VARIANTS, "variant")
     demo = _numbers(demographic_params, "demographic_params")
     if len(demo) != 4:
@@ -1062,7 +1068,9 @@ def coverage_depth_distribution(
     try:
         distribution = compute(data, pops)
     except (ValueError, KeyError, TypeError) as exc:
-        raise ConfigurationError(f"dadi could not compute the coverage distribution: {exc}") from exc
+        raise ConfigurationError(
+            f"dadi could not compute the coverage distribution: {exc}"
+        ) from exc
     result = {}
     for pop in pops:
         depth_row, frequency_row = distribution[pop][0], distribution[pop][1]
@@ -1075,7 +1083,9 @@ def coverage_depth_distribution(
         "operation": "coverage_depth_distribution",
         "sites": sites_n,
         "distribution": result,
-        "provenance": _provenance("dadi", "depth-of-coverage distribution, LowPass compute_cov_dist"),
+        "provenance": _provenance(
+            "dadi", "depth-of-coverage distribution, LowPass compute_cov_dist"
+        ),
     }
 
 

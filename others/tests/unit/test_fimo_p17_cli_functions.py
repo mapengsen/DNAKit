@@ -120,7 +120,12 @@ def test_command_assembly_and_parsed_matches(tmp_path: Path) -> None:
     assert result["match_count"] == 2
     assert result["matches_truncated"] is False
     first = result["matches"][0]
-    assert (first["motif_id"], first["start"], first["stop"], first["strand"]) == ("TESTMOTIF", 11, 16, "+")
+    assert (first["motif_id"], first["start"], first["stop"], first["strand"]) == (
+        "TESTMOTIF",
+        11,
+        16,
+        "+",
+    )
     assert first["score"] == 7.5 and first["p_value"] == 1.2e-05 and first["q_value"] == 0.03
     assert first["matched_sequence"] == "GATCAG"
     assert result["tsv_file"] == str(out / "fimo.tsv")
@@ -144,16 +149,25 @@ def test_q_value_options_are_passed_or_refused(tmp_path: Path) -> None:
     files = _inputs(tmp_path)
     fake = _fake_fimo(tmp_path)
     result = scan_motifs_with_position_priors(
-        **files, output_dir=str(tmp_path / "q"), use_q_value_threshold=True, max_strand=True,
-        parse_genomic_coordinates=False, fimo_path=fake, verbose=False,
+        **files,
+        output_dir=str(tmp_path / "q"),
+        use_q_value_threshold=True,
+        max_strand=True,
+        parse_genomic_coordinates=False,
+        fimo_path=fake,
+        verbose=False,
     )
     arguments = json.loads((tmp_path / "q" / "args.json").read_text())
     assert result["status"] == "completed"
     assert {"--qv-thresh", "--max-strand", "--no-pgc"} <= set(arguments)
     with pytest.raises(ConfigurationError, match="compute_q_values"):
         scan_motifs_with_position_priors(
-            **files, output_dir=str(tmp_path / "bad"), use_q_value_threshold=True, compute_q_values=False,
-            fimo_path=fake, verbose=False,
+            **files,
+            output_dir=str(tmp_path / "bad"),
+            use_q_value_threshold=True,
+            compute_q_values=False,
+            fimo_path=fake,
+            verbose=False,
         )
     assert not (tmp_path / "bad").exists()
 
@@ -172,7 +186,9 @@ def test_q_value_options_are_passed_or_refused(tmp_path: Path) -> None:
         ({"prior_file": "/nonexistent/prior.wig"}, "prior_file"),
     ],
 )
-def test_invalid_arguments_are_refused_before_anything_runs(tmp_path: Path, override: dict, message: str) -> None:
+def test_invalid_arguments_are_refused_before_anything_runs(
+    tmp_path: Path, override: dict, message: str
+) -> None:
     files = _inputs(tmp_path) | override
     with pytest.raises(ConfigurationError, match=message):
         scan_motifs_with_position_priors(
@@ -185,7 +201,10 @@ def test_existing_output_directory_is_never_overwritten(tmp_path: Path) -> None:
     (tmp_path / "out").mkdir()
     with pytest.raises(ConfigurationError, match="must not exist"):
         scan_motifs_with_position_priors(
-            **_inputs(tmp_path), output_dir=str(tmp_path / "out"), fimo_path=_fake_fimo(tmp_path), verbose=False
+            **_inputs(tmp_path),
+            output_dir=str(tmp_path / "out"),
+            fimo_path=_fake_fimo(tmp_path),
+            verbose=False,
         )
 
 
@@ -193,12 +212,17 @@ def test_missing_fimo_raises_install_hint_and_creates_nothing(tmp_path: Path, mo
     monkeypatch.setenv("PATH", str(tmp_path))
     monkeypatch.setattr(sys, "executable", str(tmp_path / "python"))
     with pytest.raises(BackendUnavailableError) as raised:
-        scan_motifs_with_position_priors(**_inputs(tmp_path), output_dir=str(tmp_path / "out"), verbose=False)
+        scan_motifs_with_position_priors(
+            **_inputs(tmp_path), output_dir=str(tmp_path / "out"), verbose=False
+        )
     assert "meme" in (raised.value.hint or "").lower()
     assert not (tmp_path / "out").exists()
     with pytest.raises(BackendUnavailableError):
         scan_motifs_with_position_priors(
-            **_inputs(tmp_path), output_dir=str(tmp_path / "out2"), fimo_path=str(tmp_path / "nope"), verbose=False
+            **_inputs(tmp_path),
+            output_dir=str(tmp_path / "out2"),
+            fimo_path=str(tmp_path / "nope"),
+            verbose=False,
         )
 
 
@@ -225,11 +249,18 @@ def _real_inputs(tmp_path: Path) -> dict[str, str]:
     total = sum(priors)
     priors = [value / total for value in priors]
     priors[-5:] = [0.0] * 5  # a width-6 motif cannot start in the last five positions
-    wiggle = ["variableStep chrom=seq1 span=1"] + [f"{i} {v:.8f}" for i, v in enumerate(priors, start=1) if v > 0]
+    wiggle = ["variableStep chrom=seq1 span=1"] + [
+        f"{i} {v:.8f}" for i, v in enumerate(priors, start=1) if v > 0
+    ]
     (tmp_path / "prior.wig").write_text("\n".join(wiggle) + "\n", encoding="utf-8")
-    (tmp_path / "prior.psp").write_text(">seq1 6\n" + "\n".join(f"{v:.8f}" for v in priors) + "\n", encoding="utf-8")
+    (tmp_path / "prior.psp").write_text(
+        ">seq1 6\n" + "\n".join(f"{v:.8f}" for v in priors) + "\n", encoding="utf-8"
+    )
     distribution = subprocess.run(
-        ["compute-prior-dist", "10", str(tmp_path / "prior.psp")], capture_output=True, text=True, check=True
+        ["compute-prior-dist", "10", str(tmp_path / "prior.psp")],
+        capture_output=True,
+        text=True,
+        check=True,
     )
     (tmp_path / "prior.dist").write_text(distribution.stdout, encoding="utf-8")
     return {
@@ -256,9 +287,21 @@ def test_real_fimo_scores_with_priors_and_matches_the_program(tmp_path: Path) ->
     assert by_start[101]["score"] > by_start[401]["score"]
     assert by_start[101]["p_value"] < by_start[401]["p_value"]
     direct = subprocess.run(
-        ["fimo", "--text", "--thresh", "0.001", "--psp", files["prior_file"], "--prior-dist",
-         files["prior_distribution_file"], files["motif_file"], files["sequence_file"]],
-        capture_output=True, text=True, check=True,
+        [
+            "fimo",
+            "--text",
+            "--thresh",
+            "0.001",
+            "--psp",
+            files["prior_file"],
+            "--prior-dist",
+            files["prior_distribution_file"],
+            files["motif_file"],
+            files["sequence_file"],
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
     rows = [line.split("\t") for line in direct.splitlines() if line.startswith("TESTMOTIF")]
     assert sorted((int(r[3]), float(r[6])) for r in rows) == sorted(
@@ -268,7 +311,9 @@ def test_real_fimo_scores_with_priors_and_matches_the_program(tmp_path: Path) ->
 
 @requires_fimo
 def test_real_fimo_default_threshold_keeps_only_the_favoured_site(tmp_path: Path) -> None:
-    result = scan_motifs_with_position_priors(**_real_inputs(tmp_path), output_dir=str(tmp_path / "out"), verbose=False)
+    result = scan_motifs_with_position_priors(
+        **_real_inputs(tmp_path), output_dir=str(tmp_path / "out"), verbose=False
+    )
     assert [(row["start"], row["strand"]) for row in result["matches"]] == [(101, "+")]
     assert result["matches"][0]["matched_sequence"] == "GATCAG"
     assert result["matches"][0]["q_value"] is not None
@@ -279,5 +324,7 @@ def test_real_fimo_rejects_prior_without_distribution_at_the_program(tmp_path: P
     files = _real_inputs(tmp_path)
     files["prior_distribution_file"] = str(tmp_path / "empty.dist")
     (tmp_path / "empty.dist").write_text("", encoding="utf-8")
-    result = scan_motifs_with_position_priors(**files, output_dir=str(tmp_path / "out"), verbose=False)
+    result = scan_motifs_with_position_priors(
+        **files, output_dir=str(tmp_path / "out"), verbose=False
+    )
     assert result["status"] == "failed" and result["matches"] == []

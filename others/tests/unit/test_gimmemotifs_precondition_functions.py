@@ -19,8 +19,8 @@ import pytest
 
 pytest.importorskip("gimmemotifs")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.sequence import gimmemotifs_precondition_functions as pre  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.sequence import gimmemotifs_precondition_functions as pre
 
 PFM_TEXT = """>MA0001.1
 0.2 0.2 0.2 0.4
@@ -94,7 +94,9 @@ def _seqs(seed: int, count: int, length: int) -> list[str]:
 
 def _fasta(path: Path, sequences: list[str]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(f">seq{i}\n{seq}\n" for i, seq in enumerate(sequences)), encoding="utf-8")
+    path.write_text(
+        "".join(f">seq{i}\n{seq}\n" for i, seq in enumerate(sequences)), encoding="utf-8"
+    )
     return path
 
 
@@ -201,7 +203,9 @@ def test_diff_plot_rejects_wrong_table_shape(tmp_path: Path, motifs: Path) -> No
         )
 
 
-def test_diff_motifs_counts_background_and_foreground(tmp_path: Path, motifs: Path, fasta_inputs) -> None:
+def test_diff_motifs_counts_background_and_foreground(
+    tmp_path: Path, motifs: Path, fasta_inputs
+) -> None:
     pytest.importorskip("matplotlib")
     second = _fasta(tmp_path / "fg2.fa", _seqs(10, 30, 60))
     result = pre.gimmemotifs_diff_motifs(
@@ -320,7 +324,9 @@ def test_filter_significant_motifs_applies_minimum_values(tmp_path: Path, motifs
     assert "MA0001.1" in (tmp_path / "significant.pfm").read_text()
 
 
-def test_best_motif_in_cluster_returns_one_motif_per_cluster(tmp_path: Path, motifs: Path, fasta_inputs) -> None:
+def test_best_motif_in_cluster_returns_one_motif_per_cluster(
+    tmp_path: Path, motifs: Path, fasta_inputs
+) -> None:
     result = pre.gimmemotifs_best_motif_in_cluster(
         str(motifs),
         str(motifs),
@@ -337,7 +343,9 @@ def test_best_motif_in_cluster_returns_one_motif_per_cluster(tmp_path: Path, mot
     assert set(result["best_motifs"]) <= {"MA0001.1", "MA0002.1"}
 
 
-def test_best_motif_in_cluster_rejects_unknown_motif(tmp_path: Path, motifs: Path, fasta_inputs) -> None:
+def test_best_motif_in_cluster_rejects_unknown_motif(
+    tmp_path: Path, motifs: Path, fasta_inputs
+) -> None:
     with pytest.raises(ConfigurationError):
         pre.gimmemotifs_best_motif_in_cluster(
             str(motifs),
@@ -364,7 +372,9 @@ def test_denovo_motif_report_writes_html(tmp_path: Path, motifs: Path, fasta_inp
     assert any(name.endswith(".html") for name in result["outputs"])
 
 
-def test_roc_plots_writes_one_png_per_motif_and_background(tmp_path: Path, motifs: Path, fasta_inputs) -> None:
+def test_roc_plots_writes_one_png_per_motif_and_background(
+    tmp_path: Path, motifs: Path, fasta_inputs
+) -> None:
     pytest.importorskip("matplotlib")
     result = pre.gimmemotifs_roc_plots(
         str(motifs),
@@ -463,9 +473,13 @@ def test_orthogroup_database_lookup_and_motif2factors(tmp_path: Path, motifs: Pa
 def test_offline_strategy_only(tmp_path: Path) -> None:
     results = _orthogroup_results(tmp_path)
     database = tmp_path / "orthologs.sqlite"
-    pre.gimmemotifs_load_orthogroups_in_db(str(database), ["asmA", "asmB"], str(results), verbose=False)
+    pre.gimmemotifs_load_orthogroups_in_db(
+        str(database), ["asmA", "asmB"], str(results), verbose=False
+    )
     with pytest.raises(ConfigurationError):
-        pre.gimmemotifs_factor2orthogroups("GATA1", ["asmA"], str(database), strategy="lenient", verbose=False)
+        pre.gimmemotifs_factor2orthogroups(
+            "GATA1", ["asmA"], str(database), strategy="lenient", verbose=False
+        )
 
 
 def test_motif2factor_from_orthologs_runs_pipeline_with_local_inputs(
@@ -489,7 +503,9 @@ def test_motif2factor_from_orthologs_runs_pipeline_with_local_inputs(
     assert "MA0002.1\tGATA1\tOrthologs\tN" in table.read_text(encoding="utf-8")
 
 
-def test_motif2factor_from_orthologs_missing_orthofinder(tmp_path: Path, motifs: Path, monkeypatch) -> None:
+def test_motif2factor_from_orthologs_missing_orthofinder(
+    tmp_path: Path, motifs: Path, monkeypatch
+) -> None:
     genome, gtf = _annotation(tmp_path)
     bin_dir = tmp_path / "gffonly"
     _program(bin_dir, "gffread", GFFREAD_SCRIPT)

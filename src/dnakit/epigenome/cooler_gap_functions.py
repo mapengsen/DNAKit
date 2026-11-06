@@ -12,9 +12,8 @@ dictionaries; NaN and infinite values are returned as ``None``.
 from __future__ import annotations
 
 import math
-import shutil
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
@@ -380,7 +379,9 @@ def dump_cooler_pixels(
         if row_text is None:
             frame = selector[:]
         else:
-            frame = selector.fetch(row_text) if col_text is None else selector.fetch(row_text, col_text)
+            frame = (
+                selector.fetch(row_text) if col_text is None else selector.fetch(row_text, col_text)
+            )
         total = len(frame)
     except (KeyError, ValueError) as exc:
         raise ConfigurationError(f"Pixels could not be read for this region: {exc}") from exc
@@ -536,7 +537,9 @@ def sort_pairs_file(
                 seen += 1
                 parts = line.strip().split("\t")
                 if len(parts) < 5:
-                    raise ConfigurationError(f"A pair line has fewer than 5 columns: {line.strip()!r}")
+                    raise ConfigurationError(
+                        f"A pair line has fewer than 5 columns: {line.strip()!r}"
+                    )
                 chrom1, chrom2 = parts[1], parts[3]
                 if chrom1 not in rank or chrom2 not in rank:
                     dropped += 1

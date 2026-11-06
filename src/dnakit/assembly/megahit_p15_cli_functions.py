@@ -53,15 +53,25 @@ def megahit_read_statistics(
     source = _cli.existing_file(reads, "reads")
     target = _cli.new_file(stats_path, "stats_path")
     record = _cli.invoke(
-        _TOOL, ["readstat"], cwd=target.parent, stdout_to=target, stdin_from=source, explicit=megahit_core_path,
+        _TOOL,
+        ["readstat"],
+        cwd=target.parent,
+        stdout_to=target,
+        stdin_from=source,
+        explicit=megahit_core_path,
         timeout_seconds=timeout_seconds,
     )
     found = dict(_STATS.findall(target.read_text(encoding="utf-8", errors="replace")))
     if len(found) != 5:
         raise ConfigurationError("megahit_core readstat did not print the expected table.")
     return _cli.finish(
-        record, "read_set_statistics", stats_file=str(target), read_count=int(found["number reads"]),
-        total_bases=int(found["total size"]), longest=int(found["longest"]), shortest=int(found["shortest"]),
+        record,
+        "read_set_statistics",
+        stats_file=str(target),
+        read_count=int(found["number reads"]),
+        total_bases=int(found["total size"]),
+        longest=int(found["longest"]),
+        shortest=int(found["shortest"]),
         mean_length=float(found["avg"]),
     )
 
@@ -86,10 +96,16 @@ def megahit_contigs_to_fastg(
     size = _cli.integer(k, "k", minimum=3, maximum=255)
     target = _cli.new_file(fastg_path, "fastg_path")
     record = _cli.invoke(
-        _TOOL, ["contig2fastg", str(size), str(source)], cwd=target.parent, stdout_to=target, explicit=megahit_core_path,
+        _TOOL,
+        ["contig2fastg", str(size), str(source)],
+        cwd=target.parent,
+        stdout_to=target,
+        explicit=megahit_core_path,
         timeout_seconds=timeout_seconds,
     )
-    nodes = sum(1 for line in target.open(encoding="utf-8", errors="replace") if line.startswith(">"))
+    nodes = sum(
+        1 for line in target.open(encoding="utf-8", errors="replace") if line.startswith(">")
+    )
     return _cli.finish(record, "contigs_to_fastg", fastg_file=str(target), k=size, node_count=nodes)
 
 
@@ -119,7 +135,9 @@ def _prepared_contigs(source: Path, destination: Path) -> tuple[int, int]:
             out.write(f">{header}\n{sequence}\n")
             count += 1
             bases += len(sequence)
-    destination.with_name(destination.name + ".info").write_text(f"{count} {bases}\n", encoding="utf-8")
+    destination.with_name(destination.name + ".info").write_text(
+        f"{count} {bases}\n", encoding="utf-8"
+    )
     return count, bases
 
 
@@ -160,19 +178,39 @@ def megahit_local_assembly(
     for pair in paired_reads:
         if isinstance(pair, str) or len(pair) != 2:
             raise ConfigurationError("paired_reads must be a list of [read1, read2] pairs.")
-        pairs.append((_cli.existing_file(pair[0], "paired_reads"), _cli.existing_file(pair[1], "paired_reads")))
-    interleaved = _cli.existing_files(interleaved_reads, "interleaved_reads", minimum=0) if interleaved_reads else []
+        pairs.append(
+            (
+                _cli.existing_file(pair[0], "paired_reads"),
+                _cli.existing_file(pair[1], "paired_reads"),
+            )
+        )
+    interleaved = (
+        _cli.existing_files(interleaved_reads, "interleaved_reads", minimum=0)
+        if interleaved_reads
+        else []
+    )
     if not (singles or pairs or interleaved):
         raise ConfigurationError("give reads: single_reads, paired_reads or interleaved_reads.")
     out = _cli.new_directory(output_directory, "output_directory")
     arguments_local = [
-        "--kmin", str(_cli.integer(kmin, "kmin", minimum=3)), "--kmax", str(_cli.integer(kmax, "kmax", minimum=5)),
-        "--step", str(_cli.integer(step, "step", minimum=1)), "--seed_kmer", str(_cli.integer(seed_kmer, "seed_kmer", minimum=5)),
-        "--min_contig_len", str(_cli.integer(min_contig_len, "min_contig_len", minimum=1)),
-        "--min_mapping_len", str(_cli.integer(min_mapping_len, "min_mapping_len", minimum=1)),
-        "--sparsity", str(_cli.integer(sparsity, "sparsity", minimum=1)),
-        "--similarity", format(_cli.number(similarity, "similarity", minimum=0.0, maximum=1.0), ".12g"),
-        "-t", str(_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        "--kmin",
+        str(_cli.integer(kmin, "kmin", minimum=3)),
+        "--kmax",
+        str(_cli.integer(kmax, "kmax", minimum=5)),
+        "--step",
+        str(_cli.integer(step, "step", minimum=1)),
+        "--seed_kmer",
+        str(_cli.integer(seed_kmer, "seed_kmer", minimum=5)),
+        "--min_contig_len",
+        str(_cli.integer(min_contig_len, "min_contig_len", minimum=1)),
+        "--min_mapping_len",
+        str(_cli.integer(min_mapping_len, "min_mapping_len", minimum=1)),
+        "--sparsity",
+        str(_cli.integer(sparsity, "sparsity", minimum=1)),
+        "--similarity",
+        format(_cli.number(similarity, "similarity", minimum=0.0, maximum=1.0), ".12g"),
+        "-t",
+        str(_cli.integer(threads, "threads", minimum=1, maximum=256)),
     ]
     if kmin > kmax:
         raise ConfigurationError("kmin must not exceed kmax.")
@@ -188,13 +226,21 @@ def megahit_local_assembly(
         lines += [str(path), f"se {path}"]
     library.write_text("\n".join(lines) + "\n", encoding="utf-8")
     built = _cli.invoke(
-        _TOOL, ["buildlib", str(library), str(library)], cwd=out, expected=[out / "reads.lib.bin", out / "reads.lib.lib_info"],
-        explicit=megahit_core_path, timeout_seconds=timeout_seconds,
+        _TOOL,
+        ["buildlib", str(library), str(library)],
+        cwd=out,
+        expected=[out / "reads.lib.bin", out / "reads.lib.lib_info"],
+        explicit=megahit_core_path,
+        timeout_seconds=timeout_seconds,
     )
     target = out / "local_contigs.fa"
     record = _cli.invoke(
-        _TOOL, ["local", "-c", str(prepared), "-l", str(library), "-o", str(target), *arguments_local], cwd=out, expected=[target],
-        explicit=megahit_core_path, timeout_seconds=timeout_seconds,
+        _TOOL,
+        ["local", "-c", str(prepared), "-l", str(library), "-o", str(target), *arguments_local],
+        cwd=out,
+        expected=[target],
+        explicit=megahit_core_path,
+        timeout_seconds=timeout_seconds,
     )
     count = bases = 0
     for line in target.open(encoding="utf-8", errors="replace"):
@@ -202,12 +248,19 @@ def megahit_local_assembly(
             count += 1
         else:
             bases += len(line.strip())
-    summary = [line.split(" - ", 1)[-1] for line in built["log_tail"].splitlines() if "Lib " in line]
+    summary = [
+        line.split(" - ", 1)[-1] for line in built["log_tail"].splitlines() if "Lib " in line
+    ]
     record["command"] = built["command"] + ["&&"] + record["command"]
     record["outputs"] = [str(target)]
     return _cli.finish(
-        record, "local_assembly_of_contigs_with_reads", local_contig_file=str(target), local_contig_count=count,
-        local_contig_bases=bases, input_contig_count=input_count, read_library=summary,
+        record,
+        "local_assembly_of_contigs_with_reads",
+        local_contig_file=str(target),
+        local_contig_count=count,
+        local_contig_bases=bases,
+        input_contig_count=input_count,
+        read_library=summary,
     )
 
 

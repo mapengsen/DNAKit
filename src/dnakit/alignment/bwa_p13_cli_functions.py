@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import re
 import shutil
-import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -35,7 +34,9 @@ _KIT_HINT = (
     "Install bwa.kit (for example `conda install -c bioconda bwakit`, or unpack the bwakit release tarball from "
     "https://sourceforge.net/projects/bio-bwa/files/bwakit/) and pass bwakit_directory, or put run-bwamem on PATH."
 )
-_VERSION_FLAGS: tuple[str, ...] = ()  # bwa prints its usage, with the version, when called without arguments
+_VERSION_FLAGS: tuple[
+    str, ...
+] = ()  # bwa prints its usage, with the version, when called without arguments
 _STAGES = ("fa2pac", "pac2bwt", "pac2bwtgen", "bwtupdate", "bwt2sa")
 _REFERENCE_SETS = ("hs38", "hs38a", "hs38DH", "hs37", "hs37d5")
 _GENE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
@@ -98,7 +99,9 @@ def _index_prefix(value: str, name: str = "index_prefix") -> Path:
     """A BWA index given by its prefix: ``<prefix>.bwt`` must exist."""
     prefix = Path(_cli.text(value, name)).expanduser().resolve()
     if not Path(f"{prefix}.bwt").is_file():
-        raise ConfigurationError(f"{name} must be a BWA index prefix with an existing <prefix>.bwt: {prefix}")
+        raise ConfigurationError(
+            f"{name} must be a BWA index prefix with an existing <prefix>.bwt: {prefix}"
+        )
     return prefix
 
 
@@ -117,7 +120,9 @@ def _read_group(value: str | None) -> list[str]:
         return []
     text = _cli.text(value, "read_group")
     if not text.startswith("@RG"):
-        raise ConfigurationError("read_group must be a read group header line such as '@RG\\tID:foo\\tSM:bar'.")
+        raise ConfigurationError(
+            "read_group must be a read group header line such as '@RG\\tID:foo\\tSM:bar'."
+        )
     return ["-r", text]
 
 
@@ -160,8 +165,15 @@ def bwa_index_stage(
         targets = [Path(f"{prefix}{suffix}") for suffix in (".pac", ".ann", ".amb")]
         clash = [str(path) for path in targets if path.exists()]
         if clash:
-            raise ConfigurationError(f"Output files already exist and will not be overwritten: {clash}")
-        arguments = ["fa2pac", *_switch(forward_only, "-f", "forward_only"), str(source), str(prefix)]
+            raise ConfigurationError(
+                f"Output files already exist and will not be overwritten: {clash}"
+            )
+        arguments = [
+            "fa2pac",
+            *_switch(forward_only, "-f", "forward_only"),
+            str(source),
+            str(prefix),
+        ]
         return _run(
             arguments,
             cwd=prefix.parent,
@@ -250,7 +262,12 @@ def bwa_aln(
     args += ["-o", f"{_cli.number(max_gap_opens, 'max_gap_opens', minimum=0):g}"]
     args += ["-e", str(_cli.integer(max_gap_extensions, "max_gap_extensions", minimum=-1))]
     args += ["-i", str(_cli.integer(indel_end_skip, "indel_end_skip", minimum=0))]
-    args += ["-d", str(_cli.integer(max_long_deletion_occurrences, "max_long_deletion_occurrences", minimum=0))]
+    args += [
+        "-d",
+        str(
+            _cli.integer(max_long_deletion_occurrences, "max_long_deletion_occurrences", minimum=0)
+        ),
+    ]
     args += ["-l", str(_cli.integer(seed_length, "seed_length", minimum=1))]
     args += ["-k", str(_cli.integer(max_seed_diff, "max_seed_diff", minimum=0))]
     args += ["-m", str(_cli.integer(max_queue_entries, "max_queue_entries", minimum=1))]
@@ -270,12 +287,21 @@ def bwa_aln(
     if bam_input:
         args.append("-b")
         if bam_read is not None:
-            args.append({"single": "-0", "first": "-1", "second": "-2"}[_cli.choice(bam_read, ("single", "first", "second"), "bam_read")])
+            args.append(
+                {"single": "-0", "first": "-1", "second": "-2"}[
+                    _cli.choice(bam_read, ("single", "first", "second"), "bam_read")
+                ]
+            )
     _check(bwa_path)
     out = _cli.new_file(output_path, "output_path")
     args += ["-f", str(out), str(prefix), str(reads)]
     result = _run(
-        args, cwd=out.parent, expected=[out], bwa_path=bwa_path, timeout_seconds=timeout_seconds, operation="bwa aln"
+        args,
+        cwd=out.parent,
+        expected=[out],
+        bwa_path=bwa_path,
+        timeout_seconds=timeout_seconds,
+        operation="bwa aln",
     )
     return result
 
@@ -315,7 +341,9 @@ def bwa_sai_to_sam(
     sai = [_cli.existing_file(path, "sai_paths") for path in sai_paths]
     reads = [_cli.existing_file(path, "reads_paths") for path in reads_paths]
     if len(sai) != len(reads) or len(sai) not in (1, 2):
-        raise ConfigurationError("Give one .sai and one read file (single-end) or two of each (paired-end).")
+        raise ConfigurationError(
+            "Give one .sai and one read file (single-end) or two of each (paired-end)."
+        )
     paired = len(sai) == 2
     paired_only = {
         "max_insert_size": max_insert_size,
@@ -323,7 +351,12 @@ def bwa_sai_to_sam(
         "max_discordant_hits": max_discordant_hits,
         "chimeric_rate": chimeric_rate,
     }
-    if not paired and (any(value is not None for value in paired_only.values()) or preload_index or disable_smith_waterman or disable_insert_size_estimate):
+    if not paired and (
+        any(value is not None for value in paired_only.values())
+        or preload_index
+        or disable_smith_waterman
+        or disable_insert_size_estimate
+    ):
         raise ConfigurationError(
             "max_insert_size, max_occurrences_per_end, max_discordant_hits, chimeric_rate, preload_index, "
             "disable_smith_waterman and disable_insert_size_estimate only apply to paired-end input."
@@ -342,7 +375,13 @@ def bwa_sai_to_sam(
         args += _switch(disable_insert_size_estimate, "-A", "disable_insert_size_estimate")
     _check(bwa_path)
     out = _cli.new_file(output_path, "output_path")
-    args += ["-f", str(out), str(prefix), *[str(path) for path in sai], *[str(path) for path in reads]]
+    args += [
+        "-f",
+        str(out),
+        str(prefix),
+        *[str(path) for path in sai],
+        *[str(path) for path in reads],
+    ]
     result = _run(
         args,
         cwd=out.parent,
@@ -369,7 +408,11 @@ def _parse_fastmap(path: Path, limit: int) -> tuple[list[dict[str, Any]], int]:
         fields = line.split("\t")
         if fields[0] == "SQ" and len(fields) >= 3:
             total += 1
-            current = {"query": fields[1], "length": int(fields[2]), "matches": []} if total <= limit else None
+            current = (
+                {"query": fields[1], "length": int(fields[2]), "matches": []}
+                if total <= limit
+                else None
+            )
             if current is not None:
                 queries.append(current)
         elif fields[0] == "EM" and current is not None and len(fields) >= 4:
@@ -456,7 +499,9 @@ def bwa_pemerge(
     _check(bwa_path)
     out = _cli.new_file(output_path, "output_path")
     result = _stream(args, out, bwa_path, timeout_seconds, "bwa pemerge")
-    result["merged_pairs"] = len(re.findall(r"\bmerged\b", " ".join(_header_lines(out)))) if out.is_file() else 0
+    result["merged_pairs"] = (
+        len(re.findall(r"\bmerged\b", " ".join(_header_lines(out)))) if out.is_file() else 0
+    )
     result["record_count"] = _p13.count_lines(out) // 4 if out.is_file() else 0
     return result
 
@@ -494,7 +539,12 @@ def bwa_maxk(
     if out.is_file():
         for line in out.read_text(encoding="utf-8", errors="replace").splitlines():
             fields = line.split("\t")
-            if len(fields) == 2 and fields[0].isdigit() and fields[1].isdigit() and int(fields[1]) > 0:
+            if (
+                len(fields) == 2
+                and fields[0].isdigit()
+                and fields[1].isdigit()
+                and int(fields[1]) > 0
+            ):
                 histogram.append({"length": int(fields[0]), "positions": int(fields[1])})
     result["histogram"] = histogram
     return result
@@ -550,7 +600,9 @@ def bwakit_postalt(
     """
     alt = _cli.existing_file(alt_path, "alt_path")
     alignments = _cli.existing_file(alignments_path, "alignments_path")
-    fraction = _cli.number(min_alt_fraction_for_mapq, "min_alt_fraction_for_mapq", minimum=0.0, maximum=1.0)
+    fraction = _cli.number(
+        min_alt_fraction_for_mapq, "min_alt_fraction_for_mapq", minimum=0.0, maximum=1.0
+    )
     kit = _bwakit_directory(bwakit_directory, ("k8", "bwa-postalt.js"))
     args = [str(kit / "bwa-postalt.js"), "-r", f"{fraction:g}"]
     hla_files: list[Path] = []
@@ -559,10 +611,15 @@ def bwakit_postalt(
         if not stem.parent.is_dir():
             raise ConfigurationError(f"The folder for hla_prefix does not exist: {stem.parent}")
         args += ["-p", str(stem)]
-        hla_files = [Path(f"{stem}.{gene}.fq") for gene in ("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")]
+        hla_files = [
+            Path(f"{stem}.{gene}.fq")
+            for gene in ("HLA-A", "HLA-B", "HLA-C", "HLA-DQA1", "HLA-DQB1", "HLA-DRB1")
+        ]
         clash = [str(path) for path in hla_files if path.exists()]
         if clash:
-            raise ConfigurationError(f"Output files already exist and will not be overwritten: {clash}")
+            raise ConfigurationError(
+                f"Output files already exist and will not be overwritten: {clash}"
+            )
     args += [str(alt), str(alignments)]
     out = _cli.new_file(output_path, "output_path")
     result = _p13.run_to_file(
@@ -613,7 +670,9 @@ def bwakit_type_hla(
         raise ConfigurationError(f"Input file does not exist: {reads}")
     genotypes_file = Path(f"{stem}.{name}.gt")
     if genotypes_file.exists():
-        raise ConfigurationError(f"Output already exists and will not be overwritten: {genotypes_file}")
+        raise ConfigurationError(
+            f"Output already exists and will not be overwritten: {genotypes_file}"
+        )
     kit = _bwakit_directory(bwakit_directory, ("typeHLA.sh", "k8", "resource-human-HLA"))
     args = ["-A"] if _switch(from_contigs, "-A", "from_contigs") else []
     args += [str(stem), name]
@@ -673,7 +732,9 @@ def bwakit_generate_reference(
     name = _cli.choice(analysis_set, _REFERENCE_SETS, "analysis_set")
     kit = _bwakit_directory(bwakit_directory, ("run-gen-ref",))
     if shutil.which("wget") is None:
-        raise BackendUnavailableError("wget was not found on PATH.", hint="Install wget; run-gen-ref downloads with it.")
+        raise BackendUnavailableError(
+            "wget was not found on PATH.", hint="Install wget; run-gen-ref downloads with it."
+        )
     directory = _cli.new_directory(output_directory, "output_directory")
     expected = [directory / f"{name}.fa"]
     result = _p13.run(

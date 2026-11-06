@@ -39,8 +39,16 @@ from dnakit.exceptions import BackendExecutionError, ConfigurationError
 
 _EXTRA = "bio-grelu"
 _ERRORS = (
-    AssertionError, AttributeError, IndexError, KeyError, NotImplementedError, OSError, RuntimeError,
-    TypeError, ValueError, ImportError,
+    AssertionError,
+    AttributeError,
+    IndexError,
+    KeyError,
+    NotImplementedError,
+    OSError,
+    RuntimeError,
+    TypeError,
+    ValueError,
+    ImportError,
 )
 _ARCHITECTURES = {
     "conv": "ConvModel",
@@ -54,8 +62,20 @@ _ARCHITECTURES = {
     "enformer_pretrained": "EnformerPretrainedModel",
 }
 _DATASET_KEYS = (
-    "seq_len", "genome", "end", "rc", "max_seq_shift", "max_pair_shift", "label_len", "label_aggfunc",
-    "bin_size", "min_label_clip", "max_label_clip", "label_transform_func", "seed", "augment_mode",
+    "seq_len",
+    "genome",
+    "end",
+    "rc",
+    "max_seq_shift",
+    "max_pair_shift",
+    "label_len",
+    "label_aggfunc",
+    "bin_size",
+    "min_label_clip",
+    "max_label_clip",
+    "label_transform_func",
+    "seed",
+    "augment_mode",
 )
 _MAX_VALUES = 500_000
 _LOG_TAIL = 4000
@@ -170,8 +190,11 @@ def _load_model(checkpoint: object) -> Any:
     lightning = require("grelu.lightning", _EXTRA)
     path = input_path(checkpoint)  # type: ignore[arg-type]
     model, _ = _run(
-        "load_from_checkpoint", lightning.LightningModel.load_from_checkpoint,
-        str(path), map_location="cpu", weights_only=False,
+        "load_from_checkpoint",
+        lightning.LightningModel.load_from_checkpoint,
+        str(path),
+        map_location="cpu",
+        weights_only=False,
     )
     return model
 
@@ -192,7 +215,9 @@ def _array_result(array: Any, output_path: object, name: str) -> dict[str, Any]:
 def _device(value: object) -> str:
     if value == "cpu":
         return "cpu"
-    if isinstance(value, str) and value.startswith("cuda") or (isinstance(value, str) and value.isdigit()):
+    if (isinstance(value, str) and value.startswith("cuda")) or (
+        isinstance(value, str) and value.isdigit()
+    ):
         return str(value)
     raise ConfigurationError("device must be 'cpu', 'cuda', 'cuda:N' or a GPU index.")
 
@@ -215,17 +240,33 @@ def _dataset(spec: object, name: str = "dataset") -> Any:
     np = require("numpy", _EXTRA)
     _, data = _grelu()
     extra = {k: spec[k] for k in _DATASET_KEYS if k in spec}
-    unknown = set(spec) - set(_DATASET_KEYS) - {"table", "sequences", "labels", "tasks", "intervals", "bigwigs", "anndata", "label_key"}
+    unknown = (
+        set(spec)
+        - set(_DATASET_KEYS)
+        - {"table", "sequences", "labels", "tasks", "intervals", "bigwigs", "anndata", "label_key"}
+    )
     if unknown:
         raise ConfigurationError(f"{name} has unknown keys: {', '.join(sorted(unknown))}.")
     kinds = [k for k in ("table", "sequences", "intervals", "anndata") if k in spec]
     if len(kinds) != 1:
-        raise ConfigurationError(f"{name} needs exactly one of table, sequences, intervals, anndata.")
+        raise ConfigurationError(
+            f"{name} needs exactly one of table, sequences, intervals, anndata."
+        )
     kind = kinds[0]
     if kind == "table":
-        for key in ("label_len", "label_aggfunc", "bin_size", "min_label_clip", "max_label_clip", "label_transform_func", "max_pair_shift"):
+        for key in (
+            "label_len",
+            "label_aggfunc",
+            "bin_size",
+            "min_label_clip",
+            "max_label_clip",
+            "label_transform_func",
+            "max_pair_shift",
+        ):
             extra.pop(key, None)
-        built, _log = _run("DFSeqDataset", data.DFSeqDataset, _frame(spec["table"], "table"), **extra)
+        built, _log = _run(
+            "DFSeqDataset", data.DFSeqDataset, _frame(spec["table"], "table"), **extra
+        )
     elif kind == "sequences":
         seqs = _dna_list(spec["sequences"], f"{name}.sequences")
         labels = np.asarray(spec.get("labels"), dtype="float32")
@@ -235,7 +276,12 @@ def _dataset(spec: object, name: str = "dataset") -> Any:
         if len(tasks) != labels.shape[1]:
             raise ConfigurationError(f"{name}.tasks must name every label task.")
         built, _log = _run(
-            "LabeledSeqDataset", data.LabeledSeqDataset, seqs, labels, [str(t) for t in tasks], **extra
+            "LabeledSeqDataset",
+            data.LabeledSeqDataset,
+            seqs,
+            labels,
+            [str(t) for t in tasks],
+            **extra,
         )
     elif kind == "intervals":
         pandas = require("pandas", _EXTRA)
@@ -243,20 +289,41 @@ def _dataset(spec: object, name: str = "dataset") -> Any:
         if isinstance(bigwigs, (str, bytes)) or not isinstance(bigwigs, Sequence) or not bigwigs:
             raise ConfigurationError(f"{name}.bigwigs must be a non-empty list of bigWig paths.")
         bed = pandas.read_csv(
-            input_path(spec["intervals"]), sep="\t", header=None, usecols=[0, 1, 2],
-            names=["chrom", "start", "end"], comment="#", dtype={"chrom": str},
+            input_path(spec["intervals"]),
+            sep="\t",
+            header=None,
+            usecols=[0, 1, 2],
+            names=["chrom", "start", "end"],
+            comment="#",
+            dtype={"chrom": str},
         )
         built, _log = _run(
-            "BigWigSeqDataset", data.BigWigSeqDataset, bed, [str(input_path(p)) for p in bigwigs],
-            tasks=spec.get("tasks"), **extra,
+            "BigWigSeqDataset",
+            data.BigWigSeqDataset,
+            bed,
+            [str(input_path(p)) for p in bigwigs],
+            tasks=spec.get("tasks"),
+            **extra,
         )
     else:
         anndata = require("anndata", _EXTRA)
-        for key in ("label_len", "label_aggfunc", "bin_size", "min_label_clip", "max_label_clip", "label_transform_func", "max_pair_shift"):
+        for key in (
+            "label_len",
+            "label_aggfunc",
+            "bin_size",
+            "min_label_clip",
+            "max_label_clip",
+            "label_transform_func",
+            "max_pair_shift",
+        ):
             extra.pop(key, None)
         adata, _log = _run("read_h5ad", anndata.read_h5ad, str(input_path(spec["anndata"])))
         built, _log = _run(
-            "AnnDataSeqDataset", data.AnnDataSeqDataset, adata, label_key=spec.get("label_key"), **extra
+            "AnnDataSeqDataset",
+            data.AnnDataSeqDataset,
+            adata,
+            label_key=spec.get("label_key"),
+            **extra,
         )
     return built
 
@@ -266,7 +333,9 @@ def _model_summary(model: Any) -> dict[str, Any]:
         "model_type": model.model_params.get("model_type"),
         "n_tasks": int(model.model_params["n_tasks"]),
         "parameters": int(model.count_params()),
-        "tasks": list(model.data_params.get("tasks", {}).get("name", [])) if model.data_params else [],
+        "tasks": list(model.data_params.get("tasks", {}).get("name", []))
+        if model.data_params
+        else [],
     }
 
 
@@ -311,12 +380,23 @@ def augment_sequences(
     seqs = _dna_list(sequences, "sequences")
     if len({len(s) for s in seqs}) != 1:
         raise ConfigurationError("sequences must all have the same length.")
-    shift_total = 2 * (_int(max_seq_shift, "max_seq_shift", 0, 10_000) + _int(max_pair_shift, "max_pair_shift", 0, 10_000))
-    out_len = _int(seq_len, "seq_len", 1, 10_000_000) if seq_len is not None else len(seqs[0]) - shift_total
+    shift_total = 2 * (
+        _int(max_seq_shift, "max_seq_shift", 0, 10_000)
+        + _int(max_pair_shift, "max_pair_shift", 0, 10_000)
+    )
+    out_len = (
+        _int(seq_len, "seq_len", 1, 10_000_000)
+        if seq_len is not None
+        else len(seqs[0]) - shift_total
+    )
     if out_len < 1 or out_len + shift_total != len(seqs[0]):
-        raise ConfigurationError("Sequence length must equal seq_len + 2*(max_seq_shift + max_pair_shift).")
+        raise ConfigurationError(
+            "Sequence length must equal seq_len + 2*(max_seq_shift + max_pair_shift)."
+        )
     n_mut = _int(n_mutated_seqs, "n_mutated_seqs", 0, 1000)
-    n_bases = None if n_mutated_bases is None else _int(n_mutated_bases, "n_mutated_bases", 0, 10_000)
+    n_bases = (
+        None if n_mutated_bases is None else _int(n_mutated_bases, "n_mutated_bases", 0, 10_000)
+    )
     if n_mut > 0 and not n_bases:
         raise ConfigurationError("n_mutated_bases (> 0) is required when n_mutated_seqs > 0.")
     kind = _choice(mode, "mode", ("serial", "random"))
@@ -328,13 +408,26 @@ def augment_sequences(
             raise ConfigurationError("labels must have shape (sequences, tasks, length).")
     pair_len = None
     if label_array is not None:
-        pair_len = _int(label_len, "label_len", 1, 10_000_000) if label_len is not None else label_array.shape[2] - 2 * max_pair_shift
+        pair_len = (
+            _int(label_len, "label_len", 1, 10_000_000)
+            if label_len is not None
+            else label_array.shape[2] - 2 * max_pair_shift
+        )
     augmenter, log = _run(
-        "Augmenter", augment.Augmenter, rc=_flag(rc, "rc"), max_seq_shift=max_seq_shift,
-        max_pair_shift=max_pair_shift, n_mutated_seqs=n_mut, n_mutated_bases=n_bases,
-        protect=[int(p) for p in protect], seq_len=out_len, label_len=pair_len, seed=seed, mode=kind,
+        "Augmenter",
+        augment.Augmenter,
+        rc=_flag(rc, "rc"),
+        max_seq_shift=max_seq_shift,
+        max_pair_shift=max_pair_shift,
+        n_mutated_seqs=n_mut,
+        n_mutated_bases=n_bases,
+        protect=[int(p) for p in protect],
+        seq_len=out_len,
+        label_len=pair_len,
+        seed=seed,
+        mode=kind,
     )
-    n_variants = int(len(augmenter)) if kind == "serial" else draws
+    n_variants = len(augmenter) if kind == "serial" else draws
     if len(seqs) * n_variants > 100_000:
         raise ConfigurationError("The augmentation would produce more than 100000 records.")
     records: list[dict[str, Any]] = []
@@ -395,7 +488,9 @@ def build_labeled_sequence_dataset(
     items = []
     for index in picks:
         if index >= total:
-            raise ConfigurationError(f"index {index} is out of range for a dataset of {total} items.")
+            raise ConfigurationError(
+                f"index {index} is out of range for a dataset of {total} items."
+            )
         one_hot, label = built[index]
         items.append(
             {
@@ -409,7 +504,9 @@ def build_labeled_sequence_dataset(
         "operation": "build_labeled_sequence_dataset",
         "class": type(built).__name__,
         "sequences": int(built.n_seqs),
-        "tasks": [str(t) for t in built.tasks.index] if hasattr(built.tasks, "index") else list(built.tasks),
+        "tasks": [str(t) for t in built.tasks.index]
+        if hasattr(built.tasks, "index")
+        else list(built.tasks),
         "n_tasks": int(built.n_tasks),
         "sequence_length": int(built.seq_len),
         "label_length": int(built.label_len),
@@ -473,7 +570,7 @@ def _split(index: int, sizes: Sequence[int]) -> list[int]:
     out = []
     for position in range(len(sizes)):
         stride = 1
-        for later in sizes[position + 1:]:
+        for later in sizes[position + 1 :]:
             stride *= later
         out.append(int((index // stride) % sizes[position]))
     return out
@@ -558,8 +655,12 @@ def build_sequence_model(
 
     def save() -> None:
         trainer = pl.Trainer(
-            accelerator="cpu", devices=1, logger=False, enable_checkpointing=False,
-            enable_progress_bar=False, enable_model_summary=False,
+            accelerator="cpu",
+            devices=1,
+            logger=False,
+            enable_checkpointing=False,
+            enable_progress_bar=False,
+            enable_model_summary=False,
         )
         trainer.strategy.connect(model)
         trainer.save_checkpoint(str(target))
@@ -601,8 +702,12 @@ def replace_model_head(
 
     def save() -> None:
         trainer = pl.Trainer(
-            accelerator="cpu", devices=1, logger=False, enable_checkpointing=False,
-            enable_progress_bar=False, enable_model_summary=False,
+            accelerator="cpu",
+            devices=1,
+            logger=False,
+            enable_checkpointing=False,
+            enable_progress_bar=False,
+            enable_model_summary=False,
         )
         trainer.strategy.connect(model)
         trainer.save_checkpoint(str(target))
@@ -663,14 +768,25 @@ def train_sequence_model(
     if batch_size is not None:
         model.train_params["batch_size"] = _int(batch_size, "batch_size", 1, 1_000_000)
     if learning_rate is not None:
-        if isinstance(learning_rate, bool) or not isinstance(learning_rate, (int, float)) or learning_rate <= 0:
+        if (
+            isinstance(learning_rate, bool)
+            or not isinstance(learning_rate, (int, float))
+            or learning_rate <= 0
+        ):
             raise ConfigurationError("learning_rate must be a positive number.")
         model.train_params["lr"] = float(learning_rate)
     if seed is not None:
-        require("pytorch_lightning", _EXTRA).seed_everything(_int(seed, "seed", 0, 2**32 - 1), workers=True)
+        require("pytorch_lightning", _EXTRA).seed_everything(
+            _int(seed, "seed", 0, 2**32 - 1), workers=True
+        )
     if flag:
         trainer, log = _run(
-            "tune_on_dataset", model.tune_on_dataset, train, val, final_pool_func=pool, freeze_embedding=freeze
+            "tune_on_dataset",
+            model.tune_on_dataset,
+            train,
+            val,
+            final_pool_func=pool,
+            freeze_embedding=freeze,
         )
     else:
         trainer, log = _run("train_on_dataset", model.train_on_dataset, train, val)
@@ -687,7 +803,9 @@ def train_sequence_model(
         "metrics": metrics,
         "model": _model_summary(model),
         "log_tail": log if verbose else "",
-        "provenance": _provenance("LightningModel.tune_on_dataset" if flag else "LightningModel.train_on_dataset"),
+        "provenance": _provenance(
+            "LightningModel.tune_on_dataset" if flag else "LightningModel.train_on_dataset"
+        ),
     }
 
 
@@ -710,13 +828,24 @@ def evaluate_sequence_model(
 
     model = _load_model(checkpoint)
     data = _dataset(dataset)
-    target = None if output_checkpoint is None else _new_file(output_checkpoint, "output_checkpoint", (".ckpt",))
+    target = (
+        None
+        if output_checkpoint is None
+        else _new_file(output_checkpoint, "output_checkpoint", (".ckpt",))
+    )
     frame, log = _run(
-        "test_on_dataset", model.test_on_dataset, data, devices=_device(device), num_workers=0,
+        "test_on_dataset",
+        model.test_on_dataset,
+        data,
+        devices=_device(device),
+        num_workers=0,
         batch_size=_int(batch_size, "batch_size", 1, 1_000_000),
         write_path=None if target is None else str(target),
     )
-    rows = [{"task": str(name), **{k: float(v) for k, v in row.items()}} for name, row in frame.iterrows()]
+    rows = [
+        {"task": str(name), **{k: float(v) for k, v in row.items()}}
+        for name, row in frame.iterrows()
+    ]
     return {
         "status": "completed",
         "operation": "evaluate_sequence_model",
@@ -756,9 +885,13 @@ def predict_sequence_model(
         raise ConfigurationError("checkpoints must hold between 1 and 100 paths.")
     models = [_load_model(p) for p in paths]
     seqs = _dna_list(sequences, "sequences")
-    seq_set, _ = _run("SeqDataset", data.SeqDataset, seqs, rc=_flag(rc, "rc"), max_seq_shift=max_seq_shift)
+    seq_set, _ = _run(
+        "SeqDataset", data.SeqDataset, seqs, rc=_flag(rc, "rc"), max_seq_shift=max_seq_shift
+    )
     settings = {
-        "devices": _device(device), "num_workers": 0, "batch_size": _int(batch_size, "batch_size", 1, 1_000_000),
+        "devices": _device(device),
+        "num_workers": 0,
+        "batch_size": _int(batch_size, "batch_size", 1, 1_000_000),
     }
     if len(models) == 1:
         predictor: Any = models[0]
@@ -767,7 +900,9 @@ def predict_sequence_model(
         names = list(model_names) if model_names is not None else None
         if names is not None and len(names) != len(models):
             raise ConfigurationError("model_names needs one name per checkpoint.")
-        predictor, _ = _run("LightningModelEnsemble", lightning.LightningModelEnsemble, models, names)
+        predictor, _ = _run(
+            "LightningModelEnsemble", lightning.LightningModelEnsemble, models, names
+        )
         task_names = list(predictor.data_params["tasks"].get("name", []))
     array, log = _run("predict_on_dataset", predictor.predict_on_dataset, seq_set, **settings)
     result = _array_result(array, output_path, "predictions")
@@ -805,8 +940,12 @@ def embed_sequences(
     seq_set, _ = _run("SeqDataset", data.SeqDataset, seqs)
     dev: Any = _device(device)
     array, log = _run(
-        "embed_on_dataset", model.embed_on_dataset, seq_set, device=int(dev) if dev.isdigit() else dev,
-        num_workers=0, batch_size=_int(batch_size, "batch_size", 1, 1_000_000),
+        "embed_on_dataset",
+        model.embed_on_dataset,
+        seq_set,
+        device=int(dev) if dev.isdigit() else dev,
+        num_workers=0,
+        batch_size=_int(batch_size, "batch_size", 1, 1_000_000),
     )
     result = _array_result(array, output_path, "embeddings")
     return {
@@ -891,7 +1030,11 @@ def transform_labels(
     if transform_func is not None:
         _choice(transform_func, "transform_func", ("log", "log1p"))
     transform, _ = _run(
-        "LabelTransform", transforms.LabelTransform, min_clip=min_clip, max_clip=max_clip, transform_func=transform_func
+        "LabelTransform",
+        transforms.LabelTransform,
+        min_clip=min_clip,
+        max_clip=max_clip,
+        transform_func=transform_func,
     )
     out, _ = _run("forward", transform.forward, array)
     return {
@@ -932,20 +1075,33 @@ def score_prediction_specificity(
     transforms = require("grelu.transforms.prediction_transforms", _EXTRA)
     array = np.asarray(predictions, dtype="float64")
     if array.ndim != 3 or array.size == 0:
-        raise ConfigurationError("predictions must be a non-empty (sequences, tasks, length) array.")
+        raise ConfigurationError(
+            "predictions must be a non-empty (sequences, tasks, length) array."
+        )
     aggs = ("sum", "mean", "min", "max")
     on = [_int(t, "on_tasks item", 0, array.shape[1] - 1) for t in on_tasks]
-    off = None if off_tasks is None else [_int(t, "off_tasks item", 0, array.shape[1] - 1) for t in off_tasks]
+    off = (
+        None
+        if off_tasks is None
+        else [_int(t, "off_tasks item", 0, array.shape[1] - 1) for t in off_tasks]
+    )
     if not on:
         raise ConfigurationError("on_tasks must not be empty.")
     if off is None:
         off = [i for i in range(array.shape[1]) if i not in on]
     if not off:
-        raise ConfigurationError("off_tasks is empty: the background needs at least one other task.")
+        raise ConfigurationError(
+            "off_tasks is empty: the background needs at least one other task."
+        )
     spec, _ = _run(
-        "Specificity", transforms.Specificity, on, off_tasks=off,
-        on_aggfunc=_choice(on_aggfunc, "on_aggfunc", aggs), off_aggfunc=_choice(off_aggfunc, "off_aggfunc", aggs),
-        off_weight=off_weight, off_thresh=off_thresh,
+        "Specificity",
+        transforms.Specificity,
+        on,
+        off_tasks=off,
+        on_aggfunc=_choice(on_aggfunc, "on_aggfunc", aggs),
+        off_aggfunc=_choice(off_aggfunc, "off_aggfunc", aggs),
+        off_weight=off_weight,
+        off_thresh=off_thresh,
         positions=None if positions is None else [int(p) for p in positions],
         length_aggfunc=_choice(length_aggfunc, "length_aggfunc", aggs),
         compare_func=_choice(compare_func, "compare_func", ("divide", "subtract", "log2FC")),
@@ -983,7 +1139,10 @@ def score_sequence_patterns(
     if weights is not None and len(weights) != len(pats):
         raise ConfigurationError("weights needs one value per pattern.")
     scorer, _ = _run(
-        "PatternScore", transforms.PatternScore, pats, None if weights is None else [float(w) for w in weights]
+        "PatternScore",
+        transforms.PatternScore,
+        pats,
+        None if weights is None else [float(w) for w in weights],
     )
     scores, _ = _run("forward", scorer.forward, seqs)
     return {
@@ -1027,13 +1186,21 @@ def score_sequence_motifs(
             if value.ndim != 2 or value.shape[0] != 4:
                 raise ConfigurationError(f"motif {key} must be a 4 x L matrix.")
     scorer, _ = _run(
-        "MotifScore", seq_transforms.MotifScore, source,
+        "MotifScore",
+        seq_transforms.MotifScore,
+        source,
         names=None if names is None else [str(n) for n in names],
         weights=None if weights is None else [float(w) for w in weights],
-        pthresh=pthresh, rc=_flag(rc, "rc"),
+        pthresh=pthresh,
+        rc=_flag(rc, "rc"),
     )
     sites, _ = _run(
-        "scan_sequences", seq_transforms.scan_sequences, seqs, motifs=scorer.motifs, pthresh=pthresh, rc=scorer.rc
+        "scan_sequences",
+        seq_transforms.scan_sequences,
+        seqs,
+        motifs=scorer.motifs,
+        pthresh=pthresh,
+        rc=scorer.rc,
     )
     scores = [0.0] * len(seqs)
     hits = [0] * len(seqs)

@@ -51,11 +51,15 @@ def _timestamp(options: Mapping[str, object]) -> str:
     if value is None:
         return _now()
     if not isinstance(value, str) or not value.strip():
-        raise ConfigurationError("options.timestamp must be a non-empty string.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.timestamp must be a non-empty string.", code="INVALID_OPTION"
+        )
     return value
 
 
-def _analysis(input: object, *, security: bool = True) -> tuple[dict[str, object], dict[str, object], str]:
+def _analysis(
+    input: object, *, security: bool = True
+) -> tuple[dict[str, object], dict[str, object], str]:
     document, source = _impl.load_document(input)
     return document, _impl.analyze_workflow(document, security=security), source
 
@@ -70,7 +74,9 @@ def _names(input: object, what: str) -> list[str]:
             raise InputFormatError(f"{what} must be strings.", code="INVALID_INPUT")
         names = [item.strip() for item in input if item.strip()]
     else:
-        raise InputFormatError(f"{what} must be a string or a list of strings.", code="INVALID_INPUT")
+        raise InputFormatError(
+            f"{what} must be a string or a list of strings.", code="INVALID_INPUT"
+        )
     if not names:
         raise InputFormatError(f"No {what} were given.", code="INVALID_INPUT")
     return names
@@ -89,17 +95,24 @@ def _version_tuple(version: str) -> tuple[int, ...]:
 def _compare(left: tuple[int, ...], operator: str, right: tuple[int, ...]) -> bool:
     width = max(len(left), len(right))
     a, b = left + (0,) * (width - len(left)), right + (0,) * (width - len(right))
-    return {"==": a == b, "!=": a != b, ">=": a >= b, "<=": a <= b, ">": a > b, "<": a < b}[operator]
+    return {"==": a == b, "!=": a != b, ">=": a >= b, "<=": a <= b, ">": a > b, "<": a < b}[
+        operator
+    ]
 
 
-_REQUIREMENT = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*(?:(==|!=|>=|<=|>|<)\s*([0-9][A-Za-z0-9.]*))?\s*$")
+_REQUIREMENT = re.compile(
+    r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*(?:(==|!=|>=|<=|>|<)\s*([0-9][A-Za-z0-9.]*))?\s*$"
+)
 
 
 def benchmark(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Not implemented: benchmarking would have to execute the workflow or command being measured."""
 
     return candidate_not_implemented(
-        _MODULE, "benchmark", input, options=options,
+        _MODULE,
+        "benchmark",
+        input,
+        options=options,
         requires="an execution backend allowed to run the workflow under test",
         message="Benchmarking needs to execute the workload; workflow_security never executes user commands.",
     )
@@ -122,19 +135,30 @@ def cache(input: object, *, options: Mapping[str, object] | None = None) -> obje
         if not path.is_file():
             raise InputFormatError(f"Input file does not exist: {name}", code="FILE_NOT_FOUND")
         files[str(name)] = _impl.sha256_file(path)
-    key = _impl.sha256_text(_impl.canonical_json({"step": input, "files": files, "salt": str(settings.get("salt", ""))}))
+    key = _impl.sha256_text(
+        _impl.canonical_json({"step": input, "files": files, "salt": str(settings.get("salt", ""))})
+    )
     hit = None
     cache_dir = _impl.option_path(settings, "cache_dir")
     if cache_dir is not None:
         hit = (cache_dir / key).exists() or (cache_dir / f"{key}.json").exists()
-    return candidate_ok(_MODULE, "cache", input, {"cache_key": key, "hit": hit, "input_files": files}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "cache",
+        input,
+        {"cache_key": key, "hit": hit, "input_files": files},
+        options=options,
+    )
 
 
 def cancel(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Not implemented: cancelling needs a running job or scheduler handle, which this library does not keep."""
 
     return candidate_not_implemented(
-        _MODULE, "cancel", input, options=options,
+        _MODULE,
+        "cancel",
+        input,
+        options=options,
         requires="a job scheduler or process supervisor that owns the running job",
         message="There is no job registry in this process, so there is nothing that cancel could stop.",
     )
@@ -159,7 +183,8 @@ def check_dependencies(input: object, *, options: Mapping[str, object] | None = 
         match = _REQUIREMENT.match(requirement)
         if match is None:
             raise InputFormatError(
-                f"Unsupported requirement {requirement!r}.", code="INVALID_REQUIREMENT",
+                f"Unsupported requirement {requirement!r}.",
+                code="INVALID_REQUIREMENT",
                 hint="Use 'name' or 'name<op>version' with <op> in == != >= <= > <.",
             )
         name, operator, wanted = match.groups()
@@ -172,8 +197,18 @@ def check_dependencies(input: object, *, options: Mapping[str, object] | None = 
             installed = importlib.util.find_spec(name.replace("-", "_").split(".")[0]) is not None
         satisfied = installed
         if installed and operator:
-            satisfied = version is not None and _compare(_version_tuple(version), operator, _version_tuple(wanted))
-        rows.append({"requirement": requirement.strip(), "name": name, "installed": installed, "version": version, "satisfied": satisfied})
+            satisfied = version is not None and _compare(
+                _version_tuple(version), operator, _version_tuple(wanted)
+            )
+        rows.append(
+            {
+                "requirement": requirement.strip(),
+                "name": name,
+                "installed": installed,
+                "version": version,
+                "satisfied": satisfied,
+            }
+        )
     result = {"all_satisfied": all(row["satisfied"] for row in rows), "requirements": rows}
     return candidate_ok(_MODULE, "check_dependencies", input, result, options=options)
 
@@ -187,7 +222,9 @@ def check_external_tools(input: object, *, options: Mapping[str, object] | None 
     """
 
     _opts(options)
-    if isinstance(input, Mapping) or (isinstance(input, str) and ("\n" in input or input.strip()[:1] in {"{", "["})):
+    if isinstance(input, Mapping) or (
+        isinstance(input, str) and ("\n" in input or input.strip()[:1] in {"{", "["})
+    ):
         document, _ = _impl.load_document(input)
         steps, _ = _impl.normalize_steps(document)
         tools = []
@@ -196,7 +233,9 @@ def check_external_tools(input: object, *, options: Mapping[str, object] | None 
             if tokens:
                 tools.append(tokens[0])
         if not tools:
-            raise InputFormatError("The workflow has no step commands to check.", code="INVALID_INPUT")
+            raise InputFormatError(
+                "The workflow has no step commands to check.", code="INVALID_INPUT"
+            )
     else:
         tools = _names(input, "tool names")
     rows = []
@@ -207,7 +246,9 @@ def check_external_tools(input: object, *, options: Mapping[str, object] | None 
     return candidate_ok(_MODULE, "check_external_tools", input, result, options=options)
 
 
-def check_numerical_reproducibility(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def check_numerical_reproducibility(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Compare repeated numeric results elementwise and report whether they agree within a tolerance.
 
     ``input``: a list of at least two runs (each a number or a flat/nested list of numbers) or a mapping
@@ -233,18 +274,29 @@ def check_numerical_reproducibility(input: object, *, options: Mapping[str, obje
             return [float(value)]
         if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
             return [number for item in value for number in flatten(item)]
-        raise InputFormatError(f"Runs must contain only numbers, got {type(value).__name__}.", code="INVALID_INPUT")
+        raise InputFormatError(
+            f"Runs must contain only numbers, got {type(value).__name__}.", code="INVALID_INPUT"
+        )
 
     flat = [flatten(run) for run in runs]
     rows = []
     for index, other in enumerate(flat[1:], start=1):
         base = flat[0]
         if len(other) != len(base):
-            rows.append({"run": index, "length_match": False, "agrees": False, "max_abs_diff": None, "max_rel_diff": None, "bitwise_identical": False})
+            rows.append(
+                {
+                    "run": index,
+                    "length_match": False,
+                    "agrees": False,
+                    "max_abs_diff": None,
+                    "max_rel_diff": None,
+                    "bitwise_identical": False,
+                }
+            )
             continue
         max_abs = max_rel = 0.0
         agrees = identical = True
-        for a, b in zip(base, other):
+        for a, b in zip(base, other, strict=False):
             if math.isnan(a) or math.isnan(b):
                 same = equal_nan and math.isnan(a) and math.isnan(b)
                 agrees &= same
@@ -256,14 +308,27 @@ def check_numerical_reproducibility(input: object, *, options: Mapping[str, obje
             agrees &= difference <= max(rtol * scale, atol)
             max_abs = max(max_abs, difference)
             max_rel = max(max_rel, difference / scale if scale else 0.0)
-        rows.append({"run": index, "length_match": True, "agrees": bool(agrees), "max_abs_diff": max_abs, "max_rel_diff": max_rel, "bitwise_identical": bool(identical)})
+        rows.append(
+            {
+                "run": index,
+                "length_match": True,
+                "agrees": bool(agrees),
+                "max_abs_diff": max_abs,
+                "max_rel_diff": max_rel,
+                "bitwise_identical": bool(identical),
+            }
+        )
     finite = [row["max_abs_diff"] for row in rows if row["max_abs_diff"] is not None]
     result = {
         "reproducible": all(row["agrees"] for row in rows),
         "bitwise_identical": all(row["bitwise_identical"] for row in rows),
         "max_abs_diff": max(finite) if finite else None,
-        "max_rel_diff": max((row["max_rel_diff"] for row in rows if row["max_rel_diff"] is not None), default=None),
-        "rtol": rtol, "atol": atol, "runs": rows,
+        "max_rel_diff": max(
+            (row["max_rel_diff"] for row in rows if row["max_rel_diff"] is not None), default=None
+        ),
+        "rtol": rtol,
+        "atol": atol,
+        "runs": rows,
     }
     return candidate_ok(_MODULE, "check_numerical_reproducibility", input, result, options=options)
 
@@ -289,9 +354,15 @@ def checkpoint(input: object, *, options: Mapping[str, object] | None = None) ->
     target = _impl.option_path(settings, "path")
     written = None
     if target is not None:
-        _impl.write_atomic(target, (_impl.canonical_json(document) + "\n").encode("utf-8"), overwrite=_impl.option_bool(settings, "overwrite", False))
+        _impl.write_atomic(
+            target,
+            (_impl.canonical_json(document) + "\n").encode("utf-8"),
+            overwrite=_impl.option_bool(settings, "overwrite", False),
+        )
         written = str(target)
-    return candidate_ok(_MODULE, "checkpoint", input, {"checkpoint": document, "path": written}, options=options)
+    return candidate_ok(
+        _MODULE, "checkpoint", input, {"checkpoint": document, "path": written}, options=options
+    )
 
 
 def cleanup_temp_workspace(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -316,12 +387,14 @@ def cleanup_temp_workspace(input: object, *, options: Mapping[str, object] | Non
     resolved = path.resolve()
     if resolved == root or root not in resolved.parents:
         raise ConfigurationError(
-            f"{resolved} is not strictly inside the allowed root {root}.", code="UNSAFE_CLEANUP_TARGET",
+            f"{resolved} is not strictly inside the allowed root {root}.",
+            code="UNSAFE_CLEANUP_TARGET",
             hint="Set options.allowed_root to the directory that owns the workspace.",
         )
     if not resolved.name.startswith(prefix):
         raise ConfigurationError(
-            f"Workspace name {resolved.name!r} does not start with {prefix!r}.", code="UNSAFE_CLEANUP_TARGET",
+            f"Workspace name {resolved.name!r} does not start with {prefix!r}.",
+            code="UNSAFE_CLEANUP_TARGET",
             hint="Set options.prefix to the prefix used when the workspace was created.",
         )
     files = size = 0
@@ -334,7 +407,13 @@ def cleanup_temp_workspace(input: object, *, options: Mapping[str, object] | Non
     dry_run = _impl.option_bool(settings, "dry_run", True)
     if not dry_run:
         shutil.rmtree(resolved)
-    result = {"path": str(resolved), "files": files, "bytes": size, "dry_run": dry_run, "deleted": not dry_run}
+    result = {
+        "path": str(resolved),
+        "files": files,
+        "bytes": size,
+        "dry_run": dry_run,
+        "deleted": not dry_run,
+    }
     return candidate_ok(_MODULE, "cleanup_temp_workspace", input, result, options=options)
 
 
@@ -342,7 +421,10 @@ def clear(input: object, *, options: Mapping[str, object] | None = None) -> obje
     """Not implemented: the name does not say what to clear and this library keeps no workflow state to reset."""
 
     return candidate_not_implemented(
-        _MODULE, "clear", input, options=options,
+        _MODULE,
+        "clear",
+        input,
+        options=options,
         requires="a concrete state store (cache directory, job queue) to clear",
         message="clear has no defined target; use cleanup_temp_workspace for a temporary directory.",
     )
@@ -376,12 +458,26 @@ def create(input: object, *, options: Mapping[str, object] | None = None) -> obj
             items.append(step)
         document = {"name": name, "steps": items}
     else:
-        raise InputFormatError("input must define a list or mapping of steps.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must define a list or mapping of steps.", code="INVALID_INPUT"
+        )
     analysis = _impl.analyze_workflow(document)
     _impl.raise_if_invalid(analysis, what="creation")
-    spec = {"format": _impl.SPEC_FORMAT, "name": name, "steps": analysis["steps"], "order": analysis["order"]}
+    spec = {
+        "format": _impl.SPEC_FORMAT,
+        "name": name,
+        "steps": analysis["steps"],
+        "order": analysis["order"],
+    }
     spec["sha256"] = _impl.sha256_text(_impl.canonical_json({k: v for k, v in spec.items()}))
-    return candidate_ok(_MODULE, "create", input, spec, options=options, warnings=[str(item["message"]) for item in analysis["warnings"]])  # type: ignore[union-attr]
+    return candidate_ok(
+        _MODULE,
+        "create",
+        input,
+        spec,
+        options=options,
+        warnings=[str(item["message"]) for item in analysis["warnings"]],
+    )  # type: ignore[union-attr]
 
 
 def _fernet(options: Mapping[str, object], *, allow_generate: bool) -> tuple[object, str | None]:
@@ -393,19 +489,24 @@ def _fernet(options: Mapping[str, object], *, allow_generate: bool) -> tuple[obj
     if key is None and env_name is not None:
         key = os.environ.get(str(env_name))
         if not key:
-            raise ConfigurationError(f"Environment variable {env_name!r} is not set.", code="KEY_MISSING")
+            raise ConfigurationError(
+                f"Environment variable {env_name!r} is not set.", code="KEY_MISSING"
+            )
     if key is None and allow_generate and _impl.option_bool(options, "generate_key", False):
         generated = Fernet.generate_key().decode("ascii")
         key = generated
     if key is None:
         raise ConfigurationError(
-            "An encryption key is required.", code="KEY_MISSING",
+            "An encryption key is required.",
+            code="KEY_MISSING",
             hint="Pass options.key (urlsafe base64, 32 bytes), options.key_env, or options.generate_key=true when encrypting.",
         )
     try:
         return Fernet(key if isinstance(key, bytes) else str(key).encode("ascii")), generated
     except (ValueError, TypeError, UnicodeEncodeError) as exc:
-        raise ConfigurationError("The key is not a valid Fernet key (32 url-safe base64 bytes).", code="INVALID_KEY") from exc
+        raise ConfigurationError(
+            "The key is not a valid Fernet key (32 url-safe base64 bytes).", code="INVALID_KEY"
+        ) from exc
 
 
 def _crypt_file(operation: str, input: object, options: Mapping[str, object] | None) -> object:
@@ -414,7 +515,11 @@ def _crypt_file(operation: str, input: object, options: Mapping[str, object] | N
         import cryptography.fernet  # noqa: F401
     except ImportError:
         return candidate_not_implemented(
-            _MODULE, operation, input, options=options, requires="pip install cryptography",
+            _MODULE,
+            operation,
+            input,
+            options=options,
+            requires="pip install cryptography",
             message="File encryption uses cryptography.fernet (AES-128-CBC + HMAC-SHA256), which is not installed.",
         )
     if not isinstance(input, (str, os.PathLike)):
@@ -425,7 +530,8 @@ def _crypt_file(operation: str, input: object, options: Mapping[str, object] | N
     limit = int(settings.get("max_bytes", 256 * 1024 * 1024))
     if not 1 <= limit <= 2 * 1024**3 or source.stat().st_size > limit:
         raise ConfigurationError(
-            f"File exceeds max_bytes ({limit}); Fernet processes the whole file in memory.", code="FILE_TOO_LARGE",
+            f"File exceeds max_bytes ({limit}); Fernet processes the whole file in memory.",
+            code="FILE_TOO_LARGE",
         )
     encrypting = operation == "encrypt_genomic_file"
     output = _impl.option_path(settings, "output")
@@ -433,9 +539,15 @@ def _crypt_file(operation: str, input: object, options: Mapping[str, object] | N
         if encrypting:
             output = source.with_name(source.name + ".enc")
         else:
-            output = source.with_suffix("") if source.suffix == ".enc" else source.with_name(source.name + ".dec")
+            output = (
+                source.with_suffix("")
+                if source.suffix == ".enc"
+                else source.with_name(source.name + ".dec")
+            )
     if output.resolve() == source.resolve():
-        raise ConfigurationError("The output path must differ from the input path.", code="OUTPUT_EXISTS")
+        raise ConfigurationError(
+            "The output path must differ from the input path.", code="OUTPUT_EXISTS"
+        )
     cipher, generated = _fernet(settings, allow_generate=encrypting)
     data = source.read_bytes()
     if encrypting:
@@ -447,18 +559,23 @@ def _crypt_file(operation: str, input: object, options: Mapping[str, object] | N
             payload = cipher.decrypt(data)  # type: ignore[attr-defined]
         except InvalidToken as exc:
             raise InputFormatError(
-                "Decryption failed: wrong key or the file is not a Fernet token.", code="DECRYPTION_FAILED",
+                "Decryption failed: wrong key or the file is not a Fernet token.",
+                code="DECRYPTION_FAILED",
             ) from exc
     _impl.write_atomic(output, payload, overwrite=_impl.option_bool(settings, "overwrite", False))
     result: dict[str, object] = {
-        "output": str(output), "bytes_in": len(data), "bytes_out": len(payload),
+        "output": str(output),
+        "bytes_in": len(data),
+        "bytes_out": len(payload),
         "plaintext_sha256": hashlib.sha256(data if encrypting else payload).hexdigest(),
         "algorithm": "fernet-aes128-cbc-hmac-sha256",
     }
     warnings = []
     if generated is not None:
         result["generated_key"] = generated
-        warnings.append("A key was generated; store it safely, the data cannot be decrypted without it.")
+        warnings.append(
+            "A key was generated; store it safely, the data cannot be decrypted without it."
+        )
     return candidate_ok(_MODULE, operation, input, result, options=options, warnings=warnings)
 
 
@@ -502,9 +619,12 @@ def estimate(input: object, *, options: Mapping[str, object] | None = None) -> o
     _, analysis, _ = _analysis(input, security=False)
     _impl.raise_if_invalid(analysis, what="estimation")
     result = _impl.estimate_resources(
-        analysis["steps"], analysis["order"],  # type: ignore[arg-type]
-        default_cpus=float(settings.get("default_cpus", 1)), default_memory_mb=float(settings.get("default_memory_mb", 0)),
-        default_runtime_s=float(settings.get("default_runtime_s", 0)), default_disk_mb=float(settings.get("default_disk_mb", 0)),
+        analysis["steps"],
+        analysis["order"],  # type: ignore[arg-type]
+        default_cpus=float(settings.get("default_cpus", 1)),
+        default_memory_mb=float(settings.get("default_memory_mb", 0)),
+        default_runtime_s=float(settings.get("default_runtime_s", 0)),
+        default_disk_mb=float(settings.get("default_disk_mb", 0)),
     )
     warnings = []
     if "max_cpus" in settings and result["peak_cpus"] > float(settings["max_cpus"]):  # type: ignore[operator]
@@ -516,7 +636,10 @@ def monitor(input: object, *, options: Mapping[str, object] | None = None) -> ob
     """Not implemented: monitoring needs a running job or scheduler to observe."""
 
     return candidate_not_implemented(
-        _MODULE, "monitor", input, options=options,
+        _MODULE,
+        "monitor",
+        input,
+        options=options,
         requires="a job scheduler or process supervisor exposing job status",
         message="There is no running job handle to monitor in this library.",
     )
@@ -532,7 +655,12 @@ def read(input: object, *, options: Mapping[str, object] | None = None) -> objec
 
     _opts(options)
     document, source = _impl.load_document(input)
-    result = {"document": document, "source": source, "sha256": _impl.sha256_text(_impl.canonical_json(document)), "top_level_keys": sorted(document)}
+    result = {
+        "document": document,
+        "source": source,
+        "sha256": _impl.sha256_text(_impl.canonical_json(document)),
+        "top_level_keys": sorted(document),
+    }
     return candidate_ok(_MODULE, "read", input, result, options=options)
 
 
@@ -552,18 +680,32 @@ def record_provenance(input: object, *, options: Mapping[str, object] | None = N
         raise InputFormatError("input must be a mapping describing the step.", code="INVALID_INPUT")
     for location, text in _impl._walk_strings(dict(input)):
         if _impl.scan_secrets(text):
-            raise ConfigurationError(f"Credential-looking text found at {location}; remove it before recording provenance.", code="SECRET_IN_PROVENANCE")
+            raise ConfigurationError(
+                f"Credential-looking text found at {location}; remove it before recording provenance.",
+                code="SECRET_IN_PROVENANCE",
+            )
     warnings: list[str] = []
 
     def describe(paths: object) -> list[dict[str, object]]:
-        values = [paths] if isinstance(paths, str) else (list(paths) if isinstance(paths, Sequence) else [])  # type: ignore[call-overload]
+        values = (
+            [paths]
+            if isinstance(paths, str)
+            else (list(paths) if isinstance(paths, Sequence) else [])
+        )  # type: ignore[call-overload]
         if len(values) > 1000:
             raise ConfigurationError("At most 1000 files can be hashed.", code="TOO_MANY_FILES")
         rows = []
         for value in values:
             path = Path(str(value))
             if path.is_file():
-                rows.append({"path": str(value), "exists": True, "size": path.stat().st_size, "sha256": _impl.sha256_file(path)})
+                rows.append(
+                    {
+                        "path": str(value),
+                        "exists": True,
+                        "size": path.stat().st_size,
+                        "sha256": _impl.sha256_file(path),
+                    }
+                )
             else:
                 warnings.append(f"file not found: {value}")
                 rows.append({"path": str(value), "exists": False, "size": None, "sha256": None})
@@ -575,16 +717,28 @@ def record_provenance(input: object, *, options: Mapping[str, object] | None = N
         "step": {key: value for key, value in input.items() if key not in {"inputs", "outputs"}},
         "inputs": describe(input.get("inputs", [])),
         "outputs": describe(input.get("outputs", [])),
-        "environment": {"python": platform.python_version(), "platform": platform.platform(), "dnakit": __version__},
+        "environment": {
+            "python": platform.python_version(),
+            "platform": platform.platform(),
+            "dnakit": __version__,
+        },
     }
     record["record_sha256"] = _impl.sha256_text(_impl.canonical_json(record))
     target = _impl.option_path(settings, "output")
     if target is not None:
-        _impl.write_atomic(target, (_impl.canonical_json(record) + "\n").encode("utf-8"), overwrite=_impl.option_bool(settings, "overwrite", False))
-    return candidate_ok(_MODULE, "record_provenance", input, record, options=options, warnings=warnings)
+        _impl.write_atomic(
+            target,
+            (_impl.canonical_json(record) + "\n").encode("utf-8"),
+            overwrite=_impl.option_bool(settings, "overwrite", False),
+        )
+    return candidate_ok(
+        _MODULE, "record_provenance", input, record, options=options, warnings=warnings
+    )
 
 
-def pseudonymize_metadata_fields(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def pseudonymize_metadata_fields(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Pseudonymise sensitive metadata fields (redact, drop or keyed-hash); key-name and pattern based, NOT de-identification.
 
     Input: a mapping, a list of mappings, or JSON text of those; anything else raises InputFormatError. Nested mappings
@@ -601,7 +755,9 @@ def pseudonymize_metadata_fields(input: object, *, options: Mapping[str, object]
     never values) and ``warnings``; ``input_summary`` has only ``record_count`` and ``n_keys``. This is NOT a guarantee
     of de-identification: dates, ages over 89, small geographic units and names in free text are not handled.
     """
-    return pseudonymize_envelope('workflow_security', 'pseudonymize_metadata_fields', input, options)
+    return pseudonymize_envelope(
+        "workflow_security", "pseudonymize_metadata_fields", input, options
+    )
 
 
 def report(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -615,24 +771,79 @@ def report(input: object, *, options: Mapping[str, object] | None = None) -> obj
     settings = _opts(options)
     output_format = str(settings.get("format", "markdown"))
     if output_format not in {"markdown", "json"}:
-        raise ConfigurationError("options.format must be 'markdown' or 'json'.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.format must be 'markdown' or 'json'.", code="INVALID_OPTION"
+        )
     document, analysis, source = _analysis(input)
     errors, order = analysis["errors"], analysis["order"]
     estimate_result = None
-    if order is not None and not any(item["code"] == "INVALID_RESOURCE" for item in analysis["findings"]):  # type: ignore[union-attr]
-        estimate_result = _impl.estimate_resources(analysis["steps"], order, default_cpus=1, default_memory_mb=0, default_runtime_s=0, default_disk_mb=0)  # type: ignore[arg-type]
+    if order is not None and not any(
+        item["code"] == "INVALID_RESOURCE" for item in analysis["findings"]
+    ):  # type: ignore[union-attr]
+        estimate_result = _impl.estimate_resources(
+            analysis["steps"],
+            order,
+            default_cpus=1,
+            default_memory_mb=0,
+            default_runtime_s=0,
+            default_disk_mb=0,
+        )  # type: ignore[arg-type]
     name = str(document.get("name", "workflow"))
-    summary = {"name": name, "source": source, "valid": not errors, "step_count": len(analysis["steps"]), "order": order, "findings": analysis["findings"], "estimate": estimate_result}  # type: ignore[arg-type]
+    summary = {
+        "name": name,
+        "source": source,
+        "valid": not errors,
+        "step_count": len(analysis["steps"]),
+        "order": order,
+        "findings": analysis["findings"],
+        "estimate": estimate_result,
+    }  # type: ignore[arg-type]
     if output_format == "json":
-        return candidate_ok(_MODULE, "report", input, {"format": "json", "valid": not errors, "report": summary}, options=options)
-    lines = [f"# Workflow report: {name}", "", f"- source: {source}", f"- steps: {summary['step_count']}", f"- valid: {'yes' if not errors else 'no'}", "", "## Execution order", ""]
-    lines += [f"{index}. {item}" for index, item in enumerate(order or [], start=1)] or ["(no valid order)"]
+        return candidate_ok(
+            _MODULE,
+            "report",
+            input,
+            {"format": "json", "valid": not errors, "report": summary},
+            options=options,
+        )
+    lines = [
+        f"# Workflow report: {name}",
+        "",
+        f"- source: {source}",
+        f"- steps: {summary['step_count']}",
+        f"- valid: {'yes' if not errors else 'no'}",
+        "",
+        "## Execution order",
+        "",
+    ]
+    lines += [f"{index}. {item}" for index, item in enumerate(order or [], start=1)] or [
+        "(no valid order)"
+    ]
     lines += ["", "## Findings", ""]
-    lines += [f"- [{item['severity']}] {item['code']}" + (f" ({item['step']})" if item["step"] else "") + f": {item['message']}" for item in analysis["findings"]] or ["(none)"]  # type: ignore[union-attr]
+    lines += [
+        f"- [{item['severity']}] {item['code']}"
+        + (f" ({item['step']})" if item["step"] else "")
+        + f": {item['message']}"
+        for item in analysis["findings"]
+    ] or ["(none)"]  # type: ignore[union-attr]
     if estimate_result is not None:
-        lines += ["", "## Resource estimate", "", f"- wall time: {estimate_result['wall_time_s']} s", f"- total cpu time: {estimate_result['total_cpu_seconds']} cpu-s",
-                  f"- peak cpus: {estimate_result['peak_cpus']}", f"- peak memory: {estimate_result['peak_memory_mb']} MB", f"- critical path: {' -> '.join(estimate_result['critical_path'])}"]  # type: ignore[arg-type]
-    return candidate_ok(_MODULE, "report", input, {"format": "markdown", "valid": not errors, "report": "\n".join(lines) + "\n"}, options=options)
+        lines += [
+            "",
+            "## Resource estimate",
+            "",
+            f"- wall time: {estimate_result['wall_time_s']} s",
+            f"- total cpu time: {estimate_result['total_cpu_seconds']} cpu-s",
+            f"- peak cpus: {estimate_result['peak_cpus']}",
+            f"- peak memory: {estimate_result['peak_memory_mb']} MB",
+            f"- critical path: {' -> '.join(estimate_result['critical_path'])}",
+        ]  # type: ignore[arg-type]
+    return candidate_ok(
+        _MODULE,
+        "report",
+        input,
+        {"format": "markdown", "valid": not errors, "report": "\n".join(lines) + "\n"},
+        options=options,
+    )
 
 
 def resume(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -658,22 +869,43 @@ def resume(input: object, *, options: Mapping[str, object] | None = None) -> obj
     if document is not None and document.get("format") == _impl.CHECKPOINT_FORMAT:
         state = document.get("state")
         if _impl.sha256_text(_impl.canonical_json(state)) != document.get("state_sha256"):
-            raise InputFormatError("Checkpoint state does not match its recorded SHA-256.", code="CHECKPOINT_CORRUPT")
-        result = {"kind": "checkpoint", "valid": True, "step": document.get("step"), "created_at": document.get("created_at"), "state": state}
+            raise InputFormatError(
+                "Checkpoint state does not match its recorded SHA-256.", code="CHECKPOINT_CORRUPT"
+            )
+        result = {
+            "kind": "checkpoint",
+            "valid": True,
+            "step": document.get("step"),
+            "created_at": document.get("created_at"),
+            "state": state,
+        }
         return candidate_ok(_MODULE, "resume", input, result, options=options)
     if inline or not isinstance(input, (str, os.PathLike)):
-        raise InputFormatError("input must be a checkpoint document or the path of a workflow file.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be a checkpoint document or the path of a workflow file.",
+            code="INVALID_INPUT",
+        )
     from dnakit.workflows import run_workflow
 
     run_result = run_workflow(input, resume=True, verbose=False)
-    return candidate_ok(_MODULE, "resume", input, {"kind": "workflow", **run_result.to_dict()}, options=options, implementation="dnakit.workflows.run_workflow")
+    return candidate_ok(
+        _MODULE,
+        "resume",
+        input,
+        {"kind": "workflow", **run_result.to_dict()},
+        options=options,
+        implementation="dnakit.workflows.run_workflow",
+    )
 
 
 def retry(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Not implemented: retrying means executing a failed job again, and no user command is ever executed here."""
 
     return candidate_not_implemented(
-        _MODULE, "retry", input, options=options,
+        _MODULE,
+        "retry",
+        input,
+        options=options,
         requires="an execution backend that owns the failed job",
         message="Use resume to continue a DNAKit workflow or checkpoint; re-running arbitrary jobs is not supported.",
     )
@@ -693,8 +925,17 @@ def run(input: object, *, options: Mapping[str, object] | None = None) -> object
         raise InputFormatError("input must be the path of a workflow file.", code="INVALID_INPUT")
     from dnakit.workflows import run_workflow
 
-    run_result = run_workflow(input, dry_run=_impl.option_bool(settings, "dry_run", False), verbose=False)
-    return candidate_ok(_MODULE, "run", input, run_result.to_dict(), options=options, implementation="dnakit.workflows.run_workflow")
+    run_result = run_workflow(
+        input, dry_run=_impl.option_bool(settings, "dry_run", False), verbose=False
+    )
+    return candidate_ok(
+        _MODULE,
+        "run",
+        input,
+        run_result.to_dict(),
+        options=options,
+        implementation="dnakit.workflows.run_workflow",
+    )
 
 
 def save_config(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -709,7 +950,11 @@ def save_config(input: object, *, options: Mapping[str, object] | None = None) -
     settings = _opts(options)
     target = _impl.option_path(settings, "output")
     if target is None:
-        raise ConfigurationError("options.output is required.", code="OUTPUT_REQUIRED", hint="Pass the file path to write.")
+        raise ConfigurationError(
+            "options.output is required.",
+            code="OUTPUT_REQUIRED",
+            hint="Pass the file path to write.",
+        )
     if not isinstance(input, Mapping):
         raise InputFormatError("input must be a mapping.", code="INVALID_INPUT")
     if not _impl.option_bool(settings, "allow_secrets", False):
@@ -717,15 +962,24 @@ def save_config(input: object, *, options: Mapping[str, object] | None = None) -
             hits = _impl.scan_secrets(text)
             if hits:
                 raise ConfigurationError(
-                    f"Credential-looking text ({hits[0]['rule']}, {hits[0]['masked']}) found at {location}.", code="SECRET_IN_CONFIG",
+                    f"Credential-looking text ({hits[0]['rule']}, {hits[0]['masked']}) found at {location}.",
+                    code="SECRET_IN_CONFIG",
                     hint="Reference secrets through environment variables, or pass allow_secrets=true.",
                 )
     import json
 
     _impl.canonical_json(input)  # rejects NaN and non-JSON values with a DNAKit error
-    payload = (json.dumps(input, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    payload = (json.dumps(input, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode(
+        "utf-8"
+    )
     _impl.write_atomic(target, payload, overwrite=_impl.option_bool(settings, "overwrite", False))
-    return candidate_ok(_MODULE, "save_config", input, {"path": str(target), "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "save_config",
+        input,
+        {"path": str(target), "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()},
+        options=options,
+    )
 
 
 def set_random_seed(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -740,7 +994,9 @@ def set_random_seed(input: object, *, options: Mapping[str, object] | None = Non
     settings = _opts(options)
     seed = settings.get("seed", input)
     if isinstance(seed, bool) or not isinstance(seed, int) or not 0 <= seed < 2**32:
-        raise InputFormatError("The seed must be an integer in [0, 2**32 - 1].", code="INVALID_SEED")
+        raise InputFormatError(
+            "The seed must be an integer in [0, 2**32 - 1].", code="INVALID_SEED"
+        )
     random.seed(seed)
     seeded = ["random"]
     if importlib.util.find_spec("numpy") is not None:
@@ -759,7 +1015,10 @@ def submit_cloud_job(input: object, *, options: Mapping[str, object] | None = No
     """Not implemented: submitting a cloud job needs a cloud account, credentials and a provider SDK."""
 
     return candidate_not_implemented(
-        _MODULE, "submit_cloud_job", input, options=options,
+        _MODULE,
+        "submit_cloud_job",
+        input,
+        options=options,
         requires="cloud provider credentials and SDK (AWS Batch, Google Batch, Azure Batch, ...)",
         message="No cloud backend is configured, and workflow_security does not execute user commands remotely either.",
     )
@@ -769,7 +1028,10 @@ def submit_hpc_job(input: object, *, options: Mapping[str, object] | None = None
     """Not implemented: submitting an HPC job means running sbatch/qsub on a cluster with a user-provided script."""
 
     return candidate_not_implemented(
-        _MODULE, "submit_hpc_job", input, options=options,
+        _MODULE,
+        "submit_hpc_job",
+        input,
+        options=options,
         requires="a cluster scheduler (sbatch, qsub, bsub) on PATH",
         message="Job submission executes a user script through a scheduler; workflow_security never executes user commands.",
     )
@@ -790,11 +1052,17 @@ def validate(input: object, *, options: Mapping[str, object] | None = None) -> o
     """
 
     settings = _opts(options)
-    document, analysis, source = _analysis(input, security=_impl.option_bool(settings, "security", True))
+    document, analysis, source = _analysis(
+        input, security=_impl.option_bool(settings, "security", True)
+    )
     result = {
-        "valid": not analysis["errors"], "errors": analysis["errors"], "warnings": analysis["warnings"],
-        "order": analysis["order"], "step_count": len(analysis["steps"]),  # type: ignore[arg-type]
-        "sha256": _impl.sha256_text(_impl.canonical_json(document)), "source": source,
+        "valid": not analysis["errors"],
+        "errors": analysis["errors"],
+        "warnings": analysis["warnings"],
+        "order": analysis["order"],
+        "step_count": len(analysis["steps"]),  # type: ignore[arg-type]
+        "sha256": _impl.sha256_text(_impl.canonical_json(document)),
+        "source": source,
     }
     return candidate_ok(_MODULE, "validate", input, result, options=options)
 
@@ -825,15 +1093,82 @@ def write(input: object, *, options: Mapping[str, object] | None = None) -> obje
     target = _impl.option_path(settings, "output")
     written = None
     if target is not None:
-        _impl.write_atomic(target, text.encode("utf-8"), overwrite=_impl.option_bool(settings, "overwrite", False))
+        _impl.write_atomic(
+            target, text.encode("utf-8"), overwrite=_impl.option_bool(settings, "overwrite", False)
+        )
         written = str(target)
-    return candidate_ok(_MODULE, "write", input, {"format": output_format, "text": text, "sha256": _impl.sha256_text(text), "path": written}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "write",
+        input,
+        {"format": output_format, "text": text, "sha256": _impl.sha256_text(text), "path": written},
+        options=options,
+    )
 
 
-__all__ = ['benchmark', 'cache', 'cancel', 'check_dependencies', 'check_external_tools', 'check_numerical_reproducibility', 'checkpoint', 'cleanup_temp_workspace', 'clear', 'create', 'decrypt_genomic_file', 'encrypt_genomic_file', 'estimate', 'monitor', 'pseudonymize_metadata_fields', 'read', 'record_provenance', 'report', 'resume', 'retry', 'run', 'save_config', 'set_random_seed', 'submit_cloud_job', 'submit_hpc_job', 'validate', 'write']
+__all__ = [
+    "benchmark",
+    "cache",
+    "cancel",
+    "check_dependencies",
+    "check_external_tools",
+    "check_numerical_reproducibility",
+    "checkpoint",
+    "cleanup_temp_workspace",
+    "clear",
+    "create",
+    "decrypt_genomic_file",
+    "encrypt_genomic_file",
+    "estimate",
+    "monitor",
+    "pseudonymize_metadata_fields",
+    "read",
+    "record_provenance",
+    "report",
+    "resume",
+    "retry",
+    "run",
+    "save_config",
+    "set_random_seed",
+    "submit_cloud_job",
+    "submit_hpc_job",
+    "validate",
+    "write",
+]
 
-__candidate_adapter_operations__ = set(['benchmark', 'cache', 'cancel', 'check_dependencies', 'check_external_tools', 'check_numerical_reproducibility', 'checkpoint', 'cleanup_temp_workspace', 'clear', 'create', 'decrypt_genomic_file', 'encrypt_genomic_file', 'estimate', 'monitor', 'pseudonymize_metadata_fields', 'read', 'record_provenance', 'report', 'resume', 'retry', 'run', 'save_config', 'set_random_seed', 'submit_cloud_job', 'submit_hpc_job', 'validate', 'write'])
+__candidate_adapter_operations__ = set(
+    [
+        "benchmark",
+        "cache",
+        "cancel",
+        "check_dependencies",
+        "check_external_tools",
+        "check_numerical_reproducibility",
+        "checkpoint",
+        "cleanup_temp_workspace",
+        "clear",
+        "create",
+        "decrypt_genomic_file",
+        "encrypt_genomic_file",
+        "estimate",
+        "monitor",
+        "pseudonymize_metadata_fields",
+        "read",
+        "record_provenance",
+        "report",
+        "resume",
+        "retry",
+        "run",
+        "save_config",
+        "set_random_seed",
+        "submit_cloud_job",
+        "submit_hpc_job",
+        "validate",
+        "write",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

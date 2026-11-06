@@ -21,7 +21,12 @@ def ok(envelope: dict) -> dict:
 
 
 def test_calculate_quality_percentiles_have_no_float_noise() -> None:
-    reads = [("r1", "ACGT", "5I?+"), ("r2", "ACGT", "I5+?"), ("r3", "ACGT", "?+I5"), ("r4", "ACGT", "+?5I")]
+    reads = [
+        ("r1", "ACGT", "5I?+"),
+        ("r2", "ACGT", "I5+?"),
+        ("r3", "ACGT", "?+I5"),
+        ("r4", "ACGT", "+?5I"),
+    ]
     result = ok(qc.calculate_quality(reads))
     values = [result["per_read_mean_quality"]["median"]]
     for row in result["per_position"]:
@@ -58,8 +63,16 @@ def test_functions_with_single_read_set_input_document_and_reject_pairs(call) ->
 
 @pytest.mark.parametrize(
     "function",
-    [qc.assign_sample_barcodes, qc.calculate_barcode_quality, qc.estimate_read_error_model, qc.extract_umi_sequences,
-     qc.calculate_index_hopping, qc.calculate_index_hopping_tenx, qc.collapse_umi_reads, qc.demultiplex_barcoded_reads],
+    [
+        qc.assign_sample_barcodes,
+        qc.calculate_barcode_quality,
+        qc.estimate_read_error_model,
+        qc.extract_umi_sequences,
+        qc.calculate_index_hopping,
+        qc.calculate_index_hopping_tenx,
+        qc.collapse_umi_reads,
+        qc.demultiplex_barcoded_reads,
+    ],
 )
 def test_docstrings_state_that_a_pair_is_not_accepted(function) -> None:
     assert "not accepted" in function.__doc__ or "not a {'read1'" in function.__doc__
@@ -74,26 +87,43 @@ def test_detect_platform_tenx_docstring_states_length_only() -> None:
 
 def test_build_cell_peak_matrix_reports_n_peaks_not_n_genes() -> None:
     fragments = "chr1\t110\t120\tAAA\nchr1\t160\t170\tBBB\n"
-    result = ok(sc.build_cell_peak_matrix(fragments, options={"peaks": ["chr1:100-200", "chr1:150-300", "chr2:0-50"]}))
+    result = ok(
+        sc.build_cell_peak_matrix(
+            fragments, options={"peaks": ["chr1:100-200", "chr1:150-300", "chr2:0-50"]}
+        )
+    )
     assert result["n_peaks"] == 3 and result["n_cells"] == 2
     assert "n_genes" not in result
 
 
 def test_extract_barcodes_separates_extracted_unmatched_and_too_short() -> None:
     reads = ["AAAACCCC", "AAAACCCA", "GGGGGGGG", "TTTTTTTT", "AA"]
-    result = ok(sc.extract_barcodes(reads, options={"barcode_length": 4, "whitelist": ["AAAA", "TTTT"]}))
+    result = ok(
+        sc.extract_barcodes(reads, options={"barcode_length": 4, "whitelist": ["AAAA", "TTTT"]})
+    )
     assert result["n_reads"] == 5
     assert result["n_extracted"] == 3  # AAAA, AAAA, TTTT
     assert result["n_unmatched"] == 1  # GGGG
     assert result["n_too_short"] == 1
-    assert result["n_reads"] == result["n_extracted"] + result["n_unmatched"] + result["n_too_short"]
+    assert (
+        result["n_reads"] == result["n_extracted"] + result["n_unmatched"] + result["n_too_short"]
+    )
     assert result["whitelist"]["unmatched"] == result["n_unmatched"]
 
 
 def test_extract_barcodes_without_whitelist_has_zero_unmatched() -> None:
     result = ok(sc.extract_barcodes(["AAAACCCC", "GGGGTTTT"], options={"barcode_length": 4}))
-    assert (result["n_reads"], result["n_extracted"], result["n_unmatched"], result["n_too_short"]) == (2, 2, 0, 0)
-    spatial = ok(sc.extract_barcodes_spatial(["AAAACCCC", "GGGGTTTT"], options={"barcode_length": 4, "whitelist": ["AAAA"]}))
+    assert (
+        result["n_reads"],
+        result["n_extracted"],
+        result["n_unmatched"],
+        result["n_too_short"],
+    ) == (2, 2, 0, 0)
+    spatial = ok(
+        sc.extract_barcodes_spatial(
+            ["AAAACCCC", "GGGGTTTT"], options={"barcode_length": 4, "whitelist": ["AAAA"]}
+        )
+    )
     assert (spatial["n_extracted"], spatial["n_unmatched"]) == (1, 1)
 
 
@@ -109,8 +139,13 @@ def test_remove_doublets_does_not_suggest_installing_scrublet(function) -> None:
 
 def test_differential_docstrings_describe_group1_versus_group2() -> None:
     for function in (sc.find_differential_features, sc.find_differential_features_spatial):
-        assert "log2(mean(value, group1)" in function.__doc__ and "GROUP_TOO_SMALL" in function.__doc__
-    assert "versus control" in sc.calculate_perturbation_effect.__doc__ or "control) + pseudocount" in sc.calculate_perturbation_effect.__doc__
+        assert (
+            "log2(mean(value, group1)" in function.__doc__ and "GROUP_TOO_SMALL" in function.__doc__
+        )
+    assert (
+        "versus control" in sc.calculate_perturbation_effect.__doc__
+        or "control) + pseudocount" in sc.calculate_perturbation_effect.__doc__
+    )
     assert "skipped with a warning" in sc.calculate_markers.__doc__
 
 
@@ -133,9 +168,17 @@ def test_calibrate_ece_before_is_null_outside_unit_interval() -> None:
 
 
 def test_explain_accepts_scorer_as_alias_of_model() -> None:
-    data = {"X": [[1.0, 0.0], [2.0, 1.0], [3.0, 0.0], [4.0, 1.0]], "y": [1.0, 2.0, 3.0, 4.0], "feature_names": ["a", "b"]}
-    via_model = ok(ml.explain(data, options={"model": lambda rows: [r[0] for r in rows], "seed": 1}))
-    via_scorer = ok(ml.explain(data, options={"scorer": lambda rows: [r[0] for r in rows], "seed": 1}))
+    data = {
+        "X": [[1.0, 0.0], [2.0, 1.0], [3.0, 0.0], [4.0, 1.0]],
+        "y": [1.0, 2.0, 3.0, 4.0],
+        "feature_names": ["a", "b"],
+    }
+    via_model = ok(
+        ml.explain(data, options={"model": lambda rows: [r[0] for r in rows], "seed": 1})
+    )
+    via_scorer = ok(
+        ml.explain(data, options={"scorer": lambda rows: [r[0] for r in rows], "seed": 1})
+    )
     assert via_model == via_scorer
     assert "scorer" in ml.explain.__doc__
 
@@ -147,8 +190,18 @@ def test_plot_circular_map_forces_circular_whatever_the_topology() -> None:
     from dnakit.visualization import plot
 
     features = [{"type": "gene", "start": 1, "end": 5}]
-    linear = ok(plot("ACGTACGTAC", options={"kind": "circular_map", "features": features, "topology": "linear"}))
-    circular = ok(plot("ACGTACGTAC", options={"kind": "circular_map", "features": features, "topology": "circular"}))
+    linear = ok(
+        plot(
+            "ACGTACGTAC",
+            options={"kind": "circular_map", "features": features, "topology": "linear"},
+        )
+    )
+    circular = ok(
+        plot(
+            "ACGTACGTAC",
+            options={"kind": "circular_map", "features": features, "topology": "circular"},
+        )
+    )
     assert linear["svg"] == circular["svg"]
     assert "forced to topology" in viz.plot.__doc__
 
@@ -163,16 +216,35 @@ def argv(command, **options) -> list[str]:
 def test_build_command_subcommand_precedes_flags() -> None:
     mapping = {"program": "samtools", "args": ["x.bam"], "flags": {"-b": True}}
     assert argv(mapping, subcommand="view") == ["samtools", "view", "-b", "x.bam"]
-    assert argv(mapping, subcommand=["index", "build"]) == ["samtools", "index", "build", "-b", "x.bam"]
+    assert argv(mapping, subcommand=["index", "build"]) == [
+        "samtools",
+        "index",
+        "build",
+        "-b",
+        "x.bam",
+    ]
 
 
 def test_build_command_without_subcommand_keeps_the_old_order() -> None:
-    assert argv({"program": "samtools", "args": ["view", "x.bam"], "flags": {"-b": True}}) == ["samtools", "-b", "view", "x.bam"]
+    assert argv({"program": "samtools", "args": ["view", "x.bam"], "flags": {"-b": True}}) == [
+        "samtools",
+        "-b",
+        "view",
+        "x.bam",
+    ]
 
 
 def test_build_command_subcommand_with_option_flags_and_other_forms() -> None:
     mapping = {"program": "tool", "flags": {"-a": True}, "args": ["one"]}
-    assert argv(mapping, subcommand="sub", flags={"-z": 1}, args=["two"]) == ["tool", "sub", "-a", "one", "-z", "1", "two"]
+    assert argv(mapping, subcommand="sub", flags={"-z": 1}, args=["two"]) == [
+        "tool",
+        "sub",
+        "-a",
+        "one",
+        "-z",
+        "1",
+        "two",
+    ]
     assert argv("samtools x.bam", subcommand="view") == ["samtools", "view", "x.bam"]
     assert argv(["samtools", "x.bam"], subcommand=["view"]) == ["samtools", "view", "x.bam"]
 
@@ -201,7 +273,11 @@ def test_translation_efficiency_gene_lengths_only_relabel_the_unit() -> None:
     ribo = "gene,s1,s2\ng1,100,200\ng2,300,400\n"
     rna = "gene,s1,s2\ng1,50,100\ng2,600,800\n"
     plain = ok(tx.calculate_translation_efficiency(ribo, options={"rna": rna}))
-    sized = ok(tx.calculate_translation_efficiency(ribo, options={"rna": rna, "gene_lengths": {"g1": 1000, "g2": 4000}}))
+    sized = ok(
+        tx.calculate_translation_efficiency(
+            ribo, options={"rna": rna, "gene_lengths": {"g1": 1000, "g2": 4000}}
+        )
+    )
     assert plain["genes"] == sized["genes"]
     assert "CPM" in plain["definition"] and "RPKM" in sized["definition"]
     assert "no effect" in tx.calculate_translation_efficiency.__doc__

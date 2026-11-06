@@ -25,7 +25,12 @@ _REFERENCE = "dnakit_custom"
 _MAX_RESULTS = 1_000_000
 _FEATURES = ("gene", "transcript", "exon", "protein")
 _FROM_KINDS = (
-    "gene_id", "gene_name", "transcript_id", "transcript_name", "exon_id", "protein_id",
+    "gene_id",
+    "gene_name",
+    "transcript_id",
+    "transcript_name",
+    "exon_id",
+    "protein_id",
 )
 _TO_KINDS = ("gene", "transcript", "exon")
 _ERRORS = (ValueError, KeyError, OSError, TypeError, AttributeError, LookupError)
@@ -47,7 +52,12 @@ def _int(value: object, name: str, minimum: int, maximum: int) -> int:
 
 
 def _text(value: object, name: str) -> str:
-    if not isinstance(value, str) or not value.strip() or len(value) > 256 or any(c in value for c in "\x00\r\n\t"):
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or len(value) > 256
+        or any(c in value for c in "\x00\r\n\t")
+    ):
         raise ConfigurationError(f"{name} must be a non-empty string without tabs or newlines.")
     return value.strip()
 
@@ -129,7 +139,12 @@ def _locus(item: Any) -> dict[str, Any]:
 
 def _record(kind: str, item: Any) -> dict[str, Any]:
     if kind == "gene":
-        return {"gene_id": item.gene_id, "gene_name": item.gene_name, "biotype": item.biotype, **_locus(item)}
+        return {
+            "gene_id": item.gene_id,
+            "gene_name": item.gene_name,
+            "biotype": item.biotype,
+            **_locus(item),
+        }
     if kind == "transcript":
         return {
             "transcript_id": item.transcript_id,
@@ -139,7 +154,12 @@ def _record(kind: str, item: Any) -> dict[str, Any]:
             **_locus(item),
         }
     if kind == "exon":
-        return {"exon_id": item.exon_id, "gene_id": item.gene_id, "gene_name": item.gene_name, **_locus(item)}
+        return {
+            "exon_id": item.exon_id,
+            "gene_id": item.gene_id,
+            "gene_name": item.gene_name,
+            **_locus(item),
+        }
     raise ConfigurationError(f"Unsupported feature {kind}.")
 
 
@@ -188,10 +208,7 @@ def load_hgnc_gene_aliases(
             origin = "download (cached)"
     except _ERRORS as exc:
         raise BackendExecutionError(f"pyensembl HGNC alias loading failed: {exc}") from exc
-    if wanted is None:
-        keys = sorted(table)[:limit]
-    else:
-        keys = [n for n in wanted if n in table]
+    keys = sorted(table)[:limit] if wanted is None else [n for n in wanted if n in table]
     return {
         "status": "completed",
         "operation": "load_hgnc_gene_aliases",
@@ -228,8 +245,13 @@ def fetch_genomic_sequence(
         raise ConfigurationError("The interval is longer than 50 Mb.")
     genome = _genome(genome_fasta=genome_fasta, index=False)
     sequence = _call(
-        "sequence", genome.sequence, chrom, first, last,
-        mask=_choice(mask, "mask", ("upper", "raw")), strand=_choice(strand, "strand", ("+", "-")),
+        "sequence",
+        genome.sequence,
+        chrom,
+        first,
+        last,
+        mask=_choice(mask, "mask", ("upper", "raw")),
+        strand=_choice(strand, "strand", ("+", "-")),
     )
     return {
         "status": "completed",
@@ -256,7 +278,11 @@ def fetch_transcript_sequence(
     such as ``ENST00000269305.8`` is accepted when the FASTA records that version.
     """
 
-    if isinstance(transcript_ids, (str, bytes)) or not isinstance(transcript_ids, Sequence) or not transcript_ids:
+    if (
+        isinstance(transcript_ids, (str, bytes))
+        or not isinstance(transcript_ids, Sequence)
+        or not transcript_ids
+    ):
         raise ConfigurationError("transcript_ids must be a non-empty list.")
     ids = [_text(i, "transcript_ids item") for i in transcript_ids]
     genome = _genome(transcript_fasta=transcript_fasta, index=False)
@@ -389,7 +415,9 @@ def find_nearest_transcript(
     genome = _genome(gtf, cache_dir=cache_dir)
     if chrom not in genome.contigs():
         raise ConfigurationError(f"contig {chrom!r} is not in the annotation.")
-    found = _call("nearest_transcript", genome.nearest_transcript, chrom, first, end=last, strand=side)
+    found = _call(
+        "nearest_transcript", genome.nearest_transcript, chrom, first, end=last, strand=side
+    )
     distance, transcript = found if found else (None, None)
     return {
         "status": "completed",
@@ -419,13 +447,21 @@ def get_annotation_by_id(
     kind = _choice(feature, "feature", _TO_KINDS)
     ident = _text(identifier, "identifier")
     genome = _genome(gtf, cache_dir=cache_dir)
-    getter = {"gene": genome.gene_by_id, "transcript": genome.transcript_by_id, "exon": genome.exon_by_id}[kind]
+    getter = {
+        "gene": genome.gene_by_id,
+        "transcript": genome.transcript_by_id,
+        "exon": genome.exon_by_id,
+    }[kind]
     item = _call(f"{kind}_by_id", getter, ident)
     record = _record(kind, item)
     if kind == "transcript":
-        record["exon_ids"] = list(_call("exon_ids_of_transcript_id", genome.exon_ids_of_transcript_id, ident))
+        record["exon_ids"] = list(
+            _call("exon_ids_of_transcript_id", genome.exon_ids_of_transcript_id, ident)
+        )
     elif kind == "gene":
-        record["transcript_ids"] = list(_call("transcript_ids_of_gene_id", genome.transcript_ids_of_gene_id, ident))
+        record["transcript_ids"] = list(
+            _call("transcript_ids_of_gene_id", genome.transcript_ids_of_gene_id, ident)
+        )
     return {
         "status": "completed",
         "operation": "get_annotation_by_id",
@@ -488,16 +524,22 @@ def list_annotation_features(
     if biotype is not None:
         filters["biotype"] = _text(biotype, "biotype")
     method = {
-        ("gene", "ids"): "gene_ids", ("gene", "names"): "gene_names", ("gene", "records"): "genes",
-        ("transcript", "ids"): "transcript_ids", ("transcript", "names"): "transcript_names",
+        ("gene", "ids"): "gene_ids",
+        ("gene", "names"): "gene_names",
+        ("gene", "records"): "genes",
+        ("transcript", "ids"): "transcript_ids",
+        ("transcript", "names"): "transcript_names",
         ("transcript", "records"): "transcripts",
-        ("exon", "ids"): "exon_ids", ("exon", "records"): "exons",
+        ("exon", "ids"): "exon_ids",
+        ("exon", "records"): "exons",
         ("protein", "ids"): "protein_ids",
     }[(kind, form)]
     if method in ("gene_names", "transcript_names", "exon_ids", "exons", "protein_ids"):
         filters.pop("biotype", None)
         if biotype is not None:
-            raise ConfigurationError(f"biotype is not supported together with output={form!r} for {kind}.")
+            raise ConfigurationError(
+                f"biotype is not supported together with output={form!r} for {kind}."
+            )
     found = _call(method, getattr(genome, method), **filters)
     rows, truncated = _cut(list(found), limit)
     if form == "records":
@@ -541,7 +583,9 @@ def related_annotation_features(
     genome = _genome(gtf, cache_dir=cache_dir)
     kind_of_source = source.split("_")[0]
     if kind_of_source == target and source.endswith("_id"):
-        raise ConfigurationError("from_kind and to_kind name the same feature; use get_annotation_by_id.")
+        raise ConfigurationError(
+            "from_kind and to_kind name the same feature; use get_annotation_by_id."
+        )
     plan = {
         ("protein_id", "gene"): ("gene_by_protein_id", "gene"),
         ("protein_id", "transcript"): ("transcript_by_protein_id", "transcript"),
@@ -572,9 +616,14 @@ def related_annotation_features(
         names = [raw] if isinstance(raw, str) else list(raw)
         results = []
         for name in names:
-            results.extend(_record("gene", g) for g in _call("genes_by_name", genome.genes_by_name, name))
+            results.extend(
+                _record("gene", g) for g in _call("genes_by_name", genome.genes_by_name, name)
+            )
     elif shape == "transcript_ids":
-        results = [_record("transcript", _call("transcript_by_id", genome.transcript_by_id, t)) for t in raw]
+        results = [
+            _record("transcript", _call("transcript_by_id", genome.transcript_by_id, t))
+            for t in raw
+        ]
     else:
         results = [_record("exon", _call("exon_by_id", genome.exon_by_id, e)) for e in raw]
     return {
@@ -646,7 +695,12 @@ def genomic_locus_offset(
     first = _int(start, "start", 1, 2**31 - 1)
     last = _int(end, "end", first, 2**31 - 1)
     locus = _call(
-        "Locus", pyensembl.Locus, _text(contig, "contig"), first, last, _choice(strand, "strand", ("+", "-"))
+        "Locus",
+        pyensembl.Locus,
+        _text(contig, "contig"),
+        first,
+        last,
+        _choice(strand, "strand", ("+", "-")),
     )
     if position is not None and (range_start is not None or range_end is not None):
         raise ConfigurationError("Give position or range_start/range_end, not both.")
@@ -656,8 +710,10 @@ def genomic_locus_offset(
     elif range_start is not None and range_end is not None:
         offset = list(
             _call(
-                "offset_range", locus.offset_range,
-                _int(range_start, "range_start", 1, 2**31 - 1), _int(range_end, "range_end", 1, 2**31 - 1),
+                "offset_range",
+                locus.offset_range,
+                _int(range_start, "range_start", 1, 2**31 - 1),
+                _int(range_end, "range_end", 1, 2**31 - 1),
             )
         )
         method = "Locus.offset_range"
@@ -698,7 +754,11 @@ def compare_genomic_loci(
         begin = _int(item.get("start"), f"{name}.start", 1, 2**31 - 1)
         stop = _int(item.get("end"), f"{name}.end", begin, 2**31 - 1)
         return _call(
-            "Locus", pyensembl.Locus, _text(item.get("contig"), f"{name}.contig"), begin, stop,
+            "Locus",
+            pyensembl.Locus,
+            _text(item.get("contig"), f"{name}.contig"),
+            begin,
+            stop,
             _choice(item.get("strand", "+"), f"{name}.strand", ("+", "-")),
         )
 

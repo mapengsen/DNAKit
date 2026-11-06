@@ -17,32 +17,49 @@ _COMP = str.maketrans("ACGT", "TGCA")
 
 
 # ----------------------------------------------------------------------------- option helpers
-def opt_str(options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None) -> str:
+def opt_str(
+    options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None
+) -> str:
     value = options.get(key, default)
     if not isinstance(value, str) or not value.strip():
-        raise ConfigurationError(f"Option {key!r} must be a non-empty string.", code="REGULATION_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be a non-empty string.", code="REGULATION_OPTION_INVALID"
+        )
     value = value.strip().lower()
     if allowed is not None and value not in allowed:
         raise ConfigurationError(
-            f"Option {key!r}={value!r} is not supported.", code="REGULATION_OPTION_INVALID", hint=f"Use one of: {', '.join(allowed)}."
+            f"Option {key!r}={value!r} is not supported.",
+            code="REGULATION_OPTION_INVALID",
+            hint=f"Use one of: {', '.join(allowed)}.",
         )
     return value
 
 
-def opt_int(options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int) -> int:
+def opt_int(
+    options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int
+) -> int:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int) or not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"Option {key!r} must be an integer in [{minimum}, {maximum}].", code="REGULATION_OPTION_INVALID"
+            f"Option {key!r} must be an integer in [{minimum}, {maximum}].",
+            code="REGULATION_OPTION_INVALID",
         )
     return value
 
 
-def opt_float(options: Mapping[str, object], key: str, default: float, minimum: float, maximum: float) -> float:
+def opt_float(
+    options: Mapping[str, object], key: str, default: float, minimum: float, maximum: float
+) -> float:
     value = options.get(key, default)
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not minimum <= value <= maximum:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or not minimum <= value <= maximum
+    ):
         raise ConfigurationError(
-            f"Option {key!r} must be a number in [{minimum}, {maximum}].", code="REGULATION_OPTION_INVALID"
+            f"Option {key!r} must be a number in [{minimum}, {maximum}].",
+            code="REGULATION_OPTION_INVALID",
         )
     return float(value)
 
@@ -62,10 +79,14 @@ def clean_dna(text: object, name: str = "sequence", allow_n: bool = True) -> str
     seq = re.sub(r"\s+", "", text).upper().replace("U", "T")
     allowed = set(BASES + ("N" if allow_n else ""))
     if not seq or set(seq) - allowed:
-        raise InputFormatError(f"{name} is empty or has characters outside ACGT{'N' if allow_n else ''}.",
-                               code="REGULATION_SEQUENCE_INVALID")
+        raise InputFormatError(
+            f"{name} is empty or has characters outside ACGT{'N' if allow_n else ''}.",
+            code="REGULATION_SEQUENCE_INVALID",
+        )
     if len(seq) > MAX_SEQUENCE:
-        raise ConfigurationError(f"{name} is longer than {MAX_SEQUENCE} bases.", code="REGULATION_SEQUENCE_TOO_LONG")
+        raise ConfigurationError(
+            f"{name} is longer than {MAX_SEQUENCE} bases.", code="REGULATION_SEQUENCE_TOO_LONG"
+        )
     return seq
 
 
@@ -88,7 +109,9 @@ def read_text(value: object) -> str:
     raise InputFormatError("Expected text, bytes or a path.", code="REGULATION_INPUT_INVALID")
 
 
-def parse_sequences(value: object, name: str = "sequences", max_items: int = 100_000) -> list[tuple[str, str]]:
+def parse_sequences(
+    value: object, name: str = "sequences", max_items: int = 100_000
+) -> list[tuple[str, str]]:
     """A DNA string, FASTA text/path, a list of strings or records (``sequence``/``id``), or ``{id: sequence}``."""
 
     if isinstance(value, Mapping):
@@ -104,7 +127,10 @@ def parse_sequences(value: object, name: str = "sequences", max_items: int = 100
                 if line.startswith(">"):
                     if cur is not None:
                         items.append((cur, "".join(chunks)))
-                    cur, chunks = (line[1:].split()[0] if line[1:].strip() else f"seq{len(items) + 1}"), []
+                    cur, chunks = (
+                        (line[1:].split()[0] if line[1:].strip() else f"seq{len(items) + 1}"),
+                        [],
+                    )
                 else:
                     chunks.append(line.strip())
             if cur is not None:
@@ -122,7 +148,9 @@ def parse_sequences(value: object, name: str = "sequences", max_items: int = 100
     else:
         raise InputFormatError(f"Unsupported {name} input.", code="REGULATION_INPUT_INVALID")
     if not items or len(items) > max_items:
-        raise InputFormatError(f"Provide between 1 and {max_items} {name}.", code="REGULATION_INPUT_INVALID")
+        raise InputFormatError(
+            f"Provide between 1 and {max_items} {name}.", code="REGULATION_INPUT_INVALID"
+        )
     return [(n, clean_dna(s, f"{name} {n!r}")) for n, s in items]
 
 
@@ -154,10 +182,14 @@ def _background(options: Mapping[str, object]) -> list[float]:
     if raw is None:
         return [0.25] * 4
     if not isinstance(raw, Mapping) or set(raw) != set(BASES):
-        raise ConfigurationError("background must map A, C, G and T to probabilities.", code="REGULATION_OPTION_INVALID")
+        raise ConfigurationError(
+            "background must map A, C, G and T to probabilities.", code="REGULATION_OPTION_INVALID"
+        )
     values = [float(raw[b]) for b in BASES]
     if any(not math.isfinite(v) or v <= 0 for v in values):
-        raise ConfigurationError("background probabilities must be positive.", code="REGULATION_OPTION_INVALID")
+        raise ConfigurationError(
+            "background probabilities must be positive.", code="REGULATION_OPTION_INVALID"
+        )
     total = sum(values)
     return [v / total for v in values]
 
@@ -169,12 +201,16 @@ def _matrix_rows(value: object, label: str) -> list[list[float]]:
         if all(b in value for b in BASES):
             cols = [list(value[b]) for b in BASES]  # type: ignore[call-overload]
             if len({len(c) for c in cols}) != 1:
-                raise InputFormatError(f"{label}: A/C/G/T rows have different lengths.", code="REGULATION_PWM_INVALID")
+                raise InputFormatError(
+                    f"{label}: A/C/G/T rows have different lengths.", code="REGULATION_PWM_INVALID"
+                )
             return [[float(cols[b][i]) for b in range(4)] for i in range(len(cols[0]))]
         for key in ("matrix", "pwm", "ppm", "pfm", "counts", "probabilities"):
             if key in value:
                 return _matrix_rows(value[key], label)
-        raise InputFormatError(f"{label}: expected A/C/G/T keys or a matrix.", code="REGULATION_PWM_INVALID")
+        raise InputFormatError(
+            f"{label}: expected A/C/G/T keys or a matrix.", code="REGULATION_PWM_INVALID"
+        )
     if isinstance(value, (str, bytes, Path)):
         text = read_text(value)
         letters: dict[str, list[float]] = {}
@@ -183,12 +219,20 @@ def _matrix_rows(value: object, label: str) -> list[list[float]]:
             if m:
                 letters[m.group(1)] = [float(x) for x in m.group(2).split()]
         if len(letters) != 4:
-            raise InputFormatError(f"{label}: no JASPAR-style A/C/G/T rows found.", code="REGULATION_PWM_INVALID")
+            raise InputFormatError(
+                f"{label}: no JASPAR-style A/C/G/T rows found.", code="REGULATION_PWM_INVALID"
+            )
         return _matrix_rows(letters, label)
-    if isinstance(value, Sequence) and value and all(isinstance(r, Sequence) and not isinstance(r, str) and len(r) == 4 for r in value):
+    if (
+        isinstance(value, Sequence)
+        and value
+        and all(isinstance(r, Sequence) and not isinstance(r, str) and len(r) == 4 for r in value)
+    ):
         return [[float(x) for x in r] for r in value]  # type: ignore[union-attr]
-    raise InputFormatError(f"{label}: unsupported matrix; use A/C/G/T lists, a Lx4 list or JASPAR text.",
-                           code="REGULATION_PWM_INVALID")
+    raise InputFormatError(
+        f"{label}: unsupported matrix; use A/C/G/T lists, a Lx4 list or JASPAR text.",
+        code="REGULATION_PWM_INVALID",
+    )
 
 
 def build_pwm(value: object, name: str, options: Mapping[str, object]) -> Pwm:
@@ -201,9 +245,14 @@ def build_pwm(value: object, name: str, options: Mapping[str, object]) -> Pwm:
 
     rows = _matrix_rows(value, name)
     if not rows or len(rows) > 1_000:
-        raise InputFormatError(f"{name}: a PWM needs 1-1000 positions.", code="REGULATION_PWM_INVALID")
+        raise InputFormatError(
+            f"{name}: a PWM needs 1-1000 positions.", code="REGULATION_PWM_INVALID"
+        )
     if any(not math.isfinite(x) or x < 0 for r in rows for x in r):
-        raise InputFormatError(f"{name}: matrix entries must be finite and non-negative.", code="REGULATION_PWM_INVALID")
+        raise InputFormatError(
+            f"{name}: matrix entries must be finite and non-negative.",
+            code="REGULATION_PWM_INVALID",
+        )
     if any(sum(r) <= 0 for r in rows):
         raise InputFormatError(f"{name}: a column sums to zero.", code="REGULATION_PWM_INVALID")
     mtype = opt_str(options, "matrix_type", "auto", ("auto", "counts", "probabilities"))
@@ -229,19 +278,37 @@ def parse_motifs(options: Mapping[str, object], key: str = "motifs") -> list[Pwm
 
     raw = options.get(key, options.get("motif"))
     if raw is None:
-        raise ConfigurationError(f"This operation needs options['{key}'] (a PWM).", code="REGULATION_OPTION_INVALID",
-                                 hint="Pass counts/probabilities as {'A': [...], 'C': [...], 'G': [...], 'T': [...]}.")
+        raise ConfigurationError(
+            f"This operation needs options['{key}'] (a PWM).",
+            code="REGULATION_OPTION_INVALID",
+            hint="Pass counts/probabilities as {'A': [...], 'C': [...], 'G': [...], 'T': [...]}.",
+        )
     named: list[tuple[str, object]]
-    single = isinstance(raw, Mapping) and (all(b in raw for b in BASES) or any(k in raw for k in ("matrix", "pwm", "ppm", "pfm", "counts", "probabilities")))
+    single = isinstance(raw, Mapping) and (
+        all(b in raw for b in BASES)
+        or any(k in raw for k in ("matrix", "pwm", "ppm", "pfm", "counts", "probabilities"))
+    )
     if single or isinstance(raw, (str, bytes, Path)):
         named = [(str(raw.get("name", "motif1")) if isinstance(raw, Mapping) else "motif1", raw)]
     elif isinstance(raw, Mapping):
         named = [(str(k), v) for k, v in raw.items()]
-    elif isinstance(raw, Sequence) and raw and all(isinstance(r, Sequence) and not isinstance(r, str) and len(r) == 4
-                                                   and all(isinstance(x, (int, float)) for x in r) for r in raw):
+    elif (
+        isinstance(raw, Sequence)
+        and raw
+        and all(
+            isinstance(r, Sequence)
+            and not isinstance(r, str)
+            and len(r) == 4
+            and all(isinstance(x, (int, float)) for x in r)
+            for r in raw
+        )
+    ):
         named = [("motif1", raw)]
     elif isinstance(raw, Sequence):
-        named = [(str(v.get("name", f"motif{i + 1}")) if isinstance(v, Mapping) else f"motif{i + 1}", v) for i, v in enumerate(raw)]
+        named = [
+            (str(v.get("name", f"motif{i + 1}")) if isinstance(v, Mapping) else f"motif{i + 1}", v)
+            for i, v in enumerate(raw)
+        ]
     else:
         raise InputFormatError("Unsupported motif input.", code="REGULATION_PWM_INVALID")
     if not named or len(named) > 500:
@@ -252,7 +319,10 @@ def parse_motifs(options: Mapping[str, object], key: str = "motifs") -> list[Pwm
 def information_content(pwm: Pwm) -> dict[str, object]:
     """Per-column information content sum_b p_b log2(p_b / bg_b) in bits (2 - entropy for a uniform background)."""
 
-    columns = [sum(p[b] * math.log2(p[b] / pwm.background[b]) for b in range(4) if p[b] > 0) for p in pwm.probs]
+    columns = [
+        sum(p[b] * math.log2(p[b] / pwm.background[b]) for b in range(4) if p[b] > 0)
+        for p in pwm.probs
+    ]
     return {"per_position": columns, "total_bits": sum(columns)}
 
 
@@ -279,7 +349,9 @@ def relative(score: float, pwm: Pwm) -> float:
     return (score - pwm.min_score) / span if span > 0 else 1.0
 
 
-def scan(seq: str, pwm: Pwm, threshold: float | None, min_relative: float | None, strand: str = "both") -> list[dict[str, object]]:
+def scan(
+    seq: str, pwm: Pwm, threshold: float | None, min_relative: float | None, strand: str = "both"
+) -> list[dict[str, object]]:
     """All windows with score >= threshold (absolute log2-odds) or relative score >= min_relative."""
 
     hits = []
@@ -289,11 +361,24 @@ def scan(seq: str, pwm: Pwm, threshold: float | None, min_relative: float | None
                 continue
             if not math.isfinite(score):
                 continue
-            ok = score >= threshold if threshold is not None else relative(score, pwm) >= (min_relative or 0.0)
+            ok = (
+                score >= threshold
+                if threshold is not None
+                else relative(score, pwm) >= (min_relative or 0.0)
+            )
             if ok:
-                hits.append({"start": s, "end": s + pwm.length, "strand": st, "score": score,
-                             "relative_score": relative(score, pwm),
-                             "matched": seq[s : s + pwm.length] if st == "+" else revcomp(seq[s : s + pwm.length])})
+                hits.append(
+                    {
+                        "start": s,
+                        "end": s + pwm.length,
+                        "strand": st,
+                        "score": score,
+                        "relative_score": relative(score, pwm),
+                        "matched": seq[s : s + pwm.length]
+                        if st == "+"
+                        else revcomp(seq[s : s + pwm.length]),
+                    }
+                )
     hits.sort(key=lambda h: (h["start"], h["strand"]))  # type: ignore[arg-type,return-value]
     return hits
 
@@ -302,7 +387,11 @@ def best_hit(seq: str, pwm: Pwm, strand: str = "both") -> dict[str, object] | No
     best = None
     for s, (fwd, rev) in enumerate(window_scores(seq, pwm)):
         for st, score in (("+", fwd), ("-", rev)):
-            if (strand == "forward" and st == "-") or (strand == "reverse" and st == "+") or not math.isfinite(score):
+            if (
+                (strand == "forward" and st == "-")
+                or (strand == "reverse" and st == "+")
+                or not math.isfinite(score)
+            ):
                 continue
             if best is None or score > best["score"]:  # type: ignore[operator]
                 best = {"start": s, "end": s + pwm.length, "strand": st, "score": score}
@@ -334,20 +423,36 @@ def compare_pwms(a: Pwm, b: Pwm, min_overlap: int) -> dict[str, object]:
         mp, mq = sum(p) / 4, sum(q) / 4
         sp = sum((x - mp) ** 2 for x in p)
         sq = sum((x - mq) ** 2 for x in q)
-        return sum((x - mp) * (y - mq) for x, y in zip(p, q)) / math.sqrt(sp * sq) if sp > 0 and sq > 0 else 0.0
+        return (
+            sum((x - mp) * (y - mq) for x, y in zip(p, q, strict=False)) / math.sqrt(sp * sq)
+            if sp > 0 and sq > 0
+            else 0.0
+        )
 
     best: dict[str, object] | None = None
-    rc_probs = [list(reversed(p)) for p in reversed(b.probs)]  # reverse complement: reverse rows and A<->T, C<->G
+    rc_probs = [
+        list(reversed(p)) for p in reversed(b.probs)
+    ]  # reverse complement: reverse rows and A<->T, C<->G
     for orientation, probs in (("forward", b.probs), ("reverse_complement", rc_probs)):
         for offset in range(-(len(probs) - min_overlap), a.length - min_overlap + 1):
-            pairs = [(a.probs[i], probs[i - offset]) for i in range(max(0, offset), min(a.length, offset + len(probs)))]
+            pairs = [
+                (a.probs[i], probs[i - offset])
+                for i in range(max(0, offset), min(a.length, offset + len(probs)))
+            ]
             if len(pairs) < min_overlap:
                 continue
             score = sum(corr(p, q) for p, q in pairs) / len(pairs)
             if best is None or score > best["similarity"] + 1e-12:  # type: ignore[operator]
-                best = {"similarity": score, "offset": offset, "orientation": orientation, "overlap": len(pairs)}
+                best = {
+                    "similarity": score,
+                    "offset": offset,
+                    "orientation": orientation,
+                    "overlap": len(pairs),
+                }
     if best is None:
-        raise ConfigurationError("The motifs are shorter than min_overlap.", code="REGULATION_OPTION_INVALID")
+        raise ConfigurationError(
+            "The motifs are shorter than min_overlap.", code="REGULATION_OPTION_INVALID"
+        )
     return best
 
 
@@ -365,9 +470,14 @@ def hypergeom_sf(k: int, population: int, successes: int, draws: int) -> float:
     if k > high:
         return 0.0
     if high - k > 5_000_000:
-        raise ConfigurationError("Counts are too large for the exact test.", code="REGULATION_COUNTS_TOO_LARGE")
+        raise ConfigurationError(
+            "Counts are too large for the exact test.", code="REGULATION_COUNTS_TOO_LARGE"
+        )
     denom = _log_choose(population, draws)
-    terms = [_log_choose(successes, x) + _log_choose(population - successes, draws - x) - denom for x in range(k, high + 1)]
+    terms = [
+        _log_choose(successes, x) + _log_choose(population - successes, draws - x) - denom
+        for x in range(k, high + 1)
+    ]
     top = max(terms)
     return min(1.0, math.exp(top) * sum(math.exp(t - top) for t in terms))
 
@@ -384,7 +494,9 @@ def binom_sf(k: int, n: int, p: float) -> float:
     if p >= 1:
         return 1.0
     if n - k > 5_000_000:
-        raise ConfigurationError("Counts are too large for the exact test.", code="REGULATION_COUNTS_TOO_LARGE")
+        raise ConfigurationError(
+            "Counts are too large for the exact test.", code="REGULATION_COUNTS_TOO_LARGE"
+        )
     logp, logq = math.log(p), math.log1p(-p)
     terms = [_log_choose(n, x) + x * logp + (n - x) * logq for x in range(k, n + 1)]
     top = max(terms)
@@ -415,43 +527,75 @@ def parse_variants(value: object) -> list[dict[str, object]]:
 
     if isinstance(value, Mapping) and ("ref_sequence" in value or "sequence" in value):
         value = [value]
-    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value or len(value) > 10_000:
+    if (
+        not isinstance(value, Sequence)
+        or isinstance(value, (str, bytes))
+        or not value
+        or len(value) > 10_000
+    ):
         raise InputFormatError("Provide 1-10000 variant records.", code="REGULATION_INPUT_INVALID")
     out = []
     for i, v in enumerate(value):
         if not isinstance(v, Mapping):
-            raise InputFormatError("Each variant must be a mapping.", code="REGULATION_INPUT_INVALID")
+            raise InputFormatError(
+                "Each variant must be a mapping.", code="REGULATION_INPUT_INVALID"
+            )
         vid = str(v.get("id", f"variant{i + 1}"))
         if "ref_sequence" in v and "alt_sequence" in v:
-            ref, alt = clean_dna(v["ref_sequence"], f"variant {vid!r} ref_sequence"), clean_dna(v["alt_sequence"], f"variant {vid!r} alt_sequence")
+            ref, alt = (
+                clean_dna(v["ref_sequence"], f"variant {vid!r} ref_sequence"),
+                clean_dna(v["alt_sequence"], f"variant {vid!r} alt_sequence"),
+            )
         elif {"sequence", "position", "ref", "alt"} <= set(v):
             seq = clean_dna(v["sequence"], f"variant {vid!r} sequence")
             pos, r, a = v["position"], clean_dna(v["ref"], "ref"), clean_dna(v["alt"], "alt")
-            if isinstance(pos, bool) or not isinstance(pos, int) or pos < 0 or seq[pos : pos + len(r)] != r:
-                raise InputFormatError(f"Variant {vid!r}: the reference allele does not match the sequence at position {pos}.",
-                                       code="REGULATION_VARIANT_INVALID")
+            if (
+                isinstance(pos, bool)
+                or not isinstance(pos, int)
+                or pos < 0
+                or seq[pos : pos + len(r)] != r
+            ):
+                raise InputFormatError(
+                    f"Variant {vid!r}: the reference allele does not match the sequence at position {pos}.",
+                    code="REGULATION_VARIANT_INVALID",
+                )
             ref, alt = seq, seq[:pos] + a + seq[pos + len(r) :]
         else:
-            raise InputFormatError(f"Variant {vid!r} needs ref_sequence+alt_sequence or sequence+position+ref+alt.",
-                                   code="REGULATION_INPUT_INVALID")
+            raise InputFormatError(
+                f"Variant {vid!r} needs ref_sequence+alt_sequence or sequence+position+ref+alt.",
+                code="REGULATION_INPUT_INVALID",
+            )
         out.append({"id": vid, "ref_sequence": ref, "alt_sequence": alt})
     return out
 
 
-def variant_effects(variants: Sequence[Mapping[str, object]], pwms: Sequence[Pwm]) -> list[dict[str, object]]:
+def variant_effects(
+    variants: Sequence[Mapping[str, object]], pwms: Sequence[Pwm]
+) -> list[dict[str, object]]:
     rows = []
     for v in variants:
         per_motif = []
         for pwm in pwms:
-            ref_hit, alt_hit = best_hit(str(v["ref_sequence"]), pwm), best_hit(str(v["alt_sequence"]), pwm)
+            ref_hit, alt_hit = (
+                best_hit(str(v["ref_sequence"]), pwm),
+                best_hit(str(v["alt_sequence"]), pwm),
+            )
             if ref_hit is None and alt_hit is None:
                 continue
             ref_s = float(ref_hit["score"]) if ref_hit else None  # type: ignore[arg-type]
             alt_s = float(alt_hit["score"]) if alt_hit else None  # type: ignore[arg-type]
-            per_motif.append({"motif": pwm.name, "ref_score": ref_s, "alt_score": alt_s,
-                              "delta": alt_s - ref_s if ref_s is not None and alt_s is not None else None})
+            per_motif.append(
+                {
+                    "motif": pwm.name,
+                    "ref_score": ref_s,
+                    "alt_score": alt_s,
+                    "delta": alt_s - ref_s if ref_s is not None and alt_s is not None else None,
+                }
+            )
         deltas = [abs(m["delta"]) for m in per_motif if m["delta"] is not None]  # type: ignore[arg-type]
-        rows.append({"id": v["id"], "motifs": per_motif, "max_abs_delta": max(deltas) if deltas else None})
+        rows.append(
+            {"id": v["id"], "motifs": per_motif, "max_abs_delta": max(deltas) if deltas else None}
+        )
     return rows
 
 
@@ -468,7 +612,11 @@ def ism_matrix(seq: str, pwm: Pwm) -> list[dict[str, object]]:
     out = []
     for i, ref_base in enumerate(seq):
         lo, hi = max(0, i - w + 1), min(i, n - w)  # window starts covering position i
-        outside = max([base[s] for s in range(0, lo)] + [base[s] for s in range(hi + 1, len(base))] + [-math.inf])
+        outside = max(
+            [base[s] for s in range(0, lo)]
+            + [base[s] for s in range(hi + 1, len(base))]
+            + [-math.inf]
+        )
         effects: dict[str, float | None] = {}
         for b in BASES:
             if b == ref_base:

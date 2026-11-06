@@ -72,7 +72,9 @@ def betainc(a: float, b: float, x: float) -> float:
         return 0.0
     if x >= 1.0:
         return 1.0
-    front = math.exp(math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log1p(-x))
+    front = math.exp(
+        math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log1p(-x)
+    )
     if x < (a + 1.0) / (a + b + 2.0):
         return front * _betacf(a, b, x) / a
     return 1.0 - front * _betacf(b, a, 1.0 - x) / b
@@ -86,7 +88,9 @@ def t_two_sided_p(t: float, df: float) -> float:
     return betainc(df / 2.0, 0.5, df / (df + t * t))
 
 
-def welch_t_test(x: Sequence[float], y: Sequence[float]) -> tuple[float | None, float | None, float]:
+def welch_t_test(
+    x: Sequence[float], y: Sequence[float]
+) -> tuple[float | None, float | None, float]:
     """Welch's unequal-variance t-test: returns ``(t, df, two-sided p)``.
 
     Zero variance in both groups gives ``p = 1`` when the means are equal and ``p = 0`` (t = +-inf)
@@ -182,7 +186,12 @@ def fisher_exact_two_sided(a: int, b: int, c: int, d: int) -> float:
     high = min(row1, col1)
     observed = probability(a)
     tolerance = 1.0 + 1e-7
-    return min(1.0, math.fsum(p for p in (probability(k) for k in range(low, high + 1)) if p <= observed * tolerance))
+    return min(
+        1.0,
+        math.fsum(
+            p for p in (probability(k) for k in range(low, high + 1)) if p <= observed * tolerance
+        ),
+    )
 
 
 def pearson(x: Sequence[float], y: Sequence[float]) -> float | None:
@@ -191,7 +200,7 @@ def pearson(x: Sequence[float], y: Sequence[float]) -> float | None:
     syy = math.fsum((b - my) ** 2 for b in y)
     if sxx == 0.0 or syy == 0.0:
         return None
-    sxy = math.fsum((a - mx) * (b - my) for a, b in zip(x, y))
+    sxy = math.fsum((a - mx) * (b - my) for a, b in zip(x, y, strict=False))
     return sxy / math.sqrt(sxx * syy)
 
 

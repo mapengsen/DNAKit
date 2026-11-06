@@ -46,7 +46,9 @@ def _parse_summary(path: Path) -> dict[str, Any]:
     score = _SCORE.search(text)
     if score:
         groups = score.groupdict()
-        result["scores_percent"] = {key: float(value) for key, value in groups.items() if key != "n"}
+        result["scores_percent"] = {
+            key: float(value) for key, value in groups.items() if key != "n"
+        }
         result["marker_count"] = int(groups["n"])
     counts: dict[str, int] = {}
     statistics: dict[str, Any] = {}
@@ -61,7 +63,11 @@ def _parse_summary(path: Path) -> dict[str, Any]:
             continue
         key = match.group("key").strip()
         value = match.group("value")
-        number: Any = float(value[:-1]) if value.endswith("%") else (float(value) if "." in value else int(value))
+        number: Any = (
+            float(value[:-1])
+            if value.endswith("%")
+            else (float(value) if "." in value else int(value))
+        )
         if in_stats:
             statistics[re.sub(r"[^a-z0-9]+", "_", key.lower()).strip("_")] = number
         elif re.match(r"^Complete|^Fragmented|^Missing|^Total BUSCO", key):
@@ -114,33 +120,68 @@ def busco_assess_completeness(
     name = _cli.text(output_name, "output_name")
     if "/" in name:
         raise ConfigurationError("output_name must be a simple name.")
-    arguments = ["-i", str(source), "-m", chosen_mode, "-o", name, "--out_path", str(out), "-c", str(_cli.threads_value(cpus)), "--quiet"]
+    arguments = [
+        "-i",
+        str(source),
+        "-m",
+        chosen_mode,
+        "-o",
+        name,
+        "--out_path",
+        str(out),
+        "-c",
+        str(_cli.threads_value(cpus)),
+        "--quiet",
+    ]
     if auto_lineage is not None:
-        arguments.append({"all": "--auto-lineage", "prok": "--auto-lineage-prok", "euk": "--auto-lineage-euk"}[_cli.choice(auto_lineage, ("all", "prok", "euk"), "auto_lineage")])
+        arguments.append(
+            {"all": "--auto-lineage", "prok": "--auto-lineage-prok", "euk": "--auto-lineage-euk"}[
+                _cli.choice(auto_lineage, ("all", "prok", "euk"), "auto_lineage")
+            ]
+        )
     else:
         lineage_value = _cli.text(lineage, "lineage")
         arguments += ["-l", lineage_value]
     if gene_predictor is not None:
         predictor = _cli.choice(gene_predictor, _PREDICTORS, "gene_predictor")
         if chosen_mode != "genome" and predictor != "metaeuk":
-            raise ConfigurationError("gene_predictor applies to mode='genome' (MetaEuk is also used for eukaryotic transcriptomes).")
+            raise ConfigurationError(
+                "gene_predictor applies to mode='genome' (MetaEuk is also used for eukaryotic transcriptomes)."
+            )
         if predictor != "prodigal":
             arguments.append(f"--{predictor}")
     if augustus_species is not None:
         if gene_predictor != "augustus":
             raise ConfigurationError("augustus_species needs gene_predictor='augustus'.")
         arguments += ["--augustus_species", _cli.text(augustus_species, "augustus_species")]
-    arguments += ["--evalue", format(_cli.number(evalue, "evalue", minimum=0.0), ".12g"), "--limit", str(_cli.integer(limit, "limit", minimum=1, maximum=20))]
+    arguments += [
+        "--evalue",
+        format(_cli.number(evalue, "evalue", minimum=0.0), ".12g"),
+        "--limit",
+        str(_cli.integer(limit, "limit", minimum=1, maximum=20)),
+    ]
     arguments += ["--contig_break", str(_cli.integer(contig_break, "contig_break", minimum=1))]
     if download_path is not None:
-        arguments += ["--download_path", str(_cli.existing_directory(download_path, "download_path"))]
+        arguments += [
+            "--download_path",
+            str(_cli.existing_directory(download_path, "download_path")),
+        ]
     for enabled, option in (
-        (offline, "--offline"), (long_mode, "--long"), (scaffold_composition, "--scaffold_composition"),
+        (offline, "--offline"),
+        (long_mode, "--long"),
+        (scaffold_composition, "--scaffold_composition"),
         (skip_assembly_statistics, "--skip_bbtools"),
     ):
         if _cli.flag(enabled, option):
             arguments.append(option)
-    record = _cli.invoke(_TOOL, arguments, cwd=out, expected=[out / name], explicit=busco_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _TOOL,
+        arguments,
+        cwd=out,
+        expected=[out / name],
+        explicit=busco_path,
+        timeout_seconds=timeout_seconds,
+    )
     run = out / name
     summaries = sorted(run.glob("short_summary*.txt"))
     tables = sorted(run.rglob("full_table.tsv"))
@@ -148,15 +189,35 @@ def busco_assess_completeness(
     summary = _parse_summary(summaries[0]) if summaries else {}
     table_rows: list[dict[str, Any]] = []
     if tables:
-        lines = [line for line in tables[0].read_text(encoding="utf-8", errors="replace").splitlines() if line and not line.startswith("# Busco id")]
-        header = next((line for line in tables[0].read_text(encoding="utf-8", errors="replace").splitlines() if line.startswith("# Busco id")), None)
+        lines = [
+            line
+            for line in tables[0].read_text(encoding="utf-8", errors="replace").splitlines()
+            if line and not line.startswith("# Busco id")
+        ]
+        header = next(
+            (
+                line
+                for line in tables[0].read_text(encoding="utf-8", errors="replace").splitlines()
+                if line.startswith("# Busco id")
+            ),
+            None,
+        )
         names = header.lstrip("# ").split("\t") if header else None
-        table_rows = _cli.read_table(tables[0], header=False, names=names, limit=20000) if names else []
-        table_rows = [row for row in table_rows if not str(next(iter(row.values()), "")).startswith("#")]
+        table_rows = (
+            _cli.read_table(tables[0], header=False, names=names, limit=20000) if names else []
+        )
+        table_rows = [
+            row for row in table_rows if not str(next(iter(row.values()), "")).startswith("#")
+        ]
         del lines
     return _cli.finish(
-        record, "busco_completeness", run_directory=str(run), summary_file=str(summaries[0]) if summaries else None,
-        full_table=table_rows, scaffold_composition=_cli.read_table(composition[0], limit=20000) if composition else [], **summary,
+        record,
+        "busco_completeness",
+        run_directory=str(run),
+        summary_file=str(summaries[0]) if summaries else None,
+        full_table=table_rows,
+        scaffold_composition=_cli.read_table(composition[0], limit=20000) if composition else [],
+        **summary,
     )
 
 

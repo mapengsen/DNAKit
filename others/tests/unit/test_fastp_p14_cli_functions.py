@@ -37,22 +37,49 @@ def pairs(tmp_path):
 
 def test_validation_and_missing_program(pairs):
     with pytest.raises(BackendUnavailableError):
-        fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), fastp_path=str(pairs / "nofastp"))
+        fp.fastp_process_reads(
+            str(pairs / "r1.fq"),
+            str(pairs / "o1.fq"),
+            str(pairs / "r.json"),
+            fastp_path=str(pairs / "nofastp"),
+        )
     with pytest.raises(ConfigurationError):
-        fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), read2=str(pairs / "r2.fq"))
+        fp.fastp_process_reads(
+            str(pairs / "r1.fq"),
+            str(pairs / "o1.fq"),
+            str(pairs / "r.json"),
+            read2=str(pairs / "r2.fq"),
+        )
     with pytest.raises(ConfigurationError):
-        fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), correction=True)
+        fp.fastp_process_reads(
+            str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), correction=True
+        )
     with pytest.raises(ConfigurationError):
-        fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), umi=True, umi_location="read1")
+        fp.fastp_process_reads(
+            str(pairs / "r1.fq"),
+            str(pairs / "o1.fq"),
+            str(pairs / "r.json"),
+            umi=True,
+            umi_location="read1",
+        )
     with pytest.raises(ConfigurationError):
-        fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), umi_length=4)
+        fp.fastp_process_reads(
+            str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), umi_length=4
+        )
 
 
 @needs_fastp
 def test_adapter_fasta_trimming_and_reports(pairs):
     result = fp.fastp_process_reads(
-        str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), read2=str(pairs / "r2.fq"), output_read2=str(pairs / "o2.fq"),
-        html_report=str(pairs / "r.html"), adapter_fasta=str(pairs / "adapters.fa"), threads=2, verbose=False,
+        str(pairs / "r1.fq"),
+        str(pairs / "o1.fq"),
+        str(pairs / "r.json"),
+        read2=str(pairs / "r2.fq"),
+        output_read2=str(pairs / "o2.fq"),
+        html_report=str(pairs / "r.html"),
+        adapter_fasta=str(pairs / "adapters.fa"),
+        threads=2,
+        verbose=False,
     )
     assert result["status"] == "completed" and result["version"]
     assert result["summary"]["adapter_cutting"]["adapter_trimmed_reads"] >= 150
@@ -65,7 +92,15 @@ def test_low_complexity_filter_removes_homopolymers(pairs):
     low = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     with (pairs / "r1.fq").open("a") as handle:
         handle.write(f"@low\n{low}\n+\n{'I' * len(low)}\n")
-    result = fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), low_complexity_filter=True, complexity_threshold=30, trim_poly_x=False, verbose=False)
+    result = fp.fastp_process_reads(
+        str(pairs / "r1.fq"),
+        str(pairs / "o1.fq"),
+        str(pairs / "r.json"),
+        low_complexity_filter=True,
+        complexity_threshold=30,
+        trim_poly_x=False,
+        verbose=False,
+    )
     assert result["summary"]["filtering_result"]["low_complexity_reads"] == 1
     assert "@low" not in (pairs / "o1.fq").read_text()
 
@@ -74,8 +109,17 @@ def test_low_complexity_filter_removes_homopolymers(pairs):
 def test_correction_umi_overrepresentation_and_index_filter(pairs):
     (pairs / "index.txt").write_text("ACGTAC\n")
     result = fp.fastp_process_reads(
-        str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), read2=str(pairs / "r2.fq"), output_read2=str(pairs / "o2.fq"),
-        correction=True, umi=True, umi_location="read1", umi_length=4, umi_prefix="UMI", overrepresentation_analysis=True,
+        str(pairs / "r1.fq"),
+        str(pairs / "o1.fq"),
+        str(pairs / "r.json"),
+        read2=str(pairs / "r2.fq"),
+        output_read2=str(pairs / "o2.fq"),
+        correction=True,
+        umi=True,
+        umi_location="read1",
+        umi_length=4,
+        umi_prefix="UMI",
+        overrepresentation_analysis=True,
         verbose=False,
     )
     assert result["status"] == "completed"
@@ -88,5 +132,12 @@ def test_correction_umi_overrepresentation_and_index_filter(pairs):
 @needs_fastp
 def test_index_barcode_filter_runs(pairs):
     (pairs / "index.txt").write_text("ACGTAC\n")
-    result = fp.fastp_process_reads(str(pairs / "r1.fq"), str(pairs / "o1.fq"), str(pairs / "r.json"), filter_by_index1=str(pairs / "index.txt"), index_filter_threshold=1, verbose=False)
+    result = fp.fastp_process_reads(
+        str(pairs / "r1.fq"),
+        str(pairs / "o1.fq"),
+        str(pairs / "r.json"),
+        filter_by_index1=str(pairs / "index.txt"),
+        index_filter_threshold=1,
+        verbose=False,
+    )
     assert result["status"] == "completed" and "--filter_by_index1" in result["command"]

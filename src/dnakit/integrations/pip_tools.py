@@ -312,13 +312,21 @@ def align_biotite(
                     "score": int(alignment.score),
                     "identity": (
                         float(align.get_sequence_identity(alignment, mode="all"))
-                        if rendered[0] else None
+                        if rendered[0]
+                        else None
                     ),
                     "cigar": (
-                        str(align.write_alignment_to_cigar(
-                            alignment, reference_index=1, segment_index=0,
-                            distinguish_matches=True, include_terminal_gaps=True,
-                        )) if rendered[0] else None
+                        str(
+                            align.write_alignment_to_cigar(
+                                alignment,
+                                reference_index=1,
+                                segment_index=0,
+                                distinguish_matches=True,
+                                include_terminal_gaps=True,
+                            )
+                        )
+                        if rendered[0]
+                        else None
                     ),
                     "spans": spans,
                 }
@@ -433,9 +441,7 @@ def diff_geneblocks_sequences(
     reference_text = sequence_text(
         _bounded_string(reference, "reference", maximum=max_sequence_length)
     )
-    target_text = sequence_text(
-        _bounded_string(target, "target", maximum=max_sequence_length)
-    )
+    target_text = sequence_text(_bounded_string(target, "target", maximum=max_sequence_length))
     block_limit = _bounded_limit(max_blocks, "max_blocks", maximum=100_000)
     complexity_limit = _bounded_limit(
         max_complexity,
@@ -627,8 +633,10 @@ def _pyranges_rows(value: object) -> list[dict[str, Any]]:
         if (
             not isinstance(row.get("Chromosome"), str)
             or not row["Chromosome"]
-            or isinstance(start, bool) or not isinstance(start, int)
-            or isinstance(end, bool) or not isinstance(end, int)
+            or isinstance(start, bool)
+            or not isinstance(start, int)
+            or isinstance(end, bool)
+            or not isinstance(end, int)
             or not 0 <= start < end
         ):
             raise ConfigurationError("BED rows require Chromosome and 0 <= Start < End integers.")
@@ -847,7 +855,11 @@ def summarize_dnaio_fastx(
 
     path = input_path(source)
     record_limit = _bounded_limit(max_records, "max_records")
-    if isinstance(max_bases, bool) or not isinstance(max_bases, int) or not 1 <= max_bases <= 1_000_000_000:
+    if (
+        isinstance(max_bases, bool)
+        or not isinstance(max_bases, int)
+        or not 1 <= max_bases <= 1_000_000_000
+    ):
         raise ConfigurationError("max_bases must be an integer in [1, 1000000000].")
     preview_limit = _bounded_limit(preview_records, "preview_records", maximum=1_000)
     dnaio = require("dnaio", "bio-dnaio")
@@ -874,7 +886,11 @@ def summarize_dnaio_fastx(
             sequence = getattr(record, "sequence", None)
             name = getattr(record, "name", None)
             qualities = getattr(record, "qualities", None)
-            if sequence is None and isinstance(record, Sequence) and not isinstance(record, (str, bytes)):
+            if (
+                sequence is None
+                and isinstance(record, Sequence)
+                and not isinstance(record, (str, bytes))
+            ):
                 if len(record) < 2:
                     raise ConfigurationError("dnaio returned a record without a sequence.")
                 name, sequence = record[0], record[1]
@@ -896,7 +912,12 @@ def summarize_dnaio_fastx(
             if qualities is not None:
                 fastq_records += 1
             if len(preview) < preview_limit:
-                preview.append({"name": _bounded_string(str(name or ""), "record name", maximum=512), "length": length})
+                preview.append(
+                    {
+                        "name": _bounded_string(str(name or ""), "record name", maximum=512),
+                        "length": length,
+                    }
+                )
             records += 1
     except ConfigurationError:
         raise
@@ -1051,9 +1072,7 @@ def summarize_pybigwig_region(
     if isinstance(end, bool) or not isinstance(end, int) or end <= start:
         raise ConfigurationError("end must be an integer greater than start.")
     if not isinstance(statistic, str) or statistic not in _PYBIGWIG_STATISTICS:
-        raise ConfigurationError(
-            f"statistic must be one of {sorted(_PYBIGWIG_STATISTICS)}."
-        )
+        raise ConfigurationError(f"statistic must be one of {sorted(_PYBIGWIG_STATISTICS)}.")
     bin_count = _bounded_limit(bins, "bins", maximum=10_000)
     pybigwig = require("pyBigWig", "bio-pybigwig")
     try:
@@ -1208,9 +1227,7 @@ def _gffutils_feature_summary(feature: Any) -> dict[str, Any]:
     if isinstance(attributes, Mapping):
         fields["attributes"] = {
             str(key): (
-                list(value)
-                if isinstance(value, Sequence) and not isinstance(value, str)
-                else value
+                list(value) if isinstance(value, Sequence) and not isinstance(value, str) else value
             )
             for key, value in attributes.items()
         }
@@ -1415,9 +1432,7 @@ def summarize_scadnano_design(
     design_class = getattr(scadnano, "Design", None)
     loader = getattr(design_class, "from_scadnano_file", None)
     if not callable(loader):
-        raise ConfigurationError(
-            "The installed scadnano package lacks Design.from_scadnano_file."
-        )
+        raise ConfigurationError("The installed scadnano package lacks Design.from_scadnano_file.")
     try:
         design = loader(str(path))
         strands = list(getattr(design, "strands", ()))
@@ -1668,10 +1683,7 @@ def summarize_gtars_regions(
         reduce = getattr(region_set, "reduce", None)
         if callable(reduce):
             reduced = reduce()
-            covered_bases = sum(
-                int(region.end) - int(region.start)
-                for region in reduced
-            )
+            covered_bases = sum(int(region.end) - int(region.start) for region in reduced)
     except ConfigurationError:
         raise
     except (OSError, RuntimeError, TypeError, ValueError) as exc:
@@ -1691,8 +1703,7 @@ def summarize_gtars_regions(
                 "package": "gtars",
                 "license": "BSD-2-Clause",
                 "citation": (
-                    "gtars documentation and databio contributors; "
-                    "no DOI supplied by the survey"
+                    "gtars documentation and databio contributors; no DOI supplied by the survey"
                 ),
                 "coordinate_system": "BED-style zero-based, half-open intervals",
                 "backend_scope": "read-only local RegionSet inventory",
@@ -1776,9 +1787,7 @@ def simulate_dnacauldron_assembly(
         warnings = [
             str(getattr(item, "message", item)) for item in getattr(simulation, "warnings", ())
         ]
-        errors = [
-            str(getattr(item, "message", item)) for item in getattr(simulation, "errors", ())
-        ]
+        errors = [str(getattr(item, "message", item)) for item in getattr(simulation, "errors", ())]
     except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
         raise ConfigurationError(f"DNA Cauldron assembly simulation failed: {exc}") from exc
     return serialize_for_agent(

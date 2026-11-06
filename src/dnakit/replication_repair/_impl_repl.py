@@ -23,32 +23,51 @@ _SEQ_LINE = re.compile(r"^[A-Za-z*.\-]*$")
 _COMP = str.maketrans("ACGTacgt", "TGCAtgca")
 
 
-def run_op(operation: str, fn: Any, value: object, options: Mapping[str, object] | None) -> dict[str, object]:
+def run_op(
+    operation: str, fn: Any, value: object, options: Mapping[str, object] | None
+) -> dict[str, object]:
     if options is not None and not isinstance(options, Mapping):
-        raise ConfigurationError("options must be a mapping or None.", code="INVALID_OPTION", hint="Pass options={'key': value}.")
+        raise ConfigurationError(
+            "options must be a mapping or None.",
+            code="INVALID_OPTION",
+            hint="Pass options={'key': value}.",
+        )
     opts = dict(options or {})
     warnings: list[str] = []
     result = fn(value, opts, warnings)
-    return candidate_ok("replication_repair", operation, value, result, options=opts, warnings=warnings)
+    return candidate_ok(
+        "replication_repair", operation, value, result, options=opts, warnings=warnings
+    )
 
 
 # --------------------------------------------------------------------------- option / input helpers
 
 
-def opt_int(options: Mapping[str, object], key: str, default: int, *, minimum: int, maximum: int) -> int:
+def opt_int(
+    options: Mapping[str, object], key: str, default: int, *, minimum: int, maximum: int
+) -> int:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int) or not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"option {key!r} must be an integer in [{minimum}, {maximum}]; got {value!r}.", code="INVALID_OPTION"
+            f"option {key!r} must be an integer in [{minimum}, {maximum}]; got {value!r}.",
+            code="INVALID_OPTION",
         )
     return value
 
 
-def opt_num(options: Mapping[str, object], key: str, default: float, *, minimum: float, maximum: float) -> float:
+def opt_num(
+    options: Mapping[str, object], key: str, default: float, *, minimum: float, maximum: float
+) -> float:
     value = options.get(key, default)
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not minimum <= value <= maximum:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or not minimum <= value <= maximum
+    ):
         raise ConfigurationError(
-            f"option {key!r} must be a number in [{minimum}, {maximum}]; got {value!r}.", code="INVALID_OPTION"
+            f"option {key!r} must be a number in [{minimum}, {maximum}]; got {value!r}.",
+            code="INVALID_OPTION",
         )
     return float(value)
 
@@ -56,14 +75,21 @@ def opt_num(options: Mapping[str, object], key: str, default: float, *, minimum:
 def opt_bool(options: Mapping[str, object], key: str, default: bool) -> bool:
     value = options.get(key, default)
     if not isinstance(value, bool):
-        raise ConfigurationError(f"option {key!r} must be a boolean; got {value!r}.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            f"option {key!r} must be a boolean; got {value!r}.", code="INVALID_OPTION"
+        )
     return value
 
 
-def opt_choice(options: Mapping[str, object], key: str, default: str, allowed: Sequence[str]) -> str:
+def opt_choice(
+    options: Mapping[str, object], key: str, default: str, allowed: Sequence[str]
+) -> str:
     value = options.get(key, default)
     if not isinstance(value, str) or value not in allowed:
-        raise ConfigurationError(f"option {key!r} must be one of {', '.join(allowed)}; got {value!r}.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            f"option {key!r} must be one of {', '.join(allowed)}; got {value!r}.",
+            code="INVALID_OPTION",
+        )
     return value
 
 
@@ -95,16 +121,26 @@ def dna_text(value: object, name: str = "sequence") -> str:
         body = []
         for line in lines[1:]:
             if line.startswith(">"):
-                raise InputFormatError(f"{name}: multi-record FASTA is not supported here.", code="INVALID_INPUT", hint="Pass one record at a time.")
+                raise InputFormatError(
+                    f"{name}: multi-record FASTA is not supported here.",
+                    code="INVALID_INPUT",
+                    hint="Pass one record at a time.",
+                )
             body.append(line)
         lines = body
     seq = "".join(lines).upper().replace("U", "T")
     if not seq:
-        raise InputFormatError(f"{name} is empty.", code="EMPTY_INPUT", hint="Provide a DNA sequence.")
+        raise InputFormatError(
+            f"{name} is empty.", code="EMPTY_INPUT", hint="Provide a DNA sequence."
+        )
     if not re.fullmatch(r"[ACGTNRYKMSWBDHV]+", seq):
-        raise InputFormatError(f"{name} contains characters that are not IUPAC DNA letters.", code="INVALID_SEQUENCE")
+        raise InputFormatError(
+            f"{name} contains characters that are not IUPAC DNA letters.", code="INVALID_SEQUENCE"
+        )
     if len(seq) > MAX_SEQUENCE:
-        raise InputFormatError(f"{name} is longer than {MAX_SEQUENCE} bases.", code="INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"{name} is longer than {MAX_SEQUENCE} bases.", code="INPUT_TOO_LARGE"
+        )
     return seq
 
 
@@ -121,12 +157,18 @@ def write_svg(options: Mapping[str, object], svg: str) -> str | None:
     if target is None:
         return None
     if not isinstance(target, (str, Path)) or Path(target).suffix.lower() != ".svg":
-        raise ConfigurationError("output_path must be a path ending in .svg.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "output_path must be a path ending in .svg.", code="INVALID_OPTION"
+        )
     path = Path(target)
     if not path.parent.is_dir():
         raise ConfigurationError(f"directory {path.parent} does not exist.", code="INVALID_OPTION")
     if path.exists() and not opt_bool(options, "overwrite", False):
-        raise ConfigurationError(f"{path} already exists.", code="OUTPUT_EXISTS", hint="Pass overwrite=True to replace it.")
+        raise ConfigurationError(
+            f"{path} already exists.",
+            code="OUTPUT_EXISTS",
+            hint="Pass overwrite=True to replace it.",
+        )
     path.write_text(svg, encoding="utf-8")
     return str(path)
 
@@ -156,7 +198,16 @@ def skew_windows(seq: str, window: int, step: int, kind: str) -> list[dict[str, 
         x, y = pa[end] - pa[start], pb[end] - pb[start]
         skew = (x - y) / (x + y) if x + y else 0.0
         cumulative += skew
-        rows.append({"start": start, "end": end, "skew": skew, "cumulative_skew": cumulative, "count_" + a: x, "count_" + b: y})
+        rows.append(
+            {
+                "start": start,
+                "end": end,
+                "skew": skew,
+                "cumulative_skew": cumulative,
+                "count_" + a: x,
+                "count_" + b: y,
+            }
+        )
     return rows
 
 
@@ -165,7 +216,11 @@ def _skew_params(options: Mapping[str, object], n: int) -> tuple[int, int, str]:
     step = opt_int(options, "step", window, minimum=1, maximum=10_000_000)
     kind = opt_choice(options, "skew_type", "GC", ("GC", "AT"))
     if window > n:
-        raise ConfigurationError(f"window={window} is longer than the sequence ({n} bases).", code="INVALID_OPTION", hint="Use a smaller window.")
+        raise ConfigurationError(
+            f"window={window} is longer than the sequence ({n} bases).",
+            code="INVALID_OPTION",
+            hint="Use a smaller window.",
+        )
     return window, step, kind
 
 
@@ -181,7 +236,9 @@ def _ori_ter(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def op_calculate(value: object, options: Mapping[str, object], warnings: list[str]) -> dict[str, Any]:
+def op_calculate(
+    value: object, options: Mapping[str, object], warnings: list[str]
+) -> dict[str, Any]:
     seq = dna_text(value)
     window, step, kind = _skew_params(options, len(seq))
     rows = skew_windows(seq, window, step, kind)
@@ -193,7 +250,9 @@ def op_calculate(value: object, options: Mapping[str, object], warnings: list[st
         "window": window,
         "step": step,
         "windows": len(rows),
-        "overall_skew": _round((total_a - total_b) / (total_a + total_b)) if total_a + total_b else None,
+        "overall_skew": _round((total_a - total_b) / (total_a + total_b))
+        if total_a + total_b
+        else None,
         **_ori_ter(rows),
         "heuristic": "Origin = centre of the window with the minimum cumulative skew, terminus = maximum (Lobry 1996; Grigoriev 1998). "
         "Valid only for circular bacterial-like chromosomes with a leading/lagging-strand composition bias; the positions are "
@@ -204,9 +263,14 @@ def op_calculate(value: object, options: Mapping[str, object], warnings: list[st
         warnings.append("fewer than 4 windows: the origin/terminus estimate is not meaningful.")
     limit = opt_int(options, "max_windows_returned", 20_000, minimum=1, maximum=1_000_000)
     if opt_bool(options, "include_windows", True):
-        result["window_table"] = [{k: _round(v) if isinstance(v, float) else v for k, v in r.items()} for r in rows[:limit]]
+        result["window_table"] = [
+            {k: _round(v) if isinstance(v, float) else v for k, v in r.items()}
+            for r in rows[:limit]
+        ]
         if len(rows) > limit:
-            warnings.append(f"window_table truncated to {limit} of {len(rows)} windows (max_windows_returned).")
+            warnings.append(
+                f"window_table truncated to {limit} of {len(rows)} windows (max_windows_returned)."
+            )
     return result
 
 
@@ -229,7 +293,15 @@ def dnaa_boxes(seq: str, max_mismatches: int) -> list[dict[str, Any]]:
                         break
             if mism <= max_mismatches:
                 start = i if strand == "+" else n - i - 9
-                out.append({"start": start, "end": start + 9, "strand": strand, "mismatches": mism, "sequence": s[i : i + 9]})
+                out.append(
+                    {
+                        "start": start,
+                        "end": start + 9,
+                        "strand": strand,
+                        "mismatches": mism,
+                        "sequence": s[i : i + 9],
+                    }
+                )
     return sorted(out, key=lambda r: (r["start"], r["strand"]))
 
 
@@ -255,8 +327,12 @@ def op_predict(value: object, options: Mapping[str, object], warnings: list[str]
             used.append((anchor, anchor + window))
             members = [b for b in boxes if anchor <= b["start"] and b["end"] <= anchor + window]
             candidates.append(
-                {"start": anchor, "end": min(n, anchor + window), "dnaa_boxes": count,
-                 "box_positions": [(b["start"], b["strand"]) for b in members]}
+                {
+                    "start": anchor,
+                    "end": min(n, anchor + window),
+                    "dnaa_boxes": count,
+                    "box_positions": [(b["start"], b["strand"]) for b in members],
+                }
             )
             if len(candidates) >= top_n:
                 break
@@ -303,10 +379,15 @@ def op_detect(value: object, options: Mapping[str, object], warnings: list[str])
     min_copies = dict(_DEFAULT_MIN_COPIES)
     if raw is not None:
         if not isinstance(raw, Mapping):
-            raise ConfigurationError("min_copies must be a mapping unit_length -> copies.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                "min_copies must be a mapping unit_length -> copies.", code="INVALID_OPTION"
+            )
         for k, v in raw.items():
             if isinstance(v, bool) or not isinstance(v, int) or v < 2 or int(k) < 1 or int(k) > 6:
-                raise ConfigurationError("min_copies entries need unit length 1-6 and at least 2 copies.", code="INVALID_OPTION")
+                raise ConfigurationError(
+                    "min_copies entries need unit length 1-6 and at least 2 copies.",
+                    code="INVALID_OPTION",
+                )
             min_copies[int(k)] = v
     gatc = [m.start() for m in re.finditer(r"(?=GATC)", seq)]
     tracts: list[dict[str, Any]] = []
@@ -318,7 +399,15 @@ def op_detect(value: object, options: Mapping[str, object], warnings: list[str])
                 continue
             text = match.group(1)
             start = match.start()
-            found.append({"start": start, "end": start + len(text), "unit": unit, "copies": len(text) // k, "length": len(text)})
+            found.append(
+                {
+                    "start": start,
+                    "end": start + len(text),
+                    "unit": unit,
+                    "copies": len(text) // k,
+                    "length": len(text),
+                }
+            )
         # the same repeat is seen in every reading frame: keep the longest tract of each overlapping group
         kept: list[dict[str, Any]] = []
         for tract in sorted(found, key=lambda t: (-t["length"], t["start"])):
@@ -354,21 +443,46 @@ def op_detect(value: object, options: Mapping[str, object], warnings: list[str])
 
 def _features(value: object) -> list[dict[str, Any]]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
-        raise InputFormatError("'features' must be a non-empty list of {id, start, end, strand} mappings.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "'features' must be a non-empty list of {id, start, end, strand} mappings.",
+            code="INVALID_INPUT",
+        )
     out = []
     for i, f in enumerate(value):
         if not isinstance(f, Mapping) or "start" not in f or "end" not in f or "strand" not in f:
-            raise InputFormatError(f"feature {i + 1} needs start, end and strand.", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"feature {i + 1} needs start, end and strand.", code="INVALID_INPUT"
+            )
         start, end, strand = f["start"], f["end"], f["strand"]
-        if isinstance(start, bool) or isinstance(end, bool) or not isinstance(start, int) or not isinstance(end, int) or start < 0 or end <= start:
-            raise InputFormatError(f"feature {i + 1}: need integers 0 <= start < end.", code="INVALID_INPUT")
+        if (
+            isinstance(start, bool)
+            or isinstance(end, bool)
+            or not isinstance(start, int)
+            or not isinstance(end, int)
+            or start < 0
+            or end <= start
+        ):
+            raise InputFormatError(
+                f"feature {i + 1}: need integers 0 <= start < end.", code="INVALID_INPUT"
+            )
         if strand not in ("+", "-", 1, -1):
-            raise InputFormatError(f"feature {i + 1}: strand must be '+' or '-'.", code="INVALID_INPUT")
-        out.append({"id": str(f.get("id", f.get("name", f"feature{i + 1}"))), "start": start, "end": end, "strand": "+" if strand in ("+", 1) else "-"})
+            raise InputFormatError(
+                f"feature {i + 1}: strand must be '+' or '-'.", code="INVALID_INPUT"
+            )
+        out.append(
+            {
+                "id": str(f.get("id", f.get("name", f"feature{i + 1}"))),
+                "start": start,
+                "end": end,
+                "strand": "+" if strand in ("+", 1) else "-",
+            }
+        )
     return out
 
 
-def op_annotate(value: object, options: Mapping[str, object], warnings: list[str]) -> dict[str, Any]:
+def op_annotate(
+    value: object, options: Mapping[str, object], warnings: list[str]
+) -> dict[str, Any]:
     if not isinstance(value, Mapping) or "features" not in value:
         raise InputFormatError(
             "input must be a mapping with 'features' and either 'length', 'sequence' or both origin/terminus.",
@@ -379,13 +493,19 @@ def op_annotate(value: object, options: Mapping[str, object], warnings: list[str
     seq = dna_text(value["sequence"]) if "sequence" in value else None
     length = value.get("length", len(seq) if seq else None)
     if isinstance(length, bool) or not isinstance(length, int) or length < 2:
-        raise InputFormatError("provide 'length' (integer >= 2) or 'sequence'.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "provide 'length' (integer >= 2) or 'sequence'.", code="INVALID_INPUT"
+        )
     origin = options.get("origin", value.get("origin"))
     terminus = options.get("terminus", value.get("terminus"))
     source = "supplied"
     if origin is None:
         if seq is None:
-            raise InputFormatError("origin is not given and no sequence is available to estimate it.", code="INVALID_INPUT", hint="Provide 'origin' or 'sequence'.")
+            raise InputFormatError(
+                "origin is not given and no sequence is available to estimate it.",
+                code="INVALID_INPUT",
+                hint="Provide 'origin' or 'sequence'.",
+            )
         window = max(2, min(1000, length // 4))
         est = _ori_ter(skew_windows(seq, window, window, "GC"))
         origin, source = est["origin_estimate"], "cumulative GC-skew estimate (heuristic)"
@@ -395,14 +515,21 @@ def op_annotate(value: object, options: Mapping[str, object], warnings: list[str
         terminus = (origin + length // 2) % length
     for name, pos in (("origin", origin), ("terminus", terminus)):
         if isinstance(pos, bool) or not isinstance(pos, int) or not 0 <= pos < length:
-            raise InputFormatError(f"{name} must be an integer in [0, {length}).", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"{name} must be an integer in [0, {length}).", code="INVALID_INPUT"
+            )
     if origin == terminus:
         raise InputFormatError("origin and terminus must differ.", code="INVALID_INPUT")
-    right_span = (terminus - origin) % length  # clockwise (increasing coordinate) origin -> terminus
+    right_span = (
+        terminus - origin
+    ) % length  # clockwise (increasing coordinate) origin -> terminus
     rows = []
     for f in features:
         if f["end"] > length:
-            raise InputFormatError(f"feature {f['id']} ends beyond the chromosome length {length}.", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"feature {f['id']} ends beyond the chromosome length {length}.",
+                code="INVALID_INPUT",
+            )
         mid = (f["start"] + f["end"]) // 2
         offset = (mid - origin) % length
         right = offset < right_span
@@ -411,9 +538,14 @@ def op_annotate(value: object, options: Mapping[str, object], warnings: list[str
         distance = offset if right else (length - offset) % length
         rows.append(
             {
-                "id": f["id"], "start": f["start"], "end": f["end"], "strand": f["strand"],
+                "id": f["id"],
+                "start": f["start"],
+                "end": f["end"],
+                "strand": f["strand"],
                 "replichore": replichore,
-                "orientation": "co-directional (leading strand)" if leading else "head-on (lagging strand)",
+                "orientation": "co-directional (leading strand)"
+                if leading
+                else "head-on (lagging strand)",
                 "leading_strand": leading,
                 "distance_from_origin_along_replichore": distance,
             }
@@ -468,19 +600,28 @@ def op_compare(value: object, options: Mapping[str, object], warnings: list[str]
         pair = list(value)
         names = ["first", "second"]
     else:
-        raise InputFormatError("input must be {'a': seq, 'b': seq} or a list of exactly two sequences.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be {'a': seq, 'b': seq} or a list of exactly two sequences.",
+            code="INVALID_INPUT",
+        )
     kind = opt_choice(options, "skew_type", "GC", ("GC", "AT"))
     points = opt_int(options, "points", 100, minimum=10, maximum=10_000)
     profiles = []
     summary = {}
     for name, item in zip(names, pair, strict=False):
         seq = dna_text(item, name)
-        window = opt_int(options, "window", max(2, min(1000, len(seq) // 20)), minimum=2, maximum=10_000_000)
+        window = opt_int(
+            options, "window", max(2, min(1000, len(seq) // 20)), minimum=2, maximum=10_000_000
+        )
         if window > len(seq):
-            raise ConfigurationError(f"window={window} exceeds the length of sequence {name!r}.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"window={window} exceeds the length of sequence {name!r}.", code="INVALID_OPTION"
+            )
         rows = skew_windows(seq, window, window, kind)
         if len(rows) < 2:
-            raise InputFormatError(f"sequence {name!r} yields fewer than 2 windows.", code="INPUT_TOO_SHORT")
+            raise InputFormatError(
+                f"sequence {name!r} yields fewer than 2 windows.", code="INPUT_TOO_SHORT"
+            )
         est = _ori_ter(rows)
         profiles.append(_resample([r["cumulative_skew"] for r in rows], points))
         summary[name] = {
@@ -492,7 +633,10 @@ def op_compare(value: object, options: Mapping[str, object], warnings: list[str]
             "terminus_relative_position": _round(est["terminus_estimate"] / len(seq)),
         }
     r = _pearson(profiles[0], profiles[1])
-    ori_diff = abs(summary[names[0]]["origin_relative_position"] - summary[names[1]]["origin_relative_position"])
+    ori_diff = abs(
+        summary[names[0]]["origin_relative_position"]
+        - summary[names[1]]["origin_relative_position"]
+    )
     return {
         "skew_type": kind,
         "sequences": summary,
@@ -516,11 +660,15 @@ def _median(values: Sequence[float]) -> float:
 
 def _depths(value: object, name: str) -> list[float]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
-        raise InputFormatError(f"'{name}' must be a non-empty list of window depths.", code="INVALID_INPUT")
+        raise InputFormatError(
+            f"'{name}' must be a non-empty list of window depths.", code="INVALID_INPUT"
+        )
     out = []
     for v in value:
         if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0:
-            raise InputFormatError(f"'{name}' contains a negative or non-numeric depth.", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"'{name}' contains a negative or non-numeric depth.", code="INVALID_INPUT"
+            )
         out.append(float(v))
     if len(out) > 5_000_000:
         raise InputFormatError(f"'{name}' has more than 5,000,000 windows.", code="INPUT_TOO_LARGE")
@@ -537,7 +685,9 @@ def op_map(value: object, options: Mapping[str, object], warnings: list[str]) ->
     s = _depths(value["s_phase"], "s_phase")
     g = _depths(value["g1"], "g1")
     if len(s) != len(g):
-        raise InputFormatError(f"s_phase has {len(s)} windows but g1 has {len(g)}.", code="WINDOW_MISMATCH")
+        raise InputFormatError(
+            f"s_phase has {len(s)} windows but g1 has {len(g)}.", code="WINDOW_MISMATCH"
+        )
     pseudo = opt_num(options, "pseudocount", 0.0, minimum=0.0, maximum=1e6)
     smooth = opt_int(options, "smoothing_windows", 1, minimum=1, maximum=10_001)
     if smooth % 2 == 0:
@@ -545,14 +695,18 @@ def op_map(value: object, options: Mapping[str, object], warnings: list[str]) ->
     window_size = opt_int(options, "window_size", 1, minimum=1, maximum=10_000_000_000)
     ms, mg = _median(s), _median(g)
     if ms <= 0 or mg <= 0:
-        raise InputFormatError("the median depth of s_phase and g1 must be positive for median normalisation.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "the median depth of s_phase and g1 must be positive for median normalisation.",
+            code="INVALID_INPUT",
+        )
     ratios = []
     for i, (a, b) in enumerate(zip(s, g, strict=False)):
         num, den = a / ms + pseudo, b / mg + pseudo
         if num <= 0 or den <= 0:
             raise InputFormatError(
                 f"window {i} has zero normalised depth; log2 ratio undefined.",
-                code="ZERO_DEPTH", hint="Set options['pseudocount'] (for example 0.5) or drop empty windows.",
+                code="ZERO_DEPTH",
+                hint="Set options['pseudocount'] (for example 0.5) or drop empty windows.",
             )
         ratios.append(math.log2(num / den))
     if smooth > 1:
@@ -560,10 +714,19 @@ def op_map(value: object, options: Mapping[str, object], warnings: list[str]) ->
         ratios = [_median(ratios[max(0, i - half) : i + half + 1]) for i in range(len(ratios))]
     centre = opt_num(options, "center", 0.0, minimum=-100.0, maximum=100.0)
     windows = [
-        {"start": i * window_size, "end": (i + 1) * window_size, "log2_s_over_g1": _round(r), "timing": "early" if r > centre else "late" if r < centre else "intermediate"}
+        {
+            "start": i * window_size,
+            "end": (i + 1) * window_size,
+            "log2_s_over_g1": _round(r),
+            "timing": "early" if r > centre else "late" if r < centre else "intermediate",
+        }
         for i, r in enumerate(ratios)
     ]
-    peaks = [i for i in range(1, len(ratios) - 1) if ratios[i] > ratios[i - 1] and ratios[i] >= ratios[i + 1] and ratios[i] > centre]
+    peaks = [
+        i
+        for i in range(1, len(ratios) - 1)
+        if ratios[i] > ratios[i - 1] and ratios[i] >= ratios[i + 1] and ratios[i] > centre
+    ]
     early = sum(1 for r in ratios if r > centre)
     return {
         "windows": len(ratios),
@@ -571,8 +734,13 @@ def op_map(value: object, options: Mapping[str, object], warnings: list[str]) ->
         "smoothing_windows": smooth,
         "early_fraction": _round(early / len(ratios)),
         "late_fraction": _round(sum(1 for r in ratios if r < centre) / len(ratios)),
-        "early_peaks": [{"window": i, "start": i * window_size, "log2_s_over_g1": _round(ratios[i])} for i in peaks[:1000]],
-        "window_table": windows[: opt_int(options, "max_windows_returned", 20_000, minimum=1, maximum=1_000_000)],
+        "early_peaks": [
+            {"window": i, "start": i * window_size, "log2_s_over_g1": _round(ratios[i])}
+            for i in peaks[:1000]
+        ],
+        "window_table": windows[
+            : opt_int(options, "max_windows_returned", 20_000, minimum=1, maximum=1_000_000)
+        ],
         "definition": "Replication timing score = log2( (S-phase depth / median S depth) / (G1 depth / median G1 depth) ) per window "
         "(Koren et al. 2012 style): higher = replicated earlier in S phase, because early-replicating regions have more copies in S-phase "
         "cells. 'early' / 'late' means above / below `center` (default 0, the median-normalised ratio of 1). Optional running-median smoothing.",
@@ -592,27 +760,38 @@ def _origins(options: Mapping[str, object], length: int) -> list[tuple[float, fl
         out = [(float(rng.randrange(length)), 0.0) for _ in range(n)]
         return out
     if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)) or not raw:
-        raise ConfigurationError("origins must be a non-empty list of positions or {position, firing_time} mappings.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "origins must be a non-empty list of positions or {position, firing_time} mappings.",
+            code="INVALID_OPTION",
+        )
     for item in raw:
         if isinstance(item, Mapping):
             pos, t = item.get("position"), item.get("firing_time", 0.0)
         else:
             pos, t = item, 0.0
         if isinstance(pos, bool) or not isinstance(pos, (int, float)) or not 0 <= pos < length:
-            raise ConfigurationError(f"origin position {pos!r} must be in [0, {length}).", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"origin position {pos!r} must be in [0, {length}).", code="INVALID_OPTION"
+            )
         if isinstance(t, bool) or not isinstance(t, (int, float)) or t < 0:
-            raise ConfigurationError(f"origin firing_time {t!r} must be a non-negative number.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"origin firing_time {t!r} must be a non-negative number.", code="INVALID_OPTION"
+            )
         out.append((float(pos), float(t)))
     return out
 
 
-def op_simulate(value: object, options: Mapping[str, object], warnings: list[str]) -> dict[str, Any]:
+def op_simulate(
+    value: object, options: Mapping[str, object], warnings: list[str]
+) -> dict[str, Any]:
     if isinstance(value, Mapping) and "length" in value:
         value = value["length"]
     if isinstance(value, int) and not isinstance(value, bool):
         length = value
         if length < 2 or length > 5_000_000_000:
-            raise InputFormatError("genome length must be an integer in [2, 5e9].", code="INVALID_INPUT")
+            raise InputFormatError(
+                "genome length must be an integer in [2, 5e9].", code="INVALID_INPUT"
+            )
     else:
         length = len(dna_text(value))
     speed = opt_num(options, "fork_speed", 1000.0, minimum=1e-9, maximum=1e12)  # bp per time unit
@@ -631,22 +810,38 @@ def op_simulate(value: object, options: Mapping[str, object], warnings: list[str
 
     n_windows = -(-length // window)
     if n_windows > 200_000:
-        raise ConfigurationError("window yields more than 200000 windows.", code="INVALID_OPTION", hint="Increase options['window'].")
+        raise ConfigurationError(
+            "window yields more than 200000 windows.",
+            code="INVALID_OPTION",
+            hint="Increase options['window'].",
+        )
     centres = [min(length - 1, i * window + window // 2) for i in range(n_windows)]
     times = [timing(c) for c in centres]
     sorted_origins = sorted(origins)
     terminations = []
-    ring = sorted_origins + ([(sorted_origins[0][0] + length, sorted_origins[0][1])] if circular else [])
+    ring = sorted_origins + (
+        [(sorted_origins[0][0] + length, sorted_origins[0][1])] if circular else []
+    )
     for (p0, t0), (p1, t1) in itertools.pairwise(ring):
         meet = (p0 + p1) / 2 + speed * (t1 - t0) / 2
         if p0 < meet < p1:
-            terminations.append({"position": _round(meet % length if circular else meet, 3), "time": _round(t0 + (meet - p0) / speed, 6)})
+            terminations.append(
+                {
+                    "position": _round(meet % length if circular else meet, 3),
+                    "time": _round(t0 + (meet - p0) / speed, 6),
+                }
+            )
     duration = max(times)
     steps = opt_int(options, "time_points", 5, minimum=2, maximum=1000)
     curve = []
     for k in range(steps + 1):
         t = duration * k / steps
-        curve.append({"time": _round(t, 6), "fraction_replicated": _round(sum(1 for x in times if x <= t) / len(times))})
+        curve.append(
+            {
+                "time": _round(t, 6),
+                "fraction_replicated": _round(sum(1 for x in times if x <= t) / len(times)),
+            }
+        )
     return {
         "length": length,
         "circular": circular,
@@ -656,7 +851,10 @@ def op_simulate(value: object, options: Mapping[str, object], warnings: list[str
         "mean_replication_time": _round(math.fsum(times) / len(times), 6),
         "termination_sites": terminations,
         "window": window,
-        "timing_profile": [{"start": i * window, "end": min(length, (i + 1) * window), "time": _round(t, 6)} for i, t in enumerate(times)],
+        "timing_profile": [
+            {"start": i * window, "end": min(length, (i + 1) * window), "time": _round(t, 6)}
+            for i, t in enumerate(times)
+        ],
         "replication_curve": curve,
         "definition": "Deterministic bidirectional-fork model: all origins fire at their firing_time and forks move at fork_speed in both "
         "directions; the replication time of position x is min over origins of firing_time + |x - origin| / fork_speed (passive "
@@ -674,13 +872,18 @@ def _map_distance(r: float, fn: str) -> float:
     if fn == "none":
         return r
     if not 0 <= r < 0.5:
-        raise InputFormatError(f"recombination fraction {r} must be in [0, 0.5) for the {fn} map function.", code="INVALID_INPUT")
+        raise InputFormatError(
+            f"recombination fraction {r} must be in [0, 0.5) for the {fn} map function.",
+            code="INVALID_INPUT",
+        )
     if fn == "haldane":
         return -0.5 * math.log(1 - 2 * r)
     return 0.25 * math.log((1 + 2 * r) / (1 - 2 * r))
 
 
-def op_build_recombination_map(value: object, options: Mapping[str, object], warnings: list[str]) -> dict[str, Any]:
+def op_build_recombination_map(
+    value: object, options: Mapping[str, object], warnings: list[str]
+) -> dict[str, Any]:
     markers = value["markers"] if isinstance(value, Mapping) and "markers" in value else value
     if not isinstance(markers, Sequence) or isinstance(markers, (str, bytes)) or len(markers) < 2:
         raise InputFormatError(
@@ -693,8 +896,15 @@ def op_build_recombination_map(value: object, options: Mapping[str, object], war
     cumulative_cm = 0.0
     previous = None
     for i, m in enumerate(markers):
-        if not isinstance(m, Mapping) or not isinstance(m.get("position"), int) or isinstance(m.get("position"), bool) or m["position"] < 0:
-            raise InputFormatError(f"marker {i + 1} needs a non-negative integer 'position'.", code="INVALID_INPUT")
+        if (
+            not isinstance(m, Mapping)
+            or not isinstance(m.get("position"), int)
+            or isinstance(m.get("position"), bool)
+            or m["position"] < 0
+        ):
+            raise InputFormatError(
+                f"marker {i + 1} needs a non-negative integer 'position'.", code="INVALID_INPUT"
+            )
         pos = m["position"]
         name = str(m.get("id", f"marker{i + 1}"))
         if previous is None:
@@ -704,11 +914,15 @@ def op_build_recombination_map(value: object, options: Mapping[str, object], war
             rows.append({"id": name, "position": pos, "cumulative_cm": _round(cumulative_cm)})
             continue
         if pos <= previous:
-            raise InputFormatError(f"marker {name!r}: positions must be strictly increasing.", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"marker {name!r}: positions must be strictly increasing.", code="INVALID_INPUT"
+            )
         if "cm" in m:
             cm = float(m["cm"])
             if cm < cumulative_cm:
-                raise InputFormatError(f"marker {name!r}: cM must not decrease.", code="INVALID_INPUT")
+                raise InputFormatError(
+                    f"marker {name!r}: cM must not decrease.", code="INVALID_INPUT"
+                )
             delta_cm, r = cm - cumulative_cm, None
         else:
             if "recombination_fraction" in m:
@@ -716,17 +930,27 @@ def op_build_recombination_map(value: object, options: Mapping[str, object], war
             elif "recombinants" in m and "meioses" in m and m["meioses"]:
                 r = m["recombinants"] / m["meioses"]
             else:
-                raise InputFormatError(f"marker {name!r} needs 'cm', 'recombination_fraction' or 'recombinants'+'meioses'.", code="INVALID_INPUT")
+                raise InputFormatError(
+                    f"marker {name!r} needs 'cm', 'recombination_fraction' or 'recombinants'+'meioses'.",
+                    code="INVALID_INPUT",
+                )
             if not 0 <= r <= 0.5:
-                raise InputFormatError(f"marker {name!r}: recombination fraction {r} must be in [0, 0.5].", code="INVALID_INPUT")
+                raise InputFormatError(
+                    f"marker {name!r}: recombination fraction {r} must be in [0, 0.5].",
+                    code="INVALID_INPUT",
+                )
             delta_cm = 100.0 * _map_distance(r, fn)
         cumulative_cm += delta_cm
         span = pos - previous
         rows.append(
             {
-                "id": name, "position": pos, "interval_start": previous, "interval_end": pos,
+                "id": name,
+                "position": pos,
+                "interval_start": previous,
+                "interval_end": pos,
                 "recombination_fraction": _round(r) if r is not None else None,
-                "delta_cm": _round(delta_cm), "cumulative_cm": _round(cumulative_cm),
+                "delta_cm": _round(delta_cm),
+                "cumulative_cm": _round(cumulative_cm),
                 "rate_cm_per_mb": _round(delta_cm / (span / 1e6)),
             }
         )
@@ -735,7 +959,11 @@ def op_build_recombination_map(value: object, options: Mapping[str, object], war
     total_cm = sum(r["delta_cm"] for r in intervals)
     span_total = rows[-1]["position"] - rows[0]["position"]
     return {
-        "map_function": fn if any("recombination_fraction" in r and r["recombination_fraction"] is not None for r in rows) else "not used (cM given)",
+        "map_function": fn
+        if any(
+            "recombination_fraction" in r and r["recombination_fraction"] is not None for r in rows
+        )
+        else "not used (cM given)",
         "markers": len(rows),
         "total_cm": _round(total_cm),
         "span_bp": span_total,
@@ -750,7 +978,9 @@ def op_build_recombination_map(value: object, options: Mapping[str, object], war
 # --------------------------------------------------------------------------- repair pathway
 
 
-def op_classify_repair_pathway(value: object, options: Mapping[str, object], warnings: list[str]) -> dict[str, Any]:
+def op_classify_repair_pathway(
+    value: object, options: Mapping[str, object], warnings: list[str]
+) -> dict[str, Any]:
     if not isinstance(value, Mapping) or "reference" not in value or "edited" not in value:
         raise InputFormatError(
             "input must be {'reference': <unedited sequence>, 'edited': <repaired sequence>[, 'donor': <HDR template product>]}.",
@@ -763,9 +993,17 @@ def op_classify_repair_pathway(value: object, options: Mapping[str, object], war
     ssa_mh = opt_int(options, "ssa_min_homology", 25, minimum=min_mh + 1, maximum=10_000)
     max_ins = opt_int(options, "max_nhej_insertion", 20, minimum=1, maximum=1000)
     if ref == edited:
-        return {"pathway": "no_edit", "reason": "edited sequence equals the reference.", "rule": _RULE}
+        return {
+            "pathway": "no_edit",
+            "reason": "edited sequence equals the reference.",
+            "rule": _RULE,
+        }
     if donor is not None and edited == donor:
-        return {"pathway": "HDR", "reason": "the repaired sequence equals the supplied donor/template product (template-directed repair).", "rule": _RULE}
+        return {
+            "pathway": "HDR",
+            "reason": "the repaired sequence equals the supplied donor/template product (template-directed repair).",
+            "rule": _RULE,
+        }
     lr, le = len(ref), len(edited)
     p = 0
     while p < min(lr, le) and ref[p] == edited[p]:
@@ -775,28 +1013,55 @@ def op_classify_repair_pathway(value: object, options: Mapping[str, object], war
         s += 1
     sp = min(s, min(lr, le) - p)  # suffix that does not overlap the matched prefix
     core_ref, core_edit = ref[p : lr - sp], edited[p : le - sp]
-    out: dict[str, Any] = {"reference_length": lr, "edited_length": le, "deleted_bases": len(core_ref), "inserted_bases": len(core_edit), "first_difference": p}
+    out: dict[str, Any] = {
+        "reference_length": lr,
+        "edited_length": le,
+        "deleted_bases": len(core_ref),
+        "inserted_bases": len(core_edit),
+        "first_difference": p,
+    }
     if lr == le and len(core_ref) == len(core_edit):
-        out.update(pathway="undetermined", reason="same-length substitution(s); no end-joining deletion/insertion signature and no donor match.")
+        out.update(
+            pathway="undetermined",
+            reason="same-length substitution(s); no end-joining deletion/insertion signature and no donor match.",
+        )
     elif core_edit == "" and core_ref:
         d = lr - le
         mh = max(0, p + s - le)  # bases by which the deletion can slide = homology at the junction
         mh = min(mh, d)
         out["microhomology_length"] = mh
         if mh >= ssa_mh:
-            out.update(pathway="SSA", reason=f"deletion of {d} bp flanked by {mh} bp of identical sequence (>= {ssa_mh}): single-strand annealing signature.")
+            out.update(
+                pathway="SSA",
+                reason=f"deletion of {d} bp flanked by {mh} bp of identical sequence (>= {ssa_mh}): single-strand annealing signature.",
+            )
         elif mh >= min_mh:
-            out.update(pathway="MMEJ", reason=f"deletion of {d} bp with {mh} bp microhomology at the junction (>= {min_mh}): microhomology-mediated end joining signature.")
+            out.update(
+                pathway="MMEJ",
+                reason=f"deletion of {d} bp with {mh} bp microhomology at the junction (>= {min_mh}): microhomology-mediated end joining signature.",
+            )
         else:
-            out.update(pathway="NHEJ", reason=f"deletion of {d} bp with {mh} bp (< {min_mh}) junction microhomology: classical end-joining signature.")
+            out.update(
+                pathway="NHEJ",
+                reason=f"deletion of {d} bp with {mh} bp (< {min_mh}) junction microhomology: classical end-joining signature.",
+            )
     elif core_ref == "" and core_edit:
         n = le - lr
         if n <= max_ins:
-            out.update(pathway="NHEJ", reason=f"insertion of {n} bp without deletion (<= {max_ins}): fill-in/ligation signature of classical end joining.")
+            out.update(
+                pathway="NHEJ",
+                reason=f"insertion of {n} bp without deletion (<= {max_ins}): fill-in/ligation signature of classical end joining.",
+            )
         else:
-            out.update(pathway="undetermined", reason=f"insertion of {n} bp exceeds {max_ins}; could be template-directed or an integration event.")
+            out.update(
+                pathway="undetermined",
+                reason=f"insertion of {n} bp exceeds {max_ins}; could be template-directed or an integration event.",
+            )
     else:
-        out.update(pathway="undetermined", reason=f"complex indel ({len(core_ref)} bp replaced by {len(core_edit)} bp); no single-pathway signature applies.")
+        out.update(
+            pathway="undetermined",
+            reason=f"complex indel ({len(core_ref)} bp replaced by {len(core_edit)} bp); no single-pathway signature applies.",
+        )
     out["rule"] = _RULE
     return out
 
@@ -830,7 +1095,9 @@ def op_plot(value: object, options: Mapping[str, object], warnings: list[str]) -
     def py(v: float) -> float:
         return top + ph * (1 - (v - vmin) / span)
 
-    pts = " ".join(f"{px((r['start'] + r['end']) / 2):.1f},{py(r['cumulative_skew']):.1f}" for r in rows)
+    pts = " ".join(
+        f"{px((r['start'] + r['end']) / 2):.1f},{py(r['cumulative_skew']):.1f}" for r in rows
+    )
     title = f"Cumulative {kind} skew"
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" font-family="sans-serif" font-size="11">',

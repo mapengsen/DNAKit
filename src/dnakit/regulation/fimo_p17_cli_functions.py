@@ -29,7 +29,14 @@ _HINT = (
     "https://meme-suite.org) and put fimo on PATH or pass fimo_path."
 )
 _BACKGROUND_SOURCES = {"motif": "--motif--", "uniform": "--uniform--", "nrdb": "--nrdb--"}
-_OUTPUT_FILES = ("fimo.tsv", "fimo.gff", "fimo.html", "fimo.xml", "cisml.xml", "best_site.narrowPeak")
+_OUTPUT_FILES = (
+    "fimo.tsv",
+    "fimo.gff",
+    "fimo.html",
+    "fimo.xml",
+    "cisml.xml",
+    "best_site.narrowPeak",
+)
 _TSV_COLUMNS = (
     "motif_id",
     "motif_alt_id",
@@ -146,7 +153,14 @@ def scan_motifs_with_position_priors(
         raise ConfigurationError("use_q_value_threshold requires compute_q_values=True.")
     if background_file is not None and background_source is not None:
         raise ConfigurationError("Give either background_file or background_source, not both.")
-    arguments: list[str] = ["--psp", str(prior), "--prior-dist", str(distribution), "--alpha", format(alpha, ".12g")]
+    arguments: list[str] = [
+        "--psp",
+        str(prior),
+        "--prior-dist",
+        str(distribution),
+        "--alpha",
+        format(alpha, ".12g"),
+    ]
     arguments += ["--thresh", format(threshold, ".12g")]
     arguments += ["--motif-pseudo", format(pseudocount, ".12g"), "--max-stored-scores", str(stored)]
     if use_q_value_threshold:
@@ -160,7 +174,12 @@ def scan_motifs_with_position_priors(
     if not parse_genomic_coordinates:
         arguments.append("--no-pgc")
     if background_source is not None:
-        arguments += ["--bfile", _BACKGROUND_SOURCES[_cli.choice(background_source, tuple(_BACKGROUND_SOURCES), "background_source")]]
+        arguments += [
+            "--bfile",
+            _BACKGROUND_SOURCES[
+                _cli.choice(background_source, tuple(_BACKGROUND_SOURCES), "background_source")
+            ],
+        ]
     elif background_file is not None:
         arguments += ["--bfile", str(_cli.existing_file(background_file, "background_file"))]
     arguments += _motif_ids(motif_ids)
@@ -171,7 +190,9 @@ def scan_motifs_with_position_priors(
     out.mkdir(parents=True)
     arguments += ["--verbosity", "1", "--oc", str(out), str(motifs), str(sequences)]
     expected = [out / "fimo.tsv", out / "fimo.gff"]
-    result = _cli.run("fimo", arguments, cwd=out, expected=expected, explicit=executable, hint=_HINT)
+    result = _cli.run(
+        "fimo", arguments, cwd=out, expected=expected, explicit=executable, hint=_HINT
+    )
     result["output_dir"] = str(out)
     result["tsv_file"] = str(out / "fimo.tsv") if (out / "fimo.tsv").is_file() else None
     result["gff_file"] = str(out / "fimo.gff") if (out / "fimo.gff").is_file() else None

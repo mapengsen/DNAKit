@@ -10,7 +10,9 @@ from dnakit.variants import _impl_prioritize as _prior
 from . import _impl_clinical as _clin
 
 
-def _done(operation: str, input: object, options: Mapping[str, object], result: dict[str, object]) -> dict[str, object]:
+def _done(
+    operation: str, input: object, options: Mapping[str, object], result: dict[str, object]
+) -> dict[str, object]:
     """Wrap a computed result in the candidate envelope (``warnings`` move to the envelope)."""
 
     warnings = list(result.pop("warnings", []) or [])
@@ -26,7 +28,8 @@ def analyze_trio_variants(input: object, *, options: Mapping[str, object] | None
     """
 
     options = dict(options or {})
-    return _done('analyze_trio_variants', input, options, _clin.analyze_trio(input, options))
+    return _done("analyze_trio_variants", input, options, _clin.analyze_trio(input, options))
+
 
 def annotate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Annotate clinical variants with ClinVar, gnomAD and gene-disease information (not implemented).
@@ -36,11 +39,19 @@ def annotate(input: object, *, options: Mapping[str, object] | None = None) -> o
     Currently returns status 'not_implemented': clinical annotation needs reference databases that are not bundled.
     """
 
-    return candidate_not_implemented('clinical', 'annotate', input, options=options,
-        requires='ClinVar / gnomAD / gene-disease databases (local files or network access)',
-        message='clinical annotation needs reference databases that are not bundled.')
+    return candidate_not_implemented(
+        "clinical",
+        "annotate",
+        input,
+        options=options,
+        requires="ClinVar / gnomAD / gene-disease databases (local files or network access)",
+        message="clinical annotation needs reference databases that are not bundled.",
+    )
 
-def build_cancer_evolution_tree(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def build_cancer_evolution_tree(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Build a rooted perfect-phylogeny evolution tree of somatic mutations from a binary mutation-by-sample (or cell) matrix.
 
     input: {'mutations': {'TP53': [1,1,0], ...}, 'samples': [...]} (or mutation -> {sample: 0/1}).
@@ -49,7 +60,10 @@ def build_cancer_evolution_tree(input: object, *, options: Mapping[str, object] 
     """
 
     options = dict(options or {})
-    return _done('build_cancer_evolution_tree', input, options, _clin.evolution_tree(input, options))
+    return _done(
+        "build_cancer_evolution_tree", input, options, _clin.evolution_tree(input, options)
+    )
+
 
 def calculate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Calculate an unspecified clinical quantity (not implemented).
@@ -59,9 +73,15 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
     Currently returns status 'not_implemented': 'calculate' is too unspecific to have a defined meaning; call a specific clinical function.
     """
 
-    return candidate_not_implemented('clinical', 'calculate', input, options=options,
-        requires='a specific clinical calculation (this generic name has no defined meaning)',
-        message="'calculate' is too unspecific to have a defined meaning; call a specific clinical function.")
+    return candidate_not_implemented(
+        "clinical",
+        "calculate",
+        input,
+        options=options,
+        requires="a specific clinical calculation (this generic name has no defined meaning)",
+        message="'calculate' is too unspecific to have a defined meaning; call a specific clinical function.",
+    )
+
 
 def call(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Call clinical variants from sequencing reads (not implemented).
@@ -71,9 +91,15 @@ def call(input: object, *, options: Mapping[str, object] | None = None) -> objec
     Currently returns status 'not_implemented': variant calling needs an external caller and aligned reads.
     """
 
-    return candidate_not_implemented('clinical', 'call', input, options=options,
-        requires='variant caller binary and aligned reads',
-        message='variant calling needs an external caller and aligned reads.')
+    return candidate_not_implemented(
+        "clinical",
+        "call",
+        input,
+        options=options,
+        requires="variant caller binary and aligned reads",
+        message="variant calling needs an external caller and aligned reads.",
+    )
+
 
 def classify(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Combine ACMG/AMP 2015 evidence criteria into a five-tier variant classification (Pathogenic ... Benign).
@@ -84,7 +110,8 @@ def classify(input: object, *, options: Mapping[str, object] | None = None) -> o
     """
 
     options = dict(options or {})
-    return _done('classify', input, options, _clin.classify_acmg(input, options))
+    return _done("classify", input, options, _clin.classify_acmg(input, options))
+
 
 def compare(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Compare clinical data sets (not implemented).
@@ -94,11 +121,19 @@ def compare(input: object, *, options: Mapping[str, object] | None = None) -> ob
     Currently returns status 'not_implemented': 'compare' is too unspecific here; use dnakit.variants.compare_vcfs for variant call sets.
     """
 
-    return candidate_not_implemented('clinical', 'compare', input, options=options,
-        requires='a specific comparison definition (this generic name has no defined meaning)',
-        message="'compare' is too unspecific here; use dnakit.variants.compare_vcfs for variant call sets.")
+    return candidate_not_implemented(
+        "clinical",
+        "compare",
+        input,
+        options=options,
+        requires="a specific comparison definition (this generic name has no defined meaning)",
+        message="'compare' is too unspecific here; use dnakit.variants.compare_vcfs for variant call sets.",
+    )
 
-def detect_circulating_tumor_dna(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def detect_circulating_tumor_dna(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Test for circulating tumour DNA in plasma at tracked tumour variants (tumour-informed detection by a pooled binomial test).
 
     input: tracked sites [{'alt_count','depth'[,'id','error_rate']}] or {'sites': [...]}, or a VCF/records with FORMAT/AD for the plasma sample (options.sample).
@@ -107,9 +142,19 @@ def detect_circulating_tumor_dna(input: object, *, options: Mapping[str, object]
     """
 
     options = dict(options or {})
-    return _done('detect_circulating_tumor_dna', input, options, _clin.tumor_informed_detection(input, options, alpha=0.01, min_sites=1, label='ctDNA detection'))
+    return _done(
+        "detect_circulating_tumor_dna",
+        input,
+        options,
+        _clin.tumor_informed_detection(
+            input, options, alpha=0.01, min_sites=1, label="ctDNA detection"
+        ),
+    )
 
-def detect_de_novo_variants(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def detect_de_novo_variants(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Detect de novo variant candidates in a child-father-mother trio from genotypes, depths and allelic depths.
 
     input: VCF text (tab-separated), a path to a VCF/VCF.gz, or a list of variant mappings (chrom, pos, ref, alt, genotypes/samples with FORMAT fields). It needs the three trio samples.
@@ -118,9 +163,12 @@ def detect_de_novo_variants(input: object, *, options: Mapping[str, object] | No
     """
 
     options = dict(options or {})
-    return _done('detect_de_novo_variants', input, options, _clin.de_novo(input, options))
+    return _done("detect_de_novo_variants", input, options, _clin.de_novo(input, options))
 
-def detect_minimal_residual_disease(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def detect_minimal_residual_disease(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Test for minimal residual disease (MRD) from plasma read counts at tracked tumour variants with a stricter tumour-informed pooled binomial test.
 
     input: tracked sites [{'alt_count','depth'[,'id','error_rate']}] or {'sites': [...]}, or a VCF/records with FORMAT/AD for the plasma sample (options.sample).
@@ -129,9 +177,19 @@ def detect_minimal_residual_disease(input: object, *, options: Mapping[str, obje
     """
 
     options = dict(options or {})
-    return _done('detect_minimal_residual_disease', input, options, _clin.tumor_informed_detection(input, options, alpha=0.001, min_sites=2, label='MRD detection'))
+    return _done(
+        "detect_minimal_residual_disease",
+        input,
+        options,
+        _clin.tumor_informed_detection(
+            input, options, alpha=0.001, min_sites=2, label="MRD detection"
+        ),
+    )
 
-def generate_clinical_variant_report(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def generate_clinical_variant_report(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Generate a clinical variant report (Markdown or plain text) from classified variants.
 
     input: {'variants': [{'gene','hgvs','zygosity','classification' or 'criteria', 'clinvar', ...}], 'sample': ..., 'indication': ...}, a list of such rows, or a VCF/records (gene, ClinVar and consequence fields are read from the records).
@@ -140,7 +198,10 @@ def generate_clinical_variant_report(input: object, *, options: Mapping[str, obj
     """
 
     options = dict(options or {})
-    return _done('generate_clinical_variant_report', input, options, _clin.clinical_report(input, options))
+    return _done(
+        "generate_clinical_variant_report", input, options, _clin.clinical_report(input, options)
+    )
+
 
 def infer_tumor_clones(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Infer tumour clones by clustering mutation ALT fractions with a binomial mixture model (EM, number of clones chosen by BIC).
@@ -151,7 +212,8 @@ def infer_tumor_clones(input: object, *, options: Mapping[str, object] | None = 
     """
 
     options = dict(options or {})
-    return _done('infer_tumor_clones', input, options, _clin.infer_clones(input, options))
+    return _done("infer_tumor_clones", input, options, _clin.infer_clones(input, options))
+
 
 def predict(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Predict clinical outcomes or variant effects with a trained model (not implemented).
@@ -161,9 +223,15 @@ def predict(input: object, *, options: Mapping[str, object] | None = None) -> ob
     Currently returns status 'not_implemented': prediction needs trained model weights that are not available.
     """
 
-    return candidate_not_implemented('clinical', 'predict', input, options=options,
-        requires='trained clinical/pathogenicity prediction model',
-        message='prediction needs trained model weights that are not available.')
+    return candidate_not_implemented(
+        "clinical",
+        "predict",
+        input,
+        options=options,
+        requires="trained clinical/pathogenicity prediction model",
+        message="prediction needs trained model weights that are not available.",
+    )
+
 
 def prioritize(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Rank clinical candidate variants with a transparent additive score (consequence, ClinVar, rarity, CADD/REVEL, gene panel).
@@ -174,7 +242,8 @@ def prioritize(input: object, *, options: Mapping[str, object] | None = None) ->
     """
 
     options = dict(options or {})
-    return _done('prioritize', input, options, _prior.prioritize(input, options))
+    return _done("prioritize", input, options, _prior.prioritize(input, options))
+
 
 def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Quality-control a clinical call set: per-sample call rate, het/hom ratio, Ti/Tv and depth, per-site call rate and exact HWE test, with threshold flags.
@@ -185,7 +254,8 @@ def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """
 
     options = dict(options or {})
-    return _done('qc', input, options, _clin.clinical_qc(input, options))
+    return _done("qc", input, options, _clin.clinical_qc(input, options))
+
 
 def read(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Read a (ClinVar-style) VCF or variant records into clinical fields: gene, ClinVar significance and review status, disease, consequence and genotypes.
@@ -196,7 +266,8 @@ def read(input: object, *, options: Mapping[str, object] | None = None) -> objec
     """
 
     options = dict(options or {})
-    return _done('read', input, options, _clin.read_clinical(input, options))
+    return _done("read", input, options, _clin.read_clinical(input, options))
+
 
 def report(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Generate a clinical variant report (Markdown or plain text) from classified variants.
@@ -207,7 +278,8 @@ def report(input: object, *, options: Mapping[str, object] | None = None) -> obj
     """
 
     options = dict(options or {})
-    return _done('report', input, options, _clin.clinical_report(input, options))
+    return _done("report", input, options, _clin.clinical_report(input, options))
+
 
 def type_hla(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Type HLA alleles from sequencing reads (not implemented).
@@ -217,14 +289,61 @@ def type_hla(input: object, *, options: Mapping[str, object] | None = None) -> o
     Currently returns status 'not_implemented': HLA typing needs an external program and the IMGT/HLA reference.
     """
 
-    return candidate_not_implemented('clinical', 'type_hla', input, options=options,
-        requires='HLA typing program (OptiType/HLA-LA/arcasHLA) with IPD-IMGT/HLA reference and reads',
-        message='HLA typing needs an external program and the IMGT/HLA reference.')
+    return candidate_not_implemented(
+        "clinical",
+        "type_hla",
+        input,
+        options=options,
+        requires="HLA typing program (OptiType/HLA-LA/arcasHLA) with IPD-IMGT/HLA reference and reads",
+        message="HLA typing needs an external program and the IMGT/HLA reference.",
+    )
 
-__all__ = ['analyze_trio_variants', 'annotate', 'build_cancer_evolution_tree', 'calculate', 'call', 'classify', 'compare', 'detect_circulating_tumor_dna', 'detect_de_novo_variants', 'detect_minimal_residual_disease', 'generate_clinical_variant_report', 'infer_tumor_clones', 'predict', 'prioritize', 'qc', 'read', 'report', 'type_hla']
 
-__candidate_adapter_operations__ = set(['analyze_trio_variants', 'annotate', 'build_cancer_evolution_tree', 'calculate', 'call', 'classify', 'compare', 'detect_circulating_tumor_dna', 'detect_de_novo_variants', 'detect_minimal_residual_disease', 'generate_clinical_variant_report', 'infer_tumor_clones', 'predict', 'prioritize', 'qc', 'read', 'report', 'type_hla'])
+__all__ = [
+    "analyze_trio_variants",
+    "annotate",
+    "build_cancer_evolution_tree",
+    "calculate",
+    "call",
+    "classify",
+    "compare",
+    "detect_circulating_tumor_dna",
+    "detect_de_novo_variants",
+    "detect_minimal_residual_disease",
+    "generate_clinical_variant_report",
+    "infer_tumor_clones",
+    "predict",
+    "prioritize",
+    "qc",
+    "read",
+    "report",
+    "type_hla",
+]
+
+__candidate_adapter_operations__ = set(
+    [
+        "analyze_trio_variants",
+        "annotate",
+        "build_cancer_evolution_tree",
+        "calculate",
+        "call",
+        "classify",
+        "compare",
+        "detect_circulating_tumor_dna",
+        "detect_de_novo_variants",
+        "detect_minimal_residual_disease",
+        "generate_clinical_variant_report",
+        "infer_tumor_clones",
+        "predict",
+        "prioritize",
+        "qc",
+        "read",
+        "report",
+        "type_hla",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

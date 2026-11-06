@@ -141,7 +141,7 @@ __candidate_adapter_operations__ = set(
 
 from dnakit._verbosity import register_public as _register_public_verbose
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     build_tree_sequence,
     calculate_diversity,
@@ -156,7 +156,20 @@ from .backends import (
     write_tree_sequence,
 )
 
-__all__ = [*__all__, "build_tree_sequence", "calculate_diversity", "calculate_fst", "calculate_sfs_log_likelihood", "calculate_site_frequency_spectrum", "calculate_tajimas_d", "estimate_sfs_theta", "expected_neutral_sfs", "fold_sfs", "read_tree_sequence", "write_tree_sequence"]
+__all__ = [
+    *__all__,
+    "build_tree_sequence",
+    "calculate_diversity",
+    "calculate_fst",
+    "calculate_sfs_log_likelihood",
+    "calculate_site_frequency_spectrum",
+    "calculate_tajimas_d",
+    "estimate_sfs_theta",
+    "expected_neutral_sfs",
+    "fold_sfs",
+    "read_tree_sequence",
+    "write_tree_sequence",
+]
 
 # Full-pass exports (see docs/api/features)
 from .dadi_functions import (
@@ -179,7 +192,6 @@ from .dadi_functions import (
     trinucleotide_frequency_array,
     write_sfs_file,
 )
-
 from .tskit_functions import (
     complement_intervals,
     count_sample_topologies,
@@ -195,7 +207,39 @@ from .tskit_functions import (
     write_text_tree_sequence,
 )
 
-__all__ = [*__all__, "annotate_snps_from_annovar", "apply_ancestral_misidentification", "bootstrap_snp_spectra", "expected_sfs_1d", "expected_sfs_2d", "expected_sfs_3d", "expected_sfs_from_demes", "expected_sfs_selection", "fit_demographic_model", "parameter_uncertainty_fim", "pool_sfs_populations", "read_sfs_file", "read_snp_data", "read_vcf_data", "sfs_residuals", "snp_configuration_counts", "trinucleotide_frequency_array", "write_sfs_file", "complement_intervals", "count_sample_topologies", "export_ms_format", "export_sample_sequences", "map_allele_indices", "random_tree_newick", "read_plink_fam", "read_text_table", "read_text_tree_sequence", "resolve_polytomies", "tree_to_newick", "write_text_tree_sequence"]
+__all__ = [
+    *__all__,
+    "annotate_snps_from_annovar",
+    "apply_ancestral_misidentification",
+    "bootstrap_snp_spectra",
+    "expected_sfs_1d",
+    "expected_sfs_2d",
+    "expected_sfs_3d",
+    "expected_sfs_from_demes",
+    "expected_sfs_selection",
+    "fit_demographic_model",
+    "parameter_uncertainty_fim",
+    "pool_sfs_populations",
+    "read_sfs_file",
+    "read_snp_data",
+    "read_vcf_data",
+    "sfs_residuals",
+    "snp_configuration_counts",
+    "trinucleotide_frequency_array",
+    "write_sfs_file",
+    "complement_intervals",
+    "count_sample_topologies",
+    "export_ms_format",
+    "export_sample_sequences",
+    "map_allele_indices",
+    "random_tree_newick",
+    "read_plink_fam",
+    "read_text_table",
+    "read_text_tree_sequence",
+    "resolve_polytomies",
+    "tree_to_newick",
+    "write_text_tree_sequence",
+]
 
 # Review-pass exports (see docs/api/features)
 from .dadi_review_functions import (
@@ -212,7 +256,20 @@ from .dadi_review_functions import (
     vcf_subsample_bootstrap_spectra,
 )
 
-__all__ = [*__all__, "expected_neutral_sfs_2d", "fit_demographic_model_to_residual", "godambe_matrices", "ms_command_line", "ms_core_command_2d", "nested_model_statistic", "parameter_uncertainty_gim", "slim_output_data_dict", "total_substitution_rate", "trinucleotide_misid_table", "vcf_subsample_bootstrap_spectra"]
+__all__ = [
+    *__all__,
+    "expected_neutral_sfs_2d",
+    "fit_demographic_model_to_residual",
+    "godambe_matrices",
+    "ms_command_line",
+    "ms_core_command_2d",
+    "nested_model_statistic",
+    "parameter_uncertainty_gim",
+    "slim_output_data_dict",
+    "total_substitution_rate",
+    "trinucleotide_misid_table",
+    "vcf_subsample_bootstrap_spectra",
+]
 
 # Family-pass exports (see docs/api/features)
 from .dadi_family_functions import (
@@ -223,13 +280,22 @@ from .dadi_family_functions import (
     fit_demographic_model_nlopt,
     scale_model_sfs_to_data,
 )
-
 from .tskit_family_functions import (
     count_tree_topologies,
     export_tree_sequence_nexus,
 )
 
-__all__ = [*__all__, "calculate_model_log_likelihood", "fit_demographic_model_constrained", "fit_demographic_model_grid", "fit_demographic_model_natural_scale", "fit_demographic_model_nlopt", "scale_model_sfs_to_data", "count_tree_topologies", "export_tree_sequence_nexus"]
+__all__ = [
+    *__all__,
+    "calculate_model_log_likelihood",
+    "fit_demographic_model_constrained",
+    "fit_demographic_model_grid",
+    "fit_demographic_model_natural_scale",
+    "fit_demographic_model_nlopt",
+    "scale_model_sfs_to_data",
+    "count_tree_topologies",
+    "export_tree_sequence_nexus",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -310,7 +376,69 @@ from .tskit_gap_functions import (
     tskit_random_nucleotides,
 )
 
-__all__ = [*__all__, "fig_voight_painting", "plot_haplotype_frequencies", "plot_joint_sfs", "plot_joint_sfs_folded", "plot_joint_sfs_folded_scaled", "plot_joint_sfs_scaled", "plot_moving_haplotype_frequencies", "plot_pairwise_distance", "plot_pairwise_ld", "plot_sfs", "plot_sfs_folded", "plot_sfs_folded_scaled", "plot_sfs_scaled", "plot_variant_locator", "plot_voight_painting", "roh_poissonhmm", "allel_vcf_to_zarr", "plot_3d_spectrum_mayavi", "vourlaki_visual_validation_png", "coverage_depth_distribution", "dfe_mixture_spectrum", "fit_demes_graph_parameters", "plot_dfe_bivariate", "plot_dfe_bivariate_point_pos", "plot_sfs_1d", "plot_sfs_1d_comparison", "plot_sfs_2d", "plot_sfs_2d_comparison", "plot_sfs_2d_meta_residual", "plot_sfs_2d_residual", "plot_sfs_3d", "plot_sfs_3d_comparison", "plot_sfs_3d_pairwise", "plot_trispectrum", "plot_trispectrum_comparison", "plot_two_locus_comparison", "plot_two_locus_spectrum", "dfe_mixture_point_pos_spectrum", "optimize_demes_graph_parameters", "plot_triallelic_spectrum", "plot_triallelic_spectrum_comparison", "plot_two_locus_spectrum_3d", "draw_tree_text", "export_tree_file_edges_table", "export_tree_file_fasta", "export_tree_file_individuals_table", "export_tree_file_migrations_table", "export_tree_file_mutations_table", "export_tree_file_nodes_table", "export_tree_file_populations_table", "export_tree_file_provenances_table", "export_tree_file_sites_table", "export_tree_file_vcf", "tree_file_info", "tree_file_trees", "draw_tree_html", "draw_tree_sequence_html", "draw_tree_sequence_svg", "draw_variant_html", "tskit_random_nucleotides"]
+__all__ = [
+    *__all__,
+    "fig_voight_painting",
+    "plot_haplotype_frequencies",
+    "plot_joint_sfs",
+    "plot_joint_sfs_folded",
+    "plot_joint_sfs_folded_scaled",
+    "plot_joint_sfs_scaled",
+    "plot_moving_haplotype_frequencies",
+    "plot_pairwise_distance",
+    "plot_pairwise_ld",
+    "plot_sfs",
+    "plot_sfs_folded",
+    "plot_sfs_folded_scaled",
+    "plot_sfs_scaled",
+    "plot_variant_locator",
+    "plot_voight_painting",
+    "roh_poissonhmm",
+    "allel_vcf_to_zarr",
+    "plot_3d_spectrum_mayavi",
+    "vourlaki_visual_validation_png",
+    "coverage_depth_distribution",
+    "dfe_mixture_spectrum",
+    "fit_demes_graph_parameters",
+    "plot_dfe_bivariate",
+    "plot_dfe_bivariate_point_pos",
+    "plot_sfs_1d",
+    "plot_sfs_1d_comparison",
+    "plot_sfs_2d",
+    "plot_sfs_2d_comparison",
+    "plot_sfs_2d_meta_residual",
+    "plot_sfs_2d_residual",
+    "plot_sfs_3d",
+    "plot_sfs_3d_comparison",
+    "plot_sfs_3d_pairwise",
+    "plot_trispectrum",
+    "plot_trispectrum_comparison",
+    "plot_two_locus_comparison",
+    "plot_two_locus_spectrum",
+    "dfe_mixture_point_pos_spectrum",
+    "optimize_demes_graph_parameters",
+    "plot_triallelic_spectrum",
+    "plot_triallelic_spectrum_comparison",
+    "plot_two_locus_spectrum_3d",
+    "draw_tree_text",
+    "export_tree_file_edges_table",
+    "export_tree_file_fasta",
+    "export_tree_file_individuals_table",
+    "export_tree_file_migrations_table",
+    "export_tree_file_mutations_table",
+    "export_tree_file_nodes_table",
+    "export_tree_file_populations_table",
+    "export_tree_file_provenances_table",
+    "export_tree_file_sites_table",
+    "export_tree_file_vcf",
+    "tree_file_info",
+    "tree_file_trees",
+    "draw_tree_html",
+    "draw_tree_sequence_html",
+    "draw_tree_sequence_svg",
+    "draw_variant_html",
+    "tskit_random_nucleotides",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .biopython_p19_cluster_functions import (

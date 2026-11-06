@@ -24,23 +24,43 @@ def _accession(value: str) -> str:
     return value
 
 
-def prefetch_sra_run(accession: str, output_dir: str | Path, *, executable_path: str | None = None,
-                     timeout_seconds: float = 3600, verbose: bool = True) -> dict[str, Any]:
+def prefetch_sra_run(
+    accession: str,
+    output_dir: str | Path,
+    *,
+    executable_path: str | None = None,
+    timeout_seconds: float = 3600,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Download an SRA run archive with NCBI prefetch; network access is required."""
     run = _accession(accession)
     executable = cli.program("prefetch", explicit=executable_path, hint=_HINT)
     output = cli.new_directory(output_dir, "output_dir")
     archive = output / run / f"{run}.sra"
-    result = cli.run("prefetch", ["-O", str(output), run], cwd=output, expected=[archive],
-                     explicit=executable, hint=_HINT, timeout_seconds=timeout_seconds)
+    result = cli.run(
+        "prefetch",
+        ["-O", str(output), run],
+        cwd=output,
+        expected=[archive],
+        explicit=executable,
+        hint=_HINT,
+        timeout_seconds=timeout_seconds,
+    )
     result.update(accession=run, archive=str(archive), network_operation=True)
     return result
 
 
-def extract_sra_reads(accession: str, output_dir: str | Path, *, output_format: str = "fastq",
-                      local_sra: str | Path | None = None, threads: int | None = None,
-                      executable_path: str | None = None, timeout_seconds: float = 3600,
-                      verbose: bool = True) -> dict[str, Any]:
+def extract_sra_reads(
+    accession: str,
+    output_dir: str | Path,
+    *,
+    output_format: str = "fastq",
+    local_sra: str | Path | None = None,
+    threads: int | None = None,
+    executable_path: str | None = None,
+    timeout_seconds: float = 3600,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Extract FASTQ or FASTA with fasterq-dump; optionally use an existing local SRA archive.
 
     ``output_format`` is ``fastq`` (default) or ``fasta``. Without ``local_sra`` the
@@ -59,15 +79,26 @@ def extract_sra_reads(accession: str, output_dir: str | Path, *, output_format: 
     if count is not None:
         args += ["--threads", str(count)]
     args.append(source)
-    result = cli.run("fasterq-dump", args, cwd=output, expected=[], explicit=executable,
-                     hint=_HINT, timeout_seconds=timeout_seconds)
+    result = cli.run(
+        "fasterq-dump",
+        args,
+        cwd=output,
+        expected=[],
+        explicit=executable,
+        hint=_HINT,
+        timeout_seconds=timeout_seconds,
+    )
     files = sorted(f for f in output.glob(f"{run}*.{kind}") if f.is_file())
     if not files or any(f.stat().st_size == 0 for f in files):
         raise DNAKitError("fasterq-dump finished without non-empty sequence output files.")
-    result.update(accession=run, output_format=kind, outputs=[str(f) for f in files],
-                  network_operation=local_sra is None)
+    result.update(
+        accession=run,
+        output_format=kind,
+        outputs=[str(f) for f in files],
+        network_operation=local_sra is None,
+    )
     return result
 
 
-__all__ = ["prefetch_sra_run", "extract_sra_reads"]
+__all__ = ["extract_sra_reads", "prefetch_sra_run"]
 _register_public_verbose(globals(), tuple(__all__))

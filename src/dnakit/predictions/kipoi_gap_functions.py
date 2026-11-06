@@ -22,9 +22,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from dnakit.bioinformatics._common import require as _require
-
 from dnakit._verbosity import register_public as _register_public_verbose
+from dnakit.bioinformatics._common import require as _require
 from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 
@@ -42,7 +41,7 @@ _DATALOADER_COLUMNS = ("dataloader", "version", "type", "doc", "inputs", "target
 def _kipoi() -> Any:
     try:
         import kipoi
-        import kipoi.cli.main  # noqa: F401  (prediction helpers live in this submodule)
+        import kipoi.cli.main
     except ImportError as exc:
         raise BackendUnavailableError(f"kipoi could not be imported: {exc}", hint=_HINT) from exc
     return kipoi

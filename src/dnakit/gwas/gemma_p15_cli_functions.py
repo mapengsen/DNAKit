@@ -57,7 +57,9 @@ def _genotypes(
     else:
         arguments += ["-g", str(_cli.existing_file(genotype_file, "genotype_file"))]  # type: ignore[arg-type]
         if phenotype_file is None and phenotype_required:
-            raise ConfigurationError("phenotype_file is required with a BIMBAM genotype_file (it also selects the individuals).")
+            raise ConfigurationError(
+                "phenotype_file is required with a BIMBAM genotype_file (it also selects the individuals)."
+            )
     if phenotype_file is not None:
         arguments += ["-p", str(_cli.existing_file(phenotype_file, "phenotype_file"))]
     if annotation_file is not None:
@@ -65,11 +67,21 @@ def _genotypes(
     return arguments
 
 
-def _filters(miss: float | None, maf: float | None, hwe: float | None, r2: float | None, not_snp: bool) -> list[str]:
+def _filters(
+    miss: float | None, maf: float | None, hwe: float | None, r2: float | None, not_snp: bool
+) -> list[str]:
     arguments: list[str] = []
-    for flag, value, low, high in (("-miss", miss, 0.0, 1.0), ("-maf", maf, 0.0, 0.5), ("-hwe", hwe, 0.0, 1.0), ("-r2", r2, 0.0, 1.0)):
+    for flag, value, low, high in (
+        ("-miss", miss, 0.0, 1.0),
+        ("-maf", maf, 0.0, 0.5),
+        ("-hwe", hwe, 0.0, 1.0),
+        ("-r2", r2, 0.0, 1.0),
+    ):
         if value is not None:
-            arguments += [flag, format(_cli.number(value, flag.lstrip("-"), minimum=low, maximum=high), ".12g")]
+            arguments += [
+                flag,
+                format(_cli.number(value, flag.lstrip("-"), minimum=low, maximum=high), ".12g"),
+            ]
     if _cli.flag(not_snp, "not_snp"):
         arguments.append("-notsnp")
     return arguments
@@ -111,7 +123,12 @@ def _table(path: Path, limit: int = 20000) -> list[dict[str, Any]]:
             continue
         if len(rows) >= limit:
             break
-        rows.append({name: (value if name in text_columns else _cli.convert_number(value)) for name, value in zip(names, fields, strict=False)})
+        rows.append(
+            {
+                name: (value if name in text_columns else _cli.convert_number(value))
+                for name, value in zip(names, fields, strict=False)
+            }
+        )
     return rows
 
 
@@ -130,7 +147,13 @@ def _gemma(
     command = [*arguments, "-outdir", str(out), "-o", prefix]
     accepted = (0, 134, -6) if tolerate_exit_abort else (0,)
     record = _cli.invoke(
-        _TOOL, command, cwd=out, expected=files, explicit=gemma_path, timeout_seconds=timeout_seconds, accept_codes=accepted,
+        _TOOL,
+        command,
+        cwd=out,
+        expected=files,
+        explicit=gemma_path,
+        timeout_seconds=timeout_seconds,
+        accept_codes=accepted,
     )
     if record["return_code"] != 0:
         record["warnings"] = [
@@ -174,12 +197,28 @@ def gemma_snp_covariance_matrix(
     if sample is not None:
         arguments += ["-sample", str(_cli.integer(sample, "sample", minimum=2))]
     arguments += _filters(miss, maf, hwe, r2, not_snp) + ["-gs"]
-    record = _gemma(arguments, out, output_prefix, ["S.txt", "size.txt"], gemma_path, timeout_seconds, tolerate_exit_abort=True)
-    s_rows = [line.split("\t") for line in (out / f"{output_prefix}.S.txt").read_text().splitlines() if line]
+    record = _gemma(
+        arguments,
+        out,
+        output_prefix,
+        ["S.txt", "size.txt"],
+        gemma_path,
+        timeout_seconds,
+        tolerate_exit_abort=True,
+    )
+    s_rows = [
+        line.split("\t")
+        for line in (out / f"{output_prefix}.S.txt").read_text().splitlines()
+        if line
+    ]
     sizes = [float(x) for x in (out / f"{output_prefix}.size.txt").read_text().split()]
     return _cli.finish(
-        record, "snp_variance_covariance_matrix", output_directory=str(out), s_matrix=[[float(x) for x in row] for row in s_rows],
-        sizes=sizes, log_values=_log_values(out / f"{output_prefix}.log.txt"),
+        record,
+        "snp_variance_covariance_matrix",
+        output_directory=str(out),
+        s_matrix=[[float(x) for x in row] for row in s_rows],
+        sizes=sizes,
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
     )
 
 
@@ -203,11 +242,20 @@ def gemma_summary_statistic_q_vector(
     ``output_directory``.
     """
     out = _cli.new_directory(output_directory, "output_directory")
-    arguments = ["-beta", str(_cli.existing_file(beta_file, "beta_file")), "-p", str(_cli.existing_file(phenotype_file, "phenotype_file"))]
+    arguments = [
+        "-beta",
+        str(_cli.existing_file(beta_file, "beta_file")),
+        "-p",
+        str(_cli.existing_file(phenotype_file, "phenotype_file")),
+    ]
     arguments += _optional_file("-cat", category_file, "category_file") + ["-gq"]
-    record = _gemma(arguments, out, output_prefix, ["q.txt", "Vq.txt", "size.txt"], gemma_path, timeout_seconds)
+    record = _gemma(
+        arguments, out, output_prefix, ["q.txt", "Vq.txt", "size.txt"], gemma_path, timeout_seconds
+    )
     return _cli.finish(
-        record, "summary_statistic_q_vector", output_directory=str(out),
+        record,
+        "summary_statistic_q_vector",
+        output_directory=str(out),
         q=[float(x) for x in (out / f"{output_prefix}.q.txt").read_text().split()],
         q_errors=[float(x) for x in (out / f"{output_prefix}.Vq.txt").read_text().split()],
         sizes=[float(x) for x in (out / f"{output_prefix}.size.txt").read_text().split()],
@@ -235,12 +283,24 @@ def gemma_eigen_decomposition(
     ``output_directory``; the eigenvalues are also returned.
     """
     out = _cli.new_directory(output_directory, "output_directory")
-    arguments = _genotypes(plink_prefix, genotype_file, phenotype_file, None, phenotype_required=True)
-    arguments += ["-k", str(_cli.existing_file(kinship_file, "kinship_file"))] + _optional_file("-c", covariates_file, "covariates_file") + ["-eigen"]
-    record = _gemma(arguments, out, output_prefix, ["eigenD.txt", "eigenU.txt"], gemma_path, timeout_seconds)
+    arguments = _genotypes(
+        plink_prefix, genotype_file, phenotype_file, None, phenotype_required=True
+    )
+    arguments += (
+        ["-k", str(_cli.existing_file(kinship_file, "kinship_file"))]
+        + _optional_file("-c", covariates_file, "covariates_file")
+        + ["-eigen"]
+    )
+    record = _gemma(
+        arguments, out, output_prefix, ["eigenD.txt", "eigenU.txt"], gemma_path, timeout_seconds
+    )
     values = [float(x) for x in (out / f"{output_prefix}.eigenD.txt").read_text().split()]
     return _cli.finish(
-        record, "kinship_eigen_decomposition", output_directory=str(out), eigen_values=values, individual_count=len(values),
+        record,
+        "kinship_eigen_decomposition",
+        output_directory=str(out),
+        eigen_values=values,
+        individual_count=len(values),
         log_values=_log_values(out / f"{output_prefix}.log.txt"),
     )
 
@@ -281,7 +341,9 @@ def gemma_summary_variance_components(
     chosen = _cli.choice(method, ("mqs_hew", "mqs_ldw"), "method")
     arguments = ["-beta", str(_cli.existing_file(beta_file, "beta_file"))]
     arguments += _genotypes(plink_prefix, genotype_file, phenotype_file, None)
-    arguments += _optional_file("-cat", category_file, "category_file") + _optional_file("-c", covariates_file, "covariates_file")
+    arguments += _optional_file("-cat", category_file, "category_file") + _optional_file(
+        "-c", covariates_file, "covariates_file"
+    )
     if chosen == "mqs_ldw":
         if ld_score_file is None:
             raise ConfigurationError("method='mqs_ldw' needs ld_score_file.")
@@ -290,9 +352,18 @@ def gemma_summary_variance_components(
         raise ConfigurationError("ld_score_file is only used with method='mqs_ldw'.")
     if sample is not None:
         arguments += ["-sample", str(_cli.integer(sample, "sample", minimum=2))]
-    arguments += _filters(miss, maf, hwe, r2, not_snp) + ["-vc", "2" if chosen == "mqs_ldw" else "1"]
+    arguments += _filters(miss, maf, hwe, r2, not_snp) + [
+        "-vc",
+        "2" if chosen == "mqs_ldw" else "1",
+    ]
     record = _gemma(arguments, out, output_prefix, ["log.txt"], gemma_path, timeout_seconds)
-    return _cli.finish(record, "summary_statistic_variance_components", output_directory=str(out), method=chosen, log_values=_log_values(out / f"{output_prefix}.log.txt"))
+    return _cli.finish(
+        record,
+        "summary_statistic_variance_components",
+        output_directory=str(out),
+        method=chosen,
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
+    )
 
 
 def gemma_summary_variance_component_errors(
@@ -325,7 +396,12 @@ def gemma_summary_variance_component_errors(
     chosen = _cli.choice(method, ("mqs_hew", "mqs_ldw"), "method")
     arguments = ["-beta", str(_cli.existing_file(beta_file, "beta_file"))]
     arguments += _genotypes(plink_prefix, genotype_file, phenotype_file, None)
-    arguments += ["-ref", str(Path(reference_prefix).expanduser().resolve()), "-pve", format(_cli.number(pve, "pve"), ".12g")]
+    arguments += [
+        "-ref",
+        str(Path(reference_prefix).expanduser().resolve()),
+        "-pve",
+        format(_cli.number(pve, "pve"), ".12g"),
+    ]
     arguments += _optional_file("-cat", category_file, "category_file")
     if chosen == "mqs_ldw":
         if ld_score_file is None:
@@ -333,20 +409,37 @@ def gemma_summary_variance_component_errors(
         arguments += ["-wcat", str(_cli.existing_file(ld_score_file, "ld_score_file"))]
     arguments += ["-ci", "2" if chosen == "mqs_ldw" else "1"]
     record = _gemma(arguments, out, output_prefix, ["log.txt"], gemma_path, timeout_seconds)
-    return _cli.finish(record, "summary_statistic_variance_component_errors", output_directory=str(out), method=chosen, log_values=_log_values(out / f"{output_prefix}.log.txt"))
+    return _cli.finish(
+        record,
+        "summary_statistic_variance_component_errors",
+        output_directory=str(out),
+        method=chosen,
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
+    )
 
 
 def _lmm_arguments(
-    kinship_file: str | None, eigen_values_file: str | None, eigen_vectors_file: str | None, covariates_file: str | None, test: str,
+    kinship_file: str | None,
+    eigen_values_file: str | None,
+    eigen_vectors_file: str | None,
+    covariates_file: str | None,
+    test: str,
 ) -> list[str]:
     tests = {"wald": "1", "likelihood_ratio": "2", "score": "3", "all": "4"}
     arguments: list[str] = []
     if kinship_file is not None:
         arguments += ["-k", str(_cli.existing_file(kinship_file, "kinship_file"))]
     elif eigen_values_file is not None and eigen_vectors_file is not None:
-        arguments += ["-d", str(_cli.existing_file(eigen_values_file, "eigen_values_file")), "-u", str(_cli.existing_file(eigen_vectors_file, "eigen_vectors_file"))]
+        arguments += [
+            "-d",
+            str(_cli.existing_file(eigen_values_file, "eigen_values_file")),
+            "-u",
+            str(_cli.existing_file(eigen_vectors_file, "eigen_vectors_file")),
+        ]
     else:
-        raise ConfigurationError("give kinship_file, or eigen_values_file together with eigen_vectors_file.")
+        raise ConfigurationError(
+            "give kinship_file, or eigen_values_file together with eigen_vectors_file."
+        )
     arguments += _optional_file("-c", covariates_file, "covariates_file")
     return arguments + ["-lmm", tests[_cli.choice(test, tuple(tests), "test")]]
 
@@ -380,11 +473,22 @@ def gemma_gxe_association(
     """
     out = _cli.new_directory(output_directory, "output_directory")
     arguments = _genotypes(plink_prefix, None, phenotype_file, None)
-    arguments += ["-gxe", str(_cli.existing_file(environment_file, "environment_file"))] + _filters(miss, maf, None, None, False)
-    arguments += _lmm_arguments(kinship_file, eigen_values_file, eigen_vectors_file, covariates_file, test)
+    arguments += ["-gxe", str(_cli.existing_file(environment_file, "environment_file"))] + _filters(
+        miss, maf, None, None, False
+    )
+    arguments += _lmm_arguments(
+        kinship_file, eigen_values_file, eigen_vectors_file, covariates_file, test
+    )
     record = _gemma(arguments, out, output_prefix, ["assoc.txt"], gemma_path, timeout_seconds)
     rows = _table(out / f"{output_prefix}.assoc.txt")
-    return _cli.finish(record, "gxe_linear_mixed_model", output_directory=str(out), association_count=len(rows), associations=rows[:1000], log_values=_log_values(out / f"{output_prefix}.log.txt"))
+    return _cli.finish(
+        record,
+        "gxe_linear_mixed_model",
+        output_directory=str(out),
+        association_count=len(rows),
+        associations=rows[:1000],
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
+    )
 
 
 def gemma_multivariate_association(
@@ -419,15 +523,24 @@ def gemma_multivariate_association(
     out = _cli.new_directory(output_directory, "output_directory")
     if isinstance(phenotype_columns, str) or len(phenotype_columns) < 2:
         raise ConfigurationError("phenotype_columns must list at least two phenotype columns.")
-    columns = [str(_cli.integer(item, "phenotype_columns", minimum=1)) for item in phenotype_columns]
+    columns = [
+        str(_cli.integer(item, "phenotype_columns", minimum=1)) for item in phenotype_columns
+    ]
     arguments = _genotypes(plink_prefix, genotype_file, phenotype_file, annotation_file)
     arguments += _filters(miss, maf, hwe, r2, False)
-    arguments += _lmm_arguments(kinship_file, eigen_values_file, eigen_vectors_file, covariates_file, "wald") + ["-n", *columns]
+    arguments += _lmm_arguments(
+        kinship_file, eigen_values_file, eigen_vectors_file, covariates_file, "wald"
+    ) + ["-n", *columns]
     record = _gemma(arguments, out, output_prefix, ["assoc.txt"], gemma_path, timeout_seconds)
     rows = _table(out / f"{output_prefix}.assoc.txt")
     return _cli.finish(
-        record, "multivariate_linear_mixed_model", output_directory=str(out), phenotype_columns=[int(c) for c in columns],
-        association_count=len(rows), associations=rows[:1000], log_values=_log_values(out / f"{output_prefix}.log.txt"),
+        record,
+        "multivariate_linear_mixed_model",
+        output_directory=str(out),
+        phenotype_columns=[int(c) for c in columns],
+        association_count=len(rows),
+        associations=rows[:1000],
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
     )
 
 
@@ -466,24 +579,52 @@ def gemma_bslmm(
     ``<prefix>.bv.txt``, ``<prefix>.gamma.txt`` (MCMC models only) and the log.
     """
     out = _cli.new_directory(output_directory, "output_directory")
-    number = {"linear": 1, "ridge": 2, "probit": 3}[_cli.choice(model, ("linear", "ridge", "probit"), "model")]
-    arguments = _genotypes(plink_prefix, genotype_file, phenotype_file, annotation_file, phenotype_required=True)
-    arguments += _filters(miss, maf, hwe, r2, False) + _optional_file("-k", kinship_file, "kinship_file")
-    arguments += ["-n", str(_cli.integer(phenotype_column, "phenotype_column", minimum=1)), "-bslmm", str(number)]
+    number = {"linear": 1, "ridge": 2, "probit": 3}[
+        _cli.choice(model, ("linear", "ridge", "probit"), "model")
+    ]
+    arguments = _genotypes(
+        plink_prefix, genotype_file, phenotype_file, annotation_file, phenotype_required=True
+    )
+    arguments += _filters(miss, maf, hwe, r2, False) + _optional_file(
+        "-k", kinship_file, "kinship_file"
+    )
+    arguments += [
+        "-n",
+        str(_cli.integer(phenotype_column, "phenotype_column", minimum=1)),
+        "-bslmm",
+        str(number),
+    ]
     if number != 2:
-        arguments += ["-w", str(_cli.integer(burn_in, "burn_in", minimum=0)), "-s", str(_cli.integer(sampling_steps, "sampling_steps", minimum=1))]
+        arguments += [
+            "-w",
+            str(_cli.integer(burn_in, "burn_in", minimum=0)),
+            "-s",
+            str(_cli.integer(sampling_steps, "sampling_steps", minimum=1)),
+        ]
     if max_snps_in_model is not None:
         arguments += ["-smax", str(_cli.integer(max_snps_in_model, "max_snps_in_model", minimum=1))]
     if seed is not None:
         arguments += ["-seed", str(_cli.integer(seed, "seed", minimum=0))]
-    expected = ["param.txt", "bv.txt", "log.txt"] + (["hyp.txt", "gamma.txt"] if number != 2 else [])
+    expected = ["param.txt", "bv.txt", "log.txt"] + (
+        ["hyp.txt", "gamma.txt"] if number != 2 else []
+    )
     record = _gemma(arguments, out, output_prefix, expected, gemma_path, timeout_seconds)
     effects = _table(out / f"{output_prefix}.param.txt")
     hyper = _table(out / f"{output_prefix}.hyp.txt")
-    means = {key: sum(float(row[key]) for row in hyper) / len(hyper) for key in hyper[0]} if hyper else {}
+    means = (
+        {key: sum(float(row[key]) for row in hyper) / len(hyper) for key in hyper[0]}
+        if hyper
+        else {}
+    )
     return _cli.finish(
-        record, "bayesian_sparse_linear_mixed_model", output_directory=str(out), model=model, snp_effects=effects[:1000],
-        snp_count=len(effects), hyper_parameter_means=means, log_values=_log_values(out / f"{output_prefix}.log.txt"),
+        record,
+        "bayesian_sparse_linear_mixed_model",
+        output_directory=str(out),
+        model=model,
+        snp_effects=effects[:1000],
+        snp_count=len(effects),
+        hyper_parameter_means=means,
+        log_values=_log_values(out / f"{output_prefix}.log.txt"),
     )
 
 
@@ -517,32 +658,60 @@ def gemma_predict_phenotypes(
     """
     out = _cli.new_directory(output_directory, "output_directory")
     mode = _cli.choice(source, ("bslmm", "kinship"), "source")
-    arguments = _genotypes(plink_prefix, genotype_file, phenotype_file, None, phenotype_required=True)
+    arguments = _genotypes(
+        plink_prefix, genotype_file, phenotype_file, None, phenotype_required=True
+    )
     if mode == "bslmm":
         if parameter_file is None or log_file is None:
             raise ConfigurationError("source='bslmm' needs parameter_file and log_file.")
-        arguments += ["-epm", str(_cli.existing_file(parameter_file, "parameter_file")), "-emu", str(_cli.existing_file(log_file, "log_file"))]
-        arguments += _optional_file("-ebv", breeding_value_file, "breeding_value_file") + _optional_file("-k", kinship_file, "kinship_file")
+        arguments += [
+            "-epm",
+            str(_cli.existing_file(parameter_file, "parameter_file")),
+            "-emu",
+            str(_cli.existing_file(log_file, "log_file")),
+        ]
+        arguments += _optional_file(
+            "-ebv", breeding_value_file, "breeding_value_file"
+        ) + _optional_file("-k", kinship_file, "kinship_file")
         if phenotype_columns is not None:
             raise ConfigurationError("phenotype_columns applies to source='kinship'.")
     else:
         if kinship_file is None:
             raise ConfigurationError("source='kinship' needs kinship_file.")
         if parameter_file is not None or log_file is not None or breeding_value_file is not None:
-            raise ConfigurationError("parameter_file, log_file and breeding_value_file apply to source='bslmm'.")
+            raise ConfigurationError(
+                "parameter_file, log_file and breeding_value_file apply to source='bslmm'."
+            )
         arguments += ["-k", str(_cli.existing_file(kinship_file, "kinship_file"))]
         if phenotype_columns is not None:
             if isinstance(phenotype_columns, str) or not phenotype_columns:
                 raise ConfigurationError("phenotype_columns must be a non-empty list of columns.")
-            arguments += ["-n", *[str(_cli.integer(item, "phenotype_columns", minimum=1)) for item in phenotype_columns]]
+            arguments += [
+                "-n",
+                *[
+                    str(_cli.integer(item, "phenotype_columns", minimum=1))
+                    for item in phenotype_columns
+                ],
+            ]
     arguments += ["-predict", "2" if _cli.flag(probability_scale, "probability_scale") else "1"]
     record = _gemma(arguments, out, output_prefix, ["prdt.txt"], gemma_path, timeout_seconds)
     values: list[Any] = []
     for line in (out / f"{output_prefix}.prdt.txt").read_text().splitlines():
         fields = [None if item == "NA" else float(item) for item in line.split()]
         values.append(fields[0] if len(fields) == 1 else (fields or None))
-    predicted = sum(1 for value in values if value is not None and value != [None] * (len(value) if isinstance(value, list) else 0))
-    return _cli.finish(record, "predict_phenotypes", output_directory=str(out), source=mode, predictions=values, predicted_count=predicted)
+    predicted = sum(
+        1
+        for value in values
+        if value is not None and value != [None] * (len(value) if isinstance(value, list) else 0)
+    )
+    return _cli.finish(
+        record,
+        "predict_phenotypes",
+        output_directory=str(out),
+        source=mode,
+        predictions=values,
+        predicted_count=predicted,
+    )
 
 
 __all__ = [

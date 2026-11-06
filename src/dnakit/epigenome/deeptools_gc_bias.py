@@ -31,8 +31,18 @@ def compute_gc_bias(
     bam_path = _existing(bam, "bam")
     genome = _existing(genome_2bit, "genome_2bit")
     out = _new(frequencies_output, "frequencies_output")
-    args = ["-b", str(bam_path), "-g", str(genome), "--effectiveGenomeSize", str(effective_genome_size),
-            "-freq", str(out), "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        str(bam_path),
+        "-g",
+        str(genome),
+        "--effectiveGenomeSize",
+        str(effective_genome_size),
+        "-freq",
+        str(out),
+        "-p",
+        str(number_of_processors),
+    ]
     if fragment_length is not None:
         if fragment_length < 1:
             raise ConfigurationError("fragment_length must be a positive integer.")
@@ -58,8 +68,20 @@ def correct_gc_bias(
     genome = _existing(genome_2bit, "genome_2bit")
     freq = _existing(frequencies, "frequencies")
     out = _new(output_bam, "output_bam")
-    args = ["-b", str(bam_path), "-g", str(genome), "--effectiveGenomeSize", str(effective_genome_size),
-            "-freq", str(freq), "-o", str(out), "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        str(bam_path),
+        "-g",
+        str(genome),
+        "--effectiveGenomeSize",
+        str(effective_genome_size),
+        "-freq",
+        str(freq),
+        "-o",
+        str(out),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("correctGCBias", args, [out], deeptools_path)
 
 

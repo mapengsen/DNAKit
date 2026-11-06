@@ -44,7 +44,9 @@ def _position(value: object) -> str:
         raise ConfigurationError("position must be a string such as 'chr1:100'.")
     match = _POSITION.fullmatch(value.strip())
     if match is None:
-        raise ConfigurationError(f"position must be 'chrom:pos' with a 1-based position; got {value!r}.")
+        raise ConfigurationError(
+            f"position must be 'chrom:pos' with a 1-based position; got {value!r}."
+        )
     return f"{match['chrom']}:{match['pos']}"
 
 

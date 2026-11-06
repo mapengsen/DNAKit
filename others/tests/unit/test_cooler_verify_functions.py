@@ -11,10 +11,13 @@ import pytest
 pytest.importorskip("cooler")
 pd = pytest.importorskip("pandas")
 
-from dnakit.epigenome import cooler_verify_functions as cv  # noqa: E402
-from dnakit.exceptions import ConfigurationError  # noqa: E402
+from dnakit.epigenome import cooler_verify_functions as cv
+from dnakit.exceptions import ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 CHROMSIZES = DATA / "genome.fa.sizes"
 
 
@@ -28,7 +31,9 @@ def _upstream_parse_bins(arg: str) -> pd.DataFrame:
 
 
 def _read_bed(path: Path) -> pd.DataFrame:
-    return pd.read_csv(path, sep="\t", header=None, names=["chrom", "start", "end"], dtype={"chrom": str})
+    return pd.read_csv(
+        path, sep="\t", header=None, names=["chrom", "start", "end"], dtype={"chrom": str}
+    )
 
 
 def test_public_functions_take_keyword_only_verbose() -> None:
@@ -47,7 +52,9 @@ def test_chromsizes_and_binsize_match_upstream_bins(tmp_path: Path) -> None:
     assert result["source"] == "chromsizes"
     assert result["binsize"] == 10000
     assert result["bin_count"] == len(expected) == len(written)
-    expected = expected.reset_index(drop=True).astype({"chrom": str, "start": "int64", "end": "int64"})
+    expected = expected.reset_index(drop=True).astype(
+        {"chrom": str, "start": "int64", "end": "int64"}
+    )
     assert written.equals(expected)
     assert result["chromosomes"] == ["chr1", "chr2"]
     assert result["package"].startswith("cooler ")
@@ -78,7 +85,9 @@ def test_bed_bins_match_upstream_and_are_written(tmp_path: Path) -> None:
 
 def test_missing_chromsizes_file_is_configuration_error(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError, match="not found"):
-        cv.cooler_resolve_bins(f"{tmp_path / 'absent.sizes'}:1000", str(tmp_path / "o.bed"), verbose=False)
+        cv.cooler_resolve_bins(
+            f"{tmp_path / 'absent.sizes'}:1000", str(tmp_path / "o.bed"), verbose=False
+        )
 
 
 @pytest.mark.skipif(not CHROMSIZES.exists(), reason="shared consistency chromsizes not present")
@@ -89,10 +98,14 @@ def test_non_integer_binsize_is_configuration_error(tmp_path: Path) -> None:
 
 def test_unknown_bins_argument_is_configuration_error(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError, match="Expected bins"):
-        cv.cooler_resolve_bins(str(tmp_path / "missing.bed"), str(tmp_path / "o.bed"), verbose=False)
+        cv.cooler_resolve_bins(
+            str(tmp_path / "missing.bed"), str(tmp_path / "o.bed"), verbose=False
+        )
 
 
-def test_malformed_bed_is_configuration_error_where_upstream_raises_attribute_error(tmp_path: Path) -> None:
+def test_malformed_bed_is_configuration_error_where_upstream_raises_attribute_error(
+    tmp_path: Path,
+) -> None:
     bad = tmp_path / "bad.bed"
     bad.write_text("chr1\t0\n\n", encoding="utf-8")
     with pytest.raises(ConfigurationError):
@@ -100,10 +113,9 @@ def test_malformed_bed_is_configuration_error_where_upstream_raises_attribute_er
     # Upstream defect, reproduced: its error handler names pd.parser, which pandas 2.x does not have.
     from cooler.cli._util import parse_bins
 
-    with pytest.raises(AttributeError, match="parser"):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            parse_bins(str(bad))
+    with pytest.raises(AttributeError, match="parser"), warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        parse_bins(str(bad))
 
 
 def test_existing_output_is_refused(tmp_path: Path) -> None:

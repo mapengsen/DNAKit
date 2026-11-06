@@ -53,7 +53,9 @@ def _rows(value: object, name: str, *, allow_empty: bool = True) -> list[Any]:
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
         raise ConfigurationError(f"{name} must be a list.")
     if (not allow_empty and not value) or len(value) > _MAX_ROWS:
-        raise ConfigurationError(f"{name} must hold between {0 if allow_empty else 1} and {_MAX_ROWS} entries.")
+        raise ConfigurationError(
+            f"{name} must hold between {0 if allow_empty else 1} and {_MAX_ROWS} entries."
+        )
     return list(value)
 
 
@@ -92,7 +94,9 @@ def _header_from_spec(
 ) -> Any:
     header = pysam.VariantHeader()
     for item in meta:
-        header.add_meta(_text(item.get("key"), "meta key"), _text(str(item.get("value")), "meta value"))
+        header.add_meta(
+            _text(item.get("key"), "meta key"), _text(str(item.get("value")), "meta value")
+        )
     for item in contigs:
         contig_id = _text(item.get("id"), "contig id")
         if item.get("length") is None:
@@ -112,7 +116,11 @@ def _header_from_spec(
             )
     for item in filters:
         header.add_meta(
-            "FILTER", items=[("ID", _text(item.get("id"), "filter id")), ("Description", item.get("description", ""))]
+            "FILTER",
+            items=[
+                ("ID", _text(item.get("id"), "filter id")),
+                ("Description", item.get("description", "")),
+            ],
         )
     for line in header_lines:
         header.add_line(_text(line, "header line"))
@@ -266,7 +274,9 @@ def translate_vcf_records(
             with pysam.VariantFile(str(target), mode, header=header) as out:
                 for record in src:
                     if count >= limit:
-                        raise ConfigurationError(f"source holds more than max_records={limit} records.")
+                        raise ConfigurationError(
+                            f"source holds more than max_records={limit} records."
+                        )
                     copy = record.copy()
                     copy.translate(header)
                     out.write(copy)
@@ -304,7 +314,14 @@ def compare_variant_calls(
     """
 
     pysam = _pysam()
-    values = (int(pos1), _text(ref1, "ref1"), _text(alt1, "alt1"), int(pos2), _text(ref2, "ref2"), _text(alt2, "alt2"))
+    values = (
+        int(pos1),
+        _text(ref1, "ref1"),
+        _text(alt1, "alt1"),
+        int(pos2),
+        _text(ref2, "ref2"),
+        _text(alt2, "alt2"),
+    )
     try:
         same = bool(pysam.VCF().compare_calls(*values))
     except _ERRORS as exc:

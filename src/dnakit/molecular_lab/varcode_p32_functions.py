@@ -31,7 +31,6 @@ from dnakit.molecular_lab.varcode_gap_functions import (
     _identifier,
     _int,
     _path,
-    _plain,
     _text,
     _variant,
     _variant_record,
@@ -119,15 +118,11 @@ def _collection(
     for path in _paths(csv_paths, "csv_paths"):
         parts.append(_guard(varcode.VariantCollection.from_csv, str(path), genome=genome))
     for path in _paths(json_paths, "json_paths"):
-        parts.append(
-            _guard(varcode.VariantCollection.from_json, path.read_text(encoding="utf-8"))
-        )
+        parts.append(_guard(varcode.VariantCollection.from_json, path.read_text(encoding="utf-8")))
     if variants:
         if isinstance(variants, (str, bytes)) or not isinstance(variants, Sequence):
             raise ConfigurationError("variants must be a list of mappings.")
-        parts.append(
-            varcode.VariantCollection([_variant(genome, item) for item in variants])
-        )
+        parts.append(varcode.VariantCollection([_variant(genome, item) for item in variants]))
     if not parts:
         if required:
             raise ConfigurationError(
@@ -139,7 +134,9 @@ def _collection(
 
 def _sources(genome: Any, spec: object, name: str, *, only_passing: bool) -> Any:
     if not isinstance(spec, Mapping):
-        raise ConfigurationError(f"{name} must be a mapping with any of: {', '.join(_SOURCE_KEYS)}.")
+        raise ConfigurationError(
+            f"{name} must be a mapping with any of: {', '.join(_SOURCE_KEYS)}."
+        )
     unknown = sorted(set(spec) - set(_SOURCE_KEYS))
     if unknown:
         raise ConfigurationError(f"{name} has unknown keys: {', '.join(unknown)}.")
@@ -244,7 +241,9 @@ def varcode_read_variant_csv(
     genome, info = _base(gtf, genome_fasta, cache_dir)
     collection = _collection(genome, csv_paths=[csv_path])
     rows = _rows(collection)
-    return _document("read_variant_csv", variants=rows, count=len(rows), cache_directory=info["cache_directory"])
+    return _document(
+        "read_variant_csv", variants=rows, count=len(rows), cache_directory=info["cache_directory"]
+    )
 
 
 def varcode_variant_table(
@@ -270,8 +269,16 @@ def varcode_variant_table(
     """
 
     target = _new_file(output_csv, "output_csv") if output_csv is not None else None
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
     table = _table(_guard(collection.to_dataframe))
     if target is not None:
@@ -323,10 +330,17 @@ def varcode_variant_set_operation(
 
 def _expression_map(value: object) -> dict[str, float]:
     if not isinstance(value, Mapping) or not value:
-        raise ConfigurationError("expression must be a non-empty mapping from transcript or gene id to a number.")
+        raise ConfigurationError(
+            "expression must be a non-empty mapping from transcript or gene id to a number."
+        )
     cleaned: dict[str, float] = {}
     for key, number in value.items():
-        if isinstance(number, bool) or not isinstance(number, (int, float)) or number != number or number < 0:
+        if (
+            isinstance(number, bool)
+            or not isinstance(number, (int, float))
+            or number != number
+            or number < 0
+        ):
             raise ConfigurationError("expression values must be non-negative numbers.")
         cleaned[_identifier(key, "expression id")] = float(number)
     return cleaned
@@ -363,10 +377,20 @@ def varcode_filter_by_expression(
     if isinstance(min_expression_value, bool) or not isinstance(min_expression_value, (int, float)):
         raise ConfigurationError("min_expression_value must be a number.")
     levels = _expression_map(expression)
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
-    subject = collection if chosen_target == "variants" else _effects(collection, skip_errors=skip_errors)
+    subject = (
+        collection if chosen_target == "variants" else _effects(collection, skip_errors=skip_errors)
+    )
     kept = _guard(
         getattr(subject, f"filter_by_{chosen_level}_expression"),
         levels,
@@ -411,10 +435,18 @@ def varcode_variants_in_sample(
 
     mode = _choice(genotype, "genotype", _SAMPLE_MODES)
     name = _text(sample, "sample")
-    genome, collection, info = _load(gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing)
+    _genome, collection, info = _load(
+        gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing
+    )
     if name not in list(collection.samples):
-        raise ConfigurationError(f"Sample {name} is not in the VCF files; available: {sorted(collection.samples)}.")
-    method = {"carried": "for_sample", "heterozygous": "heterozygous_in", "homozygous_alt": "homozygous_alt_in"}[mode]
+        raise ConfigurationError(
+            f"Sample {name} is not in the VCF files; available: {sorted(collection.samples)}."
+        )
+    method = {
+        "carried": "for_sample",
+        "heterozygous": "heterozygous_in",
+        "homozygous_alt": "homozygous_alt_in",
+    }[mode]
     rows = _rows(_guard(getattr(collection, method), name))
     return _document(
         "variants_in_sample",
@@ -464,13 +496,17 @@ def varcode_sample_genotype(
 
     name = _text(sample, "sample")
     index = _int(alt_index, "alt_index", minimum=1, maximum=100)
-    genome, collection, info = _load(gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing)
+    genome, collection, info = _load(
+        gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing
+    )
     item = _variant(genome, variant)
     match = next((entry for entry in collection if _row(entry) == _row(item)), None)
     if match is None:
         raise ConfigurationError("The variant is not in the VCF files.")
     if name not in list(collection.samples):
-        raise ConfigurationError(f"Sample {name} is not in the VCF files; available: {sorted(collection.samples)}.")
+        raise ConfigurationError(
+            f"Sample {name} is not in the VCF files; available: {sorted(collection.samples)}."
+        )
     call = _guard(collection.genotype, match, name)
     record = _genotype_record(call, index)
     record["collection_zygosity"] = str(getattr(collection.zygosity(match, name), "value", None))
@@ -540,8 +576,16 @@ def varcode_effect_table(
     """
 
     target = _new_file(output_csv, "output_csv") if output_csv is not None else None
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
     effects = _effects(collection, skip_errors=skip_errors)
     table = _table(_guard(effects.to_dataframe))
@@ -570,7 +614,9 @@ def varcode_read_effect_csv(
     path = _path(csv_path, "csv_path")
     effects = _guard(_vc().EffectCollection.from_csv, str(path), genome=genome)
     rows = [_effect_row(effect) for effect in effects]
-    return _document("read_effect_csv", effects=rows, count=len(rows), cache_directory=info["cache_directory"])
+    return _document(
+        "read_effect_csv", effects=rows, count=len(rows), cache_directory=info["cache_directory"]
+    )
 
 
 def varcode_effect_priority(
@@ -585,7 +631,9 @@ def varcode_effect_priority(
     """
 
     ordering = require("varcode.effects.effect_ordering", _VARCODE_EXTRA)
-    table = {cls.__name__: int(rank) for cls, rank in ordering.transcript_effect_priority_dict.items()}
+    table = {
+        cls.__name__: int(rank) for cls, rank in ordering.transcript_effect_priority_dict.items()
+    }
     if effect_classes is None:
         names = sorted(table, key=lambda item: (-table[item], item))
     else:
@@ -626,8 +674,16 @@ def varcode_top_priority_effects(
     """
 
     chosen = _choice(scope, "scope", _SCOPES)
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
     effects = _effects(collection, skip_errors=skip_errors)
     if chosen == "overall":
@@ -689,11 +745,22 @@ def varcode_filter_effects(
     minimum = None
     if min_priority_class is not None:
         wanted = _text(min_priority_class, "min_priority_class")
-        minimum = next((cls for cls in ordering.transcript_effect_priority_dict if cls.__name__ == wanted), None)
+        minimum = next(
+            (cls for cls in ordering.transcript_effect_priority_dict if cls.__name__ == wanted),
+            None,
+        )
         if minimum is None:
             raise ConfigurationError(f"Unknown effect class for min_priority_class: {wanted}.")
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
     effects = _effects(collection, skip_errors=skip_errors)
     total = len(effects)
@@ -737,8 +804,16 @@ def varcode_expression_effects(
 
     chosen = _choice(mode, "mode", ("annotate", "top"))
     levels = _expression_map(expression)
-    genome, collection, info = _load(
-        gtf, genome_fasta, cache_dir, vcf_paths, maf_paths, csv_paths, json_paths, variants, only_passing
+    _genome, collection, info = _load(
+        gtf,
+        genome_fasta,
+        cache_dir,
+        vcf_paths,
+        maf_paths,
+        csv_paths,
+        json_paths,
+        variants,
+        only_passing,
     )
     effects = _effects(collection, skip_errors=skip_errors)
     # varcode 10.11.10 hashes effects while building the mapping, which fails for splice-outcome sets; the same
@@ -754,7 +829,9 @@ def varcode_expression_effects(
     else:
         rows = []
         if pairs:
-            top, level = _guard(max, pairs, key=lambda pair: (pair[1], ordering.multi_gene_effect_sort_key(pair[0])))
+            top, level = _guard(
+                max, pairs, key=lambda pair: (pair[1], ordering.multi_gene_effect_sort_key(pair[0]))
+            )
             rows = [{**_effect_row(top), "expression": level}]
     return _document(
         "expression_effects",
@@ -796,7 +873,11 @@ def varcode_reconcile_splice_outcomes_with_rna(
         raise ConfigurationError("observed must be a non-empty list of mappings with a mechanism.")
     splice = require("varcode.splice_outcomes", _VARCODE_EXTRA)
     rna = require("varcode.rna_evidence", _VARCODE_EXTRA)
-    effect = _guard(require("varcode.effects", _VARCODE_EXTRA).predict_variant_effect_on_transcript, item, transcript)
+    effect = _guard(
+        require("varcode.effects", _VARCODE_EXTRA).predict_variant_effect_on_transcript,
+        item,
+        transcript,
+    )
 
     def provider(contig: str, start: int, end: int) -> str:
         return str(varcode.reference_range(genome, contig, start, end))
@@ -809,17 +890,28 @@ def varcode_reconcile_splice_outcomes_with_rna(
         if not isinstance(entry, Mapping) or "mechanism" not in entry:
             raise ConfigurationError("Each observed entry needs a mechanism.")
         mechanism = _text(entry["mechanism"], "mechanism")
-        match = next((c for c in outcome.dna_candidates if type(c.effect).__name__ == mechanism), None)
+        match = next(
+            (c for c in outcome.dna_candidates if type(c.effect).__name__ == mechanism), None
+        )
         if match is None:
             available = sorted({type(c.effect).__name__ for c in outcome.dna_candidates})
-            raise ConfigurationError(f"Mechanism {mechanism} is not predicted; predicted: {', '.join(available)}.")
+            raise ConfigurationError(
+                f"Mechanism {mechanism} is not predicted; predicted: {', '.join(available)}."
+            )
         count = entry.get("read_count")
         if count is not None:
             count = _int(count, "read_count", maximum=10**9)
-        chosen.append(rna.make_rna_outcome(match.effect, source=_text(entry.get("source", "rna"), "source"), read_count=count))
+        chosen.append(
+            rna.make_rna_outcome(
+                match.effect, source=_text(entry.get("source", "rna"), "source"), read_count=count
+            )
+        )
     reconciled = _guard(outcome.with_rna_evidence, chosen)
     candidates = [
-        {**_candidate_record(candidate), "rna_evidence": [_candidate_record(e) for e in reconciled.rna_evidence_for(candidate)]}
+        {
+            **_candidate_record(candidate),
+            "rna_evidence": [_candidate_record(e) for e in reconciled.rna_evidence_for(candidate)],
+        }
         for candidate in reconciled.candidates
     ]
     return _document(
@@ -848,7 +940,10 @@ def _rna_options(
     max_p_value_for_phasing: float,
     require_proper_pair: bool,
 ) -> dict[str, Any]:
-    for name, value in (("phasing_error_rate", phasing_error_rate), ("max_p_value_for_phasing", max_p_value_for_phasing)):
+    for name, value in (
+        ("phasing_error_rate", phasing_error_rate),
+        ("max_p_value_for_phasing", max_p_value_for_phasing),
+    ):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 < value < 1:
             raise ConfigurationError(f"{name} must be a number between 0 and 1.")
     return {
@@ -899,7 +994,10 @@ def varcode_query_in_cis(
     chosen = _choice(method, "method", _PHASE_METHODS)
     varcode = _vc()
     genome, info = _base(gtf, genome_fasta, cache_dir)
-    first, second = _variant(genome, variant_a, "variant_a"), _variant(genome, variant_b, "variant_b")
+    first, second = (
+        _variant(genome, variant_a, "variant_a"),
+        _variant(genome, variant_b, "variant_b"),
+    )
     transcript = None
     if transcript_id is not None:
         transcript = genome.transcript_by_id(_identifier(transcript_id, "transcript_id"))
@@ -916,7 +1014,14 @@ def varcode_query_in_cis(
             raise ConfigurationError("method 'rna_reads' needs bam_path.")
         source = _rna_source(
             bam_path,
-            _rna_options(min_mapping_quality, min_base_quality, min_alt_reads, phasing_error_rate, max_p_value_for_phasing, require_proper_pair),
+            _rna_options(
+                min_mapping_quality,
+                min_base_quality,
+                min_alt_reads,
+                phasing_error_rate,
+                max_p_value_for_phasing,
+                require_proper_pair,
+            ),
         )
         resolver = varcode.MolecularPhaseResolver(source)
     try:
@@ -969,7 +1074,11 @@ def varcode_phased_partners(
     varcode = _vc()
     genome, info = _base(gtf, genome_fasta, cache_dir)
     item = _variant(genome, variant)
-    transcript = genome.transcript_by_id(_identifier(transcript_id, "transcript_id")) if transcript_id else None
+    transcript = (
+        genome.transcript_by_id(_identifier(transcript_id, "transcript_id"))
+        if transcript_id
+        else None
+    )
     source = None
     if chosen == "vcf":
         if vcf_path is None or sample is None:
@@ -986,7 +1095,14 @@ def varcode_phased_partners(
         pool = [_variant(genome, entry, "candidate") for entry in candidates]
         source = _rna_source(
             bam_path,
-            _rna_options(min_mapping_quality, min_base_quality, min_alt_reads, phasing_error_rate, max_p_value_for_phasing, require_proper_pair),
+            _rna_options(
+                min_mapping_quality,
+                min_base_quality,
+                min_alt_reads,
+                phasing_error_rate,
+                max_p_value_for_phasing,
+                require_proper_pair,
+            ),
         )
         source.register_variants([item, *pool])
         resolver = varcode.MolecularPhaseResolver(source)
@@ -1032,16 +1148,32 @@ def varcode_rna_read_support(
         raise ConfigurationError("variants must be a non-empty list of records.")
     genome, info = _base(gtf, genome_fasta, cache_dir)
     items = [_variant(genome, entry) for entry in variants]
-    options = _rna_options(min_mapping_quality, min_base_quality, min_alt_reads, phasing_error_rate, max_p_value_for_phasing, require_proper_pair)
+    options = _rna_options(
+        min_mapping_quality,
+        min_base_quality,
+        min_alt_reads,
+        phasing_error_rate,
+        max_p_value_for_phasing,
+        require_proper_pair,
+    )
     source = _rna_source(bam_path, options)
     try:
         rows = [
-            {**_variant_record(item), "alt_reads": source.supports_variant(item), "has_evidence": bool(source.has_evidence(item))}
+            {
+                **_variant_record(item),
+                "alt_reads": source.supports_variant(item),
+                "has_evidence": bool(source.has_evidence(item)),
+            }
             for item in items
         ]
     finally:
         source.close()
-    return _document("rna_read_support", min_alt_reads=options["min_alt_reads"], variants=rows, cache_directory=info["cache_directory"])
+    return _document(
+        "rna_read_support",
+        min_alt_reads=options["min_alt_reads"],
+        variants=rows,
+        cache_directory=info["cache_directory"],
+    )
 
 
 def varcode_test_rna_haplotype(
@@ -1067,12 +1199,23 @@ def varcode_test_rna_haplotype(
     hypothesis. Returns per-variant support after registration and, for each pair, the cis/trans call.
     """
 
-    if isinstance(variants, (str, bytes)) or not isinstance(variants, Sequence) or len(variants) < 1:
+    if (
+        isinstance(variants, (str, bytes))
+        or not isinstance(variants, Sequence)
+        or len(variants) < 1
+    ):
         raise ConfigurationError("variants must be a non-empty list of records.")
     count = _int(flanking_bases, "flanking_bases", minimum=1, maximum=100)
     genome, info = _base(gtf, genome_fasta, cache_dir)
     items = [_variant(genome, entry) for entry in variants]
-    options = _rna_options(min_mapping_quality, min_base_quality, min_alt_reads, phasing_error_rate, max_p_value_for_phasing, require_proper_pair)
+    options = _rna_options(
+        min_mapping_quality,
+        min_base_quality,
+        min_alt_reads,
+        phasing_error_rate,
+        max_p_value_for_phasing,
+        require_proper_pair,
+    )
     source = _rna_source(bam_path, options)
     try:
         _guard(source.register_haplotype, items, flanking_bases=count)
@@ -1080,7 +1223,11 @@ def varcode_test_rna_haplotype(
             {**_variant_record(item), "alt_reads": source.supports_variant(item)} for item in items
         ]
         pairs = [
-            {"first": _variant_record(a), "second": _variant_record(b), "in_cis": source.in_cis(a, b)}
+            {
+                "first": _variant_record(a),
+                "second": _variant_record(b),
+                "in_cis": source.in_cis(a, b),
+            }
             for index, a in enumerate(items)
             for b in items[index + 1 :]
         ]
@@ -1110,11 +1257,17 @@ def _context(
     germline = require("varcode.germline", _VARCODE_EXTRA)
     level = germline.Completeness(_choice(completeness, "completeness", _COMPLETENESS))
     path = _path(vcf_path, "vcf_path")
-    options = {"genome": genome, "only_passing": _flag(only_passing, "only_passing"), "convert_ucsc_contig_names": False}
+    options = {
+        "genome": genome,
+        "only_passing": _flag(only_passing, "only_passing"),
+        "convert_ucsc_contig_names": False,
+    }
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         if sample is None:
-            context = _guard(germline.GermlineContext.from_germline_vcf, str(path), completeness=level, **options)
+            context = _guard(
+                germline.GermlineContext.from_germline_vcf, str(path), completeness=level, **options
+            )
         else:
             context = _guard(
                 germline.GermlineContext.from_multi_sample_vcf,
@@ -1195,7 +1348,9 @@ def varcode_germline_variants(
     context, notes = _context(genome, vcf_path, sample, completeness, only_passing)
     if contig is not None:
         found = context.variants_in_window(
-            _identifier(contig, "contig"), _int(start, "start", minimum=1), _int(end, "end", minimum=1)
+            _identifier(contig, "contig"),
+            _int(start, "start", minimum=1),
+            _int(end, "end", minimum=1),
         )
     else:
         found = tuple(context.variants)
@@ -1274,7 +1429,9 @@ def varcode_sv_junction_inserted_sequence(
     insertion; None means the allele is conflicting or unreadable. Small variants in the VCF are skipped.
     """
 
-    genome, collection, info = _load(gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing)
+    _genome, collection, info = _load(
+        gtf, genome_fasta, cache_dir, vcf_paths, (), (), (), (), only_passing
+    )
     rows: list[dict[str, Any]] = []
     for item in collection:
         if not getattr(item, "is_structural", False):
@@ -1287,13 +1444,22 @@ def varcode_sv_junction_inserted_sequence(
                     "sv_type": str(item.sv_type),
                     "alt": str(item.alt),
                     "junction": [
-                        {"contig": str(end.contig), "position": int(end.position), "keeps": str(end.keeps)}
+                        {
+                            "contig": str(end.contig),
+                            "position": int(end.position),
+                            "keeps": str(end.keeps),
+                        }
                         for end in junction
                     ],
                     "inserted_sequence": _guard(item.junction_inserted_sequence, junction),
                 }
             )
-    return _document("sv_junction_inserted_sequence", junctions=rows, count=len(rows), cache_directory=info["cache_directory"])
+    return _document(
+        "sv_junction_inserted_sequence",
+        junctions=rows,
+        count=len(rows),
+        cache_directory=info["cache_directory"],
+    )
 
 
 __all__ = [

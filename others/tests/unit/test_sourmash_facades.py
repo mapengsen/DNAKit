@@ -11,11 +11,16 @@ import pytest
 from dnakit import metagenomics_sourmash_facades as facade
 from dnakit.exceptions import ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 GENES = DATA / "genes.fa"
 _ENV_BIN = Path(sys.executable).parent
-pytestmark = pytest.mark.skipif(not (_ENV_BIN / "sourmash").is_file() or not GENES.exists(),
-                                reason="sourmash or shared FASTA missing")
+pytestmark = pytest.mark.skipif(
+    not (_ENV_BIN / "sourmash").is_file() or not GENES.exists(),
+    reason="sourmash or shared FASTA missing",
+)
 
 
 @pytest.fixture(autouse=True)
@@ -26,9 +31,15 @@ def _sourmash_on_path(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_sketch_then_compare(tmp_path: Path) -> None:
     sig_a = tmp_path / "a.sig"
     sig_b = tmp_path / "b.sig"
-    assert facade.sketch_dna(str(GENES), str(sig_a), ksizes=(21,), scaled=100)["status"] == "completed"
-    assert facade.sketch_dna(str(GENES), str(sig_b), ksizes=(21,), scaled=100)["status"] == "completed"
-    result = facade.compare_signatures([str(sig_a), str(sig_b)], str(tmp_path / "matrix.csv"), ksize=21)
+    assert (
+        facade.sketch_dna(str(GENES), str(sig_a), ksizes=(21,), scaled=100)["status"] == "completed"
+    )
+    assert (
+        facade.sketch_dna(str(GENES), str(sig_b), ksizes=(21,), scaled=100)["status"] == "completed"
+    )
+    result = facade.compare_signatures(
+        [str(sig_a), str(sig_b)], str(tmp_path / "matrix.csv"), ksize=21
+    )
     assert result["status"] == "completed", result["log_tail"]
 
 
@@ -47,21 +58,31 @@ def test_compare_needs_two_signatures(tmp_path: Path) -> None:
 def test_index_then_search_and_gather(tmp_path: Path) -> None:
     sig = tmp_path / "ref.sig"
     query = tmp_path / "query.sig"
-    assert facade.sketch_dna(str(GENES), str(sig), ksizes=(21,), scaled=100)["status"] == "completed"
-    assert facade.sketch_dna(str(GENES), str(query), ksizes=(21,), scaled=100)["status"] == "completed"
+    assert (
+        facade.sketch_dna(str(GENES), str(sig), ksizes=(21,), scaled=100)["status"] == "completed"
+    )
+    assert (
+        facade.sketch_dna(str(GENES), str(query), ksizes=(21,), scaled=100)["status"] == "completed"
+    )
     db = tmp_path / "db.zip"
     built = facade.index_signatures([str(sig)], str(db), ksize=21)
     assert built["status"] == "completed", built["log_tail"]
     database = built["database"]
-    found = facade.search_signatures(str(query), database, str(tmp_path / "hits.csv"), ksize=21, threshold=0.0)
+    found = facade.search_signatures(
+        str(query), database, str(tmp_path / "hits.csv"), ksize=21, threshold=0.0
+    )
     assert found["status"] == "completed", found["log_tail"]
-    gathered = facade.gather_signatures(str(query), database, str(tmp_path / "gather.csv"), ksize=21, threshold_bp=0)
+    gathered = facade.gather_signatures(
+        str(query), database, str(tmp_path / "gather.csv"), ksize=21, threshold_bp=0
+    )
     assert gathered["status"] == "completed", gathered["log_tail"]
 
 
 def test_describe_signature_reports_contents(tmp_path: Path) -> None:
     sig = tmp_path / "d.sig"
-    assert facade.sketch_dna(str(GENES), str(sig), ksizes=(21,), scaled=100)["status"] == "completed"
+    assert (
+        facade.sketch_dna(str(GENES), str(sig), ksizes=(21,), scaled=100)["status"] == "completed"
+    )
     result = facade.describe_signature(str(sig))
     assert result["status"] == "completed", result["description"]
     assert "21" in result["description"]
@@ -76,7 +97,10 @@ def test_merge_intersect_subtract_downsample(tmp_path: Path) -> None:
     a = tmp_path / "a.sig"
     b = tmp_path / "b.sig"
     assert facade.sketch_dna(str(GENES), str(a), ksizes=(21,), scaled=100)["status"] == "completed"
-    assert facade.sketch_dna(str(DATA / "random.fa"), str(b), ksizes=(21,), scaled=100)["status"] == "completed"
+    assert (
+        facade.sketch_dna(str(DATA / "random.fa"), str(b), ksizes=(21,), scaled=100)["status"]
+        == "completed"
+    )
     merged = facade.merge_signatures([str(a), str(b)], str(tmp_path / "m.sig"))
     assert merged["status"] == "completed", merged["log_tail"]
     inter = facade.intersect_signatures([str(a), str(b)], str(tmp_path / "i.sig"))
@@ -100,7 +124,10 @@ def test_cat_flatten_rename_fileinfo(tmp_path: Path) -> None:
     a = tmp_path / "a.sig"
     b = tmp_path / "b.sig"
     assert facade.sketch_dna(str(GENES), str(a), ksizes=(21,), scaled=100)["status"] == "completed"
-    assert facade.sketch_dna(str(DATA / "random.fa"), str(b), ksizes=(21,), scaled=100)["status"] == "completed"
+    assert (
+        facade.sketch_dna(str(DATA / "random.fa"), str(b), ksizes=(21,), scaled=100)["status"]
+        == "completed"
+    )
     cat = facade.concatenate_signatures([str(a), str(b)], str(tmp_path / "cat.sig"))
     assert cat["status"] == "completed", cat["log_tail"]
     flat = facade.flatten_signature(str(a), str(tmp_path / "flat.sig"))
@@ -115,7 +142,10 @@ def test_cat_flatten_rename_fileinfo(tmp_path: Path) -> None:
 
 def test_filter_extract_split_manifest(tmp_path: Path) -> None:
     sig = tmp_path / "f.sig"
-    assert facade.sketch_dna(str(GENES), str(sig), ksizes=(21, 31), scaled=100)["status"] == "completed"
+    assert (
+        facade.sketch_dna(str(GENES), str(sig), ksizes=(21, 31), scaled=100)["status"]
+        == "completed"
+    )
     filt = facade.filter_signature_abundance(str(sig), str(tmp_path / "filt.sig"), min_abundance=1)
     assert filt["status"] == "completed", filt["log_tail"]
     ext = facade.extract_signatures([str(sig)], str(tmp_path / "k21.sig"), ksize=21)
@@ -137,7 +167,9 @@ def _sketch(tmp_path: Path, name: str, fasta: Path = GENES) -> Path:
 def test_prefetch_multigather_categorize(tmp_path: Path) -> None:
     ref = _sketch(tmp_path, "ref.sig")
     query = _sketch(tmp_path, "query.sig")
-    fetched = facade.prefetch_signatures(str(query), [str(ref)], str(tmp_path / "prefetch.csv"), ksize=21)
+    fetched = facade.prefetch_signatures(
+        str(query), [str(ref)], str(tmp_path / "prefetch.csv"), ksize=21
+    )
     assert fetched["status"] == "completed", fetched["log_tail"]
     assert len((tmp_path / "prefetch.csv").read_text().splitlines()) >= 2
     multi = facade.multigather_signatures([str(query)], [str(ref)], str(tmp_path / "mg"), ksize=21)
@@ -157,7 +189,9 @@ def test_overlap_reports_full_similarity_for_identical(tmp_path: Path) -> None:
 
 def test_kmers_export_translate_plot(tmp_path: Path) -> None:
     a = _sketch(tmp_path, "a.sig")
-    kmers = facade.extract_signature_kmers(str(a), [str(GENES)], str(tmp_path / "kmers.fa"), ksize=21)
+    kmers = facade.extract_signature_kmers(
+        str(a), [str(GENES)], str(tmp_path / "kmers.fa"), ksize=21
+    )
     assert kmers["status"] == "completed", kmers["log_tail"]
     assert (tmp_path / "kmers.fa").read_text().startswith(">")
     exported = facade.export_signature_to_mash(str(a), str(tmp_path / "a.msh.json"), ksize=21)
@@ -179,7 +213,9 @@ def test_check_collect_ingest(tmp_path: Path) -> None:
     assert facade.manifest_signature(str(a), str(manifest))["status"] == "completed"
     picklist = tmp_path / "pick.csv"
     picklist.write_text("md5\n" + "0" * 32 + "\n")
-    checked = facade.check_signatures_against_picklist([str(a)], f"{picklist}:md5:md5", str(tmp_path / "miss.csv"))
+    checked = facade.check_signatures_against_picklist(
+        [str(a)], f"{picklist}:md5:md5", str(tmp_path / "miss.csv")
+    )
     assert checked["status"] == "completed", checked["log_tail"]
     assert checked["all_picklist_rows_found"] is False
     collected = facade.collect_signature_manifests([str(a)], str(tmp_path / "all.sqlmf"))
@@ -193,11 +229,20 @@ def test_check_collect_ingest(tmp_path: Path) -> None:
 def test_lca_index_and_classify(tmp_path: Path) -> None:
     sig = tmp_path / "g.sig"
     ident = "TOY0001"
-    assert facade.sketch_dna(str(GENES), str(sig), ksizes=(21,), scaled=10, name=f"{ident} toy genome")["status"] == "completed"
+    assert (
+        facade.sketch_dna(
+            str(GENES), str(sig), ksizes=(21,), scaled=10, name=f"{ident} toy genome"
+        )["status"]
+        == "completed"
+    )
     lineages = tmp_path / "lineages.csv"
-    lineages.write_text("ident,superkingdom,phylum\n" f"{ident},Bacteria,Firmicutes\n")
-    built = facade.index_lca_database([str(sig)], str(lineages), str(tmp_path / "db.lca.json"), ksize=21, scaled=10)
+    lineages.write_text(f"ident,superkingdom,phylum\n{ident},Bacteria,Firmicutes\n")
+    built = facade.index_lca_database(
+        [str(sig)], str(lineages), str(tmp_path / "db.lca.json"), ksize=21, scaled=10
+    )
     assert built["status"] == "completed", built["log_tail"]
-    called = facade.classify_with_lca([str(sig)], [str(tmp_path / "db.lca.json")], str(tmp_path / "cls.csv"), threshold=1)
+    called = facade.classify_with_lca(
+        [str(sig)], [str(tmp_path / "db.lca.json")], str(tmp_path / "cls.csv"), threshold=1
+    )
     assert called["status"] == "completed", called["log_tail"]
     assert "Firmicutes" in (tmp_path / "cls.csv").read_text()

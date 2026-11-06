@@ -36,7 +36,9 @@ _FORMAT = re.compile(r"^[A-Za-z0-9-]{1,32}$")
 
 def _ranges(value: str, name: str) -> str:
     if not isinstance(value, str) or not _RANGES.match(value) or value.strip(":,") == "":
-        raise ConfigurationError(f"{name} must be 'start:end' ranges separated by commas, for example '3:10' or '1:5,20:25'.")
+        raise ConfigurationError(
+            f"{name} must be 'start:end' ranges separated by commas, for example '3:10' or '1:5,20:25'."
+        )
     return value
 
 
@@ -44,7 +46,9 @@ def _format(value: str | None, name: str) -> list[str]:
     if value is None:
         return []
     if not isinstance(value, str) or not _FORMAT.match(value):
-        raise ConfigurationError(f"{name} must be a seqmagick format name such as fasta, fastq, nexus or stockholm.")
+        raise ConfigurationError(
+            f"{name} must be a seqmagick format name such as fasta, fastq, nexus or stockholm."
+        )
     return [f"--{name.replace('_', '-')}", value]
 
 
@@ -60,17 +64,31 @@ def _convert(
     seqmagick_path: str | None,
     timeout_seconds: float,
 ) -> dict[str, Any]:
-    command = ["convert", *arguments, *_format(input_format, "input_format"), *_format(output_format, "output_format")]
+    command = [
+        "convert",
+        *arguments,
+        *_format(input_format, "input_format"),
+        *_format(output_format, "output_format"),
+    ]
     if alphabet is not None:
         command += ["--alphabet", _cli.choice(alphabet, _ALPHABETS, "alphabet")]
     if line_wrap is not None:
         command += ["--line-wrap", str(_cli.integer(line_wrap, "line_wrap", minimum=0))]
     command += [str(source), str(destination)]
     record = _cli.invoke(
-        _TOOL, command, cwd=destination.parent, expected=[destination], explicit=seqmagick_path, timeout_seconds=timeout_seconds
+        _TOOL,
+        command,
+        cwd=destination.parent,
+        expected=[destination],
+        explicit=seqmagick_path,
+        timeout_seconds=timeout_seconds,
     )
     record["output"] = str(destination)
-    record["output_record_count"] = _cli.count_fastx_records(destination) if destination.suffix.lower() in {".fa", ".fasta", ".fna", ".fastq", ".fq"} else None
+    record["output_record_count"] = (
+        _cli.count_fastx_records(destination)
+        if destination.suffix.lower() in {".fa", ".fasta", ".fna", ".fastq", ".fq"}
+        else None
+    )
     return record
 
 
@@ -110,8 +128,15 @@ def seqmagick_slice_residues(
     if relative_to is not None:
         arguments += ["--relative-to", _cli.text(relative_to, "relative_to")]
     record = _convert(
-        arguments, src, dst, input_format=input_format, output_format=output_format, alphabet=alphabet, line_wrap=line_wrap,
-        seqmagick_path=seqmagick_path, timeout_seconds=timeout_seconds,
+        arguments,
+        src,
+        dst,
+        input_format=input_format,
+        output_format=output_format,
+        alphabet=alphabet,
+        line_wrap=line_wrap,
+        seqmagick_path=seqmagick_path,
+        timeout_seconds=timeout_seconds,
     )
     return _cli.finish(record, "slice_residues_by_position", cut=cut, drop=drop, mask=mask)
 
@@ -150,14 +175,29 @@ def seqmagick_clean_alignment(
     if squeeze_threshold is not None:
         if squeeze:
             raise ConfigurationError("give squeeze or squeeze_threshold, not both.")
-        arguments += ["--squeeze-threshold", format(_cli.number(squeeze_threshold, "squeeze_threshold", minimum=0.0, maximum=1.0), ".12g")]
+        arguments += [
+            "--squeeze-threshold",
+            format(
+                _cli.number(squeeze_threshold, "squeeze_threshold", minimum=0.0, maximum=1.0),
+                ".12g",
+            ),
+        ]
     if _cli.flag(prune_empty, "prune_empty"):
         arguments.append("--prune-empty")
     if not arguments:
-        raise ConfigurationError("give at least one of dash_gap, squeeze, squeeze_threshold and prune_empty.")
+        raise ConfigurationError(
+            "give at least one of dash_gap, squeeze, squeeze_threshold and prune_empty."
+        )
     record = _convert(
-        arguments, src, dst, input_format=input_format, output_format=output_format, alphabet=alphabet, line_wrap=line_wrap,
-        seqmagick_path=seqmagick_path, timeout_seconds=timeout_seconds,
+        arguments,
+        src,
+        dst,
+        input_format=input_format,
+        output_format=output_format,
+        alphabet=alphabet,
+        line_wrap=line_wrap,
+        seqmagick_path=seqmagick_path,
+        timeout_seconds=timeout_seconds,
     )
     return _cli.finish(record, "clean_alignment_gaps")
 
@@ -190,18 +230,37 @@ def seqmagick_select_sequences(
     dst = _cli.new_file(destination, "destination")
     arguments: list[str] = []
     if include_ids_file is not None:
-        arguments += ["--include-from-file", str(_cli.existing_file(include_ids_file, "include_ids_file"))]
+        arguments += [
+            "--include-from-file",
+            str(_cli.existing_file(include_ids_file, "include_ids_file")),
+        ]
     if exclude_ids_file is not None:
-        arguments += ["--exclude-from-file", str(_cli.existing_file(exclude_ids_file, "exclude_ids_file"))]
+        arguments += [
+            "--exclude-from-file",
+            str(_cli.existing_file(exclude_ids_file, "exclude_ids_file")),
+        ]
     if seq_pattern_include is not None:
-        arguments += ["--seq-pattern-include", _cli.free_text(seq_pattern_include, "seq_pattern_include")]
+        arguments += [
+            "--seq-pattern-include",
+            _cli.free_text(seq_pattern_include, "seq_pattern_include"),
+        ]
     if seq_pattern_exclude is not None:
-        arguments += ["--seq-pattern-exclude", _cli.free_text(seq_pattern_exclude, "seq_pattern_exclude")]
+        arguments += [
+            "--seq-pattern-exclude",
+            _cli.free_text(seq_pattern_exclude, "seq_pattern_exclude"),
+        ]
     if not arguments:
         raise ConfigurationError("give at least one selector.")
     record = _convert(
-        arguments, src, dst, input_format=input_format, output_format=output_format, alphabet=alphabet, line_wrap=line_wrap,
-        seqmagick_path=seqmagick_path, timeout_seconds=timeout_seconds,
+        arguments,
+        src,
+        dst,
+        input_format=input_format,
+        output_format=output_format,
+        alphabet=alphabet,
+        line_wrap=line_wrap,
+        seqmagick_path=seqmagick_path,
+        timeout_seconds=timeout_seconds,
     )
     return _cli.finish(record, "select_sequences")
 
@@ -243,20 +302,34 @@ def seqmagick_quality_filter(
     src = _cli.existing_file(sequence_file, "sequence_file")
     dst = _cli.new_file(output_file, "output_file")
     arguments = [
-        "--min-mean-quality", format(_cli.number(min_mean_quality, "min_mean_quality", minimum=0.0), ".12g"),
-        "--min-length", str(_cli.integer(min_length, "min_length", minimum=0)),
-        "--max-length", str(_cli.integer(max_length, "max_length", minimum=1)),
+        "--min-mean-quality",
+        format(_cli.number(min_mean_quality, "min_mean_quality", minimum=0.0), ".12g"),
+        "--min-length",
+        str(_cli.integer(min_length, "min_length", minimum=0)),
+        "--max-length",
+        str(_cli.integer(max_length, "max_length", minimum=1)),
     ]
     if input_qual is not None:
         arguments += ["--input-qual", str(_cli.existing_file(input_qual, "input_qual"))]
     if ambiguous_action is not None:
-        arguments += ["--ambiguous-action", _cli.choice(ambiguous_action, ("truncate", "drop"), "ambiguous_action")]
+        arguments += [
+            "--ambiguous-action",
+            _cli.choice(ambiguous_action, ("truncate", "drop"), "ambiguous_action"),
+        ]
     if max_ambiguous is not None:
-        arguments += ["--max-ambiguous", str(_cli.integer(max_ambiguous, "max_ambiguous", minimum=0))]
+        arguments += [
+            "--max-ambiguous",
+            str(_cli.integer(max_ambiguous, "max_ambiguous", minimum=0)),
+        ]
     if pct_ambiguous is not None:
-        arguments += ["--pct-ambiguous", format(_cli.number(pct_ambiguous, "pct_ambiguous", minimum=0.0, maximum=100.0), ".12g")]
+        arguments += [
+            "--pct-ambiguous",
+            format(_cli.number(pct_ambiguous, "pct_ambiguous", minimum=0.0, maximum=100.0), ".12g"),
+        ]
     if primer is not None:
-        if not isinstance(primer, str) or not re.fullmatch(r"[ACGTURYSWKMBDHVNacgturyswkmbdhvn]+", primer):
+        if not isinstance(primer, str) or not re.fullmatch(
+            r"[ACGTURYSWKMBDHVNacgturyswkmbdhvn]+", primer
+        ):
             raise ConfigurationError("primer must be an IUPAC nucleotide string.")
         arguments += ["--primer", primer]
     temporary: Path | None = None
@@ -267,16 +340,33 @@ def seqmagick_quality_filter(
     elif primer is not None:
         temporary = dst.with_name(dst.name + ".primer_only.csv")
         if temporary.exists():
-            raise ConfigurationError(f"A helper file already exists next to output_file: {temporary}")
+            raise ConfigurationError(
+                f"A helper file already exists next to output_file: {temporary}"
+            )
         temporary.write_text("primer_only,\n", encoding="utf-8")
         arguments += ["--barcode-file", str(temporary)]
     if sample_map_out is not None:
         arguments += ["--map-out", str(_cli.new_file(sample_map_out, "sample_map_out"))]
     if quality_window:
-        arguments += ["--quality-window", str(_cli.integer(quality_window, "quality_window", minimum=1))]
+        arguments += [
+            "--quality-window",
+            str(_cli.integer(quality_window, "quality_window", minimum=1)),
+        ]
         if quality_window_mean_qual is not None:
-            arguments += ["--quality-window-mean-qual", format(_cli.number(quality_window_mean_qual, "quality_window_mean_qual", minimum=0.0), ".12g")]
-        arguments += ["--quality-window-prop", format(_cli.number(quality_window_prop, "quality_window_prop", minimum=0.0, maximum=1.0), ".12g")]
+            arguments += [
+                "--quality-window-mean-qual",
+                format(
+                    _cli.number(quality_window_mean_qual, "quality_window_mean_qual", minimum=0.0),
+                    ".12g",
+                ),
+            ]
+        arguments += [
+            "--quality-window-prop",
+            format(
+                _cli.number(quality_window_prop, "quality_window_prop", minimum=0.0, maximum=1.0),
+                ".12g",
+            ),
+        ]
     expected: list[Path] = [dst]
     report = dst.with_name(dst.name + ".report.tsv")
     if report.exists():
@@ -289,7 +379,11 @@ def seqmagick_quality_filter(
         expected.append(details)
     try:
         record = _cli.invoke(
-            _TOOL, ["quality-filter", *arguments, str(src), str(dst)], cwd=dst.parent, expected=expected, explicit=seqmagick_path,
+            _TOOL,
+            ["quality-filter", *arguments, str(src), str(dst)],
+            cwd=dst.parent,
+            expected=expected,
+            explicit=seqmagick_path,
             timeout_seconds=timeout_seconds,
         )
     finally:
@@ -297,7 +391,11 @@ def seqmagick_quality_filter(
             temporary.unlink()
     rows = _cli.read_table(report, text_columns=frozenset({"name"}))
     return _cli.finish(
-        record, "filter_reads_by_quality_ambiguity_primer", output=str(dst), report_file=str(report), report=rows,
+        record,
+        "filter_reads_by_quality_ambiguity_primer",
+        output=str(dst),
+        report_file=str(report),
+        report=rows,
         output_record_count=_cli.count_fastx_records(dst),
     )
 
@@ -323,14 +421,37 @@ def seqmagick_info(
     sources = _cli.existing_files(sequence_files, "sequence_files")
     target = _cli.new_file(output_file, "output_file")
     chosen = _cli.choice(table_format, ("tab", "csv", "align"), "table_format")
-    arguments = ["info", "--format", chosen, "--threads", str(_cli.threads_value(threads)), "--out-file", str(target)]
+    arguments = [
+        "info",
+        "--format",
+        chosen,
+        "--threads",
+        str(_cli.threads_value(threads)),
+        "--out-file",
+        str(target),
+    ]
     arguments += _format(input_format, "input_format")
     arguments += [str(path) for path in sources]
     record = _cli.invoke(
-        _TOOL, arguments, cwd=target.parent, expected=[target], explicit=seqmagick_path, timeout_seconds=timeout_seconds
+        _TOOL,
+        arguments,
+        cwd=target.parent,
+        expected=[target],
+        explicit=seqmagick_path,
+        timeout_seconds=timeout_seconds,
     )
-    rows = _cli.read_table(target, delimiter="," if chosen == "csv" else "\t", text_columns=frozenset({"name", "alignment"})) if chosen != "align" else []
-    return _cli.finish(record, "summarize_sequence_files", output=str(target), file_count=len(sources), files=rows)
+    rows = (
+        _cli.read_table(
+            target,
+            delimiter="," if chosen == "csv" else "\t",
+            text_columns=frozenset({"name", "alignment"}),
+        )
+        if chosen != "align"
+        else []
+    )
+    return _cli.finish(
+        record, "summarize_sequence_files", output=str(target), file_count=len(sources), files=rows
+    )
 
 
 __all__ = [

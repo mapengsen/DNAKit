@@ -208,19 +208,44 @@ def crispresso_quantify_editing(
     args += _opt("-c", _seqs(coding_sequences, "coding_sequences"))
     if base_editor_output:
         if conversion_nuc_from is None or conversion_nuc_to is None:
-            raise ConfigurationError("base_editor_output needs conversion_nuc_from and conversion_nuc_to.")
+            raise ConfigurationError(
+                "base_editor_output needs conversion_nuc_from and conversion_nuc_to."
+            )
     elif conversion_nuc_from is not None or conversion_nuc_to is not None:
         raise ConfigurationError("conversion_nuc_from/to only apply with base_editor_output=True.")
     args += _on("--base_editor_output", base_editor_output, "base_editor_output")
-    for flag, value in (("--conversion_nuc_from", conversion_nuc_from), ("--conversion_nuc_to", conversion_nuc_to)):
-        args += _opt(flag, None if value is None else _cli.choice(value, ("A", "C", "G", "T"), flag))
-    args += _opt("--prime_editing_pegRNA_spacer_seq", _seqs(prime_editing_pegrna_spacer_seq, "pegrna spacer"))
-    args += _opt("--prime_editing_pegRNA_extension_seq", _seqs(prime_editing_pegrna_extension_seq, "pegrna extension"))
-    args += _opt("--prime_editing_pegRNA_scaffold_seq", _seqs(prime_editing_pegrna_scaffold_seq, "pegrna scaffold"))
-    args += _opt("--prime_editing_nicking_guide_seq", _seqs(prime_editing_nicking_guide_seq, "nicking guide"))
+    for flag, value in (
+        ("--conversion_nuc_from", conversion_nuc_from),
+        ("--conversion_nuc_to", conversion_nuc_to),
+    ):
+        args += _opt(
+            flag, None if value is None else _cli.choice(value, ("A", "C", "G", "T"), flag)
+        )
+    args += _opt(
+        "--prime_editing_pegRNA_spacer_seq", _seqs(prime_editing_pegrna_spacer_seq, "pegrna spacer")
+    )
+    args += _opt(
+        "--prime_editing_pegRNA_extension_seq",
+        _seqs(prime_editing_pegrna_extension_seq, "pegrna extension"),
+    )
+    args += _opt(
+        "--prime_editing_pegRNA_scaffold_seq",
+        _seqs(prime_editing_pegrna_scaffold_seq, "pegrna scaffold"),
+    )
+    args += _opt(
+        "--prime_editing_nicking_guide_seq", _seqs(prime_editing_nicking_guide_seq, "nicking guide")
+    )
     for flag, value, label in (
-        ("--prime_editing_pegRNA_extension_quantification_window_size", prime_editing_extension_quantification_window_size, "window"),
-        ("--prime_editing_pegRNA_scaffold_min_match_length", prime_editing_scaffold_min_match_length, "match length"),
+        (
+            "--prime_editing_pegRNA_extension_quantification_window_size",
+            prime_editing_extension_quantification_window_size,
+            "window",
+        ),
+        (
+            "--prime_editing_pegRNA_scaffold_min_match_length",
+            prime_editing_scaffold_min_match_length,
+            "match length",
+        ),
         ("-w", quantification_window_size, "quantification_window_size"),
         ("-wc", quantification_window_center, "quantification_window_center"),
         ("--exclude_bp_from_left", exclude_bp_from_left, "exclude_bp_from_left"),
@@ -229,11 +254,22 @@ def crispresso_quantify_editing(
         ("-s", min_single_bp_quality, "min_single_bp_quality"),
         ("--min_bp_quality_or_N", min_bp_quality_or_n, "min_bp_quality_or_n"),
     ):
-        args += _opt(flag, None if value is None else _cli.integer(value, label, minimum=-1 if flag == "-wc" else 0))
+        args += _opt(
+            flag,
+            None
+            if value is None
+            else _cli.integer(value, label, minimum=-1 if flag == "-wc" else 0),
+        )
     if quantification_window_coordinates is not None:
-        args += ["-qwc", _cli.text(quantification_window_coordinates, "quantification_window_coordinates")]
+        args += [
+            "-qwc",
+            _cli.text(quantification_window_coordinates, "quantification_window_coordinates"),
+        ]
     if min_identity_score is not None:
-        args += ["--default_min_aln_score", f"{_cli.number(min_identity_score, 'min_identity_score', minimum=0.0, maximum=100.0):g}"]
+        args += [
+            "--default_min_aln_score",
+            f"{_cli.number(min_identity_score, 'min_identity_score', minimum=0.0, maximum=100.0):g}",
+        ]
     if name is not None:
         args += ["-n", _cli.text(name, "name")]
     for flag, value, label in (
@@ -242,7 +278,11 @@ def crispresso_quantify_editing(
         ("--ignore_deletions", ignore_deletions, "ignore_deletions"),
         ("--discard_indel_reads", discard_indel_reads, "discard_indel_reads"),
         ("--trim_sequences", trim_sequences, "trim_sequences"),
-        ("--write_detailed_allele_table", write_detailed_allele_table, "write_detailed_allele_table"),
+        (
+            "--write_detailed_allele_table",
+            write_detailed_allele_table,
+            "write_detailed_allele_table",
+        ),
         ("--fastq_output", fastq_output, "fastq_output"),
         ("--bam_output", bam_output, "bam_output"),
         ("--vcf_output", vcf_output, "vcf_output"),
@@ -251,12 +291,21 @@ def crispresso_quantify_editing(
         ("--keep_intermediate", keep_intermediate, "keep_intermediate"),
     ):
         args += _on(flag, value, label)
-    args += _opt("-p", None if n_processes is None else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256))
+    args += _opt(
+        "-p",
+        None
+        if n_processes is None
+        else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256),
+    )
     out = _start("CRISPResso", crispresso_path, output_folder)
     out.mkdir()
-    result = _execute("CRISPResso", [*args, "-o", str(out)], out, crispresso_path, timeout_seconds, "CRISPResso")
+    result = _execute(
+        "CRISPResso", [*args, "-o", str(out)], out, crispresso_path, timeout_seconds, "CRISPResso"
+    )
     run = Path(result["run_folders"][0]) if result["run_folders"] else None
-    result["quantification"] = _table(run / "CRISPResso_quantification_of_editing_frequency.txt") if run else []
+    result["quantification"] = (
+        _table(run / "CRISPResso_quantification_of_editing_frequency.txt") if run else []
+    )
     stats = _table(run / "CRISPResso_mapping_statistics.txt") if run else []
     result["mapping_statistics"] = stats[0] if stats else {}
     return result
@@ -287,13 +336,34 @@ def crispresso_batch(
     args = ["-bs", str(settings)]
     args += _opt("-a", _seqs(amplicon_sequences, "amplicon_sequences"))
     args += _opt("-g", _seqs(guide_sequences, "guide_sequences"))
-    args += _opt("-w", None if quantification_window_size is None else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0))
+    args += _opt(
+        "-w",
+        None
+        if quantification_window_size is None
+        else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0),
+    )
     args += _opt("-n", None if batch_name is None else _cli.text(batch_name, "batch_name"))
-    args += _on("--suppress_plots", suppress_plots, "suppress_plots") + _on("--suppress_batch_summary_plots", suppress_batch_summary_plots, "suppress_batch_summary_plots")
-    args += _opt("-p", None if n_processes is None else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256))
+    args += _on("--suppress_plots", suppress_plots, "suppress_plots") + _on(
+        "--suppress_batch_summary_plots",
+        suppress_batch_summary_plots,
+        "suppress_batch_summary_plots",
+    )
+    args += _opt(
+        "-p",
+        None
+        if n_processes is None
+        else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256),
+    )
     out = _start("CRISPRessoBatch", crispresso_path, output_folder)
     out.mkdir()
-    return _execute("CRISPRessoBatch", [*args, "-o", str(out)], out, crispresso_path, timeout_seconds, "CRISPRessoBatch")
+    return _execute(
+        "CRISPRessoBatch",
+        [*args, "-o", str(out)],
+        out,
+        crispresso_path,
+        timeout_seconds,
+        "CRISPRessoBatch",
+    )
 
 
 def crispresso_pooled(
@@ -331,17 +401,46 @@ def crispresso_pooled(
         args += ["-f", str(_cli.existing_file(amplicons_file_path, "amplicons_file_path"))]
     args += _opt("-x", None if genome_index is None else _cli.text(genome_index, "genome_index"))
     if gene_annotations_path is not None:
-        args += ["--gene_annotations", str(_cli.existing_file(gene_annotations_path, "gene_annotations_path"))]
+        args += [
+            "--gene_annotations",
+            str(_cli.existing_file(gene_annotations_path, "gene_annotations_path")),
+        ]
     args += _opt("-n", None if name is None else _cli.text(name, "name"))
-    args += _opt("--min_reads_to_use_region", None if min_reads_to_use_region is None else _cli.integer(min_reads_to_use_region, "min_reads_to_use_region", minimum=1))
-    args += _on("--demultiplex_only_at_amplicons", demultiplex_only_at_amplicons, "demultiplex_only_at_amplicons")
+    args += _opt(
+        "--min_reads_to_use_region",
+        None
+        if min_reads_to_use_region is None
+        else _cli.integer(min_reads_to_use_region, "min_reads_to_use_region", minimum=1),
+    )
+    args += _on(
+        "--demultiplex_only_at_amplicons",
+        demultiplex_only_at_amplicons,
+        "demultiplex_only_at_amplicons",
+    )
     args += _opt("-g", _seqs(guide_sequences, "guide_sequences"))
-    args += _opt("-w", None if quantification_window_size is None else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0))
+    args += _opt(
+        "-w",
+        None
+        if quantification_window_size is None
+        else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0),
+    )
     args += _on("--suppress_plots", suppress_plots, "suppress_plots")
-    args += _opt("-p", None if n_processes is None else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256))
+    args += _opt(
+        "-p",
+        None
+        if n_processes is None
+        else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256),
+    )
     out = _start("CRISPRessoPooled", crispresso_path, output_folder)
     out.mkdir()
-    return _execute("CRISPRessoPooled", [*args, "-o", str(out)], out, crispresso_path, timeout_seconds, "CRISPRessoPooled")
+    return _execute(
+        "CRISPRessoPooled",
+        [*args, "-o", str(out)],
+        out,
+        crispresso_path,
+        timeout_seconds,
+        "CRISPRessoPooled",
+    )
 
 
 def crispresso_wgs(
@@ -366,19 +465,49 @@ def crispresso_wgs(
     ``bam_path`` is the sorted, indexed WGS BAM, ``region_file_path`` a BED file of the regions to analyse and
     ``reference_fasta_path`` the reference the reads were aligned to.
     """
-    args = ["-b", str(_cli.existing_file(bam_path, "bam_path")), "-f", str(_cli.existing_file(region_file_path, "region_file_path"))]
+    args = [
+        "-b",
+        str(_cli.existing_file(bam_path, "bam_path")),
+        "-f",
+        str(_cli.existing_file(region_file_path, "region_file_path")),
+    ]
     args += ["-r", str(_cli.existing_file(reference_fasta_path, "reference_fasta_path"))]
     args += _opt("-n", None if name is None else _cli.text(name, "name"))
     if gene_annotations_path is not None:
-        args += ["--gene_annotations", str(_cli.existing_file(gene_annotations_path, "gene_annotations_path"))]
-    args += _opt("--min_reads_to_use_region", None if min_reads_to_use_region is None else _cli.integer(min_reads_to_use_region, "min_reads_to_use_region", minimum=1))
+        args += [
+            "--gene_annotations",
+            str(_cli.existing_file(gene_annotations_path, "gene_annotations_path")),
+        ]
+    args += _opt(
+        "--min_reads_to_use_region",
+        None
+        if min_reads_to_use_region is None
+        else _cli.integer(min_reads_to_use_region, "min_reads_to_use_region", minimum=1),
+    )
     args += _opt("-g", _seqs(guide_sequences, "guide_sequences"))
-    args += _opt("-w", None if quantification_window_size is None else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0))
+    args += _opt(
+        "-w",
+        None
+        if quantification_window_size is None
+        else _cli.integer(quantification_window_size, "quantification_window_size", minimum=0),
+    )
     args += _on("--suppress_plots", suppress_plots, "suppress_plots")
-    args += _opt("-p", None if n_processes is None else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256))
+    args += _opt(
+        "-p",
+        None
+        if n_processes is None
+        else _cli.integer(n_processes, "n_processes", minimum=1, maximum=256),
+    )
     out = _start("CRISPRessoWGS", crispresso_path, output_folder)
     out.mkdir()
-    return _execute("CRISPRessoWGS", [*args, "-o", str(out)], out, crispresso_path, timeout_seconds, "CRISPRessoWGS")
+    return _execute(
+        "CRISPRessoWGS",
+        [*args, "-o", str(out)],
+        out,
+        crispresso_path,
+        timeout_seconds,
+        "CRISPRessoWGS",
+    )
 
 
 def _compare(
@@ -401,13 +530,29 @@ def _compare(
     if sample_names is not None:
         if isinstance(sample_names, str) or len(sample_names) != 2:
             raise ConfigurationError("sample_names must hold exactly two names.")
-        args += ["-n1", _cli.text(sample_names[0], "sample_names"), "-n2", _cli.text(sample_names[1], "sample_names")]
+        args += [
+            "-n1",
+            _cli.text(sample_names[0], "sample_names"),
+            "-n2",
+            _cli.text(sample_names[1], "sample_names"),
+        ]
     args += _opt("-n", None if name is None else _cli.text(name, "name"))
-    args += _opt("--reported_qvalue_cutoff", None if qvalue is None else f"{_cli.number(qvalue, 'reported_qvalue_cutoff', minimum=0.0, maximum=1.0):g}")
+    args += _opt(
+        "--reported_qvalue_cutoff",
+        None
+        if qvalue is None
+        else f"{_cli.number(qvalue, 'reported_qvalue_cutoff', minimum=0.0, maximum=1.0):g}",
+    )
     out = _start(program, crispresso_path, output_folder)
     out.mkdir()
     result = _p13.run(
-        program, [*args, "-o", str(out)], cwd=out, expected=[], explicit=crispresso_path, hint=_HINT, timeout_seconds=timeout_seconds
+        program,
+        [*args, "-o", str(out)],
+        cwd=out,
+        expected=[],
+        explicit=crispresso_path,
+        hint=_HINT,
+        timeout_seconds=timeout_seconds,
     )
     result["operation"] = program
     result["outputs"] = sorted(str(p) for p in out.rglob("*") if p.is_file())
@@ -435,7 +580,17 @@ def crispresso_compare(
     plots and tables (with q-values below ``reported_qvalue_cutoff``) go to ``output_folder``. The two analyses must
     have been run with plots and the report enabled.
     """
-    return _compare("CRISPRessoCompare", folder1, folder2, output_folder, sample_names, name, reported_qvalue_cutoff, crispresso_path, timeout_seconds)
+    return _compare(
+        "CRISPRessoCompare",
+        folder1,
+        folder2,
+        output_folder,
+        sample_names,
+        name,
+        reported_qvalue_cutoff,
+        crispresso_path,
+        timeout_seconds,
+    )
 
 
 def crispresso_pooled_wgs_compare(
@@ -451,7 +606,17 @@ def crispresso_pooled_wgs_compare(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Compare two CRISPRessoPooled or CRISPRessoWGS analyses region by region (``CRISPRessoPooledWGSCompare``)."""
-    return _compare("CRISPRessoPooledWGSCompare", folder1, folder2, output_folder, sample_names, name, reported_qvalue_cutoff, crispresso_path, timeout_seconds)
+    return _compare(
+        "CRISPRessoPooledWGSCompare",
+        folder1,
+        folder2,
+        output_folder,
+        sample_names,
+        name,
+        reported_qvalue_cutoff,
+        crispresso_path,
+        timeout_seconds,
+    )
 
 
 def crispresso_aggregate(
@@ -480,17 +645,30 @@ def crispresso_aggregate(
     for prefix in folder_prefixes or ():
         args += ["-p", _cli.text(prefix, "folder_prefixes")]
     args += _opt("-s", None if folder_suffix is None else _cli.text(folder_suffix, "folder_suffix"))
-    args += _opt("--min_reads_for_inclusion", None if min_reads_for_inclusion is None else _cli.integer(min_reads_for_inclusion, "min_reads_for_inclusion", minimum=0))
+    args += _opt(
+        "--min_reads_for_inclusion",
+        None
+        if min_reads_for_inclusion is None
+        else _cli.integer(min_reads_for_inclusion, "min_reads_for_inclusion", minimum=0),
+    )
     args += _on("--suppress_plots", suppress_plots, "suppress_plots")
     _cli.program("CRISPRessoAggregate", explicit=crispresso_path, hint=_HINT)
     target = directory / f"CRISPRessoAggregate_on_{name}"
     if target.exists():
         raise ConfigurationError(f"Output already exists and will not be overwritten: {target}")
     result = _p13.run(
-        "CRISPRessoAggregate", args, cwd=directory, expected=[], explicit=crispresso_path, hint=_HINT, timeout_seconds=timeout_seconds
+        "CRISPRessoAggregate",
+        args,
+        cwd=directory,
+        expected=[],
+        explicit=crispresso_path,
+        hint=_HINT,
+        timeout_seconds=timeout_seconds,
     )
     result["operation"] = "CRISPRessoAggregate"
-    result["outputs"] = sorted(str(p) for p in target.rglob("*") if p.is_file()) if target.is_dir() else []
+    result["outputs"] = (
+        sorted(str(p) for p in target.rglob("*") if p.is_file()) if target.is_dir() else []
+    )
     if result["return_code"] == 0 and not target.is_dir():
         result["status"] = "failed"
     return result
@@ -502,7 +680,9 @@ def crispresso_aggregate(
 
 
 def _open_text(path: Path, mode: str) -> Any:
-    return gzip.open(path, mode + "t") if path.suffix == ".gz" else path.open(mode, encoding="utf-8")
+    return (
+        gzip.open(path, mode + "t") if path.suffix == ".gz" else path.open(mode, encoding="utf-8")
+    )
 
 
 def crispresso_filter_reads_by_sequence(
@@ -603,7 +783,18 @@ def crispresso_count_high_quality_bases(
     pos = _cli.integer(position, "position", minimum=0)
     cutoff = _cli.integer(quality_cutoff, "quality_cutoff", minimum=0)
     counts = dict.fromkeys(
-        ("total_reads", "unaligned", "original_high", "original_low", "target_high", "target_low", "deletion", "other_high", "other_low"), 0
+        (
+            "total_reads",
+            "unaligned",
+            "original_high",
+            "original_low",
+            "target_high",
+            "target_low",
+            "deletion",
+            "other_high",
+            "other_low",
+        ),
+        0,
     )
     with _open_text(path, "r") as handle:
         while True:
@@ -665,13 +856,16 @@ def _load_run(folder: str) -> tuple[Any, Path, Any, Any]:
 
 def _alleles(info: dict[str, Any], directory: Path, pandas: Any) -> Any:
     running = info["running_info"]
-    with zipfile.ZipFile(directory / running["allele_frequency_table_zip_filename"]) as archive, archive.open(
-        running["allele_frequency_table_filename"]
-    ) as handle:
+    with (
+        zipfile.ZipFile(directory / running["allele_frequency_table_zip_filename"]) as archive,
+        archive.open(running["allele_frequency_table_filename"]) as handle,
+    ):
         return pandas.read_csv(handle, sep="\t")
 
 
-def crispresso_count_sgrna_specific_edits(crispresso_folder: str, *, verbose: bool = True) -> dict[str, Any]:
+def crispresso_count_sgrna_specific_edits(
+    crispresso_folder: str, *, verbose: bool = True
+) -> dict[str, Any]:
     """Count the edits that fall in each sgRNA's window in a finished CRISPResso run (port of ``count_sgRNA_specific_edits.py``).
 
     The run must have used ``--write_detailed_allele_table`` and CRISPResso2 2.2.15 or later. Returns, per reference,
@@ -708,7 +902,11 @@ def crispresso_count_sgrna_specific_edits(crispresso_folder: str, *, verbose: bo
             continue
         reads = int(row["#Reads"])
         total[ref] += reads
-        hit = set(positions(row["insertion_positions"])) | set(positions(row["deletion_positions"])) | set(positions(row["substitution_positions"]))
+        hit = (
+            set(positions(row["insertion_positions"]))
+            | set(positions(row["deletion_positions"]))
+            | set(positions(row["substitution_positions"]))
+        )
         guides = [g for g in order[ref] if any(i in hit for i in include[ref][g])]
         if guides:
             modified[ref] += reads
@@ -719,12 +917,19 @@ def crispresso_count_sgrna_specific_edits(crispresso_folder: str, *, verbose: bo
         "status": "completed",
         "operation": "count_sgRNA_specific_edits",
         "references": {
-            ref: {"modified_reads": modified[ref], "total_reads": total[ref], "categories": dict(categories[ref])} for ref in include
+            ref: {
+                "modified_reads": modified[ref],
+                "total_reads": total[ref],
+                "categories": dict(categories[ref]),
+            }
+            for ref in include
         },
     }
 
 
-def crispresso_reconstitute_reads(crispresso_folder: str, output_fastq_path: str, *, verbose: bool = True) -> dict[str, Any]:
+def crispresso_reconstitute_reads(
+    crispresso_folder: str, output_fastq_path: str, *, verbose: bool = True
+) -> dict[str, Any]:
     """Regenerate a FASTQ from the allele frequency table of a finished CRISPResso run (port of ``reconstituteReads.py``).
 
     Each allele is written once per read (gaps removed, names ``SEQ_ID_<allele>_<copy>``, quality ``A``) so the run can be
@@ -737,7 +942,9 @@ def crispresso_reconstitute_reads(crispresso_folder: str, output_fastq_path: str
         raise ConfigurationError("No alleles found in allele frequency table.")
     for column in ("#Reads", "Aligned_Sequence", "Reference_Sequence"):
         if column not in df.columns:
-            raise ConfigurationError(f"Cannot parse allele frequency table, missing {column} column.")
+            raise ConfigurationError(
+                f"Cannot parse allele frequency table, missing {column} column."
+            )
     reads = 0
     with out.open("w", encoding="utf-8") as handle:
         for allele, (_, row) in enumerate(df.iterrows()):
@@ -775,7 +982,9 @@ def _plot_alleles(
     args = info["running_info"]["args"]
     if not args.write_detailed_allele_table:
         raise ConfigurationError("The CRISPResso run must use --write_detailed_allele_table.")
-    min_freq = args.min_frequency_alleles_around_cut_to_plot if min_frequency is None else min_frequency
+    min_freq = (
+        args.min_frequency_alleles_around_cut_to_plot if min_frequency is None else min_frequency
+    )
     rows = args.max_rows_alleles_around_cut_to_plot if max_rows is None else max_rows
     root = Path(output_root).expanduser().resolve()
     if not root.parent.is_dir():
@@ -792,26 +1001,78 @@ def _plot_alleles(
             return frame
         length = len(frame["Reference_Sequence"].iloc[0].replace("-", ""))
         if cut + right + 1 > length:
-            raise ConfigurationError(f"The plotting window cannot extend past the end of the amplicon ({length} bp).")
+            raise ConfigurationError(
+                f"The plotting window cannot extend past the end of the amplicon ({length} bp)."
+            )
         if mode == "ambiguous":
             return shared.get_dataframe_around_cut_asymmetrical(frame, cut, left, right)
         rowsout = []
         for _, r in frame.iterrows():
             idx = r["ref_positions"].index(cut)
             sl = slice(idx - left + 1, idx + right + 1)
-            rowsout.append((r["Aligned_Sequence"][sl], r["Reference_Sequence"][sl], r["Read_Status"] == "UNMODIFIED", r["n_deleted"], r["n_inserted"], r["n_mutated"], r["#Reads"], r["%Reads"]))
-        out = pandas.DataFrame(rowsout, columns=["Aligned_Sequence", "Reference_Sequence", "Unedited", "n_deleted", "n_inserted", "n_mutated", "#Reads", "%Reads"])
-        out = out.groupby(["Aligned_Sequence", "Reference_Sequence", "Unedited", "n_deleted", "n_inserted", "n_mutated"]).sum().reset_index().set_index("Aligned_Sequence")
-        out = out.sort_values(by=["#Reads", "Aligned_Sequence", "Reference_Sequence"], ascending=[False, True, True])
+            rowsout.append(
+                (
+                    r["Aligned_Sequence"][sl],
+                    r["Reference_Sequence"][sl],
+                    r["Read_Status"] == "UNMODIFIED",
+                    r["n_deleted"],
+                    r["n_inserted"],
+                    r["n_mutated"],
+                    r["#Reads"],
+                    r["%Reads"],
+                )
+            )
+        out = pandas.DataFrame(
+            rowsout,
+            columns=[
+                "Aligned_Sequence",
+                "Reference_Sequence",
+                "Unedited",
+                "n_deleted",
+                "n_inserted",
+                "n_mutated",
+                "#Reads",
+                "%Reads",
+            ],
+        )
+        out = (
+            out.groupby(
+                [
+                    "Aligned_Sequence",
+                    "Reference_Sequence",
+                    "Unedited",
+                    "n_deleted",
+                    "n_inserted",
+                    "n_mutated",
+                ]
+            )
+            .sum()
+            .reset_index()
+            .set_index("Aligned_Sequence")
+        )
+        out = out.sort_values(
+            by=["#Reads", "Aligned_Sequence", "Reference_Sequence"], ascending=[False, True, True]
+        )
         out["Unedited"] = out["Unedited"] > 0
         return out
 
     for ref in info["results"]["ref_names"]:
         ref_info = refs[ref]
-        targets = [("custom", plot_center, plot_center, None)] if plot_center is not None else [
-            (g or seq, cut, pc, None) for g, seq, cut, pc in zip(ref_info["sgRNA_names"], ref_info["sgRNA_sequences"], ref_info["sgRNA_cut_points"], ref_info["sgRNA_plot_cut_points"], strict=True)
-        ]
-        for label, cut, pcut, _unused in targets:
+        targets = (
+            [("custom", plot_center, plot_center, None)]
+            if plot_center is not None
+            else [
+                (g or seq, cut, pc, None)
+                for g, seq, cut, pc in zip(
+                    ref_info["sgRNA_names"],
+                    ref_info["sgRNA_sequences"],
+                    ref_info["sgRNA_cut_points"],
+                    ref_info["sgRNA_plot_cut_points"],
+                    strict=True,
+                )
+            ]
+        )
+        for label, cut, _pcut, _unused in targets:
             if mode == "ambiguous":
                 left = right = max(1, args.plot_window_size)
                 frame = df.loc[df["Reference_Name"] == "AMBIGUOUS_" + ref]
@@ -826,9 +1087,18 @@ def _plot_alleles(
             filename = f"{root}_{ref}_{label}"
             kwargs: dict[str, Any] = {} if mode == "ambiguous" else {"cut_point_ind": cut - start}
             plot.plot_alleles_table(
-                seq, df_alleles=around, fig_filename_root=filename, MIN_FREQUENCY=min_freq, MAX_N_ROWS=rows, SAVE_ALSO_PNG=save_png,
-                plot_cut_point=plot_cut_point, sgRNA_intervals=intervals, sgRNA_names=ref_info["sgRNA_names"],
-                sgRNA_mismatches=ref_info["sgRNA_mismatches"], annotate_wildtype_allele=args.annotate_wildtype_allele, **kwargs,
+                seq,
+                df_alleles=around,
+                fig_filename_root=filename,
+                MIN_FREQUENCY=min_freq,
+                MAX_N_ROWS=rows,
+                SAVE_ALSO_PNG=save_png,
+                plot_cut_point=plot_cut_point,
+                sgRNA_intervals=intervals,
+                sgRNA_names=ref_info["sgRNA_names"],
+                sgRNA_mismatches=ref_info["sgRNA_mismatches"],
+                annotate_wildtype_allele=args.annotate_wildtype_allele,
+                **kwargs,
             )
             produced += [str(p) for p in sorted(root.parent.glob(Path(filename).name + ".*"))]
     return {
@@ -856,7 +1126,18 @@ def crispresso_plot_ambiguous_alleles(
     ``--write_detailed_allele_table``. ``min_frequency`` and ``max_rows`` default to the run's own settings. The original
     script appends each plot name to the previous one; this port names every plot independently.
     """
-    result = _plot_alleles(crispresso_folder, output_root, "ambiguous", min_frequency, max_rows, plot_cut_point, save_png, 0, 0, None)
+    result = _plot_alleles(
+        crispresso_folder,
+        output_root,
+        "ambiguous",
+        min_frequency,
+        max_rows,
+        plot_cut_point,
+        save_png,
+        0,
+        0,
+        None,
+    )
     result["operation"] = "plotAmbiguous"
     return result
 
@@ -882,7 +1163,18 @@ def crispresso_plot_allele_window(
     """
     left = _cli.integer(plot_left, "plot_left", minimum=1)
     right = _cli.integer(plot_right, "plot_right", minimum=1)
-    result = _plot_alleles(crispresso_folder, output_root, "custom", min_frequency, max_rows, plot_cut_point, save_png, left, right, plot_center)
+    result = _plot_alleles(
+        crispresso_folder,
+        output_root,
+        "custom",
+        min_frequency,
+        max_rows,
+        plot_cut_point,
+        save_png,
+        left,
+        right,
+        plot_center,
+    )
     result["operation"] = "plotCustomAllelePlot"
     return result
 

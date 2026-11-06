@@ -54,7 +54,12 @@ def read_text_input(value: object, *, what: str = "input") -> str | None:
     path: Path | None = None
     if isinstance(value, Path):
         path = value
-    elif isinstance(value, str) and "\n" not in value and 0 < len(value) < 4096 and not value.startswith(">"):
+    elif (
+        isinstance(value, str)
+        and "\n" not in value
+        and 0 < len(value) < 4096
+        and not value.startswith(">")
+    ):
         candidate = Path(value)
         try:
             if candidate.is_file():
@@ -63,9 +68,16 @@ def read_text_input(value: object, *, what: str = "input") -> str | None:
             path = None
     if path is not None:
         if not path.is_file():
-            raise InputFormatError(f"{what} file does not exist: {path}", code="ASSEMBLY_INPUT_FILE", hint="Pass an existing file.")
+            raise InputFormatError(
+                f"{what} file does not exist: {path}",
+                code="ASSEMBLY_INPUT_FILE",
+                hint="Pass an existing file.",
+            )
         if path.stat().st_size > MAX_FILE_BYTES:
-            raise InputFormatError(f"{what} file is larger than {MAX_FILE_BYTES} bytes.", code="ASSEMBLY_INPUT_TOO_LARGE")
+            raise InputFormatError(
+                f"{what} file is larger than {MAX_FILE_BYTES} bytes.",
+                code="ASSEMBLY_INPUT_TOO_LARGE",
+            )
         return path.read_text(encoding="utf-8", errors="replace")
     if isinstance(value, str):
         return value
@@ -87,12 +99,20 @@ def parse_fasta(text: str) -> list[tuple[str, str]]:
                 records.append((name, "".join(parts).upper()))
             header = line[1:].split()
             if not header:
-                raise InputFormatError("FASTA header without a record name.", code="ASSEMBLY_FASTA_FORMAT", hint="Give every '>' header an identifier.")
+                raise InputFormatError(
+                    "FASTA header without a record name.",
+                    code="ASSEMBLY_FASTA_FORMAT",
+                    hint="Give every '>' header an identifier.",
+                )
             name = header[0]
             parts = []
         else:
             if name is None:
-                raise InputFormatError("FASTA sequence data before the first '>' header.", code="ASSEMBLY_FASTA_FORMAT", hint="The input must be FASTA text.")
+                raise InputFormatError(
+                    "FASTA sequence data before the first '>' header.",
+                    code="ASSEMBLY_FASTA_FORMAT",
+                    hint="The input must be FASTA text.",
+                )
             parts.append(line)
     if name is not None:
         records.append((name, "".join(parts).upper()))
@@ -104,7 +124,10 @@ def _from_items(items: Sequence[object]) -> list[Contig]:
     for index, item in enumerate(items):
         default_name = f"contig_{index + 1}"
         if isinstance(item, bool):
-            raise InputFormatError(f"contig {index} must be a sequence string or a positive length.", code="ASSEMBLY_CONTIG_FORMAT")
+            raise InputFormatError(
+                f"contig {index} must be a sequence string or a positive length.",
+                code="ASSEMBLY_CONTIG_FORMAT",
+            )
         if isinstance(item, (int, float)):
             contigs.append((default_name, None, _positive_length(item, index)))
         elif isinstance(item, str):
@@ -119,17 +142,29 @@ def _from_items(items: Sequence[object]) -> list[Contig]:
                 length = item.get("length", item.get("size"))
                 contigs.append((name, None, _positive_length(length, index)))
         else:
-            raise InputFormatError(f"contig {index} has unsupported type {type(item).__name__}.", code="ASSEMBLY_CONTIG_FORMAT")
+            raise InputFormatError(
+                f"contig {index} has unsupported type {type(item).__name__}.",
+                code="ASSEMBLY_CONTIG_FORMAT",
+            )
     return contigs
 
 
 def _positive_length(value: object, index: int) -> int:
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or (isinstance(value, float) and not value.is_integer()) or value <= 0:
-        raise InputFormatError(f"contig length {index} must be a positive integer.", code="ASSEMBLY_CONTIG_FORMAT")
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or (isinstance(value, float) and not value.is_integer())
+        or value <= 0
+    ):
+        raise InputFormatError(
+            f"contig length {index} must be a positive integer.", code="ASSEMBLY_CONTIG_FORMAT"
+        )
     return int(value)
 
 
-def parse_contigs(value: object, *, require_sequences: bool = False, what: str = "assembly") -> list[Contig]:
+def parse_contigs(
+    value: object, *, require_sequences: bool = False, what: str = "assembly"
+) -> list[Contig]:
     """Normalise assembly input into contigs.
 
     Accepted forms: FASTA text or file path; ``{name: sequence}``; ``{name: length}``;
@@ -147,27 +182,48 @@ def parse_contigs(value: object, *, require_sequences: bool = False, what: str =
             seq = "".join(stripped.split()).upper()
             contigs = [("contig_1", seq, len(seq))]
         else:
-            raise InputFormatError(f"{what} text is neither FASTA nor a bare sequence.", code="ASSEMBLY_INPUT_FORMAT", hint="Pass FASTA text, a FASTA path, a mapping or a list of sequences/lengths.")
+            raise InputFormatError(
+                f"{what} text is neither FASTA nor a bare sequence.",
+                code="ASSEMBLY_INPUT_FORMAT",
+                hint="Pass FASTA text, a FASTA path, a mapping or a list of sequences/lengths.",
+            )
     elif isinstance(value, Mapping):
         for key in ("contigs", "records", "sequences", "lengths", "contig_lengths", "assembly"):
             if key in value:
                 return parse_contigs(value[key], require_sequences=require_sequences, what=what)
         if value and all(isinstance(v, str) for v in value.values()):
             contigs = [(str(k), v.strip().upper(), len(v.strip())) for k, v in value.items()]
-        elif value and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value.values()):
-            contigs = [(str(k), None, _positive_length(v, i)) for i, (k, v) in enumerate(value.items())]
+        elif value and all(
+            isinstance(v, (int, float)) and not isinstance(v, bool) for v in value.values()
+        ):
+            contigs = [
+                (str(k), None, _positive_length(v, i)) for i, (k, v) in enumerate(value.items())
+            ]
         else:
-            raise InputFormatError(f"{what} mapping must map contig names to sequences or lengths.", code="ASSEMBLY_INPUT_FORMAT")
+            raise InputFormatError(
+                f"{what} mapping must map contig names to sequences or lengths.",
+                code="ASSEMBLY_INPUT_FORMAT",
+            )
     elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         contigs = _from_items(value)
     else:
-        raise InputFormatError(f"{what} has unsupported type {type(value).__name__}.", code="ASSEMBLY_INPUT_FORMAT", hint="Pass FASTA text, a path, a mapping or a list.")
+        raise InputFormatError(
+            f"{what} has unsupported type {type(value).__name__}.",
+            code="ASSEMBLY_INPUT_FORMAT",
+            hint="Pass FASTA text, a path, a mapping or a list.",
+        )
     if not contigs:
         raise InputFormatError(f"{what} contains no contigs.", code="ASSEMBLY_EMPTY")
     if sum(length for _, _, length in contigs) > MAX_TOTAL_BASES:
-        raise InputFormatError(f"{what} is larger than {MAX_TOTAL_BASES} bases.", code="ASSEMBLY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"{what} is larger than {MAX_TOTAL_BASES} bases.", code="ASSEMBLY_INPUT_TOO_LARGE"
+        )
     if require_sequences and any(seq is None for _, seq, _ in contigs):
-        raise InputFormatError(f"{what} must contain sequences, not only lengths.", code="ASSEMBLY_SEQUENCES_REQUIRED", hint="Pass FASTA text or a {name: sequence} mapping.")
+        raise InputFormatError(
+            f"{what} must contain sequences, not only lengths.",
+            code="ASSEMBLY_SEQUENCES_REQUIRED",
+            hint="Pass FASTA text or a {name: sequence} mapping.",
+        )
     return contigs
 
 
@@ -175,22 +231,39 @@ def options_dict(options: Mapping[str, object] | None) -> dict[str, object]:
     return dict(options or {})
 
 
-def get_int(settings: Mapping[str, object], key: str, default: int | None, *, low: int, high: int) -> int | None:
+def get_int(
+    settings: Mapping[str, object], key: str, default: int | None, *, low: int, high: int
+) -> int | None:
     value = settings.get(key, default)
     if value is None:
         return None
     if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
-        raise ConfigurationError(f"options.{key} must be an integer in [{low}, {high}].", code="ASSEMBLY_OPTION", hint=f"Set options['{key}'] to an integer in [{low}, {high}].")
+        raise ConfigurationError(
+            f"options.{key} must be an integer in [{low}, {high}].",
+            code="ASSEMBLY_OPTION",
+            hint=f"Set options['{key}'] to an integer in [{low}, {high}].",
+        )
     return value
 
 
-def get_float(settings: Mapping[str, object], key: str, default: float, *, low: float, high: float, low_open: bool = False) -> float:
+def get_float(
+    settings: Mapping[str, object],
+    key: str,
+    default: float,
+    *,
+    low: float,
+    high: float,
+    low_open: bool = False,
+) -> float:
     value = settings.get(key, default)
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
         raise ConfigurationError(f"options.{key} must be a number.", code="ASSEMBLY_OPTION")
     ok = (low < value if low_open else low <= value) and value <= high
     if not ok:
-        raise ConfigurationError(f"options.{key} must be in {'(' if low_open else '['}{low}, {high}].", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            f"options.{key} must be in {'(' if low_open else '['}{low}, {high}].",
+            code="ASSEMBLY_OPTION",
+        )
     return float(value)
 
 
@@ -311,27 +384,56 @@ def completeness(contigs: Sequence[Contig], settings: Mapping[str, object]) -> d
     reference_length = settings.get("reference_length")
     reference = settings.get("reference")
     if reference_length is not None:
-        if isinstance(reference_length, bool) or not isinstance(reference_length, (int, float)) or reference_length <= 0:
-            raise ConfigurationError("options.reference_length must be a positive number.", code="ASSEMBLY_OPTION")
+        if (
+            isinstance(reference_length, bool)
+            or not isinstance(reference_length, (int, float))
+            or reference_length <= 0
+        ):
+            raise ConfigurationError(
+                "options.reference_length must be a positive number.", code="ASSEMBLY_OPTION"
+            )
         ratio = total / float(reference_length)
-        result.update(reference_length=int(reference_length), length_ratio=ratio, length_completeness=min(ratio, 1.0))
+        result.update(
+            reference_length=int(reference_length),
+            length_ratio=ratio,
+            length_completeness=min(ratio, 1.0),
+        )
         methods.append("length")
     if reference is not None:
         ref_contigs = parse_contigs(reference, require_sequences=True, what="options.reference")
         if any(seq is None for _, seq, _ in contigs):
-            raise InputFormatError("k-mer completeness needs assembly sequences, not only lengths.", code="ASSEMBLY_SEQUENCES_REQUIRED")
+            raise InputFormatError(
+                "k-mer completeness needs assembly sequences, not only lengths.",
+                code="ASSEMBLY_SEQUENCES_REQUIRED",
+            )
         k = get_int(settings, "k", 21, low=3, high=63) or 21
         if sum(length for _, _, length in ref_contigs) + total > MAX_KMER_BASES:
-            raise InputFormatError(f"k-mer completeness is limited to {MAX_KMER_BASES} total bases.", code="ASSEMBLY_INPUT_TOO_LARGE", hint="Use options.reference_length for a length-only estimate.")
+            raise InputFormatError(
+                f"k-mer completeness is limited to {MAX_KMER_BASES} total bases.",
+                code="ASSEMBLY_INPUT_TOO_LARGE",
+                hint="Use options.reference_length for a length-only estimate.",
+            )
         ref_kmers = set(canonical_kmer_counts((s or "" for _, s, _ in ref_contigs), k))
         asm_kmers = set(canonical_kmer_counts((s or "" for _, s, _ in contigs), k))
         if not ref_kmers:
-            raise InputFormatError("reference has no ACGT k-mers of the requested length.", code="ASSEMBLY_REFERENCE_EMPTY")
+            raise InputFormatError(
+                "reference has no ACGT k-mers of the requested length.",
+                code="ASSEMBLY_REFERENCE_EMPTY",
+            )
         shared = len(ref_kmers & asm_kmers)
-        result.update(k=k, reference_distinct_kmers=len(ref_kmers), shared_kmers=shared, kmer_completeness=shared / len(ref_kmers))
+        result.update(
+            k=k,
+            reference_distinct_kmers=len(ref_kmers),
+            shared_kmers=shared,
+            kmer_completeness=shared / len(ref_kmers),
+        )
         methods.append("kmer")
     if not methods:
-        raise ConfigurationError("calculate_assembly_completeness needs options.reference_length or options.reference.", code="ASSEMBLY_OPTION", hint="Provide the expected genome length or a reference assembly.")
+        raise ConfigurationError(
+            "calculate_assembly_completeness needs options.reference_length or options.reference.",
+            code="ASSEMBLY_OPTION",
+            hint="Provide the expected genome length or a reference assembly.",
+        )
     result["methods"] = methods
     return result
 
@@ -357,18 +459,31 @@ def busco_completeness(value: object) -> dict[str, Any]:
         for letter, names in aliases.items():
             found = [value[n] for n in names if n in value]
             if not found:
-                raise InputFormatError(f"BUSCO counts need a '{letter}' entry ({'/'.join(names)}).", code="BUSCO_COUNTS", hint="Pass {'single': .., 'duplicated': .., 'fragmented': .., 'missing': ..}.")
+                raise InputFormatError(
+                    f"BUSCO counts need a '{letter}' entry ({'/'.join(names)}).",
+                    code="BUSCO_COUNTS",
+                    hint="Pass {'single': .., 'duplicated': .., 'fragmented': .., 'missing': ..}.",
+                )
             number = found[0]
             if isinstance(number, bool) or not isinstance(number, int) or number < 0:
-                raise InputFormatError(f"BUSCO count '{letter}' must be a non-negative integer.", code="BUSCO_COUNTS")
+                raise InputFormatError(
+                    f"BUSCO count '{letter}' must be a non-negative integer.", code="BUSCO_COUNTS"
+                )
             counts[letter] = number
     else:
         text = read_text_input(value, what="BUSCO summary")
         match = _BUSCO_RE.search(text or "")
         if match is None:
-            raise InputFormatError("no BUSCO short-summary line (C:..%[S:..%,D:..%],F:..%,M:..%,n:..) found.", code="BUSCO_SUMMARY", hint="Pass the short_summary text/file or a mapping of counts.")
+            raise InputFormatError(
+                "no BUSCO short-summary line (C:..%[S:..%,D:..%],F:..%,M:..%,n:..) found.",
+                code="BUSCO_SUMMARY",
+                hint="Pass the short_summary text/file or a mapping of counts.",
+            )
         n = int(match.group(6))
-        counts = {key: round(float(match.group(i)) * n / 100.0) for key, i in (("S", 2), ("D", 3), ("F", 4), ("M", 5))}
+        counts = {
+            key: round(float(match.group(i)) * n / 100.0)
+            for key, i in (("S", 2), ("D", 3), ("F", 4), ("M", 5))
+        }
         counts["_n"] = n
     n_total = counts.pop("_n", None) or sum(counts.values())
     if n_total <= 0:
@@ -406,21 +521,33 @@ def kmer_histogram(value: object, settings: Mapping[str, object]) -> dict[int, i
             c = int(float(cov))  # type: ignore[arg-type]
             n = int(float(count))  # type: ignore[arg-type]
         except (TypeError, ValueError):
-            raise InputFormatError("histogram entries must be numeric (coverage, count).", code="KMER_HISTOGRAM") from None
+            raise InputFormatError(
+                "histogram entries must be numeric (coverage, count).", code="KMER_HISTOGRAM"
+            ) from None
         if c < 1 or n < 0:
-            raise InputFormatError("histogram coverage must be >= 1 and counts >= 0.", code="KMER_HISTOGRAM")
+            raise InputFormatError(
+                "histogram coverage must be >= 1 and counts >= 0.", code="KMER_HISTOGRAM"
+            )
         hist[c] = hist.get(c, 0) + n
 
     text = read_text_input(value, what="k-mer input")
     if isinstance(value, Mapping) and value and all(re.fullmatch(r"\d+", str(k)) for k in value):
         for cov, count in value.items():
             add(cov, count)
-    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)) and value and all(
-        isinstance(row, Sequence) and not isinstance(row, (str, bytes)) and len(row) == 2 for row in value
+    elif (
+        isinstance(value, Sequence)
+        and not isinstance(value, (str, bytes))
+        and value
+        and all(
+            isinstance(row, Sequence) and not isinstance(row, (str, bytes)) and len(row) == 2
+            for row in value
+        )
     ):
         for cov, count in value:
             add(cov, count)
-    elif text is not None and re.fullmatch(r"(?:\s*\d+(?:\.\d+)?[ \t,]+\d+(?:\.\d+)?\s*\n?)+", text):
+    elif text is not None and re.fullmatch(
+        r"(?:\s*\d+(?:\.\d+)?[ \t,]+\d+(?:\.\d+)?\s*\n?)+", text
+    ):
         for line in text.splitlines():
             if line.strip():
                 a, b = re.split(r"[ \t,]+", line.strip())
@@ -432,7 +559,10 @@ def kmer_histogram(value: object, settings: Mapping[str, object]) -> dict[int, i
         else:
             raise InputFormatError("unsupported k-mer histogram input.", code="KMER_HISTOGRAM")
         if sum(length for _, _, length in contigs) > MAX_KMER_BASES:
-            raise InputFormatError(f"counting k-mers is limited to {MAX_KMER_BASES} bases; pass a precomputed histogram instead.", code="ASSEMBLY_INPUT_TOO_LARGE")
+            raise InputFormatError(
+                f"counting k-mers is limited to {MAX_KMER_BASES} bases; pass a precomputed histogram instead.",
+                code="ASSEMBLY_INPUT_TOO_LARGE",
+            )
         counts = canonical_kmer_counts((s or "" for _, s, _ in contigs), k)
         for multiplicity in counts.values():
             hist[multiplicity] = hist.get(multiplicity, 0) + 1
@@ -453,11 +583,23 @@ def histogram_peak(hist: Mapping[int, int], settings: Mapping[str, object]) -> t
                 min_cov = x
                 break
         if min_cov is None:
-            raise InputFormatError("no error/valley cutoff found: the histogram decreases monotonically.", code="KMER_HISTOGRAM_PEAK", hint="Set options.min_coverage and options.peak_coverage.")
+            raise InputFormatError(
+                "no error/valley cutoff found: the histogram decreases monotonically.",
+                code="KMER_HISTOGRAM_PEAK",
+                hint="Set options.min_coverage and options.peak_coverage.",
+            )
     if peak is None:
-        candidates = [x for x in hist if x > min_cov] if "min_coverage" not in settings else [x for x in hist if x >= min_cov]
+        candidates = (
+            [x for x in hist if x > min_cov]
+            if "min_coverage" not in settings
+            else [x for x in hist if x >= min_cov]
+        )
         if not candidates:
-            raise InputFormatError("no k-mer coverage above the cutoff.", code="KMER_HISTOGRAM_PEAK", hint="Set options.peak_coverage.")
+            raise InputFormatError(
+                "no k-mer coverage above the cutoff.",
+                code="KMER_HISTOGRAM_PEAK",
+                hint="Set options.peak_coverage.",
+            )
         peak = max(candidates, key=lambda x: (hist[x], -x))
     return min_cov, peak
 
@@ -479,7 +621,9 @@ def estimate_genome_size(hist: Mapping[int, int], settings: Mapping[str, object]
     }
 
 
-def estimate_repeat_content(hist: Mapping[int, int], settings: Mapping[str, object]) -> dict[str, Any]:
+def estimate_repeat_content(
+    hist: Mapping[int, int], settings: Mapping[str, object]
+) -> dict[str, Any]:
     min_cov, peak = histogram_peak(hist, settings)
     factor = get_float(settings, "repeat_factor", 1.5, low=1.0, high=100.0, low_open=True)
     kept = {x: n for x, n in hist.items() if x >= min_cov}
@@ -511,7 +655,11 @@ def estimate_het(hist: Mapping[int, int], settings: Mapping[str, object]) -> dic
     het = sum(n for x, n in hist.items() if min_cov <= x <= het_upper * peak)
     hom = sum(n for x, n in hist.items() if het_upper * peak < x <= hom_upper * peak)
     if hom == 0:
-        raise InputFormatError("no k-mers in the homozygous window; cannot estimate heterozygosity.", code="KMER_HISTOGRAM_PEAK", hint="Check options.peak_coverage.")
+        raise InputFormatError(
+            "no k-mers in the homozygous window; cannot estimate heterozygosity.",
+            code="KMER_HISTOGRAM_PEAK",
+            hint="Check options.peak_coverage.",
+        )
     ratio = het / hom
     rate = ratio / (k * (2.0 + ratio))
     return {
@@ -529,11 +677,17 @@ def estimate_het(hist: Mapping[int, int], settings: Mapping[str, object]) -> dic
 # --------------------------------------------------------------------------- pangenome matrices
 
 
-def presence_matrix(value: object, *, what: str = "pangenome") -> tuple[list[str], list[str], list[list[int]]]:
+def presence_matrix(
+    value: object, *, what: str = "pangenome"
+) -> tuple[list[str], list[str], list[list[int]]]:
     """Return ``(genomes, genes, rows)`` where ``rows[g][j]`` is 1 if gene g is present in genome j."""
 
     if not isinstance(value, Mapping) or not value:
-        raise InputFormatError(f"{what} must be a non-empty mapping (see the docstring for accepted forms).", code="PANGENOME_INPUT", hint="Pass {genome: [genes]} or {'genomes': [...], 'genes': [...], 'matrix': [[...]]}.")
+        raise InputFormatError(
+            f"{what} must be a non-empty mapping (see the docstring for accepted forms).",
+            code="PANGENOME_INPUT",
+            hint="Pass {genome: [genes]} or {'genomes': [...], 'genes': [...], 'matrix': [[...]]}.",
+        )
     if "matrix" in value and "genomes" in value and "genes" in value:
         genomes = [str(g) for g in value["genomes"]]  # type: ignore[index, union-attr]
         genes = [str(g) for g in value["genes"]]  # type: ignore[index, union-attr]
@@ -543,7 +697,9 @@ def presence_matrix(value: object, *, what: str = "pangenome") -> tuple[list[str
         rows: list[list[int]] = []
         for row in matrix:
             if not isinstance(row, Sequence) or len(row) != len(genomes):
-                raise InputFormatError("every matrix row needs one value per genome.", code="PANGENOME_INPUT")
+                raise InputFormatError(
+                    "every matrix row needs one value per genome.", code="PANGENOME_INPUT"
+                )
             rows.append([_presence(v) for v in row])
     elif all(isinstance(v, (list, tuple, set, frozenset)) for v in value.values()):
         genomes = [str(g) for g in value]
@@ -557,15 +713,25 @@ def presence_matrix(value: object, *, what: str = "pangenome") -> tuple[list[str
             for genome in entry:  # type: ignore[union-attr]
                 if str(genome) not in genomes:
                     genomes.append(str(genome))
-        rows = [[_presence(entry.get(g, entry.get(str(g), 0))) for g in genomes] for entry in value.values()]  # type: ignore[union-attr]
+        rows = [
+            [_presence(entry.get(g, entry.get(str(g), 0))) for g in genomes]
+            for entry in value.values()
+        ]  # type: ignore[union-attr]
     else:
-        raise InputFormatError(f"unrecognised {what} layout.", code="PANGENOME_INPUT", hint="Pass {genome: [genes]}, {gene: {genome: 0/1}} or the genomes/genes/matrix form.")
+        raise InputFormatError(
+            f"unrecognised {what} layout.",
+            code="PANGENOME_INPUT",
+            hint="Pass {genome: [genes]}, {gene: {genome: 0/1}} or the genomes/genes/matrix form.",
+        )
     if len(set(genomes)) != len(genomes) or len(set(genes)) != len(genes):
         raise InputFormatError("genome and gene names must be unique.", code="PANGENOME_INPUT")
     if not genomes or not genes:
         raise InputFormatError("the matrix has no genomes or no genes.", code="PANGENOME_INPUT")
     if len(genomes) > MAX_GENOMES or len(genes) > MAX_GENES:
-        raise InputFormatError(f"the matrix exceeds {MAX_GENOMES} genomes or {MAX_GENES} genes.", code="ASSEMBLY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"the matrix exceeds {MAX_GENOMES} genomes or {MAX_GENES} genes.",
+            code="ASSEMBLY_INPUT_TOO_LARGE",
+        )
     return genomes, genes, rows
 
 
@@ -574,21 +740,31 @@ def _presence(value: object) -> int:
         return int(value)
     if isinstance(value, (int, float)) and value >= 0:
         return 1 if value > 0 else 0
-    raise InputFormatError("presence/absence values must be booleans or non-negative numbers.", code="PANGENOME_INPUT")
+    raise InputFormatError(
+        "presence/absence values must be booleans or non-negative numbers.", code="PANGENOME_INPUT"
+    )
 
 
-def matrix_dict(genomes: Sequence[str], genes: Sequence[str], rows: Sequence[Sequence[int]]) -> dict[str, Any]:
+def matrix_dict(
+    genomes: Sequence[str], genes: Sequence[str], rows: Sequence[Sequence[int]]
+) -> dict[str, Any]:
     return {"genomes": list(genomes), "genes": list(genes), "matrix": [list(r) for r in rows]}
 
 
-def pangenome_partition(genomes: Sequence[str], genes: Sequence[str], rows: Sequence[Sequence[int]], core_threshold: float, cloud_threshold: float = 0.15) -> dict[str, Any]:
+def pangenome_partition(
+    genomes: Sequence[str],
+    genes: Sequence[str],
+    rows: Sequence[Sequence[int]],
+    core_threshold: float,
+    cloud_threshold: float = 0.15,
+) -> dict[str, Any]:
     n = len(genomes)
     needed = math.ceil(core_threshold * n - 1e-9)
     core: list[str] = []
     shell: list[str] = []
     cloud: list[str] = []
     fractions: dict[str, float] = {}
-    for gene, row in zip(genes, rows):
+    for gene, row in zip(genes, rows, strict=False):
         present = sum(row)
         fractions[gene] = present / n
         if present >= needed:
@@ -632,21 +808,40 @@ def fit_heaps(deltas: Sequence[float]) -> dict[str, Any]:
 
     points = [(math.log(n), math.log(d)) for n, d in enumerate(deltas, start=2) if d > 0]
     if len(points) < 3:
-        raise InputFormatError("Heaps' law needs at least three genomes with new genes (>= 4 genomes).", code="PANGENOME_TOO_FEW_GENOMES", hint="Provide at least four genomes.")
+        raise InputFormatError(
+            "Heaps' law needs at least three genomes with new genes (>= 4 genomes).",
+            code="PANGENOME_TOO_FEW_GENOMES",
+            hint="Provide at least four genomes.",
+        )
     mx = sum(p[0] for p in points) / len(points)
     my = sum(p[1] for p in points) / len(points)
     sxx = sum((p[0] - mx) ** 2 for p in points)
     slope = sum((p[0] - mx) * (p[1] - my) for p in points) / sxx
     intercept = my - slope * mx
-    return {"alpha": -slope, "kappa": math.exp(intercept), "points_used": len(points), "points_dropped": len(deltas) - len(points)}
+    return {
+        "alpha": -slope,
+        "kappa": math.exp(intercept),
+        "points_used": len(points),
+        "points_dropped": len(deltas) - len(points),
+    }
 
 
-def pangenome_openness(genomes: Sequence[str], genes: Sequence[str], rows: Sequence[Sequence[int]], permutations: int, seed: int) -> dict[str, Any]:
+def pangenome_openness(
+    genomes: Sequence[str],
+    genes: Sequence[str],
+    rows: Sequence[Sequence[int]],
+    permutations: int,
+    seed: int,
+) -> dict[str, Any]:
     import random
 
     g = len(genomes)
     if g < 4:
-        raise InputFormatError("pangenome openness needs at least four genomes.", code="PANGENOME_TOO_FEW_GENOMES", hint="Provide at least four genomes.")
+        raise InputFormatError(
+            "pangenome openness needs at least four genomes.",
+            code="PANGENOME_TOO_FEW_GENOMES",
+            hint="Provide at least four genomes.",
+        )
     gene_sets: list[set[int]] = [set() for _ in range(g)]
     for gi, row in enumerate(rows):
         for j, v in enumerate(row):
@@ -693,9 +888,14 @@ def merge_intervals(intervals: Iterable[tuple[int, int]]) -> list[tuple[int, int
     return [(a, b) for a, b in merged]
 
 
-def repeats_in_assembly(contigs: Sequence[Contig], k: int, min_copies: int, min_length: int) -> dict[str, Any]:
+def repeats_in_assembly(
+    contigs: Sequence[Contig], k: int, min_copies: int, min_length: int
+) -> dict[str, Any]:
     if sum(length for _, _, length in contigs) > MAX_KMER_BASES:
-        raise InputFormatError(f"k-mer repeat detection is limited to {MAX_KMER_BASES} bases.", code="ASSEMBLY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"k-mer repeat detection is limited to {MAX_KMER_BASES} bases.",
+            code="ASSEMBLY_INPUT_TOO_LARGE",
+        )
     counts = canonical_kmer_counts((s or "" for _, s, _ in contigs), k)
     per_contig: dict[str, list[dict[str, int]]] = {}
     repeat_bases = 0
@@ -706,7 +906,10 @@ def repeats_in_assembly(contigs: Sequence[Contig], k: int, min_copies: int, min_
         spans: list[tuple[int, int]] = []
         for i in range(len(seq) - k + 1):
             kmer = seq[i : i + k]
-            if set(kmer) <= set("ACGT") and counts[min(kmer, reverse_complement(kmer))] >= min_copies:
+            if (
+                set(kmer) <= set("ACGT")
+                and counts[min(kmer, reverse_complement(kmer))] >= min_copies
+            ):
                 spans.append((i, i + k))
         intervals = [(a, b) for a, b in merge_intervals(spans) if b - a >= min_length]
         per_contig[name] = [{"start": a, "end": b, "length": b - a} for a, b in intervals]
@@ -723,9 +926,19 @@ def repeats_in_assembly(contigs: Sequence[Contig], k: int, min_copies: int, min_
     }
 
 
-def telomeres(contigs: Sequence[Contig], motif: str, min_repeats: int, max_distance: int) -> dict[str, Any]:
+def _longest_run(runs: list[tuple[int, int, int]]) -> tuple[int, int, int] | None:
+    """Return the longest (start, end, copies) run, the leftmost on ties, or None."""
+
+    return max(runs, key=lambda run: (run[1] - run[0], -run[0])) if runs else None
+
+
+def telomeres(
+    contigs: Sequence[Contig], motif: str, min_repeats: int, max_distance: int
+) -> dict[str, Any]:
     if not re.fullmatch(r"[ACGT]{2,12}", motif):
-        raise ConfigurationError("options.motif must be 2-12 bases of ACGT.", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            "options.motif must be 2-12 bases of ACGT.", code="ASSEMBLY_OPTION"
+        )
     rotations = {motif[i:] + motif[:i] for i in range(len(motif))}
     rc = reverse_complement(motif)
     rotations |= {rc[i:] + rc[:i] for i in range(len(rc))}
@@ -739,12 +952,15 @@ def telomeres(contigs: Sequence[Contig], motif: str, min_repeats: int, max_dista
                 runs.append((m.start(), m.end(), (m.end() - m.start()) // len(unit)))
         left = [r for r in runs if r[0] <= max_distance and r[0] <= len(seq) - r[1]]
         right = [r for r in runs if len(seq) - r[1] <= max_distance and len(seq) - r[1] < r[0]]
-        pick = lambda rs: max(rs, key=lambda r: (r[1] - r[0], -r[0])) if rs else None  # noqa: E731
         entry: dict[str, Any] = {"length": length}
         for side, rs in (("left", left), ("right", right)):
-            best = pick(rs)
-            entry[side] = None if best is None else {"start": best[0], "end": best[1], "copies": best[2]}
-        entry["telomeres_at_ends"] = int(entry["left"] is not None) + int(entry["right"] is not None)
+            best = _longest_run(rs)
+            entry[side] = (
+                None if best is None else {"start": best[0], "end": best[1], "copies": best[2]}
+            )
+        entry["telomeres_at_ends"] = int(entry["left"] is not None) + int(
+            entry["right"] is not None
+        )
         results[name] = entry
     return {
         "motif": motif,
@@ -770,7 +986,9 @@ def parse_gfa(text: str) -> dict[str, Any]:
         kind = fields[0]
         if kind == "S":
             if len(fields) < 3:
-                raise InputFormatError(f"GFA line {lineno}: S line needs a name and sequence.", code="GFA_FORMAT")
+                raise InputFormatError(
+                    f"GFA line {lineno}: S line needs a name and sequence.", code="GFA_FORMAT"
+                )
             name, seq = fields[1], fields[2]
             tags = {f[:2]: f[5:] for f in fields[3:] if len(f) > 5 and f[2] == ":"}
             length = len(seq) if seq != "*" else int(tags["LN"]) if "LN" in tags else None
@@ -782,18 +1000,29 @@ def parse_gfa(text: str) -> dict[str, Any]:
                     except ValueError:
                         depth = None
                     break
-            segments[name] = {"sequence": None if seq == "*" else seq.upper(), "length": length, "depth": depth}
+            segments[name] = {
+                "sequence": None if seq == "*" else seq.upper(),
+                "length": length,
+                "depth": depth,
+            }
         elif kind == "L":
             if len(fields) < 6 or fields[2] not in "+-" or fields[4] not in "+-":
                 raise InputFormatError(f"GFA line {lineno}: malformed L line.", code="GFA_FORMAT")
             links.append((fields[1], fields[2], fields[3], fields[4], fields[5]))
     if not segments:
-        raise InputFormatError("no GFA segments (S lines) found.", code="GFA_FORMAT", hint="Pass GFA1 text or a path to a .gfa file.")
+        raise InputFormatError(
+            "no GFA segments (S lines) found.",
+            code="GFA_FORMAT",
+            hint="Pass GFA1 text or a path to a .gfa file.",
+        )
     if len(segments) > 1_000_000:
         raise InputFormatError("GFA has too many segments.", code="ASSEMBLY_INPUT_TOO_LARGE")
     for a, _, b, _, _ in links:
         if a not in segments or b not in segments:
-            raise InputFormatError(f"link refers to unknown segment {a if a not in segments else b}.", code="GFA_FORMAT")
+            raise InputFormatError(
+                f"link refers to unknown segment {a if a not in segments else b}.",
+                code="GFA_FORMAT",
+            )
     return {"segments": segments, "links": links}
 
 
@@ -828,7 +1057,9 @@ def compare_gfa(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 
     flip = {"+": "-", "-": "+"}
 
-    def link_set(graph: dict[str, Any], trans: dict[str, tuple[str, bool]]) -> set[tuple[str, str, str, str]]:
+    def link_set(
+        graph: dict[str, Any], trans: dict[str, tuple[str, bool]]
+    ) -> set[tuple[str, str, str, str]]:
         keys = set()
         for a, ao, b, bo, _ in graph["links"]:
             (ka, fa), (kb, fb) = trans[a], trans[b]
@@ -850,8 +1081,16 @@ def compare_gfa(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "compared_by": "canonical segment sequence" if use_sequences else "segment name",
-        "left": {"segments": len(left["segments"]), "links": len(left["links"]), "total_segment_length": total(left)},
-        "right": {"segments": len(right["segments"]), "links": len(right["links"]), "total_segment_length": total(right)},
+        "left": {
+            "segments": len(left["segments"]),
+            "links": len(left["links"]),
+            "total_segment_length": total(left),
+        },
+        "right": {
+            "segments": len(right["segments"]),
+            "links": len(right["links"]),
+            "total_segment_length": total(right),
+        },
         "shared_segments": len(lset & rset),
         "segment_jaccard": jaccard(lset, rset),
         "left_only_segments": len(lset - rset),
@@ -865,24 +1104,34 @@ def compare_gfa(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 def graph_svg(graph: dict[str, Any], size: int = 640) -> str:
     names = sorted(graph["segments"])
     if len(names) > MAX_GRAPH_NODES:
-        raise InputFormatError(f"plot_graph is limited to {MAX_GRAPH_NODES} segments.", code="ASSEMBLY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"plot_graph is limited to {MAX_GRAPH_NODES} segments.", code="ASSEMBLY_INPUT_TOO_LARGE"
+        )
     centre = size / 2
     radius = size / 2 - 40
     pos: dict[str, tuple[float, float]] = {}
     for i, name in enumerate(names):
         angle = 2 * math.pi * i / len(names)
         pos[name] = (centre + radius * math.cos(angle), centre + radius * math.sin(angle))
-    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">']
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">'
+    ]
     for a, _, b, _, _ in graph["links"]:
         (x1, y1), (x2, y2) = pos[a], pos[b]
-        parts.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#888" stroke-width="1"/>')
+        parts.append(
+            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#888" stroke-width="1"/>'
+        )
     for name in names:
         x, y = pos[name]
         length = graph["segments"][name]["length"] or 1
         r = 4 + 2 * math.log10(length + 1)
-        parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="#4c78a8"><title>{escape(name)} ({length} bp)</title></circle>')
+        parts.append(
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="#4c78a8"><title>{escape(name)} ({length} bp)</title></circle>'
+        )
         if len(names) <= 60:
-            parts.append(f'<text x="{x + r + 2:.1f}" y="{y + 3:.1f}" font-size="9">{escape(name)}</text>')
+            parts.append(
+                f'<text x="{x + r + 2:.1f}" y="{y + 3:.1f}" font-size="9">{escape(name)}</text>'
+            )
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -891,7 +1140,10 @@ def de_bruijn_unitigs(contigs: Sequence[Contig], k: int) -> dict[str, Any]:
     """Compacted (forward-strand) de Bruijn graph of the input sequences."""
 
     if sum(length for _, _, length in contigs) > 2_000_000:
-        raise InputFormatError("build_graph_genome is limited to 2,000,000 input bases.", code="ASSEMBLY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            "build_graph_genome is limited to 2,000,000 input bases.",
+            code="ASSEMBLY_INPUT_TOO_LARGE",
+        )
     succ: dict[str, set[str]] = {}
     pred: dict[str, set[str]] = {}
     sources: dict[str, set[str]] = {}
@@ -908,7 +1160,11 @@ def de_bruijn_unitigs(contigs: Sequence[Contig], k: int) -> dict[str, Any]:
                     pred[kmer].add(previous)
                 previous = kmer
     if not succ:
-        raise InputFormatError(f"no ACGT k-mers of length {k} in the input.", code="ASSEMBLY_NO_KMERS", hint="Use a smaller options.k.")
+        raise InputFormatError(
+            f"no ACGT k-mers of length {k} in the input.",
+            code="ASSEMBLY_NO_KMERS",
+            hint="Use a smaller options.k.",
+        )
 
     def is_start(kmer: str) -> bool:
         if len(pred[kmer]) != 1:
@@ -946,7 +1202,15 @@ def de_bruijn_unitigs(contigs: Sequence[Contig], k: int) -> dict[str, Any]:
     for i, path in enumerate(unitigs):
         seq = path[0] + "".join(node[-1] for node in path[1:])
         colors = sorted(set().union(*(sources[n] for n in path)))
-        records.append({"name": f"utg{i + 1}", "sequence": seq, "length": len(seq), "kmers": len(path), "sources": colors})
+        records.append(
+            {
+                "name": f"utg{i + 1}",
+                "sequence": seq,
+                "length": len(seq),
+                "kmers": len(path),
+                "sources": colors,
+            }
+        )
     links: list[tuple[str, str]] = []
     for i, path in enumerate(unitigs):
         for nxt in sorted(succ[path[-1]]):
@@ -972,15 +1236,24 @@ def de_bruijn_unitigs(contigs: Sequence[Contig], k: int) -> dict[str, Any]:
 def scaffold_layout(contigs: Sequence[Contig], layout: object, default_gap: int) -> dict[str, Any]:
     by_name = {name: seq for name, seq, _ in contigs}
     if len(by_name) != len(contigs):
-        raise InputFormatError("contig names must be unique to scaffold.", code="ASSEMBLY_DUPLICATE_NAMES")
+        raise InputFormatError(
+            "contig names must be unique to scaffold.", code="ASSEMBLY_DUPLICATE_NAMES"
+        )
     if not isinstance(layout, Sequence) or isinstance(layout, (str, bytes)) or not layout:
-        raise ConfigurationError("options.layout must be a non-empty list of scaffold definitions.", code="ASSEMBLY_OPTION", hint="Use [{'name': 'scaf1', 'contigs': [{'contig': 'c1', 'orientation': '+', 'gap': 100}, 'c2']}].")
+        raise ConfigurationError(
+            "options.layout must be a non-empty list of scaffold definitions.",
+            code="ASSEMBLY_OPTION",
+            hint="Use [{'name': 'scaf1', 'contigs': [{'contig': 'c1', 'orientation': '+', 'gap': 100}, 'c2']}].",
+        )
     used: set[str] = set()
     scaffolds: list[dict[str, Any]] = []
     agp: list[dict[str, Any]] = []
     for sindex, definition in enumerate(layout):
         if not isinstance(definition, Mapping) or "contigs" not in definition:
-            raise ConfigurationError(f"layout entry {sindex} must be a mapping with a 'contigs' list.", code="ASSEMBLY_OPTION")
+            raise ConfigurationError(
+                f"layout entry {sindex} must be a mapping with a 'contigs' list.",
+                code="ASSEMBLY_OPTION",
+            )
         sname = str(definition.get("name", f"scaffold_{sindex + 1}"))
         pieces: list[str] = []
         position = 0
@@ -990,26 +1263,58 @@ def scaffold_layout(contigs: Sequence[Contig], layout: object, default_gap: int)
             cname = str(entry.get("contig", entry.get("name")))
             orient = str(entry.get("orientation", "+"))
             if cname not in by_name or by_name[cname] is None:
-                raise ConfigurationError(f"layout refers to unknown contig {cname!r}.", code="ASSEMBLY_OPTION")
+                raise ConfigurationError(
+                    f"layout refers to unknown contig {cname!r}.", code="ASSEMBLY_OPTION"
+                )
             if cname in used:
-                raise ConfigurationError(f"contig {cname!r} is used more than once in the layout.", code="ASSEMBLY_OPTION")
+                raise ConfigurationError(
+                    f"contig {cname!r} is used more than once in the layout.",
+                    code="ASSEMBLY_OPTION",
+                )
             if orient not in ("+", "-"):
                 raise ConfigurationError("orientation must be '+' or '-'.", code="ASSEMBLY_OPTION")
             used.add(cname)
             seq = by_name[cname] or ""
             seq = seq if orient == "+" else reverse_complement(seq)
-            agp.append({"scaffold": sname, "start": position, "end": position + len(seq), "type": "contig", "contig": cname, "orientation": orient})
+            agp.append(
+                {
+                    "scaffold": sname,
+                    "start": position,
+                    "end": position + len(seq),
+                    "type": "contig",
+                    "contig": cname,
+                    "orientation": orient,
+                }
+            )
             pieces.append(seq)
             position += len(seq)
             if mindex < len(members) - 1:  # type: ignore[arg-type]
                 gap = entry.get("gap", default_gap)
                 if isinstance(gap, bool) or not isinstance(gap, int) or gap < 0:
-                    raise ConfigurationError("gap must be a non-negative integer.", code="ASSEMBLY_OPTION")
+                    raise ConfigurationError(
+                        "gap must be a non-negative integer.", code="ASSEMBLY_OPTION"
+                    )
                 if gap:
-                    agp.append({"scaffold": sname, "start": position, "end": position + gap, "type": "gap", "contig": None, "orientation": None})
+                    agp.append(
+                        {
+                            "scaffold": sname,
+                            "start": position,
+                            "end": position + gap,
+                            "type": "gap",
+                            "contig": None,
+                            "orientation": None,
+                        }
+                    )
                     pieces.append("N" * gap)
                     position += gap
-        scaffolds.append({"name": sname, "sequence": "".join(pieces), "length": position, "contig_count": len(members)})  # type: ignore[arg-type]
+        scaffolds.append(
+            {
+                "name": sname,
+                "sequence": "".join(pieces),
+                "length": position,
+                "contig_count": len(members),
+            }
+        )  # type: ignore[arg-type]
     unplaced = [name for name, _, _ in contigs if name not in used]
     return {"scaffolds": scaffolds, "agp": agp, "unplaced_contigs": unplaced}
 
@@ -1021,7 +1326,9 @@ _MEGAHIT_RE = re.compile(r"flag=(\d+)\s+multi=([\d.]+)\s+len=(\d+)")
 def parse_assembler_output(value: object) -> dict[str, Any]:
     text = read_text_input(value, what="assembler output")
     if text is None:
-        raise InputFormatError("assembler output must be FASTA/GFA text or a path.", code="ASSEMBLY_INPUT_FORMAT")
+        raise InputFormatError(
+            "assembler output must be FASTA/GFA text or a path.", code="ASSEMBLY_INPUT_FORMAT"
+        )
     first = next((line for line in text.splitlines() if line.strip()), "")
     if first.startswith(">"):
         records = []
@@ -1058,11 +1365,25 @@ def parse_assembler_output(value: object) -> dict[str, Any]:
         if not records:
             raise InputFormatError("no FASTA records found.", code="ASSEMBLY_FASTA_FORMAT")
         contigs = [(r["name"], None, r["length"]) for r in records if r["length"] > 0]
-        return {"format": "fasta", "header_convention": convention, "records": records, "stats": assembly_stats(contigs) if contigs else None}
+        return {
+            "format": "fasta",
+            "header_convention": convention,
+            "records": records,
+            "stats": assembly_stats(contigs) if contigs else None,
+        }
     graph = parse_gfa(text)
-    records = [{"name": n, "length": s["length"], "depth": s["depth"]} for n, s in graph["segments"].items()]
+    records = [
+        {"name": n, "length": s["length"], "depth": s["depth"]}
+        for n, s in graph["segments"].items()
+    ]
     lengths = [(r["name"], None, r["length"]) for r in records if r["length"]]
-    return {"format": "gfa", "header_convention": None, "records": records, "link_count": len(graph["links"]), "stats": assembly_stats(lengths) if lengths else None}
+    return {
+        "format": "gfa",
+        "header_convention": None,
+        "records": records,
+        "link_count": len(graph["links"]),
+        "stats": assembly_stats(lengths) if lengths else None,
+    }
 
 
 _LEVELS = ("CRITICAL", "FATAL", "ERROR", "WARNING", "WARN", "INFO", "DEBUG")
@@ -1089,7 +1410,10 @@ def parse_log_text(text: str, max_lines: int = 20) -> dict[str, Any]:
             warnings.append(entry)
     return {
         "line_count": total,
-        "level_counts": {level: counts.get(level, 0) for level in ("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG")},
+        "level_counts": {
+            level: counts.get(level, 0)
+            for level in ("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG")
+        },
         "has_errors": bool(counts.get("ERROR") or counts.get("CRITICAL")),
         "errors": errors,
         "warnings": warnings,

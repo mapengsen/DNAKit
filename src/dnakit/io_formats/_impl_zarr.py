@@ -4,7 +4,7 @@ Every operation reads or writes a *directory* store.  Operations that produce a 
 sort, merge, split, convert to zarr, write) require an explicit ``output`` / ``output_dir``.
 """
 
-# ruff: noqa: E501, RUF012, B905
+# ruff: noqa: RUF012, B905
 
 from __future__ import annotations
 

@@ -19,6 +19,7 @@ from dnakit.microbiome.external import (
     profile_humann,
 )
 
+
 def annotate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse taxonomy lineage strings into ranked fields (domain..species) and report the lowest assigned rank.
 
@@ -44,27 +45,40 @@ def annotate(input: object, *, options: Mapping[str, object] | None = None) -> o
             hint="Example: 'k__Bacteria;p__Firmicutes;c__Bacilli'.",
         )
     if not items or len(items) > 1_000_000:
-        raise InputFormatError("Provide between 1 and 1,000,000 lineages.", code="MICROBIOME_TAXONOMY_INVALID")
+        raise InputFormatError(
+            "Provide between 1 and 1,000,000 lineages.", code="MICROBIOME_TAXONOMY_INVALID"
+        )
     result = [{"id": name, "lineage": text, **_impl.parse_taxonomy(text)} for name, text in items]
     return candidate_ok("microbiome", "annotate", input, result, options=opts)
+
 
 def assemble(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Assemble metagenomic reads into contigs (not implemented: needs an assembler such as MEGAHIT or metaSPAdes)."""
     return candidate_not_implemented(
-        "microbiome", "assemble", input, options=options,
+        "microbiome",
+        "assemble",
+        input,
+        options=options,
         requires="a metagenome assembler (MEGAHIT, metaSPAdes) on PATH",
         message="Metagenome assembly is not implemented natively; no assembler is wired into this function.",
     )
 
+
 def bin(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Bin metagenomic contigs into genome bins (not implemented: needs coverage data and a binner such as MetaBAT2)."""
     return candidate_not_implemented(
-        "microbiome", "bin", input, options=options,
+        "microbiome",
+        "bin",
+        input,
+        options=options,
         requires="a contig binner (MetaBAT2, MaxBin2, CONCOCT) plus read-coverage data",
         message="Contig binning is not implemented natively.",
     )
 
-def build_cooccurrence_network(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def build_cooccurrence_network(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Build a taxon co-occurrence network from pairwise correlations of relative abundance across samples.
 
     ``input``: abundance table (``{sample: {taxon: count}}``, ``{"samples","taxa","counts"}``, rows of counts with
@@ -81,7 +95,9 @@ def build_cooccurrence_network(input: object, *, options: Mapping[str, object] |
     cutoff = _impl.opt_float(opts, "min_abs_correlation", 0.6, 0.0, 1.0)
     min_present = _impl.opt_int(opts, "min_samples_present", 3, 1, 10_000)
     if len(table.samples) < 3:
-        raise InputFormatError("A co-occurrence network needs at least 3 samples.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "A co-occurrence network needs at least 3 samples.", code="MICROBIOME_TABLE_INVALID"
+        )
     _impl.require_depth(table)
     n = len(table.samples)
     columns: dict[str, list[float]] = {}
@@ -92,7 +108,8 @@ def build_cooccurrence_network(input: object, *, options: Mapping[str, object] |
     names = list(columns)
     if len(names) > 2_000:
         raise ConfigurationError(
-            "Too many taxa for pairwise correlation.", code="MICROBIOME_TABLE_TOO_LARGE",
+            "Too many taxa for pairwise correlation.",
+            code="MICROBIOME_TABLE_TOO_LARGE",
             hint="Filter to at most 2000 taxa first (raise min_samples_present).",
         )
     edges = []
@@ -102,27 +119,50 @@ def build_cooccurrence_network(input: object, *, options: Mapping[str, object] |
             if r is not None and abs(r) >= cutoff:
                 edges.append({"source": names[i], "target": names[j], "correlation": r})
     edges.sort(key=lambda e: (-abs(e["correlation"]), e["source"], e["target"]))
-    result = {"method": method, "min_abs_correlation": cutoff, "nodes": names, "edges": edges, "n_samples": n}
+    result = {
+        "method": method,
+        "min_abs_correlation": cutoff,
+        "nodes": names,
+        "edges": edges,
+        "n_samples": n,
+    }
     return candidate_ok(
-        "microbiome", "build_cooccurrence_network", input, result, options=opts,
+        "microbiome",
+        "build_cooccurrence_network",
+        input,
+        result,
+        options=opts,
         warnings=["Correlations of relative abundances are compositional; interpret with care."],
     )
 
-def build_microbial_gene_catalog(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def build_microbial_gene_catalog(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Build a non-redundant microbial gene catalog (not implemented: needs gene prediction and CD-HIT/MMseqs2 clustering)."""
     return candidate_not_implemented(
-        "microbiome", "build_microbial_gene_catalog", input, options=options,
+        "microbiome",
+        "build_microbial_gene_catalog",
+        input,
+        options=options,
         requires="a gene predictor (Prodigal) and a sequence clusterer (CD-HIT, MMseqs2) on PATH",
         message="Gene-catalog construction needs gene calling and identity clustering, which are not implemented natively.",
     )
 
-def build_pathogen_transmission_tree(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def build_pathogen_transmission_tree(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Infer a pathogen transmission tree (not implemented: needs an epidemiological/phylodynamic model such as outbreaker2)."""
     return candidate_not_implemented(
-        "microbiome", "build_pathogen_transmission_tree", input, options=options,
+        "microbiome",
+        "build_pathogen_transmission_tree",
+        input,
+        options=options,
         requires="a transmission inference model (outbreaker2, TransPhylo) with sampling dates",
         message="Transmission-tree inference requires a statistical model and dated samples; none is implemented.",
     )
+
 
 def calculate_ani(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Estimate average nucleotide identity between genomes from shared k-mers (Mash formula; an estimate, not alignment ANI).
@@ -142,13 +182,27 @@ def calculate_ani(input: object, *, options: Mapping[str, object] | None = None)
     names = [name for name, _ in seqs]
     for i in range(len(names)):
         for j in range(i + 1, len(names)):
-            pairs.append({"a": names[i], "b": names[j], "k": k, **_impl.kmer_ani(sets[names[i]], sets[names[j]], k)})
+            pairs.append(
+                {
+                    "a": names[i],
+                    "b": names[j],
+                    "k": k,
+                    **_impl.kmer_ani(sets[names[i]], sets[names[j]], k),
+                }
+            )
     return candidate_ok(
-        "microbiome", "calculate_ani", input, {"method": "mash_kmer_jaccard", "pairs": pairs}, options=opts,
+        "microbiome",
+        "calculate_ani",
+        input,
+        {"method": "mash_kmer_jaccard", "pairs": pairs},
+        options=opts,
         warnings=["k-mer set (Mash-formula) ANI estimate, not an alignment-based ANI."],
     )
 
-def calculate_differential_abundance(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def calculate_differential_abundance(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Test every taxon for differential relative abundance between two sample groups (Mann-Whitney U, BH-adjusted).
 
     ``input``: abundance table (see ``build_cooccurrence_network``). ``options``: ``groups`` (required: a list of
@@ -167,31 +221,50 @@ def calculate_differential_abundance(input: object, *, options: Mapping[str, obj
         try:
             labels = [str(groups[s]) for s in table.samples]
         except KeyError as exc:
-            raise ConfigurationError(f"Sample {exc.args[0]!r} has no group.", code="MICROBIOME_GROUPS_INVALID") from exc
-    elif isinstance(groups, Sequence) and not isinstance(groups, str) and len(groups) == len(table.samples):
+            raise ConfigurationError(
+                f"Sample {exc.args[0]!r} has no group.", code="MICROBIOME_GROUPS_INVALID"
+            ) from exc
+    elif (
+        isinstance(groups, Sequence)
+        and not isinstance(groups, str)
+        and len(groups) == len(table.samples)
+    ):
         labels = [str(g) for g in groups]
     else:
         raise ConfigurationError(
             "options['groups'] must list one group label per sample (or map sample -> label).",
-            code="MICROBIOME_GROUPS_INVALID", hint="Example: {'groups': ['ctrl', 'ctrl', 'case', 'case']}.",
+            code="MICROBIOME_GROUPS_INVALID",
+            hint="Example: {'groups': ['ctrl', 'ctrl', 'case', 'case']}.",
         )
     unique = sorted(set(labels))
     group_a = str(opts.get("group_a", unique[0]))
     group_b = str(opts.get("group_b", unique[-1]))
-    if group_a == group_b or group_a not in unique or group_b not in unique or ("group_a" not in opts and len(unique) != 2):
+    if (
+        group_a == group_b
+        or group_a not in unique
+        or group_b not in unique
+        or ("group_a" not in opts and len(unique) != 2)
+    ):
         raise ConfigurationError(
-            "Exactly two distinct groups are required.", code="MICROBIOME_GROUPS_INVALID",
+            "Exactly two distinct groups are required.",
+            code="MICROBIOME_GROUPS_INVALID",
             hint="Provide two labels in 'groups' or choose them with group_a/group_b.",
         )
     idx_a = [i for i, g in enumerate(labels) if g == group_a]
     idx_b = [i for i, g in enumerate(labels) if g == group_b]
     if len(idx_a) < 2 or len(idx_b) < 2:
-        raise ConfigurationError("Each group needs at least two samples.", code="MICROBIOME_GROUPS_INVALID")
+        raise ConfigurationError(
+            "Each group needs at least two samples.", code="MICROBIOME_GROUPS_INVALID"
+        )
     try:
         from scipy import stats
     except ImportError:
         return candidate_not_implemented(
-            "microbiome", "calculate_differential_abundance", input, options=opts, requires="pip install scipy",
+            "microbiome",
+            "calculate_differential_abundance",
+            input,
+            options=opts,
+            requires="pip install scipy",
             message="The Mann-Whitney p-values use scipy.stats, which is not installed.",
         )
     pseudocount = _impl.opt_float(opts, "pseudocount", 1e-6, 0.0)
@@ -210,32 +283,55 @@ def calculate_differential_abundance(input: object, *, options: Mapping[str, obj
         else:
             res = stats.mannwhitneyu(a, b, alternative="two-sided")
             u, p = float(res.statistic), float(res.pvalue)
-        rows.append({
-            "taxon": taxon, "mean_a": mean_a, "mean_b": mean_b,
-            "log2_fold_change": math.log2((mean_b + pseudocount) / (mean_a + pseudocount)),
-            "u_statistic": u, "p_value": p,
-        })
-    for row, q in zip(rows, _impl.benjamini_hochberg([r["p_value"] for r in rows])):
+        rows.append(
+            {
+                "taxon": taxon,
+                "mean_a": mean_a,
+                "mean_b": mean_b,
+                "log2_fold_change": math.log2((mean_b + pseudocount) / (mean_a + pseudocount)),
+                "u_statistic": u,
+                "p_value": p,
+            }
+        )
+    for row, q in zip(rows, _impl.benjamini_hochberg([r["p_value"] for r in rows]), strict=False):
         row["q_value"] = q
     rows.sort(key=lambda r: (r["p_value"], r["taxon"]))
-    result = {"group_a": group_a, "group_b": group_b, "n_a": len(idx_a), "n_b": len(idx_b), "taxa": rows, "test": "mann_whitney_u"}
-    return candidate_ok("microbiome", "calculate_differential_abundance", input, result, options=opts)
+    result = {
+        "group_a": group_a,
+        "group_b": group_b,
+        "n_a": len(idx_a),
+        "n_b": len(idx_b),
+        "taxa": rows,
+        "test": "mann_whitney_u",
+    }
+    return candidate_ok(
+        "microbiome", "calculate_differential_abundance", input, result, options=opts
+    )
+
 
 def calculate_digital_ddh(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Compute digital DNA-DNA hybridisation (not implemented: needs GGDC formulas on BLAST/BLAT HSP tables)."""
     return candidate_not_implemented(
-        "microbiome", "calculate_digital_ddh", input, options=options,
+        "microbiome",
+        "calculate_digital_ddh",
+        input,
+        options=options,
         requires="genome alignments (BLAST/BLAT/MUMmer HSPs) and the GGDC regression formulas",
         message="dDDH is not implemented; use calculate_ani for a k-mer identity estimate instead.",
     )
 
+
 def classify(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Assign taxonomy to reads or contigs (not implemented: needs a classifier and reference database)."""
     return candidate_not_implemented(
-        "microbiome", "classify", input, options=options,
+        "microbiome",
+        "classify",
+        input,
+        options=options,
         requires="a taxonomic classifier database (Kraken2, Kaiju, Centrifuge, GTDB-Tk; see classify_kraken2 etc.)",
         message="Native taxonomic classification is not implemented; use the classify_* wrappers with an installed database.",
     )
+
 
 def compare(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Compute a between-sample beta-diversity distance matrix from an abundance table.
@@ -250,17 +346,30 @@ def compare(input: object, *, options: Mapping[str, object] | None = None) -> ob
     opts = dict(options or {})
     _impl.entity(opts, "beta_diversity", ("beta_diversity",))
     table = _impl.parse_table(input, opts)
-    metric = _impl.opt_str(opts, "metric", "braycurtis", ("braycurtis", "jaccard", "aitchison", "euclidean"))
+    metric = _impl.opt_str(
+        opts, "metric", "braycurtis", ("braycurtis", "jaccard", "aitchison", "euclidean")
+    )
     pseudocount = _impl.opt_float(opts, "pseudocount", 1.0, 1e-12)
     if len(table.samples) < 2:
-        raise InputFormatError("Beta diversity needs at least 2 samples.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "Beta diversity needs at least 2 samples.", code="MICROBIOME_TABLE_INVALID"
+        )
     if len(table.samples) > 2_000:
-        raise ConfigurationError("At most 2000 samples are supported.", code="MICROBIOME_TABLE_TOO_LARGE")
+        raise ConfigurationError(
+            "At most 2000 samples are supported.", code="MICROBIOME_TABLE_TOO_LARGE"
+        )
     if _impl.opt_bool(opts, "relative", False):
         _impl.require_depth(table)
-        table = _impl.Table(table.samples, table.taxa, [[x / sum(r) for x in r] for r in table.counts])
-    result = {"metric": metric, "samples": table.samples, "distance_matrix": _impl.distance_matrix(table, metric, pseudocount)}
+        table = _impl.Table(
+            table.samples, table.taxa, [[x / sum(r) for x in r] for r in table.counts]
+        )
+    result = {
+        "metric": metric,
+        "samples": table.samples,
+        "distance_matrix": _impl.distance_matrix(table, metric, pseudocount),
+    }
     return candidate_ok("microbiome", "compare", input, result, options=opts)
+
 
 def dereplicate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Collapse redundant genome/sequence records into clusters with one representative each.
@@ -294,14 +403,22 @@ def dereplicate(input: object, *, options: Mapping[str, object] | None = None) -
         sets = {name: _impl.kmer_set(seq, k, canonical) for name, seq in ordered}
         for name, _seq in ordered:
             for cluster in clusters:
-                ani = _impl.kmer_ani(sets[str(cluster["representative"])], sets[name], k)["ani_estimate"]
+                ani = _impl.kmer_ani(sets[str(cluster["representative"])], sets[name], k)[
+                    "ani_estimate"
+                ]
                 if ani is not None and ani >= min_ani:
                     cluster["members"].append(name)  # type: ignore[union-attr]
                     break
             else:
                 clusters.append({"representative": name, "members": [name]})
-    result = {"method": method, "input_count": len(seqs), "cluster_count": len(clusters), "clusters": clusters}
+    result = {
+        "method": method,
+        "input_count": len(seqs),
+        "cluster_count": len(clusters),
+        "clusters": clusters,
+    }
     return candidate_ok("microbiome", "dereplicate", input, result, options=opts)
+
 
 def detect(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Detect taxon prevalence and the core microbiome (taxa present above a detection level in enough samples).
@@ -323,14 +440,21 @@ def detect(input: object, *, options: Mapping[str, object] | None = None) -> obj
     rows = []
     for t, taxon in enumerate(table.taxa):
         present = sum(1 for s in range(n) if rel[s][t] > detection)
-        rows.append({"taxon": taxon, "samples_present": present, "prevalence": present / n,
-                     "mean_relative_abundance": sum(rel[s][t] for s in range(n)) / n})
+        rows.append(
+            {
+                "taxon": taxon,
+                "samples_present": present,
+                "prevalence": present / n,
+                "mean_relative_abundance": sum(rel[s][t] for s in range(n)) / n,
+            }
+        )
     rows.sort(key=lambda r: (-r["prevalence"], -r["mean_relative_abundance"], r["taxon"]))
     result: dict[str, object] = {"detection": detection, "n_samples": n, "prevalence_table": rows}
     if which == "core_microbiome":
         result["prevalence_threshold"] = threshold
         result["core_taxa"] = [r["taxon"] for r in rows if r["prevalence"] >= threshold]
     return candidate_ok("microbiome", "detect", input, result, options=opts)
+
 
 def export(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise an abundance table as QIIME-style TSV (taxa rows) or JSON, optionally writing it to a file.
@@ -349,7 +473,11 @@ def export(input: object, *, options: Mapping[str, object] | None = None) -> obj
     if fmt == "tsv":
         lines = ["#OTU ID\t" + "\t".join(table.samples)]
         for t, taxon in enumerate(table.taxa):
-            lines.append(taxon + "\t" + "\t".join(fmt_num(table.counts[s][t]) for s in range(len(table.samples))))
+            lines.append(
+                taxon
+                + "\t"
+                + "\t".join(fmt_num(table.counts[s][t]) for s in range(len(table.samples)))
+            )
         text = "\n".join(lines) + "\n"
     else:
         text = json.dumps(table.as_dict(), sort_keys=True)
@@ -359,19 +487,34 @@ def export(input: object, *, options: Mapping[str, object] | None = None) -> obj
         path = Path(str(output))
         if path.exists() and not _impl.opt_bool(opts, "overwrite", False):
             raise ConfigurationError(
-                f"Output file {path} already exists.", code="MICROBIOME_OUTPUT_EXISTS", hint="Set options['overwrite']=True."
+                f"Output file {path} already exists.",
+                code="MICROBIOME_OUTPUT_EXISTS",
+                hint="Set options['overwrite']=True.",
             )
         path.write_text(text, encoding="utf-8")
         written = str(path)
-    return candidate_ok("microbiome", "export", input, {"format": fmt, "text": text, "output_path": written}, options=opts)
+    return candidate_ok(
+        "microbiome",
+        "export",
+        input,
+        {"format": fmt, "text": text, "output_path": written},
+        options=opts,
+    )
 
-def infer_viral_quasispecies(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def infer_viral_quasispecies(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Reconstruct viral quasispecies haplotypes (not implemented: needs a haplotype reconstruction program)."""
     return candidate_not_implemented(
-        "microbiome", "infer_viral_quasispecies", input, options=options,
+        "microbiome",
+        "infer_viral_quasispecies",
+        input,
+        options=options,
         requires="a viral haplotype reconstruction tool (QuRe, ShoRAH, PredictHaplo) and aligned reads",
         message="Quasispecies inference is not implemented natively.",
     )
+
 
 def plot(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Draw a stacked relative-abundance bar chart (one bar per sample) as an SVG string.
@@ -390,15 +533,22 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     if opts.get("output") is not None:
         Path(str(opts["output"])).write_text(svg, encoding="utf-8")
         written = str(opts["output"])
-    return candidate_ok("microbiome", "plot", input, {"svg": svg, "output_path": written}, options=opts)
+    return candidate_ok(
+        "microbiome", "plot", input, {"svg": svg, "output_path": written}, options=opts
+    )
+
 
 def predict(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Predict microbiome phenotypes or functions (not implemented: needs a trained model or reference database)."""
     return candidate_not_implemented(
-        "microbiome", "predict", input, options=options,
+        "microbiome",
+        "predict",
+        input,
+        options=options,
         requires="a trained model or reference database (e.g. PICRUSt2, BugBase)",
         message="Prediction from a microbiome profile needs trained reference data that is not bundled.",
     )
+
 
 def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Quality-check an abundance table: per-sample depth, richness and zero fraction plus low-depth flags.
@@ -413,16 +563,30 @@ def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     min_depth = _impl.opt_float(opts, "min_depth", 1000.0, 0.0)
     table = _impl.parse_table(input, opts)
     samples = []
-    for name, row in zip(table.samples, table.counts):
+    for name, row in zip(table.samples, table.counts, strict=False):
         observed = sum(1 for x in row if x > 0)
-        samples.append({"sample": name, "total": sum(row), "observed": observed,
-                        "zero_fraction": 1 - observed / len(row), "low_depth": sum(row) < min_depth})
-    empty = [taxon for t, taxon in enumerate(table.taxa) if all(row[t] == 0 for row in table.counts)]
+        samples.append(
+            {
+                "sample": name,
+                "total": sum(row),
+                "observed": observed,
+                "zero_fraction": 1 - observed / len(row),
+                "low_depth": sum(row) < min_depth,
+            }
+        )
+    empty = [
+        taxon for t, taxon in enumerate(table.taxa) if all(row[t] == 0 for row in table.counts)
+    ]
     result = {
-        "n_samples": len(table.samples), "n_taxa": len(table.taxa), "min_depth": min_depth, "samples": samples,
-        "empty_taxa": empty, "flagged_samples": [s["sample"] for s in samples if s["low_depth"]],
+        "n_samples": len(table.samples),
+        "n_taxa": len(table.taxa),
+        "min_depth": min_depth,
+        "samples": samples,
+        "empty_taxa": empty,
+        "flagged_samples": [s["sample"] for s in samples if s["low_depth"]],
     }
     return candidate_ok("microbiome", "qc", input, result, options=opts)
+
 
 def quantify(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Quantify an abundance table: relative abundance, alpha diversity, rarefaction or centred log-ratio (CLR).
@@ -438,14 +602,33 @@ def quantify(input: object, *, options: Mapping[str, object] | None = None) -> o
     ``"clr"`` centred log-ratio of counts + ``pseudocount`` (default 1.0).
     """
     opts = dict(options or {})
-    which = _impl.entity(opts, "relative_abundance", ("relative_abundance", "abundance", "alpha_diversity", "rarefaction", "clr"))
+    which = _impl.entity(
+        opts,
+        "relative_abundance",
+        ("relative_abundance", "abundance", "alpha_diversity", "rarefaction", "clr"),
+    )
     table = _impl.parse_table(input, opts)
     if which == "rarefaction":
-        depth = _impl.opt_int(opts, "depth", 0, 1, _impl.MAX_READS_PER_SAMPLE) if "depth" in opts else None
+        depth = (
+            _impl.opt_int(opts, "depth", 0, 1, _impl.MAX_READS_PER_SAMPLE)
+            if "depth" in opts
+            else None
+        )
         if depth is None:
-            raise ConfigurationError("Rarefaction needs options['depth'].", code="MICROBIOME_OPTION_INVALID")
-        rarefied, dropped = _impl.rarefy(table, depth, _impl.opt_int(opts, "seed", 0, 0, 2**63), _impl.opt_bool(opts, "drop_short", True))
-        result: dict[str, object] = {"depth": depth, "dropped_samples": dropped, **rarefied.as_dict()}
+            raise ConfigurationError(
+                "Rarefaction needs options['depth'].", code="MICROBIOME_OPTION_INVALID"
+            )
+        rarefied, dropped = _impl.rarefy(
+            table,
+            depth,
+            _impl.opt_int(opts, "seed", 0, 0, 2**63),
+            _impl.opt_bool(opts, "drop_short", True),
+        )
+        result: dict[str, object] = {
+            "depth": depth,
+            "dropped_samples": dropped,
+            **rarefied.as_dict(),
+        }
         return candidate_ok("microbiome", "quantify", input, result, options=opts)
     _impl.require_depth(table)
     if which in ("relative_abundance", "abundance"):
@@ -453,12 +636,22 @@ def quantify(input: object, *, options: Mapping[str, object] | None = None) -> o
         result = {"samples": table.samples, "taxa": table.taxa, "relative_abundance": rel}
     elif which == "alpha_diversity":
         base = _impl.opt_float(opts, "log_base", math.e, 1.000001)
-        result = {"samples": table.samples,
-                  "metrics": {name: _impl.alpha_metrics(row, base) for name, row in zip(table.samples, table.counts)}}
+        result = {
+            "samples": table.samples,
+            "metrics": {
+                name: _impl.alpha_metrics(row, base)
+                for name, row in zip(table.samples, table.counts, strict=False)
+            },
+        }
     else:
         pc = _impl.opt_float(opts, "pseudocount", 1.0, 1e-12)
-        result = {"samples": table.samples, "taxa": table.taxa, "clr": [_impl._clr(row, pc) for row in table.counts]}
+        result = {
+            "samples": table.samples,
+            "taxa": table.taxa,
+            "clr": [_impl._clr(row, pc) for row in table.counts],
+        }
     return candidate_ok("microbiome", "quantify", input, result, options=opts)
+
 
 def read(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Read an abundance table (QIIME/BIOM-TSV or CSV text, a file path, or in-memory structures) into samples x taxa counts.
@@ -472,21 +665,79 @@ def read(input: object, *, options: Mapping[str, object] | None = None) -> objec
     table = _impl.parse_table(input, opts)
     return candidate_ok("microbiome", "read", input, table.as_dict(), options=opts)
 
+
 def track(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Track strains or pathogens across samples (not implemented: needs strain-level markers or SNP profiles and a reference)."""
     return candidate_not_implemented(
-        "microbiome", "track", input, options=options,
+        "microbiome",
+        "track",
+        input,
+        options=options,
         requires="strain-level marker/SNP references (e.g. StrainPhlAn, inStrain) and epidemiological metadata",
         message="Strain/pathogen tracking is not implemented natively.",
     )
 
-__all__ = ['annotate', 'assemble', 'bin', 'build_cooccurrence_network', 'build_microbial_gene_catalog', 'build_pathogen_transmission_tree', 'calculate_ani', 'calculate_differential_abundance', 'calculate_digital_ddh', 'classify', 'classify_centrifuge', 'classify_gtdbtk', 'classify_kaiju', 'classify_kraken2', 'compare', 'dereplicate', 'detect', 'estimate_bracken_abundance', 'export', 'infer_viral_quasispecies', 'plot', 'predict', 'profile_humann', 'qc', 'quantify', 'read', 'track']
 
-__candidate_adapter_operations__ = set(['annotate', 'assemble', 'bin', 'build_cooccurrence_network', 'build_microbial_gene_catalog', 'build_pathogen_transmission_tree', 'calculate_ani', 'calculate_differential_abundance', 'calculate_digital_ddh', 'classify', 'compare', 'dereplicate', 'detect', 'export', 'infer_viral_quasispecies', 'plot', 'predict', 'qc', 'quantify', 'read', 'track'])
+__all__ = [
+    "annotate",
+    "assemble",
+    "bin",
+    "build_cooccurrence_network",
+    "build_microbial_gene_catalog",
+    "build_pathogen_transmission_tree",
+    "calculate_ani",
+    "calculate_differential_abundance",
+    "calculate_digital_ddh",
+    "classify",
+    "classify_centrifuge",
+    "classify_gtdbtk",
+    "classify_kaiju",
+    "classify_kraken2",
+    "compare",
+    "dereplicate",
+    "detect",
+    "estimate_bracken_abundance",
+    "export",
+    "infer_viral_quasispecies",
+    "plot",
+    "predict",
+    "profile_humann",
+    "qc",
+    "quantify",
+    "read",
+    "track",
+]
+
+__candidate_adapter_operations__ = set(
+    [
+        "annotate",
+        "assemble",
+        "bin",
+        "build_cooccurrence_network",
+        "build_microbial_gene_catalog",
+        "build_pathogen_transmission_tree",
+        "calculate_ani",
+        "calculate_differential_abundance",
+        "calculate_digital_ddh",
+        "classify",
+        "compare",
+        "dereplicate",
+        "detect",
+        "export",
+        "infer_viral_quasispecies",
+        "plot",
+        "predict",
+        "qc",
+        "quantify",
+        "read",
+        "track",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
-# Optional-backend exports (see docs/api/features) 
+
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     compare_minhash_sketches,
     estimate_unique_kmers,
@@ -498,7 +749,17 @@ from .backends import (
     write_sourmash_signatures,
 )
 
-__all__ = [*__all__, "compare_minhash_sketches", "estimate_unique_kmers", "kmer_abundance_histogram", "normalize_reads_by_median", "query_kmer_counts", "read_sourmash_signatures", "sketch_fasta_minhash", "write_sourmash_signatures"]
+__all__ = [
+    *__all__,
+    "compare_minhash_sketches",
+    "estimate_unique_kmers",
+    "kmer_abundance_histogram",
+    "normalize_reads_by_median",
+    "query_kmer_counts",
+    "read_sourmash_signatures",
+    "sketch_fasta_minhash",
+    "write_sourmash_signatures",
+]
 
 # Full-pass exports (see docs/api/features)
 from .khmer_functions import (
@@ -511,7 +772,6 @@ from .khmer_functions import (
     query_saved_countgraph,
     trim_low_abundance_reads,
 )
-
 from .sourmash_functions import (
     compare_minhash_matrix,
     downsample_minhash_sketch,
@@ -523,14 +783,31 @@ from .sourmash_functions import (
     set_size_error_probability,
 )
 
-__all__ = [*__all__, "decode_kmer_2bit", "encode_kmer_2bit", "estimate_kmer_table_size", "expected_kmer_table_collisions", "hash_kmer_murmur3", "inspect_khmer_graph", "query_saved_countgraph", "trim_low_abundance_reads", "compare_minhash_matrix", "downsample_minhash_sketch", "estimate_mutation_rate", "hash_canonical_kmer", "intersect_minhash_sketches", "lowest_common_lineage", "search_minhash_database", "set_size_error_probability"]
+__all__ = [
+    *__all__,
+    "decode_kmer_2bit",
+    "encode_kmer_2bit",
+    "estimate_kmer_table_size",
+    "expected_kmer_table_collisions",
+    "hash_kmer_murmur3",
+    "inspect_khmer_graph",
+    "query_saved_countgraph",
+    "trim_low_abundance_reads",
+    "compare_minhash_matrix",
+    "downsample_minhash_sketch",
+    "estimate_mutation_rate",
+    "hash_canonical_kmer",
+    "intersect_minhash_sketches",
+    "lowest_common_lineage",
+    "search_minhash_database",
+    "set_size_error_probability",
+]
 
 # Review-pass exports (see docs/api/features)
 from .khmer_review_functions import (
     clean_khmer_read_sequences,
     read_paired_fastx,
 )
-
 from .sourmash_review_functions import (
     bp_threshold_to_hashes,
     count_kmer_lca_assignments,
@@ -540,13 +817,22 @@ from .sourmash_review_functions import (
     variance_mutated_kmers,
 )
 
-__all__ = [*__all__, "clean_khmer_read_sequences", "read_paired_fastx", "bp_threshold_to_hashes", "count_kmer_lca_assignments", "expected_mutated_kmers", "kmer_mutation_probability", "probability_no_shared_kmers", "variance_mutated_kmers"]
+__all__ = [
+    *__all__,
+    "clean_khmer_read_sequences",
+    "read_paired_fastx",
+    "bp_threshold_to_hashes",
+    "count_kmer_lca_assignments",
+    "expected_mutated_kmers",
+    "kmer_mutation_probability",
+    "probability_no_shared_kmers",
+    "variance_mutated_kmers",
+]
 
 # Family-pass exports (see docs/api/features)
 from .khmer_family_functions import (
     query_saved_khmer_table,
 )
-
 from .sourmash_family_functions import (
     compare_minhash_abundance_matrix,
     downsample_minhash_num_sketch,
@@ -557,59 +843,69 @@ from .sourmash_family_functions import (
     write_sourmash_signature_archive,
 )
 
-__all__ = [*__all__, "query_saved_khmer_table", "compare_minhash_abundance_matrix", "downsample_minhash_num_sketch", "parse_sourmash_signature_json", "search_minhash_database_ranked", "search_sourmash_sbt_index", "select_sourmash_signatures", "write_sourmash_signature_archive"]
+__all__ = [
+    *__all__,
+    "query_saved_khmer_table",
+    "compare_minhash_abundance_matrix",
+    "downsample_minhash_num_sketch",
+    "parse_sourmash_signature_json",
+    "search_minhash_database_ranked",
+    "search_sourmash_sbt_index",
+    "select_sourmash_signatures",
+    "write_sourmash_signature_archive",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
 from dnakit.metagenomics_review_sourmash_functions import (
-    sketch_fromfile_signatures,
+    combine_sbt_indexes,
+    convert_sbt_storage,
     grep_signatures,
     inflate_signatures,
-    combine_sbt_indexes,
     migrate_sbt_index,
-    convert_sbt_storage,
+    sketch_fromfile_signatures,
 )
 from dnakit.metagenomics_review_sourmash_tax_functions import (
-    krona_taxonomy_profile,
+    bioboxes_taxonomy_profile,
     csv_taxonomy_summary,
     human_taxonomy_summary,
-    lineage_taxonomy_summary,
-    bioboxes_taxonomy_profile,
     kreport_taxonomy_report,
+    krona_taxonomy_profile,
+    lineage_taxonomy_summary,
     lingroup_taxonomy_report,
 )
 from dnakit.metagenomics_sourmash_facades import (
+    categorize_signatures,
     check_signatures_against_picklist,
     classify_with_lca,
     collect_signature_manifests,
-    index_lca_database,
-    ingest_mash_csv,
-    categorize_signatures,
+    compare_signatures,
+    concatenate_signatures,
+    describe_signature,
+    downsample_signature,
     export_signature_to_mash,
     extract_signature_kmers,
+    extract_signatures,
+    filter_signature_abundance,
+    flatten_signature,
+    gather_signatures,
+    index_lca_database,
+    index_signatures,
+    ingest_mash_csv,
+    intersect_signatures,
+    manifest_signature,
+    merge_signatures,
     multigather_signatures,
     overlap_signatures,
     plot_comparison_matrix,
     prefetch_signatures,
-    sketch_translated_dna,
-    compare_signatures,
-    concatenate_signatures,
-    extract_signatures,
-    filter_signature_abundance,
-    manifest_signature,
-    split_signatures,
-    downsample_signature,
-    flatten_signature,
     rename_signature,
-    signature_file_info,
-    intersect_signatures,
-    merge_signatures,
-    subtract_signatures,
-    describe_signature,
-    gather_signatures,
-    index_signatures,
     search_signatures,
+    signature_file_info,
     sketch_dna,
+    sketch_translated_dna,
+    split_signatures,
+    subtract_signatures,
 )
 from dnakit.metagenomics_sourmash_facades3 import (
     check_and_load_gather_csvs_summary,
@@ -622,8 +918,10 @@ from dnakit.metagenomics_sourmash_facades3 import (
     load_lca_databases,
     load_sbt_index_summary,
     load_sqlite_index_summary,
-    plot_comparison_matrix as plot_comparison_matrix_composite,
     summarize_lineage_counts,
+)
+from dnakit.metagenomics_sourmash_facades3 import (
+    plot_comparison_matrix as plot_comparison_matrix_composite,
 )
 from dnakit.metagenomics_verify_sourmash_functions import (
     classify_lca_signatures,
@@ -632,13 +930,80 @@ from dnakit.metagenomics_verify_sourmash_functions import (
     summarize_lca_signatures,
     write_lca_index_report,
 )
+
 from .khmer_gap_functions import (
     khmer_build_countgraph,
     khmer_build_nodegraph,
     khmer_table_size_from_memory,
 )
 
-__all__ = [*__all__, "sketch_fromfile_signatures", "grep_signatures", "inflate_signatures", "combine_sbt_indexes", "migrate_sbt_index", "convert_sbt_storage", "krona_taxonomy_profile", "csv_taxonomy_summary", "human_taxonomy_summary", "lineage_taxonomy_summary", "bioboxes_taxonomy_profile", "kreport_taxonomy_report", "lingroup_taxonomy_report", "check_signatures_against_picklist", "classify_with_lca", "collect_signature_manifests", "index_lca_database", "ingest_mash_csv", "categorize_signatures", "export_signature_to_mash", "extract_signature_kmers", "multigather_signatures", "overlap_signatures", "plot_comparison_matrix", "prefetch_signatures", "sketch_translated_dna", "compare_signatures", "concatenate_signatures", "extract_signatures", "filter_signature_abundance", "manifest_signature", "split_signatures", "downsample_signature", "flatten_signature", "rename_signature", "signature_file_info", "intersect_signatures", "merge_signatures", "subtract_signatures", "describe_signature", "gather_signatures", "index_signatures", "search_signatures", "sketch_dna", "check_and_load_gather_csvs_summary", "classify_signature_lineage", "gather_lineage_assignments", "lca_rank_counts", "load_comparison_matrix", "load_gather_results_summary", "load_lca_database", "load_lca_databases", "load_sbt_index_summary", "load_sqlite_index_summary", "plot_comparison_matrix_composite", "summarize_lineage_counts", "classify_lca_signatures", "compare_lineage_assignment_csvs", "lca_rank_info", "summarize_lca_signatures", "write_lca_index_report", "khmer_build_countgraph", "khmer_build_nodegraph", "khmer_table_size_from_memory"]
+__all__ = [
+    *__all__,
+    "sketch_fromfile_signatures",
+    "grep_signatures",
+    "inflate_signatures",
+    "combine_sbt_indexes",
+    "migrate_sbt_index",
+    "convert_sbt_storage",
+    "krona_taxonomy_profile",
+    "csv_taxonomy_summary",
+    "human_taxonomy_summary",
+    "lineage_taxonomy_summary",
+    "bioboxes_taxonomy_profile",
+    "kreport_taxonomy_report",
+    "lingroup_taxonomy_report",
+    "check_signatures_against_picklist",
+    "classify_with_lca",
+    "collect_signature_manifests",
+    "index_lca_database",
+    "ingest_mash_csv",
+    "categorize_signatures",
+    "export_signature_to_mash",
+    "extract_signature_kmers",
+    "multigather_signatures",
+    "overlap_signatures",
+    "plot_comparison_matrix",
+    "prefetch_signatures",
+    "sketch_translated_dna",
+    "compare_signatures",
+    "concatenate_signatures",
+    "extract_signatures",
+    "filter_signature_abundance",
+    "manifest_signature",
+    "split_signatures",
+    "downsample_signature",
+    "flatten_signature",
+    "rename_signature",
+    "signature_file_info",
+    "intersect_signatures",
+    "merge_signatures",
+    "subtract_signatures",
+    "describe_signature",
+    "gather_signatures",
+    "index_signatures",
+    "search_signatures",
+    "sketch_dna",
+    "check_and_load_gather_csvs_summary",
+    "classify_signature_lineage",
+    "gather_lineage_assignments",
+    "lca_rank_counts",
+    "load_comparison_matrix",
+    "load_gather_results_summary",
+    "load_lca_database",
+    "load_lca_databases",
+    "load_sbt_index_summary",
+    "load_sqlite_index_summary",
+    "plot_comparison_matrix_composite",
+    "summarize_lineage_counts",
+    "classify_lca_signatures",
+    "compare_lineage_assignment_csvs",
+    "lca_rank_info",
+    "summarize_lca_signatures",
+    "write_lca_index_report",
+    "khmer_build_countgraph",
+    "khmer_build_nodegraph",
+    "khmer_table_size_from_memory",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .centrifuge_p12_cli_functions import (

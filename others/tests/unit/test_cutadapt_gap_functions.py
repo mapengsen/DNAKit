@@ -13,8 +13,12 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.fasta_fastq import cutadapt_gap_functions as facade
 
 _LOCAL_CUTADAPT = Path(sys.executable).parent / "cutadapt"
-_CUTADAPT = shutil.which("cutadapt") or (str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None)
-needs_cutadapt = pytest.mark.skipif(_CUTADAPT is None, reason="cutadapt executable is not installed")
+_CUTADAPT = shutil.which("cutadapt") or (
+    str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None
+)
+needs_cutadapt = pytest.mark.skipif(
+    _CUTADAPT is None, reason="cutadapt executable is not installed"
+)
 
 _READS = [
     ("r1", "ACGTACGTAGATCGGAAGAGCTTTTTTTT"),
@@ -23,7 +27,9 @@ _READS = [
 
 
 def _write_fastq(path: Path) -> Path:
-    path.write_text("".join(f"@{name}\n{seq}\n+\n{'I' * len(seq)}\n" for name, seq in _READS), encoding="utf-8")
+    path.write_text(
+        "".join(f"@{name}\n{seq}\n+\n{'I' * len(seq)}\n" for name, seq in _READS), encoding="utf-8"
+    )
     return path
 
 
@@ -59,19 +65,31 @@ def test_public_functions_take_keyword_only_verbose() -> None:
 def test_invalid_arguments_are_rejected_before_running(tmp_path: Path) -> None:
     source = _write_fastq(tmp_path / "in.fq")
     with pytest.raises(ConfigurationError):
-        facade.cutadapt_trim(str(source), str(tmp_path / "a.fq"), adapter_3p="ACGTX!", cutadapt_path="/nope")
-    with pytest.raises(ConfigurationError):
-        facade.cutadapt_trim(str(source), str(tmp_path / "b.fq"), error_rate=1.5, cutadapt_path="/nope")
-    with pytest.raises(ConfigurationError):
-        facade.cutadapt_trim(str(source), str(tmp_path / "c.fq"), quality_cutoff="abc", cutadapt_path="/nope")
+        facade.cutadapt_trim(
+            str(source), str(tmp_path / "a.fq"), adapter_3p="ACGTX!", cutadapt_path="/nope"
+        )
     with pytest.raises(ConfigurationError):
         facade.cutadapt_trim(
-            str(source), str(tmp_path / "d.fq"), minimum_length=30, maximum_length=10, cutadapt_path="/nope"
+            str(source), str(tmp_path / "b.fq"), error_rate=1.5, cutadapt_path="/nope"
+        )
+    with pytest.raises(ConfigurationError):
+        facade.cutadapt_trim(
+            str(source), str(tmp_path / "c.fq"), quality_cutoff="abc", cutadapt_path="/nope"
+        )
+    with pytest.raises(ConfigurationError):
+        facade.cutadapt_trim(
+            str(source),
+            str(tmp_path / "d.fq"),
+            minimum_length=30,
+            maximum_length=10,
+            cutadapt_path="/nope",
         )
     with pytest.raises(ConfigurationError):
         facade.cutadapt_trim(str(source), str(tmp_path / "e.fq"), cores=0, cutadapt_path="/nope")
     with pytest.raises(ConfigurationError):
-        facade.cutadapt_trim(str(source), str(tmp_path / "f.fq"), report="long", cutadapt_path="/nope")
+        facade.cutadapt_trim(
+            str(source), str(tmp_path / "f.fq"), report="long", cutadapt_path="/nope"
+        )
     existing = tmp_path / "exists.fq"
     existing.write_text("", encoding="utf-8")
     with pytest.raises(ConfigurationError):
@@ -81,7 +99,9 @@ def test_invalid_arguments_are_rejected_before_running(tmp_path: Path) -> None:
 def test_missing_executable_raises_with_install_hint(tmp_path: Path) -> None:
     source = _write_fastq(tmp_path / "in.fq")
     with pytest.raises(BackendUnavailableError) as info:
-        facade.cutadapt_trim(str(source), str(tmp_path / "out.fq"), cutadapt_path=str(tmp_path / "missing"))
+        facade.cutadapt_trim(
+            str(source), str(tmp_path / "out.fq"), cutadapt_path=str(tmp_path / "missing")
+        )
     assert "conda install -c bioconda cutadapt" in (info.value.hint or "")
 
 
@@ -120,7 +140,9 @@ def test_argument_list_maps_fixed_flags(tmp_path: Path) -> None:
 def test_trim_removes_3p_adapter(tmp_path: Path) -> None:
     source = _write_fastq(tmp_path / "in.fq")
     output = tmp_path / "trimmed.fq"
-    result = facade.cutadapt_trim(str(source), str(output), adapter_3p="AGATCGGAAGAGC", cutadapt_path=_CUTADAPT)
+    result = facade.cutadapt_trim(
+        str(source), str(output), adapter_3p="AGATCGGAAGAGC", cutadapt_path=_CUTADAPT
+    )
     assert result["status"] == "completed"
     lines = output.read_text(encoding="utf-8").splitlines()
     assert lines[1] == "ACGTACGT"
@@ -131,12 +153,14 @@ def test_trim_removes_3p_adapter(tmp_path: Path) -> None:
 @needs_cutadapt
 def test_full_and_minimal_reports(tmp_path: Path) -> None:
     source = _write_fastq(tmp_path / "in.fq")
-    full = facade.cutadapt_full_report(str(source), str(tmp_path / "full.fq"), adapter_3p="AGATCGGAAGAGC",
-                                       cutadapt_path=_CUTADAPT)
+    full = facade.cutadapt_full_report(
+        str(source), str(tmp_path / "full.fq"), adapter_3p="AGATCGGAAGAGC", cutadapt_path=_CUTADAPT
+    )
     assert full["status"] == "completed"
     assert "=== Summary ===" in full["report"]
-    minimal = facade.cutadapt_minimal_report(str(source), str(tmp_path / "min.fq"), adapter_3p="AGATCGGAAGAGC",
-                                             cutadapt_path=_CUTADAPT)
+    minimal = facade.cutadapt_minimal_report(
+        str(source), str(tmp_path / "min.fq"), adapter_3p="AGATCGGAAGAGC", cutadapt_path=_CUTADAPT
+    )
     assert minimal["status"] == "completed"
     header, row = minimal["report"].strip().splitlines()[:2]
     assert header.startswith("status\tin_reads")

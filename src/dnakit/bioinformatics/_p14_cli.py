@@ -24,7 +24,12 @@ from typing import Any
 
 from dnakit.backends.external import execute_bounded_command
 from dnakit.bioinformatics import _gap_cli
-from dnakit.exceptions import BackendExecutionError, BackendTimeoutError, ConfigurationError, DNAKitError
+from dnakit.exceptions import (
+    BackendExecutionError,
+    BackendTimeoutError,
+    ConfigurationError,
+    DNAKitError,
+)
 
 LOG_TAIL_CHARS = _gap_cli.LOG_TAIL_CHARS
 DEFAULT_TIMEOUT_SECONDS = _gap_cli.DEFAULT_TIMEOUT_SECONDS
@@ -91,8 +96,13 @@ def run(
         files = list(expected)
     else:
         return_code, log = _run_to_stdout_file(
-            executable, arguments, cwd=cwd, stdout_file=stdout_file, timeout_seconds=timeout_seconds,
-            environment=environment, label=label,
+            executable,
+            arguments,
+            cwd=cwd,
+            stdout_file=stdout_file,
+            timeout_seconds=timeout_seconds,
+            environment=environment,
+            label=label,
         )
         files = [stdout_file, *expected]
     produced = [str(path) for path in files if path.is_file()]
@@ -159,7 +169,11 @@ def flag(value: object, name: str) -> bool:
 
 def nucleotides(value: object, name: str, *, alphabet: str = "ACGTNacgtn") -> str:
     """Non-empty text made only of nucleotide letters."""
-    if not isinstance(value, str) or not value or any(character not in alphabet for character in value):
+    if (
+        not isinstance(value, str)
+        or not value
+        or any(character not in alphabet for character in value)
+    ):
         raise ConfigurationError(f"{name} must be a non-empty string of the letters {alphabet}.")
     return value
 

@@ -72,7 +72,9 @@ _MAX_ROWS = 1000
 # ---------------------------------------------------------------------------
 
 
-def _sequence_of_text(value: object, name: str, *, pattern: re.Pattern[str] | None = None) -> list[str]:
+def _sequence_of_text(
+    value: object, name: str, *, pattern: re.Pattern[str] | None = None
+) -> list[str]:
     """One text or a list of texts, each non-empty, not starting with '-' and optionally matching ``pattern``."""
     items = [value] if isinstance(value, str) else value
     if isinstance(items, (str, bytes)) or not isinstance(items, Sequence) or not items:
@@ -127,7 +129,9 @@ def _prefix(output_prefix: str | Path, suffixes: Sequence[str]) -> Path:
     if not prefix.parent.is_dir():
         raise ConfigurationError(f"The folder of output_prefix does not exist: {prefix.parent}")
     if prefix.is_dir():
-        raise ConfigurationError(f"output_prefix must be a file-name prefix, not a folder: {prefix}")
+        raise ConfigurationError(
+            f"output_prefix must be a file-name prefix, not a folder: {prefix}"
+        )
     for suffix in (*suffixes, ".log"):
         target = Path(str(prefix) + suffix)
         if target.exists():
@@ -247,7 +251,9 @@ def _filter_arguments(filters: Mapping[str, object] | None) -> list[str]:
     unknown = sorted(set(filters) - set(_FILTER_SPECS))
     if unknown:
         raise ConfigurationError(f"Unknown filters {unknown}; allowed: {sorted(_FILTER_SPECS)}.")
-    active = {key: value for key, value in filters.items() if value is not None and value is not False}
+    active = {
+        key: value for key, value in filters.items() if value is not None and value is not False
+    }
     for first, second in _EXCLUSIVE_FILTERS:
         if first in active and second in active:
             raise ConfigurationError(f"{first} and {second} cannot be used together.")
@@ -600,9 +606,10 @@ def vcftools_missingness(
 ) -> dict[str, Any]:
     """Fraction of missing genotypes per individual (``by="individual"``, --missing-indv, ``.imiss``) or per site
     (``by="site"``, --missing-site, ``.lmiss``)."""
-    flag, suffix = {"individual": ("--missing-indv", ".imiss"), "site": ("--missing-site", ".lmiss")}[
-        _cli.choice(by, ("individual", "site"), "by")
-    ]
+    flag, suffix = {
+        "individual": ("--missing-indv", ".imiss"),
+        "site": ("--missing-site", ".lmiss"),
+    }[_cli.choice(by, ("individual", "site"), "by")]
     return _report(
         vcf_path,
         output_prefix,
@@ -663,7 +670,9 @@ def vcftools_linkage_disequilibrium(
         analysis = ["--interchrom-hap-r2" if haplotype else "--interchrom-geno-r2"]
         suffix = ".interchrom.hap.ld" if haplotype else ".interchrom.geno.ld"
     else:
-        analysis = [{"geno_r2": "--geno-r2", "geno_chisq": "--geno-chisq", "hap_r2": "--hap-r2"}[kind]]
+        analysis = [
+            {"geno_r2": "--geno-r2", "geno_chisq": "--geno-chisq", "hap_r2": "--hap-r2"}[kind]
+        ]
         suffix = {"geno_r2": ".geno.ld", "geno_chisq": ".geno.chisq", "hap_r2": ".hap.ld"}[kind]
     window: list[str] = []
     for flag, value, name in (
@@ -674,7 +683,10 @@ def vcftools_linkage_disequilibrium(
     ):
         window += _cli.option(flag, None if value is None else _cli.integer(value, name, minimum=0))
     if min_r2 is not None:
-        window += ["--min-r2", format(_cli.number(min_r2, "min_r2", minimum=0.0, maximum=1.0), ".12g")]
+        window += [
+            "--min-r2",
+            format(_cli.number(min_r2, "min_r2", minimum=0.0, maximum=1.0), ".12g"),
+        ]
     return _report(
         vcf_path,
         output_prefix,
@@ -837,7 +849,9 @@ def vcftools_long_runs_of_homozygosity(
     """
     contig = _cli.text(chromosome, "chromosome")
     if filters is not None and filters.get("chromosomes"):
-        raise ConfigurationError("Pass the chromosome as 'chromosome', not in filters['chromosomes'].")
+        raise ConfigurationError(
+            "Pass the chromosome as 'chromosome', not in filters['chromosomes']."
+        )
     return _report(
         vcf_path,
         output_prefix,
@@ -867,9 +881,10 @@ def vcftools_relatedness(
     ``method="manichaikul"`` is the KING-robust-style estimator of Manichaikul et al. 2010 (--relatedness2,
     ``.relatedness2``, column RELATEDNESS_PHI).
     """
-    flag, suffix = {"yang": ("--relatedness", ".relatedness"), "manichaikul": ("--relatedness2", ".relatedness2")}[
-        _cli.choice(method, ("yang", "manichaikul"), "method")
-    ]
+    flag, suffix = {
+        "yang": ("--relatedness", ".relatedness"),
+        "manichaikul": ("--relatedness2", ".relatedness2"),
+    }[_cli.choice(method, ("yang", "manichaikul"), "method")]
     return _report(
         vcf_path,
         output_prefix,
@@ -985,11 +1000,15 @@ def vcftools_haplotype_count(
         timeout_seconds=timeout_seconds,
         max_rows=max_rows,
     )
-    warnings = ["VCFtools 0.1.16 --hapcount can return zeros for the last region when the last VCF record lies in it."]
+    warnings = [
+        "VCFtools 0.1.16 --hapcount can return zeros for the last region when the last VCF record lies in it."
+    ]
     with bed.open(encoding="utf-8", errors="replace") as handle:
         first = handle.readline()
     if not first.startswith(("#", "track", "browser")):
-        warnings.append("VCFtools skips the first line of the BED file; it is not a header line, so that region was dropped.")
+        warnings.append(
+            "VCFtools skips the first line of the BED file; it is not a header line, so that region was dropped."
+        )
     result["warnings"] = warnings
     return result
 
@@ -1072,9 +1091,13 @@ def vcftools_pca(
             max_rows=max_rows,
         )
     if snp_loadings is None:
-        raise ConfigurationError("snp_loadings (the number of components) is required for output='snp_loadings'.")
+        raise ConfigurationError(
+            "snp_loadings (the number of components) is required for output='snp_loadings'."
+        )
     if not scaled:
-        raise ConfigurationError("SNP loadings are only written together with normalisation (normalise=True).")
+        raise ConfigurationError(
+            "SNP loadings are only written together with normalisation (normalise=True)."
+        )
     return _report(
         vcf_path,
         output_prefix,
@@ -1127,7 +1150,9 @@ def vcftools_export_genotypes(
     extra: list[str] = []
     if chromosome is not None:
         if filters is not None and filters.get("chromosomes"):
-            raise ConfigurationError("Pass the chromosome as 'chromosome', not in filters['chromosomes'].")
+            raise ConfigurationError(
+                "Pass the chromosome as 'chromosome', not in filters['chromosomes']."
+            )
         extra = ["--chr", _cli.text(chromosome, "chromosome")]
     elif needs_chromosome and not (filters and filters.get("chromosomes")):
         raise ConfigurationError(f"export_format={kind!r} requires a chromosome (VCFtools --chr).")
@@ -1175,7 +1200,10 @@ def vcftools_compare_vcfs(
     flag, suffixes = _DIFF_MODES[kind]
     extra = _input_flag(second_vcf_path, second=True)
     if individual_map_file is not None:
-        extra += ["--diff-indv-map", str(_cli.existing_file(individual_map_file, "individual_map_file"))]
+        extra += [
+            "--diff-indv-map",
+            str(_cli.existing_file(individual_map_file, "individual_map_file")),
+        ]
     return _report(
         vcf_path,
         output_prefix,
@@ -1197,8 +1225,15 @@ def vcftools_compare_vcfs(
 def _perl_environment(executable: str) -> dict[str, str]:
     """``PERL5LIB`` with the folder holding ``Vcf.pm`` next to the installed script, in front of an existing value."""
     root = Path(executable).parent.parent
-    candidates = [root / "share" / "perl5", root / "lib" / "perl5", root / "lib" / "perl", root / "perl"]
-    candidates += sorted((root / "share" / "perl").glob("*")) if (root / "share" / "perl").is_dir() else []
+    candidates = [
+        root / "share" / "perl5",
+        root / "lib" / "perl5",
+        root / "lib" / "perl",
+        root / "perl",
+    ]
+    candidates += (
+        sorted((root / "share" / "perl").glob("*")) if (root / "share" / "perl").is_dir() else []
+    )
     found = [str(path) for path in candidates if (path / "Vcf.pm").is_file()]
     if not found:
         return {}
@@ -1250,7 +1285,11 @@ def _run_script(
     command = [executable, *arguments]
     cwd = (output_path or Path(tempfile.gettempdir())).parent
     with contextlib.ExitStack() as stack:
-        stdin = stack.enter_context(stdin_path.open("rb")) if stdin_path is not None else subprocess.DEVNULL
+        stdin = (
+            stack.enter_context(stdin_path.open("rb"))
+            if stdin_path is not None
+            else subprocess.DEVNULL
+        )
         if output_path is not None:
             stdout = stack.enter_context(output_path.open("xb"))
         else:
@@ -1382,7 +1421,9 @@ def vcf_annotate(
     if filters is not None:
         spec = _cli.text(filters, "filters")
         if _FILTER_SPEC.fullmatch(spec) is None or (out.parent / spec).exists():
-            raise ConfigurationError(f"filters must be a built-in filter specification such as '+/Qual=10': {spec!r}")
+            raise ConfigurationError(
+                f"filters must be a built-in filter specification such as '+/Qual=10': {spec!r}"
+            )
         arguments += ["-f", spec]
     if _switch(hard_filter, "hard_filter"):
         arguments.append("-H")
@@ -1690,7 +1731,11 @@ def vcf_compare(
     result also holds ``venn`` (sites per file combination), ``summary`` (the SN lines) and ``genotype_classes``
     (the GS lines).
     """
-    files = [str(_cli.existing_file(path, "vcf_paths")) for path in vcf_paths] if not isinstance(vcf_paths, str) else []
+    files = (
+        [str(_cli.existing_file(path, "vcf_paths")) for path in vcf_paths]
+        if not isinstance(vcf_paths, str)
+        else []
+    )
     if len(files) < 2:
         raise ConfigurationError("vcf_paths must list at least two VCF files.")
     out = _output_path(output_path)
@@ -1703,7 +1748,12 @@ def vcf_compare(
         if _switch(value, name):
             arguments.append(flag)
     if regions is not None:
-        arguments += ["-r", ",".join(_sequence_of_text(regions, "regions", pattern=re.compile(r"[\w.|-]+(?::\d+-\d+)?")))]
+        arguments += [
+            "-r",
+            ",".join(
+                _sequence_of_text(regions, "regions", pattern=re.compile(r"[\w.|-]+(?::\d+-\d+)?"))
+            ),
+        ]
     if samples is not None:
         arguments += ["-s", ",".join(_sample_names(samples, "samples"))]
     if window is not None:
@@ -1771,15 +1821,25 @@ def vcf_phased_join(
     ``min_phase_quality`` breaks pre-phased segments whose PQ value is lower (-q, default 0.6). The joined VCF is
     written to the new ``output_path``.
     """
-    files = [str(_cli.existing_file(path, "vcf_paths")) for path in vcf_paths] if not isinstance(vcf_paths, str) else []
+    files = (
+        [str(_cli.existing_file(path, "vcf_paths")) for path in vcf_paths]
+        if not isinstance(vcf_paths, str)
+        else []
+    )
     if len(files) < 2:
         raise ConfigurationError("vcf_paths must list at least two chunks.")
     out = _output_path(output_path)
     arguments = ["-o", str(out)]
     if min_join_quality is not None:
-        arguments += ["-j", format(_cli.number(min_join_quality, "min_join_quality", minimum=0.0), ".12g")]
+        arguments += [
+            "-j",
+            format(_cli.number(min_join_quality, "min_join_quality", minimum=0.0), ".12g"),
+        ]
     if min_phase_quality is not None:
-        arguments += ["-q", format(_cli.number(min_phase_quality, "min_phase_quality", minimum=0.0), ".12g")]
+        arguments += [
+            "-q",
+            format(_cli.number(min_phase_quality, "min_phase_quality", minimum=0.0), ".12g"),
+        ]
     result = _run_script(
         "vcf-phased-join",
         [*arguments, *files],
@@ -1863,12 +1923,20 @@ def vcf_fill_flanking_sequence(
     arguments = ["-r", str(_cli.existing_file(reference_fasta, "reference_fasta"))]
     arguments += ["-l", str(_cli.integer(length, "length", minimum=1))]
     masks: list[str] = []
-    for flag, paths, name in (("-b", bed_mask_files, "bed_mask_files"), ("-v", vcf_mask_files, "vcf_mask_files")):
+    for flag, paths, name in (
+        ("-b", bed_mask_files, "bed_mask_files"),
+        ("-v", vcf_mask_files, "vcf_mask_files"),
+    ):
         if paths is not None:
             for path in _files(paths, name):
                 masks += ["-m", mask, flag, path]
     if cluster_distance is not None:
-        masks += ["-m", mask, "-c", str(_cli.integer(cluster_distance, "cluster_distance", minimum=1))]
+        masks += [
+            "-m",
+            mask,
+            "-c",
+            str(_cli.integer(cluster_distance, "cluster_distance", minimum=1)),
+        ]
     return _script_result(
         "fill-fs",
         [*arguments, *masks, str(source)],
@@ -1905,9 +1973,16 @@ def vcf_fill_reference_md5(
     out = _output_path(output_path)
     arguments = ["-r", str(_cli.existing_file(reference_fasta, "reference_fasta"))]
     if dictionary_path is not None:
-        arguments += ["-d", str(Path(_cli.text(str(dictionary_path), "dictionary_path")).expanduser().resolve())]
+        arguments += [
+            "-d",
+            str(Path(_cli.text(str(dictionary_path), "dictionary_path")).expanduser().resolve()),
+        ]
     info = []
-    for key, value, name in (("AS", assembly, "assembly"), ("SP", species, "species"), ("TX", taxonomy, "taxonomy")):
+    for key, value, name in (
+        ("AS", assembly, "assembly"),
+        ("SP", species, "species"),
+        ("TX", taxonomy, "taxonomy"),
+    ):
         if value is not None:
             text = _cli.text(value, name)
             if "," in text or "\n" in text:
@@ -1927,7 +2002,9 @@ def vcf_fill_reference_md5(
     if result["status"] == "completed" and out.stat().st_size == 0:
         # fill-ref-md5 pipes `tabix -r` through the shell and ignores its exit code, so a crashed tabix leaves an empty file.
         result["status"] = "failed"
-        result["log_tail"] = (result["log_tail"] + "\nfill-ref-md5 wrote an empty file (tabix -r failed).").strip()
+        result["log_tail"] = (
+            result["log_tail"] + "\nfill-ref-md5 wrote an empty file (tabix -r failed)."
+        ).strip()
     if result["status"] != "completed":
         out.unlink(missing_ok=True)
         Path(str(out) + ".header").unlink(missing_ok=True)

@@ -71,14 +71,18 @@ def _load(structure_file: str | Path, model: int, chain_id: str | None) -> Any:
     try:
         atoms = structure_io.load_structure(str(path), model=model_number)
     except Exception as exc:
-        raise ConfigurationError(f"{path.name} could not be read as model {model_number}: {exc}") from exc
+        raise ConfigurationError(
+            f"{path.name} could not be read as model {model_number}: {exc}"
+        ) from exc
     if chain_id is not None:
         if not isinstance(chain_id, str) or not chain_id:
             raise ConfigurationError("chain_id must be a non-empty string.")
         atoms = atoms[atoms.chain_id == chain_id]
     atoms = atoms[structure.filter_nucleotides(atoms)]
     if atoms.array_length() == 0:
-        raise ConfigurationError("The structure contains no nucleotides for the chosen model/chain.")
+        raise ConfigurationError(
+            "The structure contains no nucleotides for the chosen model/chain."
+        )
     return atoms
 
 
@@ -100,7 +104,10 @@ def _pairs(values: object, length: int | None = None) -> list[tuple[int, int]]:
     for row in values:
         if isinstance(row, (str, bytes)) or not isinstance(row, Sequence) or len(row) != 2:
             raise ConfigurationError("each base pair must be [i, j].")
-        first, second = _int(row[0], "base pair index", minimum=0), _int(row[1], "base pair index", minimum=0)
+        first, second = (
+            _int(row[0], "base pair index", minimum=0),
+            _int(row[1], "base pair index", minimum=0),
+        )
         if first == second or (length is not None and max(first, second) >= length):
             raise ConfigurationError(f"invalid base pair [{first}, {second}] for length {length}.")
         pairs.append((first, second))
@@ -227,7 +234,11 @@ def base_pairs_to_dot_bracket(
     numpy = require("numpy", _EXTRA)
     structure = require("biotite.structure", _EXTRA)
     array = numpy.asarray(pairs, dtype=int).reshape(-1, 2)
-    order = None if max_pseudoknot_order is None else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    order = (
+        None
+        if max_pseudoknot_order is None
+        else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    )
     notation = structure.dot_bracket(
         array, size, scores=_scores(scores, len(pairs)), max_pseudoknot_order=order
     )
@@ -258,7 +269,11 @@ def nucleic_acid_dot_bracket(
 
     atoms = _load(structure_file, model, chain_id)
     structure = require("biotite.structure", _EXTRA)
-    order = None if max_pseudoknot_order is None else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    order = (
+        None
+        if max_pseudoknot_order is None
+        else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    )
     try:
         notation = structure.dot_bracket_from_structure(
             atoms,
@@ -298,7 +313,11 @@ def pseudoknot_order(
     structure = require("biotite.structure", _EXTRA)
     if not pairs:
         raise ConfigurationError("base_pairs must contain at least one pair.")
-    order = None if max_pseudoknot_order is None else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    order = (
+        None
+        if max_pseudoknot_order is None
+        else _int(max_pseudoknot_order, "max_pseudoknot_order", minimum=0)
+    )
     result = structure.pseudoknots(
         numpy.asarray(pairs, dtype=int),
         scores=_scores(scores, len(pairs)),

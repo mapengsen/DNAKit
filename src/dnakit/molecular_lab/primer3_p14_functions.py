@@ -23,13 +23,19 @@ from dnakit.exceptions import ConfigurationError
 
 _HINT = "Install Primer3 2.6 or later (for example `conda install -c bioconda primer3`) and put it on PATH or pass primer3_path."
 _TASKS = (
-    "generic", "check_primers", "pick_primer_list", "pick_sequencing_primers", "pick_cloning_primers",
+    "generic",
+    "check_primers",
+    "pick_primer_list",
+    "pick_sequencing_primers",
+    "pick_cloning_primers",
     "pick_discriminative_primers",
 )
 _SETTING = re.compile(r"^PRIMER_[A-Z0-9_]+$")
 _KEY = re.compile(r"^PRIMER_(LEFT|RIGHT|INTERNAL|PAIR)_(\d+)_([A-Z0-9_]+)$")
 _DNA = re.compile(r"^[ACGTNacgtn]+$")
-_ALIGN_LINE = re.compile(r"score=(-?[\d.]+) len=(\d+)(?: align_end_1=(\d+) align_end_2=(\d+))?(?: \|(.*)\|)?")
+_ALIGN_LINE = re.compile(
+    r"score=(-?[\d.]+) len=(\d+)(?: align_end_1=(\d+) align_end_2=(\d+))?(?: \|(.*)\|)?"
+)
 
 
 def _region(value: Sequence[int] | None, name: str, length: int) -> list[int] | None:
@@ -90,40 +96,63 @@ def primer3_design_by_task(
     ):
         if value is not None:
             seq_args[key] = value
-    for key, value, name in (("SEQUENCE_TARGET", target, "target"), ("SEQUENCE_INCLUDED_REGION", included_region, "included_region")):
+    for key, value, name in (
+        ("SEQUENCE_TARGET", target, "target"),
+        ("SEQUENCE_INCLUDED_REGION", included_region, "included_region"),
+    ):
         region = _region(value, name, len(template))
         if region is not None:
             seq_args[key] = region
     if excluded_regions is not None:
-        seq_args["SEQUENCE_EXCLUDED_REGION"] = [_region(item, "excluded_regions", len(template)) for item in excluded_regions]
+        seq_args["SEQUENCE_EXCLUDED_REGION"] = [
+            _region(item, "excluded_regions", len(template)) for item in excluded_regions
+        ]
     global_args: dict[str, Any] = {}
     for key, value in (settings or {}).items():
         if not _SETTING.fullmatch(key) or key == "PRIMER_TASK":
-            raise ConfigurationError(f"settings key not allowed: {key!r} (use PRIMER_* tags; the task has its own parameter).")
+            raise ConfigurationError(
+                f"settings key not allowed: {key!r} (use PRIMER_* tags; the task has its own parameter)."
+            )
         global_args[key] = value
     global_args["PRIMER_TASK"] = chosen
     if num_return is not None:
-        global_args["PRIMER_NUM_RETURN"] = _gap_cli.integer(num_return, "num_return", minimum=1, maximum=1000)
+        global_args["PRIMER_NUM_RETURN"] = _gap_cli.integer(
+            num_return, "num_return", minimum=1, maximum=1000
+        )
     if product_size_range is not None:
-        global_args["PRIMER_PRODUCT_SIZE_RANGE"] = [list(map(int, item)) for item in product_size_range]
+        global_args["PRIMER_PRODUCT_SIZE_RANGE"] = [
+            list(map(int, item)) for item in product_size_range
+        ]
     try:
         raw = primer3.bindings.design_primers(seq_args, global_args)
     except (OSError, TypeError, ValueError, RuntimeError) as exc:
         raise ConfigurationError(f"primer3 rejected the input: {exc}") from exc
-    result: dict[str, Any] = {"status": "completed", "backend": "primer3-py", "version": getattr(primer3, "__version__", None), "task": chosen}
-    groups: dict[str, dict[int, dict[str, Any]]] = {"LEFT": {}, "RIGHT": {}, "INTERNAL": {}, "PAIR": {}}
+    result: dict[str, Any] = {
+        "status": "completed",
+        "backend": "primer3-py",
+        "version": getattr(primer3, "__version__", None),
+        "task": chosen,
+    }
+    groups: dict[str, dict[int, dict[str, Any]]] = {
+        "LEFT": {},
+        "RIGHT": {},
+        "INTERNAL": {},
+        "PAIR": {},
+    }
     explain: dict[str, str] = {}
     for key, value in raw.items():
         match = _KEY.match(key)
         if match is not None:
-            groups[match.group(1)].setdefault(int(match.group(2)), {})[match.group(3).lower()] = value
+            groups[match.group(1)].setdefault(int(match.group(2)), {})[match.group(3).lower()] = (
+                value
+            )
         elif key.endswith("_EXPLAIN"):
             explain[key] = value
     for name, rows in groups.items():
         items = []
         for index in sorted(rows):
             row = rows[index]
-            location = row.pop("", None)
+            row.pop("", None)
             items.append(row)
         result["pairs" if name == "PAIR" else name.lower()] = items
     for kind in ("left", "right", "internal"):
@@ -169,7 +198,10 @@ def ntdpal_align_oligos(
     if gap_open_penalty is not None:
         arguments += ["-g", str(_gap_cli.number(gap_open_penalty, "gap_open_penalty", minimum=0.0))]
     if gap_extend_penalty is not None:
-        arguments += ["-l", str(_gap_cli.number(gap_extend_penalty, "gap_extend_penalty", minimum=0.0))]
+        arguments += [
+            "-l",
+            str(_gap_cli.number(gap_extend_penalty, "gap_extend_penalty", minimum=0.0)),
+        ]
     if max_gap is not None:
         arguments += ["-m", str(_gap_cli.integer(max_gap, "max_gap", minimum=0))]
     if _p14_cli.flag(gc_weighted_scores, "gc_weighted_scores"):
@@ -182,8 +214,14 @@ def ntdpal_align_oligos(
     with tempfile.TemporaryDirectory(prefix="dnakit_ntdpal_") as folder:
         work = Path(folder)
         result = _p14_cli.run(
-            "ntdpal", arguments, cwd=work, expected=[], explicit=_exe("ntdpal", primer3_path), hint=_HINT,
-            version_args=("-h",), stdout_file=work / "out.txt",
+            "ntdpal",
+            arguments,
+            cwd=work,
+            expected=[],
+            explicit=_exe("ntdpal", primer3_path),
+            hint=_HINT,
+            version_args=("-h",),
+            stdout_file=work / "out.txt",
         )
         text = (work / "out.txt").read_text(encoding="utf-8", errors="replace").strip()
     result["outputs"] = []
@@ -206,7 +244,9 @@ def _exe(name: str, primer3_path: str | None) -> str | None:
         return None
     folder = Path(primer3_path).expanduser()
     if not folder.is_dir():
-        raise ConfigurationError(f"primer3_path must be a folder that contains the Primer3 programs: {folder}")
+        raise ConfigurationError(
+            f"primer3_path must be a folder that contains the Primer3 programs: {folder}"
+        )
     return str(folder / name)
 
 
@@ -247,25 +287,48 @@ def primer3_mask_repeats(
     if absolute_cutoff is not None:
         if probability_cutoff is not None:
             raise ConfigurationError("probability_cutoff cannot be combined with absolute_cutoff.")
-        arguments += ["-a", str(_gap_cli.integer(absolute_cutoff, "absolute_cutoff", minimum=1)), "-l", str(_gap_cli.existing_file(str(kmer_list), "kmer_list"))]
+        arguments += [
+            "-a",
+            str(_gap_cli.integer(absolute_cutoff, "absolute_cutoff", minimum=1)),
+            "-l",
+            str(_gap_cli.existing_file(str(kmer_list), "kmer_list")),
+        ]
     elif probability_cutoff is not None:
-        arguments += ["-p", str(_gap_cli.number(probability_cutoff, "probability_cutoff", minimum=0.0, maximum=1.0))]
+        arguments += [
+            "-p",
+            str(
+                _gap_cli.number(probability_cutoff, "probability_cutoff", minimum=0.0, maximum=1.0)
+            ),
+        ]
     if mask_5_prime is not None:
         arguments += ["-m5", str(_gap_cli.integer(mask_5_prime, "mask_5_prime", minimum=0))]
     if mask_3_prime is not None:
         arguments += ["-m3", str(_gap_cli.integer(mask_3_prime, "mask_3_prime", minimum=0))]
     if masking_character is not None:
-        if not isinstance(masking_character, str) or len(masking_character) != 1 or not masking_character.isalpha():
+        if (
+            not isinstance(masking_character, str)
+            or len(masking_character) != 1
+            or not masking_character.isalpha()
+        ):
             raise ConfigurationError("masking_character must be one letter.")
         arguments += ["-c", masking_character]
     if _p14_cli.flag(soft_mask, "soft_mask"):
         arguments.append("-s")
     if masking_direction is not None:
-        arguments += ["-d", _gap_cli.choice(masking_direction, ("fwd", "rev", "both"), "masking_direction")]
+        arguments += [
+            "-d",
+            _gap_cli.choice(masking_direction, ("fwd", "rev", "both"), "masking_direction"),
+        ]
     arguments.append(str(source))
     result = _p14_cli.run(
-        "primer3_masker", arguments, cwd=output_path.parent, expected=[], explicit=_exe("primer3_masker", primer3_path),
-        hint=_HINT, version_args=("-h",), stdout_file=output_path,
+        "primer3_masker",
+        arguments,
+        cwd=output_path.parent,
+        expected=[],
+        explicit=_exe("primer3_masker", primer3_path),
+        hint=_HINT,
+        version_args=("-h",),
+        stdout_file=output_path,
     )
     result["mode"] = "absolute_count" if absolute_cutoff is not None else "probability"
     return result

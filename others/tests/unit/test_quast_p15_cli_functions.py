@@ -9,7 +9,9 @@ import pytest
 from dnakit.assembly import quast_p15_cli_functions as qu
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
-needs_quast = pytest.mark.skipif(shutil.which("quast.py") is None, reason="quast.py is not installed")
+needs_quast = pytest.mark.skipif(
+    shutil.which("quast.py") is None, reason="quast.py is not installed"
+)
 
 
 def genome_files(folder: Path) -> tuple[Path, Path]:
@@ -25,24 +27,45 @@ def genome_files(folder: Path) -> tuple[Path, Path]:
 def test_missing_program_and_validation(tmp_path: Path) -> None:
     reference, contigs = genome_files(tmp_path)
     with pytest.raises(BackendUnavailableError):
-        qu.quast_assess_assembly([str(contigs)], str(tmp_path / "o"), reference=str(reference), quast_path=str(tmp_path / "missing"), verbose=False)
+        qu.quast_assess_assembly(
+            [str(contigs)],
+            str(tmp_path / "o"),
+            reference=str(reference),
+            quast_path=str(tmp_path / "missing"),
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        qu.quast_assess_assembly([str(contigs)], str(tmp_path / "o1"), upper_bound_assembly=True, verbose=False)
+        qu.quast_assess_assembly(
+            [str(contigs)], str(tmp_path / "o1"), upper_bound_assembly=True, verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        qu.quast_predict_genes([str(contigs)], str(tmp_path / "o2"), gene_finder=None, verbose=False)
+        qu.quast_predict_genes(
+            [str(contigs)], str(tmp_path / "o2"), gene_finder=None, verbose=False
+        )
     with pytest.raises(ConfigurationError):
         qu.quast_map_reads([str(contigs)], str(tmp_path / "o3"), verbose=False)
     with pytest.raises(ConfigurationError):
-        qu.metaquast_assess_metagenome([str(contigs)], str(tmp_path / "o4"), use_blast_search=False, verbose=False)
+        qu.metaquast_assess_metagenome(
+            [str(contigs)], str(tmp_path / "o4"), use_blast_search=False, verbose=False
+        )
 
 
 @needs_quast
 def test_reference_metrics_and_kmers(tmp_path: Path) -> None:
     reference, contigs = genome_files(tmp_path)
-    result = qu.quast_assess_assembly([str(contigs)], str(tmp_path / "q"), reference=str(reference), k_mer_stats=True, k_mer_size=31, verbose=False)
+    result = qu.quast_assess_assembly(
+        [str(contigs)],
+        str(tmp_path / "q"),
+        reference=str(reference),
+        k_mer_stats=True,
+        k_mer_size=31,
+        verbose=False,
+    )
     assert result["report"]["Genome fraction (%)"]["contigs"] == pytest.approx(97.5)
     assert result["report"]["# misassemblies"]["contigs"] == 0
-    assert result["report"]["N50"]["contigs"] == 10500 and "K-mer-based compl. (%)" in result["report"]
+    assert (
+        result["report"]["N50"]["contigs"] == 10500 and "K-mer-based compl. (%)" in result["report"]
+    )
 
 
 @needs_quast
@@ -53,6 +76,12 @@ def test_read_mapping(tmp_path: Path) -> None:
     with reads.open("w") as handle:
         for i in range(2000):
             start = random.randrange(0, len(genome) - 100)
-            handle.write(f"@r{i}\n{genome[start:start + 100]}\n+\n{'I' * 100}\n")
-    result = qu.quast_map_reads([str(contigs)], str(tmp_path / "q"), reference=str(reference), single=str(reads), verbose=False)
+            handle.write(f"@r{i}\n{genome[start : start + 100]}\n+\n{'I' * 100}\n")
+    result = qu.quast_map_reads(
+        [str(contigs)],
+        str(tmp_path / "q"),
+        reference=str(reference),
+        single=str(reads),
+        verbose=False,
+    )
     assert result["report"]["Mapped (%)"]["contigs"] > 90

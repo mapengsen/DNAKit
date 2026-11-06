@@ -9,8 +9,8 @@ import pytest
 
 pytest.importorskip("pydna")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.molecular_lab import pydna_p34_functions as m  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.molecular_lab import pydna_p34_functions as m
 
 Q = {"verbose": False}
 STICKY = {"watson": "aggctaa", "crick": "tagcc"}
@@ -82,7 +82,7 @@ def test_melt_short_strands_finds_the_gap_and_matches_pydna():
     ref = _reference(spec)
     assert out["watson_sites"] == [[int(a), int(b)] for a, b in ref.get_ss_meltsites(3)[0]]
     assert out["shed"][0]["watson"] == "at"
-    remaining, strands = ref.melt_ss_dna(3)
+    remaining, _strands = ref.melt_ss_dna(3)
     assert out["remaining"]["watson"] == str(remaining.watson)
     assert len(out["melt_fragments"]) == len(ref.melt(3))
     clean = m.pydna_melt_short_strands("tagaagtaggtatg", length=3, **Q)
@@ -113,7 +113,9 @@ def test_restriction_cutters_classes():
     assert twice["enzymes"] == ["BamHI"]
     anyc = m.pydna_restriction_cutters(seq, cutter_class="any", enzymes=names, **Q)
     assert anyc["enzymes"] == ["BamHI", "EcoRI"]
-    three = m.pydna_restriction_cutters(seq + "GGATCC" * 2, cutter_class="n", cuts=3, enzymes=names, **Q)
+    three = m.pydna_restriction_cutters(
+        seq + "GGATCC" * 2, cutter_class="n", cuts=3, enzymes=names, **Q
+    )
     assert three["enzymes"] == ["BamHI"]
     from pydna.dseq import Dseq
 
@@ -164,7 +166,9 @@ def test_assembly_figures_compact_detailed_and_matplotlib(tmp_path):
     assert "GATCGATCGATCG" in detailed["figure"].upper()
     pytest.importorskip("matplotlib")
     target = tmp_path / "asm.png"
-    drawn = m.pydna_assembly_figure(FRAGMENTS, limit=12, figure="matplotlib", output_path=str(target), **Q)
+    drawn = m.pydna_assembly_figure(
+        FRAGMENTS, limit=12, figure="matplotlib", output_path=str(target), **Q
+    )
     assert target.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n" and drawn["image_path"] == str(target)
     with pytest.raises(ConfigurationError):
         m.pydna_assembly_figure(FRAGMENTS, limit=12, figure="matplotlib", **Q)
@@ -173,9 +177,7 @@ def test_assembly_figures_compact_detailed_and_matplotlib(tmp_path):
 
 
 def test_cloning_strategy_export_import_and_history_round_trip():
-    built = m.pydna_build_cloning_strategy(
-        [TEMPLATE], operation="pcr", primers=[FWD, REV], **Q
-    )
+    built = m.pydna_build_cloning_strategy([TEMPLATE], operation="pcr", primers=[FWD, REV], **Q)
     assert built["product_names"] == ["product1"] and "PCRSource" in built["history"][0]
     records = m.pydna_cloning_strategy_to_records(built["strategy_json"], **Q)
     assert records["record_count"] == 1
@@ -189,10 +191,14 @@ def test_cloning_strategy_export_import_and_history_round_trip():
 
     gibson = m.pydna_build_cloning_strategy(FRAGMENTS, operation="gibson", limit=12, **Q)
     assert "GibsonAssemblySource" in gibson["history"][0]
-    assert m.pydna_cloning_history(gibson["strategy_json"], action="validate", **Q)["records"][0]["valid"]
+    assert m.pydna_cloning_history(gibson["strategy_json"], action="validate", **Q)["records"][0][
+        "valid"
+    ]
 
     plain = m.pydna_build_cloning_strategy([TEMPLATE], **Q)
-    assert m.pydna_cloning_history(plain["strategy_json"], **Q)["records"][0]["has_history"] is False
+    assert (
+        m.pydna_cloning_history(plain["strategy_json"], **Q)["records"][0]["has_history"] is False
+    )
     with pytest.raises(ConfigurationError):
         m.pydna_cloning_strategy_to_records("{not json", **Q)
     with pytest.raises(ConfigurationError):
@@ -281,7 +287,8 @@ def test_primer_pairs_by_size_and_flanking_pairs():
     template, _, _, _, primers = _screen_data()
     pairs = m.pydna_primer_pairs_by_size(template, primers, short=500, long=1500, **Q)
     assert {(p["forward_primer"], p["reverse_primer"], p["size"]) for p in pairs["pairs"]} == {
-        ("F", "R", 820), ("F2", "R", 620)
+        ("F", "R", 820),
+        ("F2", "R", 620),
     }
     narrow = m.pydna_primer_pairs_by_size(template, primers, short=700, long=1500, **Q)
     assert [p["size"] for p in narrow["pairs"]] == [820]
@@ -311,7 +318,10 @@ def test_diagnostic_primer_pairs_and_triplets():
         [template, other], triplet_primers, primers_per_set=3, short=300, long=1500, **Q
     )
     assert trio["set_count"] == 1
-    assert [(x["reverse_primer"], x["product_size"]) for x in trio["sets"][0]] == [("rA", 580), ("rB", 770)]
+    assert [(x["reverse_primer"], x["product_size"]) for x in trio["sets"][0]] == [
+        ("rA", 580),
+        ("rB", 770),
+    ]
     with pytest.raises(ConfigurationError):
         m.pydna_diagnostic_primer_sets([template], primers, **Q)
 
@@ -369,7 +379,9 @@ def test_open_reading_frame_check_matches_pydna():
     assert m.pydna_is_open_reading_frame("atgaaa", **Q)["is_orf"] is False
     for table in (1, 4, 11):
         for text in ["atgtgataa", "atgtaa", "ctgaaataa"]:
-            assert m.pydna_is_open_reading_frame(text, table=table, **Q)["is_orf"] == SeqRecord(text).isorf(table)
+            assert m.pydna_is_open_reading_frame(text, table=table, **Q)["is_orf"] == SeqRecord(
+                text
+            ).isorf(table)
 
 
 def test_seguid_stamp_is_deterministic_and_topology_aware():

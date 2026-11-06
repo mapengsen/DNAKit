@@ -52,7 +52,9 @@ def _bins_from_chromsizes(text: str, util: Any) -> tuple[Any, int]:
     try:
         chromsizes = util.read_chromsizes(str(chromsizes_path), all_names=True)
     except (OSError, ValueError) as exc:
-        raise ConfigurationError(f'Could not read chromsizes file "{chromsizes_text}": {exc}') from exc
+        raise ConfigurationError(
+            f'Could not read chromsizes file "{chromsizes_text}": {exc}'
+        ) from exc
     return util.binnify(chromsizes, binsize), binsize
 
 
@@ -65,15 +67,24 @@ def _bins_from_bed(path: Path, pandas: Any) -> Any:
             usecols=[0, 1, 2],
             dtype={"chrom": str},
         )
-    except (pandas.errors.ParserError, pandas.errors.EmptyDataError, UnicodeDecodeError, ValueError) as exc:
+    except (
+        pandas.errors.ParserError,
+        pandas.errors.EmptyDataError,
+        UnicodeDecodeError,
+        ValueError,
+    ) as exc:
         raise ConfigurationError(f'Failed to parse bins file "{path}": {exc}') from exc
     if table.isna().any().any():
-        raise ConfigurationError(f'Bins file "{path}" has rows with missing chrom, start or end fields.')
+        raise ConfigurationError(
+            f'Bins file "{path}" has rows with missing chrom, start or end fields.'
+        )
     try:
         table["start"] = pandas.to_numeric(table["start"], errors="raise").astype("int64")
         table["end"] = pandas.to_numeric(table["end"], errors="raise").astype("int64")
     except (ValueError, TypeError) as exc:
-        raise ConfigurationError(f'Bins file "{path}" has non-integer start or end fields: {exc}') from exc
+        raise ConfigurationError(
+            f'Bins file "{path}" has non-integer start or end fields: {exc}'
+        ) from exc
     return table[_BED_COLUMNS]
 
 
@@ -116,7 +127,7 @@ def cooler_resolve_bins(bins: str, output_bed: str, *, verbose: bool = True) -> 
         "package": f"cooler {cooler.__version__}",
         "source": source,
         "binsize": binsize,
-        "bin_count": int(len(table)),
+        "bin_count": len(table),
         "chromosomes": chromosomes,
         "output_bed": str(target),
         "coordinates": "0-based half-open BED",

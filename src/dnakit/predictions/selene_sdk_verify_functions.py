@@ -235,7 +235,9 @@ def plot_sequence_logo_scores(
     }
 
 
-def _ordered_variants(labels: Sequence[Sequence[Any]]) -> tuple[list[tuple[str, int, str, str]], list[int]]:
+def _ordered_variants(
+    labels: Sequence[Sequence[Any]],
+) -> tuple[list[tuple[str, int, str, str]], list[int]]:
     """Variant labels sorted by chromosome then position, as selene's ordered_variants_and_indices."""
     vis = _selene_module("selene_sdk.interpret.vis")
     groups: dict[str, list[tuple[int, int, str, str]]] = {}
@@ -314,7 +316,10 @@ def plot_variant_diffs_scatter(
         "hovermode": "closest",
         "hoverlabel": {"font": {"size": 16}},
         "xaxis": {
-            "title": {"text": "Genome coordinates", "font": {"family": "Arial, sans-serif", "size": 16}},
+            "title": {
+                "text": "Genome coordinates",
+                "font": {"family": "Arial, sans-serif", "size": 16},
+            },
             "showticklabels": True,
             "tickangle": 35,
             "nticks": 25,
@@ -322,7 +327,10 @@ def plot_variant_diffs_scatter(
             "automargin": True,
         },
         "yaxis": {
-            "title": {"text": "Absolute difference", "font": {"family": "Arial, sans-serif", "size": 16}},
+            "title": {
+                "text": "Absolute difference",
+                "font": {"family": "Arial, sans-serif", "size": 16},
+            },
         },
     }
     if threshold_line is not None:

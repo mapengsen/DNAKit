@@ -24,7 +24,9 @@ def sequence_length_gc_summary(sequences: Iterable[str]) -> dict[str, object]:
         if invalid:
             raise ValueError(f"invalid DNA symbols: {', '.join(invalid)}")
         lengths.append(len(sequence))
-        gc_fractions.append((sequence.count("G") + sequence.count("C")) / len(sequence) if sequence else 0.0)
+        gc_fractions.append(
+            (sequence.count("G") + sequence.count("C")) / len(sequence) if sequence else 0.0
+        )
 
     if not lengths:
         return {

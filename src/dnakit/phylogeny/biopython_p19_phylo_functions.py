@@ -130,7 +130,9 @@ def _alignment(value: object, name: str = "alignment", *, minimum_rows: int = 1)
         if not isinstance(sequence, str) or not _SEQUENCE.fullmatch(sequence):
             raise ConfigurationError(f"{name}: sequence for {taxon!r} has invalid characters.")
         if len(sequence) > _MAX_ALIGNMENT_LENGTH:
-            raise ConfigurationError(f"{name}: sequences may be at most {_MAX_ALIGNMENT_LENGTH} long.")
+            raise ConfigurationError(
+                f"{name}: sequences may be at most {_MAX_ALIGNMENT_LENGTH} long."
+            )
         cleaned[taxon] = sequence
     if len({len(text) for text in cleaned.values()}) != 1:
         raise ConfigurationError(f"{name}: all sequences must have the same length.")
@@ -233,7 +235,9 @@ def _unique_clade(tree: Any, name: str, label: str) -> Any:
     if not matches:
         raise ConfigurationError(f"{label} {name!r} is not a clade name in the tree.")
     if len(matches) > 1:
-        raise ConfigurationError(f"{label} {name!r} names {len(matches)} clades; use a unique name.")
+        raise ConfigurationError(
+            f"{label} {name!r} names {len(matches)} clades; use a unique name."
+        )
     return matches[0]
 
 
@@ -323,13 +327,17 @@ def nexus_combine_matrices(
     """
 
     if not isinstance(matrices, Mapping) or not matrices:
-        raise ConfigurationError("matrices must be a non-empty mapping of data-set name to alignment.")
+        raise ConfigurationError(
+            "matrices must be a non-empty mapping of data-set name to alignment."
+        )
     kind = _choice(datatype, _DATATYPES, "datatype")
     nexus_module = _bio("Bio.Nexus.Nexus")
     pairs = []
     for label, alignment in matrices.items():
         if not isinstance(label, str) or not _PARTITION_NAME.fullmatch(label):
-            raise ConfigurationError(f"data-set name {label!r} must use letters, digits, '_' or '-'.")
+            raise ConfigurationError(
+                f"data-set name {label!r} must use letters, digits, '_' or '-'."
+            )
         pairs.append((label, _nexus(_alignment(alignment, f"matrices[{label!r}]"), kind)))
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -371,11 +379,15 @@ def nexus_write_partition_files(
     rows = _alignment(alignment)
     length = len(next(iter(rows.values())))
     if not isinstance(charpartition, Mapping) or not charpartition:
-        raise ConfigurationError("charpartition must be a non-empty mapping of name to column indices.")
+        raise ConfigurationError(
+            "charpartition must be a non-empty mapping of name to column indices."
+        )
     partition: dict[str, list[int]] = {}
     for label, columns in charpartition.items():
         if not isinstance(label, str) or not _PARTITION_NAME.fullmatch(label):
-            raise ConfigurationError(f"partition name {label!r} must use letters, digits, '_' or '-'.")
+            raise ConfigurationError(
+                f"partition name {label!r} must use letters, digits, '_' or '-'."
+            )
         partition[label] = _indices(columns, f"charpartition[{label!r}]", length)
     stem = _name_text(file_stem, "file_stem")
     if not _PARTITION_NAME.fullmatch(stem):
@@ -399,7 +411,9 @@ def nexus_write_partition_files(
         "status": "completed",
         "operation": "nexus_write_partition_files",
         "files": files,
-        "partition_sizes": {label: len(set(columns) - set(excluded)) for label, columns in partition.items()},
+        "partition_sizes": {
+            label: len(set(columns) - set(excluded)) for label, columns in partition.items()
+        },
         "provenance": _provenance(parser="Bio.Nexus.Nexus.Nexus.write_nexus_data_partitions"),
     }
 
@@ -445,7 +459,7 @@ def nexus_weighted_stepmatrix(
         if not match:
             continue
         values = match.group(2).split()
-        for column, value in zip(header, values):
+        for column, value in zip(header, values, strict=False):
             if value == ".":
                 matrix[match.group(1)][column] = 0.0
             elif value.startswith("inf"):
@@ -534,7 +548,9 @@ def biopython_alignment_distance_matrix(
         "model": selected,
         "ids": ids,
         "matrix": _full_matrix(matrix.matrix, len(ids)),
-        "provenance": _provenance(parser=f"Bio.Phylo.TreeConstruction.DistanceCalculator({selected!r})"),
+        "provenance": _provenance(
+            parser=f"Bio.Phylo.TreeConstruction.DistanceCalculator({selected!r})"
+        ),
     }
 
 
@@ -559,8 +575,12 @@ def parsimony_tree_search(
         tips = {clade.name for clade in start.get_terminals()}
         if tips != set(rows):
             raise ConfigurationError("starting_tree tips must equal the alignment taxa.")
-        if any(clade.branch_length is None for clade in start.find_clades() if clade is not start.root):
-            raise ConfigurationError("starting_tree needs a branch length on every branch (NNI roots at the midpoint).")
+        if any(
+            clade.branch_length is None for clade in start.find_clades() if clade is not start.root
+        ):
+            raise ConfigurationError(
+                "starting_tree needs a branch length on every branch (NNI roots at the midpoint)."
+            )
     msa = _msa(rows)
     scorer = construction.ParsimonyScorer()
     searcher = construction.NNITreeSearcher(scorer)
@@ -576,7 +596,9 @@ def parsimony_tree_search(
         "operation": "parsimony_tree_search",
         "newick": _newick(tree),
         "parsimony_score": float(score),
-        "starting_tree": "supplied" if start is not None else "neighbour joining (identity distance)",
+        "starting_tree": "supplied"
+        if start is not None
+        else "neighbour joining (identity distance)",
         "provenance": _provenance(
             parser="Bio.Phylo.TreeConstruction.ParsimonyTreeConstructor / NNITreeSearcher"
         ),
@@ -668,7 +690,9 @@ def collapse_tree_genera(
     except Exception as exc:
         raise ConfigurationError(f"newick is not readable by Bio.Nexus.Trees: {exc}") from exc
     before = len(tree.get_terminals())
-    tree.collapse_genera(space_equals_underscore=_flag(space_equals_underscore, "space_equals_underscore"))
+    tree.collapse_genera(
+        space_equals_underscore=_flag(space_equals_underscore, "space_equals_underscore")
+    )
     return {
         "status": "completed",
         "operation": "collapse_tree_genera",
@@ -1003,7 +1027,9 @@ def codon_dn_ds_estimates(
             warnings.simplefilter("ignore")
             dn, ds = analysis.calculate_dn_ds_matrix(alignment, method=selected, codon_table=table)
     except (ZeroDivisionError, ValueError, OverflowError) as exc:
-        raise ConfigurationError(f"{selected} could not estimate dN/dS for this alignment: {exc}") from exc
+        raise ConfigurationError(
+            f"{selected} could not estimate dN/dS for this alignment: {exc}"
+        ) from exc
     ids = list(rows)
 
     def full(lower: Sequence[Sequence[float]]) -> list[list[float | None]]:
@@ -1060,13 +1086,18 @@ def codon_dn_ds_trees(
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             alignment = codonalign.CodonAlignment(
-                [record.SeqRecord(codonseq.CodonSeq(text), id=taxon) for taxon, text in rows.items()]
+                [
+                    record.SeqRecord(codonseq.CodonSeq(text), id=taxon)
+                    for taxon, text in rows.items()
+                ]
             )
             dn_tree, ds_tree = alignment.get_dn_ds_tree(
                 dn_ds_method=method, tree_method=builder, codon_table=table
             )
     except (ZeroDivisionError, ValueError, OverflowError) as exc:
-        raise ConfigurationError(f"{method} could not estimate dN/dS for this alignment: {exc}") from exc
+        raise ConfigurationError(
+            f"{method} could not estimate dN/dS for this alignment: {exc}"
+        ) from exc
     return {
         "status": "completed",
         "operation": "codon_dn_ds_trees",
@@ -1075,7 +1106,9 @@ def codon_dn_ds_trees(
         "genetic_code": code,
         "dn_tree_newick": _newick(dn_tree),
         "ds_tree_newick": _newick(ds_tree),
-        "provenance": _provenance(parser="Bio.codonalign.codonalignment.CodonAlignment.get_dn_ds_tree"),
+        "provenance": _provenance(
+            parser="Bio.codonalign.codonalignment.CodonAlignment.get_dn_ds_tree"
+        ),
     }
 
 
@@ -1147,7 +1180,9 @@ def run_paml(
         if tree_text.lstrip().startswith("(") and header and header[0].isdigit():
             # PAML ends with an "end of tree file" error on a bare Newick tree: give it the "<taxa> <trees>" header
             tree_text = f"{header[0]} 1\n{tree_text.lstrip()}"
-        (directory / tree_name).write_text(tree_text if tree_text.endswith("\n") else tree_text + "\n", encoding="utf-8")
+        (directory / tree_name).write_text(
+            tree_text if tree_text.endswith("\n") else tree_text + "\n", encoding="utf-8"
+        )
     lines = [f"seqfile = {seq_name}", f"outfile = {out_name}"]
     if tree_source is not None:
         lines.append(f"treefile = {tree_name}")
@@ -1182,7 +1217,9 @@ def run_paml(
         found = re.search(r"paml version ([0-9][0-9A-Za-z.\-]*)", head)
         outcome["version"] = found.group(1) if found else outcome.get("version")
         try:
-            outcome["results"] = read_paml_results(chosen, directory / out_name, verbose=False)["results"]
+            outcome["results"] = read_paml_results(chosen, directory / out_name, verbose=False)[
+                "results"
+            ]
         except ConfigurationError as exc:
             outcome["results"] = None
             outcome["parse_error"] = str(exc)
@@ -1210,7 +1247,9 @@ def read_paml_results(
             warnings.simplefilter("ignore")
             parsed = module.read(str(path))
     except (ValueError, KeyError, IndexError, TypeError) as exc:
-        raise ConfigurationError(f"{path.name} is not a valid {chosen} results file: {exc}") from exc
+        raise ConfigurationError(
+            f"{path.name} is not a valid {chosen} results file: {exc}"
+        ) from exc
     return {
         "status": "completed",
         "operation": "read_paml_results",

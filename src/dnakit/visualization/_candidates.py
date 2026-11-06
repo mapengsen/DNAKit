@@ -15,12 +15,19 @@ from collections.abc import Mapping
 from math import ceil
 from pathlib import Path
 
-from dnakit._candidate_runtime import candidate_not_implemented, candidate_ok, run_candidate_operation
+from dnakit._candidate_runtime import (
+    candidate_not_implemented,
+    candidate_ok,
+    run_candidate_operation,
+)
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError, InputFormatError
 from dnakit.visualization import _impl_plot as _plots
 
 _MODULE = "visualization"
-_UNSAFE_SVG = re.compile(r"<\s*script|<\s*foreignObject|\son[a-z]+\s*=|javascript\s*:", re.IGNORECASE)
+_UNSAFE_SVG = re.compile(
+    r"<\s*script|<\s*foreignObject|\son[a-z]+\s*=|javascript\s*:", re.IGNORECASE
+)
 
 
 def _opts(options: Mapping[str, object] | None) -> dict[str, object]:
@@ -30,10 +37,16 @@ def _opts(options: Mapping[str, object] | None) -> dict[str, object]:
 
 
 def _refuse_overwrite(error: FileExistsError) -> ConfigurationError:
-    return ConfigurationError(str(error), code="OUTPUT_EXISTS", hint="Pass options={'overwrite': True} to replace the file.")
+    return ConfigurationError(
+        str(error),
+        code="OUTPUT_EXISTS",
+        hint="Pass options={'overwrite': True} to replace the file.",
+    )
 
 
-def _artifact_result(artifact: object, data: Mapping[str, object], settings: Mapping[str, object]) -> dict[str, object]:
+def _artifact_result(
+    artifact: object, data: Mapping[str, object], settings: Mapping[str, object]
+) -> dict[str, object]:
     """Common ``plot`` result; writes the SVG only when ``options["output"]`` is given."""
 
     from dnakit.visualization.config import SaveConfig
@@ -51,12 +64,19 @@ def _artifact_result(artifact: object, data: Mapping[str, object], settings: Map
             raise _refuse_overwrite(exc) from exc
         saved = str(path)
     return {
-        "kind": data["kind"], "svg": artifact.svg, "width": artifact.width, "height": artifact.height,  # type: ignore[attr-defined]
-        "sha256": artifact.sha256, "data": {k: v for k, v in data.items() if k != "kind"}, "path": saved,  # type: ignore[attr-defined]
+        "kind": data["kind"],
+        "svg": artifact.svg,
+        "width": artifact.width,
+        "height": artifact.height,  # type: ignore[attr-defined]
+        "sha256": artifact.sha256,
+        "data": {k: v for k, v in data.items() if k != "kind"},
+        "path": saved,  # type: ignore[attr-defined]
     }
 
 
-def export_figure(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def export_figure(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Write an SVG figure to a file, or convert it to PNG/JPG/TIFF/PDF (optional ``cairosvg`` and ``Pillow``).
 
     ``input``: SVG text, a ``plot`` result (mapping with ``svg``), a ``plot`` envelope, or an ``SVGArtifact``.  The SVG must be
@@ -73,7 +93,9 @@ def export_figure(input: object, *, options: Mapping[str, object] | None = None,
     settings = _opts(options)
     target = settings.get("output")
     if not isinstance(target, (str, os.PathLike)) or not str(target).strip():
-        raise ConfigurationError("options.output (the target path) is required.", code="OUTPUT_REQUIRED")
+        raise ConfigurationError(
+            "options.output (the target path) is required.", code="OUTPUT_REQUIRED"
+        )
     overwrite = settings.get("overwrite", False)
     if not isinstance(overwrite, bool):
         raise ConfigurationError("options.overwrite must be a boolean.", code="INVALID_OPTION")
@@ -86,34 +108,62 @@ def export_figure(input: object, *, options: Mapping[str, object] | None = None,
         artifact = source
     elif isinstance(source, str) and source.lstrip().startswith("<"):
         if _UNSAFE_SVG.search(source):
-            raise ConfigurationError("The SVG contains scripts, event handlers or foreignObject.", code="UNSAFE_SVG")
+            raise ConfigurationError(
+                "The SVG contains scripts, event handlers or foreignObject.", code="UNSAFE_SVG"
+            )
         try:
             root = ET.fromstring(source)
         except ET.ParseError as exc:
-            raise InputFormatError(f"The input is not well-formed SVG/XML: {exc}", code="INVALID_SVG") from exc
+            raise InputFormatError(
+                f"The input is not well-formed SVG/XML: {exc}", code="INVALID_SVG"
+            ) from exc
         if root.tag.rsplit("}", 1)[-1] != "svg":
             raise InputFormatError("The root element must be <svg>.", code="INVALID_SVG")
         width, height = _svg_size(root)
-        artifact = SVGArtifact("exported-figure", source, width, height, sum(1 for _ in root.iter()))
+        artifact = SVGArtifact(
+            "exported-figure", source, width, height, sum(1 for _ in root.iter())
+        )
     else:
-        raise InputFormatError("input must be SVG text, a plot result or an SVGArtifact.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be SVG text, a plot result or an SVGArtifact.", code="INVALID_INPUT"
+        )
     path = Path(target)
     suffix = path.suffix.lower().lstrip(".")
     try:
         if suffix == "svg":
             save_svg(artifact, path, config=SaveConfig(overwrite=overwrite), verbose=False)
         elif suffix in {"png", "jpg", "jpeg", "tif", "tiff", "pdf"}:
-            save_image(artifact, path, config=ImageExportConfig(overwrite=overwrite, dpi=int(settings.get("dpi", 96))), verbose=False)
+            save_image(
+                artifact,
+                path,
+                config=ImageExportConfig(overwrite=overwrite, dpi=int(settings.get("dpi", 96))),
+                verbose=False,
+            )
         else:
-            raise ConfigurationError("The output suffix must be .svg, .png, .jpg, .tiff or .pdf.", code="INVALID_VISUALIZATION_FORMAT")
+            raise ConfigurationError(
+                "The output suffix must be .svg, .png, .jpg, .tiff or .pdf.",
+                code="INVALID_VISUALIZATION_FORMAT",
+            )
     except FileExistsError as exc:
         raise _refuse_overwrite(exc) from exc
     except BackendUnavailableError as exc:
-        return candidate_not_implemented(_MODULE, "export_figure", input, options=options, requires="pip install cairosvg pillow", message=str(exc))
+        return candidate_not_implemented(
+            _MODULE,
+            "export_figure",
+            input,
+            options=options,
+            requires="pip install cairosvg pillow",
+            message=str(exc),
+        )
     import hashlib
 
     data = path.read_bytes()
-    result = {"path": str(path), "format": "tiff" if suffix == "tif" else "jpg" if suffix == "jpeg" else suffix, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+    result = {
+        "path": str(path),
+        "format": "tiff" if suffix == "tif" else "jpg" if suffix == "jpeg" else suffix,
+        "bytes": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+    }
     return candidate_ok(_MODULE, "export_figure", input, result, options=options)
 
 
@@ -128,11 +178,15 @@ def _svg_size(root: ET.Element) -> tuple[int, int]:
         if len(parts) == 4:
             width, height = width or float(parts[2]), height or float(parts[3])
     if not width or not height or width <= 0 or height <= 0:
-        raise InputFormatError("The SVG needs numeric width/height attributes or a viewBox.", code="INVALID_SVG")
+        raise InputFormatError(
+            "The SVG needs numeric width/height attributes or a viewBox.", code="INVALID_SVG"
+        )
     return ceil(width), ceil(height)
 
 
-def generate_analysis_summary(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def generate_analysis_summary(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Summarize a set of DNA sequences (counts, length statistics, GC content, base counts) as data and Markdown text.
 
     ``input``: FASTA text/path, a sequence, a list of sequences, ``(id, sequence)`` pairs or mappings, or ``{id: sequence}``.
@@ -144,7 +198,10 @@ def generate_analysis_summary(input: object, *, options: Mapping[str, object] | 
     settings = _opts(options)
     records = _plots.read_sequences(input)
     result = _plots.summarize(records)
-    result["per_sequence"] = [{"id": name, "length": len(seq), "gc_percent": _plots.gc_percent(seq)} for name, seq in records[:1000]]
+    result["per_sequence"] = [
+        {"id": name, "length": len(seq), "gc_percent": _plots.gc_percent(seq)}
+        for name, seq in records[:1000]
+    ]
     result["text"] = _markdown(str(settings.get("title", "Sequence analysis summary")), result)
     return candidate_ok(_MODULE, "generate_analysis_summary", input, result, options=options)
 
@@ -152,15 +209,28 @@ def generate_analysis_summary(input: object, *, options: Mapping[str, object] | 
 def _markdown(title: str, summary: Mapping[str, object]) -> str:
     length = summary["length"]
     gc = summary["gc_percent"]
-    return "\n".join([
-        f"# {title}", "", f"- sequences: {summary['sequence_count']}", f"- total bases: {summary['total_bases']}",
-        f"- length min / median / mean / max: {length['min']} / {length['median']:g} / {length['mean']:g} / {length['max']}",  # type: ignore[index]
-        f"- N50: {length['n50']}", f"- GC content: {'n/a' if gc is None else format(gc, '.2f') + ' %'}",  # type: ignore[index]
-        f"- non-ACGT bases: {summary['non_acgt_bases']}", "",
-    ])
+    return "\n".join(
+        [
+            f"# {title}",
+            "",
+            f"- sequences: {summary['sequence_count']}",
+            f"- total bases: {summary['total_bases']}",
+            f"- length min / median / mean / max: {length['min']} / {length['median']:g} / {length['mean']:g} / {length['max']}",  # type: ignore[index]
+            f"- N50: {length['n50']}",
+            f"- GC content: {'n/a' if gc is None else format(gc, '.2f') + ' %'}",  # type: ignore[index]
+            f"- non-ACGT bases: {summary['non_acgt_bases']}",
+            "",
+        ]
+    )
 
 
-def _html_report(input: object, options: Mapping[str, object] | None, operation: str, title: str, extra: Mapping[str, object]) -> object:
+def _html_report(
+    input: object,
+    options: Mapping[str, object] | None,
+    operation: str,
+    title: str,
+    extra: Mapping[str, object],
+) -> object:
     from dnakit.core import DNA
     from dnakit.visualization.config import SaveConfig
     from dnakit.visualization.export import save_html_report
@@ -173,10 +243,16 @@ def _html_report(input: object, options: Mapping[str, object] | None, operation:
     try:
         dna_records = [DNA(sequence, id=name).record for name, sequence in records]
     except Exception as exc:  # DNAKit sequence errors: report them as an input problem
-        raise InputFormatError(f"A sequence cannot be represented as DNA: {exc}", code="INVALID_SEQUENCE") from exc
+        raise InputFormatError(
+            f"A sequence cannot be represented as DNA: {exc}", code="INVALID_SEQUENCE"
+        ) from exc
     artifact = build_html_report(
-        dna_records, results=results, title=str(settings.get("title", title)), max_records=int(settings.get("max_records", 1000)),
-        max_total_sequence_symbols=int(settings.get("max_total_sequence_symbols", 10_000_000)), verbose=False,
+        dna_records,
+        results=results,
+        title=str(settings.get("title", title)),
+        max_records=int(settings.get("max_records", 1000)),
+        max_total_sequence_symbols=int(settings.get("max_total_sequence_symbols", 10_000_000)),
+        verbose=False,
     )
     path = settings.get("output")
     if path is not None:
@@ -184,11 +260,18 @@ def _html_report(input: object, options: Mapping[str, object] | None, operation:
         if not isinstance(overwrite, bool):
             raise ConfigurationError("options.overwrite must be a boolean.", code="INVALID_OPTION")
         try:
-            save_html_report(artifact, str(path), config=SaveConfig(overwrite=overwrite), verbose=False)
+            save_html_report(
+                artifact, str(path), config=SaveConfig(overwrite=overwrite), verbose=False
+            )
         except FileExistsError as exc:
             raise _refuse_overwrite(exc) from exc
-    result = {"record_count": artifact.record_count, "result_names": list(artifact.result_names), "sha256": artifact.sha256,
-              "path": None if path is None else str(path), "summary": results["summary"]}
+    result = {
+        "record_count": artifact.record_count,
+        "result_names": list(artifact.result_names),
+        "sha256": artifact.sha256,
+        "path": None if path is None else str(path),
+        "summary": results["summary"],
+    }
     for key, value in extra.items():
         result[key] = value
     if settings.get("include_html", True) is not False:
@@ -196,17 +279,24 @@ def _html_report(input: object, options: Mapping[str, object] | None, operation:
     return candidate_ok(_MODULE, operation, input, result, options=options)
 
 
-def generate_clinical_pdf_report(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def generate_clinical_pdf_report(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Not implemented: a clinical report needs validated clinical interpretation data and a PDF report template."""
 
     return candidate_not_implemented(
-        _MODULE, "generate_clinical_pdf_report", input, options=options,
+        _MODULE,
+        "generate_clinical_pdf_report",
+        input,
+        options=options,
         requires="validated clinical variant interpretation (ClinVar/ACMG rules) and a certified report template",
         message="Clinical reports must contain validated interpretations, which DNAKit cannot produce here.",
     )
 
 
-def generate_html_genome_report(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def generate_html_genome_report(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Build a self-contained HTML report of genome/assembly sequences with assembly statistics (and optional annotation summary).
 
     ``input``: FASTA text/path or sequences as for ``generate_analysis_summary`` (contigs/chromosomes).  The report lists the
@@ -222,10 +312,14 @@ def generate_html_genome_report(input: object, *, options: Mapping[str, object] 
         from dnakit.annotation import summarize as summarize_annotation
 
         extra["annotation"] = summarize_annotation(settings["annotation"], verbose=False)["result"]  # type: ignore[index]
-    return _html_report(input, options, "generate_html_genome_report", "DNAKit genome report", extra)
+    return _html_report(
+        input, options, "generate_html_genome_report", "DNAKit genome report", extra
+    )
 
 
-def generate_qc_html_report(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def generate_qc_html_report(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Build a self-contained HTML quality-control report of DNA sequences with per-sequence pass/fail flags.
 
     ``input``: FASTA text/path or sequences as for ``generate_analysis_summary``.  A sequence fails when it is shorter than
@@ -249,15 +343,30 @@ def generate_qc_html_report(input: object, *, options: Mapping[str, object] | No
             reasons.append(f"N fraction {n_fraction:.3f} > {max_n}")
         gc = _plots.gc_percent(sequence)
         if (gc is None and (low > 0 or high < 100)) or (gc is not None and not low <= gc <= high):
-            reasons.append(f"GC percent {'n/a' if gc is None else format(gc, '.2f')} outside [{low}, {high}]")
+            reasons.append(
+                f"GC percent {'n/a' if gc is None else format(gc, '.2f')} outside [{low}, {high}]"
+            )
         if reasons:
             failed.append({"id": name, "reasons": reasons})
-    qc = {"passed": len(records) - len(failed), "failed_count": len(failed), "failed": failed,
-          "thresholds": {"min_length": minimum, "max_n_fraction": max_n, "min_gc_percent": low, "max_gc_percent": high}}
-    return _html_report(input, options, "generate_qc_html_report", "DNAKit sequence QC report", {"qc": qc})
+    qc = {
+        "passed": len(records) - len(failed),
+        "failed_count": len(failed),
+        "failed": failed,
+        "thresholds": {
+            "min_length": minimum,
+            "max_n_fraction": max_n,
+            "min_gc_percent": low,
+            "max_gc_percent": high,
+        },
+    }
+    return _html_report(
+        input, options, "generate_qc_html_report", "DNAKit sequence QC report", {"qc": qc}
+    )
 
 
-def plot(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def plot(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Draw a sequence-based figure as a standalone SVG (valid XML, no scripts) and return it with the plotted numbers.
 
     Option ``kind`` selects the figure; ``input`` is FASTA text/path, a sequence, a list of sequences or ``{id: sequence}``:
@@ -277,9 +386,18 @@ def plot(input: object, *, options: Mapping[str, object] | None = None, verbose:
 
     settings = _opts(options)
     kind = str(settings.get("kind", "length_histogram"))
-    if kind not in {"length_histogram", "gc_distribution", "base_composition", "sequence", "linear_map", "circular_map", "label_comparison"}:
+    if kind not in {
+        "length_histogram",
+        "gc_distribution",
+        "base_composition",
+        "sequence",
+        "linear_map",
+        "circular_map",
+        "label_comparison",
+    }:
         raise ConfigurationError(
-            f"Unknown plot kind {kind!r}.", code="INVALID_OPTION",
+            f"Unknown plot kind {kind!r}.",
+            code="INVALID_OPTION",
             hint="Use length_histogram, gc_distribution, base_composition, sequence, linear_map, circular_map or label_comparison.",
         )
     title = settings.get("title")
@@ -289,37 +407,97 @@ def plot(input: object, *, options: Mapping[str, object] | None = None, verbose:
 
     if kind == "label_comparison":
         if not isinstance(input, Mapping) or "true" not in input or "predicted" not in input:
-            raise InputFormatError("label_comparison needs {'true': [...], 'predicted': [...]}.", code="INVALID_INPUT")
-        artifact = plot_label_comparison(list(input["true"]), list(input["predicted"]), config=config(y_label="Sample proportion (%)"), verbose=False)  # type: ignore[call-overload]
+            raise InputFormatError(
+                "label_comparison needs {'true': [...], 'predicted': [...]}.", code="INVALID_INPUT"
+            )
+        artifact = plot_label_comparison(
+            list(input["true"]),
+            list(input["predicted"]),
+            config=config(y_label="Sample proportion (%)"),
+            verbose=False,
+        )  # type: ignore[call-overload]
         labels = list(dict.fromkeys([*map(str, input["true"]), *map(str, input["predicted"])]))  # type: ignore[call-overload]
-        data = {"kind": kind, "labels": labels, "true_counts": {k: [str(v) for v in input["true"]].count(k) for k in labels},  # type: ignore[call-overload]
-                "predicted_counts": {k: [str(v) for v in input["predicted"]].count(k) for k in labels}}  # type: ignore[call-overload]
-        return candidate_ok(_MODULE, "plot", input, _artifact_result(artifact, data, settings), options=options)
+        data = {
+            "kind": kind,
+            "labels": labels,
+            "true_counts": {k: [str(v) for v in input["true"]].count(k) for k in labels},  # type: ignore[call-overload]
+            "predicted_counts": {k: [str(v) for v in input["predicted"]].count(k) for k in labels},
+        }  # type: ignore[call-overload]
+        return candidate_ok(
+            _MODULE, "plot", input, _artifact_result(artifact, data, settings), options=options
+        )
     records = _plots.read_sequences(input)
     if kind == "length_histogram":
         lengths = [len(sequence) for _, sequence in records]
-        artifact = plot_distribution(lengths, task="regression", config=config(bins=int(settings.get("bins", 30)), x_label="Sequence length (nt)", y_label="Sequence proportion (%)"), verbose=False)  # type: ignore[call-overload]
+        artifact = plot_distribution(
+            lengths,
+            task="regression",
+            config=config(
+                bins=int(settings.get("bins", 30)),
+                x_label="Sequence length (nt)",
+                y_label="Sequence proportion (%)",
+            ),
+            verbose=False,
+        )  # type: ignore[call-overload]
         meta = artifact.metadata
-        data = {"kind": kind, "count": len(lengths), "min": min(lengths), "max": max(lengths), "mean": sum(lengths) / len(lengths),
-                "bin_edges": list(meta["bin_edges"]), "counts": list(meta["counts"])}
+        data = {
+            "kind": kind,
+            "count": len(lengths),
+            "min": min(lengths),
+            "max": max(lengths),
+            "mean": sum(lengths) / len(lengths),
+            "bin_edges": list(meta["bin_edges"]),
+            "counts": list(meta["counts"]),
+        }
     elif kind == "gc_distribution":
         values = [(name, _plots.gc_percent(sequence)) for name, sequence in records]
         gc = [value for _, value in values if value is not None]
         if not gc:
-            raise InputFormatError("No sequence contains an unambiguous A/C/G/T base.", code="INVALID_SEQUENCE")
+            raise InputFormatError(
+                "No sequence contains an unambiguous A/C/G/T base.", code="INVALID_SEQUENCE"
+            )
         bins = int(settings.get("bins", 20))
         if not 1 <= bins <= 1000:
             raise ConfigurationError("bins must be between 1 and 1000.", code="INVALID_OPTION")
         edges = [100.0 * i / bins for i in range(bins + 1)]
-        artifact = plot_distribution(gc, task="regression", config=config(bin_edges=edges, x_label="GC content (%)", y_label="Sequence proportion (%)"), verbose=False)
-        data = {"kind": kind, "count": len(gc), "skipped": len(values) - len(gc), "gc_percent": gc, "bin_edges": edges, "counts": list(artifact.metadata["counts"])}
+        artifact = plot_distribution(
+            gc,
+            task="regression",
+            config=config(
+                bin_edges=edges, x_label="GC content (%)", y_label="Sequence proportion (%)"
+            ),
+            verbose=False,
+        )
+        data = {
+            "kind": kind,
+            "count": len(gc),
+            "skipped": len(values) - len(gc),
+            "gc_percent": gc,
+            "bin_edges": edges,
+            "counts": list(artifact.metadata["counts"]),
+        }
     elif kind == "base_composition":
         bases = [symbol for _, sequence in records for symbol in sequence]
         observed = sorted(set(bases) - set("ACGT"))
         categories = [*"ACGT", *observed]
-        artifact = plot_distribution(bases, task="classification", config=config(categories=categories, x_label="Base", y_label="Base proportion (%)"), verbose=False)
-        counts = {label: count for label, count in zip(artifact.metadata["labels"], artifact.metadata["counts"])}
-        data = {"kind": kind, "total_bases": len(bases), "counts": counts, "proportions": {k: v / len(bases) for k, v in counts.items()}}
+        artifact = plot_distribution(
+            bases,
+            task="classification",
+            config=config(categories=categories, x_label="Base", y_label="Base proportion (%)"),
+            verbose=False,
+        )
+        counts = {
+            label: count
+            for label, count in zip(
+                artifact.metadata["labels"], artifact.metadata["counts"], strict=False
+            )
+        }
+        data = {
+            "kind": kind,
+            "total_bases": len(bases),
+            "counts": counts,
+            "proportions": {k: v / len(bases) for k, v in counts.items()},
+        }
     else:
         from dnakit.core import DNA
         from dnakit.visualization import plot_circular_map, plot_linear_map, plot_sequence
@@ -331,22 +509,45 @@ def plot(input: object, *, options: Mapping[str, object] | None = None, verbose:
         name, sequence = pick
         features = settings.get("features")
         topology = "circular" if kind == "circular_map" else str(settings.get("topology", "linear"))
-        dna = DNA(sequence, id=name, features=features if kind != "sequence" else None, topology=topology)  # type: ignore[arg-type]
+        dna = DNA(
+            sequence, id=name, features=features if kind != "sequence" else None, topology=topology
+        )  # type: ignore[arg-type]
         if kind == "sequence":
             artifact = plot_sequence(dna, verbose=False)
             data = {"kind": kind, "id": name, "length": len(sequence)}
         else:
-            artifact = (plot_linear_map if kind == "linear_map" else plot_circular_map)(dna, title="Linear DNA map" if title is None and kind == "linear_map" else ("Circular DNA map" if title is None else str(title)), verbose=False)
-            data = {"kind": kind, "id": name, "length": len(sequence), "feature_count": len(features or [])}  # type: ignore[arg-type]
-    return candidate_ok(_MODULE, "plot", input, _artifact_result(artifact, data, settings), options=options)
+            artifact = (plot_linear_map if kind == "linear_map" else plot_circular_map)(
+                dna,
+                title="Linear DNA map"
+                if title is None and kind == "linear_map"
+                else ("Circular DNA map" if title is None else str(title)),
+                verbose=False,
+            )
+            data = {
+                "kind": kind,
+                "id": name,
+                "length": len(sequence),
+                "feature_count": len(features or []),
+            }  # type: ignore[arg-type]
+    return candidate_ok(
+        _MODULE, "plot", input, _artifact_result(artifact, data, settings), options=options
+    )
 
 
-def save_figure(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+def save_figure(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     # Not part of ``__all__``: the public ``dnakit.visualization.save_figure`` is the Matplotlib saver in ``figure.py``.
-    return run_candidate_operation('visualization', 'save_figure', input, options=options)
+    return run_candidate_operation("visualization", "save_figure", input, options=options)
 
 
-__all__ = ['export_figure', 'generate_analysis_summary', 'generate_clinical_pdf_report', 'generate_html_genome_report', 'generate_qc_html_report', 'plot']
+__all__ = [
+    "export_figure",
+    "generate_analysis_summary",
+    "generate_clinical_pdf_report",
+    "generate_html_genome_report",
+    "generate_qc_html_report",
+    "plot",
+]
 
-from dnakit._verbosity import register_public as _register_public_verbose
 _register_public_verbose(globals())

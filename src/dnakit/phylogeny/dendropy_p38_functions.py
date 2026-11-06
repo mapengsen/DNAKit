@@ -58,7 +58,9 @@ def _read_matrix(dendropy: Any, path: Path, fmt: str, data_type: str, namespace:
     kwargs = {} if namespace is None else {"taxon_namespace": namespace}
     try:
         if schema in ("nexus", "nexml"):
-            dataset = dendropy.DataSet.get(data=_file_text(path, "alignment"), schema=schema, **kwargs)
+            dataset = dendropy.DataSet.get(
+                data=_file_text(path, "alignment"), schema=schema, **kwargs
+            )
             if not dataset.char_matrices:
                 raise ConfigurationError("The file holds no character matrix.")
             return dataset.char_matrices[0]
@@ -79,7 +81,9 @@ def _matrix_from_mapping(dendropy: Any, sequences: Mapping[str, str], name: str)
     for key, value in sequences.items():
         text = str(value).upper()
         if set(text) - _DNA:
-            raise ConfigurationError(f"{name} sequence {key!r} has symbols outside the IUPAC DNA alphabet.")
+            raise ConfigurationError(
+                f"{name} sequence {key!r} has symbols outside the IUPAC DNA alphabet."
+            )
         cleaned[h.text(key, "sequence ID")] = text
     return dendropy.DnaCharacterMatrix.from_dict(cleaned)
 
@@ -120,18 +124,28 @@ def read_multi_phylip_alignments(
     dendropy = _dendropy()
     try:
         dataset = dendropy.DataSet.get(
-            data=_file_text(source, "path"), schema="multiphylip", data_type=kind,
-            strict=h.flag(strict, "strict"), interleaved=h.flag(interleaved, "interleaved"),
+            data=_file_text(source, "path"),
+            schema="multiphylip",
+            data_type=kind,
+            strict=h.flag(strict, "strict"),
+            interleaved=h.flag(interleaved, "interleaved"),
         )
     except Exception as exc:  # dendropy raises DataParseError and TypeError
-        raise ConfigurationError(f"dendropy could not read the multi-block PHYLIP file: {exc}") from exc
+        raise ConfigurationError(
+            f"dendropy could not read the multi-block PHYLIP file: {exc}"
+        ) from exc
     blocks = []
     for index, matrix in enumerate(dataset.char_matrices[:cap]):
         rows = _matrix_rows(matrix)
-        blocks.append({
-            "index": index, "taxa": list(rows), "taxon_count": len(rows),
-            "length": int(matrix.max_sequence_size), "sequences": rows,
-        })
+        blocks.append(
+            {
+                "index": index,
+                "taxa": list(rows),
+                "taxon_count": len(rows),
+                "length": int(matrix.max_sequence_size),
+                "sequences": rows,
+            }
+        )
     return {
         "status": "completed",
         "operation": "read_multi_phylip_alignments",
@@ -223,7 +237,9 @@ def sample_stationary_nucleotide_sequence(
         "length": n,
         "base_frequencies": freqs,
         "sequence": text,
-        "provenance": h.provenance("dendropy", "NucleotideCharacterEvolutionModel.stationary_sample"),
+        "provenance": h.provenance(
+            "dendropy", "NucleotideCharacterEvolutionModel.stationary_sample"
+        ),
     }
 
 
@@ -258,7 +274,9 @@ def simulate_fragmented_population_sequences(
     params = {
         "div_time_gens": h.integer(div_time_gens, "div_time_gens", 1, 10**9),
         "num_desc_pops": h.integer(num_desc_pops, "num_desc_pops", 2, 20),
-        "mutrate_per_site_per_generation": h.number(mutrate_per_site_per_generation, "mutrate_per_site_per_generation", 1e-12, 1.0),
+        "mutrate_per_site_per_generation": h.number(
+            mutrate_per_site_per_generation, "mutrate_per_site_per_generation", 1e-12, 1.0
+        ),
         "desc_pop_size": h.integer(desc_pop_size, "desc_pop_size", 1, 10**9),
     }
     per_pop = h.integer(samples_per_pop, "samples_per_pop", 1, 200)
@@ -267,7 +285,9 @@ def simulate_fragmented_population_sequences(
     try:
         simulator = popgensim.FragmentedPopulations(rng=rng, **params)
         dataset = simulator.generate_sequences(name, samples_per_pop=per_pop, seq_len=sites)
-    except Exception as exc:  # dendropy raises ValueError, KeyError, AttributeError for bad parameters
+    except (
+        Exception
+    ) as exc:  # dendropy raises ValueError, KeyError, AttributeError for bad parameters
         raise ConfigurationError(f"dendropy could not simulate sequences: {exc}") from exc
     matrix = dataset.char_matrices[0]
     rows = _matrix_rows(matrix)
@@ -282,7 +302,9 @@ def simulate_fragmented_population_sequences(
         "length": sites,
         "sequences": rows,
         "output_path": None if target is None else str(target),
-        "provenance": h.provenance("dendropy", "dendropy.simulate.popgensim.FragmentedPopulations.generate_sequences"),
+        "provenance": h.provenance(
+            "dendropy", "dendropy.simulate.popgensim.FragmentedPopulations.generate_sequences"
+        ),
     }
 
 
@@ -311,7 +333,9 @@ def calculate_folded_site_frequency_spectrum(
         "alignment_length": int(matrix.max_sequence_size),
         "spectrum": spectrum,
         "padded": pad,
-        "provenance": h.provenance("dendropy", "DiscreteCharacterMatrix.folded_site_frequency_spectrum"),
+        "provenance": h.provenance(
+            "dendropy", "DiscreteCharacterMatrix.folded_site_frequency_spectrum"
+        ),
     }
 
 
@@ -343,7 +367,9 @@ def calculate_population_pair_statistics(
     if len(one) < 2 or len(two) < 2:
         raise ConfigurationError("Each population needs at least two sequences.")
     try:
-        stats = popgen.PopulationPairSummaryStatistics(one, two, ignore_uncertain=h.flag(ignore_uncertain, "ignore_uncertain"))
+        stats = popgen.PopulationPairSummaryStatistics(
+            one, two, ignore_uncertain=h.flag(ignore_uncertain, "ignore_uncertain")
+        )
     except (ZeroDivisionError, ValueError) as exc:
         raise ConfigurationError(f"Statistics are undefined for these sequences: {exc}") from exc
     del rows
@@ -351,15 +377,25 @@ def calculate_population_pair_statistics(
         "status": "completed",
         "operation": "calculate_population_pair_statistics",
         "population_sizes": [len(one), len(two)],
-        "average_number_of_pairwise_differences": h.plain(float(stats.average_number_of_pairwise_differences)),
-        "average_number_of_pairwise_differences_between": h.plain(float(stats.average_number_of_pairwise_differences_between)),
-        "average_number_of_pairwise_differences_within": h.plain(float(stats.average_number_of_pairwise_differences_within)),
-        "average_number_of_pairwise_differences_net": h.plain(float(stats.average_number_of_pairwise_differences_net)),
+        "average_number_of_pairwise_differences": h.plain(
+            float(stats.average_number_of_pairwise_differences)
+        ),
+        "average_number_of_pairwise_differences_between": h.plain(
+            float(stats.average_number_of_pairwise_differences_between)
+        ),
+        "average_number_of_pairwise_differences_within": h.plain(
+            float(stats.average_number_of_pairwise_differences_within)
+        ),
+        "average_number_of_pairwise_differences_net": h.plain(
+            float(stats.average_number_of_pairwise_differences_net)
+        ),
         "num_segregating_sites": int(stats.num_segregating_sites),
         "wattersons_theta": h.plain(float(stats.wattersons_theta)),
         "wakeleys_psi": h.plain(float(stats.wakeleys_psi)),
         "tajimas_d": h.plain(float(stats.tajimas_d)),
-        "provenance": h.provenance("dendropy", "dendropy.calculate.popgenstat.PopulationPairSummaryStatistics"),
+        "provenance": h.provenance(
+            "dendropy", "dendropy.calculate.popgenstat.PopulationPairSummaryStatistics"
+        ),
     }
 
 
@@ -404,35 +440,41 @@ def parse_genbank_xml_records(
         features = []
         if features_wanted:
             for feature in record.feature_table:
-                features.append({
-                    "key": feature.key,
-                    "location": feature.location,
-                    "qualifiers": {str(q.name): q.value for q in feature.qualifiers},
-                })
-        out.append({
-            "gi": record.gi,
-            "primary_accession": record.primary_accession,
-            "accession_version": record.accession_version,
-            "organism": record.organism,
-            "definition": record.definition,
-            "taxonomy": record.taxonomy,
-            "moltype": record.moltype,
-            "topology": record.topology,
-            "length": record.length,
-            "create_date": record.create_date,
-            "update_date": record.update_date,
-            "other_seq_ids": dict(record.other_seq_ids),
-            "sequence": (record.sequence_text or "").upper(),
-            "fasta": record.as_fasta(generate_new_label=(mode == "accession_organism")),
-            "features": features,
-        })
+                features.append(
+                    {
+                        "key": feature.key,
+                        "location": feature.location,
+                        "qualifiers": {str(q.name): q.value for q in feature.qualifiers},
+                    }
+                )
+        out.append(
+            {
+                "gi": record.gi,
+                "primary_accession": record.primary_accession,
+                "accession_version": record.accession_version,
+                "organism": record.organism,
+                "definition": record.definition,
+                "taxonomy": record.taxonomy,
+                "moltype": record.moltype,
+                "topology": record.topology,
+                "length": record.length,
+                "create_date": record.create_date,
+                "update_date": record.update_date,
+                "other_seq_ids": dict(record.other_seq_ids),
+                "sequence": (record.sequence_text or "").upper(),
+                "fasta": record.as_fasta(generate_new_label=(mode == "accession_organism")),
+                "features": features,
+            }
+        )
     return {
         "status": "completed",
         "operation": "parse_genbank_xml_records",
         "record_count": len(store),
         "returned": len(out),
         "records": out,
-        "provenance": h.provenance("dendropy", "dendropy.interop.genbank GenBankAccessionRecord (offline)"),
+        "provenance": h.provenance(
+            "dendropy", "dendropy.interop.genbank GenBankAccessionRecord (offline)"
+        ),
     }
 
 
@@ -467,7 +509,8 @@ def genbank_xml_to_alignment(
         raise ConfigurationError("The XML file holds no GenBank records.")
     try:
         matrix = store.generate_char_matrix(
-            label_components=components, label_component_separator=separator,
+            label_components=components,
+            label_component_separator=separator,
         )
     except (ValueError, AttributeError) as exc:
         raise ConfigurationError(f"dendropy could not build the matrix: {exc}") from exc
@@ -515,7 +558,7 @@ def concatenate_alignments(
         raise ConfigurationError(f"dendropy could not concatenate the alignments: {exc}") from exc
     parts = []
     offset = 0
-    for path, matrix in zip(paths, matrices):
+    for path, matrix in zip(paths, matrices, strict=False):
         width = int(matrix.max_sequence_size)
         parts.append({"name": path.name, "start": offset, "end": offset + width})
         offset += width

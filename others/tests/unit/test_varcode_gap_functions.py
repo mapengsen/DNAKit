@@ -22,11 +22,12 @@ pytest.importorskip("varcode")
 pytest.importorskip("pyensembl")
 pysam = pytest.importorskip("pysam")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.molecular_lab import varcode_gap_functions as vg  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.molecular_lab import varcode_gap_functions as vg
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 GENOME = DATA / "genome.fa"
 # Standard genetic code, codons in TCAG order (independent of the module's own table).
@@ -491,7 +492,7 @@ def test_germline_applied_to_transcript_returns_a_mutant(layout: dict[str, Any])
 
 
 def test_structural_deletion_inside_the_transcript_is_classified(layout: dict[str, Any]) -> None:
-    start, end = layout["t1_span"]
+    start, _end = layout["t1_span"]
     deletion = {"contig": "chr1", "start": start + 30, "end": start + 60, "sv_type": "del"}
     record = _call(vg.varcode_predict_structural_variant_effect, layout, deletion, "T1")
     assert record["structural_variant"]["sv_type"] == "DEL"

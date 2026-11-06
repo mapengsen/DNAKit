@@ -1,7 +1,5 @@
 """Resumable HTTP(S) download using Range requests (standard library only)."""
 
-# ruff: noqa: E501
-
 from __future__ import annotations
 
 import hashlib

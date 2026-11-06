@@ -49,8 +49,7 @@ def _fake_picard(path: Path) -> Path:
 
 def _fake_seqtk(path: Path) -> Path:
     path.write_text(
-        f"#!{sys.executable}\n"
-        "print('@sample\\nACGT\\n+\\nIIII')\n",
+        f"#!{sys.executable}\nprint('@sample\\nACGT\\n+\\nIIII')\n",
         encoding="ascii",
     )
     path.chmod(0o755)

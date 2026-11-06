@@ -18,9 +18,13 @@ from dnakit.tools import default_tool_registry
 
 ROOT = Path(__file__).resolve().parents[3]
 BASE = ROOT / "paper/write_paper/figure/fig2/task_coverage"
-_spec = importlib.util.spec_from_file_location(
-    "public_integration_verifier", BASE / "integration/verify_public_integration.py"
-)
+VERIFIER = BASE / "integration/verify_public_integration.py"
+if not VERIFIER.is_file():
+    # paper/write_paper/ is a local, git-ignored folder, so a fresh checkout has no manifests.
+    pytest.skip(
+        "needs the local paper/write_paper task-coverage manifests", allow_module_level=True
+    )
+_spec = importlib.util.spec_from_file_location("public_integration_verifier", VERIFIER)
 verifier = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(verifier)
 

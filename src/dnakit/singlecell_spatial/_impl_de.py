@@ -16,17 +16,25 @@ def scale_columns(cm: CountMatrix, target_sum: float) -> CountMatrix:
 
     totals = cm.column_totals()
     factors = [target_sum / total if total > 0 else 0.0 for total in totals]
-    return CountMatrix(list(cm.genes), list(cm.cells), [[x * f for x, f in zip(row, factors)] for row in cm.values])
+    return CountMatrix(
+        list(cm.genes),
+        list(cm.cells),
+        [[x * f for x, f in zip(row, factors, strict=False)] for row in cm.values],
+    )
 
 
 def log1p_columns(cm: CountMatrix, target_sum: float) -> CountMatrix:
     """Library-size normalise to ``target_sum`` and apply the natural ``log1p``."""
 
     scaled = scale_columns(cm, target_sum)
-    return CountMatrix(scaled.genes, scaled.cells, [[math.log1p(x) for x in row] for row in scaled.values])
+    return CountMatrix(
+        scaled.genes, scaled.cells, [[math.log1p(x) for x in row] for row in scaled.values]
+    )
 
 
-def two_groups(cm: CountMatrix, labels: Sequence[str], options: Mapping[str, object]) -> tuple[str, str, list[int], list[int]]:
+def two_groups(
+    cm: CountMatrix, labels: Sequence[str], options: Mapping[str, object]
+) -> tuple[str, str, list[int], list[int]]:
     """Resolve ``group1`` / ``group2`` (default: the two distinct labels, sorted) into column indices."""
 
     present = sorted(set(labels))
@@ -36,19 +44,32 @@ def two_groups(cm: CountMatrix, labels: Sequence[str], options: Mapping[str, obj
         if len(present) != 2:
             raise ConfigurationError(
                 f"options['group1'] and options['group2'] are required when there are {len(present)} distinct labels.",
-                code="MISSING_OPTION", hint="Name the two labels to compare.",
+                code="MISSING_OPTION",
+                hint="Name the two labels to compare.",
             )
         group1, group2 = present
     elif group1 is None or group2 is None:
-        raise ConfigurationError("Give both options['group1'] and options['group2'].", code="MISSING_OPTION", hint="Name both groups.")
+        raise ConfigurationError(
+            "Give both options['group1'] and options['group2'].",
+            code="MISSING_OPTION",
+            hint="Name both groups.",
+        )
     group1, group2 = str(group1), str(group2)
     if group1 == group2:
-        raise ConfigurationError("group1 and group2 must differ.", code="INVALID_OPTION", hint="Choose two different labels.")
+        raise ConfigurationError(
+            "group1 and group2 must differ.",
+            code="INVALID_OPTION",
+            hint="Choose two different labels.",
+        )
     first = [i for i, label in enumerate(labels) if label == group1]
     second = [i for i, label in enumerate(labels) if label == group2]
     for name, members in ((group1, first), (group2, second)):
         if not members:
-            raise InputFormatError(f"No cell carries the label {name!r}.", code="UNKNOWN_GROUP", hint=f"Labels present: {present}.")
+            raise InputFormatError(
+                f"No cell carries the label {name!r}.",
+                code="UNKNOWN_GROUP",
+                hint=f"Labels present: {present}.",
+            )
     return group1, group2, first, second
 
 
@@ -71,13 +92,14 @@ def differential_expression(
 
     if method == "welch" and (len(first) < 2 or len(second) < 2):
         raise InputFormatError(
-            "Welch's t-test needs at least two cells/samples in each group.", code="GROUP_TOO_SMALL",
+            "Welch's t-test needs at least two cells/samples in each group.",
+            code="GROUP_TOO_SMALL",
             hint="Use method='wilcoxon' or add replicates.",
         )
     scaled = scale_columns(cm, target_sum) if target_sum is not None else cm
     rows: list[dict[str, object]] = []
     p_values: list[float] = []
-    for g_index, (gene, row) in enumerate(zip(scaled.genes, scaled.values)):
+    for g_index, (gene, row) in enumerate(zip(scaled.genes, scaled.values, strict=False)):
         raw = cm.values[g_index]
         x1 = [row[j] for j in first]
         x2 = [row[j] for j in second]
@@ -100,15 +122,23 @@ def differential_expression(
         }
         rows.append(record)
         p_values.append(p_value)
-    for record, q_value in zip(rows, stats.benjamini_hochberg(p_values)):
+    for record, q_value in zip(rows, stats.benjamini_hochberg(p_values), strict=False):
         record["q_value"] = q_value
     return rows
 
 
-def rank_genes(rows: list[dict[str, object]], *, top_n: int | None, min_pct: float = 0.0, only_positive: bool = False) -> list[dict[str, object]]:
+def rank_genes(
+    rows: list[dict[str, object]],
+    *,
+    top_n: int | None,
+    min_pct: float = 0.0,
+    only_positive: bool = False,
+) -> list[dict[str, object]]:
     kept = [
-        row for row in rows
-        if max(row["pct_group1"], row["pct_group2"]) >= min_pct and (not only_positive or row["log2fc"] > 0)  # type: ignore[operator]
+        row
+        for row in rows
+        if max(row["pct_group1"], row["pct_group2"]) >= min_pct
+        and (not only_positive or row["log2fc"] > 0)  # type: ignore[operator]
     ]
     kept.sort(key=lambda row: (row["p_value"], -abs(row["log2fc"]), row["gene"]))  # type: ignore[operator]
     return kept if top_n is None else kept[:top_n]
@@ -120,8 +150,11 @@ def de_settings(options: Mapping[str, object], default_target_sum: float) -> dic
     normalization = opt_choice(options, "normalization", "cpm", ("cpm", "none"))
     return {
         "method": opt_choice(options, "method", "welch", ("welch", "wilcoxon")),
-        "target_sum": opt_float(options, "target_sum", default_target_sum, 0.0, math.inf, exclusive_min=True)
-        if normalization == "cpm" else None,
+        "target_sum": opt_float(
+            options, "target_sum", default_target_sum, 0.0, math.inf, exclusive_min=True
+        )
+        if normalization == "cpm"
+        else None,
         "pseudocount": opt_float(options, "pseudocount", 1.0, 0.0, math.inf, exclusive_min=True),
         "top_n": opt_int(options, "top_n", 100, 1, 10**7),
         "min_pct": opt_float(options, "min_pct", 0.0, 0.0, 1.0),

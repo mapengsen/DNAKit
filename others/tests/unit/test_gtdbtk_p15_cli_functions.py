@@ -20,7 +20,7 @@ import pytest
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.microbiome import gtdbtk_p15_cli_functions as gt
 
-STUB = r'''#!{python}
+STUB = r"""#!{python}
 import json, os, sys
 args = sys.argv[1:]
 if args == ["--version"]:
@@ -55,7 +55,7 @@ elif command == "trim_msa":
     open(option("--output"), "w").write(">s1\nAC\n>s2\nGT\n")
 elif command == "export_msa":
     open(option("--output"), "w").write(">r1\nACGT\n")
-'''
+"""
 
 
 @pytest.fixture()
@@ -80,7 +80,12 @@ def genomes(tmp_path: Path) -> Path:
 
 def test_missing_program_has_install_hint(tmp_path: Path) -> None:
     with pytest.raises(BackendUnavailableError):
-        gt.gtdbtk_export_reference_msa(str(tmp_path / "o.fa"), database=str(tmp_path), gtdbtk_path=str(tmp_path / "missing"), verbose=False)
+        gt.gtdbtk_export_reference_msa(
+            str(tmp_path / "o.fa"),
+            database=str(tmp_path),
+            gtdbtk_path=str(tmp_path / "missing"),
+            verbose=False,
+        )
 
 
 def test_database_is_required(tmp_path: Path, stub: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -91,57 +96,122 @@ def test_database_is_required(tmp_path: Path, stub: Path, monkeypatch: pytest.Mo
 
 def test_genome_input_is_exclusive(tmp_path: Path, stub: Path) -> None:
     with pytest.raises(ConfigurationError):
-        gt.gtdbtk_identify_markers(str(tmp_path / "out"), database=str(tmp_path), gtdbtk_path=str(stub), verbose=False)
-    with pytest.raises(ConfigurationError):
-        gt.gtdbtk_align_markers(
-            str(tmp_path / "o2"), str(tmp_path), custom_msa_filters=True, skip_trimming=True, database=str(tmp_path),
-            gtdbtk_path=str(stub), verbose=False,
+        gt.gtdbtk_identify_markers(
+            str(tmp_path / "out"), database=str(tmp_path), gtdbtk_path=str(stub), verbose=False
         )
     with pytest.raises(ConfigurationError):
-        gt.gtdbtk_trim_msa(str(tmp_path / "m.fa"), str(tmp_path / "t.fa"), gtdbtk_path=str(stub), verbose=False)
+        gt.gtdbtk_align_markers(
+            str(tmp_path / "o2"),
+            str(tmp_path),
+            custom_msa_filters=True,
+            skip_trimming=True,
+            database=str(tmp_path),
+            gtdbtk_path=str(stub),
+            verbose=False,
+        )
+    with pytest.raises(ConfigurationError):
+        gt.gtdbtk_trim_msa(
+            str(tmp_path / "m.fa"), str(tmp_path / "t.fa"), gtdbtk_path=str(stub), verbose=False
+        )
 
 
 def test_identify_and_align_commands(tmp_path: Path, stub: Path) -> None:
     database = tmp_path / "db"
     database.mkdir()
     identify = gt.gtdbtk_identify_markers(
-        str(tmp_path / "id"), genome_dir=str(genomes(tmp_path)), database=str(database), prefix="run", cpus=2, genes=True,
-        gtdbtk_path=str(stub), verbose=False,
+        str(tmp_path / "id"),
+        genome_dir=str(genomes(tmp_path)),
+        database=str(database),
+        prefix="run",
+        cpus=2,
+        genes=True,
+        gtdbtk_path=str(stub),
+        verbose=False,
     )
     assert identify["status"] == "completed" and identify["version"] == "2.8.0"
-    assert identify["markers_summary"]["identify/run.bac120.markers_summary.tsv"][0]["number_unique_genes"] == 100
+    assert (
+        identify["markers_summary"]["identify/run.bac120.markers_summary.tsv"][0][
+            "number_unique_genes"
+        ]
+        == 100
+    )
     first = calls(stub)[0]
     assert first["data"] == str(database)
-    assert first["args"][0] == "identify" and "--genes" in first["args"] and first["args"][first["args"].index("--cpus") + 1] == "2"
+    assert (
+        first["args"][0] == "identify"
+        and "--genes" in first["args"]
+        and first["args"][first["args"].index("--cpus") + 1] == "2"
+    )
     align = gt.gtdbtk_align_markers(
-        str(tmp_path / "al"), str(tmp_path / "id"), database=str(database), prefix="run", skip_gtdb_refs=True, taxa_filter="p__X",
-        gtdbtk_path=str(stub), verbose=False,
+        str(tmp_path / "al"),
+        str(tmp_path / "id"),
+        database=str(database),
+        prefix="run",
+        skip_gtdb_refs=True,
+        taxa_filter="p__X",
+        gtdbtk_path=str(stub),
+        verbose=False,
     )
     assert align["files"]["*.user_msa.fasta*"][0].endswith("run.bac120.user_msa.fasta.gz")
-    assert align["filtered_genomes"]["align/run.bac120.filtered.tsv"][0]["Filter Reason"] == "Too few AA"
+    assert (
+        align["filtered_genomes"]["align/run.bac120.filtered.tsv"][0]["Filter Reason"]
+        == "Too few AA"
+    )
     args = calls(stub)[1]["args"]
-    assert args[0] == "align" and "--skip_gtdb_refs" in args and args[args.index("--taxa_filter") + 1] == "p__X"
+    assert (
+        args[0] == "align"
+        and "--skip_gtdb_refs" in args
+        and args[args.index("--taxa_filter") + 1] == "p__X"
+    )
 
 
 def test_classify_de_novo_and_ani(tmp_path: Path, stub: Path) -> None:
     database = tmp_path / "db"
     database.mkdir()
     classify = gt.gtdbtk_classify_placement(
-        str(tmp_path / "cl"), str(tmp_path), genome_dir=str(genomes(tmp_path)), database=str(database), full_tree=True, min_af=0.5,
-        gtdbtk_path=str(stub), verbose=False,
+        str(tmp_path / "cl"),
+        str(tmp_path),
+        genome_dir=str(genomes(tmp_path)),
+        database=str(database),
+        full_tree=True,
+        min_af=0.5,
+        gtdbtk_path=str(stub),
+        verbose=False,
     )
-    assert classify["summary"]["classify/gtdbtk.bac120.summary.tsv"][0]["classification"] == "d__Bacteria;p__X"
+    assert (
+        classify["summary"]["classify/gtdbtk.bac120.summary.tsv"][0]["classification"]
+        == "d__Bacteria;p__X"
+    )
     args = calls(stub)[-1]["args"]
-    assert args[0] == "classify" and "--full_tree" in args and args[args.index("--min_af") + 1] == "0.5"
+    assert (
+        args[0] == "classify"
+        and "--full_tree" in args
+        and args[args.index("--min_af") + 1] == "0.5"
+    )
     denovo = gt.gtdbtk_de_novo_workflow(
-        str(tmp_path / "dn"), "p__Patescibacteria", batchfile=str(_batch(tmp_path)), database=str(database), prot_model="LG", gamma=True,
-        gtdbtk_path=str(stub), verbose=False,
+        str(tmp_path / "dn"),
+        "p__Patescibacteria",
+        batchfile=str(_batch(tmp_path)),
+        database=str(database),
+        prot_model="LG",
+        gamma=True,
+        gtdbtk_path=str(stub),
+        verbose=False,
     )
     assert denovo["trees"]["*.decorated.tree"][0].endswith("gtdbtk.bac120.decorated.tree")
     args = calls(stub)[-1]["args"]
-    assert args[0] == "de_novo_wf" and "--bacteria" in args and args[args.index("--prot_model") + 1] == "LG" and "--gamma" in args
+    assert (
+        args[0] == "de_novo_wf"
+        and "--bacteria" in args
+        and args[args.index("--prot_model") + 1] == "LG"
+        and "--gamma" in args
+    )
     ani = gt.gtdbtk_ani_to_representatives(
-        str(tmp_path / "an"), genome_dir=str(genomes(tmp_path)), database=str(database), gtdbtk_path=str(stub), verbose=False
+        str(tmp_path / "an"),
+        genome_dir=str(genomes(tmp_path)),
+        database=str(database),
+        gtdbtk_path=str(stub),
+        verbose=False,
     )
     assert ani["ani_summary"][0]["ani"] == 99.1
 
@@ -157,10 +227,27 @@ def test_trim_and_export_msa(tmp_path: Path, stub: Path) -> None:
     mask.write_text("10")
     msa = tmp_path / "msa.fa"
     msa.write_text(">s1\nAC\n>s2\nGT\n")
-    trimmed = gt.gtdbtk_trim_msa(str(msa), str(tmp_path / "trim.fa"), mask_file=str(mask), database=str(tmp_path), gtdbtk_path=str(stub), verbose=False)
+    trimmed = gt.gtdbtk_trim_msa(
+        str(msa),
+        str(tmp_path / "trim.fa"),
+        mask_file=str(mask),
+        database=str(tmp_path),
+        gtdbtk_path=str(stub),
+        verbose=False,
+    )
     assert trimmed["sequence_count"] == 2
-    exported = gt.gtdbtk_export_reference_msa(str(tmp_path / "ref.fa"), domain="arc", database=str(tmp_path), gtdbtk_path=str(stub), verbose=False)
-    assert exported["sequence_count"] == 1 and calls(stub)[-1]["args"][:3] == ["export_msa", "--domain", "arc"]
+    exported = gt.gtdbtk_export_reference_msa(
+        str(tmp_path / "ref.fa"),
+        domain="arc",
+        database=str(tmp_path),
+        gtdbtk_path=str(stub),
+        verbose=False,
+    )
+    assert exported["sequence_count"] == 1 and calls(stub)[-1]["args"][:3] == [
+        "export_msa",
+        "--domain",
+        "arc",
+    ]
 
 
 REAL = shutil.which("gtdbtk") is not None and os.environ.get("GTDBTK_DATA_PATH")
@@ -172,6 +259,8 @@ def test_real_trim_msa_with_mask_file(tmp_path: Path) -> None:
     mask.write_text("1010")
     msa = tmp_path / "msa.fa"
     msa.write_text(">s1\nACGT\n>s2\nTTGG\n")
-    result = gt.gtdbtk_trim_msa(str(msa), str(tmp_path / "t.fa"), mask_file=str(mask), verbose=False)
+    result = gt.gtdbtk_trim_msa(
+        str(msa), str(tmp_path / "t.fa"), mask_file=str(mask), verbose=False
+    )
     assert (tmp_path / "t.fa").read_text() == ">s1\nAG\n>s2\nTG\n"
     assert result["status"] == "completed"

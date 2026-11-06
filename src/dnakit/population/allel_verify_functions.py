@@ -26,7 +26,9 @@ def _field_names(value: object) -> list[str] | None:
     if value is None:
         return None
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value:
-        raise ConfigurationError("fields must be a non-empty list of field names, or None for the defaults.")
+        raise ConfigurationError(
+            "fields must be a non-empty list of field names, or None for the defaults."
+        )
     if len(value) > _MAX_FIELDS:
         raise ConfigurationError(f"fields lists more than {_MAX_FIELDS} names.")
     names: list[str] = []
@@ -78,7 +80,10 @@ def allel_vcf_to_zarr(
             "output_path": None,
             "variants": 0,
             "arrays": [],
-            "provenance": {"package": f"scikit-allel {_version('scikit-allel')}", "convention": "no variants"},
+            "provenance": {
+                "package": f"scikit-allel {_version('scikit-allel')}",
+                "convention": "no variants",
+            },
         }
     root = zarr.open_group(str(target), mode="w")
     summary = []
@@ -93,7 +98,9 @@ def allel_vcf_to_zarr(
             leaf, group = name, root
         group.create_array(leaf, data=values)
         summary.append({"name": name, "shape": list(values.shape), "dtype": str(values.dtype)})
-    variants = int(np.asarray(arrays["variants/CHROM"]).shape[0]) if "variants/CHROM" in arrays else 0
+    variants = (
+        int(np.asarray(arrays["variants/CHROM"]).shape[0]) if "variants/CHROM" in arrays else 0
+    )
     return {
         "status": "completed",
         "operation": "allel_vcf_to_zarr",

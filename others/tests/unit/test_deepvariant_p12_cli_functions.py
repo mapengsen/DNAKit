@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 import stat
 import sys
 from pathlib import Path
@@ -302,5 +301,5 @@ def test_call_postprocess_report_and_others(env: dict[str, Path]) -> None:
     )  # fmt: skip
     assert post["output_gvcf"] and "--gvcf_outfile=" + _p(env, "p.g.vcf") in _call(env, 1)
     (env["dir"] / "in.vcf").write_text("x")
-    report = dv.deepvariant_vcf_stats_report(_p(env, "in.vcf"), _p(env, "rep"), title="X", **kw)
+    dv.deepvariant_vcf_stats_report(_p(env, "in.vcf"), _p(env, "rep"), title="X", **kw)
     assert "--outfile_base=" + _p(env, "rep") in _call(env, 2)

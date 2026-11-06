@@ -13,8 +13,12 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.fasta_fastq import cutadapt_review_functions as facade
 
 _LOCAL_CUTADAPT = Path(sys.executable).parent / "cutadapt"
-_CUTADAPT = shutil.which("cutadapt") or (str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None)
-needs_cutadapt = pytest.mark.skipif(_CUTADAPT is None, reason="cutadapt executable is not installed")
+_CUTADAPT = shutil.which("cutadapt") or (
+    str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None
+)
+needs_cutadapt = pytest.mark.skipif(
+    _CUTADAPT is None, reason="cutadapt executable is not installed"
+)
 
 _READS = [
     ("r1", "ACGTACGTAG", "IIIIIIIIII"),
@@ -24,7 +28,9 @@ _READS = [
 
 
 def _write_fastq(path: Path) -> Path:
-    path.write_text("".join(f"@{name}\n{seq}\n+\n{qual}\n" for name, seq, qual in _READS), encoding="utf-8")
+    path.write_text(
+        "".join(f"@{name}\n{seq}\n+\n{qual}\n" for name, seq, qual in _READS), encoding="utf-8"
+    )
     return path
 
 
@@ -37,7 +43,9 @@ def _sequences(path: Path) -> dict[str, str]:
 def test_unconditional_cut_removes_bases_from_both_ends(tmp_path: Path) -> None:
     source = _write_fastq(tmp_path / "reads.fastq")
     target = tmp_path / "cut.fastq"
-    result = facade.cutadapt_unconditional_cut(str(source), str(target), cut_5p=2, cut_3p=3, verbose=False)
+    result = facade.cutadapt_unconditional_cut(
+        str(source), str(target), cut_5p=2, cut_3p=3, verbose=False
+    )
     assert result["status"] == "completed"
     assert result["backend"] == "cutadapt"
     assert result["command"][1:3] == ["--report", "minimal"]
@@ -77,7 +85,9 @@ def test_shorten_keeps_first_or_last_bases(tmp_path: Path) -> None:
         ("none", "ACGTGGGGG"),
     ],
 )
-def test_adapter_action_applies_the_requested_action(tmp_path: Path, action: str, expected_r3: str) -> None:
+def test_adapter_action_applies_the_requested_action(
+    tmp_path: Path, action: str, expected_r3: str
+) -> None:
     source = _write_fastq(tmp_path / "reads.fastq")
     target = tmp_path / f"{action}.fastq"
     result = facade.cutadapt_adapter_action(
@@ -141,9 +151,13 @@ def test_invalid_arguments_are_rejected_before_running(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         facade.cutadapt_adapter_action(str(source), str(target), verbose=False)
     with pytest.raises(ConfigurationError):
-        facade.cutadapt_adapter_action(str(source), str(target), adapter_3p="GGG", action="delete", verbose=False)
+        facade.cutadapt_adapter_action(
+            str(source), str(target), adapter_3p="GGG", action="delete", verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facade.cutadapt_adapter_action(str(source), str(target), adapter_3p="GGG", times=0, verbose=False)
+        facade.cutadapt_adapter_action(
+            str(source), str(target), adapter_3p="GGG", times=0, verbose=False
+        )
     with pytest.raises(ConfigurationError):
         facade.cutadapt_adapter_action(str(source), str(target), adapter_3p="GXZ", verbose=False)
     with pytest.raises(ConfigurationError):

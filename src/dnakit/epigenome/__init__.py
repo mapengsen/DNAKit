@@ -8,16 +8,21 @@ from pathlib import Path
 
 from dnakit._candidate_runtime import candidate_not_implemented, candidate_ok
 from dnakit.epigenome import _impl_local as _impl
-from dnakit.exceptions import ConfigurationError, InputFormatError
 from dnakit.epigenome.external import extract_methylation_methyldackel
+from dnakit.exceptions import ConfigurationError, InputFormatError
+
 
 def align(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Align epigenomic reads to a reference (not implemented: needs an aligner such as Bismark, Bowtie2 or BWA)."""
     return candidate_not_implemented(
-        "epigenome", "align", input, options=options,
+        "epigenome",
+        "align",
+        input,
+        options=options,
         requires="a read aligner (Bismark/bwa-meth for bisulfite, Bowtie2/BWA for ChIP/ATAC) and an indexed reference",
         message="Read alignment is not implemented natively; no aligner is wired into this function.",
     )
+
 
 def annotate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Annotate genomic regions (e.g. peaks) with overlapping and nearest features from a supplied annotation.
@@ -33,11 +38,16 @@ def annotate(input: object, *, options: Mapping[str, object] | None = None) -> o
     _impl.entity(opts, "peaks", ("peaks",))
     regions = _impl.parse_intervals(input)
     if "features" not in opts:
-        raise ConfigurationError("annotate needs options['features'].", code="EPIGENOME_OPTION_INVALID",
-                                 hint="Pass a BED with names: {'features': 'chr1\\t100\\t200\\tgeneA'}.")
+        raise ConfigurationError(
+            "annotate needs options['features'].",
+            code="EPIGENOME_OPTION_INVALID",
+            hint="Pass a BED with names: {'features': 'chr1\\t100\\t200\\tgeneA'}.",
+        )
     features = _impl.parse_intervals(opts["features"])
     if len(regions) * len(features) > 50_000_000:
-        raise ConfigurationError("Too many region x feature pairs.", code="EPIGENOME_INPUT_TOO_LARGE")
+        raise ConfigurationError(
+            "Too many region x feature pairs.", code="EPIGENOME_INPUT_TOO_LARGE"
+        )
     max_distance = _impl.opt_int(opts, "max_distance", -1, -1, 10**12)
     by_chrom = _impl.group_by_chrom(features)
     rows = []
@@ -51,14 +61,33 @@ def annotate(input: object, *, options: Mapping[str, object] | None = None) -> o
             if fs < re_ and fe > rs:
                 overlapping.append(label)
             if best is None or gap < best[0]:
-                best = (gap, label, "overlap" if fs < re_ and fe > rs else "downstream" if fs >= re_ else "upstream")
+                best = (
+                    gap,
+                    label,
+                    "overlap"
+                    if fs < re_ and fe > rs
+                    else "downstream"
+                    if fs >= re_
+                    else "upstream",
+                )
         nearest = None
         if best is not None and (max_distance < 0 or best[0] <= max_distance):
             nearest = {"name": best[1], "distance": best[0], "side": best[2]}
-        rows.append({"chrom": r["chrom"], "start": rs, "end": re_, "overlapping": overlapping, "nearest": nearest})
+        rows.append(
+            {
+                "chrom": r["chrom"],
+                "start": rs,
+                "end": re_,
+                "overlapping": overlapping,
+                "nearest": nearest,
+            }
+        )
     return candidate_ok("epigenome", "annotate", input, {"regions": rows}, options=opts)
 
-def build_chromatin_state_segments(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def build_chromatin_state_segments(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Collapse per-bin chromatin-state calls into contiguous state segments.
 
     ``input``: bins as BED text/path, rows or mappings ``chrom, start, end, name`` where ``name`` is the state label
@@ -70,33 +99,68 @@ def build_chromatin_state_segments(input: object, *, options: Mapping[str, objec
     """
     opts = dict(options or {})
     max_gap = _impl.opt_int(opts, "max_gap", 0, 0, 10**9)
-    if isinstance(input, Mapping) and input and all(isinstance(v, Sequence) and not isinstance(v, (str, bytes)) for v in input.values()) \
-            and "records" not in input:
+    if (
+        isinstance(input, Mapping)
+        and input
+        and all(isinstance(v, Sequence) and not isinstance(v, (str, bytes)) for v in input.values())
+        and "records" not in input
+    ):
         size = _impl.opt_int(opts, "bin_size", 0, 1, 10**9) if "bin_size" in opts else 0
         if not size:
-            raise ConfigurationError("A {chrom: [states]} input needs options['bin_size'].", code="EPIGENOME_OPTION_INVALID")
-        bins = [{"chrom": str(c), "start": i * size, "end": (i + 1) * size, "name": str(s)}
-                for c, states in input.items() for i, s in enumerate(states)]
+            raise ConfigurationError(
+                "A {chrom: [states]} input needs options['bin_size'].",
+                code="EPIGENOME_OPTION_INVALID",
+            )
+        bins = [
+            {"chrom": str(c), "start": i * size, "end": (i + 1) * size, "name": str(s)}
+            for c, states in input.items()
+            for i, s in enumerate(states)
+        ]
     else:
         raw = []
         if isinstance(input, Sequence) and not isinstance(input, (str, bytes)):
             for row in input:
-                raw.append({**row, "name": row.get("name", row.get("state"))} if isinstance(row, Mapping) else row)
+                raw.append(
+                    {**row, "name": row.get("name", row.get("state"))}
+                    if isinstance(row, Mapping)
+                    else row
+                )
         else:
             raw = input  # type: ignore[assignment]
         bins = _impl.parse_intervals(raw)
         if any("name" not in b or b["name"] is None for b in bins):
-            raise InputFormatError("Every bin needs a state label (BED name column).", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                "Every bin needs a state label (BED name column).", code="EPIGENOME_RECORD_INVALID"
+            )
     segments: list[dict[str, object]] = []
     for b in sorted(bins, key=lambda r: (str(r["chrom"]), int(r["start"]), int(r["end"]))):  # type: ignore[call-overload]
         last = segments[-1] if segments else None
-        if last and last["chrom"] == b["chrom"] and last["state"] == b["name"] and int(b["start"]) - int(last["end"]) <= max_gap:  # type: ignore[call-overload]
+        if (
+            last
+            and last["chrom"] == b["chrom"]
+            and last["state"] == b["name"]
+            and int(b["start"]) - int(last["end"]) <= max_gap
+        ):  # type: ignore[call-overload]
             last["end"] = max(int(last["end"]), int(b["end"]))  # type: ignore[call-overload]
             last["n_bins"] = int(last["n_bins"]) + 1  # type: ignore[call-overload]
         else:
-            segments.append({"chrom": b["chrom"], "start": b["start"], "end": b["end"], "state": b["name"], "n_bins": 1})
-    return candidate_ok("epigenome", "build_chromatin_state_segments", input,
-                        {"bin_count": len(bins), "segment_count": len(segments), "segments": segments}, options=opts)
+            segments.append(
+                {
+                    "chrom": b["chrom"],
+                    "start": b["start"],
+                    "end": b["end"],
+                    "state": b["name"],
+                    "n_bins": 1,
+                }
+            )
+    return candidate_ok(
+        "epigenome",
+        "build_chromatin_state_segments",
+        input,
+        {"bin_count": len(bins), "segment_count": len(segments), "segments": segments},
+        options=opts,
+    )
+
 
 def calculate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Calculate methylation levels from counts, CpG observed/expected ratios from DNA, or interval overlap.
@@ -118,7 +182,11 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
     intervals do not touch); each input interval is counted once however many ``b`` intervals it spans.
     """
     opts = dict(options or {})
-    which = _impl.entity(opts, "methylation_level", ("methylation_level", "cpg_observed_expected", "interval_overlap"))
+    which = _impl.entity(
+        opts,
+        "methylation_level",
+        ("methylation_level", "cpg_observed_expected", "interval_overlap"),
+    )
     if which == "methylation_level":
         sites = _impl.parse_methylation(input)
         min_cov = _impl.opt_int(opts, "min_coverage", 1, 1, 10**9)
@@ -127,25 +195,59 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
         for s in sites:
             cov = int(s["methylated"]) + int(s["unmethylated"])  # type: ignore[call-overload]
             if cov >= min_cov:
-                kept.append({"chrom": s["chrom"], "pos": int(s["start"]) - shift, "coverage": cov,  # type: ignore[call-overload]
-                             "methylated": s["methylated"], "level": int(s["methylated"]) / cov})  # type: ignore[call-overload]
+                kept.append(
+                    {
+                        "chrom": s["chrom"],
+                        "pos": int(s["start"]) - shift,
+                        "coverage": cov,  # type: ignore[call-overload]
+                        "methylated": s["methylated"],
+                        "level": int(s["methylated"]) / cov,
+                    }
+                )  # type: ignore[call-overload]
         if "regions" in opts:
             rows = []
             for reg in _impl.parse_intervals(opts["regions"]):
-                inside = [k for k in kept if k["chrom"] == reg["chrom"] and int(reg["start"]) <= int(k["pos"]) < int(reg["end"])]  # type: ignore[call-overload]
+                inside = [
+                    k
+                    for k in kept
+                    if k["chrom"] == reg["chrom"]
+                    and int(reg["start"]) <= int(k["pos"]) < int(reg["end"])
+                ]  # type: ignore[call-overload]
                 cov = sum(int(k["coverage"]) for k in inside)  # type: ignore[call-overload]
                 meth = sum(int(k["methylated"]) for k in inside)  # type: ignore[call-overload]
-                rows.append({"chrom": reg["chrom"], "start": reg["start"], "end": reg["end"], "n_sites": len(inside),
-                             "coverage": cov, "weighted_level": meth / cov if cov else None,
-                             "mean_site_level": sum(float(k["level"]) for k in inside) / len(inside) if inside else None})  # type: ignore[arg-type]
+                rows.append(
+                    {
+                        "chrom": reg["chrom"],
+                        "start": reg["start"],
+                        "end": reg["end"],
+                        "n_sites": len(inside),
+                        "coverage": cov,
+                        "weighted_level": meth / cov if cov else None,
+                        "mean_site_level": sum(float(k["level"]) for k in inside) / len(inside)
+                        if inside
+                        else None,
+                    }
+                )  # type: ignore[arg-type]
             result: dict[str, object] = {"entity": which, "regions": rows}
         else:
-            result = {"entity": which, "sites": kept, "site_count": len(kept), "dropped_low_coverage": len(sites) - len(kept)}
+            result = {
+                "entity": which,
+                "sites": kept,
+                "site_count": len(kept),
+                "dropped_low_coverage": len(sites) - len(kept),
+            }
     elif which == "cpg_observed_expected":
+
         def stats(seq: str) -> dict[str, object]:
             c, g, cg = seq.count("C"), seq.count("G"), seq.count("CG")
-            return {"length": len(seq), "c": c, "g": g, "cpg": cg, "gc_fraction": (c + g) / len(seq),
-                    "observed_expected": cg * len(seq) / (c * g) if c and g else None}
+            return {
+                "length": len(seq),
+                "c": c,
+                "g": g,
+                "cpg": cg,
+                "gc_fraction": (c + g) / len(seq),
+                "observed_expected": cg * len(seq) / (c * g) if c and g else None,
+            }
 
         window = _impl.opt_int(opts, "window", 0, 0, 10**7) if "window" in opts else 0
         step = _impl.opt_int(opts, "step", window or 1, 1, 10**7)
@@ -153,26 +255,47 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
         for name, seq in _dna_records(input):
             entry: dict[str, object] = {"id": name, **stats(seq)}
             if window:
-                entry["windows"] = [{"start": i, "end": i + window, **stats(seq[i : i + window])}
-                                    for i in range(0, len(seq) - window + 1, step)]
+                entry["windows"] = [
+                    {"start": i, "end": i + window, **stats(seq[i : i + window])}
+                    for i in range(0, len(seq) - window + 1, step)
+                ]
             out.append(entry)
         result = {"entity": which, "sequences": out}
     else:
         a = _impl.merge_intervals(_impl.parse_intervals(input))
         if "b" not in opts:
-            raise ConfigurationError("interval_overlap needs options['b'].", code="EPIGENOME_OPTION_INVALID")
+            raise ConfigurationError(
+                "interval_overlap needs options['b'].", code="EPIGENOME_OPTION_INVALID"
+            )
         b = _impl.merge_intervals(_impl.parse_intervals(opts["b"]))
         a_by, b_by = _impl.group_by_chrom(a), _impl.group_by_chrom(b)
-        inter = sum(_impl.overlap_bp((int(x["start"]), int(x["end"])), (int(y["start"]), int(y["end"])))  # type: ignore[call-overload]
-                    for chrom, xs in a_by.items() for x in xs for y in b_by.get(chrom, []))
+        inter = sum(
+            _impl.overlap_bp((int(x["start"]), int(x["end"])), (int(y["start"]), int(y["end"])))  # type: ignore[call-overload]
+            for chrom, xs in a_by.items()
+            for x in xs
+            for y in b_by.get(chrom, [])
+        )
         a_bp = sum(int(x["end"]) - int(x["start"]) for x in a)  # type: ignore[call-overload]
         b_bp = sum(int(x["end"]) - int(x["start"]) for x in b)  # type: ignore[call-overload]
-        touching = sum(1 for x in _impl.parse_intervals(input)
-                       if any(int(x["start"]) < int(y["end"]) and int(y["start"]) < int(x["end"])  # type: ignore[call-overload]
-                              for y in b_by.get(str(x["chrom"]), [])))
-        result = {"entity": which, "overlap_bp": inter, "a_bp": a_bp, "b_bp": b_bp, "union_bp": a_bp + b_bp - inter,
-                  "jaccard": inter / (a_bp + b_bp - inter) if a_bp + b_bp - inter else 0.0, "a_intervals_overlapping_b": touching}
+        touching = sum(
+            1
+            for x in _impl.parse_intervals(input)
+            if any(
+                int(x["start"]) < int(y["end"]) and int(y["start"]) < int(x["end"])  # type: ignore[call-overload]
+                for y in b_by.get(str(x["chrom"]), [])
+            )
+        )
+        result = {
+            "entity": which,
+            "overlap_bp": inter,
+            "a_bp": a_bp,
+            "b_bp": b_bp,
+            "union_bp": a_bp + b_bp - inter,
+            "jaccard": inter / (a_bp + b_bp - inter) if a_bp + b_bp - inter else 0.0,
+            "a_intervals_overlapping_b": touching,
+        }
     return candidate_ok("epigenome", "calculate", input, result, options=opts)
+
 
 def call(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Call consensus peaks across samples: regions covered by at least ``min_samples`` samples' peak sets.
@@ -187,19 +310,34 @@ def call(input: object, *, options: Mapping[str, object] | None = None) -> objec
     _impl.entity(opts, "consensus_peaks", ("consensus_peaks",))
     if isinstance(input, Mapping) and not {"records", "regions"} & set(input):
         sets = {str(k): _impl.parse_intervals(v) for k, v in input.items()}
-    elif isinstance(input, Sequence) and not isinstance(input, (str, bytes)) and input and all(
-        isinstance(s, (str, bytes, Path)) or (isinstance(s, Sequence) and s and not isinstance(s[0], (str, int, float))) for s in input
+    elif (
+        isinstance(input, Sequence)
+        and not isinstance(input, (str, bytes))
+        and input
+        and all(
+            isinstance(s, (str, bytes, Path))
+            or (isinstance(s, Sequence) and s and not isinstance(s[0], (str, int, float)))
+            for s in input
+        )
     ):
         sets = {f"sample{i + 1}": _impl.parse_intervals(v) for i, v in enumerate(input)}
     else:
-        raise InputFormatError("Provide peak sets as {sample: intervals} or a list of interval sets.",
-                               code="EPIGENOME_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide peak sets as {sample: intervals} or a list of interval sets.",
+            code="EPIGENOME_INPUT_INVALID",
+        )
     min_samples = _impl.opt_int(opts, "min_samples", 2, 1, len(sets))
     peaks = _impl.depth_segments(list(sets.values()), min_samples)
     for p in peaks:
         p.pop("n_merged", None)
-    result = {"samples": list(sets), "min_samples": min_samples, "peak_count": len(peaks), "peaks": peaks}
+    result = {
+        "samples": list(sets),
+        "min_samples": min_samples,
+        "peak_count": len(peaks),
+        "peaks": peaks,
+    }
     return candidate_ok("epigenome", "call", input, result, options=opts)
+
 
 def find(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Find differentially methylated regions by Fisher's exact test, or CpG islands in DNA.
@@ -223,31 +361,74 @@ def find(input: object, *, options: Mapping[str, object] | None = None) -> objec
 
         name, seq = _dna_records(input)[0]
         found = find_cpg_islands(
-            DNASequence(seq), window_size=_impl.opt_int(opts, "window_size", 200, 2, 10**6), step=_impl.opt_int(opts, "step", 1, 1, 10**6),
-            min_gc=_impl.opt_float(opts, "min_gc", 0.5, 0, 1), min_observed_expected=_impl.opt_float(opts, "min_observed_expected", 0.6, 0, 100),
-            min_region_length=_impl.opt_int(opts, "min_region_length", 200, 1, 10**7), verbose=False,
+            DNASequence(seq),
+            window_size=_impl.opt_int(opts, "window_size", 200, 2, 10**6),
+            step=_impl.opt_int(opts, "step", 1, 1, 10**6),
+            min_gc=_impl.opt_float(opts, "min_gc", 0.5, 0, 1),
+            min_observed_expected=_impl.opt_float(opts, "min_observed_expected", 0.6, 0, 100),
+            min_region_length=_impl.opt_int(opts, "min_region_length", 200, 1, 10**7),
+            verbose=False,
         )
-        islands = [{"start": h.coordinate_location.start, "end": h.coordinate_location.end, "length": h.length,
-                    "observed_expected": h.score, "gc_fraction": dict(h.attributes)["gc_fraction"]} for h in found.hits]
-        return candidate_ok("epigenome", "find", input, {"entity": which, "sequence": name, "islands": islands}, options=opts)
+        islands = [
+            {
+                "start": h.coordinate_location.start,
+                "end": h.coordinate_location.end,
+                "length": h.length,
+                "observed_expected": h.score,
+                "gc_fraction": dict(h.attributes)["gc_fraction"],
+            }
+            for h in found.hits
+        ]
+        return candidate_ok(
+            "epigenome",
+            "find",
+            input,
+            {"entity": which, "sequence": name, "islands": islands},
+            options=opts,
+        )
     keys = ("methylated_a", "unmethylated_a", "methylated_b", "unmethylated_b")
     rows_in = []
     for where, row in _impl._rows(input):
-        if not isinstance(row, Mapping) or not all(k in row for k in keys) or "chrom" not in row or "start" not in row:
-            raise InputFormatError(f"Differential-region rows need chrom, start, end and {', '.join(keys)} ({where}).",
-                                   code="EPIGENOME_RECORD_INVALID")
+        if (
+            not isinstance(row, Mapping)
+            or not all(k in row for k in keys)
+            or "chrom" not in row
+            or "start" not in row
+        ):
+            raise InputFormatError(
+                f"Differential-region rows need chrom, start, end and {', '.join(keys)} ({where}).",
+                code="EPIGENOME_RECORD_INVALID",
+            )
         counts = [_impl._int(row[k], k, where) for k in keys]
         if min(counts) < 0:
-            raise InputFormatError(f"Counts must be non-negative ({where}).", code="EPIGENOME_RECORD_INVALID")
-        rows_in.append({"chrom": str(row["chrom"]), "start": _impl._int(row["start"], "start", where),
-                        "end": _impl._int(row.get("end", int(row["start"]) + 1), "end", where), "counts": counts})
+            raise InputFormatError(
+                f"Counts must be non-negative ({where}).", code="EPIGENOME_RECORD_INVALID"
+            )
+        rows_in.append(
+            {
+                "chrom": str(row["chrom"]),
+                "start": _impl._int(row["start"], "start", where),
+                "end": _impl._int(row.get("end", int(row["start"]) + 1), "end", where),
+                "counts": counts,
+            }
+        )
     if "regions" in opts:
         regions = _impl.parse_intervals(opts["regions"])
         merged = []
         for reg in regions:
-            inside = [r for r in rows_in if r["chrom"] == reg["chrom"] and int(reg["start"]) <= r["start"] < int(reg["end"])]  # type: ignore[call-overload]
-            merged.append({"chrom": reg["chrom"], "start": reg["start"], "end": reg["end"],
-                           "counts": [sum(r["counts"][i] for r in inside) for i in range(4)]})  # type: ignore[index]
+            inside = [
+                r
+                for r in rows_in
+                if r["chrom"] == reg["chrom"] and int(reg["start"]) <= r["start"] < int(reg["end"])
+            ]  # type: ignore[call-overload]
+            merged.append(
+                {
+                    "chrom": reg["chrom"],
+                    "start": reg["start"],
+                    "end": reg["end"],
+                    "counts": [sum(r["counts"][i] for r in inside) for i in range(4)],
+                }
+            )  # type: ignore[index]
         rows_in = merged  # type: ignore[assignment]
     min_cov = _impl.opt_int(opts, "min_coverage", 10, 1, 10**9)
     alpha = _impl.opt_float(opts, "alpha", 0.05, 0, 1)
@@ -259,17 +440,38 @@ def find(input: object, *, options: Mapping[str, object] | None = None) -> objec
             continue
         test = _impl.fisher_exact(ma, ua, mb, ub)
         level_a, level_b = ma / (ma + ua), mb / (mb + ub)
-        tested.append({"chrom": r["chrom"], "start": r["start"], "end": r["end"], "level_a": level_a, "level_b": level_b,
-                       "delta": level_b - level_a, "coverage_a": ma + ua, "coverage_b": mb + ub,
-                       "p_value": test["p_value"], "odds_ratio": test["odds_ratio"]})
-    for row, q in zip(tested, _impl.benjamini_hochberg([t["p_value"] for t in tested])):  # type: ignore[misc]
+        tested.append(
+            {
+                "chrom": r["chrom"],
+                "start": r["start"],
+                "end": r["end"],
+                "level_a": level_a,
+                "level_b": level_b,
+                "delta": level_b - level_a,
+                "coverage_a": ma + ua,
+                "coverage_b": mb + ub,
+                "p_value": test["p_value"],
+                "odds_ratio": test["odds_ratio"],
+            }
+        )
+    for row, q in zip(
+        tested, _impl.benjamini_hochberg([t["p_value"] for t in tested]), strict=False
+    ):  # type: ignore[misc]
         row["q_value"] = q
         row["significant"] = q <= alpha and abs(float(row["delta"])) >= min_delta  # type: ignore[arg-type]
     tested.sort(key=lambda t: (t["p_value"], t["chrom"], t["start"]))  # type: ignore[arg-type]
-    result = {"entity": which, "tested": len(tested), "excluded_low_coverage": len(rows_in) - len(tested), "regions": tested}
+    result = {
+        "entity": which,
+        "tested": len(tested),
+        "excluded_low_coverage": len(rows_in) - len(tested),
+        "regions": tested,
+    }
     return candidate_ok("epigenome", "find", input, result, options=opts)
 
-def link_enhancers_to_genes(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def link_enhancers_to_genes(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Assign enhancers (or any regions) to genes by genomic distance to the gene transcription start site (TSS).
 
     ``input``: enhancers as BED text/path, rows or mappings (0-based half-open). ``options``: ``genes`` (required;
@@ -282,15 +484,25 @@ def link_enhancers_to_genes(input: object, *, options: Mapping[str, object] | No
     """
     opts = dict(options or {})
     if "genes" not in opts:
-        raise ConfigurationError("link_enhancers_to_genes needs options['genes'].", code="EPIGENOME_OPTION_INVALID")
+        raise ConfigurationError(
+            "link_enhancers_to_genes needs options['genes'].", code="EPIGENOME_OPTION_INVALID"
+        )
     method = _impl.opt_str(opts, "method", "nearest", ("nearest", "window"))
     max_distance = _impl.opt_int(opts, "max_distance", 1_000_000, 0, 10**12)
     regions = _impl.parse_intervals(input)
     genes = _impl.parse_genes(opts["genes"])
     links = _impl.link_regions_to_genes(regions, genes, method, max_distance)
-    return candidate_ok("epigenome", "link_enhancers_to_genes", input,
-                        {"method": method, "max_distance": max_distance, "links": links}, options=opts,
-                        warnings=["Distance-based assignment is a proximity heuristic, not evidence of regulation."])
+    return candidate_ok(
+        "epigenome",
+        "link_enhancers_to_genes",
+        input,
+        {"method": method, "max_distance": max_distance, "links": links},
+        options=opts,
+        warnings=[
+            "Distance-based assignment is a proximity heuristic, not evidence of regulation."
+        ],
+    )
+
 
 def merge(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge overlapping or nearby intervals (peaks, regions) per chromosome, like ``bedtools merge``.
@@ -304,8 +516,14 @@ def merge(input: object, *, options: Mapping[str, object] | None = None) -> obje
     _impl.entity(opts, "peaks", ("peaks",))
     distance = _impl.opt_int(opts, "distance", 0, 0, 10**12)
     merged = _impl.merge_intervals(_impl.parse_intervals(input), distance)
-    return candidate_ok("epigenome", "merge", input, {"distance": distance, "intervals": merged,
-                                                      "count": len(merged)}, options=opts)
+    return candidate_ok(
+        "epigenome",
+        "merge",
+        input,
+        {"distance": distance, "intervals": merged, "count": len(merged)},
+        options=opts,
+    )
+
 
 def normalize(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Normalise signal values (bedGraph records or a plain list of numbers).
@@ -320,12 +538,18 @@ def normalize(input: object, *, options: Mapping[str, object] | None = None) -> 
     opts = dict(options or {})
     _impl.entity(opts, "signal", ("signal",))
     method = _impl.opt_str(opts, "method", "cpm", ("cpm", "rpkm", "log2cpm", "zscore", "minmax"))
-    if isinstance(input, Sequence) and not isinstance(input, (str, bytes)) and input and all(
-        isinstance(v, (int, float)) and not isinstance(v, bool) for v in input
+    if (
+        isinstance(input, Sequence)
+        and not isinstance(input, (str, bytes))
+        and input
+        and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in input)
     ):
         records: list[dict[str, object]] = [{"value": float(v)} for v in input]
         if method == "rpkm":
-            raise ConfigurationError("rpkm needs interval lengths; pass bedGraph records.", code="EPIGENOME_OPTION_INVALID")
+            raise ConfigurationError(
+                "rpkm needs interval lengths; pass bedGraph records.",
+                code="EPIGENOME_OPTION_INVALID",
+            )
     else:
         records = _impl.parse_intervals(input, "bedgraph")
     values = [float(r["value"]) for r in records]  # type: ignore[arg-type]
@@ -333,7 +557,10 @@ def normalize(input: object, *, options: Mapping[str, object] | None = None) -> 
         raise InputFormatError("Signal values must be finite.", code="EPIGENOME_RECORD_INVALID")
     if method in ("cpm", "rpkm", "log2cpm"):
         if min(values) < 0:
-            raise InputFormatError("Signal values must be non-negative for this method.", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                "Signal values must be non-negative for this method.",
+                code="EPIGENOME_RECORD_INVALID",
+            )
         total = sum(values)
         if total <= 0:
             raise InputFormatError("The signal sums to zero.", code="EPIGENOME_RECORD_INVALID")
@@ -341,24 +568,39 @@ def normalize(input: object, *, options: Mapping[str, object] | None = None) -> 
         if method == "cpm":
             new = cpm
         elif method == "rpkm":
-            new = [c / ((int(r["end"]) - int(r["start"])) / 1000.0) for c, r in zip(cpm, records)]  # type: ignore[call-overload]
+            new = [
+                c / ((int(r["end"]) - int(r["start"])) / 1000.0)
+                for c, r in zip(cpm, records, strict=False)
+            ]  # type: ignore[call-overload]
         else:
             pc = _impl.opt_float(opts, "pseudocount", 1.0, 1e-12, 1e12)
             new = [math.log2(c + pc) for c in cpm]
     elif method == "zscore":
         ddof = _impl.opt_int(opts, "ddof", 0, 0, 1)
         mean = sum(values) / len(values)
-        var = sum((v - mean) ** 2 for v in values) / (len(values) - ddof) if len(values) > ddof else 0.0
+        var = (
+            sum((v - mean) ** 2 for v in values) / (len(values) - ddof)
+            if len(values) > ddof
+            else 0.0
+        )
         if var == 0:
-            raise InputFormatError("Zero variance: z-scores are undefined.", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                "Zero variance: z-scores are undefined.", code="EPIGENOME_RECORD_INVALID"
+            )
         new = [(v - mean) / math.sqrt(var) for v in values]
     else:
         lo, hi = min(values), max(values)
         if hi == lo:
-            raise InputFormatError("All values are equal: min-max scaling is undefined.", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                "All values are equal: min-max scaling is undefined.",
+                code="EPIGENOME_RECORD_INVALID",
+            )
         new = [(v - lo) / (hi - lo) for v in values]
-    out = [{**r, "raw_value": r["value"], "value": n} for r, n in zip(records, new)]
-    return candidate_ok("epigenome", "normalize", input, {"method": method, "records": out}, options=opts)
+    out = [{**r, "raw_value": r["value"], "value": n} for r, n in zip(records, new, strict=False)]
+    return candidate_ok(
+        "epigenome", "normalize", input, {"method": method, "records": out}, options=opts
+    )
+
 
 def plot(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Draw a signal track (bedGraph bins as bars) for one genomic window as an SVG string.
@@ -384,15 +626,22 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     if opts.get("output") is not None:
         Path(str(opts["output"])).write_text(svg, encoding="utf-8")
         written = str(opts["output"])
-    return candidate_ok("epigenome", "plot", input, {"svg": svg, "output_path": written}, options=opts)
+    return candidate_ok(
+        "epigenome", "plot", input, {"svg": svg, "output_path": written}, options=opts
+    )
+
 
 def predict(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Predict epigenomic signal from sequence (not implemented: needs a trained model such as Enformer or Basenji)."""
     return candidate_not_implemented(
-        "epigenome", "predict", input, options=options,
+        "epigenome",
+        "predict",
+        input,
+        options=options,
         requires="a trained sequence-to-epigenome model and its weights (Enformer, Basenji, DeepSEA)",
         message="Epigenome prediction needs trained model weights that are not bundled.",
     )
+
 
 def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Quality-check bisulfite methylation counts: coverage distribution, global methylation and conversion rate.
@@ -410,20 +659,28 @@ def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
     min_cov = _impl.opt_int(opts, "min_coverage", 10, 1, 10**9)
     controls = opts.get("control_chroms", [])
     if isinstance(controls, str) or not isinstance(controls, Sequence):
-        raise ConfigurationError("control_chroms must be a list of chromosome names.", code="EPIGENOME_OPTION_INVALID")
+        raise ConfigurationError(
+            "control_chroms must be a list of chromosome names.", code="EPIGENOME_OPTION_INVALID"
+        )
     controls = {str(c) for c in controls}
     sample = [s for s in sites if s["chrom"] not in controls]
     control = [s for s in sites if s["chrom"] in controls]
     covs = sorted(int(s["methylated"]) + int(s["unmethylated"]) for s in sample)  # type: ignore[call-overload]
     if not covs:
-        raise InputFormatError("No sites remain after removing control chromosomes.", code="EPIGENOME_INPUT_EMPTY")
+        raise InputFormatError(
+            "No sites remain after removing control chromosomes.", code="EPIGENOME_INPUT_EMPTY"
+        )
     mid = len(covs) // 2
     median = float(covs[mid]) if len(covs) % 2 else (covs[mid - 1] + covs[mid]) / 2.0
     total_cov = sum(covs)
     meth = sum(int(s["methylated"]) for s in sample)  # type: ignore[call-overload]
     result: dict[str, object] = {
-        "sites": len(sample), "total_coverage": total_cov, "mean_coverage": total_cov / len(covs), "median_coverage": median,
-        "min_coverage": min_cov, "fraction_sites_min_coverage": sum(1 for c in covs if c >= min_cov) / len(covs),
+        "sites": len(sample),
+        "total_coverage": total_cov,
+        "mean_coverage": total_cov / len(covs),
+        "median_coverage": median,
+        "min_coverage": min_cov,
+        "fraction_sites_min_coverage": sum(1 for c in covs if c >= min_cov) / len(covs),
         "global_methylation": meth / total_cov if total_cov else None,
     }
     if controls:
@@ -432,6 +689,7 @@ def qc(input: object, *, options: Mapping[str, object] | None = None) -> object:
         result["control_coverage"] = ccov
         result["conversion_rate"] = 1 - cmeth / ccov if ccov else None
     return candidate_ok("epigenome", "qc", input, result, options=opts)
+
 
 def read(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Read BED, bedGraph or Bismark coverage (per-site methylation counts) text, a file path or in-memory rows.
@@ -444,8 +702,19 @@ def read(input: object, *, options: Mapping[str, object] | None = None) -> objec
     """
     opts = dict(options or {})
     fmt = _impl.opt_str(opts, "format", "bed", ("bed", "bedgraph", "bismark_cov"))
-    records = _impl.parse_methylation(input) if fmt == "bismark_cov" else _impl.parse_intervals(input, fmt)
-    return candidate_ok("epigenome", "read", input, {"format": fmt, "count": len(records), "records": records}, options=opts)
+    records = (
+        _impl.parse_methylation(input)
+        if fmt == "bismark_cov"
+        else _impl.parse_intervals(input, fmt)
+    )
+    return candidate_ok(
+        "epigenome",
+        "read",
+        input,
+        {"format": fmt, "count": len(records), "records": records},
+        options=opts,
+    )
+
 
 def _dna_records(value: object) -> list[tuple[str, str]]:
     """DNA string, FASTA text/path or ``{id: sequence}`` as cleaned (id, ACGT sequence) pairs."""
@@ -471,20 +740,57 @@ def _dna_records(value: object) -> list[tuple[str, str]]:
     for name, seq in items:
         seq = seq.upper().replace("U", "T")
         if not seq or set(seq) - set("ACGT"):
-            raise InputFormatError(f"Sequence {name!r} is empty or has non-ACGT characters.", code="EPIGENOME_SEQUENCE_INVALID")
+            raise InputFormatError(
+                f"Sequence {name!r} is empty or has non-ACGT characters.",
+                code="EPIGENOME_SEQUENCE_INVALID",
+            )
         out.append((name, seq))
     if not out or len(out) > 10_000 or sum(len(s) for _, s in out) > 50_000_000:
-        raise ConfigurationError("Provide 1-10000 sequences of at most 50 Mb in total.", code="EPIGENOME_INPUT_TOO_LARGE")
+        raise ConfigurationError(
+            "Provide 1-10000 sequences of at most 50 Mb in total.", code="EPIGENOME_INPUT_TOO_LARGE"
+        )
     return out
 
 
-__all__ = ['align', 'annotate', 'build_chromatin_state_segments', 'calculate', 'call', 'extract_methylation_methyldackel', 'find', 'link_enhancers_to_genes', 'merge', 'normalize', 'plot', 'predict', 'qc', 'read']
+__all__ = [
+    "align",
+    "annotate",
+    "build_chromatin_state_segments",
+    "calculate",
+    "call",
+    "extract_methylation_methyldackel",
+    "find",
+    "link_enhancers_to_genes",
+    "merge",
+    "normalize",
+    "plot",
+    "predict",
+    "qc",
+    "read",
+]
 
-__candidate_adapter_operations__ = set(['align', 'annotate', 'build_chromatin_state_segments', 'calculate', 'call', 'find', 'link_enhancers_to_genes', 'merge', 'normalize', 'plot', 'predict', 'qc', 'read'])
+__candidate_adapter_operations__ = set(
+    [
+        "align",
+        "annotate",
+        "build_chromatin_state_segments",
+        "calculate",
+        "call",
+        "find",
+        "link_enhancers_to_genes",
+        "merge",
+        "normalize",
+        "plot",
+        "predict",
+        "qc",
+        "read",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
-# Optional-backend exports (see docs/api/features) 
+
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     balance_contact_matrix,
     build_contact_matrix,
@@ -506,24 +812,29 @@ from .backends import (
     summarize_pairs,
 )
 
-__all__ = [*__all__, "balance_contact_matrix", "build_contact_matrix", "build_extended_tag_pileup", "build_fragment_pileup", "calculate_coverage", "calculate_expected_contacts", "calculate_insulation_score", "calculate_non_conversion_rate", "calculate_site_binomial_pvalues", "call_fragment_peaks", "count_bam_reads_per_bin", "deduplicate_pairs", "estimate_fragment_lengths", "fetch_contact_matrix", "filter_allc_sites", "read_pairs_header", "summarize_bigwig_bins", "summarize_pairs"]
+__all__ = [
+    *__all__,
+    "balance_contact_matrix",
+    "build_contact_matrix",
+    "build_extended_tag_pileup",
+    "build_fragment_pileup",
+    "calculate_coverage",
+    "calculate_expected_contacts",
+    "calculate_insulation_score",
+    "calculate_non_conversion_rate",
+    "calculate_site_binomial_pvalues",
+    "call_fragment_peaks",
+    "count_bam_reads_per_bin",
+    "deduplicate_pairs",
+    "estimate_fragment_lengths",
+    "fetch_contact_matrix",
+    "filter_allc_sites",
+    "read_pairs_header",
+    "summarize_bigwig_bins",
+    "summarize_pairs",
+]
 
 # Full-pass exports (see docs/api/features)
-from .MACS3_functions import (
-    build_paired_fragment_pileup,
-    build_shifted_read_pileup,
-    calculate_allele_model_likelihood,
-    calculate_genotype_quality,
-    filter_summits_by_peakiness,
-    filter_summits_by_valleys,
-    find_signal_maxima,
-    guess_tag_file_format,
-    hmmratac_fragment_weights,
-    max_duplicate_tags,
-    merge_pileup_arrays,
-    refine_peak_summit,
-)
-
 from .cooler_functions import (
     coarsen_contact_matrix,
     fetch_chrom_sizes,
@@ -537,7 +848,6 @@ from .cooler_functions import (
     rename_cooler_chromosomes,
     zoomify_contact_matrix,
 )
-
 from .cooltools_functions import (
     align_windows_to_bins,
     assign_features_to_view,
@@ -560,7 +870,6 @@ from .cooltools_functions import (
     rearrange_contact_matrix,
     sample_contacts,
 )
-
 from .deeptools_functions import (
     bedgraph_to_bigwig,
     bigwig_chromosome_sizes,
@@ -573,7 +882,20 @@ from .deeptools_functions import (
     match_chromosome_name,
     parse_deeptools_region,
 )
-
+from .MACS3_functions import (
+    build_paired_fragment_pileup,
+    build_shifted_read_pileup,
+    calculate_allele_model_likelihood,
+    calculate_genotype_quality,
+    filter_summits_by_peakiness,
+    filter_summits_by_valleys,
+    find_signal_maxima,
+    guess_tag_file_format,
+    hmmratac_fragment_weights,
+    max_duplicate_tags,
+    merge_pileup_arrays,
+    refine_peak_summit,
+)
 from .methylpy_functions import (
     benjamini_hochberg_methylation_cutoffs,
     convert_fastq_to_bisulfite,
@@ -586,7 +908,6 @@ from .methylpy_functions import (
     read_allc_index,
     read_fasta_chromosome,
 )
-
 from .pairtools_functions import (
     assign_genomic_regions,
     assign_haplotype_phase,
@@ -601,29 +922,91 @@ from .pairtools_functions import (
     subset_pairs_header,
 )
 
-__all__ = [*__all__, "build_paired_fragment_pileup", "build_shifted_read_pileup", "calculate_allele_model_likelihood", "calculate_genotype_quality", "filter_summits_by_peakiness", "filter_summits_by_valleys", "find_signal_maxima", "guess_tag_file_format", "hmmratac_fragment_weights", "max_duplicate_tags", "merge_pileup_arrays", "refine_peak_summit", "coarsen_contact_matrix", "fetch_chrom_sizes", "load_fasta_lengths", "merge_contact_matrices", "parse_genomic_region", "query_bed_intervals", "read_chrom_sizes", "read_cooler_chroms", "read_cooler_pixels", "rename_cooler_chromosomes", "zoomify_contact_matrix", "align_windows_to_bins", "assign_features_to_view", "calculate_compartments", "calculate_directionality_index", "calculate_expected_trans", "calculate_logbin_expected", "calculate_saddle", "calculate_trans_compartments", "calculate_virtual_4c", "dense_cis_eigenvectors", "digitize_track", "expected_from_dense_matrix", "iterative_correction_dense", "make_chromosome_view", "observed_over_expected_matrix", "pileup_features", "read_expected_table", "read_viewframe_bed", "rearrange_contact_matrix", "sample_contacts", "bedgraph_to_bigwig", "bigwig_chromosome_sizes", "chop_regions_for_profile", "estimate_bam_scale_factors", "estimate_count_size_factors", "fingerprint_jensen_shannon", "gc_fraction_from_twobit", "map_twobit_to_bam_chromosomes", "match_chromosome_name", "parse_deeptools_region", "benjamini_hochberg_methylation_cutoffs", "convert_fastq_to_bisulfite", "count_bisulfite_basecalls", "decode_read_c_positions", "encode_read_c_positions", "expand_methylation_context", "filter_bam_by_mch_level", "index_allc_table", "read_allc_index", "read_fasta_chromosome", "assign_genomic_regions", "assign_haplotype_phase", "compute_contact_scaling", "find_read_mismatches", "find_restriction_fragment", "make_pairs_header", "normalize_scaling_curve", "parse_sam_alignments", "read_chrom_order", "read_pairs_table", "subset_pairs_header"]
+__all__ = [
+    *__all__,
+    "build_paired_fragment_pileup",
+    "build_shifted_read_pileup",
+    "calculate_allele_model_likelihood",
+    "calculate_genotype_quality",
+    "filter_summits_by_peakiness",
+    "filter_summits_by_valleys",
+    "find_signal_maxima",
+    "guess_tag_file_format",
+    "hmmratac_fragment_weights",
+    "max_duplicate_tags",
+    "merge_pileup_arrays",
+    "refine_peak_summit",
+    "coarsen_contact_matrix",
+    "fetch_chrom_sizes",
+    "load_fasta_lengths",
+    "merge_contact_matrices",
+    "parse_genomic_region",
+    "query_bed_intervals",
+    "read_chrom_sizes",
+    "read_cooler_chroms",
+    "read_cooler_pixels",
+    "rename_cooler_chromosomes",
+    "zoomify_contact_matrix",
+    "align_windows_to_bins",
+    "assign_features_to_view",
+    "calculate_compartments",
+    "calculate_directionality_index",
+    "calculate_expected_trans",
+    "calculate_logbin_expected",
+    "calculate_saddle",
+    "calculate_trans_compartments",
+    "calculate_virtual_4c",
+    "dense_cis_eigenvectors",
+    "digitize_track",
+    "expected_from_dense_matrix",
+    "iterative_correction_dense",
+    "make_chromosome_view",
+    "observed_over_expected_matrix",
+    "pileup_features",
+    "read_expected_table",
+    "read_viewframe_bed",
+    "rearrange_contact_matrix",
+    "sample_contacts",
+    "bedgraph_to_bigwig",
+    "bigwig_chromosome_sizes",
+    "chop_regions_for_profile",
+    "estimate_bam_scale_factors",
+    "estimate_count_size_factors",
+    "fingerprint_jensen_shannon",
+    "gc_fraction_from_twobit",
+    "map_twobit_to_bam_chromosomes",
+    "match_chromosome_name",
+    "parse_deeptools_region",
+    "benjamini_hochberg_methylation_cutoffs",
+    "convert_fastq_to_bisulfite",
+    "count_bisulfite_basecalls",
+    "decode_read_c_positions",
+    "encode_read_c_positions",
+    "expand_methylation_context",
+    "filter_bam_by_mch_level",
+    "index_allc_table",
+    "read_allc_index",
+    "read_fasta_chromosome",
+    "assign_genomic_regions",
+    "assign_haplotype_phase",
+    "compute_contact_scaling",
+    "find_read_mismatches",
+    "find_restriction_fragment",
+    "make_pairs_header",
+    "normalize_scaling_curve",
+    "parse_sam_alignments",
+    "read_chrom_order",
+    "read_pairs_table",
+    "subset_pairs_header",
+]
 
 # Review-pass exports (see docs/api/features)
-from .MACS3_review_functions import (
-    digest_hmmratac_fragments,
-    extract_hmmratac_training_data,
-    hmmratac_proba_to_bedgraph,
-    hmmratac_states_path,
-    load_hmmratac_model,
-    predict_hmmratac_states,
-    save_hmmratac_model,
-    train_hmmratac_model,
-    write_hmmratac_accessible_regions,
-    write_hmmratac_states_bed,
-)
-
 from .cooler_review_functions import (
     create_single_cell_cooler,
     infer_cooler_binsize,
     list_cooler_groups,
     list_scool_cells,
 )
-
 from .cooltools_review_functions import (
     adaptive_coarsegrain_matrix,
     align_track_to_cooler_bins,
@@ -642,14 +1025,24 @@ from .cooltools_review_functions import (
     saddle_compartment_strength,
     smooth_contact_decay,
 )
-
 from .deeptools_review_functions import (
     bigwig_bedgraph_tiles,
     count_reads_per_gc_bins,
     fingerprint_synthetic_jsd,
     tabulate_gc_fragment_counts,
 )
-
+from .MACS3_review_functions import (
+    digest_hmmratac_fragments,
+    extract_hmmratac_training_data,
+    hmmratac_proba_to_bedgraph,
+    hmmratac_states_path,
+    load_hmmratac_model,
+    predict_hmmratac_states,
+    save_hmmratac_model,
+    train_hmmratac_model,
+    write_hmmratac_accessible_regions,
+    write_hmmratac_states_bed,
+)
 from .methylpy_review_functions import (
     add_cytosine_info_to_dmrs,
     add_methylation_levels_to_dmrs,
@@ -664,7 +1057,6 @@ from .methylpy_review_functions import (
     split_allc_into_chunks,
     split_mpileup_chunks,
 )
-
 from .pairtools_review_functions import (
     chromsizes_from_sam_header,
     filter_pairs_by_coverage,
@@ -672,9 +1064,68 @@ from .pairtools_review_functions import (
     sam_to_pairs,
 )
 
-__all__ = [*__all__, "digest_hmmratac_fragments", "extract_hmmratac_training_data", "hmmratac_proba_to_bedgraph", "hmmratac_states_path", "load_hmmratac_model", "predict_hmmratac_states", "save_hmmratac_model", "train_hmmratac_model", "write_hmmratac_accessible_regions", "write_hmmratac_states_bed", "create_single_cell_cooler", "infer_cooler_binsize", "list_cooler_groups", "list_scool_cells", "adaptive_coarsegrain_matrix", "align_track_to_cooler_bins", "assign_bins_to_regions", "assign_paired_features_to_view", "call_chromatin_dots", "dense_trans_eigenvectors", "expand_features_to_bins", "expected_full_table", "make_track_view", "mask_track_bad_bins", "observed_over_expected_pixels", "pairwise_block_sums", "pairwise_diagonal_sums", "replace_cis_with_decoys", "saddle_compartment_strength", "smooth_contact_decay", "bigwig_bedgraph_tiles", "count_reads_per_gc_bins", "fingerprint_synthetic_jsd", "tabulate_gc_fragment_counts", "add_cytosine_info_to_dmrs", "add_methylation_levels_to_dmrs", "collapse_dmr_windows", "dmr_residual_cutoff", "estimate_dmr_fdr_cutoff", "filter_allc_by_pvalue_cutoffs", "merge_allc_tables", "merge_dms_to_dmrs", "run_allc_binomial_test", "split_allc_by_chromosome", "split_allc_into_chunks", "split_mpileup_chunks", "chromsizes_from_sam_header", "filter_pairs_by_coverage", "mark_sam_duplicate", "sam_to_pairs"]
+__all__ = [
+    *__all__,
+    "digest_hmmratac_fragments",
+    "extract_hmmratac_training_data",
+    "hmmratac_proba_to_bedgraph",
+    "hmmratac_states_path",
+    "load_hmmratac_model",
+    "predict_hmmratac_states",
+    "save_hmmratac_model",
+    "train_hmmratac_model",
+    "write_hmmratac_accessible_regions",
+    "write_hmmratac_states_bed",
+    "create_single_cell_cooler",
+    "infer_cooler_binsize",
+    "list_cooler_groups",
+    "list_scool_cells",
+    "adaptive_coarsegrain_matrix",
+    "align_track_to_cooler_bins",
+    "assign_bins_to_regions",
+    "assign_paired_features_to_view",
+    "call_chromatin_dots",
+    "dense_trans_eigenvectors",
+    "expand_features_to_bins",
+    "expected_full_table",
+    "make_track_view",
+    "mask_track_bad_bins",
+    "observed_over_expected_pixels",
+    "pairwise_block_sums",
+    "pairwise_diagonal_sums",
+    "replace_cis_with_decoys",
+    "saddle_compartment_strength",
+    "smooth_contact_decay",
+    "bigwig_bedgraph_tiles",
+    "count_reads_per_gc_bins",
+    "fingerprint_synthetic_jsd",
+    "tabulate_gc_fragment_counts",
+    "add_cytosine_info_to_dmrs",
+    "add_methylation_levels_to_dmrs",
+    "collapse_dmr_windows",
+    "dmr_residual_cutoff",
+    "estimate_dmr_fdr_cutoff",
+    "filter_allc_by_pvalue_cutoffs",
+    "merge_allc_tables",
+    "merge_dms_to_dmrs",
+    "run_allc_binomial_test",
+    "split_allc_by_chromosome",
+    "split_allc_into_chunks",
+    "split_mpileup_chunks",
+    "chromsizes_from_sam_header",
+    "filter_pairs_by_coverage",
+    "mark_sam_duplicate",
+    "sam_to_pairs",
+]
 
 # Family-pass exports (see docs/api/features)
+from .cooltools_family_functions import (
+    compute_region_contact_scaling,
+    pairwise_region_sums,
+)
+from .deeptools_family_functions import (
+    chop_regions_from_middle,
+)
 from .MACS3_family_functions import (
     build_counted_fragment_pileup,
     build_fragment_end_pileup,
@@ -682,26 +1133,28 @@ from .MACS3_family_functions import (
     calculate_allele_specific_genotype_quality,
     calculate_allele_specific_model_likelihood,
 )
-
-from .cooltools_family_functions import (
-    compute_region_contact_scaling,
-    pairwise_region_sums,
-)
-
-from .deeptools_family_functions import (
-    chop_regions_from_middle,
-)
-
 from .methylpy_family_functions import (
     convert_paired_fastq_to_bisulfite,
 )
-
 from .pairtools_family_functions import (
     deduplicate_pairs_online,
     normalize_scaling_curve_unity,
 )
 
-__all__ = [*__all__, "build_counted_fragment_pileup", "build_fragment_end_pileup", "build_hmmratac_fragment_pileup", "calculate_allele_specific_genotype_quality", "calculate_allele_specific_model_likelihood", "compute_region_contact_scaling", "pairwise_region_sums", "chop_regions_from_middle", "convert_paired_fastq_to_bisulfite", "deduplicate_pairs_online", "normalize_scaling_curve_unity"]
+__all__ = [
+    *__all__,
+    "build_counted_fragment_pileup",
+    "build_fragment_end_pileup",
+    "build_hmmratac_fragment_pileup",
+    "calculate_allele_specific_genotype_quality",
+    "calculate_allele_specific_model_likelihood",
+    "compute_region_contact_scaling",
+    "pairwise_region_sums",
+    "chop_regions_from_middle",
+    "convert_paired_fastq_to_bisulfite",
+    "deduplicate_pairs_online",
+    "normalize_scaling_curve_unity",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -866,33 +1319,191 @@ from .pairtools_gap_functions import (
     pairtools_stats,
 )
 from .snapatac2_gap_functions import (
-    load_snapatac2_dataset,
-    fetch_snapatac2_pbmc500,
+    fetch_snapatac2_cis_bp_motifs,
+    fetch_snapatac2_colon_transverse,
+    fetch_snapatac2_genome_files,
+    fetch_snapatac2_hea_ccre,
+    fetch_snapatac2_meuleman_2020_motifs,
     fetch_snapatac2_pbmc5k,
     fetch_snapatac2_pbmc10k_multiome,
-    fetch_snapatac2_colon_transverse,
-    fetch_snapatac2_hea_ccre,
-    fetch_snapatac2_cis_bp_motifs,
-    fetch_snapatac2_meuleman_2020_motifs,
-    fetch_snapatac2_genome_files,
-    render_snapatac2_figure_png,
+    fetch_snapatac2_pbmc500,
+    load_snapatac2_dataset,
+    plot_snapatac2_coverage_png,
+    plot_snapatac2_frag_size_distr_png,
     plot_snapatac2_heatmap_png,
     plot_snapatac2_kde2d_png,
-    plot_snapatac2_scatter_png,
-    plot_snapatac2_scatter3d_png,
-    plot_snapatac2_network_scores_png,
-    plot_snapatac2_network_edge_stat_png,
-    plot_snapatac2_valid_cells_png,
-    plot_snapatac2_tsse_png,
-    plot_snapatac2_frag_size_distr_png,
-    plot_snapatac2_spectral_eigenvalues_png,
-    plot_snapatac2_regions_png,
-    plot_snapatac2_umap_png,
     plot_snapatac2_motif_enrichment_png,
-    plot_snapatac2_coverage_png,
+    plot_snapatac2_network_edge_stat_png,
+    plot_snapatac2_network_scores_png,
+    plot_snapatac2_regions_png,
+    plot_snapatac2_scatter3d_png,
+    plot_snapatac2_scatter_png,
+    plot_snapatac2_spectral_eigenvalues_png,
+    plot_snapatac2_tsse_png,
+    plot_snapatac2_umap_png,
+    plot_snapatac2_valid_cells_png,
+    render_snapatac2_figure_png,
 )
 
-__all__ = [*__all__, "cooler_attrs", "cooler_balance", "cooler_balance_check", "cooler_cload_hiclib", "cooler_cload_pairix", "cooler_cload_pairs", "cooler_cload_tabix", "cooler_coarsen", "cooler_cp", "cooler_csort", "cooler_csort_flip_pairs", "cooler_csort_index_pairs", "cooler_csort_read_pairs", "cooler_csort_sort_pairs", "cooler_digest", "cooler_dump", "cooler_info", "cooler_ln", "cooler_load", "cooler_ls", "cooler_makebins", "cooler_merge", "cooler_mv", "cooler_pairs_header", "cooler_show", "cooler_show_view", "cooler_tree", "cooler_zoomify", "cooler_resolve_bins", "download_cooltools_example_data", "download_cooltools_file", "list_cooltools_example_datasets", "plot_cooltools_saddle", "bam_mapping_statistics", "alignment_sieve", "bam_compare", "bam_coverage", "bam_pe_fragment_size", "bigwig_compare", "estimate_scale_factor", "plot_coverage", "plot_fingerprint", "bigwig_average", "compute_matrix_reference_point", "compute_matrix_scale_regions", "multi_bam_summary", "multi_bigwig_summary", "plot_correlation", "plot_heatmap", "plot_pca", "plot_profile", "estimate_read_filtering", "plot_enrichment", "compute_gc_bias", "correct_gc_bias", "bind_columns", "bind_rows", "data_range", "filter_strand", "filter_values", "matrix_info", "relabel_matrix", "sort_matrix", "subset_matrix", "fragment_length_density", "plot_enrichment_counts", "plot_gc_bias", "plot_matrix_heatmap", "subtract_blacklist_intervals", "template_lengths_from_bam", "call_atac_peaks_hmmratac", "call_broad_peaks_from_bedgraph", "call_chip_peaks", "call_peaks_from_bedgraph", "call_variants_in_peaks", "combine_replicate_bedgraphs", "compare_bedgraph_tracks", "differential_bedgraph_peaks", "filter_duplicate_reads", "operate_bedgraph_scores", "pileup_reads_to_bedgraph", "plot_fragment_model", "predict_fragment_size", "random_sample_reads", "refine_peak_summits", "methylpy_bgzip_allc_file", "methylpy_convert_allc_to_bigwig", "methylpy_dmrfind", "methylpy_pe_call_methylated_sites", "methylpy_pe_find_multi_mappers", "methylpy_pe_flip_read2_strand", "methylpy_pe_merge_bam_files", "methylpy_pe_merge_sorted_multimap", "methylpy_pe_merge_sorted_multimap_max_mapq", "methylpy_pe_run_alignment", "methylpy_pe_run_mapping", "methylpy_pe_run_methylation_pipeline", "methylpy_quality_trim_pe", "methylpy_quality_trim_se", "methylpy_remove_clonal_bam", "methylpy_run_rms_tests", "methylpy_se_build_ref", "methylpy_se_call_methylated_sites", "methylpy_se_call_methylated_sites_with_snp_info", "methylpy_se_find_multi_mappers", "methylpy_se_merge_bam_files", "methylpy_se_merge_sorted_multimap", "methylpy_se_merge_sorted_multimap_max_mapq", "methylpy_se_run_alignment", "methylpy_se_run_mapping", "methylpy_se_run_methylation_pipeline", "methylpy_filter_allc_files", "pairtools_dedup", "pairtools_filterbycov", "pairtools_flip", "pairtools_header_generate", "pairtools_header_set_columns", "pairtools_header_transfer", "pairtools_header_validate_columns", "pairtools_mark_split_pair_as_dup", "pairtools_markasdup", "pairtools_merge", "pairtools_parse", "pairtools_parse2", "pairtools_phase", "pairtools_restrict", "pairtools_sample", "pairtools_scaling", "pairtools_select", "pairtools_sort", "pairtools_split", "pairtools_stats", "load_snapatac2_dataset", "fetch_snapatac2_pbmc500", "fetch_snapatac2_pbmc5k", "fetch_snapatac2_pbmc10k_multiome", "fetch_snapatac2_colon_transverse", "fetch_snapatac2_hea_ccre", "fetch_snapatac2_cis_bp_motifs", "fetch_snapatac2_meuleman_2020_motifs", "fetch_snapatac2_genome_files", "render_snapatac2_figure_png", "plot_snapatac2_heatmap_png", "plot_snapatac2_kde2d_png", "plot_snapatac2_scatter_png", "plot_snapatac2_scatter3d_png", "plot_snapatac2_network_scores_png", "plot_snapatac2_network_edge_stat_png", "plot_snapatac2_valid_cells_png", "plot_snapatac2_tsse_png", "plot_snapatac2_frag_size_distr_png", "plot_snapatac2_spectral_eigenvalues_png", "plot_snapatac2_regions_png", "plot_snapatac2_umap_png", "plot_snapatac2_motif_enrichment_png", "plot_snapatac2_coverage_png"]
+__all__ = [
+    *__all__,
+    "cooler_attrs",
+    "cooler_balance",
+    "cooler_balance_check",
+    "cooler_cload_hiclib",
+    "cooler_cload_pairix",
+    "cooler_cload_pairs",
+    "cooler_cload_tabix",
+    "cooler_coarsen",
+    "cooler_cp",
+    "cooler_csort",
+    "cooler_csort_flip_pairs",
+    "cooler_csort_index_pairs",
+    "cooler_csort_read_pairs",
+    "cooler_csort_sort_pairs",
+    "cooler_digest",
+    "cooler_dump",
+    "cooler_info",
+    "cooler_ln",
+    "cooler_load",
+    "cooler_ls",
+    "cooler_makebins",
+    "cooler_merge",
+    "cooler_mv",
+    "cooler_pairs_header",
+    "cooler_show",
+    "cooler_show_view",
+    "cooler_tree",
+    "cooler_zoomify",
+    "cooler_resolve_bins",
+    "download_cooltools_example_data",
+    "download_cooltools_file",
+    "list_cooltools_example_datasets",
+    "plot_cooltools_saddle",
+    "bam_mapping_statistics",
+    "alignment_sieve",
+    "bam_compare",
+    "bam_coverage",
+    "bam_pe_fragment_size",
+    "bigwig_compare",
+    "estimate_scale_factor",
+    "plot_coverage",
+    "plot_fingerprint",
+    "bigwig_average",
+    "compute_matrix_reference_point",
+    "compute_matrix_scale_regions",
+    "multi_bam_summary",
+    "multi_bigwig_summary",
+    "plot_correlation",
+    "plot_heatmap",
+    "plot_pca",
+    "plot_profile",
+    "estimate_read_filtering",
+    "plot_enrichment",
+    "compute_gc_bias",
+    "correct_gc_bias",
+    "bind_columns",
+    "bind_rows",
+    "data_range",
+    "filter_strand",
+    "filter_values",
+    "matrix_info",
+    "relabel_matrix",
+    "sort_matrix",
+    "subset_matrix",
+    "fragment_length_density",
+    "plot_enrichment_counts",
+    "plot_gc_bias",
+    "plot_matrix_heatmap",
+    "subtract_blacklist_intervals",
+    "template_lengths_from_bam",
+    "call_atac_peaks_hmmratac",
+    "call_broad_peaks_from_bedgraph",
+    "call_chip_peaks",
+    "call_peaks_from_bedgraph",
+    "call_variants_in_peaks",
+    "combine_replicate_bedgraphs",
+    "compare_bedgraph_tracks",
+    "differential_bedgraph_peaks",
+    "filter_duplicate_reads",
+    "operate_bedgraph_scores",
+    "pileup_reads_to_bedgraph",
+    "plot_fragment_model",
+    "predict_fragment_size",
+    "random_sample_reads",
+    "refine_peak_summits",
+    "methylpy_bgzip_allc_file",
+    "methylpy_convert_allc_to_bigwig",
+    "methylpy_dmrfind",
+    "methylpy_pe_call_methylated_sites",
+    "methylpy_pe_find_multi_mappers",
+    "methylpy_pe_flip_read2_strand",
+    "methylpy_pe_merge_bam_files",
+    "methylpy_pe_merge_sorted_multimap",
+    "methylpy_pe_merge_sorted_multimap_max_mapq",
+    "methylpy_pe_run_alignment",
+    "methylpy_pe_run_mapping",
+    "methylpy_pe_run_methylation_pipeline",
+    "methylpy_quality_trim_pe",
+    "methylpy_quality_trim_se",
+    "methylpy_remove_clonal_bam",
+    "methylpy_run_rms_tests",
+    "methylpy_se_build_ref",
+    "methylpy_se_call_methylated_sites",
+    "methylpy_se_call_methylated_sites_with_snp_info",
+    "methylpy_se_find_multi_mappers",
+    "methylpy_se_merge_bam_files",
+    "methylpy_se_merge_sorted_multimap",
+    "methylpy_se_merge_sorted_multimap_max_mapq",
+    "methylpy_se_run_alignment",
+    "methylpy_se_run_mapping",
+    "methylpy_se_run_methylation_pipeline",
+    "methylpy_filter_allc_files",
+    "pairtools_dedup",
+    "pairtools_filterbycov",
+    "pairtools_flip",
+    "pairtools_header_generate",
+    "pairtools_header_set_columns",
+    "pairtools_header_transfer",
+    "pairtools_header_validate_columns",
+    "pairtools_mark_split_pair_as_dup",
+    "pairtools_markasdup",
+    "pairtools_merge",
+    "pairtools_parse",
+    "pairtools_parse2",
+    "pairtools_phase",
+    "pairtools_restrict",
+    "pairtools_sample",
+    "pairtools_scaling",
+    "pairtools_select",
+    "pairtools_sort",
+    "pairtools_split",
+    "pairtools_stats",
+    "load_snapatac2_dataset",
+    "fetch_snapatac2_pbmc500",
+    "fetch_snapatac2_pbmc5k",
+    "fetch_snapatac2_pbmc10k_multiome",
+    "fetch_snapatac2_colon_transverse",
+    "fetch_snapatac2_hea_ccre",
+    "fetch_snapatac2_cis_bp_motifs",
+    "fetch_snapatac2_meuleman_2020_motifs",
+    "fetch_snapatac2_genome_files",
+    "render_snapatac2_figure_png",
+    "plot_snapatac2_heatmap_png",
+    "plot_snapatac2_kde2d_png",
+    "plot_snapatac2_scatter_png",
+    "plot_snapatac2_scatter3d_png",
+    "plot_snapatac2_network_scores_png",
+    "plot_snapatac2_network_edge_stat_png",
+    "plot_snapatac2_valid_cells_png",
+    "plot_snapatac2_tsse_png",
+    "plot_snapatac2_frag_size_distr_png",
+    "plot_snapatac2_spectral_eigenvalues_png",
+    "plot_snapatac2_regions_png",
+    "plot_snapatac2_umap_png",
+    "plot_snapatac2_motif_enrichment_png",
+    "plot_snapatac2_coverage_png",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .cooler_cooltools_p38_functions import (

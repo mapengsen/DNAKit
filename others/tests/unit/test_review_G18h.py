@@ -16,8 +16,8 @@ from dnakit.exceptions import ConfigurationError
 
 pysam = pytest.importorskip("pysam")
 
-from dnakit.variants import hgvs_review_functions as hgvs_mod  # noqa: E402
-from dnakit.variants import pysam_review_functions as pysam_mod  # noqa: E402
+from dnakit.variants import hgvs_review_functions as hgvs_mod
+from dnakit.variants import pysam_review_functions as pysam_mod
 
 REF_CHR1 = "ACGT" * 30  # 120 bases
 REF_CHR2 = "GGCC" * 20  # 80 bases

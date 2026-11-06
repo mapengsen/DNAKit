@@ -68,8 +68,8 @@ __all__ = [
     "compare_sourmash_sequences",
     "describe_analysis",
     "describe_mcp_tool",
-    "describe_publication_record",
     "describe_publication_audit",
+    "describe_publication_record",
     "describe_third_party_tool",
     "describe_unified_capability",
     "diff_geneblocks_sequences",
@@ -78,9 +78,9 @@ __all__ = [
     "integration_inventory",
     "intersect_pybedtools_bed",
     "list_analyses",
-    "list_publication_records",
     "list_mcp_servers",
     "list_mcp_tools",
+    "list_publication_records",
     "list_third_party_tools",
     "list_unified_capabilities",
     "map_mappy_sequences",
@@ -89,10 +89,10 @@ __all__ = [
     "optimize_with_dnachisel",
     "overlap_polars_bio_bed",
     "permanova_scikit_bio",
-    "publication_readiness",
-    "publication_audit_summary",
-    "publication_registry_summary",
     "plan_analysis",
+    "publication_audit_summary",
+    "publication_readiness",
+    "publication_registry_summary",
     "query_gffutils_database",
     "run_analysis",
     "run_unified_capability",
@@ -114,7 +114,7 @@ __all__ = [
     "unified_capability_summary",
 ]
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .service_backends import (
     analyze_fasta_with_clawbio,
     compute_toil_sequence_stats,
@@ -127,6 +127,17 @@ from .service_backends import (
     show_galaxy_tool,
 )
 
-__all__ = [*__all__, "analyze_fasta_with_clawbio", "compute_toil_sequence_stats", "describe_smartapi_api", "get_biomcp_gene", "get_biomcp_variant", "list_galaxy_tools", "search_biomcp_genes", "search_smartapi_registry", "show_galaxy_tool"]
+__all__ = [
+    *__all__,
+    "analyze_fasta_with_clawbio",
+    "compute_toil_sequence_stats",
+    "describe_smartapi_api",
+    "get_biomcp_gene",
+    "get_biomcp_variant",
+    "list_galaxy_tools",
+    "search_biomcp_genes",
+    "search_smartapi_registry",
+    "show_galaxy_tool",
+]
 
 _register_public_verbose(globals(), tuple(__all__))

@@ -128,28 +128,49 @@ def test_validation_errors(tmp_path: Path, toy: dict[str, Path]) -> None:
     fake.chmod(0o755)
     with pytest.raises(ConfigurationError):
         vs.vsearch_detect_chimeras(
-            toy["fasta"], tmp_path / "o1", method="uchime_ref", vsearch_path=str(fake), verbose=False
+            toy["fasta"],
+            tmp_path / "o1",
+            method="uchime_ref",
+            vsearch_path=str(fake),
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         vs.vsearch_detect_chimeras(
-            toy["fasta"], tmp_path / "o2", method="uchime_denovo", chimeras_parts=4, vsearch_path=str(fake), verbose=False
+            toy["fasta"],
+            tmp_path / "o2",
+            method="uchime_denovo",
+            chimeras_parts=4,
+            vsearch_path=str(fake),
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         vs.vsearch_cut_restriction_sites(
-            toy["fasta"], tmp_path / "o3", cut_pattern="GAATTC", vsearch_path=str(fake), verbose=False
+            toy["fasta"],
+            tmp_path / "o3",
+            cut_pattern="GAATTC",
+            vsearch_path=str(fake),
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
-        vs.vsearch_extract_records(toy["fasta"], tmp_path / "o4", vsearch_path=str(fake), verbose=False)
+        vs.vsearch_extract_records(
+            toy["fasta"], tmp_path / "o4", vsearch_path=str(fake), verbose=False
+        )
     with pytest.raises(ConfigurationError):
         vs.vsearch_fastq_eestats2(
-            toy["reads"], tmp_path / "o5", length_cutoffs="50;100", vsearch_path=str(fake), verbose=False
+            toy["reads"],
+            tmp_path / "o5",
+            length_cutoffs="50;100",
+            vsearch_path=str(fake),
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         vs.vsearch_dereplicate_fulllength(
             toy["fasta"], tmp_path / "o6", method="bogus", vsearch_path=str(fake), verbose=False
         )
     with pytest.raises(ConfigurationError):
-        vs.vsearch_sort_by_size(tmp_path / "missing.fa", tmp_path / "o7", vsearch_path=str(fake), verbose=False)
+        vs.vsearch_sort_by_size(
+            tmp_path / "missing.fa", tmp_path / "o7", vsearch_path=str(fake), verbose=False
+        )
 
 
 def test_public_names_have_verbose() -> None:

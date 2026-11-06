@@ -51,7 +51,12 @@ def _program(cutadapt_path: str | None) -> str:
 @functools.lru_cache(maxsize=8)
 def _version(program: str) -> str:
     completed = subprocess.run(
-        [program, "--version"], capture_output=True, text=True, timeout=120, shell=False, check=False
+        [program, "--version"],
+        capture_output=True,
+        text=True,
+        timeout=120,
+        shell=False,
+        check=False,
     )
     return (completed.stdout or completed.stderr).strip()
 
@@ -108,14 +113,20 @@ def _trim(
     source = _existing(input_path, "input_path")
     target = _new(output_path, "output_path")
     report_json = _new(json_path, "json_path") if json_path is not None else None
-    if isinstance(error_rate, bool) or not isinstance(error_rate, (int, float)) or not 0 <= error_rate <= 1:
+    if (
+        isinstance(error_rate, bool)
+        or not isinstance(error_rate, (int, float))
+        or not 0 <= error_rate <= 1
+    ):
         raise ConfigurationError("error_rate must be a number between 0 and 1.")
     if isinstance(cores, bool) or not isinstance(cores, int) or cores < 1:
         raise ConfigurationError("cores must be a positive integer.")
     if report not in _REPORTS:
         raise ConfigurationError(f"report must be one of {_REPORTS}.")
     if quality_cutoff is not None and not _QUALITY.match(quality_cutoff):
-        raise ConfigurationError("quality_cutoff must look like '20' or '10,20' (5' cutoff, 3' cutoff).")
+        raise ConfigurationError(
+            "quality_cutoff must look like '20' or '10,20' (5' cutoff, 3' cutoff)."
+        )
     minimum = _length(minimum_length, "minimum_length")
     maximum = _length(maximum_length, "maximum_length")
     if minimum is not None and maximum is not None and maximum < minimum:
@@ -152,7 +163,11 @@ def _trim(
         cwd=target.parent,
     )
     outputs = [p for p in (target, report_json) if p is not None and p.is_file()]
-    status = "completed" if completed.returncode == 0 and len(outputs) == (2 if report_json else 1) else "failed"
+    status = (
+        "completed"
+        if completed.returncode == 0 and len(outputs) == (2 if report_json else 1)
+        else "failed"
+    )
     result: dict[str, Any] = {
         "status": status,
         "backend": "cutadapt",

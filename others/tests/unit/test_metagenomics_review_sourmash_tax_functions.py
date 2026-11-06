@@ -50,16 +50,41 @@ def gather(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     header = "name,genome_filename,protein_filename\n"
     csv = root / "genomes.csv"
     csv.write_text(header + "".join(f"g{i},{root / f'g{i}.fa'},\n" for i in (1, 2, 3)))
-    _sm("sketch", "fromfile", str(csv), "--output-signatures", str(root / "db.zip"), "-p", "dna,k=31,scaled=100")
+    _sm(
+        "sketch",
+        "fromfile",
+        str(csv),
+        "--output-signatures",
+        str(root / "db.zip"),
+        "-p",
+        "dna,k=31,scaled=100",
+    )
     _sm("index", str(root / "db.sbt.zip"), str(root / "db.zip"), "-k", "31", "--scaled", "100")
     # query: half of genome 1 plus random sequence, so part of the query is unassigned
     rng = random.Random(99)
     query = genomes[1][:15000] + "".join(rng.choice("ACGT") for _ in range(15000))
     (root / "query.fa").write_text(f">q\n{query}\n")
-    _sm("sketch", "dna", str(root / "query.fa"), "-p", "k=31,scaled=100", "-o", str(root / "query.sig"))
     _sm(
-        "gather", str(root / "query.sig"), str(root / "db.sbt.zip"), "-k", "31", "--scaled", "100",
-        "-o", str(root / "gather.csv"), "--threshold-bp", "0",
+        "sketch",
+        "dna",
+        str(root / "query.fa"),
+        "-p",
+        "k=31,scaled=100",
+        "-o",
+        str(root / "query.sig"),
+    )
+    _sm(
+        "gather",
+        str(root / "query.sig"),
+        str(root / "db.sbt.zip"),
+        "-k",
+        "31",
+        "--scaled",
+        "100",
+        "-o",
+        str(root / "gather.csv"),
+        "--threshold-bp",
+        "0",
     )
     (root / "lineages.csv").write_text(_LINEAGES)
     (root / "taxpath.csv").write_text(_TAXPATH)
@@ -68,18 +93,26 @@ def gather(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
         blank += line + ",\n"
     (root / "blank_taxpath.csv").write_text(blank)
     lin = "ident,superkingdom,phylum,class,order,family,genus,species,strain,lin\n"
-    for number, line in zip((1, 2, 3), _LINEAGES.splitlines()[1:]):
+    for number, line in zip((1, 2, 3), _LINEAGES.splitlines()[1:], strict=False):
         lin += line + f",{number}\n"
     (root / "lin.csv").write_text(lin)
     (root / "lingroups.csv").write_text("name,lin\nBacillus,1\n")
-    return {"root": root, "gather": root / "gather.csv", "lineages": root / "lineages.csv",
-            "taxpath": root / "taxpath.csv", "blank": root / "blank_taxpath.csv",
-            "lin": root / "lin.csv", "lingroups": root / "lingroups.csv"}
+    return {
+        "root": root,
+        "gather": root / "gather.csv",
+        "lineages": root / "lineages.csv",
+        "taxpath": root / "taxpath.csv",
+        "blank": root / "blank_taxpath.csv",
+        "lin": root / "lin.csv",
+        "lingroups": root / "lingroups.csv",
+    }
 
 
 def test_krona_profile_requires_a_rank(gather: dict[str, Path], tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
-        tax.krona_taxonomy_profile([str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "k"), rank="")
+        tax.krona_taxonomy_profile(
+            [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "k"), rank=""
+        )
 
 
 def test_krona_profile_writes_fractions_by_lineage(gather: dict[str, Path], tmp_path: Path) -> None:
@@ -93,7 +126,9 @@ def test_krona_profile_writes_fractions_by_lineage(gather: dict[str, Path], tmp_
 
 
 def test_csv_summary_has_per_rank_rows(gather: dict[str, Path], tmp_path: Path) -> None:
-    result = tax.csv_taxonomy_summary([str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "csv"))
+    result = tax.csv_taxonomy_summary(
+        [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "csv")
+    )
     assert result["status"] == "completed", result["log_tail"]
     text = (tmp_path / "csv.summarized.csv").read_text()
     assert text.splitlines()[0].startswith("query_name,rank,fraction,lineage")
@@ -111,7 +146,10 @@ def test_human_summary_and_rank_option(gather: dict[str, Path], tmp_path: Path) 
 def test_lineage_summary_requires_valid_rank(gather: dict[str, Path], tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         tax.lineage_taxonomy_summary(
-            [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "l"), rank="kingdomish"
+            [str(gather["gather"])],
+            [str(gather["lineages"])],
+            str(tmp_path / "l"),
+            rank="kingdomish",
         )
 
 
@@ -125,11 +163,15 @@ def test_lineage_summary_at_rank(gather: dict[str, Path], tmp_path: Path) -> Non
 
 def test_bioboxes_needs_taxpath_column(gather: dict[str, Path], tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
-        tax.bioboxes_taxonomy_profile([str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "b"))
+        tax.bioboxes_taxonomy_profile(
+            [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "b")
+        )
 
 
 def test_bioboxes_profile_with_ncbi_taxids(gather: dict[str, Path], tmp_path: Path) -> None:
-    result = tax.bioboxes_taxonomy_profile([str(gather["gather"])], [str(gather["taxpath"])], str(tmp_path / "bb"))
+    result = tax.bioboxes_taxonomy_profile(
+        [str(gather["gather"])], [str(gather["taxpath"])], str(tmp_path / "bb")
+    )
     assert result["status"] == "completed", result["log_tail"]
     text = (tmp_path / "bb.bioboxes.profile").read_text()
     assert "@Ranks:superkingdom|phylum|class|order|family|genus|species|strain" in text
@@ -138,13 +180,17 @@ def test_bioboxes_profile_with_ncbi_taxids(gather: dict[str, Path], tmp_path: Pa
 
 def test_bioboxes_blank_taxids_fail_upstream(gather: dict[str, Path], tmp_path: Path) -> None:
     # sourmash 4.9.4 raises TypeError when the reported lineage has no taxid; the function reports it as failed
-    result = tax.bioboxes_taxonomy_profile([str(gather["gather"])], [str(gather["blank"])], str(tmp_path / "bb2"))
+    result = tax.bioboxes_taxonomy_profile(
+        [str(gather["gather"])], [str(gather["blank"])], str(tmp_path / "bb2")
+    )
     assert result["status"] == "failed"
     assert "TypeError" in result["log_tail"]
 
 
 def test_kreport_has_unclassified_row(gather: dict[str, Path], tmp_path: Path) -> None:
-    result = tax.kreport_taxonomy_report([str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "kr"))
+    result = tax.kreport_taxonomy_report(
+        [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "kr")
+    )
     assert result["status"] == "completed", result["log_tail"]
     text = (tmp_path / "kr.kreport.txt").read_text()
     assert "unclassified" in text
@@ -154,13 +200,19 @@ def test_kreport_has_unclassified_row(gather: dict[str, Path], tmp_path: Path) -
 def test_lingroup_report_needs_lin_column(gather: dict[str, Path], tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         tax.lingroup_taxonomy_report(
-            [str(gather["gather"])], [str(gather["lineages"])], str(gather["lingroups"]), str(tmp_path / "lg")
+            [str(gather["gather"])],
+            [str(gather["lineages"])],
+            str(gather["lingroups"]),
+            str(tmp_path / "lg"),
         )
 
 
 def test_lingroup_report_with_lin_taxonomy(gather: dict[str, Path], tmp_path: Path) -> None:
     result = tax.lingroup_taxonomy_report(
-        [str(gather["gather"])], [str(gather["lin"])], str(gather["lingroups"]), str(tmp_path / "lg")
+        [str(gather["gather"])],
+        [str(gather["lin"])],
+        str(gather["lingroups"]),
+        str(tmp_path / "lg"),
     )
     assert result["status"] == "completed", result["log_tail"]
     assert (tmp_path / "lg.lingroup.tsv").is_file()
@@ -169,14 +221,20 @@ def test_lingroup_report_with_lin_taxonomy(gather: dict[str, Path], tmp_path: Pa
 def test_existing_output_is_refused(gather: dict[str, Path], tmp_path: Path) -> None:
     (tmp_path / "taken.summarized.csv").write_text("x")
     with pytest.raises(ConfigurationError):
-        tax.csv_taxonomy_summary([str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "taken"))
+        tax.csv_taxonomy_summary(
+            [str(gather["gather"])], [str(gather["lineages"])], str(tmp_path / "taken")
+        )
 
 
 def test_public_functions_take_keyword_only_verbose() -> None:
     public = [
-        tax.krona_taxonomy_profile, tax.csv_taxonomy_summary, tax.human_taxonomy_summary,
-        tax.lineage_taxonomy_summary, tax.bioboxes_taxonomy_profile,
-        tax.kreport_taxonomy_report, tax.lingroup_taxonomy_report,
+        tax.krona_taxonomy_profile,
+        tax.csv_taxonomy_summary,
+        tax.human_taxonomy_summary,
+        tax.lineage_taxonomy_summary,
+        tax.bioboxes_taxonomy_profile,
+        tax.kreport_taxonomy_report,
+        tax.lingroup_taxonomy_report,
     ]
     for function in public:
         parameter = inspect.signature(function).parameters["verbose"]

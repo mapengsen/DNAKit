@@ -49,14 +49,26 @@ def _mito_prefixes(options: Mapping[str, object]) -> tuple[str, ...]:
     raw = options.get("mito_prefix", ("MT-", "mt-"))
     if isinstance(raw, str):
         raw = (raw,)
-    if not isinstance(raw, Sequence) or not raw or any(not isinstance(p, str) or not p for p in raw):
-        raise ConfigurationError("options['mito_prefix'] must be a non-empty string or list of strings.", code="INVALID_OPTION", hint="e.g. 'MT-'.")
+    if (
+        not isinstance(raw, Sequence)
+        or not raw
+        or any(not isinstance(p, str) or not p for p in raw)
+    ):
+        raise ConfigurationError(
+            "options['mito_prefix'] must be a non-empty string or list of strings.",
+            code="INVALID_OPTION",
+            hint="e.g. 'MT-'.",
+        )
     return tuple(raw)
 
 
 def _spatial_summary(coords: Sequence[tuple[float, float]]) -> dict[str, object]:
     xs, ys = [c[0] for c in coords], [c[1] for c in coords]
-    return {"n_spots_with_coordinates": len(coords), "x_range": [min(xs), max(xs)], "y_range": [min(ys), max(ys)]}
+    return {
+        "n_spots_with_coordinates": len(coords),
+        "x_range": [min(xs), max(xs)],
+        "y_range": [min(ys), max(ys)],
+    }
 
 
 # ---------------------------------------------------------------------------------------------
@@ -81,7 +93,7 @@ def op_read(value: object, options: dict[str, object], *, spatial: bool = False)
     warnings: list[str] = []
     if spatial and options.get("coordinates") is not None:
         coords = parse_coordinates(options["coordinates"], cm.cells, options)
-        result["coordinates"] = {cell: list(xy) for cell, xy in zip(cm.cells, coords)}
+        result["coordinates"] = {cell: list(xy) for cell, xy in zip(cm.cells, coords, strict=False)}
         result.update(_spatial_summary(coords))
     elif spatial:
         warnings.append("No options['coordinates'] given: only the count matrix was read.")
@@ -89,13 +101,17 @@ def op_read(value: object, options: dict[str, object], *, spatial: bool = False)
     if cm.n_genes * cm.n_cells <= limit:
         result["matrix"] = cm.as_dict()
     else:
-        warnings.append(f"Matrix ({cm.n_genes * cm.n_cells} elements) exceeds max_return_elements={limit}; values omitted.")
+        warnings.append(
+            f"Matrix ({cm.n_genes * cm.n_cells} elements) exceeds max_return_elements={limit}; values omitted."
+        )
     return result, warnings
 
 
 def op_validate(value: object, options: dict[str, object], *, spatial: bool = False) -> Result:
     if value is None:
-        raise InputFormatError("input is required.", code="EMPTY_INPUT", hint="Provide a count matrix.")
+        raise InputFormatError(
+            "input is required.", code="EMPTY_INPUT", hint="Provide a count matrix."
+        )
     errors: list[str] = []
     warnings: list[str] = []
     result: dict[str, object] = {}
@@ -106,7 +122,11 @@ def op_validate(value: object, options: dict[str, object], *, spatial: bool = Fa
     require_integer = opt_bool(options, "require_integer", True)
     result.update(n_genes=cm.n_genes, n_cells=cm.n_cells)
     for what, names in (("gene", cm.genes), ("cell", cm.cells)):
-        duplicates = sorted({n for n in names if names.count(n) > 1}) if len(set(names)) != len(names) else []
+        duplicates = (
+            sorted({n for n in names if names.count(n) > 1})
+            if len(set(names)) != len(names)
+            else []
+        )
         if duplicates:
             errors.append(f"duplicate {what} names: {duplicates[:5]}")
     negatives = sum(1 for row in cm.values for x in row if x < 0)
@@ -115,14 +135,20 @@ def op_validate(value: object, options: dict[str, object], *, spatial: bool = Fa
     if require_integer:
         fractional = sum(1 for row in cm.values for x in row if x != math.floor(x))
         if fractional:
-            errors.append(f"{fractional} non-integer values (raw counts must be integers; set require_integer=False for normalised data)")
+            errors.append(
+                f"{fractional} non-integer values (raw counts must be integers; set require_integer=False for normalised data)"
+            )
     totals = cm.column_totals()
-    empty_cells = [c for c, t in zip(cm.cells, totals) if t == 0]
-    empty_genes = [g for g, row in zip(cm.genes, cm.values) if not any(row)]
+    empty_cells = [c for c, t in zip(cm.cells, totals, strict=False) if t == 0]
+    empty_genes = [g for g, row in zip(cm.genes, cm.values, strict=False) if not any(row)]
     if empty_cells:
-        warnings.append(f"{len(empty_cells)} cells have zero total counts (first: {empty_cells[0]!r})")
+        warnings.append(
+            f"{len(empty_cells)} cells have zero total counts (first: {empty_cells[0]!r})"
+        )
     if empty_genes:
-        warnings.append(f"{len(empty_genes)} genes are zero in every cell (first: {empty_genes[0]!r})")
+        warnings.append(
+            f"{len(empty_genes)} genes are zero in every cell (first: {empty_genes[0]!r})"
+        )
     result.update(empty_cells=len(empty_cells), empty_genes=len(empty_genes))
     if spatial:
         if options.get("coordinates") is None:
@@ -149,7 +175,7 @@ def op_qc(value: object, options: dict[str, object], *, spatial: bool = False) -
     totals = cm.column_totals()
     n_detected = [sum(1 for row in cm.values if row[j] > 0) for j in range(cm.n_cells)]
     mito_totals = [math.fsum(cm.values[i][j] for i in mito_rows) for j in range(cm.n_cells)]
-    pct_mito = [100.0 * m / t if t > 0 else 0.0 for m, t in zip(mito_totals, totals)]
+    pct_mito = [100.0 * m / t if t > 0 else 0.0 for m, t in zip(mito_totals, totals, strict=False)]
     per_cell: list[dict[str, object]] = []
     failed: list[str] = []
     for j, cell in enumerate(cm.cells):
@@ -164,9 +190,21 @@ def op_qc(value: object, options: dict[str, object], *, spatial: bool = False) -
             reasons.append("max_pct_mito")
         if reasons:
             failed.append(cell)
-        per_cell.append({"cell": cell, "total_counts": totals[j], "n_genes_detected": n_detected[j], "pct_mito": pct_mito[j], "fails": reasons})
+        per_cell.append(
+            {
+                "cell": cell,
+                "total_counts": totals[j],
+                "n_genes_detected": n_detected[j],
+                "pct_mito": pct_mito[j],
+                "fails": reasons,
+            }
+        )
     cells_per_gene = [sum(1 for x in row if x > 0) for row in cm.values]
-    low_genes = [g for g, n in zip(cm.genes, cells_per_gene) if min_cells is not None and n < min_cells]
+    low_genes = [
+        g
+        for g, n in zip(cm.genes, cells_per_gene, strict=False)
+        if min_cells is not None and n < min_cells
+    ]
     result: dict[str, object] = {
         "n_cells": cm.n_cells,
         "n_genes": cm.n_genes,
@@ -175,7 +213,13 @@ def op_qc(value: object, options: dict[str, object], *, spatial: bool = False) -
         "median_genes_detected": stats.median([float(n) for n in n_detected]),
         "median_pct_mito": stats.median(pct_mito),
         "genes_detected_in_any_cell": sum(1 for n in cells_per_gene if n > 0),
-        "thresholds": {"min_genes": min_genes, "min_counts": min_counts, "max_counts": max_counts, "max_pct_mito": max_pct_mito, "min_cells": min_cells},
+        "thresholds": {
+            "min_genes": min_genes,
+            "min_counts": min_counts,
+            "max_counts": max_counts,
+            "max_pct_mito": max_pct_mito,
+            "min_cells": min_cells,
+        },
         "n_cells_failing": len(failed),
         "failing_cells": failed[:_MAX_LISTED],
         "n_genes_below_min_cells": len(low_genes),
@@ -187,21 +231,32 @@ def op_qc(value: object, options: dict[str, object], *, spatial: bool = False) -
     if not mito_rows:
         warnings.append(f"No gene starts with {list(prefixes)}: pct_mito is 0 for every cell.")
     if spatial and options.get("coordinates") is not None:
-        result.update(_spatial_summary(parse_coordinates(options["coordinates"], cm.cells, options)))
+        result.update(
+            _spatial_summary(parse_coordinates(options["coordinates"], cm.cells, options))
+        )
     return result, warnings
 
 
 def op_normalize(value: object, options: dict[str, object]) -> Result:
     cm = parse_matrix(value, options)
     method = opt_choice(options, "method", "log1p", ("log1p", "total", "cpm"))
-    target = 1e6 if method == "cpm" else opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    target = (
+        1e6
+        if method == "cpm"
+        else opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    )
     out = log1p_columns(cm, target) if method == "log1p" else scale_columns(cm, target)
     totals = cm.column_totals()
     warnings = []
     zero = sum(1 for t in totals if t == 0)
     if zero:
         warnings.append(f"{zero} cells have zero total counts and stay all-zero.")
-    extra = {"method": method, "target_sum": target, "library_sizes": dict(zip(cm.cells, totals)), "log_base": "e" if method == "log1p" else None}
+    extra = {
+        "method": method,
+        "target_sum": target,
+        "library_sizes": dict(zip(cm.cells, totals, strict=False)),
+        "log_base": "e" if method == "log1p" else None,
+    }
     return matrix_result(out, options, extra), warnings
 
 
@@ -215,11 +270,24 @@ def op_find_differential(value: object, options: dict[str, object]) -> Result:
     labels = option_labels(cm, options, "groups", "a label per cell, e.g. cluster or condition")
     group1, group2, first, second = two_groups(cm, labels, options)
     settings = de_settings(options, DEFAULT_SC_TARGET)
-    rows = differential_expression(cm, first, second, method=settings["method"], target_sum=settings["target_sum"], pseudocount=settings["pseudocount"])  # type: ignore[arg-type]
+    rows = differential_expression(
+        cm,
+        first,
+        second,
+        method=settings["method"],
+        target_sum=settings["target_sum"],
+        pseudocount=settings["pseudocount"],
+    )  # type: ignore[arg-type]
     result = {
-        "group1": group1, "group2": group2, "n_group1": len(first), "n_group2": len(second),
-        "method": settings["method"], "normalization": settings["normalization"], "target_sum": settings["target_sum"],
-        "pseudocount": settings["pseudocount"], "n_genes_tested": len(rows),
+        "group1": group1,
+        "group2": group2,
+        "n_group1": len(first),
+        "n_group2": len(second),
+        "method": settings["method"],
+        "normalization": settings["normalization"],
+        "target_sum": settings["target_sum"],
+        "pseudocount": settings["pseudocount"],
+        "n_genes_tested": len(rows),
         "genes": rank_genes(rows, top_n=settings["top_n"], min_pct=settings["min_pct"]),  # type: ignore[arg-type]
     }
     return result, []
@@ -236,26 +304,59 @@ def op_calculate_markers(value: object, options: dict[str, object]) -> Result:
         first = [i for i, label in enumerate(labels) if label == group]
         rest = [i for i, label in enumerate(labels) if label != group]
         if not rest:
-            raise InputFormatError("calculate_markers needs at least two groups.", code="GROUPS_TOO_FEW", hint="Provide labels with two or more distinct values.")
+            raise InputFormatError(
+                "calculate_markers needs at least two groups.",
+                code="GROUPS_TOO_FEW",
+                hint="Provide labels with two or more distinct values.",
+            )
         if settings["method"] == "welch" and (len(first) < 2 or len(rest) < 2):
-            warnings.append(f"Group {group!r} skipped: Welch's t-test needs >= 2 cells on each side.")
+            warnings.append(
+                f"Group {group!r} skipped: Welch's t-test needs >= 2 cells on each side."
+            )
             continue
-        rows = differential_expression(cm, first, rest, method=settings["method"], target_sum=settings["target_sum"], pseudocount=settings["pseudocount"])  # type: ignore[arg-type]
+        rows = differential_expression(
+            cm,
+            first,
+            rest,
+            method=settings["method"],
+            target_sum=settings["target_sum"],
+            pseudocount=settings["pseudocount"],
+        )  # type: ignore[arg-type]
         markers[group] = {
             "n_cells": len(first),
-            "genes": rank_genes(rows, top_n=settings["top_n"], min_pct=settings["min_pct"], only_positive=only_positive),  # type: ignore[arg-type]
+            "genes": rank_genes(
+                rows,
+                top_n=settings["top_n"],
+                min_pct=settings["min_pct"],
+                only_positive=only_positive,
+            ),  # type: ignore[arg-type]
         }
     if not markers:
-        raise InputFormatError("No group had enough cells to test.", code="GROUPS_TOO_SMALL", hint="Use method='wilcoxon' or merge small clusters.")
-    return {"method": settings["method"], "only_positive": only_positive, "comparison": "each group versus all other cells", "markers": markers}, warnings
+        raise InputFormatError(
+            "No group had enough cells to test.",
+            code="GROUPS_TOO_SMALL",
+            hint="Use method='wilcoxon' or merge small clusters.",
+        )
+    return {
+        "method": settings["method"],
+        "only_positive": only_positive,
+        "comparison": "each group versus all other cells",
+        "markers": markers,
+    }, warnings
 
 
-def _perturbation_groups(cm: CountMatrix, options: Mapping[str, object]) -> tuple[list[str], str, list[int]]:
+def _perturbation_groups(
+    cm: CountMatrix, options: Mapping[str, object]
+) -> tuple[list[str], str, list[int]]:
     labels = option_labels(cm, options, "perturbations", "a perturbation/guide label per cell")
     control = opt_str(options, "control", "control")
     controls = [i for i, label in enumerate(labels) if label == control]
     if not controls:
-        raise InputFormatError(f"No cell carries the control label {control!r}.", code="NO_CONTROL_CELLS", hint="Set options['control'] to the label of control cells.")
+        raise InputFormatError(
+            f"No cell carries the control label {control!r}.",
+            code="NO_CONTROL_CELLS",
+            hint="Set options['control'] to the label of control cells.",
+        )
     return labels, control, controls
 
 
@@ -266,15 +367,37 @@ def op_perturbation_effect(value: object, options: dict[str, object]) -> Result:
     warnings: list[str] = []
     effects: dict[str, object] = {}
     for label in sorted(set(labels) - {control}):
-        members = [i for i, l in enumerate(labels) if l == label]
+        members = [i for i, group in enumerate(labels) if group == label]
         if settings["method"] == "welch" and (len(members) < 2 or len(controls) < 2):
-            warnings.append(f"Perturbation {label!r} skipped: Welch's t-test needs >= 2 cells in each group.")
+            warnings.append(
+                f"Perturbation {label!r} skipped: Welch's t-test needs >= 2 cells in each group."
+            )
             continue
-        rows = differential_expression(cm, members, controls, method=settings["method"], target_sum=settings["target_sum"], pseudocount=settings["pseudocount"])  # type: ignore[arg-type]
-        effects[label] = {"n_cells": len(members), "genes": rank_genes(rows, top_n=settings["top_n"], min_pct=settings["min_pct"])}  # type: ignore[arg-type]
+        rows = differential_expression(
+            cm,
+            members,
+            controls,
+            method=settings["method"],
+            target_sum=settings["target_sum"],
+            pseudocount=settings["pseudocount"],
+        )  # type: ignore[arg-type]
+        effects[label] = {
+            "n_cells": len(members),
+            "genes": rank_genes(rows, top_n=settings["top_n"], min_pct=settings["min_pct"]),
+        }  # type: ignore[arg-type]
     if not effects:
-        raise InputFormatError("No perturbation had enough cells to test.", code="GROUPS_TOO_SMALL", hint="Use method='wilcoxon' or add cells.")
-    return {"control": control, "n_control_cells": len(controls), "comparison": "each perturbation versus control cells", "method": settings["method"], "effects": effects}, warnings
+        raise InputFormatError(
+            "No perturbation had enough cells to test.",
+            code="GROUPS_TOO_SMALL",
+            hint="Use method='wilcoxon' or add cells.",
+        )
+    return {
+        "control": control,
+        "n_control_cells": len(controls),
+        "comparison": "each perturbation versus control cells",
+        "method": settings["method"],
+        "effects": effects,
+    }, warnings
 
 
 def op_analyze_crispr(value: object, options: dict[str, object]) -> Result:
@@ -282,14 +405,20 @@ def op_analyze_crispr(value: object, options: dict[str, object]) -> Result:
     labels, control, controls = _perturbation_groups(cm, options)
     targets_raw = options.get("targets") or {}
     if not isinstance(targets_raw, Mapping):
-        raise ConfigurationError("options['targets'] must map guide label -> target gene.", code="INVALID_OPTION", hint="e.g. {'sgTP53_1': 'TP53'}.")
-    target_sum = opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+        raise ConfigurationError(
+            "options['targets'] must map guide label -> target gene.",
+            code="INVALID_OPTION",
+            hint="e.g. {'sgTP53_1': 'TP53'}.",
+        )
+    target_sum = opt_float(
+        options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True
+    )
     scaled = scale_columns(cm, target_sum)
     index = cm.gene_index()
     guides: dict[str, object] = {}
     warnings: list[str] = []
     for label in sorted(set(labels) - {control}):
-        members = [i for i, l in enumerate(labels) if l == label]
+        members = [i for i, group in enumerate(labels) if group == label]
         target = str(targets_raw.get(label, label))
         entry: dict[str, object] = {"n_cells": len(members), "target_gene": target}
         if target in index:
@@ -297,7 +426,9 @@ def op_analyze_crispr(value: object, options: dict[str, object]) -> Result:
             mean_guide = stats.mean([row[j] for j in members])
             mean_ctrl = stats.mean([row[j] for j in controls])
             entry.update(
-                target_in_matrix=True, mean_normalized_guide=mean_guide, mean_normalized_control=mean_ctrl,
+                target_in_matrix=True,
+                mean_normalized_guide=mean_guide,
+                mean_normalized_control=mean_ctrl,
                 log2fc=math.log2(mean_guide + 1.0) - math.log2(mean_ctrl + 1.0),
                 percent_knockdown=100.0 * (1.0 - mean_guide / mean_ctrl) if mean_ctrl > 0 else None,
             )
@@ -309,8 +440,11 @@ def op_analyze_crispr(value: object, options: dict[str, object]) -> Result:
     for label in labels:
         assigned[label] += 1
     return {
-        "control": control, "n_control_cells": len(controls), "cells_per_label": dict(sorted(assigned.items())),
-        "target_sum": target_sum, "knockdown_definition": "100 * (1 - mean CP10k(guide cells) / mean CP10k(control cells)) of the target gene",
+        "control": control,
+        "n_control_cells": len(controls),
+        "cells_per_label": dict(sorted(assigned.items())),
+        "target_sum": target_sum,
+        "knockdown_definition": "100 * (1 - mean CP10k(guide cells) / mean CP10k(control cells)) of the target gene",
         "guides": guides,
     }, warnings
 
@@ -322,11 +456,19 @@ def op_analyze_crispr(value: object, options: dict[str, object]) -> Result:
 
 def _marker_sets(raw: object) -> dict[str, list[str]]:
     if not isinstance(raw, Mapping) or not raw:
-        raise ConfigurationError("options['markers'] must map cell type -> list of marker genes.", code="INVALID_OPTION", hint="e.g. {'T cell': ['CD3D', 'CD3E']}.")
+        raise ConfigurationError(
+            "options['markers'] must map cell type -> list of marker genes.",
+            code="INVALID_OPTION",
+            hint="e.g. {'T cell': ['CD3D', 'CD3E']}.",
+        )
     result: dict[str, list[str]] = {}
     for name, genes in raw.items():
         if isinstance(genes, (str, bytes)) or not isinstance(genes, Sequence) or not genes:
-            raise ConfigurationError(f"Marker list of {name!r} must be a non-empty list of genes.", code="INVALID_OPTION", hint="Give gene symbols as strings.")
+            raise ConfigurationError(
+                f"Marker list of {name!r} must be a non-empty list of genes.",
+                code="INVALID_OPTION",
+                hint="Give gene symbols as strings.",
+            )
         result[str(name)] = [str(g) for g in genes]
     return result
 
@@ -335,23 +477,34 @@ def op_annotate_markers(value: object, options: dict[str, object]) -> Result:
     cm = parse_matrix(value, options)
     markers = _marker_sets(options.get("markers"))
     min_score = opt_float(options, "min_score", 0.0)
-    log = log1p_columns(cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True))
+    log = log1p_columns(
+        cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    )
     z_rows: dict[str, list[float]] = {}
     index = cm.gene_index()
     warnings: list[str] = []
     for name, genes in markers.items():
         present = [g for g in genes if g in index]
         if len(present) < len(genes):
-            warnings.append(f"{name}: markers missing from the matrix: {[g for g in genes if g not in index]}")
+            warnings.append(
+                f"{name}: markers missing from the matrix: {[g for g in genes if g not in index]}"
+            )
         if not present:
-            raise InputFormatError(f"None of the markers of {name!r} is in the matrix.", code="MARKERS_NOT_FOUND", hint="Check gene symbols and case.")
+            raise InputFormatError(
+                f"None of the markers of {name!r} is in the matrix.",
+                code="MARKERS_NOT_FOUND",
+                hint="Check gene symbols and case.",
+            )
         for gene in present:
             if gene not in z_rows:
                 row = log.values[index[gene]]
                 centre = stats.mean(row)
                 sd = math.sqrt(stats.variance(row, ddof=0))
                 z_rows[gene] = [(x - centre) / sd if sd > 0 else 0.0 for x in row]
-    scores = {name: [stats.mean([z_rows[g][j] for g in genes if g in z_rows]) for j in range(cm.n_cells)] for name, genes in markers.items()}
+    scores = {
+        name: [stats.mean([z_rows[g][j] for g in genes if g in z_rows]) for j in range(cm.n_cells)]
+        for name, genes in markers.items()
+    }
     names = list(markers)
     assignments: dict[str, str] = {}
     confidences: dict[str, float] = {}
@@ -365,8 +518,12 @@ def op_annotate_markers(value: object, options: dict[str, object]) -> Result:
         counts[label] += 1
     return {
         "definition": "score(type, cell) = mean over the type's marker genes of the per-gene z-score of ln(1 + CP10k); the highest score wins if > min_score",
-        "assignments": assignments, "best_score": confidences, "counts": dict(sorted(counts.items())),
-        "scores": {name: dict(zip(cm.cells, values)) for name, values in scores.items()},
+        "assignments": assignments,
+        "best_score": confidences,
+        "counts": dict(sorted(counts.items())),
+        "scores": {
+            name: dict(zip(cm.cells, values, strict=False)) for name, values in scores.items()
+        },
     }, warnings
 
 
@@ -376,12 +533,14 @@ def op_cell_cycle(value: object, options: dict[str, object]) -> Result:
     g2m_genes = [str(g) for g in require_option(options, "g2m_genes", "list of G2/M-phase genes")]  # type: ignore[union-attr]
     n_bins = opt_int(options, "n_bins", 25, 1, 1000)
     ctrl_size = opt_int(options, "ctrl_size", 50, 1, 10_000)
-    log = log1p_columns(cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True))
+    log = log1p_columns(
+        cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    )
     index = cm.gene_index()
     gene_means = [stats.mean(row) for row in log.values]
     order = sorted(range(cm.n_genes), key=lambda i: (gene_means[i], i))
     bins: dict[int, list[int]] = defaultdict(list)
-    for rank, gene_i in enumerate(order):
+    for rank, _gene_i in enumerate(order):
         bins[rank * n_bins // cm.n_genes].append(rank)  # store the rank positions
     rank_of = {gene_i: rank for rank, gene_i in enumerate(order)}
     warnings: list[str] = []
@@ -391,18 +550,29 @@ def op_cell_cycle(value: object, options: dict[str, object]) -> Result:
         if len(present) < len(genes):
             warnings.append(f"{label}: {len(genes) - len(present)} genes missing from the matrix.")
         if not present:
-            raise InputFormatError(f"None of the {label} genes is in the matrix.", code="MARKERS_NOT_FOUND", hint="Check gene symbols and case.")
+            raise InputFormatError(
+                f"None of the {label} genes is in the matrix.",
+                code="MARKERS_NOT_FOUND",
+                hint="Check gene symbols and case.",
+            )
         excluded = set(present)
         controls: set[int] = set()
         for gene_i in present:
             rank = rank_of[gene_i]
-            same_bin = [order[r] for r in bins[rank * n_bins // cm.n_genes] if order[r] not in excluded]
+            same_bin = [
+                order[r] for r in bins[rank * n_bins // cm.n_genes] if order[r] not in excluded
+            ]
             same_bin.sort(key=lambda other: (abs(rank_of[other] - rank), rank_of[other]))
             controls.update(same_bin[:ctrl_size])
         if not controls:
-            raise InputFormatError(f"No control genes available for {label}.", code="NO_CONTROL_GENES", hint="Use fewer bins or more genes.")
+            raise InputFormatError(
+                f"No control genes available for {label}.",
+                code="NO_CONTROL_GENES",
+                hint="Use fewer bins or more genes.",
+            )
         return [
-            stats.mean([log.values[i][j] for i in present]) - stats.mean([log.values[i][j] for i in controls])
+            stats.mean([log.values[i][j] for i in present])
+            - stats.mean([log.values[i][j] for i in controls])
             for j in range(cm.n_cells)
         ]
 
@@ -416,41 +586,65 @@ def op_cell_cycle(value: object, options: dict[str, object]) -> Result:
             phases[cell] = "S" if s_scores[j] >= g2m_scores[j] else "G2M"
     return {
         "definition": "score = mean ln(1+CP10k) of the gene set minus mean of expression-matched control genes (genes in the same mean-expression rank bin, nearest rank first); phase = G1 if both scores < 0, else the larger of S and G2M",
-        "s_score": dict(zip(cm.cells, s_scores)), "g2m_score": dict(zip(cm.cells, g2m_scores)), "phase": phases,
+        "s_score": dict(zip(cm.cells, s_scores, strict=False)),
+        "g2m_score": dict(zip(cm.cells, g2m_scores, strict=False)),
+        "phase": phases,
         "phase_counts": {p: list(phases.values()).count(p) for p in ("G1", "S", "G2M")},
     }, warnings
 
 
 def _pairs(raw: object) -> list[tuple[str, str]]:
     if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)) or not raw:
-        raise ConfigurationError("options['pairs'] must be a list of [ligand, receptor] pairs.", code="INVALID_OPTION", hint="e.g. [['CXCL12', 'CXCR4']].")
+        raise ConfigurationError(
+            "options['pairs'] must be a list of [ligand, receptor] pairs.",
+            code="INVALID_OPTION",
+            hint="e.g. [['CXCL12', 'CXCR4']].",
+        )
     pairs = []
     for item in raw:
         if isinstance(item, (str, bytes)) or not isinstance(item, Sequence) or len(item) != 2:
-            raise ConfigurationError(f"Bad ligand-receptor pair {item!r}.", code="INVALID_OPTION", hint="Use [ligand, receptor].")
+            raise ConfigurationError(
+                f"Bad ligand-receptor pair {item!r}.",
+                code="INVALID_OPTION",
+                hint="Use [ligand, receptor].",
+            )
         pairs.append((str(item[0]), str(item[1])))
     return pairs
 
 
-def op_cell_interactions(value: object, options: dict[str, object], *, spatial: bool = False) -> Result:
+def op_cell_interactions(
+    value: object, options: dict[str, object], *, spatial: bool = False
+) -> Result:
     cm = parse_matrix(value, options)
     labels = option_labels(cm, options, "cell_types", "a cell-type label per cell")
     pairs = _pairs(options.get("pairs"))
     min_pct = opt_float(options, "min_pct", 0.0, 0.0, 1.0)
     top_n = opt_int(options, "top_n", 100, 1, 10**6)
-    log = log1p_columns(cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True))
+    log = log1p_columns(
+        cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    )
     index = cm.gene_index()
     types = sorted(set(labels))
-    members = {t: [j for j, l in enumerate(labels) if l == t] for t in types}
+    members = {t: [j for j, group in enumerate(labels) if group == t] for t in types}
     warnings: list[str] = []
     interactions: list[dict[str, object]] = []
-    radius = opt_float(options, "radius", None, 0.0, math.inf, exclusive_min=True) if spatial else None
+    radius = (
+        opt_float(options, "radius", None, 0.0, math.inf, exclusive_min=True) if spatial else None
+    )
     contacts: dict[tuple[str, str], list[tuple[int, int]]] = {}
     if spatial:
         if cm.n_cells > 5000:
-            raise InputFormatError("Spatial interactions support up to 5000 cells/spots.", code="INPUT_TOO_LARGE", hint="Subsample or split the tissue.")
+            raise InputFormatError(
+                "Spatial interactions support up to 5000 cells/spots.",
+                code="INPUT_TOO_LARGE",
+                hint="Subsample or split the tissue.",
+            )
         if radius is None:
-            raise ConfigurationError("options['radius'] is required for spatial interactions.", code="MISSING_OPTION", hint="Maximum sender-receiver distance in coordinate units.")
+            raise ConfigurationError(
+                "options['radius'] is required for spatial interactions.",
+                code="MISSING_OPTION",
+                hint="Maximum sender-receiver distance in coordinate units.",
+            )
         coords = parse_coordinates(options.get("coordinates"), cm.cells, options)
         for a in range(cm.n_cells):
             for b in range(cm.n_cells):
@@ -479,22 +673,40 @@ def op_cell_interactions(value: object, options: dict[str, object], *, spatial: 
                     receptor_mean = stats.mean([rrow[j] for j in members[receiver]])
                     score = ligand_mean * receptor_mean
                     pct_l = sum(1 for j in members[sender] if raw_l[j] > 0) / len(members[sender])
-                    pct_r = sum(1 for j in members[receiver] if raw_r[j] > 0) / len(members[receiver])
+                    pct_r = sum(1 for j in members[receiver] if raw_r[j] > 0) / len(
+                        members[receiver]
+                    )
                     extra = {}
                 if pct_l < min_pct or pct_r < min_pct:
                     continue
                 interactions.append(
-                    {"ligand": ligand, "receptor": receptor, "sender": sender, "receiver": receiver,
-                     "ligand_mean": ligand_mean, "receptor_mean": receptor_mean, "score": score,
-                     "pct_ligand": pct_l, "pct_receptor": pct_r, **extra}
+                    {
+                        "ligand": ligand,
+                        "receptor": receptor,
+                        "sender": sender,
+                        "receiver": receiver,
+                        "ligand_mean": ligand_mean,
+                        "receptor_mean": receptor_mean,
+                        "score": score,
+                        "pct_ligand": pct_l,
+                        "pct_receptor": pct_r,
+                        **extra,
+                    }
                 )
-    interactions.sort(key=lambda r: (-r["score"], r["ligand"], r["receptor"], r["sender"], r["receiver"]))  # type: ignore[operator]
+    interactions.sort(
+        key=lambda r: (-r["score"], r["ligand"], r["receptor"], r["sender"], r["receiver"])
+    )  # type: ignore[operator]
     definition = (
         "score = mean ln(1+CP10k) of the ligand in sender cells x mean of the receptor in receiver cells"
-        if not spatial else
-        "score = mean over sender-receiver cell pairs within `radius` of ln(1+CP10k)(ligand in sender) x ln(1+CP10k)(receptor in receiver)"
+        if not spatial
+        else "score = mean over sender-receiver cell pairs within `radius` of ln(1+CP10k)(ligand in sender) x ln(1+CP10k)(receptor in receiver)"
     )
-    return {"definition": definition, "no_significance_test": True, "n_interactions": len(interactions), "interactions": interactions[:top_n]}, warnings
+    return {
+        "definition": definition,
+        "no_significance_test": True,
+        "n_interactions": len(interactions),
+        "interactions": interactions[:top_n],
+    }, warnings
 
 
 # ---------------------------------------------------------------------------------------------
@@ -506,7 +718,11 @@ def op_remove_ambient(value: object, options: dict[str, object]) -> Result:
     cm = parse_matrix(value, options)
     rho = opt_float(options, "contamination", None, 0.0, 1.0)
     if rho is None or rho >= 1.0:
-        raise ConfigurationError("options['contamination'] (fraction in [0, 1)) is required.", code="MISSING_OPTION", hint="The ambient fraction of every cell's counts, e.g. 0.05 (SoupX 'rho').")
+        raise ConfigurationError(
+            "options['contamination'] (fraction in [0, 1)) is required.",
+            code="MISSING_OPTION",
+            hint="The ambient fraction of every cell's counts, e.g. 0.05 (SoupX 'rho').",
+        )
     totals = cm.column_totals()
     profile_raw = options.get("ambient_profile")
     empty_raw = options.get("empty_cells")
@@ -515,11 +731,19 @@ def op_remove_ambient(value: object, options: dict[str, object]) -> Result:
     keep = list(range(cm.n_cells))
     if profile_raw is not None:
         if not isinstance(profile_raw, Mapping):
-            raise ConfigurationError("options['ambient_profile'] must map gene -> weight.", code="INVALID_OPTION", hint="Weights are normalised to sum to 1.")
+            raise ConfigurationError(
+                "options['ambient_profile'] must map gene -> weight.",
+                code="INVALID_OPTION",
+                hint="Weights are normalised to sum to 1.",
+            )
         weights = [max(0.0, float(profile_raw.get(g, 0.0))) for g in cm.genes]
         total_w = math.fsum(weights)
         if total_w <= 0:
-            raise InputFormatError("ambient_profile has no weight on any gene of the matrix.", code="EMPTY_PROFILE", hint="Use gene names from the matrix.")
+            raise InputFormatError(
+                "ambient_profile has no weight on any gene of the matrix.",
+                code="EMPTY_PROFILE",
+                hint="Use gene names from the matrix.",
+            )
         profile = [w / total_w for w in weights]
         source = "ambient_profile"
     else:
@@ -528,23 +752,43 @@ def op_remove_ambient(value: object, options: dict[str, object]) -> Result:
             idx = cm.cell_index()
             unknown = [c for c in names if c not in idx]
             if unknown:
-                raise InputFormatError(f"empty_cells not in the matrix: {unknown[:3]}", code="UNKNOWN_CELLS", hint="Use column names of the matrix.")
+                raise InputFormatError(
+                    f"empty_cells not in the matrix: {unknown[:3]}",
+                    code="UNKNOWN_CELLS",
+                    hint="Use column names of the matrix.",
+                )
             empty = sorted(idx[c] for c in names)
         elif empty_max is not None:
             empty = [j for j, t in enumerate(totals) if t <= empty_max]
         else:
-            raise ConfigurationError("Provide options['ambient_profile'], options['empty_cells'] or options['empty_max_counts'].", code="MISSING_OPTION", hint="The ambient profile is estimated from empty droplets.")
+            raise ConfigurationError(
+                "Provide options['ambient_profile'], options['empty_cells'] or options['empty_max_counts'].",
+                code="MISSING_OPTION",
+                hint="The ambient profile is estimated from empty droplets.",
+            )
         if not empty:
-            raise InputFormatError("No empty droplets selected.", code="NO_EMPTY_CELLS", hint="Raise empty_max_counts or pass empty_cells.")
+            raise InputFormatError(
+                "No empty droplets selected.",
+                code="NO_EMPTY_CELLS",
+                hint="Raise empty_max_counts or pass empty_cells.",
+            )
         pooled = [math.fsum(cm.values[i][j] for j in empty) for i in range(cm.n_genes)]
         total_p = math.fsum(pooled)
         if total_p <= 0:
-            raise InputFormatError("The empty droplets contain no counts.", code="EMPTY_PROFILE", hint="Select other droplets.")
+            raise InputFormatError(
+                "The empty droplets contain no counts.",
+                code="EMPTY_PROFILE",
+                hint="Select other droplets.",
+            )
         profile = [x / total_p for x in pooled]
         keep = [j for j in range(cm.n_cells) if j not in set(empty)]
         source = "empty droplets"
         if not keep:
-            raise InputFormatError("Every droplet was treated as empty.", code="NO_CELLS", hint="Lower empty_max_counts.")
+            raise InputFormatError(
+                "Every droplet was treated as empty.",
+                code="NO_CELLS",
+                hint="Lower empty_max_counts.",
+            )
     rounding = opt_bool(options, "round", False)
     corrected = []
     for i in range(cm.n_genes):
@@ -557,9 +801,13 @@ def op_remove_ambient(value: object, options: dict[str, object]) -> Result:
     removed = math.fsum(totals[j] for j in keep) - math.fsum(out.column_totals())
     extra = {
         "definition": "corrected = max(0, count - contamination * cell_total * ambient_fraction(gene)); simplified subtractive SoupX-style correction with a user-given contamination fraction",
-        "contamination": rho, "ambient_source": source,
-        "ambient_profile": dict(zip(cm.genes, profile)) if cm.n_genes <= 1000 else None,
-        "counts_removed": removed, "excluded_empty_droplets": [cm.cells[j] for j in range(cm.n_cells) if j not in set(keep)],
+        "contamination": rho,
+        "ambient_source": source,
+        "ambient_profile": dict(zip(cm.genes, profile, strict=False))
+        if cm.n_genes <= 1000
+        else None,
+        "counts_removed": removed,
+        "excluded_empty_droplets": [cm.cells[j] for j in range(cm.n_cells) if j not in set(keep)],
     }
     return matrix_result(out, options, extra), warnings
 
@@ -569,10 +817,16 @@ def op_demultiplex(value: object, options: dict[str, object]) -> Result:
     min_counts = opt_float(options, "min_counts", 5.0, 0.0)
     ratio = opt_float(options, "ratio", 3.0, 1.0)
     if cm.n_genes < 2:
-        raise InputFormatError("Demultiplexing needs at least two hashtag rows.", code="TOO_FEW_HASHTAGS", hint="Rows are hashtags, columns are cells.")
+        raise InputFormatError(
+            "Demultiplexing needs at least two hashtag rows.",
+            code="TOO_FEW_HASHTAGS",
+            hint="Rows are hashtags, columns are cells.",
+        )
     assignments: dict[str, str] = {}
     for j, cell in enumerate(cm.cells):
-        counts = sorted(((cm.values[i][j], i) for i in range(cm.n_genes)), key=lambda item: (-item[0], item[1]))
+        counts = sorted(
+            ((cm.values[i][j], i) for i in range(cm.n_genes)), key=lambda item: (-item[0], item[1])
+        )
         (c1, i1), c2 = counts[0], counts[1][0]
         if c1 < min_counts:
             assignments[cell] = "Negative"
@@ -585,21 +839,42 @@ def op_demultiplex(value: object, options: dict[str, object]) -> Result:
         tally[label] += 1
     return {
         "definition": f"Negative if top hashtag count < {min_counts}; Doublet if second count >= {min_counts} and top < {ratio} x second; otherwise Singlet of the top hashtag. Simple count-threshold rule, not a mixture-model (HTODemux) fit",
-        "min_counts": min_counts, "ratio": ratio, "assignments": assignments, "counts": dict(sorted(tally.items())),
+        "min_counts": min_counts,
+        "ratio": ratio,
+        "assignments": assignments,
+        "counts": dict(sorted(tally.items())),
     }, []
 
 
 def _signature(options: Mapping[str, object], mixtures: CountMatrix) -> CountMatrix:
     if options.get("signature") is not None:
-        return parse_matrix(options["signature"], {k: v for k, v in options.items() if k not in {"genes", "cells", "orientation"}} | {"orientation": "genes_by_cells"})
+        return parse_matrix(
+            options["signature"],
+            {k: v for k, v in options.items() if k not in {"genes", "cells", "orientation"}}
+            | {"orientation": "genes_by_cells"},
+        )
     if options.get("reference") is None:
-        raise ConfigurationError("Provide options['signature'] (genes x cell types) or options['reference'] + options['reference_labels'].", code="MISSING_OPTION", hint="A signature matrix has one column per cell type.")
-    ref = parse_matrix(options["reference"], {k: v for k, v in options.items() if k in {"delimiter", "max_matrix_elements"}})
-    labels = labels_for(ref.cells, require_option(options, "reference_labels", "label of each reference cell"), "options['reference_labels']")
+        raise ConfigurationError(
+            "Provide options['signature'] (genes x cell types) or options['reference'] + options['reference_labels'].",
+            code="MISSING_OPTION",
+            hint="A signature matrix has one column per cell type.",
+        )
+    ref = parse_matrix(
+        options["reference"],
+        {k: v for k, v in options.items() if k in {"delimiter", "max_matrix_elements"}},
+    )
+    labels = labels_for(
+        ref.cells,
+        require_option(options, "reference_labels", "label of each reference cell"),
+        "options['reference_labels']",
+    )
     scaled = scale_columns(ref, 1.0)
     types = sorted(set(labels))
-    columns = [[j for j, l in enumerate(labels) if l == t] for t in types]
-    values = [[stats.mean([scaled.values[i][j] for j in cols]) for cols in columns] for i in range(ref.n_genes)]
+    columns = [[j for j, group in enumerate(labels) if group == t] for t in types]
+    values = [
+        [stats.mean([scaled.values[i][j] for j in cols]) for cols in columns]
+        for i in range(ref.n_genes)
+    ]
     return CountMatrix(ref.genes, types, values)
 
 
@@ -610,7 +885,11 @@ def op_deconvolve(value: object, options: dict[str, object]) -> Result:
     np = numpy_module()
     shared = [g for g in mixtures.genes if g in signature.gene_index()]
     if len(shared) < len(signature.cells):
-        raise InputFormatError(f"Only {len(shared)} genes are shared between mixtures and signature.", code="TOO_FEW_SHARED_GENES", hint="Use the same gene identifiers.")
+        raise InputFormatError(
+            f"Only {len(shared)} genes are shared between mixtures and signature.",
+            code="TOO_FEW_SHARED_GENES",
+            hint="Use the same gene identifiers.",
+        )
     mi, si = mixtures.gene_index(), signature.gene_index()
     mix = CountMatrix(shared, mixtures.cells, [mixtures.values[mi[g]] for g in shared])
     sig = CountMatrix(shared, signature.cells, [signature.values[si[g]] for g in shared])
@@ -624,11 +903,19 @@ def op_deconvolve(value: object, options: dict[str, object]) -> Result:
         target = np.array([row[j] for row in mix.values], dtype=float)
         coefficients, residual = optimize.nnls(design, target)
         total = float(coefficients.sum())
-        fractions[cell] = {t: (float(c) / total if total > 0 else 0.0) for t, c in zip(sig.cells, coefficients)}
+        fractions[cell] = {
+            t: (float(c) / total if total > 0 else 0.0)
+            for t, c in zip(sig.cells, coefficients, strict=False)
+        }
         rmse[cell] = float(residual) / math.sqrt(len(shared))
     return {
-        "definition": "non-negative least squares of each mixture column on the signature columns (scipy.optimize.nnls); fractions = coefficients / sum(coefficients); columns are library-size normalised to 1 first" if normalize else "non-negative least squares on the raw values",
-        "cell_types": list(sig.cells), "n_shared_genes": len(shared), "fractions": fractions, "rmse": rmse,
+        "definition": "non-negative least squares of each mixture column on the signature columns (scipy.optimize.nnls); fractions = coefficients / sum(coefficients); columns are library-size normalised to 1 first"
+        if normalize
+        else "non-negative least squares on the raw values",
+        "cell_types": list(sig.cells),
+        "n_shared_genes": len(shared),
+        "fractions": fractions,
+        "rmse": rmse,
     }, []
 
 
@@ -636,11 +923,22 @@ def op_integrate(value: object, options: dict[str, object]) -> Result:
     cm = parse_matrix(value, options, allow_negative=True)
     batches = option_labels(cm, options, "batches", "a batch label per cell")
     log_norm = opt_bool(options, "log_normalize", True)
-    data = log1p_columns(cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)) if log_norm else cm
+    data = (
+        log1p_columns(
+            cm,
+            opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True),
+        )
+        if log_norm
+        else cm
+    )
     names = sorted(set(batches))
     if len(names) < 2:
-        raise InputFormatError("Integration needs at least two batches.", code="BATCHES_TOO_FEW", hint="Provide labels with two or more distinct values.")
-    members = {b: [j for j, l in enumerate(batches) if l == b] for b in names}
+        raise InputFormatError(
+            "Integration needs at least two batches.",
+            code="BATCHES_TOO_FEW",
+            hint="Provide labels with two or more distinct values.",
+        )
+    members = {b: [j for j, group in enumerate(batches) if group == b] for b in names}
     corrected = []
     for row in data.values:
         grand = stats.mean(row)
@@ -652,8 +950,11 @@ def op_integrate(value: object, options: dict[str, object]) -> Result:
         corrected.append(out)
     result_cm = CountMatrix(list(cm.genes), list(cm.cells), corrected)
     extra = {
-        "definition": "per-gene batch mean-centring: x' = x - mean(gene, batch) + mean(gene, all cells), on ln(1+CP10k) values" if log_norm else "per-gene batch mean-centring on the supplied values",
-        "batches": {b: len(members[b]) for b in names}, "scale": "ln(1+CP10k)" if log_norm else "as supplied",
+        "definition": "per-gene batch mean-centring: x' = x - mean(gene, batch) + mean(gene, all cells), on ln(1+CP10k) values"
+        if log_norm
+        else "per-gene batch mean-centring on the supplied values",
+        "batches": {b: len(members[b]) for b in names},
+        "scale": "ln(1+CP10k)" if log_norm else "as supplied",
         "note": "Aligns batch means only; it does not correct batch-specific variance or cell-type composition differences (not Harmony/scVI/MNN).",
     }
     return matrix_result(result_cm, options, extra), []
@@ -667,10 +968,21 @@ def op_integrate(value: object, options: dict[str, object]) -> Result:
 def op_velocity(value: object, options: dict[str, object]) -> Result:
     spliced = parse_matrix(value, options)
     if options.get("unspliced") is None:
-        raise ConfigurationError("options['unspliced'] (unspliced count matrix) is required.", code="MISSING_OPTION", hint="Same genes and cells as the spliced input.")
-    unspliced = parse_matrix(options["unspliced"], {k: v for k, v in options.items() if k in {"orientation", "delimiter", "genes", "cells"}})
+        raise ConfigurationError(
+            "options['unspliced'] (unspliced count matrix) is required.",
+            code="MISSING_OPTION",
+            hint="Same genes and cells as the spliced input.",
+        )
+    unspliced = parse_matrix(
+        options["unspliced"],
+        {k: v for k, v in options.items() if k in {"orientation", "delimiter", "genes", "cells"}},
+    )
     if unspliced.genes != spliced.genes or unspliced.cells != spliced.cells:
-        raise InputFormatError("The unspliced matrix must have the same genes and cells as the spliced matrix, in the same order.", code="LAYER_MISMATCH", hint="Reindex the layers first.")
+        raise InputFormatError(
+            "The unspliced matrix must have the same genes and cells as the spliced matrix, in the same order.",
+            code="LAYER_MISMATCH",
+            hint="Reindex the layers first.",
+        )
     quantile = opt_float(options, "quantile", 0.05, 0.0, 1.0, exclusive_min=True)
     if opt_bool(options, "normalize", False):
         spliced = scale_columns(spliced, DEFAULT_SC_TARGET)
@@ -678,7 +990,7 @@ def op_velocity(value: object, options: dict[str, object]) -> Result:
     gamma: dict[str, float | None] = {}
     velocity = []
     warnings: list[str] = []
-    for g, (srow, urow) in enumerate(zip(spliced.values, unspliced.values)):
+    for g, (srow, urow) in enumerate(zip(spliced.values, unspliced.values, strict=False)):
         high_s = stats.quantile(srow, 1.0 - quantile)
         high_u = stats.quantile(urow, 1.0 - quantile)
         chosen = [j for j in range(len(srow)) if srow[j] >= high_s or urow[j] >= high_u]
@@ -686,7 +998,9 @@ def op_velocity(value: object, options: dict[str, object]) -> Result:
         if sss == 0.0:
             gamma[spliced.genes[g]] = None
             velocity.append([0.0] * len(srow))
-            warnings.append(f"{spliced.genes[g]}: no spliced signal in the fitted cells; velocity set to 0.")
+            warnings.append(
+                f"{spliced.genes[g]}: no spliced signal in the fitted cells; velocity set to 0."
+            )
             continue
         value_g = math.fsum(srow[j] * urow[j] for j in chosen) / sss
         gamma[spliced.genes[g]] = value_g
@@ -694,7 +1008,8 @@ def op_velocity(value: object, options: dict[str, object]) -> Result:
     out = CountMatrix(list(spliced.genes), list(spliced.cells), velocity)
     extra = {
         "definition": "steady-state model (La Manno et al. 2018): gamma_g = sum(u*s)/sum(s^2) over the cells whose s or u is in the top `quantile` of that gene (least squares through the origin); velocity = u - gamma*s",
-        "quantile": quantile, "gamma": gamma,
+        "quantile": quantile,
+        "gamma": gamma,
     }
     return matrix_result(out, options, extra), warnings[:20]
 
@@ -711,10 +1026,18 @@ def _gene_positions(raw: object) -> dict[str, tuple[str, float]]:
         out = {}
         for gene, item in raw.items():
             if isinstance(item, (str, bytes)) or not isinstance(item, Sequence) or len(item) < 2:
-                raise ConfigurationError(f"gene_positions[{gene!r}] must be [chromosome, start].", code="INVALID_OPTION", hint="e.g. {'TP53': ['chr17', 7661779]}.")
+                raise ConfigurationError(
+                    f"gene_positions[{gene!r}] must be [chromosome, start].",
+                    code="INVALID_OPTION",
+                    hint="e.g. {'TP53': ['chr17', 7661779]}.",
+                )
             out[str(gene)] = (str(item[0]), float(item[1]))
         return out
-    raise ConfigurationError("options['gene_positions'] must map gene -> [chromosome, start].", code="MISSING_OPTION", hint="Genomic order is needed to smooth expression along chromosomes.")
+    raise ConfigurationError(
+        "options['gene_positions'] must map gene -> [chromosome, start].",
+        code="MISSING_OPTION",
+        hint="Genomic order is needed to smooth expression along chromosomes.",
+    )
 
 
 def op_infer_cnv(value: object, options: dict[str, object]) -> Result:
@@ -723,18 +1046,34 @@ def op_infer_cnv(value: object, options: dict[str, object]) -> Result:
     labels = option_labels(cm, options, "groups", "a label per cell")
     reference = opt_str(options, "reference_group", None)
     if reference is None:
-        raise ConfigurationError("options['reference_group'] (label of normal reference cells) is required.", code="MISSING_OPTION", hint="Reference cells define the diploid baseline.")
-    ref_idx = [j for j, l in enumerate(labels) if l == reference]
+        raise ConfigurationError(
+            "options['reference_group'] (label of normal reference cells) is required.",
+            code="MISSING_OPTION",
+            hint="Reference cells define the diploid baseline.",
+        )
+    ref_idx = [j for j, group in enumerate(labels) if group == reference]
     if not ref_idx:
-        raise InputFormatError(f"No cell carries the reference label {reference!r}.", code="UNKNOWN_GROUP", hint=f"Labels present: {sorted(set(labels))}.")
+        raise InputFormatError(
+            f"No cell carries the reference label {reference!r}.",
+            code="UNKNOWN_GROUP",
+            hint=f"Labels present: {sorted(set(labels))}.",
+        )
     window = opt_int(options, "window", 101, 1, 10_001)
     min_mean = opt_float(options, "min_mean", 0.1, 0.0)
     target_sum = opt_float(options, "target_sum", 1e6, 0.0, math.inf, exclusive_min=True)
     log2 = scale_columns(cm, target_sum)
-    log2 = CountMatrix(log2.genes, log2.cells, [[math.log2(x + 1.0) for x in row] for row in log2.values])
-    kept = [i for i, g in enumerate(cm.genes) if g in positions and stats.mean(cm.values[i]) >= min_mean]
+    log2 = CountMatrix(
+        log2.genes, log2.cells, [[math.log2(x + 1.0) for x in row] for row in log2.values]
+    )
+    kept = [
+        i for i, g in enumerate(cm.genes) if g in positions and stats.mean(cm.values[i]) >= min_mean
+    ]
     if not kept:
-        raise InputFormatError("No gene has a genomic position and mean count >= min_mean.", code="NO_GENES", hint="Check gene names or lower min_mean.")
+        raise InputFormatError(
+            "No gene has a genomic position and mean count >= min_mean.",
+            code="NO_GENES",
+            hint="Check gene names or lower min_mean.",
+        )
     by_chrom: dict[str, list[int]] = defaultdict(list)
     for i in kept:
         by_chrom[positions[cm.genes[i]][0]].append(i)
@@ -750,7 +1089,9 @@ def op_infer_cnv(value: object, options: dict[str, object]) -> Result:
         half = window // 2
         for position, i in enumerate(members):
             low, high = max(0, position - half), min(len(members), position + half + 1)
-            rows.append([stats.mean([relative[k][j] for k in range(low, high)]) for j in range(cm.n_cells)])
+            rows.append(
+                [stats.mean([relative[k][j] for k in range(low, high)]) for j in range(cm.n_cells)]
+            )
             ordered_genes.append(cm.genes[i])
             chrom_of.append(chrom)
     # centre every cell on the median of its smoothed profile
@@ -760,8 +1101,11 @@ def op_infer_cnv(value: object, options: dict[str, object]) -> Result:
     scores = {cell: stats.mean([abs(row[j]) for row in rows]) for j, cell in enumerate(cm.cells)}
     extra = {
         "definition": "inferCNV-style expression profile: log2(CPM+1) minus the mean of the reference cells per gene, moving average over `window` genes along each chromosome (window shrinks at chromosome ends), then median-centred per cell. No HMM / CNV calling.",
-        "window": window, "reference_group": reference, "n_reference_cells": len(ref_idx),
-        "chromosome_of_gene": dict(zip(ordered_genes, chrom_of)), "cnv_score": scores,
+        "window": window,
+        "reference_group": reference,
+        "n_reference_cells": len(ref_idx),
+        "chromosome_of_gene": dict(zip(ordered_genes, chrom_of, strict=False)),
+        "cnv_score": scores,
         "cnv_score_definition": "mean absolute value of the modified expression of the cell",
     }
     return matrix_result(out, options, extra), []
@@ -772,7 +1116,9 @@ def op_infer_cnv(value: object, options: dict[str, object]) -> Result:
 # ---------------------------------------------------------------------------------------------
 
 
-def _points(value: object, options: Mapping[str, object]) -> tuple[list[str], list[float], list[float]]:
+def _points(
+    value: object, options: Mapping[str, object]
+) -> tuple[list[str], list[float], list[float]]:
     """Point names and their first two coordinates; rows are points unless orientation says otherwise."""
 
     opts = {k: v for k, v in options.items() if k not in {"genes", "cells"}}
@@ -780,14 +1126,24 @@ def _points(value: object, options: Mapping[str, object]) -> tuple[list[str], li
     table = parse_matrix(value, opts, allow_negative=True)
     # parse_matrix always returns dimensions as rows ("genes") and points as columns ("cells").
     if table.n_genes < 2:
-        raise InputFormatError("An embedding needs at least two coordinates (x and y) per point.", code="EMBEDDING_SHAPE", hint="Pass [x, y] per point.")
+        raise InputFormatError(
+            "An embedding needs at least two coordinates (x and y) per point.",
+            code="EMBEDDING_SHAPE",
+            hint="Pass [x, y] per point.",
+        )
     return table.cells, table.values[0], table.values[1]
 
 
-def op_plot_embedding(value: object, options: dict[str, object], *, spatial: bool = False) -> Result:
+def op_plot_embedding(
+    value: object, options: dict[str, object], *, spatial: bool = False
+) -> Result:
     names, xs, ys = _points(value, options)
     title = opt_str(options, "title", "Spatial map" if spatial else "Embedding") or ""
-    labels = labels_for(names, options["labels"], "options['labels']") if options.get("labels") is not None else None
+    labels = (
+        labels_for(names, options["labels"], "options['labels']")
+        if options.get("labels") is not None
+        else None
+    )
     values = None
     if options.get("values") is not None:
         raw = options["values"]
@@ -796,8 +1152,14 @@ def op_plot_embedding(value: object, options: dict[str, object], *, spatial: boo
         else:
             values = [float(v) for v in raw]  # type: ignore[union-attr]
             if len(values) != len(names):
-                raise InputFormatError("options['values'] must have one number per point.", code="LABEL_COUNT_MISMATCH", hint="Match the point order.")
-    drawing = svg.scatter_svg(xs, ys, names=names, labels=labels, values=values, title=title, invert_y=spatial)
+                raise InputFormatError(
+                    "options['values'] must have one number per point.",
+                    code="LABEL_COUNT_MISMATCH",
+                    hint="Match the point order.",
+                )
+    drawing = svg.scatter_svg(
+        xs, ys, names=names, labels=labels, values=values, title=title, invert_y=spatial
+    )
     path = svg.write_svg(drawing, options)
     return {"format": "svg", "svg": drawing, "n_points": len(names), "output_path": path}, []
 
@@ -808,12 +1170,17 @@ def op_plot_heatmap(value: object, options: dict[str, object]) -> Result:
     max_cells = opt_int(options, "max_cells", 200, 1, 2000)
     log = opt_bool(options, "log1p", True)
     zscore = opt_bool(options, "row_zscore", False)
-    order = sorted(range(cm.n_genes), key=lambda i: (-stats.variance(cm.values[i]) if cm.n_cells > 1 else 0.0, i))[:max_genes]
+    order = sorted(
+        range(cm.n_genes),
+        key=lambda i: (-stats.variance(cm.values[i]) if cm.n_cells > 1 else 0.0, i),
+    )[:max_genes]
     cols = list(range(min(cm.n_cells, max_cells)))
     data = [[cm.values[i][j] for j in cols] for i in order]
     if log:
         if any(x < 0 for row in data for x in row):
-            raise InputFormatError("log1p needs non-negative values.", code="NEGATIVE_VALUES", hint="Set log1p=False.")
+            raise InputFormatError(
+                "log1p needs non-negative values.", code="NEGATIVE_VALUES", hint="Set log1p=False."
+            )
         data = [[math.log1p(x) for x in row] for row in data]
     if zscore:
         scaled = []
@@ -822,19 +1189,50 @@ def op_plot_heatmap(value: object, options: dict[str, object]) -> Result:
             scaled.append([(x - centre) / sd if sd > 0 else 0.0 for x in row])
         data = scaled
     names = [cm.genes[i] for i in order]
-    drawing = svg.heatmap_svg(data, names, [cm.cells[j] for j in cols], title=opt_str(options, "title", "Expression heatmap") or "")
+    drawing = svg.heatmap_svg(
+        data,
+        names,
+        [cm.cells[j] for j in cols],
+        title=opt_str(options, "title", "Expression heatmap") or "",
+    )
     path = svg.write_svg(drawing, options)
-    return {"format": "svg", "svg": drawing, "genes_shown": names, "n_cells_shown": len(cols), "selection": "genes with the highest variance across the shown cells", "output_path": path}, []
+    return {
+        "format": "svg",
+        "svg": drawing,
+        "genes_shown": names,
+        "n_cells_shown": len(cols),
+        "selection": "genes with the highest variance across the shown cells",
+        "output_path": path,
+    }, []
 
 
 def op_plot_spatial_gene(value: object, options: dict[str, object]) -> Result:
     cm = parse_matrix(value, options)
     gene = str(require_option(options, "gene", "gene symbol to colour spots by"))
     if gene not in cm.gene_index():
-        raise InputFormatError(f"Gene {gene!r} is not in the matrix.", code="UNKNOWN_GENE", hint="Check the symbol.")
+        raise InputFormatError(
+            f"Gene {gene!r} is not in the matrix.", code="UNKNOWN_GENE", hint="Check the symbol."
+        )
     coords = parse_coordinates(options.get("coordinates"), cm.cells, options)
-    log = log1p_columns(cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True))
+    log = log1p_columns(
+        cm, opt_float(options, "target_sum", DEFAULT_SC_TARGET, 0.0, math.inf, exclusive_min=True)
+    )
     row = log.values[cm.gene_index()[gene]]
-    drawing = svg.scatter_svg([c[0] for c in coords], [c[1] for c in coords], names=cm.cells, values=row, title=opt_str(options, "title", f"{gene} (ln(1+CP10k))") or "", invert_y=True)
+    drawing = svg.scatter_svg(
+        [c[0] for c in coords],
+        [c[1] for c in coords],
+        names=cm.cells,
+        values=row,
+        title=opt_str(options, "title", f"{gene} (ln(1+CP10k))") or "",
+        invert_y=True,
+    )
     path = svg.write_svg(drawing, options)
-    return {"format": "svg", "svg": drawing, "gene": gene, "n_spots": cm.n_cells, "min_value": min(row), "max_value": max(row), "output_path": path}, []
+    return {
+        "format": "svg",
+        "svg": drawing,
+        "gene": gene,
+        "n_spots": cm.n_cells,
+        "min_value": min(row),
+        "max_value": max(row),
+        "output_path": path,
+    }, []

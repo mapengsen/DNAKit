@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from dnakit._candidate_runtime import run_candidate_operation
+from dnakit._candidate_runtime import run_candidate_operation as run_candidate_operation
 
 from . import _impl_lab as _impl
+
 
 def analyze(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Analyze oligonucleotide sequences: composition, GC fraction, reverse complement, molecular weight, A260 extinction coefficient and melting temperature.
@@ -17,7 +18,8 @@ def analyze(input: object, *, options: Mapping[str, object] | None = None) -> ob
     Result per sequence: length, base counts, gc_fraction, longest homopolymer, 3' GC clamp, molecular_weight_da (anhydrous, 5'-OH), extinction_coefficient_260nm,
     nmol_per_od260, ug_per_od260, tm_celsius.
     """
-    return _impl.run_op('analyze', _impl.op_analyze, input, options)
+    return _impl.run_op("analyze", _impl.op_analyze, input, options)
+
 
 def assemble_sanger_reads(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Assemble overlapping Sanger reads into contigs by greedy suffix/prefix overlap merging (both strands).
@@ -27,7 +29,8 @@ def assemble_sanger_reads(input: object, *, options: Mapping[str, object] | None
     The pair of contigs with the longest overlap is merged repeatedly; the consensus keeps the earlier contig's base in overlaps (no quality weighting, no gap
     handling), so reads should be quality-trimmed first. Result: contigs (sequence, reads with strand and offset) and singlets.
     """
-    return _impl.run_op('assemble_sanger_reads', _impl.op_assemble_sanger, input, options)
+    return _impl.run_op("assemble_sanger_reads", _impl.op_assemble_sanger, input, options)
+
 
 def calculate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Perform a bench calculation selected by options['calculation']: dilution, molarity, copy_number, ligation, a260, tm, pcr_yield or gel_size.
@@ -42,7 +45,8 @@ def calculate(input: object, *, options: Mapping[str, object] | None = None) -> 
     pcr_yield: template_copies, cycles, efficiency (default 1.0): N0 * (1+E)^cycles.
     gel_size: ladder [{'bp', 'distance'}], distances: log-linear least-squares fit of size against migration distance.
     """
-    return _impl.run_op('calculate', _impl.op_calculate, input, options)
+    return _impl.run_op("calculate", _impl.op_calculate, input, options)
+
 
 def call_bases_from_sanger(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Call bases from Sanger chromatogram traces by picking the strongest channel at each peak, with IUPAC codes for mixed peaks.
@@ -52,7 +56,8 @@ def call_bases_from_sanger(input: object, *, options: Mapping[str, object] | Non
     min_peak_spacing (default 3 samples).
     Result: sequence, per-peak secondary/primary ratio, mixed positions and, for .ab1 files, agreement with the instrument's own calls. No Phred-style quality values are estimated.
     """
-    return _impl.run_op('call_bases_from_sanger', _impl.op_call_bases, input, options)
+    return _impl.run_op("call_bases_from_sanger", _impl.op_call_bases, input, options)
+
 
 def export(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise lab records (samples, primers, sequences) to CSV, TSV, JSON or FASTA text, optionally writing a file.
@@ -61,7 +66,8 @@ def export(input: object, *, options: Mapping[str, object] | None = None) -> obj
     options: format ('csv' default, 'tsv', 'json', 'fasta'), columns (field order; default = fields in order of appearance), line_width (FASTA, default 80),
     output_path (optional file; refuses to overwrite unless overwrite=True). FASTA needs a 'sequence' (or 'seq') field and uses 'id' or 'name' as the header.
     """
-    return _impl.run_op('export', _impl.op_export, input, options)
+    return _impl.run_op("export", _impl.op_export, input, options)
+
 
 def optimize(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Optimize primer length to reach a target melting temperature.
@@ -71,7 +77,8 @@ def optimize(input: object, *, options: Mapping[str, object] | None = None) -> o
     tm_method ('nearest_neighbor' default via dnakit.thermodynamics with sodium_mm=50, primer_nm=250, or 'basic').
     The length whose Tm is closest to target_tm is chosen (ties: shorter). Secondary structure and specificity are not evaluated.
     """
-    return _impl.run_op('optimize', _impl.op_optimize, input, options)
+    return _impl.run_op("optimize", _impl.op_optimize, input, options)
+
 
 def parse(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse laboratory quantity strings ('50 ng/uL', '10 mM', '200 uL') into SI values, or expand plate well ranges ('A1:B3').
@@ -80,7 +87,8 @@ def parse(input: object, *, options: Mapping[str, object] | None = None) -> obje
     options: kind ('quantity' default or 'wells'), plate (96 default or 384) and order ('row' default or 'column') for wells.
     Units: g, L, mol, M with prefixes k, m, u (or micro sign), n, p, f; ratios mass/volume and amount/volume; 'X' (fold). Result: value, unit, dimension, si_value and si_unit (g, L, mol, g/L, mol/L).
     """
-    return _impl.run_op('parse', _impl.op_parse, input, options)
+    return _impl.run_op("parse", _impl.op_parse, input, options)
+
 
 def plan(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Plan a bench protocol with exact volumes: PCR master mix, serial dilution or ligation setup.
@@ -91,7 +99,8 @@ def plan(input: object, *, options: Mapping[str, object] | None = None) -> objec
     serial_dilution: start_concentration, dilution_factor (10), steps, final_volume_ul (100).
     ligation: vector_bp, insert_bp, vector_ng, insert_to_vector_ratio (3), optional concentrations, reaction_volume_ul (20).
     """
-    return _impl.run_op('plan', _impl.op_plan, input, options)
+    return _impl.run_op("plan", _impl.op_plan, input, options)
+
 
 def plot(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Draw a schematic virtual agarose gel as an SVG string.
@@ -100,7 +109,8 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     options: min_bp (default 100), max_bp (default 10000), output_path (optional .svg; no overwrite unless overwrite=True).
     Migration is linear in log10(size) between min_bp and max_bp; brightness grows with fragment mass. It is a drawing, not a simulation of a particular gel.
     """
-    return _impl.run_op('plot', _impl.op_plot, input, options)
+    return _impl.run_op("plot", _impl.op_plot, input, options)
+
 
 def validate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate PCR primers against rule-of-thumb design criteria.
@@ -110,15 +120,41 @@ def validate(input: object, *, options: Mapping[str, object] | None = None) -> o
     Checks length, GC content, 3' G/C clamp (3' base G/C, at most 3 G/C in the last 5), homopolymer runs, dinucleotide repeats and Tm. Passing does not predict amplification;
     secondary structure and off-target binding are not assessed.
     """
-    return _impl.run_op('validate', _impl.op_validate, input, options)
+    return _impl.run_op("validate", _impl.op_validate, input, options)
 
-__all__ = ['analyze', 'assemble_sanger_reads', 'calculate', 'call_bases_from_sanger', 'export', 'optimize', 'parse', 'plan', 'plot', 'validate']
 
-__candidate_adapter_operations__ = set(['analyze', 'assemble_sanger_reads', 'calculate', 'call_bases_from_sanger', 'export', 'optimize', 'parse', 'plan', 'plot', 'validate'])
+__all__ = [
+    "analyze",
+    "assemble_sanger_reads",
+    "calculate",
+    "call_bases_from_sanger",
+    "export",
+    "optimize",
+    "parse",
+    "plan",
+    "plot",
+    "validate",
+]
+
+__candidate_adapter_operations__ = set(
+    [
+        "analyze",
+        "assemble_sanger_reads",
+        "calculate",
+        "call_bases_from_sanger",
+        "export",
+        "optimize",
+        "parse",
+        "plan",
+        "plot",
+        "validate",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
-# Optional-backend exports (see docs/api/features) 
+
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     build_feature_map,
     build_genbank_feature_map,
@@ -144,33 +180,53 @@ from .backends import (
     write_dnacauldron_constructs,
 )
 
-__all__ = [*__all__, "build_feature_map", "build_genbank_feature_map", "build_sbol3_document", "calculate_primer3_dimer", "calculate_primer3_hairpin", "calculate_primer3_tm", "convert_snapgene_to_genbank", "design_assembly_primers", "design_pcr_primers", "evaluate_dnachisel_specs", "find_recombination_sites", "optimize_dnachisel_record", "read_dnacauldron_parts", "read_genbank_genome_tracks", "read_sbol3_sequences", "read_snapgene_features", "read_snapgene_sequence", "render_feature_map_svg", "render_genome_tracks_svg", "reverse_translate_protein", "validate_sbol3_document", "write_dnacauldron_constructs"]
+__all__ = [
+    *__all__,
+    "build_feature_map",
+    "build_genbank_feature_map",
+    "build_sbol3_document",
+    "calculate_primer3_dimer",
+    "calculate_primer3_hairpin",
+    "calculate_primer3_tm",
+    "convert_snapgene_to_genbank",
+    "design_assembly_primers",
+    "design_pcr_primers",
+    "evaluate_dnachisel_specs",
+    "find_recombination_sites",
+    "optimize_dnachisel_record",
+    "read_dnacauldron_parts",
+    "read_genbank_genome_tracks",
+    "read_sbol3_sequences",
+    "read_snapgene_features",
+    "read_snapgene_sequence",
+    "render_feature_map_svg",
+    "render_genome_tracks_svg",
+    "reverse_translate_protein",
+    "validate_sbol3_document",
+    "write_dnacauldron_constructs",
+]
 
 # Full-pass exports (see docs/api/features)
 from .dna_features_viewer_functions import (
     annotate_sequence_feature,
     graphical_translation,
 )
-
 from .dnacauldron_functions import (
     autoselect_golden_gate_enzyme,
     crop_dna_record_with_features,
     list_type2s_digestion_overhangs,
 )
-
 from .dnachisel_functions import (
     find_sequence_difference_segments,
     generate_constrained_dna_sequence,
     group_nearby_positions,
     list_common_restriction_enzymes,
 )
-
 from .primer3_functions import (
     calculate_primer3_end_stability,
     design_primer3_pairs,
     sanitize_primer3_sequence,
 )
-
 from .pydna_functions import (
     assemble_pydna_fragments,
     fetch_genbank_record,
@@ -181,24 +237,50 @@ from .pydna_functions import (
     primer_pair_hybridization,
     simulate_pcr_amplicon,
 )
-
 from .pygenomeviz_functions import (
     fetch_genbank_by_accession,
     summarize_genbank_records,
 )
-
 from .sbol3_functions import (
     check_sbol3_display_id,
     copy_sbol3_design,
     extract_sbol3_display_id,
     to_sbol3_display_id,
 )
-
 from .snapgene_reader_functions import (
     snapgene_seqrecord_summary,
 )
 
-__all__ = [*__all__, "annotate_sequence_feature", "graphical_translation", "autoselect_golden_gate_enzyme", "crop_dna_record_with_features", "list_type2s_digestion_overhangs", "find_sequence_difference_segments", "generate_constrained_dna_sequence", "group_nearby_positions", "list_common_restriction_enzymes", "calculate_primer3_end_stability", "design_primer3_pairs", "sanitize_primer3_sequence", "assemble_pydna_fragments", "fetch_genbank_record", "find_common_substrings", "find_terminal_overlaps", "parse_primer_sequences", "primer_melting_temperature", "primer_pair_hybridization", "simulate_pcr_amplicon", "fetch_genbank_by_accession", "summarize_genbank_records", "check_sbol3_display_id", "copy_sbol3_design", "extract_sbol3_display_id", "to_sbol3_display_id", "snapgene_seqrecord_summary"]
+__all__ = [
+    *__all__,
+    "annotate_sequence_feature",
+    "graphical_translation",
+    "autoselect_golden_gate_enzyme",
+    "crop_dna_record_with_features",
+    "list_type2s_digestion_overhangs",
+    "find_sequence_difference_segments",
+    "generate_constrained_dna_sequence",
+    "group_nearby_positions",
+    "list_common_restriction_enzymes",
+    "calculate_primer3_end_stability",
+    "design_primer3_pairs",
+    "sanitize_primer3_sequence",
+    "assemble_pydna_fragments",
+    "fetch_genbank_record",
+    "find_common_substrings",
+    "find_terminal_overlaps",
+    "parse_primer_sequences",
+    "primer_melting_temperature",
+    "primer_pair_hybridization",
+    "simulate_pcr_amplicon",
+    "fetch_genbank_by_accession",
+    "summarize_genbank_records",
+    "check_sbol3_display_id",
+    "copy_sbol3_design",
+    "extract_sbol3_display_id",
+    "to_sbol3_display_id",
+    "snapgene_seqrecord_summary",
+]
 
 # Review-pass exports (see docs/api/features)
 from .dnacauldron_review_functions import (
@@ -208,18 +290,15 @@ from .dnacauldron_review_functions import (
     simulate_type2s_assembly,
     substitute_type2s_overhangs,
 )
-
 from .dnachisel_review_functions import (
     codon_backtranslation_table,
     dna_window_overlap,
     group_nearby_dna_segments,
     subdivide_dna_window,
 )
-
 from .primer3_review_functions import (
     validate_acgt_sequence,
 )
-
 from .pydna_review_functions import (
     annotate_primer_binding_sites,
     assemble_recombinase_fragments,
@@ -236,19 +315,42 @@ from .pydna_review_functions import (
     suggest_pcr_program,
 )
 
-__all__ = [*__all__, "assign_parts_to_backbones", "clone_into_donor_vector", "record_has_backbone", "simulate_type2s_assembly", "substitute_type2s_overhangs", "codon_backtranslation_table", "dna_window_overlap", "group_nearby_dna_segments", "subdivide_dna_window", "validate_acgt_sequence", "annotate_primer_binding_sites", "assemble_recombinase_fragments", "design_user_cloning_primers", "dna_molecules_equal", "extract_protospacers", "gateway_recombination_products", "generate_random_orf", "ligate_blunt_fragments", "parse_sequence_text", "rare_codon_positions", "simulate_genome_edit", "smallest_circular_rotation", "suggest_pcr_program"]
+__all__ = [
+    *__all__,
+    "assign_parts_to_backbones",
+    "clone_into_donor_vector",
+    "record_has_backbone",
+    "simulate_type2s_assembly",
+    "substitute_type2s_overhangs",
+    "codon_backtranslation_table",
+    "dna_window_overlap",
+    "group_nearby_dna_segments",
+    "subdivide_dna_window",
+    "validate_acgt_sequence",
+    "annotate_primer_binding_sites",
+    "assemble_recombinase_fragments",
+    "design_user_cloning_primers",
+    "dna_molecules_equal",
+    "extract_protospacers",
+    "gateway_recombination_products",
+    "generate_random_orf",
+    "ligate_blunt_fragments",
+    "parse_sequence_text",
+    "rare_codon_positions",
+    "simulate_genome_edit",
+    "smallest_circular_rotation",
+    "suggest_pcr_program",
+]
 
 # Family-pass exports (see docs/api/features)
 from .dnacauldron_family_functions import (
     parse_dnacauldron_sequence_text,
     read_dnacauldron_records,
 )
-
 from .dnachisel_family_functions import (
     annotate_sequence_differences,
     find_sequence_difference_positions,
 )
-
 from .pydna_family_functions import (
     amplicon_melting_temperature,
     find_common_substrings_with_topology,
@@ -258,7 +360,19 @@ from .pydna_family_functions import (
     simulate_pcr_assembly,
 )
 
-__all__ = [*__all__, "parse_dnacauldron_sequence_text", "read_dnacauldron_records", "annotate_sequence_differences", "find_sequence_difference_positions", "amplicon_melting_temperature", "find_common_substrings_with_topology", "pcr_annealing_temperature", "primer_melting_temperature_breslauer", "primer_melting_temperature_dbd", "simulate_pcr_assembly"]
+__all__ = [
+    *__all__,
+    "parse_dnacauldron_sequence_text",
+    "read_dnacauldron_records",
+    "annotate_sequence_differences",
+    "find_sequence_difference_positions",
+    "amplicon_melting_temperature",
+    "find_common_substrings_with_topology",
+    "pcr_annealing_temperature",
+    "primer_melting_temperature_breslauer",
+    "primer_melting_temperature_dbd",
+    "simulate_pcr_assembly",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -299,26 +413,26 @@ from .pydna_gap_functions import (
 from .varcode_gap_functions import (
     build_local_reference,
     varcode_apply_germline_to_transcript,
+    varcode_apply_phase_resolver_to_effects,
     varcode_apply_variant_to_transcript,
     varcode_apply_variants_to_transcript,
+    varcode_build_exon_runs,
     varcode_candidates_from_effects,
     varcode_classify_from_protein_diff,
     varcode_codon_table_for_transcript,
     varcode_default_germline_window,
+    varcode_enumerate_from_structural_variant,
+    varcode_enumerate_layout_splice_plans,
     varcode_infer_genome,
     varcode_infer_genome_for_reference_name,
     varcode_left_align_indels,
     varcode_make_rna_outcome,
     varcode_predict_germline_aware_effect,
     varcode_predict_realized_effect,
+    varcode_predict_structural_variant_effect,
     varcode_predict_variant_effect_on_transcript,
     varcode_predict_variant_effect_on_transcript_or_failure,
     varcode_predict_variant_effects,
-    varcode_apply_phase_resolver_to_effects,
-    varcode_build_exon_runs,
-    varcode_enumerate_from_structural_variant,
-    varcode_enumerate_layout_splice_plans,
-    varcode_predict_structural_variant_effect,
     varcode_random_variants,
     varcode_realize_exon_path,
     varcode_realize_splice_plan,
@@ -327,11 +441,11 @@ from .varcode_gap_functions import (
     varcode_reference_selenocysteine,
 )
 from .varcode_precondition_functions import (
-    varcode_make_fusion_outcome,
     varcode_apply_rna_evidence_to_effects,
-    varcode_load_exacto_fusions,
-    varcode_reference_completion_hypotheses,
     varcode_enumerate_splice_outcomes,
+    varcode_load_exacto_fusions,
+    varcode_make_fusion_outcome,
+    varcode_reference_completion_hypotheses,
 )
 from .varcode_review_misc_functions import (
     varcode_install_reference_data,
@@ -344,7 +458,72 @@ from .varcode_verify_functions import (
     varcode_load_variant_sources,
 )
 
-__all__ = [*__all__, "dnacauldron_plot_leveled_graph", "dnacauldron_write_simulation_pdf_report", "simulate_dnacauldron_plan", "annotate_pattern_occurrences_features", "blast_sequence_hits", "constraints_breaches_table", "create_bowtie_index", "find_bowtie_matches", "gc_fraction_or_windows", "generate_random_dna_with_composition", "list_common_restriction_enzymes_filtered", "load_dna_record", "plot_constraint_breaches_png", "plot_optimization_changes_png", "write_constraint_breaches_pdf", "write_dnachisel_no_solution_report", "write_dnachisel_optimization_report", "optimize_dnachisel_source_record", "pydna_blast_best_nt_hit", "pydna_codon_adaptation_index", "pydna_draw_gel", "pydna_neb_melting_temperature", "pydna_parse_snapgene_history", "pydna_predict_gel_relative_front", "build_local_reference", "varcode_apply_germline_to_transcript", "varcode_apply_variant_to_transcript", "varcode_apply_variants_to_transcript", "varcode_candidates_from_effects", "varcode_classify_from_protein_diff", "varcode_codon_table_for_transcript", "varcode_default_germline_window", "varcode_infer_genome", "varcode_infer_genome_for_reference_name", "varcode_left_align_indels", "varcode_make_rna_outcome", "varcode_predict_germline_aware_effect", "varcode_predict_realized_effect", "varcode_predict_variant_effect_on_transcript", "varcode_predict_variant_effect_on_transcript_or_failure", "varcode_predict_variant_effects", "varcode_apply_phase_resolver_to_effects", "varcode_build_exon_runs", "varcode_enumerate_from_structural_variant", "varcode_enumerate_layout_splice_plans", "varcode_predict_structural_variant_effect", "varcode_random_variants", "varcode_realize_exon_path", "varcode_realize_splice_plan", "varcode_reference_base", "varcode_reference_range", "varcode_reference_selenocysteine", "varcode_make_fusion_outcome", "varcode_apply_rna_evidence_to_effects", "varcode_load_exacto_fusions", "varcode_reference_completion_hypotheses", "varcode_enumerate_splice_outcomes", "varcode_install_reference_data", "varcode_variant_gene_overlaps", "varcode_check_sample_identity_files", "varcode_compare_sv_calls_directory", "varcode_effects_table", "varcode_load_variant_sources"]
+__all__ = [
+    *__all__,
+    "dnacauldron_plot_leveled_graph",
+    "dnacauldron_write_simulation_pdf_report",
+    "simulate_dnacauldron_plan",
+    "annotate_pattern_occurrences_features",
+    "blast_sequence_hits",
+    "constraints_breaches_table",
+    "create_bowtie_index",
+    "find_bowtie_matches",
+    "gc_fraction_or_windows",
+    "generate_random_dna_with_composition",
+    "list_common_restriction_enzymes_filtered",
+    "load_dna_record",
+    "plot_constraint_breaches_png",
+    "plot_optimization_changes_png",
+    "write_constraint_breaches_pdf",
+    "write_dnachisel_no_solution_report",
+    "write_dnachisel_optimization_report",
+    "optimize_dnachisel_source_record",
+    "pydna_blast_best_nt_hit",
+    "pydna_codon_adaptation_index",
+    "pydna_draw_gel",
+    "pydna_neb_melting_temperature",
+    "pydna_parse_snapgene_history",
+    "pydna_predict_gel_relative_front",
+    "build_local_reference",
+    "varcode_apply_germline_to_transcript",
+    "varcode_apply_variant_to_transcript",
+    "varcode_apply_variants_to_transcript",
+    "varcode_candidates_from_effects",
+    "varcode_classify_from_protein_diff",
+    "varcode_codon_table_for_transcript",
+    "varcode_default_germline_window",
+    "varcode_infer_genome",
+    "varcode_infer_genome_for_reference_name",
+    "varcode_left_align_indels",
+    "varcode_make_rna_outcome",
+    "varcode_predict_germline_aware_effect",
+    "varcode_predict_realized_effect",
+    "varcode_predict_variant_effect_on_transcript",
+    "varcode_predict_variant_effect_on_transcript_or_failure",
+    "varcode_predict_variant_effects",
+    "varcode_apply_phase_resolver_to_effects",
+    "varcode_build_exon_runs",
+    "varcode_enumerate_from_structural_variant",
+    "varcode_enumerate_layout_splice_plans",
+    "varcode_predict_structural_variant_effect",
+    "varcode_random_variants",
+    "varcode_realize_exon_path",
+    "varcode_realize_splice_plan",
+    "varcode_reference_base",
+    "varcode_reference_range",
+    "varcode_reference_selenocysteine",
+    "varcode_make_fusion_outcome",
+    "varcode_apply_rna_evidence_to_effects",
+    "varcode_load_exacto_fusions",
+    "varcode_reference_completion_hypotheses",
+    "varcode_enumerate_splice_outcomes",
+    "varcode_install_reference_data",
+    "varcode_variant_gene_overlaps",
+    "varcode_check_sample_identity_files",
+    "varcode_compare_sv_calls_directory",
+    "varcode_effects_table",
+    "varcode_load_variant_sources",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .chamaeleo_p37_functions import (

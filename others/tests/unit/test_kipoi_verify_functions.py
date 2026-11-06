@@ -16,7 +16,7 @@ import pytest
 
 pytest.importorskip("kipoi")
 
-from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError  # noqa: E402
+from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 kv = importlib.import_module("dnakit.predictions.kipoi_verify_functions")
 
@@ -47,7 +47,7 @@ schema:
     doc: GC fraction
 """
 
-_DATALOADER_PY = '''import numpy as np
+_DATALOADER_PY = """import numpy as np
 from kipoi.data import Dataset
 
 
@@ -72,7 +72,7 @@ class SeqDataset(Dataset):
             if c in "ACGT":
                 x[j, "ACGT".index(c)] = 1
         return {"inputs": x, "metadata": {"name": self.names[i]}}
-'''
+"""
 
 _DATALOADER_YAML = """type: Dataset
 defined_as: dataloader.py::SeqDataset
@@ -98,7 +98,7 @@ dependencies:
     - numpy
 """
 
-_MODEL_PY = '''import numpy as np
+_MODEL_PY = """import numpy as np
 from kipoi.model import BaseModel
 
 
@@ -106,22 +106,24 @@ class GcModel(BaseModel):
     def predict_on_batch(self, x):
         x = np.asarray(x)
         return x[:, :, 1:3].sum(axis=(1, 2)) / x.shape[1]
-'''
+"""
 
-_BROKEN_MODEL_PY = '''from kipoi.model import BaseModel
+_BROKEN_MODEL_PY = """from kipoi.model import BaseModel
 
 
 class BrokenModel(BaseModel):
     def predict_on_batch(self, x):
         raise RuntimeError("deliberately broken toy model")
-'''
+"""
 
 _FASTA = ">a\nGGGGCCCCGGGGCCCCGGGG\n>b\nAAAAAAAAAATTTTTTTTTT\n"
 
 
 def _write_model(root: Path, *, broken: bool = False) -> Path:
     root.mkdir(parents=True, exist_ok=True)
-    (root / "model.yaml").write_text(_MODEL_YAML.format(object="BrokenModel" if broken else "GcModel"))
+    (root / "model.yaml").write_text(
+        _MODEL_YAML.format(object="BrokenModel" if broken else "GcModel")
+    )
     (root / "model.py").write_text(_BROKEN_MODEL_PY if broken else _MODEL_PY)
     (root / "dataloader.yaml").write_text(_DATALOADER_YAML)
     (root / "dataloader.py").write_text(_DATALOADER_PY)
@@ -174,15 +176,33 @@ def test_prepare_batch_matches_kipoi_and_keeps_input_unchanged() -> None:
 
     predictions = np.array([0.25, 0.5])
     cases = [
-        ({"inputs": np.ones((2, 20, 4)), "targets": np.zeros(2), "metadata": {"name": ["a", "b"]}}, {}),
-        ({"inputs": np.ones((2, 20, 4)), "targets": np.zeros(2), "metadata": {"name": ["a", "b"]}},
-         {"keep_inputs": True, "keep_metadata": True}),
-        ({"inputs": np.ones((2, 20, 4))}, {"keep_metadata": True}),  # edge: no targets or metadata entries
+        (
+            {
+                "inputs": np.ones((2, 20, 4)),
+                "targets": np.zeros(2),
+                "metadata": {"name": ["a", "b"]},
+            },
+            {},
+        ),
+        (
+            {
+                "inputs": np.ones((2, 20, 4)),
+                "targets": np.zeros(2),
+                "metadata": {"name": ["a", "b"]},
+            },
+            {"keep_inputs": True, "keep_metadata": True},
+        ),
+        (
+            {"inputs": np.ones((2, 20, 4))},
+            {"keep_metadata": True},
+        ),  # edge: no targets or metadata entries
     ]
     for batch, flags in cases:
         original = dict(batch)
         got = kv.prepare_kipoi_batch(batch, predictions, **flags)
-        expected = main.prepare_batch(dict(original), predictions, **{k: v for k, v in flags.items()})
+        expected = main.prepare_batch(
+            dict(original), predictions, **{k: v for k, v in flags.items()}
+        )
         assert _same(got, expected)
         assert batch.keys() == original.keys()
 
@@ -215,7 +235,9 @@ def test_concatenate_batches_errors() -> None:
     with pytest.raises(ConfigurationError):
         kv.concatenate_kipoi_batches("not a batch list")
     with pytest.raises(BackendExecutionError):
-        kv.concatenate_kipoi_batches([{"inputs": np.zeros((2, 20, 4))}, {"inputs": np.zeros((2, 7, 4))}])
+        kv.concatenate_kipoi_batches(
+            [{"inputs": np.zeros((2, 20, 4))}, {"inputs": np.zeros((2, 7, 4))}]
+        )
 
 
 def test_example_kwargs_plain_values_match_kipoi(tmp_path: Path) -> None:
@@ -251,8 +273,11 @@ def test_example_kwargs_remote_example_dry_run_and_no_example(tmp_path: Path) ->
     # Without a cache directory the remote example is reported, not downloaded.
     no_cache = kv.kipoi_dataloader_example_kwargs(str(dataloader))
     assert no_cache["example_kwargs"] == {
-        "fasta_file": {"url": "https://example.invalid/records.fa",
-                       "md5": "abcdef0123456789abcdef0123456789", "name": "records.fa"}
+        "fasta_file": {
+            "url": "https://example.invalid/records.fa",
+            "md5": "abcdef0123456789abcdef0123456789",
+            "name": "records.fa",
+        }
     }
     # A dry run with a cache directory returns the target path and writes nothing.
     dry = kv.kipoi_dataloader_example_kwargs(str(dataloader), cache_dir=str(cache), dry_run=True)
@@ -278,7 +303,9 @@ def test_default_args_match_kipoi(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     import kipoi.specs as specs
 
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "example.fa").write_text(_FASTA)  # the default file must exist in the current directory
+    (tmp_path / "example.fa").write_text(
+        _FASTA
+    )  # the default file must exist in the current directory
     defaults = (
         "  fasta_file:\n"
         "    doc: FASTA file\n"
@@ -299,7 +326,8 @@ def test_default_args_match_kipoi(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     dataloader = _write_dataloader(tmp_path / "defaults", defaults)
     got = kv.kipoi_dataloader_default_args(str(dataloader), str(tmp_path / "downloads"))
     expected = specs.download_default_args(
-        sources.load_component_descr(str(dataloader), which="dataloader").args, str(tmp_path / "downloads")
+        sources.load_component_descr(str(dataloader), which="dataloader").args,
+        str(tmp_path / "downloads"),
     )
     assert got["overrides"] == dict(expected)
     assert got["overrides"]["width"] == 987654 and got["overrides"]["reverse"] is True
@@ -338,7 +366,10 @@ def test_source_models_collect_failures_and_stop_on_failure(tmp_path: Path) -> N
     assert result["status"] == "failed"
     assert result["failed"] == ["bad"]
     # models run in sorted order: "bad" before "good"
-    assert [(r["model"], r["status"]) for r in result["results"]] == [("bad", "failed"), ("good", "passed")]
+    assert [(r["model"], r["status"]) for r in result["results"]] == [
+        ("bad", "failed"),
+        ("good", "passed"),
+    ]
     assert "deliberately broken toy model" in result["results"][0]["error"]
     stopped = kv.test_kipoi_source_models(str(source), stop_on_failure=True)
     assert stopped["tested"] == 1 and stopped["failed"] == ["bad"]
@@ -359,7 +390,9 @@ def test_source_models_rejects_unknown_model_and_empty_source(tmp_path: Path) ->
         kv.test_kipoi_source_models(str(empty))
 
 
-def test_missing_kipoi_raises_backend_unavailable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_missing_kipoi_raises_backend_unavailable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     toy = _write_model(tmp_path / "toy")
     monkeypatch.setitem(sys.modules, "kipoi", None)  # makes `import kipoi` raise ImportError
     with pytest.raises(BackendUnavailableError):
@@ -377,7 +410,9 @@ def test_default_args_survive_numeric_defaults_that_look_like_open_descriptors(
     dataloader = _write_dataloader(tmp_path / "defaults", defaults)
     original_exists = specs.os.path.exists
     monkeypatch.setattr(  # an int is read as a file descriptor; an open one makes exists() true
-        specs.os.path, "exists", lambda value: True if isinstance(value, int) else original_exists(value)
+        specs.os.path,
+        "exists",
+        lambda value: True if isinstance(value, int) else original_exists(value),
     )
     got = kv.kipoi_dataloader_default_args(str(dataloader), str(tmp_path / "downloads"))
     assert got["overrides"] == {"width": 20, "ratio": 0.5}

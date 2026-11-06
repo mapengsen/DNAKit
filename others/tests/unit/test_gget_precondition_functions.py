@@ -24,8 +24,8 @@ import pytest
 pytest.importorskip("gget")
 pd = pytest.importorskip("pandas")
 
-from dnakit.databases import gget_precondition_functions as gp  # noqa: E402
-from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError  # noqa: E402
+from dnakit.databases import gget_precondition_functions as gp
+from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 
 class _FakeAdata:

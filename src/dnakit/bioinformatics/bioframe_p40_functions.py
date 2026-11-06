@@ -26,8 +26,12 @@ from dnakit.exceptions import ConfigurationError
 _EXTRA = "bio-bioframe"
 _TABLES = ("gap", "cytoband", "mrna", "centromeres")
 _ENGINES = ("pyfaidx", "pysam")
-_URLS = {"gap": "database/gap.txt.gz", "cytoband": "database/cytoBand.txt.gz",
-         "mrna": "database/all_mrna.txt.gz", "centromeres": "database/centromeres.txt.gz"}
+_URLS = {
+    "gap": "database/gap.txt.gz",
+    "cytoband": "database/cytoBand.txt.gz",
+    "mrna": "database/all_mrna.txt.gz",
+    "centromeres": "database/centromeres.txt.gz",
+}
 
 
 def bioframe_fetch_ucsc_table(
@@ -95,8 +99,13 @@ def bioframe_is_complete_ucsc_string(region: str, *, verbose: bool = True) -> di
         complete = bool(bioframe.is_complete_ucsc_string(text))
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"region is not a UCSC-style string: {exc}") from exc
-    return {"status": "completed", "backend": "bioframe", "version": _bioframe_version(), "region": text,
-            "is_complete": complete}
+    return {
+        "status": "completed",
+        "backend": "bioframe",
+        "version": _bioframe_version(),
+        "region": text,
+        "is_complete": complete,
+    }
 
 
 def bioframe_load_fasta(
@@ -119,7 +128,10 @@ def bioframe_load_fasta(
     which = _h.choice(engine, _ENGINES, "engine")
     cap = _h.integer(max_sequence_chars, "max_sequence_chars", minimum=1, maximum=10_000_000)
     bioframe = require("bioframe", _EXTRA)
-    require("pyfaidx" if which == "pyfaidx" else "pysam", "bio-pyfaidx" if which == "pyfaidx" else "bio-pysam")
+    require(
+        "pyfaidx" if which == "pyfaidx" else "pysam",
+        "bio-pyfaidx" if which == "pyfaidx" else "bio-pysam",
+    )
     try:
         records = bioframe.load_fasta(str(source), engine=which)
     except (OSError, ValueError, KeyError) as exc:
@@ -134,10 +146,25 @@ def bioframe_load_fasta(
         lo = 0 if start is None else int(start)
         hi = len(record) if end is None else int(end)
         sequence = str(record[lo:hi])
-        pieces.append({"region": region, "chrom": str(chrom), "start": lo, "end": hi,
-                       "sequence": sequence[:cap], "truncated": len(sequence) > cap})
-    return {"status": "completed", "backend": "bioframe", "version": _bioframe_version(), "engine": which,
-            "record_count": len(names), "records": names, "regions": pieces}
+        pieces.append(
+            {
+                "region": region,
+                "chrom": str(chrom),
+                "start": lo,
+                "end": hi,
+                "sequence": sequence[:cap],
+                "truncated": len(sequence) > cap,
+            }
+        )
+    return {
+        "status": "completed",
+        "backend": "bioframe",
+        "version": _bioframe_version(),
+        "engine": which,
+        "record_count": len(names),
+        "records": names,
+        "regions": pieces,
+    }
 
 
 __all__ = ["bioframe_fetch_ucsc_table", "bioframe_is_complete_ucsc_string", "bioframe_load_fasta"]

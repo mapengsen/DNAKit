@@ -6,14 +6,16 @@ import gzip
 import hashlib
 import json
 import mimetypes
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 
 def _bytes(value: object) -> bytes:
     if isinstance(value, bytes):
         return value
-    if isinstance(value, Path) or (isinstance(value, str) and "\n" not in value and Path(value).exists()):
+    if isinstance(value, Path) or (
+        isinstance(value, str) and "\n" not in value and Path(value).exists()
+    ):
         return Path(value).read_bytes()
     if isinstance(value, str):
         return value.encode("utf-8")
@@ -29,7 +31,12 @@ def build_file_manifest(input: object) -> dict[str, object]:
 
     payload = _bytes(input)
     path = str(input) if isinstance(input, (str, Path)) and Path(input).exists() else None
-    return {"path": path, "size_bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest(), "media_type": mimetypes.guess_type(path or "")[0]}
+    return {
+        "path": path,
+        "size_bytes": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "media_type": mimetypes.guess_type(path or "")[0],
+    }
 
 
 def chunk_large_file(input: object, *, chunk_size: int = 1024) -> list[bytes]:
@@ -41,7 +48,9 @@ def chunk_large_file(input: object, *, chunk_size: int = 1024) -> list[bytes]:
     return [payload[index : index + chunk_size] for index in range(0, len(payload), chunk_size)]
 
 
-def clean_temporary_files(input: str | Path, *, suffixes: Sequence[str] = (".tmp", ".part")) -> list[str]:
+def clean_temporary_files(
+    input: str | Path, *, suffixes: Sequence[str] = (".tmp", ".part")
+) -> list[str]:
     """Delete matching temporary files in a directory and return deleted paths."""
 
     directory = Path(input)
@@ -71,7 +80,12 @@ def detect_compression(input: object) -> str:
     """Detect gzip, zip, bzip2, xz or uncompressed bytes."""
 
     payload = _bytes(input)
-    signatures = ((b"\x1f\x8b", "gzip"), (b"PK\x03\x04", "zip"), (b"BZh", "bzip2"), (b"\xfd7zXZ", "xz"))
+    signatures = (
+        (b"\x1f\x8b", "gzip"),
+        (b"PK\x03\x04", "zip"),
+        (b"BZh", "bzip2"),
+        (b"\xfd7zXZ", "xz"),
+    )
     return next((name for signature, name in signatures if payload.startswith(signature)), "none")
 
 
@@ -148,10 +162,17 @@ def validate(input: object) -> dict[str, object]:
         error = None if valid else "NUL byte is not allowed"
     except UnicodeDecodeError as exc:
         text, valid, error = "", False, str(exc)
-    return {"valid": valid, "size_bytes": len(payload), "line_count": len(text.splitlines()), "error": error}
+    return {
+        "valid": valid,
+        "size_bytes": len(payload),
+        "line_count": len(text.splitlines()),
+        "error": error,
+    }
 
 
-def validate_metadata_schema(input: Mapping[str, object], *, required: Sequence[str] = ()) -> dict[str, object]:
+def validate_metadata_schema(
+    input: Mapping[str, object], *, required: Sequence[str] = ()
+) -> dict[str, object]:
     """Validate required metadata keys and return a structured report."""
 
     missing = [key for key in required if key not in input]
@@ -188,7 +209,9 @@ def decode_metadata_categorical(input: Mapping[str, object]) -> dict[str, list[s
 
     categories = input["categories"]
     data = input["data"]
-    return {key: [str(categories[key][int(index)]) for index in values] for key, values in data.items()}  # type: ignore[index]
+    return {
+        key: [str(categories[key][int(index)]) for index in values] for key, values in data.items()
+    }  # type: ignore[index]
 
 
 def normalize_sample_metadata(input: Sequence[Mapping[str, object]]) -> list[dict[str, object]]:
@@ -196,13 +219,18 @@ def normalize_sample_metadata(input: Sequence[Mapping[str, object]]) -> list[dic
 
     result = []
     for index, row in enumerate(input, start=1):
-        normalized = {str(key).strip(): value.strip() if isinstance(value, str) else value for key, value in row.items()}
+        normalized = {
+            str(key).strip(): value.strip() if isinstance(value, str) else value
+            for key, value in row.items()
+        }
         normalized.setdefault("sample_id", f"sample_{index}")
         result.append(normalized)
     return result
 
 
-def merge_metadata_tables(input: Sequence[Sequence[Mapping[str, object]]]) -> list[dict[str, object]]:
+def merge_metadata_tables(
+    input: Sequence[Sequence[Mapping[str, object]]],
+) -> list[dict[str, object]]:
     """Concatenate metadata tables while preserving row order."""
 
     return [dict(row) for table in input for row in table]
@@ -220,16 +248,33 @@ def write(input: object, *, target: str | Path | None = None, encoding: str = "u
 
 
 __all__ = [
-    "build_file_manifest", "chunk_large_file", "clean_temporary_files", "compress", "decompress",
-    "detect_compression", "detect_file_format", "encode_metadata_categorical", "decode_metadata_categorical",
-    "estimate_storage_size", "get_file_checksum", "list_file_records", "merge_metadata_tables",
-    "normalize_sample_metadata", "read", "repack_compressed_file", "stream_records", "validate",
-    "validate_metadata_schema", "verify_checksum", "write",
+    "build_file_manifest",
+    "chunk_large_file",
+    "clean_temporary_files",
+    "compress",
+    "decode_metadata_categorical",
+    "decompress",
+    "detect_compression",
+    "detect_file_format",
+    "encode_metadata_categorical",
+    "estimate_storage_size",
+    "get_file_checksum",
+    "list_file_records",
+    "merge_metadata_tables",
+    "normalize_sample_metadata",
+    "read",
+    "repack_compressed_file",
+    "stream_records",
+    "validate",
+    "validate_metadata_schema",
+    "verify_checksum",
+    "write",
 ]
 
 
 from dnakit.io_formats._impl_compress import run as _run_compress
 from dnakit.io_formats._impl_dispatch import run as _run_io_format
+
 
 def compress_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a PLINK .map variant file and return it as base64 text; the content is not parsed.
@@ -250,7 +295,8 @@ def compress_map(input: object, *, options: Mapping[str, object] | None = None) 
     the size limit.
     """
 
-    return _run_compress('compress_map', input, options)
+    return _run_compress("compress_map", input, options)
+
 
 def compress_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a Newick tree file and return it as base64 text; the content is not parsed.
@@ -271,7 +317,8 @@ def compress_newick(input: object, *, options: Mapping[str, object] | None = Non
     the size limit.
     """
 
-    return _run_compress('compress_newick', input, options)
+    return _run_compress("compress_newick", input, options)
+
 
 def compress_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a NEXUS file and return it as base64 text; the content is not parsed.
@@ -292,7 +339,8 @@ def compress_nexus(input: object, *, options: Mapping[str, object] | None = None
     the size limit.
     """
 
-    return _run_compress('compress_nexus', input, options)
+    return _run_compress("compress_nexus", input, options)
+
 
 def compress_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a PAF alignment file and return it as base64 text; the content is not parsed.
@@ -313,7 +361,8 @@ def compress_paf(input: object, *, options: Mapping[str, object] | None = None) 
     the size limit.
     """
 
-    return _run_compress('compress_paf', input, options)
+    return _run_compress("compress_paf", input, options)
+
 
 def compress_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a PLINK .ped pedigree/genotype file and return it as base64 text; the content is not parsed.
@@ -334,7 +383,8 @@ def compress_ped(input: object, *, options: Mapping[str, object] | None = None) 
     the size limit.
     """
 
-    return _run_compress('compress_ped', input, options)
+    return _run_compress("compress_ped", input, options)
+
 
 def compress_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a PHYLIP alignment file and return it as base64 text; the content is not parsed.
@@ -355,7 +405,8 @@ def compress_phylip(input: object, *, options: Mapping[str, object] | None = Non
     the size limit.
     """
 
-    return _run_compress('compress_phylip', input, options)
+    return _run_compress("compress_phylip", input, options)
+
 
 def compress_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Gzip-compress a UCSC 2bit genome file and return it as base64 text; the content is not parsed.
@@ -376,7 +427,8 @@ def compress_twobit(input: object, *, options: Mapping[str, object] | None = Non
     the size limit.
     """
 
-    return _run_compress('compress_twobit', input, options)
+    return _run_compress("compress_twobit", input, options)
+
 
 def compress_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Pack a Zarr store directory as a reproducible tar archive and gzip-compress it, returned as base64 text.
@@ -397,7 +449,8 @@ def compress_zarr(input: object, *, options: Mapping[str, object] | None = None)
     the size limit.
     """
 
-    return _run_compress('compress_zarr', input, options)
+    return _run_compress("compress_zarr", input, options)
+
 
 def convert(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a file of any supported format (map, ped, paf, newick, nexus, phylip, twobit, zarr; FASTA as a source) to another format.
@@ -417,7 +470,8 @@ def convert(input: object, *, options: Mapping[str, object] | None = None) -> ob
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('convert', input, options)
+    return _run_io_format("convert", input, options)
+
 
 def convert_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a PLINK .map variant file to another format (targets: map, bed, tsv, json).
@@ -438,7 +492,8 @@ def convert_map(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('convert_map', input, options)
+    return _run_io_format("convert_map", input, options)
+
 
 def convert_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a Newick tree file to another format (targets: newick, nexus, tsv, json).
@@ -459,7 +514,8 @@ def convert_newick(input: object, *, options: Mapping[str, object] | None = None
     limits.
     """
 
-    return _run_io_format('convert_newick', input, options)
+    return _run_io_format("convert_newick", input, options)
+
 
 def convert_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a NEXUS file to another format (targets: nexus, phylip, fasta, twobit, newick, json).
@@ -485,7 +541,8 @@ def convert_nexus(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('convert_nexus', input, options)
+    return _run_io_format("convert_nexus", input, options)
+
 
 def convert_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a PAF (Pairwise mApping Format) alignment file to another format (targets: paf, bed, tsv, json).
@@ -507,7 +564,8 @@ def convert_paf(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('convert_paf', input, options)
+    return _run_io_format("convert_paf", input, options)
+
 
 def convert_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a PLINK .ped pedigree/genotype file to another format (targets: ped, tsv, json).
@@ -529,7 +587,8 @@ def convert_ped(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('convert_ped', input, options)
+    return _run_io_format("convert_ped", input, options)
+
 
 def convert_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a PHYLIP alignment file to another format (targets: phylip, nexus, fasta, twobit, json).
@@ -558,7 +617,8 @@ def convert_phylip(input: object, *, options: Mapping[str, object] | None = None
     limits.
     """
 
-    return _run_io_format('convert_phylip', input, options)
+    return _run_io_format("convert_phylip", input, options)
+
 
 def convert_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a UCSC 2bit genome file to another format (targets: twobit, fasta, json).
@@ -584,7 +644,8 @@ def convert_twobit(input: object, *, options: Mapping[str, object] | None = None
     limits.
     """
 
-    return _run_io_format('convert_twobit', input, options)
+    return _run_io_format("convert_twobit", input, options)
+
 
 def convert_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Convert a Zarr directory store to another format (targets: zarr, json, tsv, npz).
@@ -607,7 +668,8 @@ def convert_zarr(input: object, *, options: Mapping[str, object] | None = None) 
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('convert_zarr', input, options)
+    return _run_io_format("convert_zarr", input, options)
+
 
 def decompress_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a PLINK .map variant file.
@@ -624,7 +686,8 @@ def decompress_map(input: object, *, options: Mapping[str, object] | None = None
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_map', input, options)
+    return _run_compress("decompress_map", input, options)
+
 
 def decompress_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a Newick tree file.
@@ -641,7 +704,8 @@ def decompress_newick(input: object, *, options: Mapping[str, object] | None = N
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_newick', input, options)
+    return _run_compress("decompress_newick", input, options)
+
 
 def decompress_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a NEXUS file.
@@ -658,7 +722,8 @@ def decompress_nexus(input: object, *, options: Mapping[str, object] | None = No
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_nexus', input, options)
+    return _run_compress("decompress_nexus", input, options)
+
 
 def decompress_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a PAF alignment file.
@@ -675,7 +740,8 @@ def decompress_paf(input: object, *, options: Mapping[str, object] | None = None
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_paf', input, options)
+    return _run_compress("decompress_paf", input, options)
+
 
 def decompress_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a PLINK .ped pedigree/genotype file.
@@ -692,7 +758,8 @@ def decompress_ped(input: object, *, options: Mapping[str, object] | None = None
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_ped', input, options)
+    return _run_compress("decompress_ped", input, options)
+
 
 def decompress_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a PHYLIP alignment file.
@@ -709,7 +776,8 @@ def decompress_phylip(input: object, *, options: Mapping[str, object] | None = N
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_phylip', input, options)
+    return _run_compress("decompress_phylip", input, options)
+
 
 def decompress_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data into the original bytes of a UCSC 2bit genome file.
@@ -726,7 +794,8 @@ def decompress_twobit(input: object, *, options: Mapping[str, object] | None = N
     existing outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_twobit', input, options)
+    return _run_compress("decompress_twobit", input, options)
+
 
 def decompress_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Decompress gzip data made by compress_zarr: restore a Zarr store directory, or the original bytes.
@@ -749,7 +818,8 @@ def decompress_zarr(input: object, *, options: Mapping[str, object] | None = Non
     ConfigurationError for invalid options, non-empty outputs or data above the size limit.
     """
 
-    return _run_compress('decompress_zarr', input, options)
+    return _run_compress("decompress_zarr", input, options)
+
 
 def filter(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a file of any supported format with the criteria of its format-specific filter function.
@@ -768,7 +838,8 @@ def filter(input: object, *, options: Mapping[str, object] | None = None) -> obj
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('filter', input, options)
+    return _run_io_format("filter", input, options)
+
 
 def filter_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a PLINK .map variant file by chromosome, variant ID, position and genetic-distance criteria and return the filtered .map content.
@@ -794,7 +865,8 @@ def filter_map(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('filter_map', input, options)
+    return _run_io_format("filter_map", input, options)
+
 
 def filter_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a Newick tree file by tip names, short branches and tip counts and return the filtered .nwk content.
@@ -816,7 +888,8 @@ def filter_newick(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('filter_newick', input, options)
+    return _run_io_format("filter_newick", input, options)
+
 
 def filter_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a NEXUS file by taxon names and per-taxon / per-site missing data (trees are pruned to the kept taxa) and return the filtered .nex content.
@@ -841,7 +914,8 @@ def filter_nexus(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('filter_nexus', input, options)
+    return _run_io_format("filter_nexus", input, options)
+
 
 def filter_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a PAF (Pairwise mApping Format) alignment file by mapping quality, identity, length, strand, name, region and tag criteria and return the filtered .paf content.
@@ -872,7 +946,8 @@ def filter_paf(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('filter_paf', input, options)
+    return _run_io_format("filter_paf", input, options)
+
 
 def filter_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a PLINK .ped pedigree/genotype file by family, individual, sex, phenotype and missing-genotype criteria and return the filtered .ped content.
@@ -905,7 +980,8 @@ def filter_ped(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('filter_ped', input, options)
+    return _run_io_format("filter_ped", input, options)
+
 
 def filter_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a PHYLIP alignment file by taxon names and per-taxon / per-site missing data and return the filtered .phy content.
@@ -933,7 +1009,8 @@ def filter_phylip(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('filter_phylip', input, options)
+    return _run_io_format("filter_phylip", input, options)
+
 
 def filter_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a UCSC 2bit genome file by sequence name, length and N fraction and return the filtered .2bit content.
@@ -959,7 +1036,8 @@ def filter_twobit(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('filter_twobit', input, options)
+    return _run_io_format("filter_twobit", input, options)
+
 
 def filter_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter a Zarr directory store by array paths and rows along the first axis and return the filtered .zarr content.
@@ -981,7 +1059,8 @@ def filter_zarr(input: object, *, options: Mapping[str, object] | None = None) -
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('filter_zarr', input, options)
+    return _run_io_format("filter_zarr", input, options)
+
 
 def index(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a file of any supported format.
@@ -998,7 +1077,8 @@ def index(input: object, *, options: Mapping[str, object] | None = None) -> obje
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('index', input, options)
+    return _run_io_format("index", input, options)
+
 
 def index_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a PLINK .map variant file: variant IDs with line/byte offsets.
@@ -1018,7 +1098,8 @@ def index_map(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('index_map', input, options)
+    return _run_io_format("index_map", input, options)
+
 
 def index_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a Newick tree file: trees with byte offsets and the trees containing each tip.
@@ -1034,7 +1115,8 @@ def index_newick(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('index_newick', input, options)
+    return _run_io_format("index_newick", input, options)
+
 
 def index_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a NEXUS file: taxa and trees.
@@ -1050,7 +1132,8 @@ def index_nexus(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('index_nexus', input, options)
+    return _run_io_format("index_nexus", input, options)
+
 
 def index_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a PAF (Pairwise mApping Format) alignment file: query or target names with line/byte offsets and intervals.
@@ -1069,7 +1152,8 @@ def index_paf(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('index_paf', input, options)
+    return _run_io_format("index_paf", input, options)
+
 
 def index_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a PLINK .ped pedigree/genotype file: individuals with line/byte offsets.
@@ -1087,7 +1171,8 @@ def index_ped(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('index_ped', input, options)
+    return _run_io_format("index_ped", input, options)
+
 
 def index_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a PHYLIP alignment file: taxa.
@@ -1109,7 +1194,8 @@ def index_phylip(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('index_phylip', input, options)
+    return _run_io_format("index_phylip", input, options)
+
 
 def index_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a UCSC 2bit genome file: sequence names with file offsets.
@@ -1124,7 +1210,8 @@ def index_twobit(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('index_twobit', input, options)
+    return _run_io_format("index_twobit", input, options)
+
 
 def index_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Build a lookup index of a Zarr directory store: array paths with shape and chunk grid.
@@ -1139,7 +1226,8 @@ def index_zarr(input: object, *, options: Mapping[str, object] | None = None) ->
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('index_zarr', input, options)
+    return _run_io_format("index_zarr", input, options)
+
 
 def merge(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several files of the same supported format into one.
@@ -1158,7 +1246,8 @@ def merge(input: object, *, options: Mapping[str, object] | None = None) -> obje
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('merge', input, options)
+    return _run_io_format("merge", input, options)
+
 
 def merge_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several variant lists into one PLINK .map variant file.
@@ -1178,7 +1267,8 @@ def merge_map(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('merge_map', input, options)
+    return _run_io_format("merge_map", input, options)
+
 
 def merge_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several tree files into one multi-tree file into one Newick tree file.
@@ -1197,7 +1287,8 @@ def merge_newick(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('merge_newick', input, options)
+    return _run_io_format("merge_newick", input, options)
+
 
 def merge_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several NEXUS files (concatenate sites per taxon, or append taxa) into one NEXUS file.
@@ -1217,7 +1308,8 @@ def merge_nexus(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('merge_nexus', input, options)
+    return _run_io_format("merge_nexus", input, options)
+
 
 def merge_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several PAF files into one PAF (Pairwise mApping Format) alignment file.
@@ -1237,7 +1329,8 @@ def merge_paf(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('merge_paf', input, options)
+    return _run_io_format("merge_paf", input, options)
+
 
 def merge_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several .ped files with the same variants (rows are concatenated) into one PLINK .ped pedigree/genotype file.
@@ -1257,7 +1350,8 @@ def merge_ped(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('merge_ped', input, options)
+    return _run_io_format("merge_ped", input, options)
+
 
 def merge_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several PHYLIP alignments (concatenate sites per taxon, or append taxa) into one PHYLIP alignment file.
@@ -1282,7 +1376,8 @@ def merge_phylip(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('merge_phylip', input, options)
+    return _run_io_format("merge_phylip", input, options)
+
 
 def merge_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several 2bit files into one 2bit file into one UCSC 2bit genome file.
@@ -1304,7 +1399,8 @@ def merge_twobit(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('merge_twobit', input, options)
+    return _run_io_format("merge_twobit", input, options)
+
 
 def merge_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Merge several zarr stores by concatenating arrays of the same path into one Zarr directory store.
@@ -1325,7 +1421,8 @@ def merge_zarr(input: object, *, options: Mapping[str, object] | None = None) ->
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('merge_zarr', input, options)
+    return _run_io_format("merge_zarr", input, options)
+
 
 def read_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a PLINK .map variant file into structured variants.
@@ -1340,7 +1437,8 @@ def read_map(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('read_map', input, options)
+    return _run_io_format("read_map", input, options)
+
 
 def read_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a Newick tree file into structured trees.
@@ -1358,7 +1456,8 @@ def read_newick(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('read_newick', input, options)
+    return _run_io_format("read_newick", input, options)
+
 
 def read_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a NEXUS file into structured sequences.
@@ -1377,7 +1476,8 @@ def read_nexus(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('read_nexus', input, options)
+    return _run_io_format("read_nexus", input, options)
+
 
 def read_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a PAF (Pairwise mApping Format) alignment file into structured alignments.
@@ -1393,7 +1493,8 @@ def read_paf(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('read_paf', input, options)
+    return _run_io_format("read_paf", input, options)
+
 
 def read_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a PLINK .ped pedigree/genotype file into structured individuals.
@@ -1410,7 +1511,8 @@ def read_ped(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('read_ped', input, options)
+    return _run_io_format("read_ped", input, options)
+
 
 def read_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a PHYLIP alignment file into structured sequences.
@@ -1433,7 +1535,8 @@ def read_phylip(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('read_phylip', input, options)
+    return _run_io_format("read_phylip", input, options)
+
 
 def read_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a UCSC 2bit genome file into structured sequences.
@@ -1454,7 +1557,8 @@ def read_twobit(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('read_twobit', input, options)
+    return _run_io_format("read_twobit", input, options)
+
 
 def read_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Parse a Zarr directory store into structured arrays.
@@ -1475,7 +1579,8 @@ def read_zarr(input: object, *, options: Mapping[str, object] | None = None) -> 
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('read_zarr', input, options)
+    return _run_io_format("read_zarr", input, options)
+
 
 def resume_download(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Download a file over HTTP(S), resuming an interrupted transfer with a Range request.
@@ -1501,7 +1606,8 @@ def resume_download(input: object, *, options: Mapping[str, object] | None = Non
     URLs are accepted.
     """
 
-    return _run_io_format('resume_download', input, options)
+    return _run_io_format("resume_download", input, options)
+
 
 def sort(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort a file of any supported format with the ordering of its format-specific sort function.
@@ -1520,7 +1626,8 @@ def sort(input: object, *, options: Mapping[str, object] | None = None) -> objec
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('sort', input, options)
+    return _run_io_format("sort", input, options)
+
 
 def sort_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort variants by chromosome and position (or by ID / genetic distance) of a PLINK .map variant file and return the sorted content.
@@ -1539,7 +1646,8 @@ def sort_map(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('sort_map', input, options)
+    return _run_io_format("sort_map", input, options)
+
 
 def sort_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort the clades of each tree (ladderize or alphabetical order) of a Newick tree file and return the sorted content.
@@ -1558,7 +1666,8 @@ def sort_newick(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('sort_newick', input, options)
+    return _run_io_format("sort_newick", input, options)
+
 
 def sort_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort the taxa (matrix rows) by name or missing-data fraction of a NEXUS file and return the sorted content.
@@ -1577,7 +1686,8 @@ def sort_nexus(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('sort_nexus', input, options)
+    return _run_io_format("sort_nexus", input, options)
+
 
 def sort_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort alignment records by target, query, mapping quality, identity, block length or matches of a PAF (Pairwise mApping Format) alignment file and return the sorted content.
@@ -1598,7 +1708,8 @@ def sort_paf(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('sort_paf', input, options)
+    return _run_io_format("sort_paf", input, options)
+
 
 def sort_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort individuals by family, individual ID, sex or phenotype of a PLINK .ped pedigree/genotype file and return the sorted content.
@@ -1619,7 +1730,8 @@ def sort_ped(input: object, *, options: Mapping[str, object] | None = None) -> o
     limits.
     """
 
-    return _run_io_format('sort_ped', input, options)
+    return _run_io_format("sort_ped", input, options)
+
 
 def sort_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort the taxa (rows) by name or missing-data fraction of a PHYLIP alignment file and return the sorted content.
@@ -1643,7 +1755,8 @@ def sort_phylip(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('sort_phylip', input, options)
+    return _run_io_format("sort_phylip", input, options)
+
 
 def sort_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort the sequences of a 2bit file by name, natural chromosome order or length of a UCSC 2bit genome file and return the sorted content.
@@ -1665,7 +1778,8 @@ def sort_twobit(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('sort_twobit', input, options)
+    return _run_io_format("sort_twobit", input, options)
+
 
 def sort_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Sort the rows (axis 0) of all arrays by the values of a key array of a Zarr directory store and return the sorted content.
@@ -1686,7 +1800,8 @@ def sort_zarr(input: object, *, options: Mapping[str, object] | None = None) -> 
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('sort_zarr', input, options)
+    return _run_io_format("sort_zarr", input, options)
+
 
 def split_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a PLINK .map variant file per chromosome (or into blocks of N variants).
@@ -1705,7 +1820,8 @@ def split_map(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('split_map', input, options)
+    return _run_io_format("split_map", input, options)
+
 
 def split_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a Newick tree file into files of N trees.
@@ -1723,7 +1839,8 @@ def split_newick(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('split_newick', input, options)
+    return _run_io_format("split_newick", input, options)
+
 
 def split_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a NEXUS file by site blocks, taxon groups, named site partitions or tree groups.
@@ -1744,7 +1861,8 @@ def split_nexus(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('split_nexus', input, options)
+    return _run_io_format("split_nexus", input, options)
+
 
 def split_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a PAF (Pairwise mApping Format) alignment file per query, target or strand (or into blocks of N alignments).
@@ -1764,7 +1882,8 @@ def split_paf(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('split_paf', input, options)
+    return _run_io_format("split_paf", input, options)
+
 
 def split_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a PLINK .ped pedigree/genotype file per family (or into blocks of N individuals).
@@ -1785,7 +1904,8 @@ def split_ped(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('split_ped', input, options)
+    return _run_io_format("split_ped", input, options)
+
 
 def split_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a PHYLIP alignment file by site blocks, taxon groups or named site partitions.
@@ -1811,7 +1931,8 @@ def split_phylip(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('split_phylip', input, options)
+    return _run_io_format("split_phylip", input, options)
+
 
 def split_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a UCSC 2bit genome file into 2bit files of N sequences.
@@ -1832,7 +1953,8 @@ def split_twobit(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('split_twobit', input, options)
+    return _run_io_format("split_twobit", input, options)
+
 
 def split_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Split a Zarr directory store into stores of N rows (axis 0).
@@ -1852,7 +1974,8 @@ def split_zarr(input: object, *, options: Mapping[str, object] | None = None) ->
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('split_zarr', input, options)
+    return _run_io_format("split_zarr", input, options)
+
 
 def stream(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of records from a file of any supported format, with a cursor for the next page.
@@ -1871,7 +1994,8 @@ def stream(input: object, *, options: Mapping[str, object] | None = None) -> obj
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('stream', input, options)
+    return _run_io_format("stream", input, options)
+
 
 def stream_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of variants from a PLINK .map variant file, with a cursor for the next page.
@@ -1887,7 +2011,8 @@ def stream_map(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('stream_map', input, options)
+    return _run_io_format("stream_map", input, options)
+
 
 def stream_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of trees from a Newick tree file, with a cursor for the next page.
@@ -1903,7 +2028,8 @@ def stream_newick(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('stream_newick', input, options)
+    return _run_io_format("stream_newick", input, options)
+
 
 def stream_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of sequences from a NEXUS file, with a cursor for the next page.
@@ -1919,7 +2045,8 @@ def stream_nexus(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('stream_nexus', input, options)
+    return _run_io_format("stream_nexus", input, options)
+
 
 def stream_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of alignments from a PAF (Pairwise mApping Format) alignment file, with a cursor for the next page.
@@ -1936,7 +2063,8 @@ def stream_paf(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('stream_paf', input, options)
+    return _run_io_format("stream_paf", input, options)
+
 
 def stream_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of individuals from a PLINK .ped pedigree/genotype file, with a cursor for the next page.
@@ -1954,7 +2082,8 @@ def stream_ped(input: object, *, options: Mapping[str, object] | None = None) ->
     limits.
     """
 
-    return _run_io_format('stream_ped', input, options)
+    return _run_io_format("stream_ped", input, options)
+
 
 def stream_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of sequences from a PHYLIP alignment file, with a cursor for the next page.
@@ -1975,7 +2104,8 @@ def stream_phylip(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('stream_phylip', input, options)
+    return _run_io_format("stream_phylip", input, options)
+
 
 def stream_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of sequences from a UCSC 2bit genome file, with a cursor for the next page.
@@ -1996,7 +2126,8 @@ def stream_twobit(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('stream_twobit', input, options)
+    return _run_io_format("stream_twobit", input, options)
+
 
 def stream_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Return one page of arrays from a Zarr directory store, with a cursor for the next page.
@@ -2016,7 +2147,8 @@ def stream_zarr(input: object, *, options: Mapping[str, object] | None = None) -
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('stream_zarr', input, options)
+    return _run_io_format("stream_zarr", input, options)
+
 
 def summarize(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a file of any supported format.
@@ -2033,7 +2165,8 @@ def summarize(input: object, *, options: Mapping[str, object] | None = None) -> 
     InputFormatError for malformed content and ConfigurationError for invalid options.
     """
 
-    return _run_io_format('summarize', input, options)
+    return _run_io_format("summarize", input, options)
+
 
 def summarize_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a PLINK .map variant file: variant and chromosome counts, bp ranges and duplicate IDs.
@@ -2046,7 +2179,8 @@ def summarize_map(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('summarize_map', input, options)
+    return _run_io_format("summarize_map", input, options)
+
 
 def summarize_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a Newick tree file: per-tree node counts, depth, height, total branch length and resolution.
@@ -2062,7 +2196,8 @@ def summarize_newick(input: object, *, options: Mapping[str, object] | None = No
     limits.
     """
 
-    return _run_io_format('summarize_newick', input, options)
+    return _run_io_format("summarize_newick", input, options)
+
 
 def summarize_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a NEXUS file: alignment statistics (constant / variable / parsimony-informative sites, composition) and tree statistics.
@@ -2078,7 +2213,8 @@ def summarize_nexus(input: object, *, options: Mapping[str, object] | None = Non
     limits.
     """
 
-    return _run_io_format('summarize_nexus', input, options)
+    return _run_io_format("summarize_nexus", input, options)
+
 
 def summarize_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a PAF (Pairwise mApping Format) alignment file: alignment counts, identity, aligned bases, strands and mapping-quality histogram.
@@ -2095,7 +2231,8 @@ def summarize_paf(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('summarize_paf', input, options)
+    return _run_io_format("summarize_paf", input, options)
+
 
 def summarize_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a PLINK .ped pedigree/genotype file: individual, family and variant counts, sex, phenotype classes and missing-genotype rates.
@@ -2110,7 +2247,8 @@ def summarize_ped(input: object, *, options: Mapping[str, object] | None = None)
     limits.
     """
 
-    return _run_io_format('summarize_ped', input, options)
+    return _run_io_format("summarize_ped", input, options)
+
 
 def summarize_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a PHYLIP alignment file: alignment statistics (constant / variable / parsimony-informative sites, composition, missing data).
@@ -2132,7 +2270,8 @@ def summarize_phylip(input: object, *, options: Mapping[str, object] | None = No
     limits.
     """
 
-    return _run_io_format('summarize_phylip', input, options)
+    return _run_io_format("summarize_phylip", input, options)
+
 
 def summarize_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a UCSC 2bit genome file: per-sequence length, base composition, N and soft-masked bases, GC fraction.
@@ -2146,7 +2285,8 @@ def summarize_twobit(input: object, *, options: Mapping[str, object] | None = No
     limits.
     """
 
-    return _run_io_format('summarize_twobit', input, options)
+    return _run_io_format("summarize_twobit", input, options)
+
 
 def summarize_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Summarise a Zarr directory store: array shapes, dtypes, chunking and totals.
@@ -2160,7 +2300,8 @@ def summarize_zarr(input: object, *, options: Mapping[str, object] | None = None
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('summarize_zarr', input, options)
+    return _run_io_format("summarize_zarr", input, options)
+
 
 def validate_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a PLINK .map variant file and report its errors and warnings.
@@ -2178,7 +2319,8 @@ def validate_map(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('validate_map', input, options)
+    return _run_io_format("validate_map", input, options)
+
 
 def validate_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a Newick tree file and report its errors and warnings.
@@ -2195,7 +2337,8 @@ def validate_newick(input: object, *, options: Mapping[str, object] | None = Non
     limits.
     """
 
-    return _run_io_format('validate_newick', input, options)
+    return _run_io_format("validate_newick", input, options)
+
 
 def validate_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a NEXUS file and report its errors and warnings.
@@ -2212,7 +2355,8 @@ def validate_nexus(input: object, *, options: Mapping[str, object] | None = None
     limits.
     """
 
-    return _run_io_format('validate_nexus', input, options)
+    return _run_io_format("validate_nexus", input, options)
+
 
 def validate_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a PAF (Pairwise mApping Format) alignment file and report its errors and warnings.
@@ -2232,7 +2376,8 @@ def validate_paf(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('validate_paf', input, options)
+    return _run_io_format("validate_paf", input, options)
+
 
 def validate_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a PLINK .ped pedigree/genotype file and report its errors and warnings.
@@ -2254,7 +2399,8 @@ def validate_ped(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('validate_ped', input, options)
+    return _run_io_format("validate_ped", input, options)
+
 
 def validate_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a PHYLIP alignment file and report its errors and warnings.
@@ -2275,7 +2421,8 @@ def validate_phylip(input: object, *, options: Mapping[str, object] | None = Non
     limits.
     """
 
-    return _run_io_format('validate_phylip', input, options)
+    return _run_io_format("validate_phylip", input, options)
+
 
 def validate_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a UCSC 2bit genome file and report its errors and warnings.
@@ -2291,7 +2438,8 @@ def validate_twobit(input: object, *, options: Mapping[str, object] | None = Non
     limits.
     """
 
-    return _run_io_format('validate_twobit', input, options)
+    return _run_io_format("validate_twobit", input, options)
+
 
 def validate_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate a Zarr directory store and report its errors and warnings.
@@ -2308,7 +2456,8 @@ def validate_zarr(input: object, *, options: Mapping[str, object] | None = None)
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('validate_zarr', input, options)
+    return _run_io_format("validate_zarr", input, options)
+
 
 def write_map(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise variants (or normalise existing PLINK .map variant file content) into a PLINK .map variant file.
@@ -2326,7 +2475,8 @@ def write_map(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('write_map', input, options)
+    return _run_io_format("write_map", input, options)
+
 
 def write_newick(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise trees (or normalise existing Newick tree file content) into a Newick tree file.
@@ -2344,7 +2494,8 @@ def write_newick(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('write_newick', input, options)
+    return _run_io_format("write_newick", input, options)
+
 
 def write_nexus(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise sequences (or normalise existing NEXUS file content) into a NEXUS file.
@@ -2369,7 +2520,8 @@ def write_nexus(input: object, *, options: Mapping[str, object] | None = None) -
     limits.
     """
 
-    return _run_io_format('write_nexus', input, options)
+    return _run_io_format("write_nexus", input, options)
+
 
 def write_paf(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise alignments (or normalise existing PAF (Pairwise mApping Format) alignment file content) into a PAF (Pairwise mApping Format) alignment file.
@@ -2387,7 +2539,8 @@ def write_paf(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('write_paf', input, options)
+    return _run_io_format("write_paf", input, options)
+
 
 def write_ped(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise individuals (or normalise existing PLINK .ped pedigree/genotype file content) into a PLINK .ped pedigree/genotype file.
@@ -2406,7 +2559,8 @@ def write_ped(input: object, *, options: Mapping[str, object] | None = None) -> 
     limits.
     """
 
-    return _run_io_format('write_ped', input, options)
+    return _run_io_format("write_ped", input, options)
+
 
 def write_phylip(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise sequences (or normalise existing PHYLIP alignment file content) into a PHYLIP alignment file.
@@ -2435,7 +2589,8 @@ def write_phylip(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('write_phylip', input, options)
+    return _run_io_format("write_phylip", input, options)
+
 
 def write_twobit(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise sequences (or normalise existing UCSC 2bit genome file content) into a UCSC 2bit genome file.
@@ -2456,7 +2611,8 @@ def write_twobit(input: object, *, options: Mapping[str, object] | None = None) 
     limits.
     """
 
-    return _run_io_format('write_twobit', input, options)
+    return _run_io_format("write_twobit", input, options)
+
 
 def write_zarr(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Create a Zarr directory store from named arrays.
@@ -2479,12 +2635,242 @@ def write_zarr(input: object, *, options: Mapping[str, object] | None = None) ->
     InputFormatError for malformed content and ConfigurationError for invalid options or inputs above the size limits.
     """
 
-    return _run_io_format('write_zarr', input, options)
+    return _run_io_format("write_zarr", input, options)
 
-__all__ += ['compress_map', 'compress_newick', 'compress_nexus', 'compress_paf', 'compress_ped', 'compress_phylip', 'compress_twobit', 'compress_zarr', 'convert', 'convert_map', 'convert_newick', 'convert_nexus', 'convert_paf', 'convert_ped', 'convert_phylip', 'convert_twobit', 'convert_zarr', 'decompress_map', 'decompress_newick', 'decompress_nexus', 'decompress_paf', 'decompress_ped', 'decompress_phylip', 'decompress_twobit', 'decompress_zarr', 'filter', 'filter_map', 'filter_newick', 'filter_nexus', 'filter_paf', 'filter_ped', 'filter_phylip', 'filter_twobit', 'filter_zarr', 'index', 'index_map', 'index_newick', 'index_nexus', 'index_paf', 'index_ped', 'index_phylip', 'index_twobit', 'index_zarr', 'merge', 'merge_map', 'merge_newick', 'merge_nexus', 'merge_paf', 'merge_ped', 'merge_phylip', 'merge_twobit', 'merge_zarr', 'read_map', 'read_newick', 'read_nexus', 'read_paf', 'read_ped', 'read_phylip', 'read_twobit', 'read_zarr', 'resume_download', 'sort', 'sort_map', 'sort_newick', 'sort_nexus', 'sort_paf', 'sort_ped', 'sort_phylip', 'sort_twobit', 'sort_zarr', 'split_map', 'split_newick', 'split_nexus', 'split_paf', 'split_ped', 'split_phylip', 'split_twobit', 'split_zarr', 'stream', 'stream_map', 'stream_newick', 'stream_nexus', 'stream_paf', 'stream_ped', 'stream_phylip', 'stream_twobit', 'stream_zarr', 'summarize', 'summarize_map', 'summarize_newick', 'summarize_nexus', 'summarize_paf', 'summarize_ped', 'summarize_phylip', 'summarize_twobit', 'summarize_zarr', 'validate_map', 'validate_newick', 'validate_nexus', 'validate_paf', 'validate_ped', 'validate_phylip', 'validate_twobit', 'validate_zarr', 'write_map', 'write_newick', 'write_nexus', 'write_paf', 'write_ped', 'write_phylip', 'write_twobit', 'write_zarr']
 
-__candidate_adapter_operations__ = set(['compress_map', 'compress_newick', 'compress_nexus', 'compress_paf', 'compress_ped', 'compress_phylip', 'compress_twobit', 'compress_zarr', 'convert', 'convert_map', 'convert_newick', 'convert_nexus', 'convert_paf', 'convert_ped', 'convert_phylip', 'convert_twobit', 'convert_zarr', 'decompress_map', 'decompress_newick', 'decompress_nexus', 'decompress_paf', 'decompress_ped', 'decompress_phylip', 'decompress_twobit', 'decompress_zarr', 'filter', 'filter_map', 'filter_newick', 'filter_nexus', 'filter_paf', 'filter_ped', 'filter_phylip', 'filter_twobit', 'filter_zarr', 'index', 'index_map', 'index_newick', 'index_nexus', 'index_paf', 'index_ped', 'index_phylip', 'index_twobit', 'index_zarr', 'merge', 'merge_map', 'merge_newick', 'merge_nexus', 'merge_paf', 'merge_ped', 'merge_phylip', 'merge_twobit', 'merge_zarr', 'read_map', 'read_newick', 'read_nexus', 'read_paf', 'read_ped', 'read_phylip', 'read_twobit', 'read_zarr', 'resume_download', 'sort', 'sort_map', 'sort_newick', 'sort_nexus', 'sort_paf', 'sort_ped', 'sort_phylip', 'sort_twobit', 'sort_zarr', 'split_map', 'split_newick', 'split_nexus', 'split_paf', 'split_ped', 'split_phylip', 'split_twobit', 'split_zarr', 'stream', 'stream_map', 'stream_newick', 'stream_nexus', 'stream_paf', 'stream_ped', 'stream_phylip', 'stream_twobit', 'stream_zarr', 'summarize', 'summarize_map', 'summarize_newick', 'summarize_nexus', 'summarize_paf', 'summarize_ped', 'summarize_phylip', 'summarize_twobit', 'summarize_zarr', 'validate_map', 'validate_newick', 'validate_nexus', 'validate_paf', 'validate_ped', 'validate_phylip', 'validate_twobit', 'validate_zarr', 'write_map', 'write_newick', 'write_nexus', 'write_paf', 'write_ped', 'write_phylip', 'write_twobit', 'write_zarr'])
+__all__ += [
+    "compress_map",
+    "compress_newick",
+    "compress_nexus",
+    "compress_paf",
+    "compress_ped",
+    "compress_phylip",
+    "compress_twobit",
+    "compress_zarr",
+    "convert",
+    "convert_map",
+    "convert_newick",
+    "convert_nexus",
+    "convert_paf",
+    "convert_ped",
+    "convert_phylip",
+    "convert_twobit",
+    "convert_zarr",
+    "decompress_map",
+    "decompress_newick",
+    "decompress_nexus",
+    "decompress_paf",
+    "decompress_ped",
+    "decompress_phylip",
+    "decompress_twobit",
+    "decompress_zarr",
+    "filter",
+    "filter_map",
+    "filter_newick",
+    "filter_nexus",
+    "filter_paf",
+    "filter_ped",
+    "filter_phylip",
+    "filter_twobit",
+    "filter_zarr",
+    "index",
+    "index_map",
+    "index_newick",
+    "index_nexus",
+    "index_paf",
+    "index_ped",
+    "index_phylip",
+    "index_twobit",
+    "index_zarr",
+    "merge",
+    "merge_map",
+    "merge_newick",
+    "merge_nexus",
+    "merge_paf",
+    "merge_ped",
+    "merge_phylip",
+    "merge_twobit",
+    "merge_zarr",
+    "read_map",
+    "read_newick",
+    "read_nexus",
+    "read_paf",
+    "read_ped",
+    "read_phylip",
+    "read_twobit",
+    "read_zarr",
+    "resume_download",
+    "sort",
+    "sort_map",
+    "sort_newick",
+    "sort_nexus",
+    "sort_paf",
+    "sort_ped",
+    "sort_phylip",
+    "sort_twobit",
+    "sort_zarr",
+    "split_map",
+    "split_newick",
+    "split_nexus",
+    "split_paf",
+    "split_ped",
+    "split_phylip",
+    "split_twobit",
+    "split_zarr",
+    "stream",
+    "stream_map",
+    "stream_newick",
+    "stream_nexus",
+    "stream_paf",
+    "stream_ped",
+    "stream_phylip",
+    "stream_twobit",
+    "stream_zarr",
+    "summarize",
+    "summarize_map",
+    "summarize_newick",
+    "summarize_nexus",
+    "summarize_paf",
+    "summarize_ped",
+    "summarize_phylip",
+    "summarize_twobit",
+    "summarize_zarr",
+    "validate_map",
+    "validate_newick",
+    "validate_nexus",
+    "validate_paf",
+    "validate_ped",
+    "validate_phylip",
+    "validate_twobit",
+    "validate_zarr",
+    "write_map",
+    "write_newick",
+    "write_nexus",
+    "write_paf",
+    "write_ped",
+    "write_phylip",
+    "write_twobit",
+    "write_zarr",
+]
+
+__candidate_adapter_operations__ = set(
+    [
+        "compress_map",
+        "compress_newick",
+        "compress_nexus",
+        "compress_paf",
+        "compress_ped",
+        "compress_phylip",
+        "compress_twobit",
+        "compress_zarr",
+        "convert",
+        "convert_map",
+        "convert_newick",
+        "convert_nexus",
+        "convert_paf",
+        "convert_ped",
+        "convert_phylip",
+        "convert_twobit",
+        "convert_zarr",
+        "decompress_map",
+        "decompress_newick",
+        "decompress_nexus",
+        "decompress_paf",
+        "decompress_ped",
+        "decompress_phylip",
+        "decompress_twobit",
+        "decompress_zarr",
+        "filter",
+        "filter_map",
+        "filter_newick",
+        "filter_nexus",
+        "filter_paf",
+        "filter_ped",
+        "filter_phylip",
+        "filter_twobit",
+        "filter_zarr",
+        "index",
+        "index_map",
+        "index_newick",
+        "index_nexus",
+        "index_paf",
+        "index_ped",
+        "index_phylip",
+        "index_twobit",
+        "index_zarr",
+        "merge",
+        "merge_map",
+        "merge_newick",
+        "merge_nexus",
+        "merge_paf",
+        "merge_ped",
+        "merge_phylip",
+        "merge_twobit",
+        "merge_zarr",
+        "read_map",
+        "read_newick",
+        "read_nexus",
+        "read_paf",
+        "read_ped",
+        "read_phylip",
+        "read_twobit",
+        "read_zarr",
+        "resume_download",
+        "sort",
+        "sort_map",
+        "sort_newick",
+        "sort_nexus",
+        "sort_paf",
+        "sort_ped",
+        "sort_phylip",
+        "sort_twobit",
+        "sort_zarr",
+        "split_map",
+        "split_newick",
+        "split_nexus",
+        "split_paf",
+        "split_ped",
+        "split_phylip",
+        "split_twobit",
+        "split_zarr",
+        "stream",
+        "stream_map",
+        "stream_newick",
+        "stream_nexus",
+        "stream_paf",
+        "stream_ped",
+        "stream_phylip",
+        "stream_twobit",
+        "stream_zarr",
+        "summarize",
+        "summarize_map",
+        "summarize_newick",
+        "summarize_nexus",
+        "summarize_paf",
+        "summarize_ped",
+        "summarize_phylip",
+        "summarize_twobit",
+        "summarize_zarr",
+        "validate_map",
+        "validate_newick",
+        "validate_nexus",
+        "validate_paf",
+        "validate_ped",
+        "validate_phylip",
+        "validate_twobit",
+        "validate_zarr",
+        "write_map",
+        "write_newick",
+        "write_nexus",
+        "write_paf",
+        "write_ped",
+        "write_phylip",
+        "write_twobit",
+        "write_zarr",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

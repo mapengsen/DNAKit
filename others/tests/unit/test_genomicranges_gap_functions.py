@@ -16,7 +16,7 @@ from dnakit.exceptions import ConfigurationError
 pytest.importorskip("genomicranges")
 pytest.importorskip("pandas")
 
-from dnakit.annotation import genomicranges_gap_functions as facades  # noqa: E402
+from dnakit.annotation import genomicranges_gap_functions as facades
 
 GTF_LINES = (
     'chr1\tdemo\tgene\t100\t500\t.\t+\t.\tgene_id "g1"; gene_name "G1";\n'
@@ -63,7 +63,9 @@ def test_read_local_gtf_writes_table_and_summary(tmp_path):
 def test_read_local_plain_gtf(tmp_path):
     source = tmp_path / "plain.gtf"
     source.write_text(GTF_LINES, encoding="utf-8")
-    result = facades.read_ucsc_gtf("hg38", str(tmp_path / "plain.tsv"), local_gtf=str(source), verbose=False)
+    result = facades.read_ucsc_gtf(
+        "hg38", str(tmp_path / "plain.tsv"), local_gtf=str(source), verbose=False
+    )
     assert result["row_count"] == 3
 
 
@@ -71,12 +73,18 @@ def test_read_refuses_existing_output_and_missing_local_file(tmp_path):
     existing = tmp_path / "exists.tsv"
     existing.write_text("x", encoding="utf-8")
     with pytest.raises(ConfigurationError):
-        facades.read_ucsc_gtf("hg38", str(existing), local_gtf=str(tmp_path / "none.gtf"), verbose=False)
+        facades.read_ucsc_gtf(
+            "hg38", str(existing), local_gtf=str(tmp_path / "none.gtf"), verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facades.read_ucsc_gtf("hg38", str(tmp_path / "new.tsv"), local_gtf=str(tmp_path / "none.gtf"), verbose=False)
+        facades.read_ucsc_gtf(
+            "hg38", str(tmp_path / "new.tsv"), local_gtf=str(tmp_path / "none.gtf"), verbose=False
+        )
 
 
-@pytest.mark.skipif(os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="network test; set DNAKIT_LIVE_TESTS=1")
+@pytest.mark.skipif(
+    os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="network test; set DNAKIT_LIVE_TESTS=1"
+)
 def test_live_ucsc_download_summary(tmp_path):
     result = facades.read_ucsc_gtf("hg38", str(tmp_path / "refgene.tsv"), verbose=False)
     assert result["row_count"] > 0

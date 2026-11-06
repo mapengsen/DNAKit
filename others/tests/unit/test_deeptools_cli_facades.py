@@ -11,11 +11,16 @@ import pytest
 from dnakit.epigenome import deeptools_cli_facades as facade
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 BAM = DATA / "reads.bam"
 _ENV_BIN = Path(sys.executable).parent
 HAS_DEEPTOOLS = (_ENV_BIN / "bamCoverage").is_file()
-pytestmark = pytest.mark.skipif(not HAS_DEEPTOOLS or not BAM.exists(), reason="deepTools or shared BAM missing")
+pytestmark = pytest.mark.skipif(
+    not HAS_DEEPTOOLS or not BAM.exists(), reason="deepTools or shared BAM missing"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -25,22 +30,32 @@ def _deeptools_on_path(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_bam_coverage_writes_bedgraph(tmp_path: Path) -> None:
-    result = facade.bam_coverage(str(BAM), str(tmp_path / "cov.bedgraph"), output_format="bedgraph", bin_size=1000)
+    result = facade.bam_coverage(
+        str(BAM), str(tmp_path / "cov.bedgraph"), output_format="bedgraph", bin_size=1000
+    )
     assert result["status"] == "completed", result["log_tail"]
     assert Path(result["outputs"][0]).stat().st_size > 0
 
 
 def test_bam_compare_writes_bedgraph(tmp_path: Path) -> None:
-    result = facade.bam_compare(str(BAM), str(BAM), str(tmp_path / "cmp.bedgraph"), output_format="bedgraph", bin_size=1000)
+    result = facade.bam_compare(
+        str(BAM), str(BAM), str(tmp_path / "cmp.bedgraph"), output_format="bedgraph", bin_size=1000
+    )
     assert result["status"] == "completed", result["log_tail"]
 
 
-def test_bam_pe_fragment_size_runs_from_relative_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_bam_pe_fragment_size_runs_from_relative_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.chdir(DATA)
-    result = facade.bam_pe_fragment_size(["reads.bam"], str(tmp_path / "hist.png"), table_output=str(tmp_path / "t.tab"))
+    result = facade.bam_pe_fragment_size(
+        ["reads.bam"], str(tmp_path / "hist.png"), table_output=str(tmp_path / "t.tab")
+    )
     assert "bamPEFragmentSize" in " ".join(result["command"])
     assert result["status"] in ("completed", "failed")
-    assert "log_tail" in result  # a rejected single-end input is reported as a structured failure, not an exception
+    assert (
+        "log_tail" in result
+    )  # a rejected single-end input is reported as a structured failure, not an exception
 
 
 def test_estimate_scale_factor_needs_two_bams() -> None:
@@ -49,7 +64,9 @@ def test_estimate_scale_factor_needs_two_bams() -> None:
 
 
 def test_estimate_scale_factor_with_two_bams() -> None:
-    result = facade.estimate_scale_factor([str(BAM), str(BAM)], sample_window_length=500, number_of_samples=2000)
+    result = facade.estimate_scale_factor(
+        [str(BAM), str(BAM)], sample_window_length=500, number_of_samples=2000
+    )
     assert result["tool"] == "estimateScaleFactor"
     assert result["return_code"] == 0, result["stdout_tail"]
 
@@ -73,5 +90,7 @@ def test_shift_must_have_four_integers(tmp_path: Path) -> None:
 
 def test_missing_program_gives_install_hint(tmp_path: Path) -> None:
     with pytest.raises(BackendUnavailableError) as info:
-        facade.bam_coverage(str(BAM), str(tmp_path / "out.bw"), deeptools_path=str(tmp_path / "no-such-tool"))
+        facade.bam_coverage(
+            str(BAM), str(tmp_path / "out.bw"), deeptools_path=str(tmp_path / "no-such-tool")
+        )
     assert "deeptools" in (info.value.hint or "").lower()

@@ -31,13 +31,37 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 _EXTRA = "bio-pybedtools"
 _MAP_OPERATIONS = (
-    "sum", "min", "max", "absmin", "absmax", "mean", "median", "mode", "antimode", "stdev",
-    "sstdev", "collapse", "distinct", "distinct_sort_num", "distinct_sort_num_desc", "count",
-    "count_distinct", "first", "last",
+    "sum",
+    "min",
+    "max",
+    "absmin",
+    "absmax",
+    "mean",
+    "median",
+    "mode",
+    "antimode",
+    "stdev",
+    "sstdev",
+    "collapse",
+    "distinct",
+    "distinct_sort_num",
+    "distinct_sort_num_desc",
+    "count",
+    "count_distinct",
+    "first",
+    "last",
 )
 _COVERAGE_REPORTS = ("histogram", "bedgraph", "bedgraph_all", "per_base", "per_base_nonzero")
 _PAIR_TYPES = (
-    "either", "neither", "xor", "both", "notboth", "ispan", "ospan", "notispan", "notospan",
+    "either",
+    "neither",
+    "xor",
+    "both",
+    "notboth",
+    "ispan",
+    "ospan",
+    "notispan",
+    "notospan",
 )
 _MAX_ITERATIONS = 10_000
 _MAX_FILES = 50
@@ -255,7 +279,9 @@ def convert_intervals_to_bam_pybedtools(
     method = bt.to_bam if fmt == "bed" else bt.bedpe_to_bam
     result = _guard("to_bam", lambda: method(**kwargs))
     try:
-        return _bam_result("convert_intervals_to_bam_pybedtools", pb, result.fn, out, input_format=fmt)
+        return _bam_result(
+            "convert_intervals_to_bam_pybedtools", pb, result.fn, out, input_format=fmt
+        )
     finally:
         _discard(result)
 
@@ -281,7 +307,9 @@ def intervals_to_records_pybedtools(
     pb = _pybedtools()
     frame = _guard(
         "to_dataframe",
-        lambda: pb.BedTool(str(file)).to_dataframe(disable_auto_names=off, **({"header": None} if off else {})),
+        lambda: pb.BedTool(str(file)).to_dataframe(
+            disable_auto_names=off, **({"header": None} if off else {})
+        ),
     )
     records = [
         {str(key): _c.plain(value) for key, value in row.items()}
@@ -292,7 +320,7 @@ def intervals_to_records_pybedtools(
         "operation": "intervals_to_records_pybedtools",
         "columns": [str(name) for name in frame.columns],
         "dtypes": {str(name): str(kind) for name, kind in frame.dtypes.items()},
-        "n_records": int(len(frame)),
+        "n_records": len(frame),
         "records": records,
         "truncated": len(frame) > limit,
         "provenance": _provenance(pb),
@@ -650,8 +678,13 @@ def genome_coverage_pybedtools(
     file = input_path(path)
     mode = _c.choice(report, _COVERAGE_REPORTS, "report")
     kwargs: dict[str, Any] = {
-        {"histogram": "", "bedgraph": "bg", "bedgraph_all": "bga", "per_base": "d",
-         "per_base_nonzero": "dz"}[mode]: True
+        {
+            "histogram": "",
+            "bedgraph": "bg",
+            "bedgraph_all": "bga",
+            "per_base": "d",
+            "per_base_nonzero": "dz",
+        }[mode]: True
     }
     kwargs.pop("", None)
     is_bam = file.suffix.lower() == ".bam"
@@ -943,7 +976,9 @@ def introns_pybedtools(
     out = _c.new_output(output_path)
     limit = _c.rows_limit(max_rows)
     pb = _pybedtools()
-    result = _guard("introns", lambda: pb.BedTool(str(path)).introns(gene=gene_type, exon=exon_type))
+    result = _guard(
+        "introns", lambda: pb.BedTool(str(path)).introns(gene=gene_type, exon=exon_type)
+    )
     try:
         raw = Path(result.fn).read_text(encoding="utf-8").splitlines()
         kept = []
@@ -1137,7 +1172,9 @@ def random_overlap_distribution_pybedtools(
     n = _c.integer(iterations, "iterations", 1, _MAX_ITERATIONS)
     start = _c.integer(seed, "seed", 0, 2**31 - 1 - _MAX_ITERATIONS)
     pb = _pybedtools()
-    values = _guard("randomintersection", lambda: _shuffled_counts(pb, a, b, genome, n, kind, start))
+    values = _guard(
+        "randomintersection", lambda: _shuffled_counts(pb, a, b, genome, n, kind, start)
+    )
     observed = _guard("intersect", lambda: _observed(pb, a, b, kind))
     return {
         "status": "completed",
@@ -1266,11 +1303,12 @@ def random_overlap_matrix_pybedtools(
     start = _c.integer(seed, "seed", 0, 2**31 - 1 - _MAX_ITERATIONS)
     pb = _pybedtools()
     matrix: dict[str, dict[str, Any]] = {}
-    for first, name_a in zip(files, names):
+    for first, name_a in zip(files, names, strict=False):
         matrix[name_a] = {}
-        for second, name_b in zip(files, names):
+        for second, name_b in zip(files, names, strict=False):
             values = _guard(
-                "randomstats", lambda a=first, b=second: _shuffled_counts(pb, a, b, genome, n, "count", start)
+                "randomstats",
+                lambda a=first, b=second: _shuffled_counts(pb, a, b, genome, n, "count", start),
             )
             actual = _guard("intersect", lambda a=first, b=second: _observed(pb, a, b, "count"))
             matrix[name_a][name_b] = _summary(
@@ -1393,10 +1431,12 @@ def plot_interval_tracks_pybedtools(
     figure = plt.Figure(figsize=(8, max(1.5, 0.8 * len(drawn) + 0.8)))
     backend.FigureCanvasAgg(figure)
     axes = figure.add_subplot(111)
-    for row, (label, items) in enumerate(drawn.items()):
+    for row, (_label, items) in enumerate(drawn.items()):
         for index, (lo, hi, feature) in enumerate(items):
             axes.add_patch(
-                patches.Rectangle((lo, row + 0.1 + 0.2 * (index % 3)), max(hi - lo, 1), 0.15, color="#4477aa")
+                patches.Rectangle(
+                    (lo, row + 0.1 + 0.2 * (index % 3)), max(hi - lo, 1), 0.15, color="#4477aa"
+                )
             )
             if show_names and feature:
                 axes.text(lo, row + 0.1 + 0.2 * (index % 3) + 0.17, feature, fontsize=6)
@@ -1416,7 +1456,10 @@ def plot_interval_tracks_pybedtools(
             label: [{"start": lo, "end": hi, "name": feature} for lo, hi, feature in items]
             for label, items in drawn.items()
         },
-        "provenance": {"package": "matplotlib", "package_version": _c.package_version("matplotlib")},
+        "provenance": {
+            "package": "matplotlib",
+            "package_version": _c.package_version("matplotlib"),
+        },
     }
 
 
@@ -1460,7 +1503,11 @@ def build_igv_script_pybedtools(
     pb = _pybedtools()
     result = _guard("igv", lambda: pb.BedTool(str(path)).igv(**kwargs))
     try:
-        script = Path(result.igv_script).read_text(encoding="utf-8") if hasattr(result, "igv_script") else str(result)
+        script = (
+            Path(result.igv_script).read_text(encoding="utf-8")
+            if hasattr(result, "igv_script")
+            else str(result)
+        )
     finally:
         _discard(result)
     if out is not None:
@@ -1502,7 +1549,7 @@ def build_ucsc_links_page_pybedtools(
     program = shutil.which("bedtools")
     assert program is not None
     try:
-        done = subprocess.run(  # noqa: S603 - fixed argument list, no shell
+        done = subprocess.run(
             [program, "links", "-i", str(path), "-base", url, "-org", org, "-db", db],
             capture_output=True,
             text=True,

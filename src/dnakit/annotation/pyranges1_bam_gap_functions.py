@@ -15,7 +15,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _gap_cli as _cli
 from dnakit.bioinformatics._common import require

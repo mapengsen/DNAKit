@@ -11,8 +11,9 @@ Install the optional dependency with ``python -m pip install "dnakit[bio-sourmas
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
@@ -67,10 +68,14 @@ def _lca_summary(path: Path, db: Any, ksize: int, scaled: int) -> dict[str, Any]
     }
 
 
-def _load_lca(lca_databases: Sequence[str], scaled: int | None) -> tuple[list[Any], int, int, list[Path]]:
+def _load_lca(
+    lca_databases: Sequence[str], scaled: int | None
+) -> tuple[list[Any], int, int, list[Path]]:
     paths = _paths(lca_databases, "lca_databases")
     lca_utils = _sourmash("sourmash.lca.lca_utils")
-    dblist, ksize, db_scaled = lca_utils.load_databases([str(p) for p in paths], scaled, verbose=False)
+    dblist, ksize, db_scaled = lca_utils.load_databases(
+        [str(p) for p in paths], scaled, verbose=False
+    )
     return dblist, ksize, db_scaled, paths
 
 
@@ -199,7 +204,9 @@ def load_sqlite_index_summary(
     return _index_summary(index, source, type(index).__name__)
 
 
-def load_sbt_index_summary(path: str, *, cache_size: int | None = None, verbose: bool = True) -> dict[str, Any]:
+def load_sbt_index_summary(
+    path: str, *, cache_size: int | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Open a sourmash SBT index file (``.sbt.zip``) and summarise its signatures (sbtmh.load_sbt_index)."""
     source = _existing(path, "path")
     index = _sourmash("sourmash.sbtmh").load_sbt_index(
@@ -224,14 +231,18 @@ def load_lca_databases(
         "backend": "sourmash",
         "ksize": int(ksize),
         "scaled": int(db_scaled),
-        "databases": [_lca_summary(p, db, ksize, db_scaled) for p, db in zip(paths, dblist)],
+        "databases": [
+            _lca_summary(p, db, ksize, db_scaled) for p, db in zip(paths, dblist, strict=False)
+        ],
     }
 
 
 def load_lca_database(path: str, *, verbose: bool = True) -> dict[str, Any]:
     """Load one LCA taxonomy database and report its k-mer size, scaled value and size (load_single_database)."""
     source = _existing(path, "path")
-    db, ksize, scaled = _sourmash("sourmash.lca.lca_db").load_single_database(str(source), verbose=False)
+    db, ksize, scaled = _sourmash("sourmash.lca.lca_db").load_single_database(
+        str(source), verbose=False
+    )
     return {"status": "completed", "backend": "sourmash", **_lca_summary(source, db, ksize, scaled)}
 
 
@@ -266,13 +277,17 @@ def gather_lineage_assignments(
     }
 
 
-def lca_rank_counts(lca_databases: Sequence[str], *, min_num: int = 0, verbose: bool = True) -> dict[str, Any]:
+def lca_rank_counts(
+    lca_databases: Sequence[str], *, min_num: int = 0, verbose: bool = True
+) -> dict[str, Any]:
     """Count, for every lineage, the k-mer hashes whose lowest common ancestor it is (sourmash.lca.command_rankinfo)."""
     if min_num < 0:
         raise ConfigurationError("min_num must not be negative.")
     dblist, ksize, scaled, _ = _load_lca(lca_databases, None)
     counts = _sourmash("sourmash.lca.command_rankinfo").make_lca_counts(dblist, min_num=min_num)
-    rows = [{"lineage": _lineage(lineage), "count": int(count)} for lineage, count in counts.items()]
+    rows = [
+        {"lineage": _lineage(lineage), "count": int(count)} for lineage, count in counts.items()
+    ]
     rows.sort(key=lambda row: (-row["count"], _rank_key(row["lineage"])))
     return {
         "status": "completed",
@@ -341,7 +356,9 @@ def summarize_lineage_counts(
     counts = _sourmash("sourmash.lca.command_summarize").summarize(
         query.minhash.hashes, dblist, threshold, ignore_abundance
     )
-    rows = [{"lineage": _lineage(lineage), "count": int(count)} for lineage, count in counts.items()]
+    rows = [
+        {"lineage": _lineage(lineage), "count": int(count)} for lineage, count in counts.items()
+    ]
     rows.sort(key=lambda row: (-row["count"], _rank_key(row["lineage"])))
     return {
         "status": "completed",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from dnakit.exceptions import ConfigurationError
 from dnakit.variants import (
     calculate_minor_allele_frequency,
     compare,
@@ -17,7 +18,6 @@ from dnakit.variants import (
     split_multiallelic,
 )
 
-
 VCF = "\n".join(
     (
         "##fileformat=VCFv4.3",
@@ -29,8 +29,22 @@ VCF = "\n".join(
 
 def _records():
     return [
-        {"chrom": "chr1", "pos": 10, "ref": "A", "alt": "G", "qual": 50, "genotypes": ["0/1", "1/1"]},
-        {"chrom": "chr1", "pos": 20, "ref": "C", "alt": "T", "qual": 10, "genotypes": ["0/0", "./."]},
+        {
+            "chrom": "chr1",
+            "pos": 10,
+            "ref": "A",
+            "alt": "G",
+            "qual": 50,
+            "genotypes": ["0/1", "1/1"],
+        },
+        {
+            "chrom": "chr1",
+            "pos": 20,
+            "ref": "C",
+            "alt": "T",
+            "qual": 10,
+            "genotypes": ["0/0", "./."],
+        },
     ]
 
 
@@ -83,9 +97,13 @@ def test_minor_allele_frequency_includes_zero_count_alts():
 
 def test_quality_missingness_and_frequency_filters():
     records = _records()
-    quality = filter_variants_by_quality({"variants": records}, options={"min_quality": 20}, verbose=False)["result"]
+    quality = filter_variants_by_quality(
+        {"variants": records}, options={"min_quality": 20}, verbose=False
+    )["result"]
     assert quality["output_record_count"] == 1
-    missing = filter_variants_by_missingness({"variants": records}, options={"max_missingness": 0.4}, verbose=False)["result"]
+    missing = filter_variants_by_missingness(
+        {"variants": records}, options={"max_missingness": 0.4}, verbose=False
+    )["result"]
     assert missing["output_record_count"] == 1
     frequency = filter_variants_by_allele_frequency(
         {"variants": records}, options={"min_frequency": 0.4}, verbose=False
@@ -109,7 +127,9 @@ def test_depth_and_genotype_quality_filters():
 
 
 def test_filters_require_explicit_thresholds_and_calls():
-    with pytest.raises(Exception):
+    with pytest.raises(ConfigurationError):
         filter_variants_by_quality({"variants": _records()}, verbose=False)
-    with pytest.raises(Exception):
-        calculate_minor_allele_frequency({"variants": [{"chrom": "chr1", "pos": 1, "ref": "A", "alt": "G"}]}, verbose=False)
+    with pytest.raises(ConfigurationError):
+        calculate_minor_allele_frequency(
+            {"variants": [{"chrom": "chr1", "pos": 1, "ref": "A", "alt": "G"}]}, verbose=False
+        )

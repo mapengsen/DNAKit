@@ -28,7 +28,10 @@ def test_journal_status_does_not_promote_preprint_or_archive() -> None:
     dnaio = describe_publication_audit("dnaio", verbose=False)
     assert pyfaidx["journal_citation_status"] == "preprint"
     assert dnaio["journal_citation_status"] == "software_archive"
-    assert describe_publication_audit("Centrifuge", verbose=False)["journal_citation_status"] == "journal_article"
+    assert (
+        describe_publication_audit("Centrifuge", verbose=False)["journal_citation_status"]
+        == "journal_article"
+    )
     assert pyfaidx["manuscript_category"] != "manuscript_ready"
     assert dnaio["manuscript_category"] != "manuscript_ready"
 

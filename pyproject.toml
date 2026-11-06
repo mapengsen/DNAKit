@@ -335,8 +335,19 @@ extend-exclude = ["build", "dist", "dashing_similarity", "site", "src/dnakit/dat
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+# `ruff format` wraps code at line-length. Long docstrings, comments, URLs and literal
+# command strings, which the formatter leaves as written, are not lint errors. RUF005's
+# `[*a, b]` rewrite of `a + [b]` changes the result when `a` is a NumPy array, and
+# RUF046's `int(round(x))` -> `round(x)` returns a NumPy float under NumPy 1.x.
+ignore = ["E501", "RUF005", "RUF046"]
+# The en dash and full-width parentheses appear on purpose in scientific and Chinese text.
+allowed-confusables = ["–", "（", "）"]
 
 [tool.ruff.lint.per-file-ignores]
+# Package __init__ files re-export each adapter batch in its own appended import block.
+"src/dnakit/**/__init__.py" = ["E402"]
+# Test modules import optional packages after pytest.importorskip.
+"others/tests/**" = ["E402"]
 # These maintainers embed source-code patterns and generated documentation verbatim.
 "others/skills/build_genomics_survey.py" = ["E501", "RUF001"]
 "others/skills/build_native_providers.py" = ["E501"]

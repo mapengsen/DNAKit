@@ -41,15 +41,26 @@ def _parse(path: str | Path, paired: bool, max_records: int, max_bases: int) -> 
             records.append(converted if paired else converted[0])
             bases += size
     except (OSError, ValueError, RuntimeError) as exc:
-        raise ConfigurationError(f"khmer could not parse {'paired ' if paired else ''}reads: {exc}") from exc
-    return {"status": "completed", "source": str(source), "paired": paired,
-            "records": records, "record_count": len(records), "base_count": bases,
-            "truncated": truncated, "provenance": c.provenance(source_function=
-                "khmer.ReadParser.iter_read_pairs" if paired else "khmer.ReadParser")}
+        raise ConfigurationError(
+            f"khmer could not parse {'paired ' if paired else ''}reads: {exc}"
+        ) from exc
+    return {
+        "status": "completed",
+        "source": str(source),
+        "paired": paired,
+        "records": records,
+        "record_count": len(records),
+        "base_count": bases,
+        "truncated": truncated,
+        "provenance": c.provenance(
+            source_function="khmer.ReadParser.iter_read_pairs" if paired else "khmer.ReadParser"
+        ),
+    }
 
 
-def khmer_parse_reads(path: str | Path, *, max_records: int = 1000, max_bases: int = 1_000_000,
-                       verbose: bool = True) -> dict[str, Any]:
+def khmer_parse_reads(
+    path: str | Path, *, max_records: int = 1000, max_bases: int = 1_000_000, verbose: bool = True
+) -> dict[str, Any]:
     """Read FASTA/FASTQ records, preserving names, sequences and FASTQ qualities.
 
     ``truncated`` explicitly signals that more records exist beyond the record or
@@ -58,8 +69,9 @@ def khmer_parse_reads(path: str | Path, *, max_records: int = 1000, max_bases: i
     return _parse(path, False, max_records, max_bases)
 
 
-def khmer_parse_read_pairs(path: str | Path, *, max_records: int = 1000,
-                            max_bases: int = 1_000_000, verbose: bool = True) -> dict[str, Any]:
+def khmer_parse_read_pairs(
+    path: str | Path, *, max_records: int = 1000, max_bases: int = 1_000_000, verbose: bool = True
+) -> dict[str, Any]:
     """Read interleaved FASTA/FASTQ pairs with khmer's name-pairing validation.
 
     Each returned record is a two-read list; ``max_records`` counts pairs. Invalid
@@ -68,5 +80,5 @@ def khmer_parse_read_pairs(path: str | Path, *, max_records: int = 1000,
     return _parse(path, True, max_records, max_bases)
 
 
-__all__ = ["khmer_parse_reads", "khmer_parse_read_pairs"]
+__all__ = ["khmer_parse_read_pairs", "khmer_parse_reads"]
 _register_public_verbose(globals(), tuple(__all__))

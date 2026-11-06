@@ -115,7 +115,12 @@ def _base_map(value: object, name: str, *, positive_sum: bool = False) -> dict[s
     result = {}
     for base in _BASES:
         item = value[base]
-        if isinstance(item, bool) or not isinstance(item, (int, float)) or not math.isfinite(item) or item < 0:
+        if (
+            isinstance(item, bool)
+            or not isinstance(item, (int, float))
+            or not math.isfinite(item)
+            or item < 0
+        ):
             raise ConfigurationError(f"{name}[{base!r}] must be a non-negative number.")
         result[base] = float(item)
     if positive_sum and sum(result.values()) <= 0:
@@ -137,7 +142,11 @@ def _motif(
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             if instances is not None:
-                if isinstance(instances, (str, bytes)) or not isinstance(instances, Sequence) or not instances:
+                if (
+                    isinstance(instances, (str, bytes))
+                    or not isinstance(instances, Sequence)
+                    or not instances
+                ):
                     raise ConfigurationError("instances must be a non-empty list of DNA strings.")
                 if len(instances) > _MAX_INSTANCES:
                     raise ConfigurationError(f"instances may hold at most {_MAX_INSTANCES} sites.")
@@ -156,19 +165,28 @@ def _motif(
                     raise ConfigurationError("counts must give a list for each of A, C, G and T.")
                 widths = {len(counts[base]) for base in _BASES}
                 if len(widths) != 1 or not 1 <= next(iter(widths)) <= _MAX_WIDTH:
-                    raise ConfigurationError(f"counts lists must have the same length (1 to {_MAX_WIDTH}).")
+                    raise ConfigurationError(
+                        f"counts lists must have the same length (1 to {_MAX_WIDTH})."
+                    )
                 table = {}
                 for base in _BASES:
                     table[base] = []
                     for item in counts[base]:
-                        if isinstance(item, bool) or not isinstance(item, (int, float)) or not math.isfinite(item) or item < 0:
+                        if (
+                            isinstance(item, bool)
+                            or not isinstance(item, (int, float))
+                            or not math.isfinite(item)
+                            or item < 0
+                        ):
                             raise ConfigurationError("counts must be non-negative numbers.")
                         table[base].append(float(item))
                 motif = motifs.Motif(alphabet=_BASES, counts=table)
             chosen_background = _base_map(background, "background", positive_sum=True)
             if chosen_background is not None:
                 total = sum(chosen_background.values())
-                motif.background = {base: value / total for base, value in chosen_background.items()}
+                motif.background = {
+                    base: value / total for base, value in chosen_background.items()
+                }
             chosen_pseudocounts = _base_map(pseudocounts, "pseudocounts")
             if chosen_pseudocounts is not None:
                 motif.pseudocounts = chosen_pseudocounts
@@ -274,7 +292,11 @@ def pssm_search(
         raise ConfigurationError("sequence must be a non-empty DNA string.")
     if set(sequence.upper()) - set("ACGTN"):
         raise ConfigurationError("sequence may contain only A, C, G, T and N.")
-    if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or not math.isfinite(threshold):
+    if (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, (int, float))
+        or not math.isfinite(threshold)
+    ):
         raise ConfigurationError("threshold must be a finite number.")
     limit = _integer(max_hits, "max_hits", minimum=1, maximum=10_000_000)
     motif = _motif(instances, counts, pseudocounts, background)
@@ -424,9 +446,13 @@ def pssm_threshold(
 
     chosen = method if method in _THRESHOLD_METHODS else None
     if chosen is None:
-        raise ConfigurationError(f"method must be one of {list(_THRESHOLD_METHODS)}; got {method!r}.")
+        raise ConfigurationError(
+            f"method must be one of {list(_THRESHOLD_METHODS)}; got {method!r}."
+        )
     motif = _motif(instances, counts, pseudocounts, background)
-    dist = _distribution(motif, _integer(precision, "precision", minimum=1, maximum=100_000), background)
+    dist = _distribution(
+        motif, _integer(precision, "precision", minimum=1, maximum=100_000), background
+    )
     result: dict[str, Any] = {
         "status": "completed",
         "operation": "pssm_threshold",
@@ -435,14 +461,30 @@ def pssm_threshold(
     }
     if chosen in ("fpr", "fnr"):
         if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not 0 < rate < 1:
-            raise ConfigurationError("rate must be a number between 0 and 1 for methods fpr and fnr.")
+            raise ConfigurationError(
+                "rate must be a number between 0 and 1 for methods fpr and fnr."
+            )
         result["rate"] = float(rate)
-        result["threshold"] = float(dist.threshold_fpr(rate) if chosen == "fpr" else dist.threshold_fnr(rate))
+        result["threshold"] = float(
+            dist.threshold_fpr(rate) if chosen == "fpr" else dist.threshold_fnr(rate)
+        )
     elif chosen == "balanced":
-        if isinstance(rate_proportion, bool) or not isinstance(rate_proportion, (int, float)) or rate_proportion <= 0:
+        if (
+            isinstance(rate_proportion, bool)
+            or not isinstance(rate_proportion, (int, float))
+            or rate_proportion <= 0
+        ):
             raise ConfigurationError("rate_proportion must be a positive number.")
-        threshold, achieved = dist.threshold_balanced(rate_proportion=rate_proportion, return_rate=True)
-        result.update({"rate_proportion": float(rate_proportion), "threshold": float(threshold), "rate": float(achieved)})
+        threshold, achieved = dist.threshold_balanced(
+            rate_proportion=rate_proportion, return_rate=True
+        )
+        result.update(
+            {
+                "rate_proportion": float(rate_proportion),
+                "threshold": float(threshold),
+                "rate": float(achieved),
+            }
+        )
     else:
         result["threshold"] = float(dist.threshold_patser())
     result["provenance"] = _provenance(
@@ -507,8 +549,12 @@ def weblogo_service_logo(
     for key, value in (options or {}).items():
         expected = _LOGO_OPTIONS.get(key)
         if expected is None:
-            raise ConfigurationError(f"{key!r} is not a WebLogo option; allowed: {sorted(_LOGO_OPTIONS)}.")
-        if not isinstance(value, expected) or (expected is str and (len(value) > 200 or "\n" in value)):
+            raise ConfigurationError(
+                f"{key!r} is not a WebLogo option; allowed: {sorted(_LOGO_OPTIONS)}."
+            )
+        if not isinstance(value, expected) or (
+            expected is str and (len(value) > 200 or "\n" in value)
+        ):
             raise ConfigurationError(f"option {key} must be {expected.__name__}.")
         extra[key] = value
     motif = _motif(instances, counts, None, None)

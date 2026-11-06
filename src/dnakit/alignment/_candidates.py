@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import re
 from collections import Counter, defaultdict
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from dnakit._candidate_runtime import candidate_ok
+from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import InputFormatError
 from dnakit.sequence import build_minimizer_index, normalize_dna_sequence
 
@@ -40,12 +41,16 @@ class SamRecord:
 
     @property
     def end(self) -> int:
-        reference_span = sum(int(length) for length, operation in re.findall(r"(\d+)([MDN=X])", self.cigar))
+        reference_span = sum(
+            int(length) for length, operation in re.findall(r"(\d+)([MDN=X])", self.cigar)
+        )
         return self.position + reference_span
 
 
 def _source_text(source: str | Path) -> str:
-    if isinstance(source, Path) or (isinstance(source, str) and "\n" not in source and Path(source).exists()):
+    if isinstance(source, Path) or (
+        isinstance(source, str) and "\n" not in source and Path(source).exists()
+    ):
         return Path(source).read_text(encoding="utf-8")
     if not isinstance(source, str):
         raise TypeError("source must be SAM text or a filesystem path")
@@ -65,7 +70,19 @@ def _parse_sam_text(source: str | Path) -> list[SamRecord]:
             pieces = tag.split(":", 2)
             if len(pieces) == 3:
                 tags[pieces[0]] = pieces[2]
-        records.append(SamRecord(fields[0], int(fields[1]), fields[2], int(fields[3]) - 1, int(fields[4]), fields[5], fields[9], fields[10], tags))
+        records.append(
+            SamRecord(
+                fields[0],
+                int(fields[1]),
+                fields[2],
+                int(fields[3]) - 1,
+                int(fields[4]),
+                fields[5],
+                fields[9],
+                fields[10],
+                tags,
+            )
+        )
     return records
 
 
@@ -97,7 +114,19 @@ def _records(source: str | Path | Sequence[SamRecord | Mapping[str, object]]) ->
         if isinstance(item, SamRecord):
             result.append(item)
         else:
-            result.append(SamRecord(str(item["query_name"]), int(item["flag"]), str(item["reference"]), int(item["position"]), int(item.get("mapping_quality", 0)), str(item.get("cigar", "*")), str(item.get("sequence", "*")), str(item.get("quality", "*")), item.get("tags", {})))
+            result.append(
+                SamRecord(
+                    str(item["query_name"]),
+                    int(item["flag"]),
+                    str(item["reference"]),
+                    int(item["position"]),
+                    int(item.get("mapping_quality", 0)),
+                    str(item.get("cigar", "*")),
+                    str(item.get("sequence", "*")),
+                    str(item.get("quality", "*")),
+                    item.get("tags", {}),
+                )
+            )
     return result
 
 
@@ -114,7 +143,19 @@ def _sam_text(records: Sequence[SamRecord]) -> str:
     lines = []
     for record in records:
         tags = "\t".join(f"{key}:Z:{value}" for key, value in (record.tags or {}).items())
-        fields = [record.query_name, str(record.flag), record.reference, str(record.position + 1), str(record.mapping_quality), record.cigar, "*", "0", "0", record.sequence, record.quality]
+        fields = [
+            record.query_name,
+            str(record.flag),
+            record.reference,
+            str(record.position + 1),
+            str(record.mapping_quality),
+            record.cigar,
+            "*",
+            "0",
+            "0",
+            record.sequence,
+            record.quality,
+        ]
         lines.append("\t".join(fields + ([tags] if tags else [])))
     return "\n".join(lines) + ("\n" if lines else "")
 
@@ -127,30 +168,51 @@ def _alignment_input(value: object) -> tuple[list[str], str]:
     return reads, reference
 
 
-def align_reads(input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True) -> list[dict[str, object]]:
+def align_reads(
+    input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True
+) -> list[dict[str, object]]:
     """Place exact reads on a reference with a deterministic local backend."""
 
     reads, reference = _alignment_input(input)
     result = []
     for index, read in enumerate(reads):
         position = reference.find(read)
-        result.append({"query_name": f"read_{index + 1}", "flag": 0 if position >= 0 else 4, "reference": "reference" if position >= 0 else "*", "position": position, "mapping_quality": 60 if position >= 0 else 0, "cigar": f"{len(read)}M" if position >= 0 else "*", "sequence": read, "backend": backend})
+        result.append(
+            {
+                "query_name": f"read_{index + 1}",
+                "flag": 0 if position >= 0 else 4,
+                "reference": "reference" if position >= 0 else "*",
+                "position": position,
+                "mapping_quality": 60 if position >= 0 else 0,
+                "cigar": f"{len(read)}M" if position >= 0 else "*",
+                "sequence": read,
+                "backend": backend,
+            }
+        )
     return result
 
 
-def align_long_reads(input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True) -> list[dict[str, object]]:
+def align_long_reads(
+    input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True
+) -> list[dict[str, object]]:
     return align_reads(input, backend=backend)
 
 
-def align_paired_reads(input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True) -> list[dict[str, object]]:
+def align_paired_reads(
+    input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True
+) -> list[dict[str, object]]:
     return align_reads(input, backend=backend)
 
 
-def align_to_graph(input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True) -> list[dict[str, object]]:
+def align_to_graph(
+    input: Mapping[str, object], *, backend: str = "naive", verbose: bool = True
+) -> list[dict[str, object]]:
     return align_reads(input, backend=backend)
 
 
-def build_index(input: Mapping[str, object] | str, *, k: int = 15, verbose: bool = True) -> dict[str, list[int]]:
+def build_index(
+    input: Mapping[str, object] | str, *, k: int = 15, verbose: bool = True
+) -> dict[str, list[int]]:
     """Build a minimizer index over a reference sequence."""
 
     reference = input["reference"] if isinstance(input, Mapping) else input
@@ -179,7 +241,12 @@ def calculate_base_depth(input: object, *, verbose: bool = True) -> dict[str, di
 def calculate_coverage(input: object, *, verbose: bool = True) -> dict[str, object]:
     depths = calculate_base_depth(input)
     values = [depth for reference in depths.values() for depth in reference.values()]
-    return {"covered_bases": len(values), "total_depth": sum(values), "mean_depth": sum(values) / len(values) if values else 0.0, "by_reference": depths}
+    return {
+        "covered_bases": len(values),
+        "total_depth": sum(values),
+        "mean_depth": sum(values) / len(values) if values else 0.0,
+        "by_reference": depths,
+    }
 
 
 def calculate_depth(input: object, *, verbose: bool = True) -> dict[str, object]:
@@ -187,8 +254,16 @@ def calculate_depth(input: object, *, verbose: bool = True) -> dict[str, object]
 
 
 def calculate_insert_size(input: object, *, verbose: bool = True) -> dict[str, object]:
-    values = [abs(int(record.tags.get("TLEN", "0"))) for record in _records(_record_source(input)) if record.tags and record.tags.get("TLEN", "0") not in {"0", "*"}]
-    return {"count": len(values), "mean": sum(values) / len(values) if values else 0.0, "values": values}
+    values = [
+        abs(int(record.tags.get("TLEN", "0")))
+        for record in _records(_record_source(input))
+        if record.tags and record.tags.get("TLEN", "0") not in {"0", "*"}
+    ]
+    return {
+        "count": len(values),
+        "mean": sum(values) / len(values) if values else 0.0,
+        "values": values,
+    }
 
 
 def calculate_mapping_rate(input: object, *, verbose: bool = True) -> float:
@@ -224,7 +299,11 @@ def calculate_strand_balance(input: object, *, verbose: bool = True) -> dict[str
     records = [record for record in _records(_record_source(input)) if not record.is_unmapped]
     forward = sum(not record.is_reverse for record in records)
     reverse = len(records) - forward
-    return {"forward": forward, "reverse": reverse, "forward_fraction": forward / len(records) if records else 0.0}
+    return {
+        "forward": forward,
+        "reverse": reverse,
+        "forward_fraction": forward / len(records) if records else 0.0,
+    }
 
 
 def calculate_strand_bias(input: object, *, verbose: bool = True) -> dict[str, object]:
@@ -239,24 +318,50 @@ def call_consensus_from_pileup(input: object, *, verbose: bool = True) -> dict[s
             continue
         for offset, base in enumerate(record.sequence):
             bases[record.reference][record.position + offset][base] += 1
-    return {reference: "".join(counts[position].most_common(1)[0][0] for position in sorted(counts)) for reference, counts in bases.items()}
+    return {
+        reference: "".join(counts[position].most_common(1)[0][0] for position in sorted(counts))
+        for reference, counts in bases.items()
+    }
 
 
-def filter_bam_by_flags(input: object, *, include_flags: int = 0, exclude_flags: int = 0, verbose: bool = True) -> list[dict[str, object]]:
-    return [_record_dict(record) for record in _records(_record_source(input)) if record.flag & include_flags == include_flags and not record.flag & exclude_flags]
+def filter_bam_by_flags(
+    input: object, *, include_flags: int = 0, exclude_flags: int = 0, verbose: bool = True
+) -> list[dict[str, object]]:
+    return [
+        _record_dict(record)
+        for record in _records(_record_source(input))
+        if record.flag & include_flags == include_flags and not record.flag & exclude_flags
+    ]
 
 
-def filter_bam_by_mapping_quality(input: object, *, minimum: int = 0, verbose: bool = True) -> list[dict[str, object]]:
-    return [_record_dict(record) for record in _records(_record_source(input)) if record.mapping_quality >= minimum]
+def filter_bam_by_mapping_quality(
+    input: object, *, minimum: int = 0, verbose: bool = True
+) -> list[dict[str, object]]:
+    return [
+        _record_dict(record)
+        for record in _records(_record_source(input))
+        if record.mapping_quality >= minimum
+    ]
 
 
 def generate_pileup(input: object, *, verbose: bool = True) -> list[dict[str, object]]:
     depth = calculate_base_depth(input)
-    return [{"reference": reference, "position": position, "depth": value} for reference, positions in depth.items() for position, value in positions.items()]
+    return [
+        {"reference": reference, "position": position, "depth": value}
+        for reference, positions in depth.items()
+        for position, value in positions.items()
+    ]
 
 
 def index_alignments(input: object, *, verbose: bool = True) -> dict[str, list[int]]:
-    return {reference: [record.position for record in _records(_record_source(input)) if record.reference == reference] for reference in sorted({record.reference for record in _records(_record_source(input))})}
+    return {
+        reference: [
+            record.position
+            for record in _records(_record_source(input))
+            if record.reference == reference
+        ]
+        for reference in sorted({record.reference for record in _records(_record_source(input))})
+    }
 
 
 def mark_duplicates(input: object, *, verbose: bool = True) -> list[dict[str, object]]:
@@ -269,7 +374,21 @@ def mark_duplicates(input: object, *, verbose: bool = True) -> list[dict[str, ob
             tags["DUP"] = "1"
         else:
             seen.add(key)
-        result.append(_record_dict(SamRecord(record.query_name, record.flag, record.reference, record.position, record.mapping_quality, record.cigar, record.sequence, record.quality, tags)))
+        result.append(
+            _record_dict(
+                SamRecord(
+                    record.query_name,
+                    record.flag,
+                    record.reference,
+                    record.position,
+                    record.mapping_quality,
+                    record.cigar,
+                    record.sequence,
+                    record.quality,
+                    tags,
+                )
+            )
+        )
     return result
 
 
@@ -287,13 +406,24 @@ def parse_cram_records(input: str | Path, *, verbose: bool = True) -> list[dict[
 
 def plot_alignment_view(input: object, *, width: int = 80, verbose: bool = True) -> str:
     records = _records(_record_source(input))
-    rows = [f'<text x="0" y="{index * 18 + 18}">{record.query_name} {record.reference}:{record.position + 1} {record.sequence}</text>' for index, record in enumerate(records)]
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{width * 8}" height="{max(30, len(rows) * 18 + 10)}">' + "".join(rows) + "</svg>"
+    rows = [
+        f'<text x="0" y="{index * 18 + 18}">{record.query_name} {record.reference}:{record.position + 1} {record.sequence}</text>'
+        for index, record in enumerate(records)
+    ]
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width * 8}" height="{max(30, len(rows) * 18 + 10)}">'
+        + "".join(rows)
+        + "</svg>"
+    )
 
 
 def plot_coverage_track(input: object, *, verbose: bool = True) -> str:
     coverage = calculate_coverage(input)
-    return "<svg xmlns=\"http://www.w3.org/2000/svg\"><text>mean_depth=" + str(coverage["mean_depth"]) + "</text></svg>"
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg"><text>mean_depth='
+        + str(coverage["mean_depth"])
+        + "</text></svg>"
+    )
 
 
 def remove_duplicates(input: object, *, verbose: bool = True) -> list[dict[str, object]]:
@@ -314,27 +444,80 @@ def bam_to_cram(input: str | Path, *, verbose: bool = True) -> bytes:
     return _sam_text(_parse_sam_text(input)).encode("utf-8")
 
 
-def sort_alignments(input: object, *, by: str = "coordinate", verbose: bool = True) -> list[dict[str, object]]:
+def sort_alignments(
+    input: object, *, by: str = "coordinate", verbose: bool = True
+) -> list[dict[str, object]]:
     records = _records(_record_source(input))
     if by == "query":
         ordered = sorted(records, key=lambda record: record.query_name)
     else:
-        ordered = sorted(records, key=lambda record: (record.is_unmapped, record.reference, record.position, record.query_name))
+        ordered = sorted(
+            records,
+            key=lambda record: (
+                record.is_unmapped,
+                record.reference,
+                record.position,
+                record.query_name,
+            ),
+        )
     return [_record_dict(record) for record in ordered]
 
 
-def split_bam_by_region(input: object, *, regions: Mapping[str, Sequence[Sequence[int]]], verbose: bool = True) -> dict[str, list[dict[str, object]]]:
+def split_bam_by_region(
+    input: object, *, regions: Mapping[str, Sequence[Sequence[int]]], verbose: bool = True
+) -> dict[str, list[dict[str, object]]]:
     result = {name: [] for name in regions}
     for record in _records(_record_source(input)):
         for name, intervals in regions.items():
-            if any(record.reference == name and record.position < end and record.end > start for start, end in intervals):
+            if any(
+                record.reference == name and record.position < end and record.end > start
+                for start, end in intervals
+            ):
                 result[name].append(_record_dict(record))
     return result
 
 
-__all__ = ['align_long_reads', 'align_paired_reads', 'align_reads', 'align_to_graph', 'bam_to_cram', 'bam_to_sam', 'build_index', 'calculate_base_depth', 'calculate_clipping_profile', 'calculate_coverage', 'calculate_depth', 'calculate_insert_size', 'calculate_mapping_rate', 'calculate_mismatch_rate', 'calculate_read_group_stats', 'calculate_soft_clipping', 'calculate_strand_balance', 'calculate_strand_bias', 'call_consensus_from_pileup', 'filter_bam_by_flags', 'filter_bam_by_mapping_quality', 'generate_pileup', 'index_alignments', 'mark_duplicates', 'merge_bam_files', 'parse_bam_records', 'parse_cram_records', 'parse_sam_records', 'plot_alignment_view', 'plot_coverage_track', 'remove_duplicates', 'sam_to_bam', 'sort_alignments', 'split_bam_by_region']
+__all__ = [
+    "align_long_reads",
+    "align_paired_reads",
+    "align_reads",
+    "align_to_graph",
+    "bam_to_cram",
+    "bam_to_sam",
+    "build_index",
+    "calculate_base_depth",
+    "calculate_clipping_profile",
+    "calculate_coverage",
+    "calculate_depth",
+    "calculate_insert_size",
+    "calculate_mapping_rate",
+    "calculate_mismatch_rate",
+    "calculate_read_group_stats",
+    "calculate_soft_clipping",
+    "calculate_strand_balance",
+    "calculate_strand_bias",
+    "call_consensus_from_pileup",
+    "filter_bam_by_flags",
+    "filter_bam_by_mapping_quality",
+    "generate_pileup",
+    "index_alignments",
+    "mark_duplicates",
+    "merge_bam_files",
+    "parse_bam_records",
+    "parse_cram_records",
+    "parse_sam_records",
+    "plot_alignment_view",
+    "plot_coverage_track",
+    "remove_duplicates",
+    "sam_to_bam",
+    "sort_alignments",
+    "split_bam_by_region",
+]
 
-def calculate_clipping_profile(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> object:
+
+def calculate_clipping_profile(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> object:
     """Summarize soft- and hard-clipping at the 5'/3' ends of the mapped reads of SAM text or SAM-like records.
 
     ``input``: SAM text / path (``@`` headers are ignored), a list of record mappings (``query_name``, ``flag``,
@@ -352,7 +535,8 @@ def calculate_clipping_profile(input: object, *, options: Mapping[str, object] |
         records = _records(_record_source(input))
     except (ValueError, KeyError, TypeError) as exc:
         raise InputFormatError(
-            f"Cannot read the alignment records: {exc}", code="INVALID_ALIGNMENT_INPUT",
+            f"Cannot read the alignment records: {exc}",
+            code="INVALID_ALIGNMENT_INPUT",
             hint="Pass SAM text/path or a list of record mappings with query_name, flag, reference, position and cigar.",
         ) from exc
     totals = {"left_soft": 0, "right_soft": 0, "left_hard": 0, "right_hard": 0}
@@ -362,7 +546,10 @@ def calculate_clipping_profile(input: object, *, options: Mapping[str, object] |
     for record in records:
         if record.is_unmapped:
             continue
-        operations = [(int(length), operation) for length, operation in re.findall(r"(\d+)([MIDNSHP=X])", record.cigar)]
+        operations = [
+            (int(length), operation)
+            for length, operation in re.findall(r"(\d+)([MIDNSHP=X])", record.cigar)
+        ]
         row = {"left_soft": 0, "right_soft": 0, "left_hard": 0, "right_hard": 0}
         for side, sequence in (("left", operations), ("right", operations[::-1])):
             for length, operation in sequence:
@@ -378,8 +565,11 @@ def calculate_clipping_profile(input: object, *, options: Mapping[str, object] |
         if len(rows) < 10_000:
             rows.append({"query_name": record.query_name, **row})
     result: dict[str, object] = {
-        "reads": len(records), "mapped_reads": mapped, "clipped_reads": clipped,
-        "clipped_fraction": clipped / mapped if mapped else 0.0, **totals,
+        "reads": len(records),
+        "mapped_reads": mapped,
+        "clipped_reads": clipped,
+        "clipped_fraction": clipped / mapped if mapped else 0.0,
+        **totals,
         "soft_clipped_bases": totals["left_soft"] + totals["right_soft"],
         "hard_clipped_bases": totals["left_hard"] + totals["right_hard"],
         "clip_length_histogram": dict(sorted(histogram.items())),
@@ -388,5 +578,5 @@ def calculate_clipping_profile(input: object, *, options: Mapping[str, object] |
         result["per_read"] = rows
     return candidate_ok("alignment", "calculate_clipping_profile", input, result, options=options)
 
-from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

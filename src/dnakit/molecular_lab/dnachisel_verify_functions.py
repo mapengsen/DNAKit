@@ -66,7 +66,9 @@ def optimize_dnachisel_source_record(
     dnachisel = require("dnachisel", _EXTRA)
     source = _source(source_path)
     target = _target(target_path)
-    problem_class = dnachisel.CircularDnaOptimizationProblem if circular else dnachisel.DnaOptimizationProblem
+    problem_class = (
+        dnachisel.CircularDnaOptimizationProblem if circular else dnachisel.DnaOptimizationProblem
+    )
     problem = problem_class.from_record(str(source), logger=None)
     problem.max_random_iters = 10000
     before = {

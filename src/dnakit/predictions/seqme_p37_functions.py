@@ -88,8 +88,15 @@ def _sequences(value: object, name: str, *, minimum: int = 1) -> list[str]:
     if len(value) > _MAX_SEQUENCES:
         raise ConfigurationError(f"{name} may hold at most {_MAX_SEQUENCES} sequences.")
     for item in value:
-        if not isinstance(item, str) or not item or len(item) > _MAX_LENGTH or set(item) - _ALPHABET:
-            raise ConfigurationError(f"every sequence in {name} must be a non-empty upper-case string of A, C, G, T and N.")
+        if (
+            not isinstance(item, str)
+            or not item
+            or len(item) > _MAX_LENGTH
+            or set(item) - _ALPHABET
+        ):
+            raise ConfigurationError(
+                f"every sequence in {name} must be a non-empty upper-case string of A, C, G, T and N."
+            )
     return list(value)
 
 
@@ -100,7 +107,9 @@ def _matrix(value: object, name: str, *, minimum_rows: int = 2) -> Any:
     except (TypeError, ValueError) as exc:
         raise ConfigurationError(f"{name} must be a matrix of numbers.") from exc
     if array.ndim != 2 or array.shape[0] < minimum_rows or array.shape[1] < 1:
-        raise ConfigurationError(f"{name} must be a matrix with at least {minimum_rows} rows and one column.")
+        raise ConfigurationError(
+            f"{name} must be a matrix with at least {minimum_rows} rows and one column."
+        )
     if not np.isfinite(array).all():
         raise ConfigurationError(f"{name} must hold finite numbers.")
     return array
@@ -135,11 +144,15 @@ def _property(name: str) -> Callable[[list[str]], Any]:
 
 def _properties(names: Sequence[str], minimum: int) -> list[Callable[[list[str]], Any]]:
     if isinstance(names, (str, bytes)) or len(names) < minimum:
-        raise ConfigurationError(f"property_names must list at least {minimum} property name(s) from {list(_PROPERTIES)}.")
+        raise ConfigurationError(
+            f"property_names must list at least {minimum} property name(s) from {list(_PROPERTIES)}."
+        )
     return [_property(item) for item in names]
 
 
-def _result(operation: str, metric: Any, outcome: Any, generated: Sequence[str], **extra: object) -> dict[str, Any]:
+def _result(
+    operation: str, metric: Any, outcome: Any, generated: Sequence[str], **extra: object
+) -> dict[str, Any]:
     return {
         "status": "completed",
         "operation": operation,
@@ -153,7 +166,9 @@ def _result(operation: str, metric: Any, outcome: Any, generated: Sequence[str],
     }
 
 
-def _run(operation: str, build: Callable[[], Any], generated: Sequence[str], **extra: object) -> dict[str, Any]:
+def _run(
+    operation: str, build: Callable[[], Any], generated: Sequence[str], **extra: object
+) -> dict[str, Any]:
     try:
         metric = build()
         outcome = metric(list(generated))
@@ -164,7 +179,9 @@ def _run(operation: str, build: Callable[[], Any], generated: Sequence[str], **e
     return _result(operation, metric, outcome, generated, **extra)
 
 
-def seqme_authenticity(generated: Sequence[str], train_set: Sequence[str], *, kmer_size: int = 3, verbose: bool = True) -> dict[str, Any]:
+def seqme_authenticity(
+    generated: Sequence[str], train_set: Sequence[str], *, kmer_size: int = 3, verbose: bool = True
+) -> dict[str, Any]:
     """Authenticity (AuthPct): the fraction of generated sequences whose nearest training neighbour is closer to another training sequence than to the generated one (Alaa et al. 2022).
 
     Higher is better; low values mean the generator copies its training data. k-mer embeddings of ``kmer_size`` are used.
@@ -173,10 +190,20 @@ def seqme_authenticity(generated: Sequence[str], train_set: Sequence[str], *, km
     seqs, train = _sequences(generated, "generated"), _sequences(train_set, "train_set", minimum=2)
     metrics = _seqme("seqme.metrics")
     embedder = _embedder(kmer_size)
-    return _run("seqme_authenticity", lambda: metrics.AuthPct(train, embedder), seqs, kmer_size=kmer_size)
+    return _run(
+        "seqme_authenticity", lambda: metrics.AuthPct(train, embedder), seqs, kmer_size=kmer_size
+    )
 
 
-def _manifold_metric(operation: str, name: str, generated: Sequence[str], reference: Sequence[str], n_neighbors: int, kmer_size: int, strict: bool) -> dict[str, Any]:
+def _manifold_metric(
+    operation: str,
+    name: str,
+    generated: Sequence[str],
+    reference: Sequence[str],
+    n_neighbors: int,
+    kmer_size: int,
+    strict: bool,
+) -> dict[str, Any]:
     seqs = _sequences(generated, "generated")
     ref = _sequences(reference, "reference", minimum=2)
     neighbors = _integer(n_neighbors, "n_neighbors", 1, 1000)
@@ -184,34 +211,92 @@ def _manifold_metric(operation: str, name: str, generated: Sequence[str], refere
     metrics = _seqme("seqme.metrics")
     embedder = _embedder(kmer_size)
     cls = getattr(metrics, name)
-    return _run(operation, lambda: cls(neighbors, ref, embedder, strict=strict), seqs, n_neighbors=neighbors, kmer_size=kmer_size)
+    return _run(
+        operation,
+        lambda: cls(neighbors, ref, embedder, strict=strict),
+        seqs,
+        n_neighbors=neighbors,
+        kmer_size=kmer_size,
+    )
 
 
-def seqme_clipped_density(generated: Sequence[str], reference: Sequence[str], *, n_neighbors: int = 5, kmer_size: int = 3, strict: bool = True, verbose: bool = True) -> dict[str, Any]:
+def seqme_clipped_density(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    n_neighbors: int = 5,
+    kmer_size: int = 3,
+    strict: bool = True,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Clipped density, an outlier-robust fidelity score of generated sequences against a reference manifold built from k-nearest-neighbour radii (Salvy et al. 2024). Range 0 to 1, higher is better.
 
     ``strict=True`` requires equally many generated and reference sequences.
     """
 
-    return _manifold_metric("seqme_clipped_density", "ClippedDensity", generated, reference, n_neighbors, kmer_size, strict)
+    return _manifold_metric(
+        "seqme_clipped_density",
+        "ClippedDensity",
+        generated,
+        reference,
+        n_neighbors,
+        kmer_size,
+        strict,
+    )
 
 
-def seqme_clipped_coverage(generated: Sequence[str], reference: Sequence[str], *, n_neighbors: int = 5, kmer_size: int = 3, strict: bool = True, verbose: bool = True) -> dict[str, Any]:
+def seqme_clipped_coverage(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    n_neighbors: int = 5,
+    kmer_size: int = 3,
+    strict: bool = True,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Clipped coverage, an outlier-robust diversity score: how much of the reference manifold the generated sequences cover. Range 0 to 1, higher is better."""
 
-    return _manifold_metric("seqme_clipped_coverage", "ClippedCoverage", generated, reference, n_neighbors, kmer_size, strict)
+    return _manifold_metric(
+        "seqme_clipped_coverage",
+        "ClippedCoverage",
+        generated,
+        reference,
+        n_neighbors,
+        kmer_size,
+        strict,
+    )
 
 
-def seqme_precision(generated: Sequence[str], reference: Sequence[str], *, n_neighbors: int = 5, kmer_size: int = 3, strict: bool = True, verbose: bool = True) -> dict[str, Any]:
+def seqme_precision(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    n_neighbors: int = 5,
+    kmer_size: int = 3,
+    strict: bool = True,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Improved precision (Kynkaanniemi et al. 2019): the share of generated sequences inside the k-NN manifold of the reference set (fidelity). Higher is better."""
 
-    return _manifold_metric("seqme_precision", "Precision", generated, reference, n_neighbors, kmer_size, strict)
+    return _manifold_metric(
+        "seqme_precision", "Precision", generated, reference, n_neighbors, kmer_size, strict
+    )
 
 
-def seqme_recall(generated: Sequence[str], reference: Sequence[str], *, n_neighbors: int = 5, kmer_size: int = 3, strict: bool = True, verbose: bool = True) -> dict[str, Any]:
+def seqme_recall(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    n_neighbors: int = 5,
+    kmer_size: int = 3,
+    strict: bool = True,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Improved recall (Kynkaanniemi et al. 2019): the share of reference sequences inside the k-NN manifold of the generated set (coverage). Higher is better."""
 
-    return _manifold_metric("seqme_recall", "Recall", generated, reference, n_neighbors, kmer_size, strict)
+    return _manifold_metric(
+        "seqme_recall", "Recall", generated, reference, n_neighbors, kmer_size, strict
+    )
 
 
 def seqme_conformity_score(
@@ -232,7 +317,11 @@ def seqme_conformity_score(
     seqs, ref = _sequences(generated, "generated"), _sequences(reference, "reference", minimum=2)
     predictors = _properties(property_names, 1)
     metrics = _seqme("seqme.metrics")
-    bandwidth = kde_bandwidth if isinstance(kde_bandwidth, str) else _number(kde_bandwidth, "kde_bandwidth", positive=True)
+    bandwidth = (
+        kde_bandwidth
+        if isinstance(kde_bandwidth, str)
+        else _number(kde_bandwidth, "kde_bandwidth", positive=True)
+    )
     return _run(
         "seqme_conformity_score",
         lambda: metrics.ConformityScore(ref, predictors, n_splits=_integer(n_splits, "n_splits", 2, 100), kde_bandwidth=bandwidth, seed=seed),
@@ -240,7 +329,16 @@ def seqme_conformity_score(
     )  # fmt: skip
 
 
-def seqme_fkea_diversity(generated: Sequence[str], *, bandwidth: float = 1.0, alpha: float = 2, n_random_fourier_features: int | None = 2048, kmer_size: int = 3, seed: int = 0, verbose: bool = True) -> dict[str, Any]:
+def seqme_fkea_diversity(
+    generated: Sequence[str],
+    *,
+    bandwidth: float = 1.0,
+    alpha: float = 2,
+    n_random_fourier_features: int | None = 2048,
+    kmer_size: int = 3,
+    seed: int = 0,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """FKEA kernel-entropy diversity (Vendi / RKE score): the effective number of distinct modes of the generated k-mer embeddings under a Gaussian kernel (Friedman and Dieng 2023; Ospanov et al. 2024).
 
     ``alpha=2`` gives the RKE score, other values the Vendi-alpha score. ``n_random_fourier_features=None`` uses the exact kernel.
@@ -249,7 +347,11 @@ def seqme_fkea_diversity(generated: Sequence[str], *, bandwidth: float = 1.0, al
     seqs = _sequences(generated, "generated")
     metrics = _seqme("seqme.metrics")
     embedder = _embedder(kmer_size)
-    fourier = None if n_random_fourier_features is None else _integer(n_random_fourier_features, "n_random_fourier_features", 1, 10**6)
+    fourier = (
+        None
+        if n_random_fourier_features is None
+        else _integer(n_random_fourier_features, "n_random_fourier_features", 1, 10**6)
+    )
     np = require("numpy", _EXTRA)
 
     def single_precision(items: list[str]) -> Any:
@@ -263,7 +365,14 @@ def seqme_fkea_diversity(generated: Sequence[str], *, bandwidth: float = 1.0, al
     )  # fmt: skip
 
 
-def seqme_hit_rate(generated: Sequence[str], property_name: str, *, min_value: float | None = None, max_value: float | None = None, verbose: bool = True) -> dict[str, Any]:
+def seqme_hit_rate(
+    generated: Sequence[str],
+    property_name: str,
+    *,
+    min_value: float | None = None,
+    max_value: float | None = None,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Hit rate: the proportion of generated sequences whose property lies in ``[min_value, max_value]`` (a bound left as None is open), with its standard error."""
 
     seqs = _sequences(generated, "generated")
@@ -284,7 +393,14 @@ def seqme_hit_rate(generated: Sequence[str], property_name: str, *, min_value: f
             keep &= values <= high
         return keep
 
-    return _run("seqme_hit_rate", lambda: metrics.HitRate(condition, name=f"Hit-rate {property_name}"), seqs, property_name=property_name, min_value=low, max_value=high)
+    return _run(
+        "seqme_hit_rate",
+        lambda: metrics.HitRate(condition, name=f"Hit-rate {property_name}"),
+        seqs,
+        property_name=property_name,
+        min_value=low,
+        max_value=high,
+    )
 
 
 def seqme_hypervolume(
@@ -316,7 +432,15 @@ def seqme_hypervolume(
     )  # fmt: skip
 
 
-def seqme_property_mean(generated: Sequence[str], property_name: str, *, objective: str = "maximize", deviation: str = "se", estimate: str = "unbiased", verbose: bool = True) -> dict[str, Any]:
+def seqme_property_mean(
+    generated: Sequence[str],
+    property_name: str,
+    *,
+    objective: str = "maximize",
+    deviation: str = "se",
+    estimate: str = "unbiased",
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Mean of a sequence property over the generated set with its deviation (the seqme ``ID`` metric); ``deviation`` is ``std``, ``se`` or ``var``, ``estimate`` ``biased`` or ``unbiased``."""
 
     seqs = _sequences(generated, "generated")
@@ -325,16 +449,39 @@ def seqme_property_mean(generated: Sequence[str], property_name: str, *, objecti
     _choice(deviation, ("std", "se", "var"), "deviation")
     _choice(estimate, ("biased", "unbiased"), "estimate")
     metrics = _seqme("seqme.metrics")
-    return _run("seqme_property_mean", lambda: metrics.ID(predictor, property_name, objective, deviation=deviation, estimate=estimate), seqs, property_name=property_name)
+    return _run(
+        "seqme_property_mean",
+        lambda: metrics.ID(
+            predictor, property_name, objective, deviation=deviation, estimate=estimate
+        ),
+        seqs,
+        property_name=property_name,
+    )
 
 
-def seqme_property_kl_divergence(generated: Sequence[str], reference: Sequence[str], property_name: str, *, n_draws: int = 10_000, kde_bandwidth: str | float = "silverman", seed: int = 0, verbose: bool = True) -> dict[str, Any]:
+def seqme_property_kl_divergence(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    property_name: str,
+    *,
+    n_draws: int = 10_000,
+    kde_bandwidth: str | float = "silverman",
+    seed: int = 0,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """KL divergence between the property distribution of the generated set and the reference set, estimated with Gaussian KDEs and ``n_draws`` Monte Carlo samples. Lower is better."""
 
-    seqs, ref = _sequences(generated, "generated", minimum=2), _sequences(reference, "reference", minimum=2)
+    seqs, ref = (
+        _sequences(generated, "generated", minimum=2),
+        _sequences(reference, "reference", minimum=2),
+    )
     predictor = _property(property_name)
     metrics = _seqme("seqme.metrics")
-    bandwidth = kde_bandwidth if isinstance(kde_bandwidth, str) else _number(kde_bandwidth, "kde_bandwidth", positive=True)
+    bandwidth = (
+        kde_bandwidth
+        if isinstance(kde_bandwidth, str)
+        else _number(kde_bandwidth, "kde_bandwidth", positive=True)
+    )
     return _run(
         "seqme_property_kl_divergence",
         lambda: metrics.KLDivergence(ref, predictor, n_draws=_integer(n_draws, "n_draws", 1, 10**7), kde_bandwidth=bandwidth, seed=seed),
@@ -342,27 +489,74 @@ def seqme_property_kl_divergence(generated: Sequence[str], reference: Sequence[s
     )  # fmt: skip
 
 
-def seqme_mmd(generated: Sequence[str], reference: Sequence[str], *, estimate: str = "biased", sigma: float = 10, scale: float = 1000, kmer_size: int = 3, verbose: bool = True) -> dict[str, Any]:
+def seqme_mmd(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    estimate: str = "biased",
+    sigma: float = 10,
+    scale: float = 1000,
+    kmer_size: int = 3,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Maximum mean discrepancy with a Gaussian RBF kernel between the k-mer embeddings of the generated and reference sets, multiplied by ``scale``. Lower is better."""
 
     seqs, ref = _sequences(generated, "generated"), _sequences(reference, "reference", minimum=2)
     _choice(estimate, ("biased", "unbiased"), "estimate")
     metrics = _seqme("seqme.metrics")
     embedder = _embedder(kmer_size)
-    return _run("seqme_mmd", lambda: metrics.MMD(ref, embedder, estimate=estimate, sigma=_number(sigma, "sigma", positive=True), scale=_number(scale, "scale", positive=True)), seqs, kmer_size=kmer_size)
+    return _run(
+        "seqme_mmd",
+        lambda: metrics.MMD(
+            ref,
+            embedder,
+            estimate=estimate,
+            sigma=_number(sigma, "sigma", positive=True),
+            scale=_number(scale, "scale", positive=True),
+        ),
+        seqs,
+        kmer_size=kmer_size,
+    )
 
 
-def seqme_kid(generated: Sequence[str], reference: Sequence[str], *, estimate: str = "biased", degree: int = 3, coef0: float = 1.0, kmer_size: int = 3, verbose: bool = True) -> dict[str, Any]:
+def seqme_kid(
+    generated: Sequence[str],
+    reference: Sequence[str],
+    *,
+    estimate: str = "biased",
+    degree: int = 3,
+    coef0: float = 1.0,
+    kmer_size: int = 3,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Kernel inception distance: MMD with a polynomial kernel (``degree``, ``coef0``) between k-mer embeddings (Binkowski et al. 2018). Lower is better."""
 
     seqs, ref = _sequences(generated, "generated"), _sequences(reference, "reference", minimum=2)
     _choice(estimate, ("biased", "unbiased"), "estimate")
     metrics = _seqme("seqme.metrics")
     embedder = _embedder(kmer_size)
-    return _run("seqme_kid", lambda: metrics.KID(ref, embedder, estimate=estimate, degree=_integer(degree, "degree", 1, 20), coef0=_number(coef0, "coef0")), seqs, kmer_size=kmer_size)
+    return _run(
+        "seqme_kid",
+        lambda: metrics.KID(
+            ref,
+            embedder,
+            estimate=estimate,
+            degree=_integer(degree, "degree", 1, 20),
+            coef0=_number(coef0, "coef0"),
+        ),
+        seqs,
+        kmer_size=kmer_size,
+    )
 
 
-def seqme_threshold_fraction(generated: Sequence[str], property_name: str, *, min_value: float | None = None, max_value: float | None = None, verbose: bool = True) -> dict[str, Any]:
+def seqme_threshold_fraction(
+    generated: Sequence[str],
+    property_name: str,
+    *,
+    min_value: float | None = None,
+    max_value: float | None = None,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Fraction of generated sequences whose property passes a threshold: at least ``min_value`` and/or at most ``max_value`` (give one or both)."""
 
     seqs = _sequences(generated, "generated")
@@ -372,13 +566,27 @@ def seqme_threshold_fraction(generated: Sequence[str], property_name: str, *, mi
     if low is None and high is None:
         raise ConfigurationError("give min_value, max_value or both.")
     metrics = _seqme("seqme.metrics")
-    return _run("seqme_threshold_fraction", lambda: metrics.Threshold(predictor, property_name, min_value=low, max_value=high), seqs, property_name=property_name, min_value=low, max_value=high)
+    return _run(
+        "seqme_threshold_fraction",
+        lambda: metrics.Threshold(predictor, property_name, min_value=low, max_value=high),
+        seqs,
+        property_name=property_name,
+        min_value=low,
+        max_value=high,
+    )
 
 
 # Embedding models and projections -----------------------------------------------------------------------
 
 
-def seqme_embed_rna_fm(sequences: Sequence[str], *, model_name: str = "mRNA", layer: int = 12, batch_size: int = 32, verbose: bool = True) -> dict[str, Any]:
+def seqme_embed_rna_fm(
+    sequences: Sequence[str],
+    *,
+    model_name: str = "mRNA",
+    layer: int = 12,
+    batch_size: int = 32,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Embed RNA/mRNA sequences with RNA-FM (``mRNA`` codon-aligned CDS model, 1280 dimensions, or ``ncRNA``, 640 dimensions) by averaging token embeddings of ``layer`` (last layer is 12).
 
     Needs the ``rna-fm`` package and downloads the model weights on first use. Sequences are RNA (U) or DNA (T) letters as RNA-FM expects.
@@ -388,7 +596,11 @@ def seqme_embed_rna_fm(sequences: Sequence[str], *, model_name: str = "mRNA", la
     seqs = _sequences_loose(sequences)
     models = _seqme("seqme.models")
     try:
-        model = models.RNAFM(model_name=model_name, batch_size=_integer(batch_size, "batch_size", 1, 4096), device="cpu")
+        model = models.RNAFM(
+            model_name=model_name,
+            batch_size=_integer(batch_size, "batch_size", 1, 4096),
+            device="cpu",
+        )
         matrix = model.embed(seqs, layer=_integer(layer, "layer", 0, 12))
     except (ValueError, TypeError, RuntimeError) as exc:
         raise ConfigurationError(f"RNA-FM could not embed the sequences: {exc}") from exc
@@ -396,9 +608,16 @@ def seqme_embed_rna_fm(sequences: Sequence[str], *, model_name: str = "mRNA", la
 
 
 def _sequences_loose(value: object) -> list[str]:
-    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value or len(value) > _MAX_SEQUENCES:
+    if (
+        isinstance(value, (str, bytes))
+        or not isinstance(value, Sequence)
+        or not value
+        or len(value) > _MAX_SEQUENCES
+    ):
         raise ConfigurationError("sequences must be a non-empty list of sequence strings.")
-    if not all(isinstance(item, str) and item and re.fullmatch(r"[ACGTUNacgtun]+", item) for item in value):
+    if not all(
+        isinstance(item, str) and item and re.fullmatch(r"[ACGTUNacgtun]+", item) for item in value
+    ):
         raise ConfigurationError("every sequence must be a non-empty string of nucleotide letters.")
     return list(value)
 
@@ -414,7 +633,15 @@ def _embedding_result(operation: str, matrix: Any, **extra: object) -> dict[str,
     }
 
 
-def seqme_embed_genalm(sequences: Sequence[str], *, checkpoint: str = "bert_base_t2t", layer: int = -1, batch_size: int = 16, cache_dir: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def seqme_embed_genalm(
+    sequences: Sequence[str],
+    *,
+    checkpoint: str = "bert_base_t2t",
+    layer: int = -1,
+    batch_size: int = 16,
+    cache_dir: str | None = None,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Embed DNA sequences with a GENA-LM language-model checkpoint (mean of the token embeddings of ``layer``, default the last).
 
     ``checkpoint`` is one of bert_base_t2t, bert_base_t2t_lastln_t2t, bert_base_t2t_multi, bert_large_t2t or bigbird_base_t2t.
@@ -425,14 +652,26 @@ def seqme_embed_genalm(sequences: Sequence[str], *, checkpoint: str = "bert_base
     seqs = _sequences(sequences, "sequences")
     models = _seqme("seqme.models")
     try:
-        model = models.GENALM(getattr(models.GENALMCheckpoint, checkpoint), device="cpu", batch_size=_integer(batch_size, "batch_size", 1, 4096), cache_dir=cache_dir)
+        model = models.GENALM(
+            getattr(models.GENALMCheckpoint, checkpoint),
+            device="cpu",
+            batch_size=_integer(batch_size, "batch_size", 1, 4096),
+            cache_dir=cache_dir,
+        )
         matrix = model.embed(seqs, layer=_integer(layer, "layer", -64, 64))
     except (ValueError, TypeError, RuntimeError, OSError) as exc:
         raise ConfigurationError(f"GENA-LM could not embed the sequences: {exc}") from exc
     return _embedding_result("seqme_embed_genalm", matrix, checkpoint=checkpoint, layer=layer)
 
 
-def seqme_classify_genalm(sequences: Sequence[str], *, checkpoint: str = "bert_base_t2t_promoters", batch_size: int = 16, cache_dir: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def seqme_classify_genalm(
+    sequences: Sequence[str],
+    *,
+    checkpoint: str = "bert_base_t2t_promoters",
+    batch_size: int = 16,
+    cache_dir: str | None = None,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Classify DNA sequences with a fine-tuned GENA-LM model and return class probabilities.
 
     ``checkpoint`` is a promoter model (bert_base_t2t_promoters, bert_large_t2t_promoters at 300 bp, bert_large_t2t_promoters2 at 2000 bp;
@@ -444,11 +683,20 @@ def seqme_classify_genalm(sequences: Sequence[str], *, checkpoint: str = "bert_b
     seqs = _sequences(sequences, "sequences")
     models = _seqme("seqme.models")
     try:
-        model = models.GENALM(getattr(models.GENALMCheckpoint, checkpoint), device="cpu", batch_size=_integer(batch_size, "batch_size", 1, 4096), cache_dir=cache_dir)
+        model = models.GENALM(
+            getattr(models.GENALMCheckpoint, checkpoint),
+            device="cpu",
+            batch_size=_integer(batch_size, "batch_size", 1, 4096),
+            cache_dir=cache_dir,
+        )
         probabilities = model.classify(seqs)
     except (ValueError, TypeError, RuntimeError, OSError) as exc:
         raise ConfigurationError(f"GENA-LM could not classify the sequences: {exc}") from exc
-    classes = ["no_promoter", "promoter"] if "promoters" in checkpoint else ["neither", "splice_acceptor", "splice_donor"]
+    classes = (
+        ["no_promoter", "promoter"]
+        if "promoters" in checkpoint
+        else ["neither", "splice_acceptor", "splice_donor"]
+    )
     return {
         "status": "completed",
         "operation": "seqme_classify_genalm",
@@ -486,7 +734,11 @@ def seqme_project_embeddings(
                 raise ConfigurationError("reference_embeddings is only used with method='pca'.")
             reference = _matrix(reference_embeddings, "reference_embeddings")
             models = _seqme("seqme.models")
-            fitted = models.PCA(lambda items: np.asarray(items, dtype=float), reference, _integer(n_components, "n_components", 1, 1000))
+            fitted = models.PCA(
+                lambda items: np.asarray(items, dtype=float),
+                reference,
+                _integer(n_components, "n_components", 1, 1000),
+            )
             projected = fitted(matrix)
             extra["explained_variance_ratio"] = [float(x) for x in fitted.variance_explained]
         else:
@@ -506,10 +758,18 @@ def seqme_project_embeddings(
     }
 
 
-def seqme_spearman_alignment_score(embeddings_a: Sequence[Sequence[float]], embeddings_b: Sequence[Sequence[float]], *, verbose: bool = True) -> dict[str, Any]:
+def seqme_spearman_alignment_score(
+    embeddings_a: Sequence[Sequence[float]],
+    embeddings_b: Sequence[Sequence[float]],
+    *,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Spearman correlation between the pairwise-distance matrices of two embeddings of the same sequences (alignment of two embedding spaces, -1 to 1)."""
 
-    a, b = _matrix(embeddings_a, "embeddings_a", minimum_rows=3), _matrix(embeddings_b, "embeddings_b", minimum_rows=3)
+    a, b = (
+        _matrix(embeddings_a, "embeddings_a", minimum_rows=3),
+        _matrix(embeddings_b, "embeddings_b", minimum_rows=3),
+    )
     if a.shape[0] != b.shape[0]:
         raise ConfigurationError("both embeddings must describe the same number of sequences.")
     utils = _seqme("seqme.utils")
@@ -529,7 +789,13 @@ def _labels(labels: object, rows: int) -> Any:
     return np.asarray(list(labels))
 
 
-def seqme_knn_alignment_score(embeddings: Sequence[Sequence[float]], labels: Sequence[Any], *, n_neighbors: int = 5, verbose: bool = True) -> dict[str, Any]:
+def seqme_knn_alignment_score(
+    embeddings: Sequence[Sequence[float]],
+    labels: Sequence[Any],
+    *,
+    n_neighbors: int = 5,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """k-NN feature alignment score of an embedding model: the share of each sequence's ``n_neighbors`` nearest neighbours that carry the same label (0 to 1)."""
 
     matrix = _matrix(embeddings, "embeddings")
@@ -573,8 +839,13 @@ def seqme_plot_embeddings(
 
     target = _new_image(output_path)
     if not isinstance(projections, Mapping) or not projections:
-        raise ConfigurationError("projections must be a non-empty mapping from group name to 2-D points.")
-    groups = {str(name): _matrix(points, f"projections[{name}]", minimum_rows=1) for name, points in projections.items()}
+        raise ConfigurationError(
+            "projections must be a non-empty mapping from group name to 2-D points."
+        )
+    groups = {
+        str(name): _matrix(points, f"projections[{name}]", minimum_rows=1)
+        for name, points in projections.items()
+    }
     for name, array in groups.items():
         if array.shape[1] != 2:
             raise ConfigurationError(f"projections[{name}] must have two columns.")
@@ -582,7 +853,14 @@ def seqme_plot_embeddings(
     plt = require("matplotlib.pyplot", _EXTRA)
     figure, axes = plt.subplots(figsize=(5, 3.5))
     try:
-        utils.plot_embeddings(list(groups.values()), values=list(groups), title=title, point_size=_number(point_size, "point_size", positive=True), alpha=_number(alpha, "alpha", positive=True), ax=axes)
+        utils.plot_embeddings(
+            list(groups.values()),
+            values=list(groups),
+            title=title,
+            point_size=_number(point_size, "point_size", positive=True),
+            alpha=_number(alpha, "alpha", positive=True),
+            ax=axes,
+        )
         figure.savefig(target, dpi=150, bbox_inches="tight")
     finally:
         plt.close(figure)
@@ -611,7 +889,9 @@ def seqme_plot_knn_alignment_score(
         raise ConfigurationError("n_neighbors must be a non-empty list of integers.")
     ks = [_integer(k, "n_neighbors", 1, 1000) for k in n_neighbors]
     if max(ks) >= matrix.shape[0]:
-        raise ConfigurationError("every n_neighbors value must be smaller than the number of sequences.")
+        raise ConfigurationError(
+            "every n_neighbors value must be smaller than the number of sequences."
+        )
     array = _labels(labels, matrix.shape[0])
     utils = _seqme("seqme.utils")
     plt = require("matplotlib.pyplot", _EXTRA)

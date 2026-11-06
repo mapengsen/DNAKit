@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import io
 
 import pytest
@@ -18,7 +19,22 @@ QUIET = {"verbose": False}
 TREES = ["((A:0.1,B:0.2)90:0.3,(C:0.4,D:0.5):0.1);", "(A:1,(B:1,C:1):1);"]
 
 
-@pytest.mark.parametrize("fmt", ["newick", "nexus", "phyloxml", "nexml", "cdao"])
+@pytest.mark.parametrize(
+    "fmt",
+    [
+        "newick",
+        "nexus",
+        "phyloxml",
+        "nexml",
+        pytest.param(
+            "cdao",
+            marks=pytest.mark.skipif(
+                importlib.util.find_spec("rdflib") is None,
+                reason="Biopython's CDAO I/O needs rdflib",
+            ),
+        ),
+    ],
+)
 def test_write_tree_file_round_trip(tmp_path, fmt):
     out = tmp_path / f"trees.{fmt}"
     result = m.write_tree_file(TREES, out, file_format=fmt, **QUIET)

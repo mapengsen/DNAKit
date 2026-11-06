@@ -96,9 +96,7 @@ def _strings(values: object, name: str, *, minimum: int = 1) -> list[str]:
         or not isinstance(values, Sequence)
         or not minimum <= len(values) <= _MAX_SEQUENCES
     ):
-        raise ConfigurationError(
-            f"{name} must be a list of {minimum} to {_MAX_SEQUENCES} strings."
-        )
+        raise ConfigurationError(f"{name} must be a list of {minimum} to {_MAX_SEQUENCES} strings.")
     return [_text(value, f"{name}[{i}]") for i, value in enumerate(values)]
 
 
@@ -126,9 +124,9 @@ def _alignment_dict(alignment: Any, score: int | None = None) -> dict[str, Any]:
         "trace": [[int(a), int(b)] for a, b in alignment.trace.tolist()]
         if alignment.trace.shape[1] == 2
         else alignment.trace.tolist(),
-        "score": score if score is not None else (
-            None if alignment.score is None else int(alignment.score)
-        ),
+        "score": score
+        if score is not None
+        else (None if alignment.score is None else int(alignment.score)),
         "length": int(alignment.trace.shape[0]),
     }
 
@@ -168,7 +166,11 @@ def _flag(value: object, name: str) -> bool:
 
 def _kmer_alphabet(seq_type: str, k: int, spacing: str | None = None) -> Any:
     _, align = _modules()
-    base = _factory(seq_type).alphabet if seq_type == "protein" else _factory(seq_type).alphabet_unambiguous
+    base = (
+        _factory(seq_type).alphabet
+        if seq_type == "protein"
+        else _factory(seq_type).alphabet_unambiguous
+    )
     return align.KmerAlphabet(base, _int(k, "k", minimum=1, maximum=_MAX_K), spacing=spacing)
 
 
@@ -622,8 +624,9 @@ def _evalue_estimator(
     name = matrix or ("NUC" if seq_type == "dna" else "BLOSUM62")
     if matrix is None and seq_type == "dna" and (match, mismatch) != (1, -1):
         matrix_object = align.SubstitutionMatrix(
-            alphabet, alphabet, {a: {b: match if a == b else mismatch for b in alphabet}
-                                 for a in alphabet}
+            alphabet,
+            alphabet,
+            {a: {b: match if a == b else mismatch for b in alphabet} for a in alphabet},
         )
     else:
         matrix_object = align.SubstitutionMatrix(alphabet, alphabet, name)
@@ -669,8 +672,16 @@ def alignment_evalue_parameters(
 
     kind = _choice(seq_type, _SEQ_TYPES, "seq_type")
     estimator = _evalue_estimator(
-        kind, matrix, match, mismatch, gap_penalty, gap_extension, frequencies,
-        sample_length, sample_size, seed,
+        kind,
+        matrix,
+        match,
+        mismatch,
+        gap_penalty,
+        gap_extension,
+        frequencies,
+        sample_length,
+        sample_size,
+        seed,
     )
     return {
         "status": "completed",
@@ -1198,9 +1209,7 @@ def write_a3m_alignment(
     _, align = _modules()
     alignments = []
     for target in items[1:]:
-        alignments.append(
-            align.Alignment.from_strings([items[0], target], _factory(kind))
-        )
+        alignments.append(align.Alignment.from_strings([items[0], target], _factory(kind)))
     file = fasta.FastaFile()
     fasta.set_a3m_alignments(file, alignments, _text(query_label, "query_label", limit=200), labels)
     file.write(str(out))

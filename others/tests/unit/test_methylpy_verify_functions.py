@@ -9,8 +9,8 @@ import pytest
 
 pytest.importorskip("methylpy.utilities")
 
-from dnakit.epigenome import methylpy_verify_functions as module  # noqa: E402
-from dnakit.exceptions import ConfigurationError  # noqa: E402
+from dnakit.epigenome import methylpy_verify_functions as module
+from dnakit.exceptions import ConfigurationError
 
 ROWS = (
     "chr1\t100\t+\tCGG\t3\t5\t1\t4,2\t1,0\n"
@@ -103,7 +103,9 @@ def test_matches_direct_upstream_call(tmp_path, allc, kwargs):
 
 
 def test_compress_output_appends_gz(tmp_path, allc):
-    result = module.methylpy_filter_allc_files([allc], [tmp_path / "out.allc"], compress_output=True, min_cov=5)
+    result = module.methylpy_filter_allc_files(
+        [allc], [tmp_path / "out.allc"], compress_output=True, min_cov=5
+    )
     assert result["outputs"][0]["output"].endswith("out.allc.gz")
     assert _sites(tmp_path / "out.allc.gz") == ["chr1:100", "chr2:300"]
 

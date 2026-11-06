@@ -19,385 +19,504 @@ from dnakit.bioinformatics._gatk_p01_core import Param as _Param
 from dnakit.bioinformatics._gatk_p01_core import Spec as _Spec
 
 _SPECS: dict[str, _Spec] = {
-    'gatk_pathseq': _Spec(
-        'gatk_pathseq',
-        {'filter': 'PathSeqFilterSpark', 'align': 'PathSeqBwaSpark', 'score': 'PathSeqScoreSpark', 'pipeline': 'PathSeqPipelineSpark'},
+    "gatk_pathseq": _Spec(
+        "gatk_pathseq",
+        {
+            "filter": "PathSeqFilterSpark",
+            "align": "PathSeqBwaSpark",
+            "score": "PathSeqScoreSpark",
+            "pipeline": "PathSeqPipelineSpark",
+        },
         (
-            _Param('input_path', 'in', 'input', v=('filter', 'pipeline'), req=('filter', 'pipeline')),
-            _Param('paired_input', 'in', 'paired-input', v=('align', 'score')),
-            _Param('unpaired_input', 'in', 'unpaired-input', v=('align', 'score')),
-            _Param('microbe_bwa_image', 'in', 'microbe-bwa-image', v=('align', 'pipeline'), req=('align', 'pipeline')),
-            _Param('microbe_dict', 'in', 'microbe-dict', v=('align', 'pipeline'), req=('align', 'pipeline')),
-            _Param('taxonomy_file', 'in', 'taxonomy-file', v=('score', 'pipeline'), req=('score', 'pipeline')),
-            _Param('paired_output', 'out', 'paired-output', v=('filter', 'align')),
-            _Param('unpaired_output', 'out', 'unpaired-output', v=('filter', 'align')),
-            _Param('scores_output', 'out', 'scores-output', v=('score', 'pipeline'), req=('score', 'pipeline')),
+            _Param(
+                "input_path", "in", "input", v=("filter", "pipeline"), req=("filter", "pipeline")
+            ),
+            _Param("paired_input", "in", "paired-input", v=("align", "score")),
+            _Param("unpaired_input", "in", "unpaired-input", v=("align", "score")),
+            _Param(
+                "microbe_bwa_image",
+                "in",
+                "microbe-bwa-image",
+                v=("align", "pipeline"),
+                req=("align", "pipeline"),
+            ),
+            _Param(
+                "microbe_dict",
+                "in",
+                "microbe-dict",
+                v=("align", "pipeline"),
+                req=("align", "pipeline"),
+            ),
+            _Param(
+                "taxonomy_file",
+                "in",
+                "taxonomy-file",
+                v=("score", "pipeline"),
+                req=("score", "pipeline"),
+            ),
+            _Param("paired_output", "out", "paired-output", v=("filter", "align")),
+            _Param("unpaired_output", "out", "unpaired-output", v=("filter", "align")),
+            _Param(
+                "scores_output",
+                "out",
+                "scores-output",
+                v=("score", "pipeline"),
+                req=("score", "pipeline"),
+            ),
         ),
-        selector='step',
-        any_of=((('align', 'score'), ('paired_input', 'unpaired_input')), (('filter', 'align'), ('paired_output', 'unpaired_output'))),
+        selector="step",
+        any_of=(
+            (("align", "score"), ("paired_input", "unpaired_input")),
+            (("filter", "align"), ("paired_output", "unpaired_output")),
+        ),
     ),
-    'gatk_detect_cram_issue_8768': _Spec(
-        'gatk_detect_cram_issue_8768',
-        {'default': 'CRAMIssue8768Detector'},
+    "gatk_detect_cram_issue_8768": _Spec(
+        "gatk_detect_cram_issue_8768",
+        {"default": "CRAMIssue8768Detector"},
         (
-            _Param('cram_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("cram_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_create_bam_splitting_index': _Spec(
-        'gatk_create_bam_splitting_index',
-        {'default': 'CreateHadoopBamSplittingIndex'},
+    "gatk_create_bam_splitting_index": _Spec(
+        "gatk_create_bam_splitting_index",
+        {"default": "CreateHadoopBamSplittingIndex"},
         (
-            _Param('bam_path', 'in', 'input', req=True),
-            _Param('create_bai', 'bool', 'create-bai'),
+            _Param("bam_path", "in", "input", req=True),
+            _Param("create_bai", "bool", "create-bai"),
         ),
-        derived=(('sbi', 'bam_path', ('.sbi',), True),),
+        derived=(("sbi", "bam_path", (".sbi",), True),),
     ),
-    'gatk_print_bgzf_block_information': _Spec(
-        'gatk_print_bgzf_block_information',
-        {'default': 'PrintBGZFBlockInformation'},
-        (
-            _Param('bgzf_path', 'in', 'bgzf-file', req=True),
-        ),
-        hook='bgzf_blocks',
+    "gatk_print_bgzf_block_information": _Spec(
+        "gatk_print_bgzf_block_information",
+        {"default": "PrintBGZFBlockInformation"},
+        (_Param("bgzf_path", "in", "bgzf-file", req=True),),
+        hook="bgzf_blocks",
         big_output=True,
     ),
-    'gatk_print_file_diagnostics': _Spec(
-        'gatk_print_file_diagnostics',
-        {'default': 'PrintFileDiagnostics'},
+    "gatk_print_file_diagnostics": _Spec(
+        "gatk_print_file_diagnostics",
+        {"default": "PrintFileDiagnostics"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_read_anonymizer': _Spec(
-        'gatk_read_anonymizer',
-        {'default': 'ReadAnonymizer'},
+    "gatk_read_anonymizer": _Spec(
+        "gatk_read_anonymizer",
+        {"default": "ReadAnonymizer"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('ref_base_quality', 'int', 'ref-base-quality', minimum=0),
-            _Param('use_simple_cigar', 'bool', 'use-simple-cigar'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("ref_base_quality", "int", "ref-base-quality", minimum=0),
+            _Param("use_simple_cigar", "bool", "use-simple-cigar"),
         ),
     ),
-    'gatk_add_comments_to_bam': _Spec(
-        'gatk_add_comments_to_bam',
-        {'default': 'AddCommentsToBam'},
+    "gatk_add_comments_to_bam": _Spec(
+        "gatk_add_comments_to_bam",
+        {"default": "AddCommentsToBam"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('comments', 'strs', 'COMMENT', req=True),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("comments", "strs", "COMMENT", req=True),
         ),
     ),
-    'gatk_add_original_alignment_tags': _Spec(
-        'gatk_add_original_alignment_tags',
-        {'oa_tag': 'AddOATag', 'original_alignment': 'AddOriginalAlignmentTags'},
+    "gatk_add_original_alignment_tags": _Spec(
+        "gatk_add_original_alignment_tags",
+        {"oa_tag": "AddOATag", "original_alignment": "AddOriginalAlignmentTags"},
         (
-            _Param('input_path', 'in', {'oa_tag': 'INPUT', 'original_alignment': 'input'}, req=True),
-            _Param('output_path', 'out', {'oa_tag': 'OUTPUT', 'original_alignment': 'output'}, req=True),
-            _Param('interval_list', 'in', 'INTERVAL_LIST', v=('oa_tag',)),
+            _Param(
+                "input_path", "in", {"oa_tag": "INPUT", "original_alignment": "input"}, req=True
+            ),
+            _Param(
+                "output_path", "out", {"oa_tag": "OUTPUT", "original_alignment": "output"}, req=True
+            ),
+            _Param("interval_list", "in", "INTERVAL_LIST", v=("oa_tag",)),
         ),
-        selector='mode',
+        selector="mode",
     ),
-    'gatk_base_recalibrator': _Spec(
-        'gatk_base_recalibrator',
-        {'default': 'BaseRecalibrator'},
+    "gatk_base_recalibrator": _Spec(
+        "gatk_base_recalibrator",
+        {"default": "BaseRecalibrator"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('known_sites', 'ins', 'known-sites', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-        ),
-    ),
-    'gatk_apply_bqsr': _Spec(
-        'gatk_apply_bqsr',
-        {'default': 'ApplyBQSR'},
-        (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('recalibration_table', 'in', 'bqsr-recal-file', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('reference_path', 'in', 'reference'),
-            _Param('static_quantized_quals', 'strs', 'static-quantized-quals'),
-            _Param('use_original_qualities', 'bool', 'use-original-qualities'),
-            _Param('emit_original_quals', 'bool', 'emit-original-quals'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("known_sites", "ins", "known-sites", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_bqsr_pipeline_spark': _Spec(
-        'gatk_bqsr_pipeline_spark',
-        {'default': 'BQSRPipelineSpark'},
+    "gatk_apply_bqsr": _Spec(
+        "gatk_apply_bqsr",
+        {"default": "ApplyBQSR"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('known_sites', 'ins', 'known-sites', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("recalibration_table", "in", "bqsr-recal-file", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("reference_path", "in", "reference"),
+            _Param("static_quantized_quals", "strs", "static-quantized-quals"),
+            _Param("use_original_qualities", "bool", "use-original-qualities"),
+            _Param("emit_original_quals", "bool", "emit-original-quals"),
         ),
     ),
-    'gatk_bam_to_bfq': _Spec(
-        'gatk_bam_to_bfq',
-        {'default': 'BamToBfq'},
+    "gatk_bqsr_pipeline_spark": _Spec(
+        "gatk_bqsr_pipeline_spark",
+        {"default": "BQSRPipelineSpark"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('analysis_dir', 'outd', 'ANALYSIS_DIR', req=True),
-            _Param('output_file_prefix', 'str', 'OUTPUT_FILE_PREFIX'),
-            _Param('flowcell_barcode', 'str', 'FLOWCELL_BARCODE'),
-            _Param('paired_run', 'bool', 'PAIRED_RUN', req=True),
-            _Param('lane', 'int', 'LANE', minimum=1),
-        ),
-        any_of=((None, ('output_file_prefix', 'flowcell_barcode')),),
-    ),
-    'gatk_bwa_spark': _Spec(
-        'gatk_bwa_spark',
-        {'align': 'BwaSpark', 'align_mark_duplicates': 'BwaAndMarkDuplicatesPipelineSpark'},
-        (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('bwa_mem_index_image', 'in', 'bwa-mem-index-image'),
-            _Param('single_end_alignment', 'bool', 'single-end-alignment'),
-        ),
-        selector='pipeline',
-    ),
-    'gatk_clean_sam': _Spec(
-        'gatk_clean_sam',
-        {'default': 'CleanSam'},
-        (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("known_sites", "ins", "known-sites", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_clip_reads': _Spec(
-        'gatk_clip_reads',
-        {'default': 'ClipReads'},
+    "gatk_bam_to_bfq": _Spec(
+        "gatk_bam_to_bfq",
+        {"default": "BamToBfq"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('clip_sequences', 'strs', 'clip-sequence'),
-            _Param('cycles_to_trim', 'str', 'cycles-to-trim'),
-            _Param('q_trimming_threshold', 'int', 'q-trimming-threshold', minimum=0),
-            _Param('clip_representation', 'choice', 'clip-representation', choices=('WRITE_NS', 'WRITE_Q0S', 'WRITE_NS_Q0S', 'SOFTCLIP_BASES', 'HARDCLIP_BASES', 'REVERT_SOFTCLIPPED_BASES')),
-            _Param('statistics_path', 'out', 'output-statistics'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("analysis_dir", "outd", "ANALYSIS_DIR", req=True),
+            _Param("output_file_prefix", "str", "OUTPUT_FILE_PREFIX"),
+            _Param("flowcell_barcode", "str", "FLOWCELL_BARCODE"),
+            _Param("paired_run", "bool", "PAIRED_RUN", req=True),
+            _Param("lane", "int", "LANE", minimum=1),
+        ),
+        any_of=((None, ("output_file_prefix", "flowcell_barcode")),),
+    ),
+    "gatk_bwa_spark": _Spec(
+        "gatk_bwa_spark",
+        {"align": "BwaSpark", "align_mark_duplicates": "BwaAndMarkDuplicatesPipelineSpark"},
+        (
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("bwa_mem_index_image", "in", "bwa-mem-index-image"),
+            _Param("single_end_alignment", "bool", "single-end-alignment"),
+        ),
+        selector="pipeline",
+    ),
+    "gatk_clean_sam": _Spec(
+        "gatk_clean_sam",
+        {"default": "CleanSam"},
+        (
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
         ),
     ),
-    'gatk_convert_headerless_bam_shard': _Spec(
-        'gatk_convert_headerless_bam_shard',
-        {'default': 'ConvertHeaderlessHadoopBamShardToBam'},
+    "gatk_clip_reads": _Spec(
+        "gatk_clip_reads",
+        {"default": "ClipReads"},
         (
-            _Param('shard_path', 'in', 'bam-shard', req=True),
-            _Param('header_bam_path', 'in', 'bam-with-header', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("clip_sequences", "strs", "clip-sequence"),
+            _Param("cycles_to_trim", "str", "cycles-to-trim"),
+            _Param("q_trimming_threshold", "int", "q-trimming-threshold", minimum=0),
+            _Param(
+                "clip_representation",
+                "choice",
+                "clip-representation",
+                choices=(
+                    "WRITE_NS",
+                    "WRITE_Q0S",
+                    "WRITE_NS_Q0S",
+                    "SOFTCLIP_BASES",
+                    "HARDCLIP_BASES",
+                    "REVERT_SOFTCLIPPED_BASES",
+                ),
+            ),
+            _Param("statistics_path", "out", "output-statistics"),
         ),
     ),
-    'gatk_downsample_by_duplicate_set': _Spec(
-        'gatk_downsample_by_duplicate_set',
-        {'default': 'DownsampleByDuplicateSet'},
+    "gatk_convert_headerless_bam_shard": _Spec(
+        "gatk_convert_headerless_bam_shard",
+        {"default": "ConvertHeaderlessHadoopBamShardToBam"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('fraction_to_keep', 'float', 'fraction-to-keep', minimum=0),
-            _Param('min_reads', 'int', 'min-reads', minimum=0),
-            _Param('min_per_strand_reads', 'int', 'min-per-strand-reads', minimum=0),
+            _Param("shard_path", "in", "bam-shard", req=True),
+            _Param("header_bam_path", "in", "bam-with-header", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_downsample_sam': _Spec(
-        'gatk_downsample_sam',
-        {'default': 'DownsampleSam'},
+    "gatk_downsample_by_duplicate_set": _Spec(
+        "gatk_downsample_by_duplicate_set",
+        {"default": "DownsampleByDuplicateSet"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('probability', 'float', 'PROBABILITY', minimum=0),
-            _Param('strategy', 'choice', 'STRATEGY', choices=('HighAccuracy', 'ConstantMemory', 'Chained')),
-            _Param('accuracy', 'float', 'ACCURACY', minimum=0),
-            _Param('random_seed', 'int', 'RANDOM_SEED'),
-            _Param('metrics_path', 'out', 'METRICS_FILE'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("fraction_to_keep", "float", "fraction-to-keep", minimum=0),
+            _Param("min_reads", "int", "min-reads", minimum=0),
+            _Param("min_per_strand_reads", "int", "min-per-strand-reads", minimum=0),
         ),
     ),
-    'gatk_position_based_downsample_sam': _Spec(
-        'gatk_position_based_downsample_sam',
-        {'default': 'PositionBasedDownsampleSam'},
+    "gatk_downsample_sam": _Spec(
+        "gatk_downsample_sam",
+        {"default": "DownsampleSam"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('fraction', 'float', 'FRACTION', req=True, minimum=0),
-            _Param('stop_after', 'int', 'STOP_AFTER', minimum=0),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("probability", "float", "PROBABILITY", minimum=0),
+            _Param(
+                "strategy",
+                "choice",
+                "STRATEGY",
+                choices=("HighAccuracy", "ConstantMemory", "Chained"),
+            ),
+            _Param("accuracy", "float", "ACCURACY", minimum=0),
+            _Param("random_seed", "int", "RANDOM_SEED"),
+            _Param("metrics_path", "out", "METRICS_FILE"),
         ),
     ),
-    'gatk_extract_original_alignment_records_by_name': _Spec(
-        'gatk_extract_original_alignment_records_by_name',
-        {'default': 'ExtractOriginalAlignmentRecordsByNameSpark'},
+    "gatk_position_based_downsample_sam": _Spec(
+        "gatk_position_based_downsample_sam",
+        {"default": "PositionBasedDownsampleSam"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('read_name_file', 'in', 'read-name-file', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('invert_match', 'bool', 'invert-match'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("fraction", "float", "FRACTION", req=True, minimum=0),
+            _Param("stop_after", "int", "STOP_AFTER", minimum=0),
         ),
     ),
-    'gatk_filter_sam_reads': _Spec(
-        'gatk_filter_sam_reads',
-        {'default': 'FilterSamReads'},
+    "gatk_extract_original_alignment_records_by_name": _Spec(
+        "gatk_extract_original_alignment_records_by_name",
+        {"default": "ExtractOriginalAlignmentRecordsByNameSpark"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('filter', 'choice', 'FILTER', req=True, choices=('includeAligned', 'excludeAligned', 'includeReadList', 'excludeReadList', 'includePairedIntervals', 'includeTagValues', 'excludeTagValues')),
-            _Param('read_list_file', 'in', 'READ_LIST_FILE'),
-            _Param('interval_list', 'in', 'INTERVAL_LIST'),
-            _Param('tag', 'str', 'TAG'),
-            _Param('tag_values', 'strs', 'TAG_VALUE'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("read_name_file", "in", "read-name-file", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("invert_match", "bool", "invert-match"),
         ),
     ),
-    'gatk_fix_misencoded_base_quality_reads': _Spec(
-        'gatk_fix_misencoded_base_quality_reads',
-        {'default': 'FixMisencodedBaseQualityReads'},
+    "gatk_filter_sam_reads": _Spec(
+        "gatk_filter_sam_reads",
+        {"default": "FilterSamReads"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param(
+                "filter",
+                "choice",
+                "FILTER",
+                req=True,
+                choices=(
+                    "includeAligned",
+                    "excludeAligned",
+                    "includeReadList",
+                    "excludeReadList",
+                    "includePairedIntervals",
+                    "includeTagValues",
+                    "excludeTagValues",
+                ),
+            ),
+            _Param("read_list_file", "in", "READ_LIST_FILE"),
+            _Param("interval_list", "in", "INTERVAL_LIST"),
+            _Param("tag", "str", "TAG"),
+            _Param("tag_values", "strs", "TAG_VALUE"),
         ),
     ),
-    'gatk_left_align_indels': _Spec(
-        'gatk_left_align_indels',
-        {'default': 'LeftAlignIndels'},
+    "gatk_fix_misencoded_base_quality_reads": _Spec(
+        "gatk_fix_misencoded_base_quality_reads",
+        {"default": "FixMisencodedBaseQualityReads"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_mark_duplicates_with_mate_cigar': _Spec(
-        'gatk_mark_duplicates_with_mate_cigar',
-        {'standard': 'MarkDuplicatesWithMateCigar', 'simple': 'SimpleMarkDuplicatesWithMateCigar', 'umi_aware': 'UmiAwareMarkDuplicatesWithMateCigar'},
+    "gatk_left_align_indels": _Spec(
+        "gatk_left_align_indels",
+        {"default": "LeftAlignIndels"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('metrics_path', 'out', 'METRICS_FILE', req=True),
-            _Param('umi_metrics_path', 'out', 'UMI_METRICS_FILE', v=('umi_aware',), req=('umi_aware',)),
-            _Param('remove_duplicates', 'bool', 'REMOVE_DUPLICATES'),
-            _Param('umi_tag_name', 'str', 'UMI_TAG_NAME', v=('umi_aware',)),
-        ),
-        selector='variant',
-        tables={'metrics_path': 'metrics'},
-    ),
-    'gatk_merge_bam_alignment': _Spec(
-        'gatk_merge_bam_alignment',
-        {'default': 'MergeBamAlignment'},
-        (
-            _Param('unmapped_bam', 'in', 'UNMAPPED_BAM', req=True),
-            _Param('reference_path', 'in', 'REFERENCE_SEQUENCE', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('aligned_bams', 'ins', 'ALIGNED_BAM'),
-            _Param('paired_run', 'bool', 'PAIRED_RUN'),
-            _Param('sort_order', 'choice', 'SORT_ORDER', choices=('coordinate', 'queryname', 'unsorted')),
-            _Param('add_mate_cigar', 'bool', 'ADD_MATE_CIGAR'),
-            _Param('clip_adapters', 'bool', 'CLIP_ADAPTERS'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_print_distant_mates': _Spec(
-        'gatk_print_distant_mates',
-        {'default': 'PrintDistantMates'},
+    "gatk_mark_duplicates_with_mate_cigar": _Spec(
+        "gatk_mark_duplicates_with_mate_cigar",
+        {
+            "standard": "MarkDuplicatesWithMateCigar",
+            "simple": "SimpleMarkDuplicatesWithMateCigar",
+            "umi_aware": "UmiAwareMarkDuplicatesWithMateCigar",
+        },
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("metrics_path", "out", "METRICS_FILE", req=True),
+            _Param(
+                "umi_metrics_path", "out", "UMI_METRICS_FILE", v=("umi_aware",), req=("umi_aware",)
+            ),
+            _Param("remove_duplicates", "bool", "REMOVE_DUPLICATES"),
+            _Param("umi_tag_name", "str", "UMI_TAG_NAME", v=("umi_aware",)),
+        ),
+        selector="variant",
+        tables={"metrics_path": "metrics"},
+    ),
+    "gatk_merge_bam_alignment": _Spec(
+        "gatk_merge_bam_alignment",
+        {"default": "MergeBamAlignment"},
+        (
+            _Param("unmapped_bam", "in", "UNMAPPED_BAM", req=True),
+            _Param("reference_path", "in", "REFERENCE_SEQUENCE", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("aligned_bams", "ins", "ALIGNED_BAM"),
+            _Param("paired_run", "bool", "PAIRED_RUN"),
+            _Param(
+                "sort_order",
+                "choice",
+                "SORT_ORDER",
+                choices=("coordinate", "queryname", "unsorted"),
+            ),
+            _Param("add_mate_cigar", "bool", "ADD_MATE_CIGAR"),
+            _Param("clip_adapters", "bool", "CLIP_ADAPTERS"),
         ),
     ),
-    'gatk_reorder_sam': _Spec(
-        'gatk_reorder_sam',
-        {'default': 'ReorderSam'},
+    "gatk_print_distant_mates": _Spec(
+        "gatk_print_distant_mates",
+        {"default": "PrintDistantMates"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('sequence_dictionary', 'in', 'SEQUENCE_DICTIONARY', req=True),
-            _Param('allow_incomplete_dict_concordance', 'bool', 'ALLOW_INCOMPLETE_DICT_CONCORDANCE'),
-            _Param('allow_contig_length_discordance', 'bool', 'ALLOW_CONTIG_LENGTH_DISCORDANCE'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_revert_base_quality_scores': _Spec(
-        'gatk_revert_base_quality_scores',
-        {'original_qualities': 'RevertBaseQualityScores', 'with_mate_cigar': 'RevertOriginalBaseQualitiesAndAddMateCigar'},
+    "gatk_reorder_sam": _Spec(
+        "gatk_reorder_sam",
+        {"default": "ReorderSam"},
         (
-            _Param('input_path', 'in', {'original_qualities': 'input', 'with_mate_cigar': 'INPUT'}, req=True),
-            _Param('output_path', 'out', {'original_qualities': 'output', 'with_mate_cigar': 'OUTPUT'}, req=True),
-            _Param('restore_original_qualities', 'bool', 'RESTORE_ORIGINAL_QUALITIES', v=('with_mate_cigar',)),
-            _Param('sort_order', 'choice', 'SORT_ORDER', v=('with_mate_cigar',), choices=('coordinate', 'queryname', 'unsorted')),
-        ),
-        selector='mode',
-    ),
-    'gatk_revert_sam': _Spec(
-        'gatk_revert_sam',
-        {'default': 'RevertSam'},
-        (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('restore_original_qualities', 'bool', 'RESTORE_ORIGINAL_QUALITIES'),
-            _Param('remove_duplicate_information', 'bool', 'REMOVE_DUPLICATE_INFORMATION'),
-            _Param('remove_alignment_information', 'bool', 'REMOVE_ALIGNMENT_INFORMATION'),
-            _Param('sanitize', 'bool', 'SANITIZE'),
-            _Param('sample_alias', 'str', 'SAMPLE_ALIAS'),
-            _Param('library_name', 'str', 'LIBRARY_NAME'),
-            _Param('sort_order', 'choice', 'SORT_ORDER', choices=('coordinate', 'queryname', 'unsorted')),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("sequence_dictionary", "in", "SEQUENCE_DICTIONARY", req=True),
+            _Param(
+                "allow_incomplete_dict_concordance", "bool", "ALLOW_INCOMPLETE_DICT_CONCORDANCE"
+            ),
+            _Param("allow_contig_length_discordance", "bool", "ALLOW_CONTIG_LENGTH_DISCORDANCE"),
         ),
     ),
-    'gatk_convert_sam_format': _Spec(
-        'gatk_convert_sam_format',
-        {'default': 'SamFormatConverter'},
+    "gatk_revert_base_quality_scores": _Spec(
+        "gatk_revert_base_quality_scores",
+        {
+            "original_qualities": "RevertBaseQualityScores",
+            "with_mate_cigar": "RevertOriginalBaseQualitiesAndAddMateCigar",
+        },
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
+            _Param(
+                "input_path",
+                "in",
+                {"original_qualities": "input", "with_mate_cigar": "INPUT"},
+                req=True,
+            ),
+            _Param(
+                "output_path",
+                "out",
+                {"original_qualities": "output", "with_mate_cigar": "OUTPUT"},
+                req=True,
+            ),
+            _Param(
+                "restore_original_qualities",
+                "bool",
+                "RESTORE_ORIGINAL_QUALITIES",
+                v=("with_mate_cigar",),
+            ),
+            _Param(
+                "sort_order",
+                "choice",
+                "SORT_ORDER",
+                v=("with_mate_cigar",),
+                choices=("coordinate", "queryname", "unsorted"),
+            ),
+        ),
+        selector="mode",
+    ),
+    "gatk_revert_sam": _Spec(
+        "gatk_revert_sam",
+        {"default": "RevertSam"},
+        (
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("restore_original_qualities", "bool", "RESTORE_ORIGINAL_QUALITIES"),
+            _Param("remove_duplicate_information", "bool", "REMOVE_DUPLICATE_INFORMATION"),
+            _Param("remove_alignment_information", "bool", "REMOVE_ALIGNMENT_INFORMATION"),
+            _Param("sanitize", "bool", "SANITIZE"),
+            _Param("sample_alias", "str", "SAMPLE_ALIAS"),
+            _Param("library_name", "str", "LIBRARY_NAME"),
+            _Param(
+                "sort_order",
+                "choice",
+                "SORT_ORDER",
+                choices=("coordinate", "queryname", "unsorted"),
+            ),
         ),
     ),
-    'gatk_sam_to_fastq_with_tags': _Spec(
-        'gatk_sam_to_fastq_with_tags',
-        {'default': 'SamToFastqWithTags'},
+    "gatk_convert_sam_format": _Spec(
+        "gatk_convert_sam_format",
+        {"default": "SamFormatConverter"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('fastq_path', 'out', 'FASTQ', req=True),
-            _Param('sequence_tag_groups', 'strs', 'SEQUENCE_TAG_GROUP', req=True),
-            _Param('quality_tag_groups', 'strs', 'QUALITY_TAG_GROUP'),
-            _Param('second_end_fastq', 'out', 'SECOND_END_FASTQ'),
-            _Param('unpaired_fastq', 'out', 'UNPAIRED_FASTQ'),
-            _Param('interleave', 'bool', 'INTERLEAVE'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
         ),
     ),
-    'gatk_split_n_cigar_reads': _Spec(
-        'gatk_split_n_cigar_reads',
-        {'default': 'SplitNCigarReads'},
+    "gatk_sam_to_fastq_with_tags": _Spec(
+        "gatk_sam_to_fastq_with_tags",
+        {"default": "SamToFastqWithTags"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('max_bases_in_overhang', 'int', 'max-bases-in-overhang', minimum=0),
-            _Param('max_mismatches_in_overhang', 'int', 'max-mismatches-in-overhang', minimum=0),
-            _Param('skip_mapping_quality_transform', 'bool', 'skip-mapping-quality-transform'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("fastq_path", "out", "FASTQ", req=True),
+            _Param("sequence_tag_groups", "strs", "SEQUENCE_TAG_GROUP", req=True),
+            _Param("quality_tag_groups", "strs", "QUALITY_TAG_GROUP"),
+            _Param("second_end_fastq", "out", "SECOND_END_FASTQ"),
+            _Param("unpaired_fastq", "out", "UNPAIRED_FASTQ"),
+            _Param("interleave", "bool", "INTERLEAVE"),
         ),
     ),
-    'gatk_split_sam': _Spec(
-        'gatk_split_sam',
-        {'library': 'SplitSamByLibrary', 'number_of_reads': 'SplitSamByNumberOfReads'},
+    "gatk_split_n_cigar_reads": _Spec(
+        "gatk_split_n_cigar_reads",
+        {"default": "SplitNCigarReads"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_dir', 'outd', 'OUTPUT', req=True),
-            _Param('split_to_n_files', 'int', 'SPLIT_TO_N_FILES', v=('number_of_reads',), minimum=1),
-            _Param('split_to_n_reads', 'int', 'SPLIT_TO_N_READS', v=('number_of_reads',), minimum=1),
-            _Param('total_reads_in_input', 'int', 'TOTAL_READS_IN_INPUT', v=('number_of_reads',), minimum=1),
-            _Param('out_prefix', 'str', 'OUT_PREFIX', v=('number_of_reads',)),
-        ),
-        selector='by',
-    ),
-    'gatk_transfer_read_tags': _Spec(
-        'gatk_transfer_read_tags',
-        {'default': 'TransferReadTags'},
-        (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('unmapped_sam', 'in', 'unmapped-sam', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('read_tags', 'strs', 'read-tags', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("max_bases_in_overhang", "int", "max-bases-in-overhang", minimum=0),
+            _Param("max_mismatches_in_overhang", "int", "max-mismatches-in-overhang", minimum=0),
+            _Param("skip_mapping_quality_transform", "bool", "skip-mapping-quality-transform"),
         ),
     ),
-    'gatk_unmark_duplicates': _Spec(
-        'gatk_unmark_duplicates',
-        {'default': 'UnmarkDuplicates'},
+    "gatk_split_sam": _Spec(
+        "gatk_split_sam",
+        {"library": "SplitSamByLibrary", "number_of_reads": "SplitSamByNumberOfReads"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_dir", "outd", "OUTPUT", req=True),
+            _Param(
+                "split_to_n_files", "int", "SPLIT_TO_N_FILES", v=("number_of_reads",), minimum=1
+            ),
+            _Param(
+                "split_to_n_reads", "int", "SPLIT_TO_N_READS", v=("number_of_reads",), minimum=1
+            ),
+            _Param(
+                "total_reads_in_input",
+                "int",
+                "TOTAL_READS_IN_INPUT",
+                v=("number_of_reads",),
+                minimum=1,
+            ),
+            _Param("out_prefix", "str", "OUT_PREFIX", v=("number_of_reads",)),
+        ),
+        selector="by",
+    ),
+    "gatk_transfer_read_tags": _Spec(
+        "gatk_transfer_read_tags",
+        {"default": "TransferReadTags"},
+        (
+            _Param("input_path", "in", "input", req=True),
+            _Param("unmapped_sam", "in", "unmapped-sam", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("read_tags", "strs", "read-tags", req=True),
+        ),
+    ),
+    "gatk_unmark_duplicates": _Spec(
+        "gatk_unmark_duplicates",
+        {"default": "UnmarkDuplicates"},
+        (
+            _Param("input_path", "in", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
 }
@@ -405,7 +524,7 @@ _SPECS: dict[str, _Spec] = {
 
 def gatk_pathseq(
     *,
-    step: str = 'filter',
+    step: str = "filter",
     input_path: str | None = None,
     paired_input: str | None = None,
     unpaired_input: str | None = None,
@@ -442,8 +561,18 @@ def gatk_pathseq(
     Output: The common result fields, `mode` and the output paths that were requested.
     """
     return _core.execute(
-        _SPECS['gatk_pathseq'],
-        {'input_path': input_path, 'paired_input': paired_input, 'unpaired_input': unpaired_input, 'microbe_bwa_image': microbe_bwa_image, 'microbe_dict': microbe_dict, 'taxonomy_file': taxonomy_file, 'paired_output': paired_output, 'unpaired_output': unpaired_output, 'scores_output': scores_output},
+        _SPECS["gatk_pathseq"],
+        {
+            "input_path": input_path,
+            "paired_input": paired_input,
+            "unpaired_input": unpaired_input,
+            "microbe_bwa_image": microbe_bwa_image,
+            "microbe_dict": microbe_dict,
+            "taxonomy_file": taxonomy_file,
+            "paired_output": paired_output,
+            "unpaired_output": unpaired_output,
+            "scores_output": scores_output,
+        },
         mode=step,
         options=options,
         gatk_path=gatk_path,
@@ -476,8 +605,8 @@ def gatk_detect_cram_issue_8768(
     Output: The common result fields; `outputs.output_path` is the report.
     """
     return _core.execute(
-        _SPECS['gatk_detect_cram_issue_8768'],
-        {'cram_path': cram_path, 'reference_path': reference_path, 'output_path': output_path},
+        _SPECS["gatk_detect_cram_issue_8768"],
+        {"cram_path": cram_path, "reference_path": reference_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -508,8 +637,8 @@ def gatk_create_bam_splitting_index(
     Output: The common result fields; `outputs.sbi` is the splitting index path.
     """
     return _core.execute(
-        _SPECS['gatk_create_bam_splitting_index'],
-        {'bam_path': bam_path, 'create_bai': create_bai},
+        _SPECS["gatk_create_bam_splitting_index"],
+        {"bam_path": bam_path, "create_bai": create_bai},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -538,8 +667,8 @@ def gatk_print_bgzf_block_information(
     Output: The common result fields plus `block_count` and `blocks` (block, offset, compressed_size, uncompressed_size).
     """
     return _core.execute(
-        _SPECS['gatk_print_bgzf_block_information'],
-        {'bgzf_path': bgzf_path},
+        _SPECS["gatk_print_bgzf_block_information"],
+        {"bgzf_path": bgzf_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -570,8 +699,8 @@ def gatk_print_file_diagnostics(
     Output: The common result fields; `outputs.output_path` is the diagnostics file.
     """
     return _core.execute(
-        _SPECS['gatk_print_file_diagnostics'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_print_file_diagnostics"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -608,8 +737,14 @@ def gatk_read_anonymizer(
     Output: The common result fields; `outputs.output_path` is the anonymised file.
     """
     return _core.execute(
-        _SPECS['gatk_read_anonymizer'],
-        {'input_path': input_path, 'reference_path': reference_path, 'output_path': output_path, 'ref_base_quality': ref_base_quality, 'use_simple_cigar': use_simple_cigar},
+        _SPECS["gatk_read_anonymizer"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "ref_base_quality": ref_base_quality,
+            "use_simple_cigar": use_simple_cigar,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -642,8 +777,8 @@ def gatk_add_comments_to_bam(
     Output: The common result fields; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_add_comments_to_bam'],
-        {'input_path': input_path, 'output_path': output_path, 'comments': comments},
+        _SPECS["gatk_add_comments_to_bam"],
+        {"input_path": input_path, "output_path": output_path, "comments": comments},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -656,7 +791,7 @@ def gatk_add_original_alignment_tags(
     input_path: str,
     output_path: str,
     *,
-    mode: str = 'oa_tag',
+    mode: str = "oa_tag",
     interval_list: str | None = None,
     options: Mapping[str, Any] | None = None,
     gatk_path: str | None = None,
@@ -679,8 +814,8 @@ def gatk_add_original_alignment_tags(
     Output: The common result fields and `mode`; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_add_original_alignment_tags'],
-        {'input_path': input_path, 'output_path': output_path, 'interval_list': interval_list},
+        _SPECS["gatk_add_original_alignment_tags"],
+        {"input_path": input_path, "output_path": output_path, "interval_list": interval_list},
         mode=mode,
         options=options,
         gatk_path=gatk_path,
@@ -715,8 +850,13 @@ def gatk_base_recalibrator(
     Output: The common result fields; `outputs.output_path` is the recalibration table.
     """
     return _core.execute(
-        _SPECS['gatk_base_recalibrator'],
-        {'input_path': input_path, 'reference_path': reference_path, 'known_sites': known_sites, 'output_path': output_path},
+        _SPECS["gatk_base_recalibrator"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "known_sites": known_sites,
+            "output_path": output_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -757,8 +897,16 @@ def gatk_apply_bqsr(
     Output: The common result fields; `outputs.output_path` is the recalibrated file.
     """
     return _core.execute(
-        _SPECS['gatk_apply_bqsr'],
-        {'input_path': input_path, 'recalibration_table': recalibration_table, 'output_path': output_path, 'reference_path': reference_path, 'static_quantized_quals': static_quantized_quals, 'use_original_qualities': use_original_qualities, 'emit_original_quals': emit_original_quals},
+        _SPECS["gatk_apply_bqsr"],
+        {
+            "input_path": input_path,
+            "recalibration_table": recalibration_table,
+            "output_path": output_path,
+            "reference_path": reference_path,
+            "static_quantized_quals": static_quantized_quals,
+            "use_original_qualities": use_original_qualities,
+            "emit_original_quals": emit_original_quals,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -793,8 +941,13 @@ def gatk_bqsr_pipeline_spark(
     Output: The common result fields; `outputs.output_path` is the recalibrated BAM.
     """
     return _core.execute(
-        _SPECS['gatk_bqsr_pipeline_spark'],
-        {'input_path': input_path, 'reference_path': reference_path, 'known_sites': known_sites, 'output_path': output_path},
+        _SPECS["gatk_bqsr_pipeline_spark"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "known_sites": known_sites,
+            "output_path": output_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -833,8 +986,15 @@ def gatk_bam_to_bfq(
     Output: The common result fields and `files` (file names inside `analysis_dir`).
     """
     return _core.execute(
-        _SPECS['gatk_bam_to_bfq'],
-        {'input_path': input_path, 'analysis_dir': analysis_dir, 'output_file_prefix': output_file_prefix, 'flowcell_barcode': flowcell_barcode, 'paired_run': paired_run, 'lane': lane},
+        _SPECS["gatk_bam_to_bfq"],
+        {
+            "input_path": input_path,
+            "analysis_dir": analysis_dir,
+            "output_file_prefix": output_file_prefix,
+            "flowcell_barcode": flowcell_barcode,
+            "paired_run": paired_run,
+            "lane": lane,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -848,7 +1008,7 @@ def gatk_bwa_spark(
     reference_path: str,
     output_path: str,
     *,
-    pipeline: str = 'align',
+    pipeline: str = "align",
     bwa_mem_index_image: str | None = None,
     single_end_alignment: bool | None = None,
     options: Mapping[str, Any] | None = None,
@@ -874,8 +1034,14 @@ def gatk_bwa_spark(
     Output: The common result fields and `mode`; `outputs.output_path` is the aligned BAM.
     """
     return _core.execute(
-        _SPECS['gatk_bwa_spark'],
-        {'input_path': input_path, 'reference_path': reference_path, 'output_path': output_path, 'bwa_mem_index_image': bwa_mem_index_image, 'single_end_alignment': single_end_alignment},
+        _SPECS["gatk_bwa_spark"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "bwa_mem_index_image": bwa_mem_index_image,
+            "single_end_alignment": single_end_alignment,
+        },
         mode=pipeline,
         options=options,
         gatk_path=gatk_path,
@@ -906,8 +1072,8 @@ def gatk_clean_sam(
     Output: The common result fields; `outputs.output_path` is the cleaned file.
     """
     return _core.execute(
-        _SPECS['gatk_clean_sam'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_clean_sam"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -948,8 +1114,16 @@ def gatk_clip_reads(
     Output: The common result fields; `outputs.output_path` is the clipped file (and `statistics_path` when requested).
     """
     return _core.execute(
-        _SPECS['gatk_clip_reads'],
-        {'input_path': input_path, 'output_path': output_path, 'clip_sequences': clip_sequences, 'cycles_to_trim': cycles_to_trim, 'q_trimming_threshold': q_trimming_threshold, 'clip_representation': clip_representation, 'statistics_path': statistics_path},
+        _SPECS["gatk_clip_reads"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "clip_sequences": clip_sequences,
+            "cycles_to_trim": cycles_to_trim,
+            "q_trimming_threshold": q_trimming_threshold,
+            "clip_representation": clip_representation,
+            "statistics_path": statistics_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -982,8 +1156,8 @@ def gatk_convert_headerless_bam_shard(
     Output: The common result fields; `outputs.output_path` is the BAM.
     """
     return _core.execute(
-        _SPECS['gatk_convert_headerless_bam_shard'],
-        {'shard_path': shard_path, 'header_bam_path': header_bam_path, 'output_path': output_path},
+        _SPECS["gatk_convert_headerless_bam_shard"],
+        {"shard_path": shard_path, "header_bam_path": header_bam_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1020,8 +1194,14 @@ def gatk_downsample_by_duplicate_set(
     Output: The common result fields; `outputs.output_path` is the downsampled BAM.
     """
     return _core.execute(
-        _SPECS['gatk_downsample_by_duplicate_set'],
-        {'input_path': input_path, 'output_path': output_path, 'fraction_to_keep': fraction_to_keep, 'min_reads': min_reads, 'min_per_strand_reads': min_per_strand_reads},
+        _SPECS["gatk_downsample_by_duplicate_set"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "fraction_to_keep": fraction_to_keep,
+            "min_reads": min_reads,
+            "min_per_strand_reads": min_per_strand_reads,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1062,8 +1242,16 @@ def gatk_downsample_sam(
     Output: The common result fields; `outputs.output_path` is the downsampled file.
     """
     return _core.execute(
-        _SPECS['gatk_downsample_sam'],
-        {'input_path': input_path, 'output_path': output_path, 'probability': probability, 'strategy': strategy, 'accuracy': accuracy, 'random_seed': random_seed, 'metrics_path': metrics_path},
+        _SPECS["gatk_downsample_sam"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "probability": probability,
+            "strategy": strategy,
+            "accuracy": accuracy,
+            "random_seed": random_seed,
+            "metrics_path": metrics_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1098,8 +1286,13 @@ def gatk_position_based_downsample_sam(
     Output: The common result fields; `outputs.output_path` is the downsampled file.
     """
     return _core.execute(
-        _SPECS['gatk_position_based_downsample_sam'],
-        {'input_path': input_path, 'output_path': output_path, 'fraction': fraction, 'stop_after': stop_after},
+        _SPECS["gatk_position_based_downsample_sam"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "fraction": fraction,
+            "stop_after": stop_after,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1134,8 +1327,13 @@ def gatk_extract_original_alignment_records_by_name(
     Output: The common result fields; `outputs.output_path` is the subset.
     """
     return _core.execute(
-        _SPECS['gatk_extract_original_alignment_records_by_name'],
-        {'input_path': input_path, 'read_name_file': read_name_file, 'output_path': output_path, 'invert_match': invert_match},
+        _SPECS["gatk_extract_original_alignment_records_by_name"],
+        {
+            "input_path": input_path,
+            "read_name_file": read_name_file,
+            "output_path": output_path,
+            "invert_match": invert_match,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1176,8 +1374,16 @@ def gatk_filter_sam_reads(
     Output: The common result fields; `outputs.output_path` is the filtered file.
     """
     return _core.execute(
-        _SPECS['gatk_filter_sam_reads'],
-        {'input_path': input_path, 'output_path': output_path, 'filter': filter, 'read_list_file': read_list_file, 'interval_list': interval_list, 'tag': tag, 'tag_values': tag_values},
+        _SPECS["gatk_filter_sam_reads"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "filter": filter,
+            "read_list_file": read_list_file,
+            "interval_list": interval_list,
+            "tag": tag,
+            "tag_values": tag_values,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1208,8 +1414,8 @@ def gatk_fix_misencoded_base_quality_reads(
     Output: The common result fields; `outputs.output_path` is the fixed file.
     """
     return _core.execute(
-        _SPECS['gatk_fix_misencoded_base_quality_reads'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_fix_misencoded_base_quality_reads"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1242,8 +1448,8 @@ def gatk_left_align_indels(
     Output: The common result fields; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_left_align_indels'],
-        {'input_path': input_path, 'reference_path': reference_path, 'output_path': output_path},
+        _SPECS["gatk_left_align_indels"],
+        {"input_path": input_path, "reference_path": reference_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1257,7 +1463,7 @@ def gatk_mark_duplicates_with_mate_cigar(
     output_path: str,
     metrics_path: str,
     *,
-    variant: str = 'standard',
+    variant: str = "standard",
     umi_metrics_path: str | None = None,
     remove_duplicates: bool | None = None,
     umi_tag_name: str | None = None,
@@ -1285,8 +1491,15 @@ def gatk_mark_duplicates_with_mate_cigar(
     Output: The common result fields, `mode` and `tables.metrics_path` (the Picard metrics rows).
     """
     return _core.execute(
-        _SPECS['gatk_mark_duplicates_with_mate_cigar'],
-        {'input_path': input_path, 'output_path': output_path, 'metrics_path': metrics_path, 'umi_metrics_path': umi_metrics_path, 'remove_duplicates': remove_duplicates, 'umi_tag_name': umi_tag_name},
+        _SPECS["gatk_mark_duplicates_with_mate_cigar"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "metrics_path": metrics_path,
+            "umi_metrics_path": umi_metrics_path,
+            "remove_duplicates": remove_duplicates,
+            "umi_tag_name": umi_tag_name,
+        },
         mode=variant,
         options=options,
         gatk_path=gatk_path,
@@ -1329,8 +1542,17 @@ def gatk_merge_bam_alignment(
     Output: The common result fields; `outputs.output_path` is the merged BAM.
     """
     return _core.execute(
-        _SPECS['gatk_merge_bam_alignment'],
-        {'unmapped_bam': unmapped_bam, 'reference_path': reference_path, 'output_path': output_path, 'aligned_bams': aligned_bams, 'paired_run': paired_run, 'sort_order': sort_order, 'add_mate_cigar': add_mate_cigar, 'clip_adapters': clip_adapters},
+        _SPECS["gatk_merge_bam_alignment"],
+        {
+            "unmapped_bam": unmapped_bam,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "aligned_bams": aligned_bams,
+            "paired_run": paired_run,
+            "sort_order": sort_order,
+            "add_mate_cigar": add_mate_cigar,
+            "clip_adapters": clip_adapters,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1361,8 +1583,8 @@ def gatk_print_distant_mates(
     Output: The common result fields; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_print_distant_mates'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_print_distant_mates"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1399,8 +1621,14 @@ def gatk_reorder_sam(
     Output: The common result fields; `outputs.output_path` is the reordered file.
     """
     return _core.execute(
-        _SPECS['gatk_reorder_sam'],
-        {'input_path': input_path, 'output_path': output_path, 'sequence_dictionary': sequence_dictionary, 'allow_incomplete_dict_concordance': allow_incomplete_dict_concordance, 'allow_contig_length_discordance': allow_contig_length_discordance},
+        _SPECS["gatk_reorder_sam"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "sequence_dictionary": sequence_dictionary,
+            "allow_incomplete_dict_concordance": allow_incomplete_dict_concordance,
+            "allow_contig_length_discordance": allow_contig_length_discordance,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1413,7 +1641,7 @@ def gatk_revert_base_quality_scores(
     input_path: str,
     output_path: str,
     *,
-    mode: str = 'original_qualities',
+    mode: str = "original_qualities",
     restore_original_qualities: bool | None = None,
     sort_order: str | None = None,
     options: Mapping[str, Any] | None = None,
@@ -1438,8 +1666,13 @@ def gatk_revert_base_quality_scores(
     Output: The common result fields and `mode`; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_revert_base_quality_scores'],
-        {'input_path': input_path, 'output_path': output_path, 'restore_original_qualities': restore_original_qualities, 'sort_order': sort_order},
+        _SPECS["gatk_revert_base_quality_scores"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "restore_original_qualities": restore_original_qualities,
+            "sort_order": sort_order,
+        },
         mode=mode,
         options=options,
         gatk_path=gatk_path,
@@ -1484,8 +1717,18 @@ def gatk_revert_sam(
     Output: The common result fields; `outputs.output_path` is the reverted file.
     """
     return _core.execute(
-        _SPECS['gatk_revert_sam'],
-        {'input_path': input_path, 'output_path': output_path, 'restore_original_qualities': restore_original_qualities, 'remove_duplicate_information': remove_duplicate_information, 'remove_alignment_information': remove_alignment_information, 'sanitize': sanitize, 'sample_alias': sample_alias, 'library_name': library_name, 'sort_order': sort_order},
+        _SPECS["gatk_revert_sam"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "restore_original_qualities": restore_original_qualities,
+            "remove_duplicate_information": remove_duplicate_information,
+            "remove_alignment_information": remove_alignment_information,
+            "sanitize": sanitize,
+            "sample_alias": sample_alias,
+            "library_name": library_name,
+            "sort_order": sort_order,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1516,8 +1759,8 @@ def gatk_convert_sam_format(
     Output: The common result fields; `outputs.output_path` is the converted file.
     """
     return _core.execute(
-        _SPECS['gatk_convert_sam_format'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_convert_sam_format"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1558,8 +1801,16 @@ def gatk_sam_to_fastq_with_tags(
     Output: The common result fields; `outputs` lists the FASTQ files that were requested.
     """
     return _core.execute(
-        _SPECS['gatk_sam_to_fastq_with_tags'],
-        {'input_path': input_path, 'fastq_path': fastq_path, 'sequence_tag_groups': sequence_tag_groups, 'quality_tag_groups': quality_tag_groups, 'second_end_fastq': second_end_fastq, 'unpaired_fastq': unpaired_fastq, 'interleave': interleave},
+        _SPECS["gatk_sam_to_fastq_with_tags"],
+        {
+            "input_path": input_path,
+            "fastq_path": fastq_path,
+            "sequence_tag_groups": sequence_tag_groups,
+            "quality_tag_groups": quality_tag_groups,
+            "second_end_fastq": second_end_fastq,
+            "unpaired_fastq": unpaired_fastq,
+            "interleave": interleave,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1598,8 +1849,15 @@ def gatk_split_n_cigar_reads(
     Output: The common result fields; `outputs.output_path` is the split file.
     """
     return _core.execute(
-        _SPECS['gatk_split_n_cigar_reads'],
-        {'input_path': input_path, 'reference_path': reference_path, 'output_path': output_path, 'max_bases_in_overhang': max_bases_in_overhang, 'max_mismatches_in_overhang': max_mismatches_in_overhang, 'skip_mapping_quality_transform': skip_mapping_quality_transform},
+        _SPECS["gatk_split_n_cigar_reads"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "max_bases_in_overhang": max_bases_in_overhang,
+            "max_mismatches_in_overhang": max_mismatches_in_overhang,
+            "skip_mapping_quality_transform": skip_mapping_quality_transform,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1612,7 +1870,7 @@ def gatk_split_sam(
     input_path: str,
     output_dir: str,
     *,
-    by: str = 'library',
+    by: str = "library",
     split_to_n_files: int | None = None,
     split_to_n_reads: int | None = None,
     total_reads_in_input: int | None = None,
@@ -1641,8 +1899,15 @@ def gatk_split_sam(
     Output: The common result fields, `mode` and `files` (file names inside `output_dir`).
     """
     return _core.execute(
-        _SPECS['gatk_split_sam'],
-        {'input_path': input_path, 'output_dir': output_dir, 'split_to_n_files': split_to_n_files, 'split_to_n_reads': split_to_n_reads, 'total_reads_in_input': total_reads_in_input, 'out_prefix': out_prefix},
+        _SPECS["gatk_split_sam"],
+        {
+            "input_path": input_path,
+            "output_dir": output_dir,
+            "split_to_n_files": split_to_n_files,
+            "split_to_n_reads": split_to_n_reads,
+            "total_reads_in_input": total_reads_in_input,
+            "out_prefix": out_prefix,
+        },
         mode=by,
         options=options,
         gatk_path=gatk_path,
@@ -1677,8 +1942,13 @@ def gatk_transfer_read_tags(
     Output: The common result fields; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_transfer_read_tags'],
-        {'input_path': input_path, 'unmapped_sam': unmapped_sam, 'output_path': output_path, 'read_tags': read_tags},
+        _SPECS["gatk_transfer_read_tags"],
+        {
+            "input_path": input_path,
+            "unmapped_sam": unmapped_sam,
+            "output_path": output_path,
+            "read_tags": read_tags,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1709,8 +1979,8 @@ def gatk_unmark_duplicates(
     Output: The common result fields; `outputs.output_path` is the new file.
     """
     return _core.execute(
-        _SPECS['gatk_unmark_duplicates'],
-        {'input_path': input_path, 'output_path': output_path},
+        _SPECS["gatk_unmark_duplicates"],
+        {"input_path": input_path, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1720,36 +1990,36 @@ def gatk_unmark_duplicates(
 
 
 __all__ = [
-    "gatk_pathseq",
-    "gatk_detect_cram_issue_8768",
-    "gatk_create_bam_splitting_index",
-    "gatk_print_bgzf_block_information",
-    "gatk_print_file_diagnostics",
-    "gatk_read_anonymizer",
     "gatk_add_comments_to_bam",
     "gatk_add_original_alignment_tags",
-    "gatk_base_recalibrator",
     "gatk_apply_bqsr",
-    "gatk_bqsr_pipeline_spark",
     "gatk_bam_to_bfq",
+    "gatk_base_recalibrator",
+    "gatk_bqsr_pipeline_spark",
     "gatk_bwa_spark",
     "gatk_clean_sam",
     "gatk_clip_reads",
     "gatk_convert_headerless_bam_shard",
+    "gatk_convert_sam_format",
+    "gatk_create_bam_splitting_index",
+    "gatk_detect_cram_issue_8768",
     "gatk_downsample_by_duplicate_set",
     "gatk_downsample_sam",
-    "gatk_position_based_downsample_sam",
     "gatk_extract_original_alignment_records_by_name",
     "gatk_filter_sam_reads",
     "gatk_fix_misencoded_base_quality_reads",
     "gatk_left_align_indels",
     "gatk_mark_duplicates_with_mate_cigar",
     "gatk_merge_bam_alignment",
+    "gatk_pathseq",
+    "gatk_position_based_downsample_sam",
+    "gatk_print_bgzf_block_information",
     "gatk_print_distant_mates",
+    "gatk_print_file_diagnostics",
+    "gatk_read_anonymizer",
     "gatk_reorder_sam",
     "gatk_revert_base_quality_scores",
     "gatk_revert_sam",
-    "gatk_convert_sam_format",
     "gatk_sam_to_fastq_with_tags",
     "gatk_split_n_cigar_reads",
     "gatk_split_sam",

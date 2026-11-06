@@ -94,7 +94,9 @@ def test_existing_output_is_never_overwritten(tmp_path: Path) -> None:
         lambda d: sk.seqkit_flanking_sequences(
             d["in"], d["bed"], d["out"], up_stream=2, feature_types=["gene"], verbose=False
         ),
-        lambda d: sk.seqkit_fish_search(d["in"], d["in"], d["out"], alignment_params="4,-4", verbose=False),
+        lambda d: sk.seqkit_fish_search(
+            d["in"], d["in"], d["out"], alignment_params="4,-4", verbose=False
+        ),
     ],
 )
 def test_invalid_arguments_are_rejected_before_running(tmp_path: Path, call) -> None:
@@ -116,14 +118,18 @@ def test_invalid_arguments_are_rejected_before_running(tmp_path: Path, call) -> 
 @requires_seqkit
 def test_range_and_duplicate_report_counts_and_version(tmp_path: Path) -> None:
     source = _write(tmp_path / "in.fa", FASTA)
-    first = sk.seqkit_range_records(source, str(tmp_path / "range.fa"), start=1, end=2, verbose=False)
+    first = sk.seqkit_range_records(
+        source, str(tmp_path / "range.fa"), start=1, end=2, verbose=False
+    )
     assert first["status"] == "completed" and first["backend"] == "seqkit"
     assert first["record_count"] == 2
     assert _fasta_ids(tmp_path / "range.fa") == ["chr1", "chr2"]
     assert re.match(r"\d+\.\d+", first["version"] or "")
     json.dumps(first)
 
-    last = sk.seqkit_range_records(source, str(tmp_path / "last.fa"), start=-1, end=-1, verbose=False)
+    last = sk.seqkit_range_records(
+        source, str(tmp_path / "last.fa"), start=-1, end=-1, verbose=False
+    )
     assert _fasta_ids(tmp_path / "last.fa") == ["chr3_a"]
     assert last["record_count"] == 1
 
@@ -140,7 +146,9 @@ def test_count_and_motif_filter(tmp_path: Path) -> None:
         source, patterns=["chr1", "chr3_a"], invert_match=True, verbose=False
     )
     assert inverted["count"] == 1
-    motif = sk.seqkit_grep_motif(source, str(tmp_path / "motif.fa"), motifs=["ACGTAC"], verbose=False)
+    motif = sk.seqkit_grep_motif(
+        source, str(tmp_path / "motif.fa"), motifs=["ACGTAC"], verbose=False
+    )
     assert motif["record_count"] == 2
     assert _fasta_ids(tmp_path / "motif.fa") == ["chr1", "chr3_a"]
 
@@ -169,7 +177,9 @@ def test_flank_split_concat_rename_replace_and_merge(tmp_path: Path) -> None:
         source, bed, str(tmp_path / "flank.fa"), up_stream=2, only_flank=True, verbose=False
     )
     sequence = "".join(
-        line for line in (tmp_path / "flank.fa").read_text().splitlines() if not line.startswith(">")
+        line
+        for line in (tmp_path / "flank.fa").read_text().splitlines()
+        if not line.startswith(">")
     )
     assert len(sequence) == 2 and flank["record_count"] == 1
     assert Path(flank["index_file"]).name == "in.fa.seqkit.fai"
@@ -187,11 +197,18 @@ def test_flank_split_concat_rename_replace_and_merge(tmp_path: Path) -> None:
     sk.seqkit_rename_duplicate_ids(dups, str(tmp_path / "renamed.fa"), verbose=False)
     assert _fasta_ids(tmp_path / "renamed.fa") == ["a", "a_2"]
 
-    sk.seqkit_replace_sequence_regex(source, str(tmp_path / "rep.fa"), pattern="N+", replacement="-", verbose=False)
+    sk.seqkit_replace_sequence_regex(
+        source, str(tmp_path / "rep.fa"), pattern="N+", replacement="-", verbose=False
+    )
     assert "ACGTACGT-ACGTTTGCA" in (tmp_path / "rep.fa").read_text()
 
-    names = _write(tmp_path / "windows.txt", "chr1_sliding:1-1000\nchr1_sliding:501-1500\nchr2_sliding:1-1000\n")
-    merged = sk.seqkit_merge_slides_to_bed(names, str(tmp_path / "merged.bed"), min_overlap=499, verbose=False)
+    names = _write(
+        tmp_path / "windows.txt",
+        "chr1_sliding:1-1000\nchr1_sliding:501-1500\nchr2_sliding:1-1000\n",
+    )
+    merged = sk.seqkit_merge_slides_to_bed(
+        names, str(tmp_path / "merged.bed"), min_overlap=499, verbose=False
+    )
     assert merged["records"] == [
         {"chrom": "chr1", "start": 0, "end": 1500},
         {"chrom": "chr2", "start": 0, "end": 1000},
@@ -216,7 +233,9 @@ def test_fish_and_fasta_for_fastq(tmp_path: Path) -> None:
 def test_histogram_can_save_image(tmp_path: Path) -> None:
     fastq = _write(tmp_path / "reads.fq", FASTQ)
     image = tmp_path / "hist.png"
-    result = sk.seqkit_read_feature_histogram(fastq, "GC", bins=2, image_path=str(image), verbose=False)
+    result = sk.seqkit_read_feature_histogram(
+        fastq, "GC", bins=2, image_path=str(image), verbose=False
+    )
     assert image.is_file() and result["outputs"]["image"] == str(image)
 
 
@@ -230,7 +249,9 @@ def test_bam_facades(tmp_path: Path) -> None:
             segment = pysam.AlignedSegment()
             segment.query_name = f"r{index}"
             segment.query_sequence = "ACGT" * (5 + index)
-            segment.query_qualities = pysam.qualitystring_to_array("I" * len(segment.query_sequence))
+            segment.query_qualities = pysam.qualitystring_to_array(
+                "I" * len(segment.query_sequence)
+            )
             segment.reference_id = 0
             segment.reference_start = start
             segment.cigarstring = f"{len(segment.query_sequence)}M"

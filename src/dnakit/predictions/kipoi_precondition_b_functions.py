@@ -41,8 +41,8 @@ _SINGULARITY_HINT = (
 )
 __all__ = [
     "predict_kipoi_model_in_singularity",
-    "test_kipoi_model_in_singularity",
     "test_kipoi_model_in_current_env",
+    "test_kipoi_model_in_singularity",
 ]
 
 _TSV = ".tsv"
@@ -55,9 +55,11 @@ _LOG_TAIL_CHARS = 4000
 def _kipoi() -> Any:
     try:
         import kipoi
-        import kipoi.cli.main  # noqa: F401  (cli_test lives in this submodule)
+        import kipoi.cli.main
     except ImportError as exc:
-        raise BackendUnavailableError(f"kipoi could not be imported: {exc}", hint=_KIPOI_HINT) from exc
+        raise BackendUnavailableError(
+            f"kipoi could not be imported: {exc}", hint=_KIPOI_HINT
+        ) from exc
     return kipoi
 
 
@@ -127,7 +129,9 @@ def _bind_directories(paths: Sequence[Path], arguments: Mapping[str, Any]) -> li
 def _singularity() -> str:
     found = shutil.which("singularity")
     if found is None:
-        raise BackendUnavailableError("The singularity executable was not found on PATH.", hint=_SINGULARITY_HINT)
+        raise BackendUnavailableError(
+            "The singularity executable was not found on PATH.", hint=_SINGULARITY_HINT
+        )
     return found
 
 
@@ -136,7 +140,9 @@ def _tail(text: str) -> str:
 
 
 def _singularity_version(executable: str) -> str | None:
-    result = execute_bounded_command(executable, ["--version"], backend_id="singularity", cwd=os.getcwd(), verbose=False)
+    result = execute_bounded_command(
+        executable, ["--version"], backend_id="singularity", cwd=os.getcwd(), verbose=False
+    )
     if result.return_code != 0:
         return None
     return result.output.strip() or None
@@ -285,7 +291,9 @@ class _WarningCollector(logging.Handler):
         self.messages.append(record.getMessage())
 
 
-def test_kipoi_model_in_current_env(model_dir: str, *, batch_size: int = 32, verbose: bool = True) -> dict[str, Any]:
+def test_kipoi_model_in_current_env(
+    model_dir: str, *, batch_size: int = 32, verbose: bool = True
+) -> dict[str, Any]:
     """Run ``kipoi test`` on a local model directory in the current Python environment and fail on logged warnings.
 
     kipoi's own ``cli_test`` runs with ``--source dir --batch_size <n>``: the example inputs from ``dataloader.yaml`` are
@@ -303,10 +311,14 @@ def test_kipoi_model_in_current_env(model_dir: str, *, batch_size: int = 32, ver
     captured = StringIO()
     try:
         with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
-            kipoi.cli.main.cli_test("test", ["--batch_size", str(size), "--source", _SOURCE, str(directory)])
+            kipoi.cli.main.cli_test(
+                "test", ["--batch_size", str(size), "--source", _SOURCE, str(directory)]
+            )
     except SystemExit as exc:
         if exc.code not in (None, 0):
-            raise BackendExecutionError(f"kipoi test exited with code {exc.code}: {_tail(captured.getvalue())}") from exc
+            raise BackendExecutionError(
+                f"kipoi test exited with code {exc.code}: {_tail(captured.getvalue())}"
+            ) from exc
     except Exception as exc:
         raise BackendExecutionError(f"kipoi test failed for {directory}: {exc}") from exc
     finally:

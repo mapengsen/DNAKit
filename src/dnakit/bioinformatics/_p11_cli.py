@@ -45,7 +45,13 @@ def switch(arguments: list[str], option: str, value: object, name: str) -> None:
 
 
 def opt_int(
-    arguments: list[str], option: str, value: int | None, name: str, *, minimum: int | None = None, maximum: int | None = None
+    arguments: list[str],
+    option: str,
+    value: int | None,
+    name: str,
+    *,
+    minimum: int | None = None,
+    maximum: int | None = None,
 ) -> None:
     if value is not None:
         arguments.extend((option, str(cli.integer(value, name, minimum=minimum, maximum=maximum))))
@@ -61,7 +67,9 @@ def opt_num(
     maximum: float | None = None,
 ) -> None:
     if value is not None:
-        arguments.extend((option, format(cli.number(value, name, minimum=minimum, maximum=maximum), ".12g")))
+        arguments.extend(
+            (option, format(cli.number(value, name, minimum=minimum, maximum=maximum), ".12g"))
+        )
 
 
 def opt_text(arguments: list[str], option: str, value: str | None, name: str) -> None:
@@ -101,7 +109,9 @@ def file_stem(value: str, name: str) -> str:
     """A file-name prefix: letters, digits, underscore, dot and dash; no path separators."""
     text = cli.text(value, name)
     if not all(character.isalnum() or character in "_.-" for character in text):
-        raise ConfigurationError(f"{name} may contain only letters, digits, '_', '.' and '-': {text!r}")
+        raise ConfigurationError(
+            f"{name} may contain only letters, digits, '_', '.' and '-': {text!r}"
+        )
     return text
 
 
@@ -144,7 +154,9 @@ def stream(
             )
         except OSError as exc:
             raise BackendExecutionError(
-                "External command could not be started.", code="P11_START_FAILED", context={"error": str(exc)}
+                "External command could not be started.",
+                code="P11_START_FAILED",
+                context={"error": str(exc)},
             ) from exc
         deadline = time.monotonic() + timeout
         try:
@@ -154,7 +166,9 @@ def stream(
                 if (out_path is not None and out_path.stat().st_size > MAX_ARTIFACT_BYTES) or (
                     log_path.stat().st_size > MAX_LOG_BYTES
                 ):
-                    raise BackendExecutionError(f"{Path(executable).name} exceeded its output size limit.")
+                    raise BackendExecutionError(
+                        f"{Path(executable).name} exceeded its output size limit."
+                    )
                 time.sleep(0.02)
         finally:
             if process.poll() is None:
@@ -183,7 +197,12 @@ def run_checked(
 ) -> None:
     """Run and raise ``BackendExecutionError`` (with the log tail) when the exit code is not 0."""
     code = stream(
-        executable, arguments, directory, stdout_name=stdout_name, timeout_seconds=timeout_seconds, environment=environment
+        executable,
+        arguments,
+        directory,
+        stdout_name=stdout_name,
+        timeout_seconds=timeout_seconds,
+        environment=environment,
     )
     if code != 0:
         raise BackendExecutionError(

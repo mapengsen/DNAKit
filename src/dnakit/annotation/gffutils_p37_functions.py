@@ -9,7 +9,6 @@ inclusive as stored in GFF. gffutils is imported only when a function runs; a mi
 
 from __future__ import annotations
 
-import io
 import shutil
 from collections.abc import Sequence
 from pathlib import Path
@@ -82,14 +81,18 @@ def _new_database(source: str | Path, output_path: str | Path) -> tuple[Any, Any
         return gffutils, gffutils.FeatureDB(str(target)), target
     except Exception as exc:
         target.unlink(missing_ok=True)
-        raise ConfigurationError(f"gffutils could not build a database from {path.name}: {exc}") from exc
+        raise ConfigurationError(
+            f"gffutils could not build a database from {path.name}: {exc}"
+        ) from exc
 
 
 def _feature(db: Any, feature_id: str) -> Any:
     try:
         return db[_text(feature_id, "feature_id")]
     except Exception as exc:
-        raise ConfigurationError(f"feature {feature_id!r} was not found in the annotation.") from exc
+        raise ConfigurationError(
+            f"feature {feature_id!r} was not found in the annotation."
+        ) from exc
 
 
 def _rows(features: Any, limit: int, what: str) -> list[dict[str, Any]]:
@@ -101,7 +104,9 @@ def _rows(features: Any, limit: int, what: str) -> list[dict[str, Any]]:
     return _checked(rows, limit, what)
 
 
-def fetch_gffutils_feature(source: str | Path, feature_id: str, *, verbose: bool = True) -> dict[str, Any]:
+def fetch_gffutils_feature(
+    source: str | Path, feature_id: str, *, verbose: bool = True
+) -> dict[str, Any]:
     """Fetch one annotation feature by its ID from a GFF/GTF file or gffutils database (``gffutils-cli fetch``)."""
 
     _, db = _open(source)
@@ -196,7 +201,11 @@ def fetch_gffutils_parents(
 
     _, db = _open(source)
     feature = _feature(db, feature_id)
-    parents = list(db.parents(feature, level=_level(level), featuretype=_optional_text(featuretype, "featuretype")))
+    parents = list(
+        db.parents(
+            feature, level=_level(level), featuretype=_optional_text(featuretype, "featuretype")
+        )
+    )
     return {
         "status": "completed",
         "operation": "fetch_gffutils_parents",
@@ -225,7 +234,9 @@ def get_gffutils_interfeatures(
     _, db = _open(source)
     ordered = db.features_of_type(kind, order_by=("seqid", "start"))
     gaps = []
-    for gap in db.interfeatures(ordered, new_featuretype=_optional_text(new_featuretype, "new_featuretype")):
+    for gap in db.interfeatures(
+        ordered, new_featuretype=_optional_text(new_featuretype, "new_featuretype")
+    ):
         gaps.append(_feature_record(gap))
         if len(gaps) > limit:
             break
@@ -256,7 +267,9 @@ def delete_gffutils_features(
         raise ConfigurationError("give exactly one of feature_ids or featuretype.")
     _, db, target = _new_database(source, output_path)
     before = db.count_features_of_type()
-    doomed = [_feature(db, item) for item in ids] if ids is not None else list(db.features_of_type(kind))
+    doomed = (
+        [_feature(db, item) for item in ids] if ids is not None else list(db.features_of_type(kind))
+    )
     db.delete(doomed, make_backup=False)
     after = db.count_features_of_type()
     return {
@@ -361,7 +374,9 @@ def _derived(
         ) from exc
     _checked(features, limit, "derived features")
     if target is not None:
-        target.write_text("##gff-version 3\n" + "".join(f"{item}\n" for item in features), encoding="utf-8")
+        target.write_text(
+            "##gff-version 3\n" + "".join(f"{item}\n" for item in features), encoding="utf-8"
+        )
     return {
         "status": "completed",
         "count": len(features),
@@ -489,7 +504,9 @@ def extract_gffutils_feature_sequence(
     try:
         sequence = feature.sequence(str(fasta_path), use_strand=_flag(use_strand, "use_strand"))
     except Exception as exc:
-        raise ConfigurationError(f"gffutils could not read the sequence of {feature.id}: {exc}") from exc
+        raise ConfigurationError(
+            f"gffutils could not read the sequence of {feature.id}: {exc}"
+        ) from exc
     return {
         "status": "completed",
         "operation": "extract_gffutils_feature_sequence",
@@ -534,7 +551,11 @@ def write_gffutils_gff(
             writer.write_recs(db.features_of_type(kind) if kind else db.all_features())
     finally:
         writer.close()
-    written = sum(1 for line in target.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#"))
+    written = sum(
+        1
+        for line in target.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    )
     return {
         "status": "completed",
         "operation": "write_gffutils_gff",
@@ -559,7 +580,11 @@ def remove_gffutils_duplicates(
     gffutils = _gffutils()
     path = input_path(source)
     target = _new_file(output_path, None, "output_path")
-    lines_before = sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#"))
+    lines_before = sum(
+        1
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    )
     try:
         db = gffutils.create_db(str(path), ":memory:", verbose=False, merge_strategy="merge")
     except Exception as exc:
@@ -570,7 +595,11 @@ def remove_gffutils_duplicates(
             writer.write_rec(record)
     finally:
         writer.close()
-    lines_after = sum(1 for line in target.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#"))
+    lines_after = sum(
+        1
+        for line in target.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    )
     return {
         "status": "completed",
         "operation": "remove_gffutils_duplicates",
@@ -608,7 +637,9 @@ def plot_gffutils_gene_model(
     plotting = require("gffutils.contrib.plotting", "bio-gffutils")
     _, db = _open(source)
     gene = _feature(db, gene_id)
-    model = plotting.Gene(db, gene.id, transcripts=kinds["transcripts"], utrs=kinds["utrs"], cds=kinds["cds"])
+    model = plotting.Gene(
+        db, gene.id, transcripts=kinds["transcripts"], utrs=kinds["utrs"], cds=kinds["cds"]
+    )
     matplotlib.use("Agg", force=True)
     from matplotlib import pyplot
 
@@ -630,8 +661,12 @@ def plot_gffutils_gene_model(
                     "id": child.id,
                     "start": int(child.start),
                     "end": int(child.end),
-                    "utr_count": sum(1 for x in db.children(child, level=1) if x.featuretype in kinds["utrs"]),
-                    "cds_count": sum(1 for x in db.children(child, level=1) if x.featuretype in kinds["cds"]),
+                    "utr_count": sum(
+                        1 for x in db.children(child, level=1) if x.featuretype in kinds["utrs"]
+                    ),
+                    "cds_count": sum(
+                        1 for x in db.children(child, level=1) if x.featuretype in kinds["cds"]
+                    ),
                 }
             )
     return {

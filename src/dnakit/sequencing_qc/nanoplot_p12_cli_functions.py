@@ -155,7 +155,9 @@ def nanoplot_plots(
     if directory.exists():
         raise ConfigurationError(f"output_dir must not exist yet: {directory}")
     if not directory.parent.is_dir():
-        raise ConfigurationError(f"The parent folder of output_dir does not exist: {directory.parent}")
+        raise ConfigurationError(
+            f"The parent folder of output_dir does not exist: {directory.parent}"
+        )
     wanted = list(PLOT_FILES) if plot_names is None else list(plot_names)
     unknown = [name for name in wanted if name not in PLOT_FILES]
     if unknown or not wanted:

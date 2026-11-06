@@ -1,7 +1,6 @@
 """Tests of ``dnakit.alignment.mmseqs2_p07_taxonomy_cli_functions``: command lines against a stand-in executable, argument
 validation, and (when MMseqs2 is installed) results against direct MMseqs2 runs on toy data."""
 
-# ruff: noqa: E501
 from __future__ import annotations
 
 import inspect
@@ -560,10 +559,8 @@ def test_aggregate_taxonomy_variants(fake):
                                      mmseqs_path=fake["path"], verbose=False)  # fmt: skip
     first = calls(fake)[-1]
     assert (
-        (first[0] == "aggregatetax"
-        and first[-4:-1] == ["--lca-ranks", "genus", "--threads"][:3])
-        or first[0] == "aggregatetax"
-    )
+        first[0] == "aggregatetax" and first[-4:-1] == ["--lca-ranks", "genus", "--threads"][:3]
+    ) or first[0] == "aggregatetax"
     module.mmseqs_aggregate_taxonomy(str(work / "target"), str(work / "sets"), str(work / "per_seq"), str(work / "o2"),
                                      alignment_per_sequence_db=str(work / "aln"), vote_mode=2, majority=0.7, swap_headers=True,
                                      mmseqs_path=fake["path"], verbose=False)  # fmt: skip

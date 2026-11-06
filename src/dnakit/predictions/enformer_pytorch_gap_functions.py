@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
@@ -57,7 +58,9 @@ def download_pretrained_enformer(
     torch = require("torch", _EXTRA)
     modeling = require("enformer_pytorch.modeling_enformer", _EXTRA)
     if not isinstance(name, str) or not name.strip():
-        raise ConfigurationError("name must be a Hugging Face model id such as EleutherAI/enformer-official-rough.")
+        raise ConfigurationError(
+            "name must be a Hugging Face model id such as EleutherAI/enformer-official-rough."
+        )
     state_path = _new(output_state_dict, "output_state_dict")
     config_path = state_path.with_name(state_path.name + ".config.json")
     if config_path.exists():
@@ -118,7 +121,9 @@ def enformer_embeddings(
     if not isinstance(config, Mapping) or not config:
         raise ConfigurationError("config must be a non-empty mapping of EnformerConfig arguments.")
     if freeze and (train_layernorms_only or train_last_n_layers_only is not None):
-        raise ConfigurationError("freeze cannot be combined with train_layernorms_only or train_last_n_layers_only.")
+        raise ConfigurationError(
+            "freeze cannot be combined with train_layernorms_only or train_last_n_layers_only."
+        )
     if train_last_n_layers_only is not None and train_last_n_layers_only < 0:
         raise ConfigurationError("train_last_n_layers_only must not be negative.")
     try:

@@ -44,7 +44,9 @@ def _runner(jar: str | None) -> tuple[_cli.Tool, str | None, tuple[str, ...]]:
     if jar is None:
         return _TOOL, None, ()
     path = _cli.existing_file(jar, "trimmomatic_jar")
-    tool = dataclasses.replace(_TOOL, executable="java", hint=_JAVA_HINT, version_arguments=("-jar", str(path), "-version"))
+    tool = dataclasses.replace(
+        _TOOL, executable="java", hint=_JAVA_HINT, version_arguments=("-jar", str(path), "-version")
+    )
     return tool, "java", ("-jar", str(path))
 
 
@@ -101,7 +103,13 @@ def trimmomatic_process_reads(
     steps: list[str] = []
     if convert_quality is not None:
         steps.append(f"TOPHRED{_cli.choice(str(convert_quality), ('33', '64'), 'convert_quality')}")
-    for name, value in (("CROP", crop), ("HEADCROP", head_crop), ("TAILCROP", tail_crop), ("LEADING", leading), ("TRAILING", trailing)):
+    for name, value in (
+        ("CROP", crop),
+        ("HEADCROP", head_crop),
+        ("TAILCROP", tail_crop),
+        ("LEADING", leading),
+        ("TRAILING", trailing),
+    ):
         if value is not None:
             steps.append(f"{name}:{_cli.integer(value, name.lower(), minimum=0)}")
     if sliding_window is not None:
@@ -122,10 +130,14 @@ def trimmomatic_process_reads(
         steps.append(f"AVGQUAL:{_cli.integer(average_quality, 'average_quality', minimum=0)}")
     if base_count is not None:
         if len(base_count) not in (2, 3):
-            raise ConfigurationError("base_count must be [bases, minimum] or [bases, minimum, maximum].")
+            raise ConfigurationError(
+                "base_count must be [bases, minimum] or [bases, minimum, maximum]."
+            )
         bases = base_count[0]
         if not isinstance(bases, str) or not _BASES.match(bases):
-            raise ConfigurationError("base_count bases must be a string of nucleotide letters such as 'N' or 'GC'.")
+            raise ConfigurationError(
+                "base_count bases must be a string of nucleotide letters such as 'N' or 'GC'."
+            )
         counts = [str(_cli.integer(int(item), "base_count", minimum=0)) for item in base_count[1:]]
         steps.append("BASECOUNT:" + ":".join([bases.upper(), *counts]))
     if min_length is not None:
@@ -144,15 +156,30 @@ def trimmomatic_process_reads(
         outputs = [out / "trimmed.fastq.gz"]
         arguments += [str(first), str(outputs[0])]
     else:
-        outputs = [out / "R1.paired.fastq.gz", out / "R1.unpaired.fastq.gz", out / "R2.paired.fastq.gz", out / "R2.unpaired.fastq.gz"]
+        outputs = [
+            out / "R1.paired.fastq.gz",
+            out / "R1.unpaired.fastq.gz",
+            out / "R2.paired.fastq.gz",
+            out / "R2.unpaired.fastq.gz",
+        ]
         arguments += [str(first), str(second), *map(str, outputs)]
     arguments += steps
     tool, name, prefix = _runner(trimmomatic_jar)
     record = _cli.invoke(
-        tool, arguments, cwd=out, expected=[*outputs, summary], executable_name=name, prefix=prefix, timeout_seconds=timeout_seconds,
+        tool,
+        arguments,
+        cwd=out,
+        expected=[*outputs, summary],
+        executable_name=name,
+        prefix=prefix,
+        timeout_seconds=timeout_seconds,
     )
     return _cli.finish(
-        record, "trim_and_filter_reads_with_trimmomatic_steps", output_directory=str(out), steps=steps, survival=_summary(summary),
+        record,
+        "trim_and_filter_reads_with_trimmomatic_steps",
+        output_directory=str(out),
+        steps=steps,
+        survival=_summary(summary),
         read_outputs={path.name: str(path) for path in outputs},
     )
 
@@ -179,21 +206,43 @@ def trimmomatic_pair_reads(
     second = _cli.existing_file(read2, "read2")
     if first == second:
         raise ConfigurationError("read1 and read2 must be different files.")
-    jar = _cli.existing_file(trimmomatic_jar, "trimmomatic_jar") if trimmomatic_jar is not None else None
+    jar = (
+        _cli.existing_file(trimmomatic_jar, "trimmomatic_jar")
+        if trimmomatic_jar is not None
+        else None
+    )
     if jar is None:
-        raise ConfigurationError("trimmomatic_jar is required: Pairomatic is started from the Trimmomatic jar file.")
+        raise ConfigurationError(
+            "trimmomatic_jar is required: Pairomatic is started from the Trimmomatic jar file."
+        )
     out = _cli.new_directory(output_directory, "output_directory")
-    outputs = [out / "R1.paired.fastq", out / "R1.unpaired.fastq", out / "R2.paired.fastq", out / "R2.unpaired.fastq"]
+    outputs = [
+        out / "R1.paired.fastq",
+        out / "R1.unpaired.fastq",
+        out / "R2.paired.fastq",
+        out / "R2.unpaired.fastq",
+    ]
     arguments = ["-cp", str(jar), "org.usadellab.trimmomatic.Pairomatic"]
     if delimiter is not None:
         if not isinstance(delimiter, str) or len(delimiter) != 1 or delimiter in "\n\r\x00":
             raise ConfigurationError("delimiter must be a single character such as '/' or ' '.")
         arguments += ["-delim", delimiter]
     arguments += [str(first), str(second), *map(str, outputs)]
-    tool = dataclasses.replace(_TOOL, executable="java", hint=_JAVA_HINT, version_arguments=("-jar", str(jar), "-version"))
-    record = _cli.invoke(tool, arguments, cwd=out, expected=outputs, executable_name="java", timeout_seconds=timeout_seconds)
+    tool = dataclasses.replace(
+        _TOOL, executable="java", hint=_JAVA_HINT, version_arguments=("-jar", str(jar), "-version")
+    )
+    record = _cli.invoke(
+        tool,
+        arguments,
+        cwd=out,
+        expected=outputs,
+        executable_name="java",
+        timeout_seconds=timeout_seconds,
+    )
     return _cli.finish(
-        record, "pair_fastq_mates_by_read_name", output_directory=str(out),
+        record,
+        "pair_fastq_mates_by_read_name",
+        output_directory=str(out),
         read_counts={path.name: _cli.count_fastx_records(path) for path in outputs},
         read_outputs={path.name: str(path) for path in outputs},
     )

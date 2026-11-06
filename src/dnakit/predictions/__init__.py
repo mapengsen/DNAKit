@@ -133,7 +133,7 @@ __all__ = [
     "train_custom_property_model",
 ]
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .dna_model_backends import (
     check_genomic_benchmark_cache,
     describe_genomic_benchmark,
@@ -157,7 +157,29 @@ from .dna_model_backends import (
     shuffle_dinucleotides,
 )
 
-__all__ = [*__all__, "check_genomic_benchmark_cache", "describe_genomic_benchmark", "describe_kipoi_model", "encode_one_hot_enformer", "encode_one_hot_selene", "extract_gencode_transcripts", "fetch_genome_sequences", "generate_evo2_sequences", "list_genomic_benchmark_datasets", "list_kipoi_models", "merge_alphagenome_intervals", "mutate_dna_sequence", "parse_alphagenome_interval", "parse_alphagenome_variant", "read_contig_lengths", "read_enformer_bed_windows", "read_gencode_gene_intervals", "resize_dna_sequences", "reverse_complement_with_grelu", "shuffle_dinucleotides"]
+__all__ = [
+    *__all__,
+    "check_genomic_benchmark_cache",
+    "describe_genomic_benchmark",
+    "describe_kipoi_model",
+    "encode_one_hot_enformer",
+    "encode_one_hot_selene",
+    "extract_gencode_transcripts",
+    "fetch_genome_sequences",
+    "generate_evo2_sequences",
+    "list_genomic_benchmark_datasets",
+    "list_kipoi_models",
+    "merge_alphagenome_intervals",
+    "mutate_dna_sequence",
+    "parse_alphagenome_interval",
+    "parse_alphagenome_variant",
+    "read_contig_lengths",
+    "read_enformer_bed_windows",
+    "read_gencode_gene_intervals",
+    "resize_dna_sequences",
+    "reverse_complement_with_grelu",
+    "shuffle_dinucleotides",
+]
 
 # Full-pass exports (see docs/api/features)
 from .alphagenome_functions import (
@@ -171,17 +193,14 @@ from .alphagenome_functions import (
     upgrade_alphagenome_annotation_ids,
     validate_alphagenome_sequence_length,
 )
-
 from .enformer_pytorch_functions import (
     encode_enformer_indices,
     indices_to_one_hot_enformer,
     reverse_complement_enformer,
 )
-
 from .genomic_benchmarks_functions import (
     locate_sequences_in_reference,
 )
-
 from .grelu_functions import (
     check_dna_encoding,
     clip_intervals_to_bounds,
@@ -204,7 +223,6 @@ from .grelu_functions import (
     trim_motif_pwm,
     variants_to_sequence_intervals,
 )
-
 from .selene_sdk_functions import (
     apply_one_hot_mutations,
     decode_one_hot_sequence,
@@ -220,7 +238,54 @@ from .selene_sdk_functions import (
     unpack_bit_packed_sequence,
 )
 
-__all__ = [*__all__, "build_alphagenome_ism_matrix", "combine_alphagenome_intervals", "enumerate_alphagenome_ism_variants", "extract_alphagenome_tss", "filter_alphagenome_transcripts", "get_alphagenome_fold_intervals", "normalize_alphagenome_variant", "upgrade_alphagenome_annotation_ids", "validate_alphagenome_sequence_length", "encode_enformer_indices", "indices_to_one_hot_enformer", "reverse_complement_enformer", "locate_sequences_in_reference", "check_dna_encoding", "clip_intervals_to_bounds", "compare_motif_pwm_alleles", "convert_dna_encoding", "dna_sequence_differences", "extend_intervals_from_centers", "filter_intervals_blacklist", "filter_intervals_by_chromosome", "filter_intervals_overlapping_reference", "filter_variants_by_length", "gc_content_distribution", "merge_intervals_by_group", "pwm_to_consensus", "read_fasta_sequences", "sample_intervals", "scan_motifs_with_pwms", "split_intervals_by_chromosome", "summarize_sequence_lengths", "trim_motif_pwm", "variants_to_sequence_intervals", "apply_one_hot_mutations", "decode_one_hot_sequence", "interval_length_probabilities", "list_in_silico_mutants", "load_variant_diff_scores", "order_variant_labels", "read_selene_vcf", "rescale_attribution_scores", "reverse_complement_allele", "reverse_complement_one_hot", "sort_standard_chromosomes", "unpack_bit_packed_sequence"]
+__all__ = [
+    *__all__,
+    "build_alphagenome_ism_matrix",
+    "combine_alphagenome_intervals",
+    "enumerate_alphagenome_ism_variants",
+    "extract_alphagenome_tss",
+    "filter_alphagenome_transcripts",
+    "get_alphagenome_fold_intervals",
+    "normalize_alphagenome_variant",
+    "upgrade_alphagenome_annotation_ids",
+    "validate_alphagenome_sequence_length",
+    "encode_enformer_indices",
+    "indices_to_one_hot_enformer",
+    "reverse_complement_enformer",
+    "locate_sequences_in_reference",
+    "check_dna_encoding",
+    "clip_intervals_to_bounds",
+    "compare_motif_pwm_alleles",
+    "convert_dna_encoding",
+    "dna_sequence_differences",
+    "extend_intervals_from_centers",
+    "filter_intervals_blacklist",
+    "filter_intervals_by_chromosome",
+    "filter_intervals_overlapping_reference",
+    "filter_variants_by_length",
+    "gc_content_distribution",
+    "merge_intervals_by_group",
+    "pwm_to_consensus",
+    "read_fasta_sequences",
+    "sample_intervals",
+    "scan_motifs_with_pwms",
+    "split_intervals_by_chromosome",
+    "summarize_sequence_lengths",
+    "trim_motif_pwm",
+    "variants_to_sequence_intervals",
+    "apply_one_hot_mutations",
+    "decode_one_hot_sequence",
+    "interval_length_probabilities",
+    "list_in_silico_mutants",
+    "load_variant_diff_scores",
+    "order_variant_labels",
+    "read_selene_vcf",
+    "rescale_attribution_scores",
+    "reverse_complement_allele",
+    "reverse_complement_one_hot",
+    "sort_standard_chromosomes",
+    "unpack_bit_packed_sequence",
+]
 
 # Review-pass exports (see docs/api/features)
 from .alphagenome_review_functions import (
@@ -232,7 +297,6 @@ from .alphagenome_review_functions import (
     tidy_alphagenome_scores,
     unmerge_alphagenome_stranded_gene_tracks,
 )
-
 from .grelu_review_functions import (
     add_negative_intervals,
     check_genomic_interval_table,
@@ -256,7 +320,36 @@ from .grelu_review_functions import (
     shuffle_tile_effects,
 )
 
-__all__ = [*__all__, "convert_alphagenome_variant_scores", "list_alphagenome_recommended_scorers", "merge_alphagenome_stranded_gene_tracks", "merge_alphagenome_track_metadata", "tidy_alphagenome_anndata", "tidy_alphagenome_scores", "unmerge_alphagenome_stranded_gene_tracks", "add_negative_intervals", "check_genomic_interval_table", "design_sequence_ledidi", "design_sequences_evolve", "expand_chromosome_names", "filter_interval_coverage", "get_attention_scores", "get_sequence_attributions", "grelu_marginalize_variants", "grelu_predict_variant_effects", "in_silico_mutagenesis_scores", "marginalize_pattern_insertions", "marginalize_pattern_spacing", "read_modisco_motifs", "read_narrowpeak_intervals", "read_tomtom_matches", "run_modisco_motifs", "score_motif_pwm_products", "score_motif_sites", "shuffle_tile_effects"]
+__all__ = [
+    *__all__,
+    "convert_alphagenome_variant_scores",
+    "list_alphagenome_recommended_scorers",
+    "merge_alphagenome_stranded_gene_tracks",
+    "merge_alphagenome_track_metadata",
+    "tidy_alphagenome_anndata",
+    "tidy_alphagenome_scores",
+    "unmerge_alphagenome_stranded_gene_tracks",
+    "add_negative_intervals",
+    "check_genomic_interval_table",
+    "design_sequence_ledidi",
+    "design_sequences_evolve",
+    "expand_chromosome_names",
+    "filter_interval_coverage",
+    "get_attention_scores",
+    "get_sequence_attributions",
+    "grelu_marginalize_variants",
+    "grelu_predict_variant_effects",
+    "in_silico_mutagenesis_scores",
+    "marginalize_pattern_insertions",
+    "marginalize_pattern_spacing",
+    "read_modisco_motifs",
+    "read_narrowpeak_intervals",
+    "read_tomtom_matches",
+    "run_modisco_motifs",
+    "score_motif_pwm_products",
+    "score_motif_sites",
+    "shuffle_tile_effects",
+]
 
 
 # Coverage-gap exports (see paper/write_paper/figure/fig2/task_coverage/coverage_gap/waves/CANONICAL_MODULES.md)
@@ -350,14 +443,14 @@ from .kipoi_gap_functions import (
 )
 from .kipoi_precondition_b_functions import (
     predict_kipoi_model_in_singularity,
-    test_kipoi_model_in_singularity,
     test_kipoi_model_in_current_env,
+    test_kipoi_model_in_singularity,
 )
 from .kipoi_verify_functions import (
-    prepare_kipoi_batch,
     concatenate_kipoi_batches,
-    kipoi_dataloader_example_kwargs,
     kipoi_dataloader_default_args,
+    kipoi_dataloader_example_kwargs,
+    prepare_kipoi_batch,
     test_kipoi_source_models,
 )
 from .selene_sdk_gap_functions import (
@@ -374,7 +467,104 @@ from .selene_sdk_verify_functions import (
     plot_variant_diffs_scatter,
 )
 
-__all__ = [*__all__, "create_alphagenome_atlas_client", "create_alphagenome_dna_client", "get_alphagenome_junctions_to_plot", "pad_alphagenome_track", "plot_alphagenome_components", "plot_alphagenome_contact_map", "plot_alphagenome_sashimi", "plot_alphagenome_seqlogo", "plot_alphagenome_track", "plot_alphagenome_tracks", "plot_alphagenome_transcripts", "download_pretrained_enformer", "enformer_embeddings", "download_genomic_benchmark_cloud_cache", "download_genomic_benchmark_sequences", "get_genomic_benchmark_dataset", "load_demo_coding_vs_intergenomic_seqs", "load_demo_human_or_worm", "load_demo_mouse_enhancers", "load_drosophila_enhancers_stark", "load_human_enhancers_cohn", "load_human_enhancers_ensembl", "load_human_nontata_promoters", "load_human_ocr_ensembl", "grelu_check_chrom_ends", "grelu_check_reference", "grelu_download_dataset", "grelu_download_model", "grelu_filter_chrom_ends", "grelu_get_base_models", "grelu_get_dataset_info", "grelu_get_datasets_by_model", "grelu_get_gc_matched_intervals", "grelu_get_genome", "grelu_get_jaspar", "grelu_get_model_info", "grelu_get_models_by_dataset", "grelu_intervals_to_strings", "grelu_list_datasets", "grelu_list_models", "grelu_load_model", "grelu_make_insertion_bigwig", "grelu_plot_attention_matrix", "grelu_plot_attributions", "grelu_plot_binary_preds", "grelu_plot_calibration_curve", "grelu_plot_distribution", "grelu_plot_evolution", "grelu_plot_gc_match", "grelu_plot_ism", "grelu_plot_motif", "grelu_plot_position_effect", "grelu_plot_pred_distribution", "grelu_plot_pred_scatter", "grelu_plot_tracks", "grelu_read_gtf", "grelu_read_sizes", "grelu_run_tomtom", "grelu_variant_to_seqs", "grelu_wandb_artifacts", "grelu_wandb_datasets", "grelu_wandb_get_artifact", "grelu_wandb_get_dataset_by_model", "grelu_wandb_get_model_by_dataset", "grelu_wandb_load_model", "grelu_wandb_models", "grelu_wandb_projects", "grelu_wandb_runs", "compare_kipoi_predictions", "describe_kipoi_component", "describe_kipoi_dataloader", "get_kipoi_example_kwargs", "list_kipoi_directory_dataloaders", "list_kipoi_directory_models", "load_kipoi_dataloader", "load_kipoi_model", "predict_kipoi_model", "validate_kipoi_model_example", "predict_kipoi_model_in_singularity", "test_kipoi_model_in_singularity", "test_kipoi_model_in_current_env", "prepare_kipoi_batch", "concatenate_kipoi_batches", "kipoi_dataloader_example_kwargs", "kipoi_dataloader_default_args", "test_kipoi_source_models", "predict_selene_sequences", "run_selene_config_file", "run_selene_configs", "run_selene_operations", "selene_precision_recall_curves", "selene_roc_curves", "selene_score_heatmap", "plot_sequence_logo_scores", "plot_variant_diffs_scatter"]
+__all__ = [
+    *__all__,
+    "create_alphagenome_atlas_client",
+    "create_alphagenome_dna_client",
+    "get_alphagenome_junctions_to_plot",
+    "pad_alphagenome_track",
+    "plot_alphagenome_components",
+    "plot_alphagenome_contact_map",
+    "plot_alphagenome_sashimi",
+    "plot_alphagenome_seqlogo",
+    "plot_alphagenome_track",
+    "plot_alphagenome_tracks",
+    "plot_alphagenome_transcripts",
+    "download_pretrained_enformer",
+    "enformer_embeddings",
+    "download_genomic_benchmark_cloud_cache",
+    "download_genomic_benchmark_sequences",
+    "get_genomic_benchmark_dataset",
+    "load_demo_coding_vs_intergenomic_seqs",
+    "load_demo_human_or_worm",
+    "load_demo_mouse_enhancers",
+    "load_drosophila_enhancers_stark",
+    "load_human_enhancers_cohn",
+    "load_human_enhancers_ensembl",
+    "load_human_nontata_promoters",
+    "load_human_ocr_ensembl",
+    "grelu_check_chrom_ends",
+    "grelu_check_reference",
+    "grelu_download_dataset",
+    "grelu_download_model",
+    "grelu_filter_chrom_ends",
+    "grelu_get_base_models",
+    "grelu_get_dataset_info",
+    "grelu_get_datasets_by_model",
+    "grelu_get_gc_matched_intervals",
+    "grelu_get_genome",
+    "grelu_get_jaspar",
+    "grelu_get_model_info",
+    "grelu_get_models_by_dataset",
+    "grelu_intervals_to_strings",
+    "grelu_list_datasets",
+    "grelu_list_models",
+    "grelu_load_model",
+    "grelu_make_insertion_bigwig",
+    "grelu_plot_attention_matrix",
+    "grelu_plot_attributions",
+    "grelu_plot_binary_preds",
+    "grelu_plot_calibration_curve",
+    "grelu_plot_distribution",
+    "grelu_plot_evolution",
+    "grelu_plot_gc_match",
+    "grelu_plot_ism",
+    "grelu_plot_motif",
+    "grelu_plot_position_effect",
+    "grelu_plot_pred_distribution",
+    "grelu_plot_pred_scatter",
+    "grelu_plot_tracks",
+    "grelu_read_gtf",
+    "grelu_read_sizes",
+    "grelu_run_tomtom",
+    "grelu_variant_to_seqs",
+    "grelu_wandb_artifacts",
+    "grelu_wandb_datasets",
+    "grelu_wandb_get_artifact",
+    "grelu_wandb_get_dataset_by_model",
+    "grelu_wandb_get_model_by_dataset",
+    "grelu_wandb_load_model",
+    "grelu_wandb_models",
+    "grelu_wandb_projects",
+    "grelu_wandb_runs",
+    "compare_kipoi_predictions",
+    "describe_kipoi_component",
+    "describe_kipoi_dataloader",
+    "get_kipoi_example_kwargs",
+    "list_kipoi_directory_dataloaders",
+    "list_kipoi_directory_models",
+    "load_kipoi_dataloader",
+    "load_kipoi_model",
+    "predict_kipoi_model",
+    "validate_kipoi_model_example",
+    "predict_kipoi_model_in_singularity",
+    "test_kipoi_model_in_singularity",
+    "test_kipoi_model_in_current_env",
+    "prepare_kipoi_batch",
+    "concatenate_kipoi_batches",
+    "kipoi_dataloader_example_kwargs",
+    "kipoi_dataloader_default_args",
+    "test_kipoi_source_models",
+    "predict_selene_sequences",
+    "run_selene_config_file",
+    "run_selene_configs",
+    "run_selene_operations",
+    "selene_precision_recall_curves",
+    "selene_roc_curves",
+    "selene_score_heatmap",
+    "plot_sequence_logo_scores",
+    "plot_variant_diffs_scatter",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .alphagenome_p34_functions import (

@@ -28,7 +28,9 @@ def fetch_bgen_example(filename: str, *, verbose: bool = True) -> dict[str, Any]
     require("requests", _EXTRA)
     if not isinstance(filename, str) or filename not in module._filenames:
         known = ", ".join(sorted(module._filenames))
-        raise ConfigurationError(f"Unknown bgen_reader example file {filename!r}. Known names: {known}.")
+        raise ConfigurationError(
+            f"Unknown bgen_reader example file {filename!r}. Known names: {known}."
+        )
     path = Path(module.example_filepath(filename))
     return {
         "status": "completed",

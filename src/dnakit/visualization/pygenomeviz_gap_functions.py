@@ -58,6 +58,7 @@ def _require_isolated(module: str, extra: str) -> Any:
         matplotlib.rcParams.update(saved_rc)
         warnings.filters[:] = saved_filters
 
+
 _EXTRA = "bio-pygenomeviz"
 _SERVICE = "pygenomeviz-data repository on GitHub"
 _MAX_TAIL = 4000
@@ -740,7 +741,12 @@ def compare_genomes_mmseqs(
     alignments = _finish_alignments(folder, coords, min_length=0, min_identity=min_identity)
     image = folder / "result.png"
     _draw_feature_alignment(
-        _require_isolated("pygenomeviz", _EXTRA), genomes, alignments, image, fig_width=fig_width, dpi=dpi
+        _require_isolated("pygenomeviz", _EXTRA),
+        genomes,
+        alignments,
+        image,
+        fig_width=fig_width,
+        dpi=dpi,
     )
     outputs = [*rbh_files, folder / "align_coords.tsv", image]
     return _completed(steps, outputs, image, _alignment_data(genomes, alignments))
@@ -840,7 +846,12 @@ def compare_genomes_mummer(
     )
     image = folder / "result.png"
     _draw_feature_alignment(
-        _require_isolated("pygenomeviz", _EXTRA), genomes, alignments, image, fig_width=fig_width, dpi=dpi
+        _require_isolated("pygenomeviz", _EXTRA),
+        genomes,
+        alignments,
+        image,
+        fig_width=fig_width,
+        dpi=dpi,
     )
     outputs = [folder / "align_coords.tsv", image]
     return _completed(steps, outputs, image, _alignment_data(genomes, alignments))

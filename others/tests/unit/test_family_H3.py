@@ -9,6 +9,7 @@ broken upstream). Every input is built in ``tmp_path``; nothing needs the networ
 
 from __future__ import annotations
 
+import importlib.util
 import inspect
 import io
 import math
@@ -264,7 +265,7 @@ BLAST_XML2 = """<?xml version="1.0"?>
 </report>
 </BlastOutput2>
 </BlastXML2>
-"""  # noqa: E501
+"""
 
 PRIMER3_TEXT = (
     "# EPRIMER3 RELEASE 5.0.0\n"
@@ -656,7 +657,22 @@ def test_read_genbank_record_fields_exactly_one_follows_bio_genbank_read(tmp_pat
 # --- read_phylogeny_collection ----------------------------------------------------------------
 
 
-@pytest.mark.parametrize("file_format", ["newick", "nexus", "phyloxml", "nexml", "cdao"])
+@pytest.mark.parametrize(
+    "file_format",
+    [
+        "newick",
+        "nexus",
+        "phyloxml",
+        "nexml",
+        pytest.param(
+            "cdao",
+            marks=pytest.mark.skipif(
+                importlib.util.find_spec("rdflib") is None,
+                reason="Biopython's CDAO I/O needs rdflib",
+            ),
+        ),
+    ],
+)
 def test_read_phylogeny_collection_reads_every_tree(tmp_path: Path, file_format: str) -> None:
     from Bio import Phylo
 
@@ -951,7 +967,7 @@ def test_query_saved_khmer_table_validates_inputs(tmp_path: Path) -> None:
 
 
 def test_write_tree_format_reaches_phylo_codec_writers(tmp_path: Path) -> None:
-    from Bio.Phylo import CDAOIO, BaseTree, NeXMLIO, NexusIO, PhyloXMLIO
+    from Bio.Phylo import BaseTree, NeXMLIO, NexusIO, PhyloXMLIO
 
     from dnakit.bioinformatics.phylogeny import read_tree, write_tree
 
@@ -964,12 +980,12 @@ def test_write_tree_format_reaches_phylo_codec_writers(tmp_path: Path) -> None:
         )
 
     reference = BaseTree.Tree(root=clade(tree))
-    for fmt, module in (
-        ("nexus", NexusIO),
-        ("nexml", NeXMLIO),
-        ("phyloxml", PhyloXMLIO),
-        ("cdao", CDAOIO),
-    ):
+    writers = [("nexus", NexusIO), ("nexml", NeXMLIO), ("phyloxml", PhyloXMLIO)]
+    if importlib.util.find_spec("rdflib") is not None:  # Biopython's CDAO I/O needs rdflib
+        from Bio.Phylo import CDAOIO
+
+        writers.append(("cdao", CDAOIO))
+    for fmt, module in writers:
         written = tmp_path / f"w.{fmt}"
         write_tree(tree, written, format=fmt, verbose=False)
         buffer = io.StringIO()

@@ -105,7 +105,9 @@ def _bglr_dosages(np: Any, alleles: Any) -> tuple[Any, list[str | None], list[st
     missing = (one == "0") & (two == "0")
     heterozygous = (one != two) & ~missing
     hom_reference = (one == two) & (one == reference)
-    dosage = np.where(missing, np.nan, np.where(heterozygous, 1.0, np.where(hom_reference, 0.0, 2.0)))
+    dosage = np.where(
+        missing, np.nan, np.where(heterozygous, 1.0, np.where(hom_reference, 0.0, 2.0))
+    )
     counted: list[str | None] = []
     for j in range(first.shape[1]):
         seen = [a for a in np.unique(first[:, j, :]) if a not in ("0", reference[j])]
@@ -118,7 +120,9 @@ def _minor_dosages(
 ) -> tuple[Any, list[str | None], list[str | None], list[int], int]:
     n, m, _ = alleles.shape
     missing = (alleles[:, :, 0] == missing_allele) | (alleles[:, :, 1] == missing_allele)
-    half_missing = int(np.sum((alleles[:, :, 0] == missing_allele) ^ (alleles[:, :, 1] == missing_allele)))
+    half_missing = int(
+        np.sum((alleles[:, :, 0] == missing_allele) ^ (alleles[:, :, 1] == missing_allele))
+    )
     dosage = np.full((n, m), np.nan)
     counted: list[str | None] = []
     other: list[str | None] = []
@@ -330,7 +334,7 @@ def _brent_fmin(function: Any, lower: float, upper: float, tol: float) -> float:
             if fu <= fw or w == x:
                 v, fv = w, fw
                 w, fw = u, fu
-            elif fu <= fv or v == x or v == w:
+            elif fu <= fv or v in (x, w):
                 v, fv = u, fu
     return x
 
@@ -352,7 +356,9 @@ def _reml_null(np: Any, y: Any, kinship: Any, bounds: tuple[float, float]) -> di
     omega_sq = (s_vectors[:, order].T @ y) ** 2
 
     def objective(lam: float) -> float:
-        return float((n - 1) * math.log(np.sum(omega_sq / (theta + lam))) + np.sum(np.log(theta + lam)))
+        return float(
+            (n - 1) * math.log(np.sum(omega_sq / (theta + lam))) + np.sum(np.log(theta + lam))
+        )
 
     lam = _brent_fmin(objective, bounds[0], bounds[1], 2.220446049250313e-16**0.25)
     vu = float(np.sum(omega_sq / (theta + lam)) / (n - 1))
@@ -360,7 +366,9 @@ def _reml_null(np: Any, y: Any, kinship: Any, bounds: tuple[float, float]) -> di
     return {"lambda": lam, "vu": vu, "ve": lam * vu, "objective": objective(lam), "hinv": hinv}
 
 
-def _f_tests(np: Any, special: Any, hi_1: Any, hi_x: Any, hi_y: Any, x: Any, y: Any, n: int) -> tuple[Any, ...]:
+def _f_tests(
+    np: Any, special: Any, hi_1: Any, hi_x: Any, hi_y: Any, x: Any, y: Any, n: int
+) -> tuple[Any, ...]:
     """Vectorised rrBLUP score.calc: GLS on [1, x], residual variance re-estimated, F(1, n-2)."""
     s11 = hi_1.sum(axis=0)
     s1x = hi_x.sum(axis=0)
@@ -458,7 +466,11 @@ def mixed_model_gwas(
         if ((g < 0) | (g > 2)).any():
             raise ConfigurationError("genotype dosages must lie in [0, 2].")
         m = g.shape[1]
-        for name, labels in (("variant_ids", variant_ids), ("chromosomes", chromosomes), ("positions", positions)):
+        for name, labels in (
+            ("variant_ids", variant_ids),
+            ("chromosomes", chromosomes),
+            ("positions", positions),
+        ):
             if labels is not None and (not isinstance(labels, list) or len(labels) != m):
                 raise ConfigurationError(f"{name} must be a list with one entry per marker.")
         keep = ~np.isnan(y_all)
@@ -476,9 +488,9 @@ def mixed_model_gwas(
         counts = observed.sum(axis=0)
         means = np.divide(np.nansum(x + 1.0, axis=0), counts, out=np.zeros(m), where=counts > 0)
         maf = np.minimum(means / 2, 1 - means / 2)
-        variable = np.array([
-            counts[j] > 0 and np.nanmax(x[:, j]) > np.nanmin(x[:, j]) for j in range(m)
-        ])
+        variable = np.array(
+            [counts[j] > 0 and np.nanmax(x[:, j]) > np.nanmin(x[:, j]) for j in range(m)]
+        )
         testable = variable & (maf >= float(min_maf)) & (counts >= 4)
         n_used = np.where(missing_genotypes == "mean", n, counts)
         beta = np.full(m, np.nan)
@@ -498,11 +510,19 @@ def mixed_model_gwas(
             xb = x[:, block]
             hi_x = hinv @ xb
             b1, s, f, p, det = _f_tests(
-                np, special, np.repeat(hi_1_full[:, None], len(block), 1), hi_x,
-                np.repeat(hi_y_full[:, None], len(block), 1), xb, np.repeat(y[:, None], len(block), 1), n,
+                np,
+                special,
+                np.repeat(hi_1_full[:, None], len(block), 1),
+                hi_x,
+                np.repeat(hi_y_full[:, None], len(block), 1),
+                xb,
+                np.repeat(y[:, None], len(block), 1),
+                n,
             )
             ok = (det > 0) & np.isfinite(p)
-            beta[block], se[block], fstat[block], pval[block] = (np.where(ok, v, np.nan) for v in (b1, s, f, p))
+            beta[block], se[block], fstat[block], pval[block] = (
+                np.where(ok, v, np.nan) for v in (b1, s, f, p)
+            )
         for j in np.flatnonzero(testable & ~complete):
             obs = observed[:, j]
             xo, yo = x[obs, j], y[obs]
@@ -514,8 +534,14 @@ def mixed_model_gwas(
                 cross = hinv[np.ix_(obs, mis)]
                 hi_rhs = hi_rhs - cross @ np.linalg.solve(hinv[np.ix_(mis, mis)], cross.T @ rhs)
             b1, s, f, p, det = _f_tests(
-                np, special, hi_rhs[:, [0]], hi_rhs[:, [1]], hi_rhs[:, [2]],
-                xo[:, None], yo[:, None], len(yo),
+                np,
+                special,
+                hi_rhs[:, [0]],
+                hi_rhs[:, [1]],
+                hi_rhs[:, [2]],
+                xo[:, None],
+                yo[:, None],
+                len(yo),
             )
             if det[0] > 0 and math.isfinite(p[0]):
                 beta[j], se[j], fstat[j], pval[j] = b1[0], s[0], f[0], p[0]
@@ -524,12 +550,16 @@ def mixed_model_gwas(
         tested = np.flatnonzero(np.isfinite(pval))
         n_tested = len(tested)
         threshold = float(alpha) / n_tested if n_tested else None
-        significant = [] if threshold is None else sorted(
-            (int(j) for j in tested if pval[j] < threshold), key=lambda j: pval[j]
+        significant = (
+            []
+            if threshold is None
+            else sorted((int(j) for j in tested if pval[j] < threshold), key=lambda j: pval[j])
         )
         stats = require("scipy.stats", "bio-analysis")
         lambda_gc = (
-            float(np.median(stats.chi2.isf(pval[tested], 1)) / stats.chi2.ppf(0.5, 1)) if n_tested else None
+            float(np.median(stats.chi2.isf(pval[tested], 1)) / stats.chi2.ppf(0.5, 1))
+            if n_tested
+            else None
         )
 
         def status(j: int) -> str:

@@ -22,7 +22,8 @@ from dnakit.exceptions import (
 from dnakit.sequence import gimmemotifs_gap_functions as gap
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 
 PFM_TEXT = """>MA0001.1 AR1

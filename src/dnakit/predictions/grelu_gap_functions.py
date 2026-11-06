@@ -22,10 +22,16 @@ from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, Co
 
 _HINT = "Install gReLU in the same environment as DNAKit: python -m pip install grelu."
 _GENOME_HINT = "Install genomepy (python -m pip install genomepy) to download and read genomes."
-_HUB_HINT = "Install huggingface_hub (python -m pip install huggingface_hub) to use the gReLU model zoo."
-_WANDB_HINT = "Install wandb (python -m pip install wandb) to use the gReLU Weights & Biases model zoo."
+_HUB_HINT = (
+    "Install huggingface_hub (python -m pip install huggingface_hub) to use the gReLU model zoo."
+)
+_WANDB_HINT = (
+    "Install wandb (python -m pip install wandb) to use the gReLU Weights & Biases model zoo."
+)
 _PLOT_HINT = "Install matplotlib (python -m pip install matplotlib) to draw plots."
-_MEMELITE_HINT = "Install memelite (python -m pip install memelite) for the tomtom motif comparison."
+_MEMELITE_HINT = (
+    "Install memelite (python -m pip install memelite) for the tomtom motif comparison."
+)
 _IMAGE_SUFFIXES = (".png", ".pdf", ".svg")
 _WANDB_HOST = "https://api.wandb.ai"
 
@@ -97,8 +103,15 @@ def grelu_filter_chrom_ends(
     verbose: bool = True,
 ) -> Any:
     """Drop intervals that extend beyond the chromosome ends, optionally after padding them (gReLU filter_chrom_ends)."""
-    return _call("grelu.data.preprocess", "filter_chrom_ends", _GENOME_HINT, data, genome=genome, pad=pad,
-                 inplace=inplace)
+    return _call(
+        "grelu.data.preprocess",
+        "filter_chrom_ends",
+        _GENOME_HINT,
+        data,
+        genome=genome,
+        pad=pad,
+        inplace=inplace,
+    )
 
 
 def grelu_get_gc_matched_intervals(
@@ -113,8 +126,17 @@ def grelu_get_gc_matched_intervals(
 ) -> Any:
     """Sample background intervals whose GC content matches the given intervals (gReLU get_gc_matched_intervals; genome via genomepy)."""
     _text(genome, "genome")
-    return _call("grelu.data.preprocess", "get_gc_matched_intervals", _GENOME_HINT, intervals, genome,
-                 binwidth=binwidth, chroms=chroms, blacklist=blacklist, seed=seed)
+    return _call(
+        "grelu.data.preprocess",
+        "get_gc_matched_intervals",
+        _GENOME_HINT,
+        intervals,
+        genome,
+        binwidth=binwidth,
+        chroms=chroms,
+        blacklist=blacklist,
+        seed=seed,
+    )
 
 
 def grelu_make_insertion_bigwig(
@@ -132,9 +154,19 @@ def grelu_make_insertion_bigwig(
     """Convert a fragment file of Tn5 insertions into a strand-specific insertion bigWig for a genome (gReLU make_insertion_bigwig)."""
     _text(genome, "genome")
     source = _existing(frag_file, "frag_file")
-    return _call("grelu.data.preprocess", "make_insertion_bigwig", _GENOME_HINT, source, genome,
-                 out_prefix=out_prefix, plus_shift=plus_shift, minus_shift=minus_shift, chroms=chroms,
-                 tmp_dir=tmp_dir, out_dir=out_dir)
+    return _call(
+        "grelu.data.preprocess",
+        "make_insertion_bigwig",
+        _GENOME_HINT,
+        source,
+        genome,
+        out_prefix=out_prefix,
+        plus_shift=plus_shift,
+        minus_shift=minus_shift,
+        chroms=chroms,
+        tmp_dir=tmp_dir,
+        out_dir=out_dir,
+    )
 
 
 def grelu_read_sizes(genome: str = "hg38", *, verbose: bool = True) -> Any:
@@ -147,7 +179,9 @@ def grelu_get_genome(genome: str, *, verbose: bool = True) -> Any:
     return _call("grelu.io.genome", "get_genome", _GENOME_HINT, _text(genome, "genome"))
 
 
-def grelu_read_gtf(genome: str, features: Sequence[str] | str | None = None, *, verbose: bool = True) -> Any:
+def grelu_read_gtf(
+    genome: str, features: Sequence[str] | str | None = None, *, verbose: bool = True
+) -> Any:
     """Install a genome annotation through genomepy and read its gene features as a table (gReLU read_gtf)."""
     return _call("grelu.io.genome", "read_gtf", _GENOME_HINT, _text(genome, "genome"), features)
 
@@ -161,13 +195,26 @@ def grelu_get_jaspar(
     verbose: bool = True,
 ) -> Any:
     """Download motifs from the JASPAR database as position frequency matrices (gReLU get_jaspar; network)."""
-    return _call("grelu.io.motifs", "get_jaspar", _HINT, release=release, collection=collection,
-                 tax_group=tax_group, species=species)
+    return _call(
+        "grelu.io.motifs",
+        "get_jaspar",
+        _HINT,
+        release=release,
+        collection=collection,
+        tax_group=tax_group,
+        species=species,
+    )
 
 
 def grelu_intervals_to_strings(intervals: Any, genome: str, *, verbose: bool = True) -> Any:
     """Extract the DNA sequences of genomic intervals from a genome (gReLU intervals_to_strings; genome via genomepy)."""
-    return _call("grelu.sequence.format", "intervals_to_strings", _GENOME_HINT, intervals, _text(genome, "genome"))
+    return _call(
+        "grelu.sequence.format",
+        "intervals_to_strings",
+        _GENOME_HINT,
+        intervals,
+        _text(genome, "genome"),
+    )
 
 
 def grelu_variant_to_seqs(
@@ -181,8 +228,17 @@ def grelu_variant_to_seqs(
     verbose: bool = True,
 ) -> tuple[str, str]:
     """Return the reference and alternate sequences around a single-nucleotide variant of a genome (gReLU variant_to_seqs)."""
-    return _call("grelu.variant", "variant_to_seqs", _GENOME_HINT, _text(chrom, "chrom"), pos, ref, alt,
-                 _text(genome, "genome"), seq_len=seq_len)
+    return _call(
+        "grelu.variant",
+        "variant_to_seqs",
+        _GENOME_HINT,
+        _text(chrom, "chrom"),
+        pos,
+        ref,
+        alt,
+        _text(genome, "genome"),
+        seq_len=seq_len,
+    )
 
 
 def grelu_check_reference(
@@ -193,8 +249,14 @@ def grelu_check_reference(
     verbose: bool = True,
 ) -> None:
     """Check that the reference alleles of a variant table match the reference genome (gReLU check_reference)."""
-    return _call("grelu.variant", "check_reference", _GENOME_HINT, variants, genome=_text(genome, "genome"),
-                 null_string=null_string)
+    return _call(
+        "grelu.variant",
+        "check_reference",
+        _GENOME_HINT,
+        variants,
+        genome=_text(genome, "genome"),
+        null_string=null_string,
+    )
 
 
 def grelu_run_tomtom(
@@ -217,7 +279,9 @@ def grelu_run_tomtom(
     for name, matrix in motifs.items():
         array = np.asarray(matrix, dtype=float)
         if array.ndim != 2 or array.shape[1] != 4 or not np.isfinite(array).all():
-            raise ConfigurationError(f"Motif {name!r} must be a finite matrix with four columns (A, C, G, T).")
+            raise ConfigurationError(
+                f"Motif {name!r} must be a finite matrix with four columns (A, C, G, T)."
+            )
         arrays[str(name)] = array
     if meme_file not in ("hocomoco_v12", "hocomoco_v13", "consensus"):
         meme_file = _existing(meme_file, "meme_file")
@@ -234,14 +298,26 @@ def grelu_list_datasets(*, verbose: bool = True) -> list[str]:
     return _call("grelu.resources", "list_datasets", _HUB_HINT)
 
 
-def grelu_download_model(repo_id: str, filename: str = "model.ckpt", *, verbose: bool = True) -> str:
+def grelu_download_model(
+    repo_id: str, filename: str = "model.ckpt", *, verbose: bool = True
+) -> str:
     """Download a model checkpoint from the gReLU model zoo on Hugging Face and return its local path (network)."""
-    return _call("grelu.resources", "download_model", _HUB_HINT, _text(repo_id, "repo_id"), filename=filename)
+    return _call(
+        "grelu.resources", "download_model", _HUB_HINT, _text(repo_id, "repo_id"), filename=filename
+    )
 
 
-def grelu_download_dataset(repo_id: str, filename: str = "data.h5ad", *, verbose: bool = True) -> str:
+def grelu_download_dataset(
+    repo_id: str, filename: str = "data.h5ad", *, verbose: bool = True
+) -> str:
     """Download a dataset file from the gReLU model zoo on Hugging Face and return its local path (network)."""
-    return _call("grelu.resources", "download_dataset", _HUB_HINT, _text(repo_id, "repo_id"), filename=filename)
+    return _call(
+        "grelu.resources",
+        "download_dataset",
+        _HUB_HINT,
+        _text(repo_id, "repo_id"),
+        filename=filename,
+    )
 
 
 def grelu_load_model(
@@ -254,8 +330,16 @@ def grelu_load_model(
     verbose: bool = True,
 ) -> Any:
     """Load a gReLU model from the Hugging Face model zoo (repo_id) or from Weights & Biases (project and model_name)."""
-    return _call("grelu.resources", "load_model", _HUB_HINT, repo_id=repo_id, filename=filename, device=device,
-                 project=project, model_name=model_name)
+    return _call(
+        "grelu.resources",
+        "load_model",
+        _HUB_HINT,
+        repo_id=repo_id,
+        filename=filename,
+        device=device,
+        project=project,
+        model_name=model_name,
+    )
 
 
 def grelu_get_model_info(repo_id: str, *, verbose: bool = True) -> dict[str, Any]:
@@ -297,18 +381,35 @@ def grelu_wandb_artifacts(
     verbose: bool = True,
 ) -> list[str]:
     """List the artifacts of a Weights & Biases project of the gReLU model zoo (network)."""
-    return _call("grelu.resources.wandb", "artifacts", _WANDB_HINT, project=_text(project, "project"), host=host,
-                 type_is=type_is, type_contains=type_contains)
+    return _call(
+        "grelu.resources.wandb",
+        "artifacts",
+        _WANDB_HINT,
+        project=_text(project, "project"),
+        host=host,
+        type_is=type_is,
+        type_contains=type_contains,
+    )
 
 
 def grelu_wandb_models(project: str, *, host: str = _WANDB_HOST, verbose: bool = True) -> list[str]:
     """List the models of a Weights & Biases project of the gReLU model zoo (network)."""
-    return _call("grelu.resources.wandb", "models", _WANDB_HINT, project=_text(project, "project"), host=host)
+    return _call(
+        "grelu.resources.wandb", "models", _WANDB_HINT, project=_text(project, "project"), host=host
+    )
 
 
-def grelu_wandb_datasets(project: str, *, host: str = _WANDB_HOST, verbose: bool = True) -> list[str]:
+def grelu_wandb_datasets(
+    project: str, *, host: str = _WANDB_HOST, verbose: bool = True
+) -> list[str]:
     """List the datasets of a Weights & Biases project of the gReLU model zoo (network)."""
-    return _call("grelu.resources.wandb", "datasets", _WANDB_HINT, project=_text(project, "project"), host=host)
+    return _call(
+        "grelu.resources.wandb",
+        "datasets",
+        _WANDB_HINT,
+        project=_text(project, "project"),
+        host=host,
+    )
 
 
 def grelu_wandb_runs(
@@ -320,8 +421,15 @@ def grelu_wandb_runs(
     verbose: bool = True,
 ) -> list[Any]:
     """List one attribute of every run of a Weights & Biases project of the gReLU model zoo (network)."""
-    return _call("grelu.resources.wandb", "runs", _WANDB_HINT, project=_text(project, "project"), host=host,
-                 field=field, filters=dict(filters) if filters is not None else None)
+    return _call(
+        "grelu.resources.wandb",
+        "runs",
+        _WANDB_HINT,
+        project=_text(project, "project"),
+        host=host,
+        field=field,
+        filters=dict(filters) if filters is not None else None,
+    )
 
 
 def grelu_wandb_get_artifact(
@@ -333,8 +441,15 @@ def grelu_wandb_get_artifact(
     verbose: bool = True,
 ) -> Any:
     """Retrieve a Weights & Biases artifact of the gReLU model zoo by name and alias (network download)."""
-    return _call("grelu.resources.wandb", "get_artifact", _WANDB_HINT, name=_text(name, "name"),
-                 project=_text(project, "project"), host=host, alias=alias)
+    return _call(
+        "grelu.resources.wandb",
+        "get_artifact",
+        _WANDB_HINT,
+        name=_text(name, "name"),
+        project=_text(project, "project"),
+        host=host,
+        alias=alias,
+    )
 
 
 def grelu_wandb_get_dataset_by_model(
@@ -346,8 +461,15 @@ def grelu_wandb_get_dataset_by_model(
     verbose: bool = True,
 ) -> list[str]:
     """List the datasets linked to a model of the gReLU model zoo on Weights & Biases (network)."""
-    return _call("grelu.resources.wandb", "get_dataset_by_model", _WANDB_HINT, model_name=_text(model_name, "model_name"),
-                 project=_text(project, "project"), host=host, alias=alias)
+    return _call(
+        "grelu.resources.wandb",
+        "get_dataset_by_model",
+        _WANDB_HINT,
+        model_name=_text(model_name, "model_name"),
+        project=_text(project, "project"),
+        host=host,
+        alias=alias,
+    )
 
 
 def grelu_wandb_get_model_by_dataset(
@@ -359,9 +481,15 @@ def grelu_wandb_get_model_by_dataset(
     verbose: bool = True,
 ) -> list[str]:
     """List the models trained on a dataset of the gReLU model zoo on Weights & Biases (network)."""
-    return _call("grelu.resources.wandb", "get_model_by_dataset", _WANDB_HINT,
-                 dataset_name=_text(dataset_name, "dataset_name"), project=_text(project, "project"), host=host,
-                 alias=alias)
+    return _call(
+        "grelu.resources.wandb",
+        "get_model_by_dataset",
+        _WANDB_HINT,
+        dataset_name=_text(dataset_name, "dataset_name"),
+        project=_text(project, "project"),
+        host=host,
+        alias=alias,
+    )
 
 
 def grelu_wandb_load_model(
@@ -376,9 +504,18 @@ def grelu_wandb_load_model(
     verbose: bool = True,
 ) -> Any:
     """Load a gReLU model from a Weights & Biases project of the model zoo (network download)."""
-    return _call("grelu.resources.wandb", "load_model", _WANDB_HINT, project=_text(project, "project"),
-                 model_name=_text(model_name, "model_name"), device=device, host=host, alias=alias,
-                 checkpoint_file=checkpoint_file, weights_only=weights_only)
+    return _call(
+        "grelu.resources.wandb",
+        "load_model",
+        _WANDB_HINT,
+        project=_text(project, "project"),
+        model_name=_text(model_name, "model_name"),
+        device=device,
+        host=host,
+        alias=alias,
+        checkpoint_file=checkpoint_file,
+        weights_only=weights_only,
+    )
 
 
 _MAX_VALUES = 100_000
@@ -391,7 +528,11 @@ def _describe(value: Any) -> Any:
         return value
     if hasattr(value, "columns") and hasattr(value, "to_dict"):
         table = value.head(_MAX_ROWS)
-        return {"columns": [str(c) for c in value.columns], "rows": int(len(value)), "values": table.to_dict("list")}
+        return {
+            "columns": [str(c) for c in value.columns],
+            "rows": len(value),
+            "values": table.to_dict("list"),
+        }
     if hasattr(value, "tolist"):
         size = int(getattr(value, "size", 0))
         shape = [int(s) for s in getattr(value, "shape", ())]
@@ -399,7 +540,9 @@ def _describe(value: Any) -> Any:
             return {"shape": shape, "truncated": True}
         return {"shape": shape, "values": value.tolist()}
     if isinstance(value, (list, tuple)):
-        return list(value) if len(value) <= _MAX_VALUES else {"length": len(value), "truncated": True}
+        return (
+            list(value) if len(value) <= _MAX_VALUES else {"length": len(value), "truncated": True}
+        )
     return str(type(value).__name__)
 
 
@@ -411,11 +554,15 @@ def _numeric(value: Any, name: str, ndim: int | tuple[int, ...]) -> Any:
     except (TypeError, ValueError) as exc:
         raise ConfigurationError(f"{name} must be a numeric array.") from exc
     if array.ndim not in allowed or array.size == 0 or not np.isfinite(array).all():
-        raise ConfigurationError(f"{name} must be a finite array with {' or '.join(map(str, allowed))} dimensions.")
+        raise ConfigurationError(
+            f"{name} must be a finite array with {' or '.join(map(str, allowed))} dimensions."
+        )
     return array
 
 
-def _plot(function: str, output_path: str, inputs: Mapping[str, Any], options: Mapping[str, Any]) -> dict[str, Any]:
+def _plot(
+    function: str, output_path: str, inputs: Mapping[str, Any], options: Mapping[str, Any]
+) -> dict[str, Any]:
     """Draw one gReLU plot, save it as an image and return the image path with the plotted data."""
     image = _new_image(output_path, "output_path")
     plt = _upstream("matplotlib.pyplot", _PLOT_HINT)
@@ -449,8 +596,12 @@ def grelu_plot_distribution(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot a histogram, density or box plot of a list of values (gReLU plot_distribution)."""
-    return _plot("plot_distribution", output_path, {"values": list(values)},
-                 {"title": title, "method": method, "figsize": figsize})
+    return _plot(
+        "plot_distribution",
+        output_path,
+        {"values": list(values)},
+        {"title": title, "method": method, "figsize": figsize},
+    )
 
 
 def grelu_plot_pred_distribution(
@@ -464,9 +615,12 @@ def grelu_plot_pred_distribution(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot the distribution of model predictions for the positive and negative labels of each task (gReLU plot_pred_distribution)."""
-    return _plot("plot_pred_distribution", output_path, {"preds": _numeric(preds, "preds", 3),
-                                                         "labels": _numeric(labels, "labels", 3)},
-                 {"tasks": tasks, "bins": bins, "figsize": figsize})
+    return _plot(
+        "plot_pred_distribution",
+        output_path,
+        {"preds": _numeric(preds, "preds", 3), "labels": _numeric(labels, "labels", 3)},
+        {"tasks": tasks, "bins": bins, "figsize": figsize},
+    )
 
 
 def grelu_plot_pred_scatter(
@@ -481,9 +635,12 @@ def grelu_plot_pred_scatter(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Scatter plot of predictions against measured labels for each task (gReLU plot_pred_scatter)."""
-    return _plot("plot_pred_scatter", output_path, {"preds": _numeric(preds, "preds", 3),
-                                                    "labels": _numeric(labels, "labels", 3)},
-                 {"tasks": tasks, "bins": bins, "density": density, "figsize": figsize})
+    return _plot(
+        "plot_pred_scatter",
+        output_path,
+        {"preds": _numeric(preds, "preds", 3), "labels": _numeric(labels, "labels", 3)},
+        {"tasks": tasks, "bins": bins, "density": density, "figsize": figsize},
+    )
 
 
 def grelu_plot_binary_preds(
@@ -497,9 +654,12 @@ def grelu_plot_binary_preds(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot predicted probabilities of binary labels as box plots per class and task (gReLU plot_binary_preds)."""
-    return _plot("plot_binary_preds", output_path, {"preds": _numeric(preds, "preds", 3),
-                                                    "labels": _numeric(labels, "labels", 3)},
-                 {"tasks": tasks, "bins": bins, "figsize": figsize})
+    return _plot(
+        "plot_binary_preds",
+        output_path,
+        {"preds": _numeric(preds, "preds", 3), "labels": _numeric(labels, "labels", 3)},
+        {"tasks": tasks, "bins": bins, "figsize": figsize},
+    )
 
 
 def grelu_plot_calibration_curve(
@@ -515,10 +675,18 @@ def grelu_plot_calibration_curve(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot the calibration curve of predicted probabilities against observed binary labels (gReLU plot_calibration_curve)."""
-    return _plot("plot_calibration_curve", output_path, {"probs": _numeric(probs, "probs", (2, 3)),
-                                                         "labels": _numeric(labels, "labels", 3)},
-                 {"tasks": tasks, "bins": bins, "aggregate": aggregate, "figsize": figsize,
-                  "show_legend": show_legend})
+    return _plot(
+        "plot_calibration_curve",
+        output_path,
+        {"probs": _numeric(probs, "probs", (2, 3)), "labels": _numeric(labels, "labels", 3)},
+        {
+            "tasks": tasks,
+            "bins": bins,
+            "aggregate": aggregate,
+            "figsize": figsize,
+            "show_legend": show_legend,
+        },
+    )
 
 
 def grelu_plot_evolution(
@@ -543,8 +711,12 @@ def grelu_plot_gc_match(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Histogram of GC content of positive and GC-matched negative intervals (gReLU plot_gc_match; genome via genomepy)."""
-    return _plot("plot_gc_match", output_path, {"positives": positives, "negatives": negatives},
-                 {"binwidth": binwidth, "genome": genome, "figsize": figsize})
+    return _plot(
+        "plot_gc_match",
+        output_path,
+        {"positives": positives, "negatives": negatives},
+        {"binwidth": binwidth, "genome": genome, "figsize": figsize},
+    )
 
 
 def grelu_plot_attributions(
@@ -565,11 +737,24 @@ def grelu_plot_attributions(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot per-base attribution scores of one sequence as a bar track with optional highlights (gReLU plot_attributions)."""
-    return _plot("plot_attributions", output_path, {"attrs": _numeric(attrs, "attrs", 2)},
-                 {"start_pos": start_pos, "end_pos": end_pos, "figsize": figsize, "ticks": ticks,
-                  "highlight_centers": highlight_centers, "highlight_width": highlight_width,
-                  "highlight_positions": highlight_positions, "ylim": ylim, "facecolor": facecolor,
-                  "edgecolor": edgecolor, "alpha": alpha})
+    return _plot(
+        "plot_attributions",
+        output_path,
+        {"attrs": _numeric(attrs, "attrs", 2)},
+        {
+            "start_pos": start_pos,
+            "end_pos": end_pos,
+            "figsize": figsize,
+            "ticks": ticks,
+            "highlight_centers": highlight_centers,
+            "highlight_width": highlight_width,
+            "highlight_positions": highlight_positions,
+            "ylim": ylim,
+            "facecolor": facecolor,
+            "edgecolor": edgecolor,
+            "alpha": alpha,
+        },
+    )
 
 
 def grelu_plot_ism(
@@ -583,8 +768,12 @@ def grelu_plot_ism(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot an in-silico mutagenesis table as a heatmap or a line plot (gReLU plot_ISM)."""
-    return _plot("plot_ISM", output_path, {"ism_preds": ism_preds},
-                 {"start_pos": start_pos, "end_pos": end_pos, "figsize": figsize, "method": method})
+    return _plot(
+        "plot_ISM",
+        output_path,
+        {"ism_preds": ism_preds},
+        {"start_pos": start_pos, "end_pos": end_pos, "figsize": figsize, "method": method},
+    )
 
 
 def grelu_plot_tracks(
@@ -602,10 +791,21 @@ def grelu_plot_tracks(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot one or more prediction or signal tracks over a sequence window (gReLU plot_tracks)."""
-    return _plot("plot_tracks", output_path, {"tracks": _numeric(tracks, "tracks", 2)},
-                 {"start_pos": start_pos, "end_pos": end_pos, "titles": titles, "figsize": figsize,
-                  "highlight_intervals": highlight_intervals, "facecolor": facecolor, "edgecolor": edgecolor,
-                  "alpha": alpha})
+    return _plot(
+        "plot_tracks",
+        output_path,
+        {"tracks": _numeric(tracks, "tracks", 2)},
+        {
+            "start_pos": start_pos,
+            "end_pos": end_pos,
+            "titles": titles,
+            "figsize": figsize,
+            "highlight_intervals": highlight_intervals,
+            "facecolor": facecolor,
+            "edgecolor": edgecolor,
+            "alpha": alpha,
+        },
+    )
 
 
 def grelu_plot_attention_matrix(
@@ -619,9 +819,17 @@ def grelu_plot_attention_matrix(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Heatmap of an attention matrix of a transformer model over a sequence window (gReLU plot_attention_matrix)."""
-    return _plot("plot_attention_matrix", output_path, {"attn": _numeric(attn, "attn", 2)},
-                 {"start_pos": start_pos, "end_pos": end_pos, "highlight_intervals": highlight_intervals,
-                  "figsize": figsize})
+    return _plot(
+        "plot_attention_matrix",
+        output_path,
+        {"attn": _numeric(attn, "attn", 2)},
+        {
+            "start_pos": start_pos,
+            "end_pos": end_pos,
+            "highlight_intervals": highlight_intervals,
+            "figsize": figsize,
+        },
+    )
 
 
 def grelu_plot_motif(
@@ -646,9 +854,12 @@ def grelu_plot_position_effect(
     verbose: bool = True,
 ) -> dict[str, Any]:
     """Plot how the model output changes with the position of an inserted motif (gReLU plot_position_effect)."""
-    return _plot("plot_position_effect", output_path,
-                 {"preds": _numeric(preds, "preds", 2), "positions": list(positions)},
-                 {"title": title, "xlab": xlab, "figsize": figsize})
+    return _plot(
+        "plot_position_effect",
+        output_path,
+        {"preds": _numeric(preds, "preds", 2), "positions": list(positions)},
+        {"title": title, "xlab": xlab, "figsize": figsize},
+    )
 
 
 __all__ = [

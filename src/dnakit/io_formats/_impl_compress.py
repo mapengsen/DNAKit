@@ -6,8 +6,6 @@ always gives the same output, and decompression returns the exact bytes again.  
 ``options['output']`` is given.
 """
 
-# ruff: noqa: E501
-
 from __future__ import annotations
 
 import base64
@@ -116,7 +114,9 @@ def _tar_directory(root: Path, limit: int) -> bytes:
 
     buffer = io.BytesIO()
     total = 0
-    with tarfile.open(fileobj=buffer, mode="w", format=tarfile.GNU_FORMAT, encoding="utf-8") as archive:
+    with tarfile.open(
+        fileobj=buffer, mode="w", format=tarfile.GNU_FORMAT, encoding="utf-8"
+    ) as archive:
         for arcname, full, is_dir in _walk(str(root), ""):
             info = tarfile.TarInfo(arcname)
             info.mtime, info.uid, info.gid, info.uname, info.gname = 0, 0, 0, "", ""
@@ -194,7 +194,8 @@ def _extract_tar(archive: tarfile.TarFile, target: Path, overwrite: bool, limit:
         for depth in range(1, len(parts)):
             if kinds.get(parts[:depth]) == "file":
                 raise bad_input(
-                    f"Archive member {member.name!r} lies below a file.", code="IO_FORMATS_BAD_ARCHIVE"
+                    f"Archive member {member.name!r} lies below a file.",
+                    code="IO_FORMATS_BAD_ARCHIVE",
                 )
         previous = kinds.get(parts)
         if previous is not None and (previous != kind or kind == "file"):
@@ -427,7 +428,9 @@ def _decompress(fmt: str, function: str, source: object, opts: Opts) -> dict[str
 # ---------------------------------------------------------------------------------------------
 
 
-def run(function_name: str, input: object, options: Mapping[str, object] | None) -> dict[str, object]:
+def run(
+    function_name: str, input: object, options: Mapping[str, object] | None
+) -> dict[str, object]:
     """Execute ``compress_<format>`` or ``decompress_<format>`` and wrap the result in the envelope."""
 
     operation, _, fmt = function_name.partition("_")

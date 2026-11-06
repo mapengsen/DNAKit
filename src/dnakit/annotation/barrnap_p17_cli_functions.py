@@ -67,7 +67,9 @@ def _genetic_code(value: int | str) -> str:
     if value == "auto":
         return "auto"
     if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 33:
-        raise ConfigurationError("genetic_code must be 'auto' or a translation table number from 1 to 33.")
+        raise ConfigurationError(
+            "genetic_code must be 'auto' or a translation table number from 1 to 33."
+        )
     return str(value)
 
 
@@ -127,7 +129,9 @@ def predict_mrna_features_barrnap(
     arguments += inputs
     stderr_file = output.with_name(output.name + ".stderr")
     if stderr_file.exists():
-        raise ConfigurationError(f"A diagnostic file already exists next to output_gff: {stderr_file}")
+        raise ConfigurationError(
+            f"A diagnostic file already exists next to output_gff: {stderr_file}"
+        )
     config = _common.ExecutionConfig(threads=cores, timeout_seconds=_cli.DEFAULT_TIMEOUT_SECONDS)
     return_code = 0
     try:

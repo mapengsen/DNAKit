@@ -8,8 +8,9 @@ JSON-serialisable dictionaries with status, backend, command, outputs and a boun
 from __future__ import annotations
 
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import execute_bounded_command
@@ -31,9 +32,15 @@ def _program(sourmash_path: str | None) -> str:
     return found
 
 
-def _run(args: list[str], cwd: Path, outputs: Sequence[Path], sourmash_path: str | None) -> dict[str, Any]:
-    result = execute_bounded_command(_program(sourmash_path), args, backend_id="sourmash", cwd=cwd, verbose=False)
-    status = "completed" if result.return_code == 0 and all(p.is_file() for p in outputs) else "failed"
+def _run(
+    args: list[str], cwd: Path, outputs: Sequence[Path], sourmash_path: str | None
+) -> dict[str, Any]:
+    result = execute_bounded_command(
+        _program(sourmash_path), args, backend_id="sourmash", cwd=cwd, verbose=False
+    )
+    status = (
+        "completed" if result.return_code == 0 and all(p.is_file() for p in outputs) else "failed"
+    )
     return {
         "status": status,
         "backend": "sourmash",
@@ -121,7 +128,17 @@ def search_signatures(
     out = _new(output_csv, "output_csv")
     if not 0 <= threshold <= 1:
         raise ConfigurationError("threshold must be between 0 and 1.")
-    args = ["search", str(q), str(db), "-k", str(ksize), "--threshold", str(threshold), "-o", str(out)]
+    args = [
+        "search",
+        str(q),
+        str(db),
+        "-k",
+        str(ksize),
+        "--threshold",
+        str(threshold),
+        "-o",
+        str(out),
+    ]
     if containment:
         args.append("--containment")
     return _run(args, out.parent, [out], sourmash_path)
@@ -146,7 +163,17 @@ def gather_signatures(
     out = _new(output_csv, "output_csv")
     if threshold_bp < 0:
         raise ConfigurationError("threshold_bp must not be negative.")
-    args = ["gather", str(q), str(db), "-k", str(ksize), "-o", str(out), "--threshold-bp", str(threshold_bp)]
+    args = [
+        "gather",
+        str(q),
+        str(db),
+        "-k",
+        str(ksize),
+        "-o",
+        str(out),
+        "--threshold-bp",
+        str(threshold_bp),
+    ]
     return _run(args, out.parent, [out], sourmash_path)
 
 
@@ -167,7 +194,9 @@ def index_signatures(
     written = out.parent / (out.name + ".sbt.zip")
     if written.exists():
         raise ConfigurationError(f"output_database must not exist yet: {written}")
-    result = _run(["index", str(out), *paths, "-k", str(ksize)], out.parent, [written], sourmash_path)
+    result = _run(
+        ["index", str(out), *paths, "-k", str(ksize)], out.parent, [written], sourmash_path
+    )
     result["database"] = str(written)
     return result
 
@@ -180,8 +209,13 @@ def describe_signature(
 ) -> dict[str, Any]:
     """Describe the contents of a signature file: k-mer sizes, scaled value and name (sourmash sig describe)."""
     sig = _existing(signature, "signature")
-    result = execute_bounded_command(_program(sourmash_path), ["sig", "describe", str(sig)],
-                                     backend_id="sourmash", cwd=sig.parent, verbose=False)
+    result = execute_bounded_command(
+        _program(sourmash_path),
+        ["sig", "describe", str(sig)],
+        backend_id="sourmash",
+        cwd=sig.parent,
+        verbose=False,
+    )
     return {
         "status": "completed" if result.return_code == 0 else "failed",
         "backend": "sourmash",
@@ -254,7 +288,12 @@ def downsample_signature(
         raise ConfigurationError("scaled must be a positive integer.")
     sig = str(_existing(signature, "signature"))
     out = _new(output_signature, "output_signature")
-    return _run(["sig", "downsample", sig, "--scaled", str(scaled), "-o", str(out)], out.parent, [out], sourmash_path)
+    return _run(
+        ["sig", "downsample", sig, "--scaled", str(scaled), "-o", str(out)],
+        out.parent,
+        [out],
+        sourmash_path,
+    )
 
 
 def concatenate_signatures(
@@ -309,8 +348,13 @@ def signature_file_info(
 ) -> dict[str, Any]:
     """Report file-level information about a signature file (sourmash sig fileinfo)."""
     sig = _existing(signature, "signature")
-    result = execute_bounded_command(_program(sourmash_path), ["sig", "fileinfo", str(sig)],
-                                     backend_id="sourmash", cwd=sig.parent, verbose=False)
+    result = execute_bounded_command(
+        _program(sourmash_path),
+        ["sig", "fileinfo", str(sig)],
+        backend_id="sourmash",
+        cwd=sig.parent,
+        verbose=False,
+    )
     return {
         "status": "completed" if result.return_code == 0 else "failed",
         "backend": "sourmash",
@@ -355,7 +399,16 @@ def extract_signatures(
         raise ConfigurationError("collection must contain at least one signature file.")
     paths = [str(_existing(s, "signature")) for s in collection]
     out = _new(output_signature, "output_signature")
-    args = ["sig", "extract", *paths, "-k", str(ksize), "-o", str(out), "--dna" if dna else "--protein"]
+    args = [
+        "sig",
+        "extract",
+        *paths,
+        "-k",
+        str(ksize),
+        "-o",
+        str(out),
+        "--dna" if dna else "--protein",
+    ]
     return _run(args, out.parent, [out], sourmash_path)
 
 
@@ -409,7 +462,18 @@ def prefetch_signatures(
         raise ConfigurationError("databases must list at least one signature collection.")
     dbs = [str(_existing(d, "database")) for d in databases]
     out = _new(output_csv, "output_csv")
-    args = ["prefetch", q, *dbs, "-k", str(ksize), "--dna", "--threshold-bp", str(threshold_bp), "-o", str(out)]
+    args = [
+        "prefetch",
+        q,
+        *dbs,
+        "-k",
+        str(ksize),
+        "--dna",
+        "--threshold-bp",
+        str(threshold_bp),
+        "-o",
+        str(out),
+    ]
     return _run(args, out.parent, [out], sourmash_path)
 
 
@@ -431,8 +495,20 @@ def multigather_signatures(
     folder = Path(output_dir).expanduser().resolve()
     folder.mkdir(parents=True, exist_ok=True)
     before = {p.name for p in folder.iterdir()}
-    args = ["multigather", "--query", *qs, "--db", *dbs, "-k", str(ksize), "--dna",
-            "--threshold-bp", str(threshold_bp), "--output-dir", str(folder)]
+    args = [
+        "multigather",
+        "--query",
+        *qs,
+        "--db",
+        *dbs,
+        "-k",
+        str(ksize),
+        "--dna",
+        "--threshold-bp",
+        str(threshold_bp),
+        "--output-dir",
+        str(folder),
+    ]
     result = _run(args, folder, [], sourmash_path)
     produced = sorted(p for p in folder.iterdir() if p.name not in before)
     result["outputs"] = [str(p) for p in produced]
@@ -458,7 +534,18 @@ def categorize_signatures(
     db = str(_existing(database, "database"))
     qs = [str(_existing(q, "query")) for q in queries]
     out = _new(output_csv, "output_csv")
-    args = ["categorize", db, *qs, "-k", str(ksize), "--dna", "--threshold", str(threshold), "--csv", str(out)]
+    args = [
+        "categorize",
+        db,
+        *qs,
+        "-k",
+        str(ksize),
+        "--dna",
+        "--threshold",
+        str(threshold),
+        "--csv",
+        str(out),
+    ]
     return _run(args, out.parent, [out], sourmash_path)
 
 
@@ -472,8 +559,13 @@ def overlap_signatures(
     """Report Jaccard similarity, containment and shared/unique hash counts of two signatures (sourmash sig overlap)."""
     a = _existing(signature_a, "signature_a")
     b = _existing(signature_b, "signature_b")
-    result = execute_bounded_command(_program(sourmash_path), ["sig", "overlap", str(a), str(b)],
-                                     backend_id="sourmash", cwd=a.parent, verbose=False)
+    result = execute_bounded_command(
+        _program(sourmash_path),
+        ["sig", "overlap", str(a), str(b)],
+        backend_id="sourmash",
+        cwd=a.parent,
+        verbose=False,
+    )
     text = result.output or ""
     values: dict[str, float] = {}
     for line in text.splitlines():
@@ -507,7 +599,18 @@ def extract_signature_kmers(
     sig = str(_existing(signature, "signature"))
     seqs = [str(_existing(s, "sequence file")) for s in sequences]
     out = _new(output_sequences, "output_sequences")
-    args = ["sig", "kmers", "--signatures", sig, "--sequences", *seqs, "-k", str(ksize), "--save-sequences", str(out)]
+    args = [
+        "sig",
+        "kmers",
+        "--signatures",
+        sig,
+        "--sequences",
+        *seqs,
+        "-k",
+        str(ksize),
+        "--save-sequences",
+        str(out),
+    ]
     return _run(args, out.parent, [out], sourmash_path)
 
 
@@ -522,7 +625,9 @@ def export_signature_to_mash(
     """Export a signature to the Mash JSON dump format (sourmash sig export)."""
     sig = str(_existing(signature, "signature"))
     out = _new(output_json, "output_json")
-    return _run(["sig", "export", sig, "-k", str(ksize), "-o", str(out)], out.parent, [out], sourmash_path)
+    return _run(
+        ["sig", "export", sig, "-k", str(ksize), "-o", str(out)], out.parent, [out], sourmash_path
+    )
 
 
 def sketch_translated_dna(
@@ -557,7 +662,9 @@ def plot_comparison_matrix(
     before = {p.name for p in folder.iterdir()}
     result = _run(["plot", str(matrix), "--output-dir", str(folder)], folder, [], sourmash_path)
     images = sorted(p for p in folder.iterdir() if p.name not in before and p.suffix == ".png")
-    result["outputs"] = [str(p) for p in sorted(p for p in folder.iterdir() if p.name not in before)]
+    result["outputs"] = [
+        str(p) for p in sorted(p for p in folder.iterdir() if p.name not in before)
+    ]
     result["status"] = "completed" if result["return_code"] == 0 and images else "failed"
     result["image"] = str(images[0]) if images else None
     return result
@@ -583,14 +690,24 @@ def check_signatures_against_picklist(
         raise ConfigurationError("signatures must list at least one file.")
     sigs = [str(_existing(f, "signature")) for f in signatures]
     missing = _new(output_missing_csv, "output_missing_csv")
-    args = ["sig", "check", *sigs, "--picklist", picklist, "-o", str(missing), "--no-require-manifest"]
+    args = [
+        "sig",
+        "check",
+        *sigs,
+        "--picklist",
+        picklist,
+        "-o",
+        str(missing),
+        "--no-require-manifest",
+    ]
     outputs = [missing]
     if output_manifest is not None:
         manifest = _new(output_manifest, "output_manifest")
         args += ["-m", str(manifest)]
         outputs.append(manifest)
-    result = execute_bounded_command(_program(sourmash_path), args, backend_id="sourmash",
-                                     cwd=missing.parent, verbose=False)
+    result = execute_bounded_command(
+        _program(sourmash_path), args, backend_id="sourmash", cwd=missing.parent, verbose=False
+    )
     return {
         "status": "completed" if result.return_code in (0, 1) else "failed",
         "backend": "sourmash",
@@ -614,7 +731,12 @@ def collect_signature_manifests(
         raise ConfigurationError("signatures must list at least one file.")
     sigs = [str(_existing(f, "signature")) for f in signatures]
     out = _new(output_manifest, "output_manifest")
-    return _run(["sig", "collect", *sigs, "-o", str(out), "--no-require-manifest"], out.parent, [out], sourmash_path)
+    return _run(
+        ["sig", "collect", *sigs, "-o", str(out), "--no-require-manifest"],
+        out.parent,
+        [out],
+        sourmash_path,
+    )
 
 
 def ingest_mash_csv(
@@ -629,7 +751,9 @@ def ingest_mash_csv(
         raise ConfigurationError("csv_files must list at least one file.")
     files = [str(_existing(f, "csv file")) for f in csv_files]
     out = _new(output_signature, "output_signature")
-    return _run(["sig", "ingest", "--csv", *files, "-o", str(out)], out.parent, [out], sourmash_path)
+    return _run(
+        ["sig", "ingest", "--csv", *files, "-o", str(out)], out.parent, [out], sourmash_path
+    )
 
 
 def index_lca_database(
@@ -649,7 +773,18 @@ def index_lca_database(
     sigs = [str(_existing(f, "signature")) for f in signatures]
     lineages = str(_existing(lineages_csv, "lineages_csv"))
     out = _new(output_database, "output_database")
-    args = ["lca", "index", lineages, str(out), *sigs, "-k", str(ksize), "--scaled", str(scaled), "--dna"]
+    args = [
+        "lca",
+        "index",
+        lineages,
+        str(out),
+        *sigs,
+        "-k",
+        str(ksize),
+        "--scaled",
+        str(scaled),
+        "--dna",
+    ]
     if split_identifiers:
         args.append("--split-identifiers")
     return _run(args, out.parent, [out], sourmash_path)
@@ -671,43 +806,54 @@ def classify_with_lca(
     qs = [str(_existing(q, "query")) for q in queries]
     dbs = [str(_existing(d, "database")) for d in databases]
     out = _new(output_csv, "output_csv")
-    args = ["lca", "classify", "--query", *qs, "--db", *dbs, "--threshold", str(threshold), "-o", str(out)]
+    args = [
+        "lca",
+        "classify",
+        "--query",
+        *qs,
+        "--db",
+        *dbs,
+        "--threshold",
+        str(threshold),
+        "-o",
+        str(out),
+    ]
     if majority:
         args.append("--majority")
     return _run(args, out.parent, [out], sourmash_path)
 
 
 __all__ = [
+    "categorize_signatures",
     "check_signatures_against_picklist",
     "classify_with_lca",
     "collect_signature_manifests",
-    "index_lca_database",
-    "ingest_mash_csv",
-    "categorize_signatures",
+    "compare_signatures",
+    "concatenate_signatures",
+    "describe_signature",
+    "downsample_signature",
     "export_signature_to_mash",
     "extract_signature_kmers",
+    "extract_signatures",
+    "filter_signature_abundance",
+    "flatten_signature",
+    "gather_signatures",
+    "index_lca_database",
+    "index_signatures",
+    "ingest_mash_csv",
+    "intersect_signatures",
+    "manifest_signature",
+    "merge_signatures",
     "multigather_signatures",
     "overlap_signatures",
     "plot_comparison_matrix",
     "prefetch_signatures",
-    "sketch_translated_dna",
-    "compare_signatures",
-    "concatenate_signatures",
-    "extract_signatures",
-    "filter_signature_abundance",
-    "manifest_signature",
-    "split_signatures",
-    "downsample_signature",
-    "flatten_signature",
     "rename_signature",
-    "signature_file_info",
-    "intersect_signatures",
-    "merge_signatures",
-    "subtract_signatures",
-    "describe_signature",
-    "gather_signatures",
-    "index_signatures",
     "search_signatures",
+    "signature_file_info",
     "sketch_dna",
+    "sketch_translated_dna",
+    "split_signatures",
+    "subtract_signatures",
 ]
 _register_public_verbose(globals())

@@ -17,7 +17,7 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 pytest.importorskip("hgvs")
 context = pytest.importorskip("hgvs.utils.context")
 
-from dnakit.variants import hgvs_gap_functions as facades  # noqa: E402
+from dnakit.variants import hgvs_gap_functions as facades
 
 INSERTION = "NM_000399.3:c.2689_2690insA"
 DUPLICATION = "NC_000010.10:g.64572045dupT"
@@ -33,7 +33,9 @@ def test_public_functions_are_keyword_only_verbose():
 def test_sequence_line_matches_hgvs_layout():
     from hgvs.parser import Parser
 
-    line = facades.hgvs_sequence_line(INSERTION, (2680, 2700), "ACGTACGTAC", direction=">", verbose=False)
+    line = facades.hgvs_sequence_line(
+        INSERTION, (2680, 2700), "ACGTACGTAC", direction=">", verbose=False
+    )
     expected = context.seq_line_fmt(
         var=Parser().parse_hgvs_variant(INSERTION), span=(2680, 2700), content="ACGTACGTAC", dir=">"
     )

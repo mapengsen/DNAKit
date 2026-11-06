@@ -24,8 +24,8 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
 from dnakit.exceptions import BackendExecutionError, ConfigurationError, DownloadError
 from dnakit.molecular_lab.varcode_gap_functions import (
-    _VARCODE_EXTRA,
     _PYENSEMBL_EXTRA,
+    _VARCODE_EXTRA,
     _document,
     _genome,
 )
@@ -39,7 +39,9 @@ _MAX_VARIANTS = 10000
 
 def _names(value: object) -> list[str]:
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
-        raise ConfigurationError("reference_names must be a list of reference names such as GRCh38.")
+        raise ConfigurationError(
+            "reference_names must be a list of reference names such as GRCh38."
+        )
     if not 1 <= len(value) <= _MAX_NAMES:
         raise ConfigurationError(f"reference_names must hold 1 to {_MAX_NAMES} names.")
     names: list[str] = []
@@ -59,18 +61,24 @@ def _integer(value: object, name: str) -> int:
 
 def _variant(item: object, index: int) -> dict[str, Any]:
     if not isinstance(item, Mapping):
-        raise ConfigurationError(f"variants[{index}] must be a mapping with contig, position, ref and alt.")
+        raise ConfigurationError(
+            f"variants[{index}] must be a mapping with contig, position, ref and alt."
+        )
     missing = [key for key in ("contig", "position", "ref", "alt") if key not in item]
     if missing:
         raise ConfigurationError(f"variants[{index}] is missing {', '.join(missing)}.")
     contig = item["contig"]
     if not isinstance(contig, str) or not _CONTIG_PATTERN.match(contig):
-        raise ConfigurationError(f"variants[{index}].contig must be a chromosome name such as chr1.")
+        raise ConfigurationError(
+            f"variants[{index}].contig must be a chromosome name such as chr1."
+        )
     ref = item["ref"]
     alt = item["alt"]
     for label, allele in (("ref", ref), ("alt", alt)):
         if not isinstance(allele, str) or not _BASES_PATTERN.match(allele.upper()):
-            raise ConfigurationError(f"variants[{index}].{label} must be a DNA allele (A, C, G, T or N).")
+            raise ConfigurationError(
+                f"variants[{index}].{label} must be a DNA allele (A, C, G, T or N)."
+            )
     return {
         "contig": contig,
         "position": _integer(item["position"], f"variants[{index}].position"),
@@ -172,7 +180,13 @@ def varcode_variant_gene_overlaps(
     failures = 0
     for index, item in enumerate(parsed):
         label = f"{item['contig']}:{item['position']}:{item['ref']}>{item['alt']}"
-        entry: dict[str, Any] = {"variant_index": index, "variant": label, **item, "genes": [], "error": None}
+        entry: dict[str, Any] = {
+            "variant_index": index,
+            "variant": label,
+            **item,
+            "genes": [],
+            "error": None,
+        }
         try:
             variant = varcode.Variant(
                 item["contig"],

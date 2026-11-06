@@ -13,8 +13,12 @@ from dnakit.exceptions import ConfigurationError
 
 
 def draw_genome_promoters(
-    promoters: Sequence[Mapping[str, Any]], output_path: str, *,
-    segment_size: int, segment_name: str = "genome", verbose: bool = True,
+    promoters: Sequence[Mapping[str, Any]],
+    output_path: str,
+    *,
+    segment_size: int,
+    segment_name: str = "genome",
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Draw promoter arrows using FeatureSegment.add_promoter and return image path plus glyph data.
 
@@ -31,8 +35,14 @@ def draw_genome_promoters(
     if isinstance(promoters, (str, bytes)) or not isinstance(promoters, Sequence) or not promoters:
         raise ConfigurationError("promoters must be a non-empty list.")
     target = Path(output_path).expanduser().resolve()
-    if target.suffix.lower() not in (".png", ".svg", ".pdf") or target.exists() or not target.parent.is_dir():
-        raise ConfigurationError("output_path must be a new PNG, SVG or PDF file in an existing directory.")
+    if (
+        target.suffix.lower() not in (".png", ".svg", ".pdf")
+        or target.exists()
+        or not target.parent.is_dir()
+    ):
+        raise ConfigurationError(
+            "output_path must be a new PNG, SVG or PDF file in an existing directory."
+        )
     graph = pgv.GenomeViz()
     track = graph.add_feature_track(segment_name, segment_size)
     segment = track.get_segment() if modern else None
@@ -40,8 +50,16 @@ def draw_genome_promoters(
     for item in promoters:
         if not isinstance(item, Mapping):
             raise ConfigurationError("Each promoter must be a mapping.")
-        position, strand, length = item.get("position"), item.get("strand", 1), item.get("length", 0.02)
-        if isinstance(position, bool) or not isinstance(position, (int, float)) or not 0 <= position <= segment_size:
+        position, strand, length = (
+            item.get("position"),
+            item.get("strand", 1),
+            item.get("length", 0.02),
+        )
+        if (
+            isinstance(position, bool)
+            or not isinstance(position, (int, float))
+            or not 0 <= position <= segment_size
+        ):
             raise ConfigurationError("position must lie inside the segment.")
         if isinstance(strand, bool) or strand not in (-1, 1):
             raise ConfigurationError("strand must be +1 or -1.")
@@ -53,8 +71,16 @@ def draw_genome_promoters(
         color = str(item.get("color", "black"))
         if modern:
             segment.add_promoter(float(position), float(length), strand=strand, color=color)
-        rows.append({"position": position, "strand": strand, "length": length, "color": color,
-                     "arrow_start": [float(position), 0.0], "arrow_end": [endpoint, 1.0]})
+        rows.append(
+            {
+                "position": position,
+                "strand": strand,
+                "length": length,
+                "color": color,
+                "arrow_start": [float(position), 0.0],
+                "arrow_end": [endpoint, 1.0],
+            }
+        )
     pyplot = require("matplotlib.pyplot", "bio-pygenomeviz")
     try:
         figure = graph.plotfig()
@@ -63,16 +89,34 @@ def draw_genome_promoters(
     try:
         if not modern:
             for row in rows:
-                track.ax.annotate("", xy=row["arrow_end"], xytext=row["arrow_start"],
-                    arrowprops={"arrowstyle": "-|>,head_length=1,head_width=0.5",
-                                "connectionstyle": "angle", "shrinkA": 0, "shrinkB": 0,
-                                "color": row["color"]}, annotation_clip=False)
+                track.ax.annotate(
+                    "",
+                    xy=row["arrow_end"],
+                    xytext=row["arrow_start"],
+                    arrowprops={
+                        "arrowstyle": "-|>,head_length=1,head_width=0.5",
+                        "connectionstyle": "angle",
+                        "shrinkA": 0,
+                        "shrinkB": 0,
+                        "color": row["color"],
+                    },
+                    annotation_clip=False,
+                )
         figure.savefig(target, bbox_inches="tight")
     finally:
         pyplot.close(figure)
-    return {"status": "completed", "image_path": str(target), "promoters": rows,
-            "segment_size": segment_size, "provenance": {"pygenomeviz": version("pygenomeviz"),
-            "method": "FeatureSegment.add_promoter" if modern else "feature-track matplotlib promoter geometry"}}
+    return {
+        "status": "completed",
+        "image_path": str(target),
+        "promoters": rows,
+        "segment_size": segment_size,
+        "provenance": {
+            "pygenomeviz": version("pygenomeviz"),
+            "method": "FeatureSegment.add_promoter"
+            if modern
+            else "feature-track matplotlib promoter geometry",
+        },
+    }
 
 
 __all__ = ["draw_genome_promoters"]

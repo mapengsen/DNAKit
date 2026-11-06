@@ -54,7 +54,9 @@ _MAX_LOCAL_SEQUENCE = 5_000_000
 
 def _text(value: object, name: str, *, maximum: int = 500) -> str:
     if not isinstance(value, str) or not value.strip() or len(value) > maximum or "\x00" in value:
-        raise ConfigurationError(f"{name} must be a non-empty string of at most {maximum} characters.")
+        raise ConfigurationError(
+            f"{name} must be a non-empty string of at most {maximum} characters."
+        )
     return value.strip()
 
 
@@ -104,7 +106,15 @@ def _hgvs_call(action: Any, message: str) -> Any:
         raise
     except exceptions.HGVSError as exc:
         raise ConfigurationError(f"{message}: {type(exc).__name__}: {exc}") from exc
-    except (AssertionError, AttributeError, IndexError, KeyError, TypeError, ValueError, RuntimeError) as exc:
+    except (
+        AssertionError,
+        AttributeError,
+        IndexError,
+        KeyError,
+        TypeError,
+        ValueError,
+        RuntimeError,
+    ) as exc:
         raise ConfigurationError(f"{message}: {type(exc).__name__}: {exc}") from exc
 
 
@@ -129,35 +139,66 @@ def _check_local_data(data: object) -> dict[str, Any]:
     unknown = set(data) - {"sequences", "transcripts", "alignments", "genes", "assemblies"}
     if unknown:
         raise ConfigurationError(f"local_data has unknown keys: {sorted(unknown)}.")
-    result: dict[str, Any] = {"sequences": {}, "transcripts": {}, "alignments": [], "genes": {}, "assemblies": {}}
+    result: dict[str, Any] = {
+        "sequences": {},
+        "transcripts": {},
+        "alignments": [],
+        "genes": {},
+        "assemblies": {},
+    }
     sequences = data.get("sequences") or {}
     if not isinstance(sequences, Mapping):
         raise ConfigurationError("local_data['sequences'] must map accessions to sequences.")
     for key, value in sequences.items():
-        if not isinstance(key, str) or not isinstance(value, str) or len(value) > _MAX_LOCAL_SEQUENCE:
-            raise ConfigurationError("local_data['sequences'] must map accession strings to sequence strings.")
+        if (
+            not isinstance(key, str)
+            or not isinstance(value, str)
+            or len(value) > _MAX_LOCAL_SEQUENCE
+        ):
+            raise ConfigurationError(
+                "local_data['sequences'] must map accession strings to sequence strings."
+            )
         result["sequences"][key] = value.upper()
     transcripts = data.get("transcripts") or {}
     if not isinstance(transcripts, Mapping):
-        raise ConfigurationError("local_data['transcripts'] must map transcript accessions to records.")
+        raise ConfigurationError(
+            "local_data['transcripts'] must map transcript accessions to records."
+        )
     for key, record in transcripts.items():
-        if not isinstance(record, Mapping) or set(record) - {"hgnc", "cds_start_i", "cds_end_i", "pro_ac"}:
+        if not isinstance(record, Mapping) or set(record) - {
+            "hgnc",
+            "cds_start_i",
+            "cds_end_i",
+            "pro_ac",
+        }:
             raise ConfigurationError(
                 f"local_data['transcripts'][{key!r}] must hold hgnc, cds_start_i, cds_end_i and pro_ac only."
             )
         start, end = record.get("cds_start_i"), record.get("cds_end_i")
         if (start is None) != (end is None):
-            raise ConfigurationError(f"transcript {key!r}: cds_start_i and cds_end_i must both be set or both null.")
+            raise ConfigurationError(
+                f"transcript {key!r}: cds_start_i and cds_end_i must both be set or both null."
+            )
         result["transcripts"][key] = dict(record)
     alignments = data.get("alignments") or []
     if isinstance(alignments, (str, bytes)) or not isinstance(alignments, Sequence):
         raise ConfigurationError("local_data['alignments'] must be a list.")
     required = {"ord", "tx_start_i", "tx_end_i", "alt_start_i", "alt_end_i", "cigar"}
     for index, alignment in enumerate(alignments):
-        if not isinstance(alignment, Mapping) or set(alignment) - {"tx_ac", "alt_ac", "alt_aln_method", "alt_strand", "exons"}:
-            raise ConfigurationError(f"local_data['alignments'][{index}] has unknown or missing structure.")
+        if not isinstance(alignment, Mapping) or set(alignment) - {
+            "tx_ac",
+            "alt_ac",
+            "alt_aln_method",
+            "alt_strand",
+            "exons",
+        }:
+            raise ConfigurationError(
+                f"local_data['alignments'][{index}] has unknown or missing structure."
+            )
         if alignment.get("tx_ac") not in result["transcripts"]:
-            raise ConfigurationError(f"alignments[{index}].tx_ac is not in local_data['transcripts'].")
+            raise ConfigurationError(
+                f"alignments[{index}].tx_ac is not in local_data['transcripts']."
+            )
         if alignment.get("alt_strand") not in (1, -1):
             raise ConfigurationError(f"alignments[{index}].alt_strand must be 1 or -1.")
         exons = alignment.get("exons")
@@ -165,7 +206,9 @@ def _check_local_data(data: object) -> dict[str, Any]:
             raise ConfigurationError(f"alignments[{index}].exons must be a non-empty list.")
         for exon in exons:
             if not isinstance(exon, Mapping) or set(exon) != required:
-                raise ConfigurationError(f"alignments[{index}] exons need exactly the keys {sorted(required)}.")
+                raise ConfigurationError(
+                    f"alignments[{index}] exons need exactly the keys {sorted(required)}."
+                )
         result["alignments"].append(
             {
                 "tx_ac": alignment["tx_ac"],
@@ -181,7 +224,9 @@ def _check_local_data(data: object) -> dict[str, Any]:
     result["genes"] = {str(k): dict(v) for k, v in genes.items()}
     assemblies = data.get("assemblies") or {}
     if not isinstance(assemblies, Mapping):
-        raise ConfigurationError("local_data['assemblies'] must map assembly names to accession maps.")
+        raise ConfigurationError(
+            "local_data['assemblies'] must map assembly names to accession maps."
+        )
     result["assemblies"] = {str(k): dict(v) for k, v in assemblies.items()}
     return result
 
@@ -223,12 +268,16 @@ def _provider_class() -> Any:
             try:
                 sequence = self._data["sequences"][ac]
             except KeyError:
-                raise exceptions.HGVSDataNotAvailableError(f"No sequence for {ac} in the local data") from None
+                raise exceptions.HGVSDataNotAvailableError(
+                    f"No sequence for {ac} in the local data"
+                ) from None
             return sequence[start_i:end_i]
 
         def get_acs_for_protein_seq(self, seq: str) -> list[str]:
             md5 = digests.seq_md5(seq)
-            return [ac for ac, value in self._data["sequences"].items() if value == seq.upper()] + ["MD5_" + md5]
+            return [ac for ac, value in self._data["sequences"].items() if value == seq.upper()] + [
+                "MD5_" + md5
+            ]
 
         def get_gene_info(self, gene: str) -> dict[str, Any] | None:
             record = self._data["genes"].get(gene)
@@ -251,7 +300,9 @@ def _provider_class() -> Any:
                 )
             return sorted(rows, key=lambda row: row["alt_start_i"])
 
-        def get_tx_exons(self, tx_ac: str, alt_ac: str, alt_aln_method: str) -> list[dict[str, Any]]:
+        def get_tx_exons(
+            self, tx_ac: str, alt_ac: str, alt_aln_method: str
+        ) -> list[dict[str, Any]]:
             for alignment in self._alignments(tx_ac):
                 if alignment["alt_ac"] == alt_ac and alignment["alt_aln_method"] == alt_aln_method:
                     rows = self._exon_rows(alignment)
@@ -285,7 +336,9 @@ def _provider_class() -> Any:
                 "alt_aln_method": alignment["alt_aln_method"],
             }
 
-        def get_tx_for_region(self, alt_ac: str, alt_aln_method: str, start_i: int, end_i: int) -> list[dict[str, Any]]:
+        def get_tx_for_region(
+            self, alt_ac: str, alt_aln_method: str, start_i: int, end_i: int
+        ) -> list[dict[str, Any]]:
             return self.get_alignments_for_region(alt_ac, start_i, end_i, alt_aln_method)
 
         def get_alignments_for_region(
@@ -324,7 +377,9 @@ def _provider_class() -> Any:
                 if info is not None and tx_ac in self._data["sequences"]:
                     lengths = [len(self._data["sequences"][tx_ac])]
                 else:
-                    raise exceptions.HGVSDataNotAvailableError(f"No transcript definition for (tx_ac={tx_ac})")
+                    raise exceptions.HGVSDataNotAvailableError(
+                        f"No transcript definition for (tx_ac={tx_ac})"
+                    )
             return {
                 "tx_ac": tx_ac,
                 "alt_ac": tx_ac,
@@ -376,13 +431,26 @@ def _provider_class() -> Any:
                 if info.get("cds_start_i") is not None:
                     pieces = []
                     for e in alignment["exons"]:
-                        lo, hi = max(e["tx_start_i"], info["cds_start_i"]), min(e["tx_end_i"], info["cds_end_i"])
+                        lo, hi = (
+                            max(e["tx_start_i"], info["cds_start_i"]),
+                            min(e["tx_end_i"], info["cds_end_i"]),
+                        )
                         if lo >= hi:
                             continue
                         if alignment["alt_strand"] == 1:
-                            pieces.append((e["alt_start_i"] + lo - e["tx_start_i"], e["alt_start_i"] + hi - e["tx_start_i"]))
+                            pieces.append(
+                                (
+                                    e["alt_start_i"] + lo - e["tx_start_i"],
+                                    e["alt_start_i"] + hi - e["tx_start_i"],
+                                )
+                            )
                         else:
-                            pieces.append((e["alt_end_i"] - (hi - e["tx_start_i"]), e["alt_end_i"] - (lo - e["tx_start_i"])))
+                            pieces.append(
+                                (
+                                    e["alt_end_i"] - (hi - e["tx_start_i"]),
+                                    e["alt_end_i"] - (lo - e["tx_start_i"]),
+                                )
+                            )
                     clipped = tuple(sorted(pieces))
                 result[(alignment["alt_ac"], alignment["alt_aln_method"])] = (full, clipped)
             return result
@@ -402,7 +470,9 @@ def _provider_class() -> Any:
                     "tx_ac2": other,
                     "cds_eq": my_cds is not None and my_cds == cds,
                     "es_fp_eq": any(mine[k][0] == theirs[k][0] for k in shared),
-                    "cds_es_fp_eq": any(mine[k][1] is not None and mine[k][1] == theirs[k][1] for k in shared),
+                    "cds_es_fp_eq": any(
+                        mine[k][1] is not None and mine[k][1] == theirs[k][1] for k in shared
+                    ),
                 }
                 if row["cds_eq"] or row["es_fp_eq"] or row["cds_es_fp_eq"]:
                     rows.append(row)
@@ -467,7 +537,10 @@ def parse_hgvs_posedit(
     kind = _choice(variant_type, "variant_type", _TYPES)
     value = _text(text, "text")
     parser = _parser()
-    posedit = _hgvs_call(lambda: getattr(parser, f"parse_{kind}_posedit")(value), f"{value!r} is not a valid {kind}. posedit")
+    posedit = _hgvs_call(
+        lambda: getattr(parser, f"parse_{kind}_posedit")(value),
+        f"{value!r} is not a valid {kind}. posedit",
+    )
     edit = getattr(posedit, "edit", None)
     pos = getattr(posedit, "pos", None)
     return {
@@ -515,11 +588,16 @@ def parse_hgvs_position(
     interval = getattr(parsed, "pos", parsed)
 
     def describe(position: Any) -> dict[str, Any]:
-        info: dict[str, Any] = {"text": str(position), "base": _plain(getattr(position, "base", None))}
+        info: dict[str, Any] = {
+            "text": str(position),
+            "base": _plain(getattr(position, "base", None)),
+        }
         if hasattr(position, "offset"):
             info["offset"] = int(position.offset)
         if hasattr(position, "datum"):
-            info["datum"] = str(position.datum.name if hasattr(position.datum, "name") else position.datum)
+            info["datum"] = str(
+                position.datum.name if hasattr(position.datum, "name") else position.datum
+            )
         return info
 
     return {
@@ -551,7 +629,10 @@ def validate_hgvs_position(
     kind = _choice(variant_type, "variant_type", _TYPES)
     value = _text(text, "text")
     parser = _parser()
-    interval = _hgvs_call(lambda: getattr(parser, f"parse_{kind}_interval")(value), f"{value!r} is not a valid {kind}. interval")
+    interval = _hgvs_call(
+        lambda: getattr(parser, f"parse_{kind}_interval")(value),
+        f"{value!r} is not a valid {kind}. interval",
+    )
     level, message = interval.validate()
     return {
         "status": "completed",
@@ -603,7 +684,9 @@ def validate_hgvs_variant(
     except (exceptions.HGVSInvalidVariantError, exceptions.HGVSInvalidIntervalError) as exc:
         valid, message = False, str(exc)
     except exceptions.HGVSError as exc:
-        raise ConfigurationError(f"hgvs could not validate the variant: {type(exc).__name__}: {exc}") from exc
+        raise ConfigurationError(
+            f"hgvs could not validate the variant: {type(exc).__name__}: {exc}"
+        ) from exc
     return {
         "status": "completed",
         "operation": "validate_hgvs_variant",
@@ -637,7 +720,9 @@ def fill_hgvs_reference(
     provider = _provider(data_source, local_data, uta_db_url)
     alt_ac = None if genomic_accession is None else _text(genomic_accession, "genomic_accession")
     filled = _hgvs_call(
-        lambda: parsed.fill_ref(provider, alt_ac=alt_ac, alt_aln_method=_text(alt_aln_method, "alt_aln_method")),
+        lambda: parsed.fill_ref(
+            provider, alt_ac=alt_ac, alt_aln_method=_text(alt_aln_method, "alt_aln_method")
+        ),
         "hgvs could not fill the reference",
     )
     return {
@@ -665,7 +750,10 @@ def hgvs_length_change(
     parsed = _parse_variant(variant)
     if parsed.posedit is None:
         raise ConfigurationError("variant has no position and edit.")
-    change = _hgvs_call(lambda: parsed.posedit.length_change(on_error_raise=True), "hgvs could not compute the length change")
+    change = _hgvs_call(
+        lambda: parsed.posedit.length_change(on_error_raise=True),
+        "hgvs could not compute the length change",
+    )
     return {
         "status": "completed",
         "operation": "hgvs_length_change",
@@ -681,8 +769,14 @@ def hgvs_length_change(
 # ---------------------------------------------------------------------------------------------
 
 
-def _mapper_options(prevalidation_level: str | None, alt_aln_method: str, normalize: bool, replace_reference: bool) -> dict[str, Any]:
-    level = None if prevalidation_level is None else _choice(prevalidation_level.upper(), "prevalidation_level", _PREVALIDATION)
+def _mapper_options(
+    prevalidation_level: str | None, alt_aln_method: str, normalize: bool, replace_reference: bool
+) -> dict[str, Any]:
+    level = (
+        None
+        if prevalidation_level is None
+        else _choice(prevalidation_level.upper(), "prevalidation_level", _PREVALIDATION)
+    )
     return {
         "prevalidation_level": None if level == "NONE" else level,
         "alt_aln_method": _text(alt_aln_method, "alt_aln_method"),
@@ -723,12 +817,25 @@ def map_hgvs_variant(
     target = _choice(to_type, "to_type", ("g", "c", "n", "t"))
     parsed = _parse_variant(variant)
     source = parsed.type
-    allowed = {"g": ("c", "n", "t"), "m": ("c", "n", "t"), "c": ("g", "n", "t"), "n": ("g", "c", "t")}
-    if source not in allowed or target not in allowed[source] and not (source in "cn" and target == "g"):
-        raise ConfigurationError(f"cannot map a {source}. variant to {target}.; use one of {allowed.get(source, ())}.")
+    allowed = {
+        "g": ("c", "n", "t"),
+        "m": ("c", "n", "t"),
+        "c": ("g", "n", "t"),
+        "n": ("g", "c", "t"),
+    }
+    if source not in allowed or (
+        target not in allowed[source] and not (source in "cn" and target == "g")
+    ):
+        raise ConfigurationError(
+            f"cannot map a {source}. variant to {target}.; use one of {allowed.get(source, ())}."
+        )
     options = _mapper_options(prevalidation_level, alt_aln_method, normalize, replace_reference)
     provider = _provider(data_source, local_data, uta_db_url)
-    tx_ac = None if transcript_accession is None else _text(transcript_accession, "transcript_accession")
+    tx_ac = (
+        None
+        if transcript_accession is None
+        else _text(transcript_accession, "transcript_accession")
+    )
     alt_ac = None if genomic_accession is None else _text(genomic_accession, "genomic_accession")
     method = f"{source}_to_{target}" if source != "m" else f"g_to_{target}"
     if target == "t":
@@ -764,7 +871,14 @@ def map_hgvs_variant(
         else:
             args = (parsed,)
         used = "VariantMapper"
-    result = _hgvs_call(lambda: getattr(mapper, method)(*args, alt_aln_method=options["alt_aln_method"]) if used == "VariantMapper" else getattr(mapper, method)(*args), f"hgvs could not map the variant ({method})")
+    result = _hgvs_call(
+        lambda: (
+            getattr(mapper, method)(*args, alt_aln_method=options["alt_aln_method"])
+            if used == "VariantMapper"
+            else getattr(mapper, method)(*args)
+        ),
+        f"hgvs could not map the variant ({method})",
+    )
     return {
         "status": "completed",
         "operation": "map_hgvs_variant",
@@ -772,7 +886,9 @@ def map_hgvs_variant(
         "mapper_method": method,
         "mapper": used,
         "output": _variant_info(result),
-        "provenance": _provenance(method=f"hgvs.{'assemblymapper' if used == 'AssemblyMapper' else 'variantmapper'}.{used}.{method}"),
+        "provenance": _provenance(
+            method=f"hgvs.{'assemblymapper' if used == 'AssemblyMapper' else 'variantmapper'}.{used}.{method}"
+        ),
     }
 
 
@@ -805,7 +921,10 @@ def map_hgvs_interval(
     if source == target:
         raise ConfigurationError("from_type and to_type must differ.")
     value = _text(interval, "interval")
-    parsed = _hgvs_call(lambda: getattr(_parser(), f"parse_{source}_interval")(value), f"{value!r} is not a valid {source}. interval")
+    parsed = _hgvs_call(
+        lambda: getattr(_parser(), f"parse_{source}_interval")(value),
+        f"{value!r} is not a valid {source}. interval",
+    )
     provider = _provider(data_source, local_data, uta_db_url)
     tx_ac = _text(transcript_accession, "transcript_accession")
     if {source, target} == {"c", "n"}:
@@ -813,10 +932,19 @@ def map_hgvs_interval(
     else:
         if genomic_accession is None:
             raise ConfigurationError("genomic_accession is required when mapping to or from g.")
-        alt_ac, method = _text(genomic_accession, "genomic_accession"), _text(alt_aln_method, "alt_aln_method")
-    mapper = _hgvs_call(lambda: alignment.AlignmentMapper(provider, tx_ac, alt_ac, method), "hgvs could not create the AlignmentMapper")
+        alt_ac, method = (
+            _text(genomic_accession, "genomic_accession"),
+            _text(alt_aln_method, "alt_aln_method"),
+        )
+    mapper = _hgvs_call(
+        lambda: alignment.AlignmentMapper(provider, tx_ac, alt_ac, method),
+        "hgvs could not create the AlignmentMapper",
+    )
     bounds = None if strict_bounds is None else _flag(strict_bounds, "strict_bounds")
-    out = _hgvs_call(lambda: getattr(mapper, f"{source}_to_{target}")(parsed, strict_bounds=bounds), "hgvs could not map the interval")
+    out = _hgvs_call(
+        lambda: getattr(mapper, f"{source}_to_{target}")(parsed, strict_bounds=bounds),
+        "hgvs could not map the interval",
+    )
     return {
         "status": "completed",
         "operation": "map_hgvs_interval",
@@ -825,7 +953,9 @@ def map_hgvs_interval(
         "output": str(out),
         "start": str(out.start),
         "end": str(out.end),
-        "provenance": _provenance(method=f"hgvs.alignmentmapper.AlignmentMapper.{source}_to_{target}"),
+        "provenance": _provenance(
+            method=f"hgvs.alignmentmapper.AlignmentMapper.{source}_to_{target}"
+        ),
     }
 
 
@@ -866,15 +996,23 @@ def predict_hgvs_protein_consequence(
     if parsed.type != "c":
         raise ConfigurationError("variant must be a coding (c.) variant.")
     if assembly_name is not None:
-        mapper = assembly.AssemblyMapper(provider, assembly_name=_text(assembly_name, "assembly_name"), alt_aln_method=method)
-        result = _hgvs_call(lambda: mapper.c_to_p(parsed), "hgvs could not predict the protein consequence")
+        mapper = assembly.AssemblyMapper(
+            provider, assembly_name=_text(assembly_name, "assembly_name"), alt_aln_method=method
+        )
+        result = _hgvs_call(
+            lambda: mapper.c_to_p(parsed), "hgvs could not predict the protein consequence"
+        )
     else:
         vm = mapping.VariantMapper(provider)
         result = _hgvs_call(
             lambda: vm.c_to_p(
                 parsed,
-                pro_ac=None if protein_accession is None else _text(protein_accession, "protein_accession"),
-                alt_ac=None if genomic_accession is None else _text(genomic_accession, "genomic_accession"),
+                pro_ac=None
+                if protein_accession is None
+                else _text(protein_accession, "protein_accession"),
+                alt_ac=None
+                if genomic_accession is None
+                else _text(genomic_accession, "genomic_accession"),
                 alt_aln_method=method,
             ),
             "hgvs could not predict the protein consequence",
@@ -929,14 +1067,18 @@ def project_hgvs_variant(
     if ":" in value:
         parsed = _parse_variant(value)
         result = _hgvs_call(
-            lambda: getattr(projector, f"project_variant_{way}")(parsed), "hgvs could not project the variant"
+            lambda: getattr(projector, f"project_variant_{way}")(parsed),
+            "hgvs could not project the variant",
         )
         output: Any = _variant_info(result)
         kind = "variant"
     else:
-        interval = _hgvs_call(lambda: _parser().parse_c_interval(value), f"{value!r} is not a valid c. interval")
+        interval = _hgvs_call(
+            lambda: _parser().parse_c_interval(value), f"{value!r} is not a valid c. interval"
+        )
         result = _hgvs_call(
-            lambda: getattr(projector, f"project_interval_{way}")(interval), "hgvs could not project the interval"
+            lambda: getattr(projector, f"project_interval_{way}")(interval),
+            "hgvs could not project the interval",
         )
         output = str(result)
         kind = "interval"
@@ -974,11 +1116,15 @@ def list_hgvs_relevant_transcripts(
     provider = _provider(data_source, local_data, uta_db_url)
     mapper = _hgvs_call(
         lambda: assembly.AssemblyMapper(
-            provider, assembly_name=_text(assembly_name, "assembly_name"), alt_aln_method=_text(alt_aln_method, "alt_aln_method")
+            provider,
+            assembly_name=_text(assembly_name, "assembly_name"),
+            alt_aln_method=_text(alt_aln_method, "alt_aln_method"),
         ),
         "hgvs could not create the AssemblyMapper",
     )
-    accessions = _hgvs_call(lambda: mapper.relevant_transcripts(parsed), "hgvs could not list the transcripts")
+    accessions = _hgvs_call(
+        lambda: mapper.relevant_transcripts(parsed), "hgvs could not list the transcripts"
+    )
     return {
         "status": "completed",
         "operation": "list_hgvs_relevant_transcripts",
@@ -1009,8 +1155,13 @@ def hgvs_to_vcf_allele(
     babelfish = require("hgvs.extras.babelfish", _EXTRA)
     parsed = _parse_variant(variant)
     provider = _provider(data_source, local_data, uta_db_url)
-    fish = _hgvs_call(lambda: babelfish.Babelfish(provider, _text(assembly_name, "assembly_name")), "hgvs could not create the Babelfish")
-    chrom, position, ref, alt, kind = _hgvs_call(lambda: fish.hgvs_to_vcf(parsed), "hgvs could not convert the variant")
+    fish = _hgvs_call(
+        lambda: babelfish.Babelfish(provider, _text(assembly_name, "assembly_name")),
+        "hgvs could not create the Babelfish",
+    )
+    chrom, position, ref, alt, kind = _hgvs_call(
+        lambda: fish.hgvs_to_vcf(parsed), "hgvs could not convert the variant"
+    )
     return {
         "status": "completed",
         "operation": "hgvs_to_vcf_allele",
@@ -1052,7 +1203,9 @@ def fetch_hgvs_reference_sequence(
         if value is not None:
             _integer(value, label, minimum=0, maximum=10**10)
     provider = _provider(data_source, local_data, uta_db_url)
-    sequence = _hgvs_call(lambda: provider.get_seq(ac, start_i, end_i), "hgvs could not fetch the sequence")
+    sequence = _hgvs_call(
+        lambda: provider.get_seq(ac, start_i, end_i), "hgvs could not fetch the sequence"
+    )
     return {
         "status": "completed",
         "operation": "fetch_hgvs_reference_sequence",
@@ -1062,7 +1215,9 @@ def fetch_hgvs_reference_sequence(
         "length": len(sequence),
         "sequence": sequence,
         "source": data_source,
-        "provenance": _provenance(method="hgvs.dataproviders.seqfetcher.SeqFetcher.fetch_seq / provider.get_seq"),
+        "provenance": _provenance(
+            method="hgvs.dataproviders.seqfetcher.SeqFetcher.fetch_seq / provider.get_seq"
+        ),
     }
 
 
@@ -1109,32 +1264,69 @@ def query_hgvs_transcript_database(
         tx = needs(transcript_accession, "transcript_accession")
         alt = needs(genomic_accession, "genomic_accession")
         method = needs(alt_aln_method, "alt_aln_method")
-        rows = _rows(_hgvs_call(lambda: provider.get_tx_exons(tx, alt, method), "hgvs could not read the exons"))
+        rows = _rows(
+            _hgvs_call(
+                lambda: provider.get_tx_exons(tx, alt, method), "hgvs could not read the exons"
+            )
+        )
     elif kind == "tx_for_gene":
         symbol = needs(gene, "gene")
-        rows = _rows(_hgvs_call(lambda: provider.get_tx_for_gene(symbol), "hgvs could not read the transcripts"))
+        rows = _rows(
+            _hgvs_call(
+                lambda: provider.get_tx_for_gene(symbol), "hgvs could not read the transcripts"
+            )
+        )
     elif kind == "tx_identity_info":
         tx = needs(transcript_accession, "transcript_accession")
-        rows = _rows([_hgvs_call(lambda: provider.get_tx_identity_info(tx), "hgvs could not read the transcript")])
+        rows = _rows(
+            [
+                _hgvs_call(
+                    lambda: provider.get_tx_identity_info(tx), "hgvs could not read the transcript"
+                )
+            ]
+        )
     elif kind == "tx_info":
         tx = needs(transcript_accession, "transcript_accession")
         alt = needs(genomic_accession, "genomic_accession")
         method = needs(alt_aln_method, "alt_aln_method")
-        rows = _rows([_hgvs_call(lambda: provider.get_tx_info(tx, alt, method), "hgvs could not read the transcript info")])
+        rows = _rows(
+            [
+                _hgvs_call(
+                    lambda: provider.get_tx_info(tx, alt, method),
+                    "hgvs could not read the transcript info",
+                )
+            ]
+        )
     elif kind == "tx_mapping_options":
         tx = needs(transcript_accession, "transcript_accession")
-        rows = _rows(_hgvs_call(lambda: provider.get_tx_mapping_options(tx), "hgvs could not read the mapping options"))
+        rows = _rows(
+            _hgvs_call(
+                lambda: provider.get_tx_mapping_options(tx),
+                "hgvs could not read the mapping options",
+            )
+        )
     elif kind == "similar_transcripts":
         tx = needs(transcript_accession, "transcript_accession")
-        rows = _rows(_hgvs_call(lambda: provider.get_similar_transcripts(tx), "hgvs could not read the similar transcripts"))
+        rows = _rows(
+            _hgvs_call(
+                lambda: provider.get_similar_transcripts(tx),
+                "hgvs could not read the similar transcripts",
+            )
+        )
     elif kind == "protein_accession":
         tx = needs(transcript_accession, "transcript_accession")
-        value = _hgvs_call(lambda: provider.get_pro_ac_for_tx_ac(tx), "hgvs could not read the protein")
+        value = _hgvs_call(
+            lambda: provider.get_pro_ac_for_tx_ac(tx), "hgvs could not read the protein"
+        )
         rows = [] if value is None else [{"tx_ac": tx, "pro_ac": str(value)}]
     else:
         name = needs(assembly_name, "assembly_name")
-        mapping = _hgvs_call(lambda: provider.get_assembly_map(name), "hgvs could not read the assembly map")
-        rows = [{"accession": str(k), "name": str(v)} for k, v in sorted(mapping.items())][:_MAX_ROWS]
+        mapping = _hgvs_call(
+            lambda: provider.get_assembly_map(name), "hgvs could not read the assembly map"
+        )
+        rows = [{"accession": str(k), "name": str(v)} for k, v in sorted(mapping.items())][
+            :_MAX_ROWS
+        ]
     return {
         "status": "completed",
         "operation": "query_hgvs_transcript_database",
@@ -1154,8 +1346,8 @@ __all__ = [
     "list_hgvs_relevant_transcripts",
     "map_hgvs_interval",
     "map_hgvs_variant",
-    "parse_hgvs_position",
     "parse_hgvs_posedit",
+    "parse_hgvs_position",
     "predict_hgvs_protein_consequence",
     "project_hgvs_variant",
     "query_hgvs_transcript_database",

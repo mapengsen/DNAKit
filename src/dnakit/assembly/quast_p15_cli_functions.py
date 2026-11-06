@@ -27,8 +27,13 @@ _TOOL = _cli.Tool(
     version_pattern=r"QUAST v?(\d+\.\d+\.\d+)",
 )
 _META_TOOL = _cli.Tool(
-    name="metaquast", executable="metaquast.py", hint=_TOOL.hint, tested_version="5.2.0", citation="https://doi.org/10.1093/bioinformatics/btv697",
-    version_arguments=("--version",), version_pattern=r"QUAST v?(\d+\.\d+\.\d+)",
+    name="metaquast",
+    executable="metaquast.py",
+    hint=_TOOL.hint,
+    tested_version="5.2.0",
+    citation="https://doi.org/10.1093/bioinformatics/btv697",
+    version_arguments=("--version",),
+    version_pattern=r"QUAST v?(\d+\.\d+\.\d+)",
 )
 _GENE_FINDERS = ("genemarks", "mgm", "glimmer")
 
@@ -47,22 +52,49 @@ def _report(directory: Path) -> dict[str, dict[str, Any]]:
     path = directory / "report.tsv"
     if not path.is_file():
         return {}
-    lines = [line.split("\t") for line in path.read_text(encoding="utf-8", errors="replace").splitlines() if line]
+    lines = [
+        line.split("\t")
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()
+        if line
+    ]
     assemblies = lines[0][1:]
-    return {row[0]: {name: _cli.convert_number(value) for name, value in zip(assemblies, row[1:], strict=False)} for row in lines[1:]}
+    return {
+        row[0]: {
+            name: _cli.convert_number(value)
+            for name, value in zip(assemblies, row[1:], strict=False)
+        }
+        for row in lines[1:]
+    }
 
 
 def _common(
-    contigs: Sequence[str], threads: int, min_contig: int, eukaryote: bool, large: bool, labels: Sequence[str] | None, build_reports: bool,
+    contigs: Sequence[str],
+    threads: int,
+    min_contig: int,
+    eukaryote: bool,
+    large: bool,
+    labels: Sequence[str] | None,
+    build_reports: bool,
 ) -> tuple[list[str], list[str]]:
     files = [str(path) for path in _cli.existing_files(contigs, "contigs")]
-    arguments = ["-t", str(_cli.threads_value(threads)), "-m", str(_cli.integer(min_contig, "min_contig", minimum=0))]
+    arguments = [
+        "-t",
+        str(_cli.threads_value(threads)),
+        "-m",
+        str(_cli.integer(min_contig, "min_contig", minimum=0)),
+    ]
     for enabled, option in ((eukaryote, "--eukaryote"), (large, "--large")):
         if _cli.flag(enabled, option):
             arguments.append(option)
     if labels is not None:
-        if isinstance(labels, str) or len(labels) != len(files) or any("," in str(item) for item in labels):
-            raise ConfigurationError("labels must be a list with one comma-free label per contig file.")
+        if (
+            isinstance(labels, str)
+            or len(labels) != len(files)
+            or any("," in str(item) for item in labels)
+        ):
+            raise ConfigurationError(
+                "labels must be a list with one comma-free label per contig file."
+            )
         arguments += ["--labels", ", ".join(_cli.text(item, "labels") for item in labels)]
     if not _cli.flag(build_reports, "build_reports"):
         arguments += ["--no-plots", "--no-html", "--no-icarus"]
@@ -70,11 +102,21 @@ def _common(
 
 
 def _run(
-    tool: _cli.Tool, arguments: Sequence[str], files: Sequence[str], out: Path, quast_path: str | None, timeout_seconds: float,
-    operation: str, **extra: Any,
+    tool: _cli.Tool,
+    arguments: Sequence[str],
+    files: Sequence[str],
+    out: Path,
+    quast_path: str | None,
+    timeout_seconds: float,
+    operation: str,
+    **extra: Any,
 ) -> dict[str, Any]:
     record = _cli.invoke(
-        tool, ["-o", str(out), *arguments, *files], cwd=out.parent, expected=[out / "report.tsv"], explicit=quast_path,
+        tool,
+        ["-o", str(out), *arguments, *files],
+        cwd=out.parent,
+        expected=[out / "report.tsv"],
+        explicit=quast_path,
         timeout_seconds=timeout_seconds,
     )
     record["outputs"] = sorted(str(path) for path in out.glob("*") if path.is_file())
@@ -121,11 +163,15 @@ def quast_assess_assembly(
     ``build_reports``). Result keys: ``report`` (``{metric: {assembly: value}}``) and the files of the run.
     """
     out = _output_directory(output_directory)
-    arguments, files = _common(contigs, threads, min_contig, eukaryote, large, labels, build_reports)
+    arguments, files = _common(
+        contigs, threads, min_contig, eukaryote, large, labels, build_reports
+    )
     if reference is not None:
         arguments += ["-r", str(_cli.existing_file(reference, "reference"))]
     elif any(item is not None for item in (features, operons, sv_bedpe)) or upper_bound_assembly:
-        raise ConfigurationError("features, operons, sv_bedpe and upper_bound_assembly need a reference.")
+        raise ConfigurationError(
+            "features, operons, sv_bedpe and upper_bound_assembly need a reference."
+        )
     if features is not None:
         arguments += ["-g", str(_cli.existing_file(features, "features"))]
     if operons is not None:
@@ -135,24 +181,39 @@ def quast_assess_assembly(
     if _cli.flag(upper_bound_assembly, "upper_bound_assembly"):
         arguments.append("--upper-bound-assembly")
         if upper_bound_reads is None:
-            raise ConfigurationError("upper_bound_assembly needs upper_bound_reads (one or two FASTQ files).")
+            raise ConfigurationError(
+                "upper_bound_assembly needs upper_bound_reads (one or two FASTQ files)."
+            )
         reads = [str(path) for path in _cli.existing_files(upper_bound_reads, "upper_bound_reads")]
         if len(reads) == 2:
             arguments += ["--pe1", reads[0], "--pe2", reads[1]]
         elif len(reads) == 1:
             arguments += ["--single", reads[0]]
         else:
-            raise ConfigurationError("upper_bound_reads must be one file (single reads) or two files (a pair).")
+            raise ConfigurationError(
+                "upper_bound_reads must be one file (single reads) or two files (a pair)."
+            )
     if sv_bedpe is not None:
         arguments += ["--sv-bedpe", str(_cli.existing_file(sv_bedpe, "sv_bedpe"))]
     if _cli.flag(circos, "circos"):
         arguments.append("--circos")
     arguments += [
-        "-i", str(_cli.integer(min_alignment, "min_alignment", minimum=1)),
-        "--min-identity", format(_cli.number(min_identity, "min_identity", minimum=80.0, maximum=100.0), ".12g"),
-        "-x", str(_cli.integer(extensive_misassembly_size, "extensive_misassembly_size", minimum=1)),
+        "-i",
+        str(_cli.integer(min_alignment, "min_alignment", minimum=1)),
+        "--min-identity",
+        format(_cli.number(min_identity, "min_identity", minimum=80.0, maximum=100.0), ".12g"),
+        "-x",
+        str(_cli.integer(extensive_misassembly_size, "extensive_misassembly_size", minimum=1)),
     ]
-    return _run(_TOOL, arguments, files, out, quast_path, timeout_seconds, "reference_based_assembly_evaluation")
+    return _run(
+        _TOOL,
+        arguments,
+        files,
+        out,
+        quast_path,
+        timeout_seconds,
+        "reference_based_assembly_evaluation",
+    )
 
 
 def quast_predict_genes(
@@ -191,12 +252,27 @@ def quast_predict_genes(
             arguments.append("--glimmer")
         if isinstance(gene_thresholds, str) or not gene_thresholds:
             raise ConfigurationError("gene_thresholds must be a non-empty list of lengths.")
-        arguments += ["--gene-thresholds", ",".join(str(_cli.integer(item, "gene_thresholds", minimum=0)) for item in gene_thresholds)]
+        arguments += [
+            "--gene-thresholds",
+            ",".join(
+                str(_cli.integer(item, "gene_thresholds", minimum=0)) for item in gene_thresholds
+            ),
+        ]
     if _cli.flag(rna_finding, "rna_finding"):
         arguments.append("--rna-finding")
     if gene_finder is None and not rna_finding:
         raise ConfigurationError("give gene_finder or rna_finding.")
-    return _run(_TOOL, arguments, files, out, quast_path, timeout_seconds, "predict_genes_on_contigs", gene_finder=gene_finder, rna_finding=rna_finding)
+    return _run(
+        _TOOL,
+        arguments,
+        files,
+        out,
+        quast_path,
+        timeout_seconds,
+        "predict_genes_on_contigs",
+        gene_finder=gene_finder,
+        rna_finding=rna_finding,
+    )
 
 
 def quast_map_reads(
@@ -232,7 +308,14 @@ def quast_map_reads(
         arguments += ["-r", str(_cli.existing_file(reference, "reference"))]
     if (pe1 is None) != (pe2 is None):
         raise ConfigurationError("pe1 and pe2 must be given together.")
-    options = (("--pe1", pe1), ("--pe2", pe2), ("--single", single), ("--pacbio", pacbio), ("--nanopore", nanopore), ("--ref-bam", reference_bam))
+    options = (
+        ("--pe1", pe1),
+        ("--pe2", pe2),
+        ("--single", single),
+        ("--pacbio", pacbio),
+        ("--nanopore", nanopore),
+        ("--ref-bam", reference_bam),
+    )
     given = False
     for flag, value in options:
         if value is not None:
@@ -245,7 +328,9 @@ def quast_map_reads(
         arguments += ["--bam", ",".join(bams)]
         given = True
     if not given:
-        raise ConfigurationError("give reads (pe1/pe2, single, pacbio, nanopore) or alignments (reference_bam, contig_bam_files).")
+        raise ConfigurationError(
+            "give reads (pe1/pe2, single, pacbio, nanopore) or alignments (reference_bam, contig_bam_files)."
+        )
     if not _cli.flag(detect_variants, "detect_variants"):
         arguments += ["--no-snps", "--no-sv"]
     return _run(_TOOL, arguments, files, out, quast_path, timeout_seconds, "map_reads_to_assembly")
@@ -281,17 +366,40 @@ def metaquast_assess_metagenome(
         paths = [str(path) for path in _cli.existing_files(references, "references")]
         arguments += ["-r", ",".join(paths)]
     if references_list is not None:
-        arguments += ["--references-list", str(_cli.existing_file(references_list, "references_list"))]
-    if not _cli.flag(use_blast_search, "use_blast_search") and not references and references_list is None:
+        arguments += [
+            "--references-list",
+            str(_cli.existing_file(references_list, "references_list")),
+        ]
+    if (
+        not _cli.flag(use_blast_search, "use_blast_search")
+        and not references
+        and references_list is None
+    ):
         raise ConfigurationError("without BLAST search give references or references_list.")
     if not use_blast_search:
         arguments += ["--max-ref-number", "0"]
     else:
-        arguments += ["--max-ref-number", str(_cli.integer(max_references, "max_references", minimum=0))]
+        arguments += [
+            "--max-ref-number",
+            str(_cli.integer(max_references, "max_references", minimum=0)),
+        ]
     if _cli.flag(unique_mapping, "unique_mapping"):
         arguments.append("--unique-mapping")
-    return _run(_META_TOOL, arguments, files, out, quast_path, timeout_seconds, "metagenome_assembly_evaluation")
+    return _run(
+        _META_TOOL,
+        arguments,
+        files,
+        out,
+        quast_path,
+        timeout_seconds,
+        "metagenome_assembly_evaluation",
+    )
 
 
-__all__ = ["metaquast_assess_metagenome", "quast_assess_assembly", "quast_map_reads", "quast_predict_genes"]
+__all__ = [
+    "metaquast_assess_metagenome",
+    "quast_assess_assembly",
+    "quast_map_reads",
+    "quast_predict_genes",
+]
 _register_public_verbose(globals())

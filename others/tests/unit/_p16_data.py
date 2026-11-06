@@ -28,7 +28,9 @@ def write_fasta(path: Path, records: dict[str, str]) -> str:
 
 
 def write_fastq(path: Path, records: list[tuple[str, str]], quality: str = "I") -> str:
-    path.write_text("".join(f"@{h}\n{s}\n+\n{quality * len(s)}\n" for h, s in records), encoding="utf-8")
+    path.write_text(
+        "".join(f"@{h}\n{s}\n+\n{quality * len(s)}\n" for h, s in records), encoding="utf-8"
+    )
     return str(path)
 
 
@@ -46,7 +48,10 @@ def genome(directory: Path) -> dict[str, str]:
 def read_bam(directory: Path, contigs: dict[str, str]) -> str:
     """Sorted, indexed BAM of 150 bp error-free reads every 25 bp; some reads carry a deletion in the homopolymer."""
     pysam = pytest.importorskip("pysam")
-    header = {"HD": {"VN": "1.6", "SO": "coordinate"}, "SQ": [{"SN": k, "LN": len(v)} for k, v in contigs.items()]}
+    header = {
+        "HD": {"VN": "1.6", "SO": "coordinate"},
+        "SQ": [{"SN": k, "LN": len(v)} for k, v in contigs.items()],
+    }
     path = directory / "reads.bam"
     n = 0
     with pysam.AlignmentFile(str(path), "wb", header=header) as out:
@@ -58,7 +63,11 @@ def read_bam(directory: Path, contigs: dict[str, str]) -> str:
                     cigar = [(0, 1008 - pos), (2, 1), (0, len(read) - (1008 - pos))]
                 segment = pysam.AlignedSegment()
                 segment.query_name, segment.query_sequence, segment.flag = f"r{n}", read, 0
-                segment.reference_id, segment.reference_start, segment.mapping_quality = ref_id, pos, 60
+                segment.reference_id, segment.reference_start, segment.mapping_quality = (
+                    ref_id,
+                    pos,
+                    60,
+                )
                 segment.cigar = cigar
                 segment.query_qualities = pysam.qualitystring_to_array("I" * len(read))
                 out.write(segment)
@@ -77,7 +86,16 @@ def alignment_fasta(directory: Path) -> str:
             letters[rng.randrange(len(letters))] = rng.choice("ACGT")
         return "".join(letters)
 
-    return write_fasta(directory / "aln.fa", {"t1": base, "t2": mutate(base, 5), "t3": mutate(base, 10), "t4": mutate(base, 20), "t5": mutate(base, 30)})
+    return write_fasta(
+        directory / "aln.fa",
+        {
+            "t1": base,
+            "t2": mutate(base, 5),
+            "t3": mutate(base, 10),
+            "t4": mutate(base, 20),
+            "t5": mutate(base, 30),
+        },
+    )
 
 
 def long_reads(directory: Path, contigs: dict[str, str]) -> tuple[str, str]:
@@ -91,7 +109,12 @@ def long_reads(directory: Path, contigs: dict[str, str]) -> tuple[str, str]:
         letters = list(contigs[name][start : start + length])
         for _ in range(length // 30):
             letters[rng.randrange(length)] = rng.choice("ACGT")
-        records.append((f"lr{i} runid=x read={i} ch=1 start_time=2024-01-0{1 + i % 5}T10:00:00Z", "".join(letters)))
+        records.append(
+            (
+                f"lr{i} runid=x read={i} ch=1 start_time=2024-01-0{1 + i % 5}T10:00:00Z",
+                "".join(letters),
+            )
+        )
     plain = write_fastq(directory / "long.fastq", records, "5")
     zipped = directory / "long.fastq.gz"
     with gzip.open(zipped, "wt") as handle:
@@ -102,23 +125,62 @@ def long_reads(directory: Path, contigs: dict[str, str]) -> tuple[str, str]:
 def kaiju_data(directory: Path) -> dict[str, str]:
     """Three proteins, reads back-translated from them, and a small taxonomy (nodes.dmp / names.dmp)."""
     codons = {
-        "A": "GCT", "C": "TGT", "D": "GAT", "E": "GAA", "F": "TTT", "G": "GGT", "H": "CAT", "I": "ATT", "K": "AAA", "L": "CTG",
-        "M": "ATG", "N": "AAT", "P": "CCT", "Q": "CAA", "R": "CGT", "S": "TCT", "T": "ACT", "V": "GTT", "W": "TGG", "Y": "TAT",
+        "A": "GCT",
+        "C": "TGT",
+        "D": "GAT",
+        "E": "GAA",
+        "F": "TTT",
+        "G": "GGT",
+        "H": "CAT",
+        "I": "ATT",
+        "K": "AAA",
+        "L": "CTG",
+        "M": "ATG",
+        "N": "AAT",
+        "P": "CCT",
+        "Q": "CAA",
+        "R": "CGT",
+        "S": "TCT",
+        "T": "ACT",
+        "V": "GTT",
+        "W": "TGG",
+        "Y": "TAT",
     }
     rng = random.Random(5)
-    proteins = {f"p{i}_{taxon}": "".join(rng.choice(list(codons)) for _ in range(300)) for i, taxon in enumerate((100, 200, 300))}
+    proteins = {
+        f"p{i}_{taxon}": "".join(rng.choice(list(codons)) for _ in range(300))
+        for i, taxon in enumerate((100, 200, 300))
+    }
     write_fasta(directory / "db.faa", proteins)
-    reads = {f"read_{name}_{j}": "".join(codons[a] for a in seq[j * 30 : j * 30 + 50]) for name, seq in proteins.items() for j in range(3)}
+    reads = {
+        f"read_{name}_{j}": "".join(codons[a] for a in seq[j * 30 : j * 30 + 50])
+        for name, seq in proteins.items()
+        for j in range(3)
+    }
     reads["read_random"] = rand_dna(rng, 150)
     write_fasta(directory / "reads.fa", reads)
     (directory / "nodes.dmp").write_text(
         "1\t|\t1\t|\tno rank\t|\n10\t|\t1\t|\tsuperkingdom\t|\n20\t|\t10\t|\tphylum\t|\n30\t|\t20\t|\tclass\t|\n40\t|\t30\t|\torder\t|\n"
         "50\t|\t40\t|\tfamily\t|\n60\t|\t50\t|\tgenus\t|\n100\t|\t60\t|\tspecies\t|\n200\t|\t60\t|\tspecies\t|\n300\t|\t50\t|\tgenus\t|\n"
     )
-    labels = ((1, "root"), (10, "Bacteria"), (20, "Phylum_A"), (30, "Class_A"), (40, "Order_A"), (50, "Family_A"), (60, "Genus_A"),
-              (100, "Species_one"), (200, "Species_two"), (300, "Genus_B"))
-    (directory / "names.dmp").write_text("".join(f"{i}\t|\t{n}\t|\t\t|\tscientific name\t|\n" for i, n in labels))
-    return {name: str(directory / name) for name in ("db.faa", "reads.fa", "nodes.dmp", "names.dmp")}
+    labels = (
+        (1, "root"),
+        (10, "Bacteria"),
+        (20, "Phylum_A"),
+        (30, "Class_A"),
+        (40, "Order_A"),
+        (50, "Family_A"),
+        (60, "Genus_A"),
+        (100, "Species_one"),
+        (200, "Species_two"),
+        (300, "Genus_B"),
+    )
+    (directory / "names.dmp").write_text(
+        "".join(f"{i}\t|\t{n}\t|\t\t|\tscientific name\t|\n" for i, n in labels)
+    )
+    return {
+        name: str(directory / name) for name in ("db.faa", "reads.fa", "nodes.dmp", "names.dmp")
+    }
 
 
 def noisy_reads(contigs: dict[str, str], coverage: int, path: Path, seed: int = 8) -> str:
@@ -152,11 +214,20 @@ def sv_bam(directory: Path, contigs: dict[str, str]) -> str:
     minimap2, samtools = need("minimap2"), need("samtools")
     rng = random.Random(9)
     a = contigs["chrA"]
-    sample = {"chrA": a[:8000] + a[8400:14000] + rand_dna(rng, 300) + a[14000:], "chrB": contigs["chrB"]}
+    sample = {
+        "chrA": a[:8000] + a[8400:14000] + rand_dna(rng, 300) + a[14000:],
+        "chrB": contigs["chrB"],
+    }
     reads = noisy_reads(sample, 30, directory / "sample_reads.fq")
-    sam = subprocess.run([minimap2, "-ax", "map-ont", "-t", "4", str(directory / "genome.fa"), reads], capture_output=True, check=True).stdout
+    sam = subprocess.run(
+        [minimap2, "-ax", "map-ont", "-t", "4", str(directory / "genome.fa"), reads],
+        capture_output=True,
+        check=True,
+    ).stdout
     bam = directory / "sample.bam"
-    subprocess.run([samtools, "sort", "-o", str(bam), "-"], input=sam, check=True, capture_output=True)
+    subprocess.run(
+        [samtools, "sort", "-o", str(bam), "-"], input=sam, check=True, capture_output=True
+    )
     subprocess.run([samtools, "index", str(bam)], check=True)
     return str(bam)
 
@@ -184,7 +255,13 @@ def bisulfite_data(directory: Path) -> dict[str, str]:
     with pysam.AlignmentFile(str(directory / "bs.bam"), "wb", header=header) as out:
         for n, (pos, strand, seq) in enumerate(reads):
             a = pysam.AlignedSegment()
-            a.query_name, a.query_sequence, a.flag, a.reference_id, a.reference_start = f"r{n}", seq, strand, 0, pos
+            a.query_name, a.query_sequence, a.flag, a.reference_id, a.reference_start = (
+                f"r{n}",
+                seq,
+                strand,
+                0,
+                pos,
+            )
             a.mapping_quality, a.cigar = 60, [(0, 100)]
             a.query_qualities = pysam.qualitystring_to_array("I" * 100)
             a.set_tag("YD", "f" if strand == 0 else "r")
@@ -216,12 +293,18 @@ def mageck_data(directory: Path) -> dict[str, str]:
 
     for name, factor in (("c1.fq", 1.0), ("c2.fq", 1.0), ("t1.fq", 0.1), ("t2.fq", 0.1)):
         sample(name, factor)
-    (directory / "design.txt").write_text("Samples\tbaseline\ttreat\nc1\t1\t0\nc2\t1\t0\nt1\t1\t1\nt2\t1\t1\n")
-    (directory / "sets.gmt").write_text("setA\tna\t" + "\t".join(genes[:10]) + "\nsetB\tna\t" + "\t".join(genes[10:25]) + "\n")
+    (directory / "design.txt").write_text(
+        "Samples\tbaseline\ttreat\nc1\t1\t0\nc2\t1\t0\nt1\t1\t1\nt2\t1\t1\n"
+    )
+    (directory / "sets.gmt").write_text(
+        "setA\tna\t" + "\t".join(genes[:10]) + "\nsetB\tna\t" + "\t".join(genes[10:25]) + "\n"
+    )
     lines = ["GENE_CLONE\tGENE\tc1\tc2\td1\td2"]
     for sid, _seq, gene in library:
         base = rng.randint(100, 400)
         factor = 0.3 if gene == "G5" else 1.0
-        lines.append(f"{gene}_{sid}\t{gene}\t{base + rng.randint(0, 20)}\t{base + rng.randint(0, 20)}\t{int(base * factor) + rng.randint(0, 20)}\t{int(base * factor) + rng.randint(0, 20)}")
+        lines.append(
+            f"{gene}_{sid}\t{gene}\t{base + rng.randint(0, 20)}\t{base + rng.randint(0, 20)}\t{int(base * factor) + rng.randint(0, 20)}\t{int(base * factor) + rng.randint(0, 20)}"
+        )
     (directory / "drugz_counts.txt").write_text("\n".join(lines) + "\n")
     return {p.name: str(p) for p in directory.iterdir()}

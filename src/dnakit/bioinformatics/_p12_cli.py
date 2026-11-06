@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any
 
 from dnakit.backends.external import execute_bounded_command
-from dnakit.bioinformatics._gap_cli import (  # noqa: F401  (re-exported for the facades)
+from dnakit.bioinformatics._gap_cli import (
     LOG_TAIL_CHARS,
     choice,
     existing_file,
@@ -358,8 +358,8 @@ __all__ = [
     "new_file",
     "number",
     "open_text",
-    "optional_text",
     "option",
+    "optional_text",
     "program",
     "read_table",
     "text",

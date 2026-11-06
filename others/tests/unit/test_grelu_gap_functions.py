@@ -15,8 +15,8 @@ import pytest
 os.environ.setdefault("MPLBACKEND", "Agg")
 pytest.importorskip("grelu")
 
-from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.predictions import grelu_gap_functions as facade  # noqa: E402
+from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
+from dnakit.predictions import grelu_gap_functions as facade
 
 _PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 
@@ -115,7 +115,9 @@ def test_plot_output_must_be_an_image_path(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         facade.grelu_plot_distribution([1.0, 2.0], str(tmp_path / "plot.txt"))
     with pytest.raises(ConfigurationError):
-        facade.grelu_plot_motif([0.1, 0.2, 0.3, 0.4], str(tmp_path / "motif.png"))  # must be a 2-D position matrix
+        facade.grelu_plot_motif(
+            [0.1, 0.2, 0.3, 0.4], str(tmp_path / "motif.png")
+        )  # must be a 2-D position matrix
 
 
 def test_distribution_plot_saves_image_and_data(tmp_path: Path) -> None:

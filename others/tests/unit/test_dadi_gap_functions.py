@@ -21,7 +21,6 @@ import pytest
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.population import dadi_gap_functions as module
 
-
 requires_pkg = pytest.mark.skipif(
     importlib.util.find_spec("dadi") is None,
     reason="dadi is not installed",
@@ -108,8 +107,10 @@ def test_plot_sfs_2d_comparison_and_meta_residual(tmp_path):
     assert comparison["likelihood"] == "poisson"
     assert comparison["model"] == SFS_2D and comparison["data"] == SFS_2D
     meta = module.plot_sfs_2d_meta_residual(
-        RESID_2D, [[None, 0.1, -0.2], [-0.1, 0.0, 0.3], [None, 0.2, None]],
-        str(tmp_path / "meta.png"), verbose=False,
+        RESID_2D,
+        [[None, 0.1, -0.2], [-0.1, 0.0, 0.3], [None, 0.2, None]],
+        str(tmp_path / "meta.png"),
+        verbose=False,
     )
     assert _is_png(tmp_path / "meta.png")
     assert meta["synonymous_residual"] == RESID_2D
@@ -135,7 +136,9 @@ def test_plot_trispectrum_argument_checks_run_before_drawing(tmp_path):
     with pytest.raises(ConfigurationError, match="folded"):
         module.plot_trispectrum(TRI, str(tmp_path / "t.png"), folded="yes", verbose=False)
     with pytest.raises(ConfigurationError, match="titles must be strings"):
-        module.plot_trispectrum_comparison(TRI, TRI, str(tmp_path / "t2.png"), title1=3, verbose=False)
+        module.plot_trispectrum_comparison(
+            TRI, TRI, str(tmp_path / "t2.png"), title1=3, verbose=False
+        )
     assert not (tmp_path / "t.png").exists()
 
 
@@ -197,7 +200,9 @@ def test_plot_two_locus_spectrum_draws_png(tmp_path):
 @requires_pkg
 def test_two_locus_slice_arguments_are_checked_before_drawing(tmp_path):
     with pytest.raises(ConfigurationError, match="max_sum"):
-        module.plot_two_locus_spectrum(TWO_LOCUS, str(tmp_path / "x.png"), max_sum=-1, verbose=False)
+        module.plot_two_locus_spectrum(
+            TWO_LOCUS, str(tmp_path / "x.png"), max_sum=-1, verbose=False
+        )
     assert not (tmp_path / "x.png").exists()
 
 
@@ -208,16 +213,18 @@ def test_two_locus_slice_arguments_are_checked_before_drawing(tmp_path):
 
 @requires_pkg
 def test_plot_dfe_bivariate_gamma_and_lognormal(tmp_path):
-    gamma = module.plot_dfe_bivariate("biv_ind_gamma", [0.2, 10.0], str(tmp_path / "g.png"),
-                                      grid_size=8, verbose=False)
+    gamma = module.plot_dfe_bivariate(
+        "biv_ind_gamma", [0.2, 10.0], str(tmp_path / "g.png"), grid_size=8, verbose=False
+    )
     assert _is_png(tmp_path / "g.png")
     assert gamma["distribution"] == "biv_ind_gamma" and gamma["params"] == [0.2, 10.0]
     grid = gamma["gamma_grid"]
     assert len(grid) == 8 and all(value < 0 for value in grid)
     # Negative gammas on a log grid, from -1e-3 (weakest) down to -100 (strongest), as dadi expects.
     assert grid[0] == pytest.approx(-1e-3) and grid[-1] == pytest.approx(-100.0)
-    lognormal = module.plot_dfe_bivariate("biv_lognormal", [1.0, 0.5, 0.2],
-                                          str(tmp_path / "l.png"), grid_size=8, verbose=False)
+    lognormal = module.plot_dfe_bivariate(
+        "biv_lognormal", [1.0, 0.5, 0.2], str(tmp_path / "l.png"), grid_size=8, verbose=False
+    )
     assert _is_png(tmp_path / "l.png")
     assert lognormal["distribution"] == "biv_lognormal" and lognormal["params"] == [1.0, 0.5, 0.2]
 
@@ -225,8 +232,12 @@ def test_plot_dfe_bivariate_gamma_and_lognormal(tmp_path):
 @requires_pkg
 def test_plot_dfe_bivariate_point_pos(tmp_path):
     result = module.plot_dfe_bivariate_point_pos(
-        "biv_lognormal", [1.0, 0.5, 0.0, 0.1, 5.0, 0.1, 3.0], str(tmp_path / "pp.png"),
-        rho=0.2, grid_size=8, verbose=False,
+        "biv_lognormal",
+        [1.0, 0.5, 0.0, 0.1, 5.0, 0.1, 3.0],
+        str(tmp_path / "pp.png"),
+        rho=0.2,
+        grid_size=8,
+        verbose=False,
     )
     assert _is_png(tmp_path / "pp.png")
     assert result["rho"] == 0.2 and result["params"] == [1.0, 0.5, 0.0, 0.1, 5.0, 0.1, 3.0]
@@ -244,12 +255,15 @@ def test_plot_dfe_bivariate_rejects_unknown_distribution(tmp_path):
 # ---------------------------------------------------------------------------
 
 DEMO = [2.0, 2.0, 0.2, 0.0]
-MIX_OPTS = dict(sample_sizes=[4, 4], grid_points=(12, 14, 16), gamma_points=5, gamma_max=200.0,
-                verbose=False)
+MIX_OPTS = dict(
+    sample_sizes=[4, 4], grid_points=(12, 14, 16), gamma_points=5, gamma_max=200.0, verbose=False
+)
 
 
 def _mixture(variant, dfe_params, theta=1.0):
-    return module.dfe_mixture_spectrum(variant, DEMO, dfe_params=dfe_params, theta=theta, **MIX_OPTS)
+    return module.dfe_mixture_spectrum(
+        variant, DEMO, dfe_params=dfe_params, theta=theta, **MIX_OPTS
+    )
 
 
 @requires_pkg
@@ -265,7 +279,9 @@ def test_mixture_weight_interpolates_between_components():
             if value_half is None:
                 assert value_1d is None and value_2d is None
             else:
-                assert value_half == pytest.approx(0.5 * value_1d + 0.5 * value_2d, rel=1e-6, abs=1e-9)
+                assert value_half == pytest.approx(
+                    0.5 * value_1d + 0.5 * value_2d, rel=1e-6, abs=1e-9
+                )
 
 
 @requires_pkg
@@ -325,8 +341,9 @@ def test_mixture_checks_variant_and_parameter_count(variant, dfe_params, message
 @requires_pkg
 def test_mixture_checks_demography_length():
     with pytest.raises(ConfigurationError, match="four values"):
-        module.dfe_mixture_spectrum("mixture", [2.0, 2.0, 0.2], [4, 4], [1.0, 0.5, 0.2, 0.3],
-                                    verbose=False)
+        module.dfe_mixture_spectrum(
+            "mixture", [2.0, 2.0, 0.2], [4, 4], [1.0, 0.5, 0.2, 0.3], verbose=False
+        )
 
 
 def test_mixture_needs_dadi(monkeypatch):
@@ -349,11 +366,13 @@ def test_demes_fit_rejects_missing_inputs_and_bad_method(tmp_path):
     options.write_text("parameters: []\n", encoding="utf-8")
     sfs = [[None, 1.0], [1.0, None]]
     with pytest.raises(ConfigurationError, match="does not exist"):
-        module.fit_demes_graph_parameters(tmp_path / "missing.yaml", options, sfs, ["A", "B"], [8, 10, 12],
-                                          verbose=False)
+        module.fit_demes_graph_parameters(
+            tmp_path / "missing.yaml", options, sfs, ["A", "B"], [8, 10, 12], verbose=False
+        )
     with pytest.raises(ConfigurationError, match="method"):
-        module.fit_demes_graph_parameters(graph, options, sfs, ["A", "B"], [8, 10, 12], method="newton",
-                                          verbose=False)
+        module.fit_demes_graph_parameters(
+            graph, options, sfs, ["A", "B"], [8, 10, 12], method="newton", verbose=False
+        )
 
 
 @pytest.mark.xfail(
@@ -361,7 +380,7 @@ def test_demes_fit_rejects_missing_inputs_and_bad_method(tmp_path):
     raises=ConfigurationError,
     reason=(
         "upstream dadi.Demes.Inference.optimize reads the options file with ruamel.yaml.load, which "
-        "ruamel.yaml 0.19.1 (installed) removed; the call fails with AttributeError: \"load()\" has "
+        'ruamel.yaml 0.19.1 (installed) removed; the call fails with AttributeError: "load()" has '
         "been removed"
     ),
 )
@@ -381,10 +400,16 @@ def test_demes_fit_returns_parameters_in_bounds(tmp_path):
         "            epochs:\n              0: start_size\n    lower_bound: 1\n    upper_bound: 10000\n",
         encoding="utf-8",
     )
-    sfs = [[None, 0.5, 0.2, 0.1, None], [0.6, 0.9, 0.4, 0.2, 0.1], [0.2, 0.3, 0.5, 0.2, 0.1],
-           [0.1, 0.2, 0.1, 0.3, 0.1], [None, 0.1, 0.1, 0.1, None]]
-    result = module.fit_demes_graph_parameters(graph, options, sfs, ["A", "B"], [8, 10, 12],
-                                               maxiter=3, verbose=False)
+    sfs = [
+        [None, 0.5, 0.2, 0.1, None],
+        [0.6, 0.9, 0.4, 0.2, 0.1],
+        [0.2, 0.3, 0.5, 0.2, 0.1],
+        [0.1, 0.2, 0.1, 0.3, 0.1],
+        [None, 0.1, 0.1, 0.1, None],
+    ]
+    result = module.fit_demes_graph_parameters(
+        graph, options, sfs, ["A", "B"], [8, 10, 12], maxiter=3, verbose=False
+    )
     assert result["parameter_names"] == ["nuB"]
     assert 1.0 <= result["params"][0] <= 10000.0
 

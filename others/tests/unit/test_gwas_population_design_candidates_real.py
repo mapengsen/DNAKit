@@ -17,13 +17,13 @@ import pytest
 np = pytest.importorskip("numpy")
 scipy_stats = pytest.importorskip("scipy.stats")
 
-import dnakit.breeding as breeding  # noqa: E402
-import dnakit.experimental_design as design  # noqa: E402
-import dnakit.forensic_reproductive as forensic  # noqa: E402
-import dnakit.gwas as gwas  # noqa: E402
-import dnakit.population as population  # noqa: E402
-from dnakit.exceptions import ConfigurationError, DNAKitError, InputFormatError  # noqa: E402
-from dnakit.gwas import _impl_stats as st  # noqa: E402
+import dnakit.breeding as breeding
+import dnakit.experimental_design as design
+import dnakit.forensic_reproductive as forensic
+import dnakit.gwas as gwas
+import dnakit.population as population
+from dnakit.exceptions import ConfigurationError, DNAKitError, InputFormatError
+from dnakit.gwas import _impl_stats as st
 
 
 def ok(envelope: dict) -> dict:

@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import shutil
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import execute_bounded_command
@@ -19,7 +20,13 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 _HINT = "Install sourmash 4.9 or later (python -m pip install sourmash, or conda install -c bioconda sourmash)."
 _MAX_TAIL = 4000
-_MOLTYPE_FLAGS = {"DNA": "--dna", "RNA": "--rna", "protein": "--protein", "dayhoff": "--dayhoff", "hp": "--hp"}
+_MOLTYPE_FLAGS = {
+    "DNA": "--dna",
+    "RNA": "--rna",
+    "protein": "--protein",
+    "dayhoff": "--dayhoff",
+    "hp": "--hp",
+}
 _BACKENDS = ("zip", "fs")
 
 
@@ -35,7 +42,9 @@ def _program(sourmash_path: str | None) -> str:
         beside = Path(sys.executable).with_name("sourmash")
         if beside.is_file():
             return str(beside)
-        raise BackendUnavailableError("sourmash was not found on PATH or beside the Python interpreter.", hint=_HINT)
+        raise BackendUnavailableError(
+            "sourmash was not found on PATH or beside the Python interpreter.", hint=_HINT
+        )
     return found
 
 
@@ -45,7 +54,9 @@ def _run(
     result = execute_bounded_command(
         _program(sourmash_path), args, backend_id="sourmash", cwd=Path.cwd(), verbose=verbose
     )
-    status = "completed" if result.return_code == 0 and all(p.exists() for p in outputs) else "failed"
+    status = (
+        "completed" if result.return_code == 0 and all(p.exists() for p in outputs) else "failed"
+    )
     return {
         "status": status,
         "backend": "sourmash",
@@ -160,7 +171,10 @@ def inflate_signatures(
     abundances; each other signature is inflated with ``MinHash.inflate`` against it and saved to one new file.
     ``ksize`` selects the k-mer size; when omitted the DNA molecule type is used."""
     ref = str(_existing(signature_from, "signature_from"))
-    others = [str(_existing(p, "other_signatures")) for p in _nonempty(other_signatures, "other_signatures")]
+    others = [
+        str(_existing(p, "other_signatures"))
+        for p in _nonempty(other_signatures, "other_signatures")
+    ]
     out = _new(output, "output")
     args = ["sig", "inflate", ref, *others, "-o", str(out)]
     if ksize is not None:
@@ -234,7 +248,12 @@ def convert_sbt_storage(
     storage = Path(target).expanduser().resolve()
     if storage.exists():
         raise ConfigurationError(f"backend target must not exist yet: {storage}")
-    return _run(["storage", "convert", str(out), "-b", f"{name}({storage})"], [out, storage], sourmash_path, verbose)
+    return _run(
+        ["storage", "convert", str(out), "-b", f"{name}({storage})"],
+        [out, storage],
+        sourmash_path,
+        verbose,
+    )
 
 
 _register_public_verbose(globals())

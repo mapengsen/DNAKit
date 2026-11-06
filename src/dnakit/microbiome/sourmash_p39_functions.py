@@ -123,10 +123,23 @@ def watch_reads_against_index(
     if moltype not in _MOLTYPES:
         raise ConfigurationError(f"moltype must be one of {list(_MOLTYPES)}.")
     n_hashes = _positive(num_hashes, "num_hashes", 50_000)
-    if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or not 0 <= threshold <= 1:
+    if (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, (int, float))
+        or not 0 <= threshold <= 1
+    ):
         raise ConfigurationError("threshold must be a number in [0, 1].")
     flag = {"DNA": "--dna", "protein": "--protein", "dayhoff": "--dayhoff", "hp": "--hp"}[moltype]
-    args = ["watch", str(path), str(reads_path), flag, "-n", str(n_hashes), "--threshold", str(threshold)]
+    args = [
+        "watch",
+        str(path),
+        str(reads_path),
+        flag,
+        "-n",
+        str(n_hashes),
+        "--threshold",
+        str(threshold),
+    ]
     if ksize is not None:
         args += ["-k", str(_positive(ksize, "ksize", 100))]
     if name is not None:
@@ -166,7 +179,16 @@ def build_signature_index(
     written = out.parent / (out.name + ".sbt.zip") if index_type == "SBT" else out
     if written.exists():
         raise ConfigurationError(f"output_index must not exist yet: {written}")
-    args = ["index", str(out), *sigs, "-F", index_type, "-k", str(_positive(ksize, "ksize", 100)), flag]
+    args = [
+        "index",
+        str(out),
+        *sigs,
+        "-F",
+        index_type,
+        "-k",
+        str(_positive(ksize, "ksize", 100)),
+        flag,
+    ]
     result = _run(args, [written], sourmash_path, verbose)
     return _finish(result, "build_signature_index", index_type=index_type, index=str(written))
 
@@ -198,11 +220,15 @@ def tax_genome_classification(
     """
 
     gathers = [str(_existing(item, "gather_csv")) for item in _nonempty(gather_csvs, "gather_csvs")]
-    taxonomies = [str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")]
+    taxonomies = [
+        str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")
+    ]
     formats = [str(item) for item in _nonempty(output_formats, "output_formats")]
     for item in formats:
         if item not in _GENOME_FORMATS:
-            raise ConfigurationError(f"output_formats entries must be among {list(_GENOME_FORMATS)}.")
+            raise ConfigurationError(
+                f"output_formats entries must be among {list(_GENOME_FORMATS)}."
+            )
     if rank is not None and rank not in _RANKS:
         raise ConfigurationError(f"rank must be one of {list(_RANKS)}.")
     if "krona" in formats and rank is None:
@@ -211,7 +237,18 @@ def tax_genome_classification(
     base = re.sub(r"[^A-Za-z0-9_.-]", "_", str(output_base))
     if not base:
         raise ConfigurationError("output_base must not be empty.")
-    args = ["tax", "genome", "-g", *gathers, "-t", *taxonomies, "-o", base, "--output-dir", str(folder)]
+    args = [
+        "tax",
+        "genome",
+        "-g",
+        *gathers,
+        "-t",
+        *taxonomies,
+        "-o",
+        base,
+        "--output-dir",
+        str(folder),
+    ]
     args += ["-F", *formats]
     if rank is not None:
         args += ["--rank", rank]
@@ -219,7 +256,9 @@ def tax_genome_classification(
         args += ["--ani-threshold", str(ani_threshold)]
     else:
         args += ["--containment-threshold", str(containment_threshold)]
-    args += _identifier_flags(keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy)
+    args += _identifier_flags(
+        keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy
+    )
     if force:
         args.append("--force")
     result = _run_collect(args, folder, sourmash_path, verbose)
@@ -241,10 +280,14 @@ def tax_annotate_gather_results(
     """Add a lineage column to gather CSV files (sourmash tax annotate); writes ``<name>.with-lineages.csv``."""
 
     gathers = [str(_existing(item, "gather_csv")) for item in _nonempty(gather_csvs, "gather_csvs")]
-    taxonomies = [str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")]
+    taxonomies = [
+        str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")
+    ]
     folder = _new_dir(output_dir, "output_dir")
     args = ["tax", "annotate", "-g", *gathers, "-t", *taxonomies, "-o", str(folder)]
-    args += _identifier_flags(keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy)
+    args += _identifier_flags(
+        keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy
+    )
     if force:
         args.append("--force")
     result = _run_collect(args, folder, sourmash_path, verbose)
@@ -267,10 +310,14 @@ def tax_prepare_taxonomy_database(
 
     if database_format not in ("csv", "sql"):
         raise ConfigurationError("database_format must be 'csv' or 'sql'.")
-    taxonomies = [str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")]
+    taxonomies = [
+        str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")
+    ]
     out = _new(output, "output")
     args = ["tax", "prepare", "-t", *taxonomies, "-o", str(out), "-F", database_format]
-    args += _identifier_flags(keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy)
+    args += _identifier_flags(
+        keep_full_identifiers, keep_identifier_versions, fail_on_missing_taxonomy
+    )
     if force:
         args.append("--force")
     result = _run(args, [out], sourmash_path, verbose)
@@ -300,7 +347,9 @@ def tax_grep_lineages(
         raise ConfigurationError("pattern must be a non-empty string.")
     if rank is not None and rank not in _RANKS:
         raise ConfigurationError(f"rank must be one of {list(_RANKS)}.")
-    taxonomies = [str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")]
+    taxonomies = [
+        str(_existing(item, "taxonomy_csv")) for item in _nonempty(taxonomy_csvs, "taxonomy_csvs")
+    ]
     args = ["tax", "grep", pattern, "-t", *taxonomies]
     out = None
     if output is None:
@@ -337,7 +386,10 @@ def tax_summarize_lineages(
     ``output_lineage_counts`` a new CSV ``rank,lineage_count,lineage`` is written.
     """
 
-    files = [str(_existing(item, "taxonomy file")) for item in _nonempty(taxonomy_files, "taxonomy_files")]
+    files = [
+        str(_existing(item, "taxonomy file"))
+        for item in _nonempty(taxonomy_files, "taxonomy_files")
+    ]
     args = ["tax", "summarize", *files]
     out = None
     if output_lineage_counts is not None:
@@ -348,7 +400,9 @@ def tax_summarize_lineages(
         args.append("--force")
     result = _run(args, [out] if out else [], sourmash_path, verbose)
     text = result["log_tail"]
-    rank_counts = {rank: int(count) for rank, count in re.findall(r"rank (\w+):\s+(\d+) distinct", text)}
+    rank_counts = {
+        rank: int(count) for rank, count in re.findall(r"rank (\w+):\s+(\d+) distinct", text)
+    }
     total = re.search(r"number of distinct taxonomic lineages: (\d+)", text)
     return _finish(
         result,
@@ -388,7 +442,9 @@ def _sketch(sourmash: Any, value: object, name: str) -> Any:
             raise ConfigurationError(f"{name} hashes must be unsigned 64-bit integers.")
     abundances = value.get("abundances")
     try:
-        minhash = sourmash.MinHash(n=0, ksize=ksize, scaled=scaled, track_abundance=abundances is not None)
+        minhash = sourmash.MinHash(
+            n=0, ksize=ksize, scaled=scaled, track_abundance=abundances is not None
+        )
         if abundances is None:
             minhash.add_many(list(hashes))
         else:
@@ -493,7 +549,12 @@ def sequence_kmer_hashes(
             kmers = [[kmer, None if h is None else int(h)] for kmer, h in pairs]
             hashes = [item[1] for item in kmers]
         else:
-            hashes = [int(h) for h in minhash.seq_to_hashes(sequence, force=bool(force), bad_kmers_as_zeroes=bool(force))]
+            hashes = [
+                int(h)
+                for h in minhash.seq_to_hashes(
+                    sequence, force=bool(force), bad_kmers_as_zeroes=bool(force)
+                )
+            ]
             kmers = None
     except (OverflowError, TypeError, ValueError) as exc:
         raise ConfigurationError(f"sourmash could not hash the sequence: {exc}") from exc
@@ -530,7 +591,9 @@ def sketch_size_accuracy(
     sourmash = require("sourmash", _EXTRA)
     minhash = _sketch(sourmash, sketch, "sketch")
     try:
-        accurate = bool(minhash.size_is_accurate(relative_error=relative_error, confidence=confidence))
+        accurate = bool(
+            minhash.size_is_accurate(relative_error=relative_error, confidence=confidence)
+        )
     except (TypeError, ValueError) as exc:
         raise ConfigurationError(f"sourmash could not evaluate the sketch: {exc}") from exc
     return {

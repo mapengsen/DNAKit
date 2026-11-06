@@ -48,11 +48,19 @@ def classify_kraken2(
     database_path = Path(database).expanduser().resolve()
     if not database_path.is_dir():
         raise ConfigurationError(f"database directory does not exist: {database_path}")
-    if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) or not 0 <= confidence <= 1:
+    if (
+        isinstance(confidence, bool)
+        or not isinstance(confidence, (int, float))
+        or not 0 <= confidence <= 1
+    ):
         raise ConfigurationError("confidence must be a number in [0, 1].")
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
-    if not isinstance(program, str) or not program.strip() or any(char in program for char in "\x00\r\n"):
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(char in program for char in "\x00\r\n")
+    ):
         raise ConfigurationError("program must be a non-empty executable name without newlines.")
     directory = workspace(output_directory)
     report = directory / "report.tsv"
@@ -66,8 +74,17 @@ def classify_kraken2(
     run(
         program.strip(),
         (
-            "--db", str(database_path), "--confidence", str(confidence), "--threads", str(threads),
-            "--report", str(report), "--output", str(assignments), str(reads_path),
+            "--db",
+            str(database_path),
+            "--confidence",
+            str(confidence),
+            "--threads",
+            str(threads),
+            "--report",
+            str(report),
+            "--output",
+            str(assignments),
+            str(reads_path),
         ),
         directory,
         config,
@@ -115,11 +132,19 @@ def estimate_bracken_abundance(
 
     report_path = input_path(report)
     database_path = _directory(database, "database")
-    if isinstance(read_length, bool) or not isinstance(read_length, int) or not 1 <= read_length <= 10_000:
+    if (
+        isinstance(read_length, bool)
+        or not isinstance(read_length, int)
+        or not 1 <= read_length <= 10_000
+    ):
         raise ConfigurationError("read_length must be an integer in [1, 10000].")
     if level not in {"D", "P", "C", "O", "F", "G", "S"}:
         raise ConfigurationError("level must be one of D, P, C, O, F, G or S.")
-    if isinstance(threshold, bool) or not isinstance(threshold, int) or not 0 <= threshold <= 1_000_000:
+    if (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, int)
+        or not 0 <= threshold <= 1_000_000
+    ):
         raise ConfigurationError("threshold must be an integer in [0, 1000000].")
     program = _program(program)
     directory = workspace(output_directory)
@@ -133,8 +158,18 @@ def estimate_bracken_abundance(
     run(
         program,
         (
-            "-d", str(database_path), "-i", str(report_path), "-o", str(abundance),
-            "-r", str(read_length), "-l", level, "-t", str(threshold),
+            "-d",
+            str(database_path),
+            "-i",
+            str(report_path),
+            "-o",
+            str(abundance),
+            "-r",
+            str(read_length),
+            "-l",
+            level,
+            "-t",
+            str(threshold),
         ),
         directory,
         config,
@@ -198,8 +233,16 @@ def classify_centrifuge(
     run(
         program,
         (
-            "-x", str(prefix), "-U", str(reads_path), "-S", str(assignments),
-            "--report-file", str(report), "-p", str(threads),
+            "-x",
+            str(prefix),
+            "-U",
+            str(reads_path),
+            "-S",
+            str(assignments),
+            "--report-file",
+            str(report),
+            "-p",
+            str(threads),
         ),
         directory,
         config,
@@ -259,8 +302,16 @@ def classify_kaiju(
     run(
         program,
         (
-            "-t", str(taxonomy_path), "-f", str(database_path), "-i", str(reads_path),
-            "-o", str(assignments), "-z", str(threads),
+            "-t",
+            str(taxonomy_path),
+            "-f",
+            str(database_path),
+            "-i",
+            str(reads_path),
+            "-o",
+            str(assignments),
+            "-z",
+            str(threads),
         ),
         directory,
         config,
@@ -312,7 +363,11 @@ def classify_gtdbtk(
 
     genomes_path = _directory(genomes, "genomes")
     database_path = _directory(database, "database")
-    if not isinstance(extension, str) or not extension or not all(char.isalnum() or char == "." for char in extension):
+    if (
+        not isinstance(extension, str)
+        or not extension
+        or not all(char.isalnum() or char == "." for char in extension)
+    ):
         raise ConfigurationError("extension must contain only letters, digits or periods.")
     threads = _threads(threads)
     program = _program(program)
@@ -327,8 +382,15 @@ def classify_gtdbtk(
     run(
         program,
         (
-            "classify_wf", "--genome_dir", str(genomes_path), "--out_dir", str(result_directory),
-            "--cpus", str(threads), "--extension", extension,
+            "classify_wf",
+            "--genome_dir",
+            str(genomes_path),
+            "--out_dir",
+            str(result_directory),
+            "--cpus",
+            str(threads),
+            "--extension",
+            extension,
         ),
         directory,
         config,
@@ -336,7 +398,9 @@ def classify_gtdbtk(
     )
     summaries = tuple(result_directory.rglob("*.summary.tsv"))
     if not summaries:
-        raise BackendExecutionError("GTDB-Tk did not produce a *.summary.tsv classification report.")
+        raise BackendExecutionError(
+            "GTDB-Tk did not produce a *.summary.tsv classification report."
+        )
     return serialize_for_agent(
         {
             "status": "completed",
@@ -379,20 +443,36 @@ def profile_humann(
     reads_path = input_path(reads)
     threads = _threads(threads)
     program = _program(program)
-    nucleotide_path = _directory(nucleotide_database, "nucleotide_database") if nucleotide_database is not None else None
-    protein_path = _directory(protein_database, "protein_database") if protein_database is not None else None
+    nucleotide_path = (
+        _directory(nucleotide_database, "nucleotide_database")
+        if nucleotide_database is not None
+        else None
+    )
+    protein_path = (
+        _directory(protein_database, "protein_database") if protein_database is not None else None
+    )
     directory = workspace(output_directory)
     result_directory = directory / "humann"
     result_directory.mkdir()
     stem = reads_path.name.split(".", 1)[0]
-    outputs = tuple(result_directory / f"{stem}{suffix}" for suffix in ("_genefamilies.tsv", "_pathabundance.tsv", "_pathcoverage.tsv"))
+    outputs = tuple(
+        result_directory / f"{stem}{suffix}"
+        for suffix in ("_genefamilies.tsv", "_pathabundance.tsv", "_pathcoverage.tsv")
+    )
     config = ExecutionConfig(
         threads=threads,
         timeout_seconds=timeout_seconds,
         max_output_bytes=max_output_bytes,
         max_artifact_bytes=max_artifact_bytes,
     )
-    arguments = ["--input", str(reads_path), "--output", str(result_directory), "--threads", str(threads)]
+    arguments = [
+        "--input",
+        str(reads_path),
+        "--output",
+        str(result_directory),
+        "--threads",
+        str(threads),
+    ]
     if nucleotide_path is not None:
         arguments.extend(("--nucleotide-database", str(nucleotide_path)))
     if protein_path is not None:
@@ -420,6 +500,8 @@ def profile_humann(
         },
         verbose=verbose,
     )
+
+
 __all__ = [
     "classify_centrifuge",
     "classify_gtdbtk",

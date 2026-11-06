@@ -82,6 +82,8 @@ class FakeDataset:
 
 
 def test_missing_pytorch_module_raises_backend_unavailable(monkeypatch):
+    # Without torch itself the getters report torch first; this checks the next guard.
+    pytest.importorskip("torch")
     monkeypatch.setitem(sys.modules, PYTORCH, None)
     with pytest.raises(BackendUnavailableError, match="bio-genomic-benchmarks"):
         gap.load_demo_human_or_worm("train", verbose=False)

@@ -38,8 +38,31 @@ _LOG_TAIL_CHARS = 4000
 _VERSION_LINE = re.compile(r"macs3\s+(\S+)")
 _FRAGMENT_LENGTH = re.compile(r"predicted fragment length is (\d+) bps")
 _TAG_SIZE = re.compile(r"tag size is determined as (\d+) bps")
-_FORMATS = ("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE", "FRAG")
-_PEAK_FORMATS = ("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE")
+_FORMATS = (
+    "AUTO",
+    "BAM",
+    "SAM",
+    "BED",
+    "ELAND",
+    "ELANDMULTI",
+    "ELANDEXPORT",
+    "BOWTIE",
+    "BAMPE",
+    "BEDPE",
+    "FRAG",
+)
+_PEAK_FORMATS = (
+    "AUTO",
+    "BAM",
+    "SAM",
+    "BED",
+    "ELAND",
+    "ELANDMULTI",
+    "ELANDEXPORT",
+    "BOWTIE",
+    "BAMPE",
+    "BEDPE",
+)
 _BDG_METHODS = ("ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR", "max")
 _OPT_METHODS = ("multiply", "add", "p2q", "max", "min")
 _COMBINE_METHODS = ("fisher", "max", "mean")
@@ -56,7 +79,9 @@ def _text(value: object, name: str) -> str:
     return value
 
 
-def _int(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int:
+def _int(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{name} must be an integer.")
     if minimum is not None and value < minimum:
@@ -66,7 +91,9 @@ def _int(value: object, name: str, *, minimum: int | None = None, maximum: int |
     return value
 
 
-def _number(value: object, name: str, *, minimum: float | None = None, maximum: float | None = None) -> float:
+def _number(
+    value: object, name: str, *, minimum: float | None = None, maximum: float | None = None
+) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or value != value:
         raise ConfigurationError(f"{name} must be a number.")
     number = float(value)
@@ -125,14 +152,18 @@ def _new_directory(value: object, name: str = "outdir") -> Path:
 def _name(value: object, name: str = "name") -> str:
     text = _text(value, name)
     if "/" in text or "\\" in text or text.startswith("-") or len(text) > 200:
-        raise ConfigurationError(f"{name} must be a plain name without slashes and not starting with '-'.")
+        raise ConfigurationError(
+            f"{name} must be a plain name without slashes and not starting with '-'."
+        )
     return text
 
 
 def _genome_size(value: object) -> str:
     """MACS3 accepts the shortcuts hs, mm, ce, dm, or an integer number of effective bases."""
     if isinstance(value, bool):
-        raise ConfigurationError("genome_size must be a shortcut (hs, mm, ce, dm) or a positive integer.")
+        raise ConfigurationError(
+            "genome_size must be a shortcut (hs, mm, ce, dm) or a positive integer."
+        )
     if isinstance(value, int):
         return str(_int(value, "genome_size", minimum=1))
     if isinstance(value, str) and value in {"hs", "mm", "ce", "dm"}:
@@ -282,7 +313,9 @@ def _tail(text: str) -> str:
 def _count_rows(path: Path) -> int:
     """Data rows of a BED, bedGraph, narrowPeak or VCF file (track, header and comment lines skipped)."""
     with path.open(encoding="utf-8", errors="replace") as handle:
-        return sum(1 for line in handle if line.strip() and not line.startswith(("#", "track", "browser")))
+        return sum(
+            1 for line in handle if line.strip() and not line.startswith(("#", "track", "browser"))
+        )
 
 
 def _directory_files(directory: Path) -> dict[str, Path]:
@@ -382,15 +415,22 @@ def macs3_call_peaks(
     options += _opt("-s", None if tag_size is None else _int(tag_size, "tag_size", minimum=1))
     options += ["--keep-dup", _keep_duplicates(keep_duplicates)]
     options += _opt("--extsize", None if extsize is None else _int(extsize, "extsize", minimum=1))
-    options += _opt("--shift", None if shift is None else _int(shift, "shift", minimum=-100000, maximum=100000))
+    options += _opt(
+        "--shift", None if shift is None else _int(shift, "shift", minimum=-100000, maximum=100000)
+    )
     options += _switch("--nomodel", _flag(no_model, "no_model"))
     low, high = _mfold(mfold)
     options += ["-m", str(low), str(high), "--bw", str(_int(bandwidth, "bandwidth", minimum=1))]
     options += _switch("--call-summits", _flag(call_summits, "call_summits"))
     options += _switch("--broad", _flag(broad, "broad"))
     if broad:
-        options += ["--broad-cutoff", str(_number(broad_cutoff, "broad_cutoff", minimum=1e-12, maximum=1.0))]
-    options += _opt("--min-length", None if min_length is None else _int(min_length, "min_length", minimum=1))
+        options += [
+            "--broad-cutoff",
+            str(_number(broad_cutoff, "broad_cutoff", minimum=1e-12, maximum=1.0)),
+        ]
+    options += _opt(
+        "--min-length", None if min_length is None else _int(min_length, "min_length", minimum=1)
+    )
     options += _opt("--max-gap", None if max_gap is None else _int(max_gap, "max_gap", minimum=0))
     options += _switch("-B", _flag(save_bedgraph, "save_bedgraph"))
     options += _opt("--seed", None if seed is None else _int(seed, "seed", minimum=0))
@@ -400,8 +440,18 @@ def macs3_call_peaks(
     if call_summits:
         monitored.append(directory / f"{label}_summits.bed")
     if save_bedgraph:
-        monitored += [directory / f"{label}_treat_pileup.bdg", directory / f"{label}_control_lambda.bdg"]
-    run = _run("callpeak", options, cwd=directory.parent, monitored=monitored, macs3_path=macs3_path, verbose=verbose)
+        monitored += [
+            directory / f"{label}_treat_pileup.bdg",
+            directory / f"{label}_control_lambda.bdg",
+        ]
+    run = _run(
+        "callpeak",
+        options,
+        cwd=directory.parent,
+        monitored=monitored,
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
     files = _directory_files(directory)
     counts = {"peak_count": _count_rows(directory / f"{label}_peaks.{peak_name}")}
     if call_summits:
@@ -442,10 +492,27 @@ def macs3_predict_fragment_length(
     directory = _new_directory(outdir)
     fmt = _choice(input_format, _PEAK_FORMATS, "input_format")
     low, high = _mfold(mfold)
-    options = ["-i", *map(str, inputs), "-f", fmt, "-g", _genome_size(genome_size), "-m", str(low), str(high)]
+    options = [
+        "-i",
+        *map(str, inputs),
+        "-f",
+        fmt,
+        "-g",
+        _genome_size(genome_size),
+        "-m",
+        str(low),
+        str(high),
+    ]
     options += ["--bw", str(_int(bandwidth, "bandwidth", minimum=1)), "--outdir", str(directory)]
     options += _opt("--d-min", None if d_min is None else _int(d_min, "d_min", minimum=1))
-    run = _run("predictd", options, cwd=directory.parent, monitored=(), macs3_path=macs3_path, verbose=verbose)
+    run = _run(
+        "predictd",
+        options,
+        cwd=directory.parent,
+        monitored=(),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
     info = _fragment_info(run.text)
     if info["predicted_fragment_length"] is None:
         raise BackendExecutionError(
@@ -481,11 +548,27 @@ def macs3_pileup(
     inputs = _inputs(input_paths, "input_paths")
     target = _output(output_path)
     fmt = _choice(input_format, _FORMATS, "input_format")
-    options = ["-i", *map(str, inputs), "-f", fmt, "--extsize", str(_int(extsize, "extsize", minimum=1))]
+    options = [
+        "-i",
+        *map(str, inputs),
+        "-f",
+        fmt,
+        "--extsize",
+        str(_int(extsize, "extsize", minimum=1)),
+    ]
     options += _switch("-B", _flag(both_directions, "both_directions"))
     options += ["-o", str(target)]
-    run = _run("pileup", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("pileup", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)})
+    run = _run(
+        "pileup",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "pileup", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)}
+    )
 
 
 def macs3_filter_duplicates(
@@ -507,11 +590,28 @@ def macs3_filter_duplicates(
     target = _output(output_path)
     fmt = _choice(input_format, _PEAK_FORMATS, "input_format")
     options = [
-        "-i", *map(str, inputs), "-f", fmt, "-g", _genome_size(genome_size),
-        "--keep-dup", _keep_duplicates(keep_duplicates), "-o", str(target),
+        "-i",
+        *map(str, inputs),
+        "-f",
+        fmt,
+        "-g",
+        _genome_size(genome_size),
+        "--keep-dup",
+        _keep_duplicates(keep_duplicates),
+        "-o",
+        str(target),
     ]
-    run = _run("filterdup", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("filterdup", run, outputs={"bed": target}, counts={"kept_reads": _count_rows(target)})
+    run = _run(
+        "filterdup",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "filterdup", run, outputs={"bed": target}, counts={"kept_reads": _count_rows(target)}
+    )
 
 
 def macs3_random_sample(
@@ -537,8 +637,17 @@ def macs3_random_sample(
     else:
         options += ["-n", str(_int(number, "number", minimum=1))]
     options += _opt("--seed", None if seed is None else _int(seed, "seed", minimum=0))
-    run = _run("randsample", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("randsample", run, outputs={"sample": target}, counts={"sampled_reads": _count_rows(target)})
+    run = _run(
+        "randsample",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "randsample", run, outputs={"sample": target}, counts={"sampled_reads": _count_rows(target)}
+    )
 
 
 def macs3_refine_summits(
@@ -558,12 +667,30 @@ def macs3_refine_summits(
     target = _output(output_path)
     fmt = _choice(input_format, _PEAK_FORMATS, "input_format")
     options = [
-        "-b", str(candidate), "-i", *map(str, inputs), "-f", fmt,
-        "-c", str(_number(cutoff, "cutoff", minimum=0.0)),
-        "-w", str(_int(window_size, "window_size", minimum=1)), "-o", str(target),
+        "-b",
+        str(candidate),
+        "-i",
+        *map(str, inputs),
+        "-f",
+        fmt,
+        "-c",
+        str(_number(cutoff, "cutoff", minimum=0.0)),
+        "-w",
+        str(_int(window_size, "window_size", minimum=1)),
+        "-o",
+        str(target),
     ]
-    run = _run("refinepeak", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("refinepeak", run, outputs={"bed": target}, counts={"refined_peaks": _count_rows(target)})
+    run = _run(
+        "refinepeak",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "refinepeak", run, outputs={"bed": target}, counts={"refined_peaks": _count_rows(target)}
+    )
 
 
 def macs3_call_variants(
@@ -584,13 +711,31 @@ def macs3_call_variants(
     peaks = _input(peak_bed, "peak_bed")
     treatment = _input(treatment_bam, "treatment_bam")
     target = _output(output_path)
-    options = ["-b", str(peaks), "-t", str(treatment), "-o", str(target),
-               "-Q", str(_int(min_quality, "min_quality", minimum=0)),
-               "-D", str(_int(max_duplicates, "max_duplicates", minimum=1))]
+    options = [
+        "-b",
+        str(peaks),
+        "-t",
+        str(treatment),
+        "-o",
+        str(target),
+        "-Q",
+        str(_int(min_quality, "min_quality", minimum=0)),
+        "-D",
+        str(_int(max_duplicates, "max_duplicates", minimum=1)),
+    ]
     if control_bam is not None:
         options += ["-c", str(_input(control_bam, "control_bam"))]
-    run = _run("callvar", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("callvar", run, outputs={"variants": target}, counts={"variant_rows": _count_rows(target)})
+    run = _run(
+        "callvar",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "callvar", run, outputs={"variants": target}, counts={"variant_rows": _count_rows(target)}
+    )
 
 
 def macs3_combine_replicates(
@@ -606,8 +751,17 @@ def macs3_combine_replicates(
     target = _output(output_path)
     chosen = _choice(method, _COMBINE_METHODS, "method")
     options = ["-i", *map(str, inputs), "-m", chosen, "-o", str(target)]
-    run = _run("cmbreps", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("cmbreps", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)})
+    run = _run(
+        "cmbreps",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "cmbreps", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)}
+    )
 
 
 def macs3_compare_bedgraphs(
@@ -630,12 +784,30 @@ def macs3_compare_bedgraphs(
     target = _output(output_path)
     chosen = _choice(method, _BDG_METHODS, "method")
     options = [
-        "-t", str(treatment), "-c", str(control), "-m", chosen,
-        "-S", str(_number(scaling_factor, "scaling_factor", minimum=1e-12)),
-        "-p", str(_number(pseudocount, "pseudocount", minimum=0.0)), "-o", str(target),
+        "-t",
+        str(treatment),
+        "-c",
+        str(control),
+        "-m",
+        chosen,
+        "-S",
+        str(_number(scaling_factor, "scaling_factor", minimum=1e-12)),
+        "-p",
+        str(_number(pseudocount, "pseudocount", minimum=0.0)),
+        "-o",
+        str(target),
     ]
-    run = _run("bdgcmp", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("bdgcmp", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)})
+    run = _run(
+        "bdgcmp",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "bdgcmp", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)}
+    )
 
 
 def macs3_operate_bedgraph(
@@ -653,14 +825,25 @@ def macs3_operate_bedgraph(
     chosen = _choice(method, _OPT_METHODS, "method")
     params = _floats(extra_params, "extra_params")
     if chosen != "p2q" and len(params) != 1:
-        raise ConfigurationError(f"method {chosen!r} needs exactly one value in extra_params (MACS3 -p).")
+        raise ConfigurationError(
+            f"method {chosen!r} needs exactly one value in extra_params (MACS3 -p)."
+        )
     if chosen == "p2q" and params:
         raise ConfigurationError("method 'p2q' takes no extra_params.")
     options = ["-i", str(source), "-m", chosen, "-o", str(target)]
     if params:
         options += ["-p", *map(str, params)]
-    run = _run("bdgopt", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("bdgopt", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)})
+    run = _run(
+        "bdgopt",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "bdgopt", run, outputs={"bedgraph": target}, counts={"bedgraph_rows": _count_rows(target)}
+    )
 
 
 def macs3_call_bedgraph_peaks(
@@ -679,8 +862,17 @@ def macs3_call_bedgraph_peaks(
     options = ["-i", str(source), "-c", str(_number(cutoff, "cutoff")), "-o", str(target)]
     options += _opt("-l", None if min_length is None else _int(min_length, "min_length", minimum=1))
     options += _opt("-g", None if max_gap is None else _int(max_gap, "max_gap", minimum=0))
-    run = _run("bdgpeakcall", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("bdgpeakcall", run, outputs={"bed": target}, counts={"peak_count": _count_rows(target)})
+    run = _run(
+        "bdgpeakcall",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "bdgpeakcall", run, outputs={"bed": target}, counts={"peak_count": _count_rows(target)}
+    )
 
 
 def macs3_call_bedgraph_broad_peaks(
@@ -703,13 +895,35 @@ def macs3_call_bedgraph_broad_peaks(
     if link > peak:
         raise ConfigurationError("cutoff_link must not be larger than cutoff_peak.")
     options = [
-        "-i", str(source), "-c", str(peak), "-C", str(link),
-        "-l", str(_int(min_length, "min_length", minimum=1)),
-        "-g", str(_int(lvl1_max_gap, "lvl1_max_gap", minimum=0)),
-        "-G", str(_int(lvl2_max_gap, "lvl2_max_gap", minimum=0)), "-o", str(target),
+        "-i",
+        str(source),
+        "-c",
+        str(peak),
+        "-C",
+        str(link),
+        "-l",
+        str(_int(min_length, "min_length", minimum=1)),
+        "-g",
+        str(_int(lvl1_max_gap, "lvl1_max_gap", minimum=0)),
+        "-G",
+        str(_int(lvl2_max_gap, "lvl2_max_gap", minimum=0)),
+        "-o",
+        str(target),
     ]
-    run = _run("bdgbroadcall", options, cwd=target.parent, monitored=(target,), macs3_path=macs3_path, verbose=verbose)
-    return _result("bdgbroadcall", run, outputs={"bed": target}, counts={"broad_region_count": _count_rows(target)})
+    run = _run(
+        "bdgbroadcall",
+        options,
+        cwd=target.parent,
+        monitored=(target,),
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
+    return _result(
+        "bdgbroadcall",
+        run,
+        outputs={"bed": target},
+        counts={"broad_region_count": _count_rows(target)},
+    )
 
 
 def macs3_diff_bedgraphs(
@@ -737,26 +951,50 @@ def macs3_diff_bedgraphs(
     c1 = _input(control1_bedgraph, "control1_bedgraph")
     t2 = _input(treatment2_bedgraph, "treatment2_bedgraph")
     c2 = _input(control2_bedgraph, "control2_bedgraph")
-    if isinstance(output_paths, str) or not isinstance(output_paths, Sequence) or len(output_paths) != 3:
-        raise ConfigurationError("output_paths must list three new files: condition 1, condition 2, common.")
+    if (
+        isinstance(output_paths, str)
+        or not isinstance(output_paths, Sequence)
+        or len(output_paths) != 3
+    ):
+        raise ConfigurationError(
+            "output_paths must list three new files: condition 1, condition 2, common."
+        )
     targets = [_output(path, "output_paths") for path in output_paths]
     if len({str(path) for path in targets}) != 3:
         raise ConfigurationError("output_paths must be three different files.")
     options = [
-        "--t1", str(t1), "--c1", str(c1), "--t2", str(t2), "--c2", str(c2),
-        "-C", str(_number(cutoff, "cutoff")),
-        "-l", str(_int(min_length, "min_length", minimum=1)),
-        "-g", str(_int(max_gap, "max_gap", minimum=0)),
-        "-o", *map(str, targets),
+        "--t1",
+        str(t1),
+        "--c1",
+        str(c1),
+        "--t2",
+        str(t2),
+        "--c2",
+        str(c2),
+        "-C",
+        str(_number(cutoff, "cutoff")),
+        "-l",
+        str(_int(min_length, "min_length", minimum=1)),
+        "-g",
+        str(_int(max_gap, "max_gap", minimum=0)),
+        "-o",
+        *map(str, targets),
     ]
     options += _opt("--d1", None if depth1 is None else _number(depth1, "depth1", minimum=1e-12))
     options += _opt("--d2", None if depth2 is None else _number(depth2, "depth2", minimum=1e-12))
     run = _run(
-        "bdgdiff", options, cwd=targets[0].parent, monitored=targets, macs3_path=macs3_path, verbose=verbose
+        "bdgdiff",
+        options,
+        cwd=targets[0].parent,
+        monitored=targets,
+        macs3_path=macs3_path,
+        verbose=verbose,
     )
     labels = ("condition1_specific", "condition2_specific", "common")
-    counts = {f"{label}_regions": _count_rows(path) for label, path in zip(labels, targets)}
-    return _result("bdgdiff", run, outputs=dict(zip(labels, targets)), counts=counts)
+    counts = {
+        f"{label}_regions": _count_rows(path) for label, path in zip(labels, targets, strict=False)
+    }
+    return _result("bdgdiff", run, outputs=dict(zip(labels, targets, strict=False)), counts=counts)
 
 
 def macs3_hmmratac(
@@ -787,16 +1025,30 @@ def macs3_hmmratac(
     options = ["-i", *map(str, inputs), "-f", fmt, "-n", label, "--outdir", str(directory)]
     options += _opt("-l", None if lower is None else _int(lower, "lower", minimum=1))
     options += _opt("-u", None if upper is None else _int(upper, "upper", minimum=1))
-    options += _opt("-c", None if prescan_cutoff is None else _number(prescan_cutoff, "prescan_cutoff", minimum=0.0))
-    options += _opt("--minlen", None if min_length is None else _int(min_length, "min_length", minimum=1))
+    options += _opt(
+        "-c",
+        None if prescan_cutoff is None else _number(prescan_cutoff, "prescan_cutoff", minimum=0.0),
+    )
+    options += _opt(
+        "--minlen", None if min_length is None else _int(min_length, "min_length", minimum=1)
+    )
     if blacklist is not None:
         options += ["-e", str(_input(blacklist, "blacklist"))]
     options += _switch("--save-digested", _flag(save_digested, "save_digested"))
     monitored = [directory / f"{label}_peaks.narrowPeak", directory / f"{label}_summits.bed"]
-    run = _run("hmmratac", options, cwd=directory.parent, monitored=monitored, macs3_path=macs3_path, verbose=verbose)
+    run = _run(
+        "hmmratac",
+        options,
+        cwd=directory.parent,
+        monitored=monitored,
+        macs3_path=macs3_path,
+        verbose=verbose,
+    )
     files = _directory_files(directory)
     counts = {"open_region_count": _count_rows(directory / f"{label}_peaks.narrowPeak")}
-    return _result("hmmratac", run, outputs={name: directory / name for name in files}, counts=counts)
+    return _result(
+        "hmmratac", run, outputs={name: directory / name for name in files}, counts=counts
+    )
 
 
 __all__ = [

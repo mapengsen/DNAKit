@@ -8,7 +8,10 @@ from pathlib import Path
 
 import pytest
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 
 HAVE_SAMTOOLS = shutil.which("samtools") is not None
 HAVE_BCFTOOLS = shutil.which("bcftools") is not None
@@ -30,7 +33,9 @@ def have_plugins() -> bool:
 
 requires_samtools = pytest.mark.skipif(not HAVE_SAMTOOLS, reason="samtools is not on PATH")
 requires_bcftools = pytest.mark.skipif(not HAVE_BCFTOOLS, reason="bcftools is not on PATH")
-requires_plugins = pytest.mark.skipif(not have_plugins(), reason="bcftools plugins are not available")
+requires_plugins = pytest.mark.skipif(
+    not have_plugins(), reason="bcftools plugins are not available"
+)
 requires_data = pytest.mark.skipif(not DATA.is_dir(), reason="shared consistency/data is missing")
 
 HEADER = """##fileformat=VCFv4.2
@@ -81,7 +86,9 @@ def trio_vcf_text(count: int = 40, *, phased: bool = False, indels: bool = False
         if indels and index % 3 == 0:
             ref, alt = (ref, ref + "CG") if index % 2 == 0 else (ref + "CGT", ref)
         fields = "\t".join(_call(genotype) for genotype in genotypes)
-        lines.append(f"chr1\t{1000 + 100 * index}\t.\t{ref}\t{alt}\t50\tPASS\tDP=120\tGT:PL:AD:DP:GQ:QS:SP\t{fields}")
+        lines.append(
+            f"chr1\t{1000 + 100 * index}\t.\t{ref}\t{alt}\t50\tPASS\tDP=120\tGT:PL:AD:DP:GQ:QS:SP\t{fields}"
+        )
     return "\n".join(lines) + "\n"
 
 
@@ -94,7 +101,9 @@ def write_vcf(path: Path, text: str, *, compress: bool = False, index: bool = Fa
     if not compress:
         return path
     target = path.with_name(path.name + ".gz")
-    subprocess.run(["bcftools", "view", "-Oz", "-o", str(target), str(path)], check=True, capture_output=True)
+    subprocess.run(
+        ["bcftools", "view", "-Oz", "-o", str(target), str(path)], check=True, capture_output=True
+    )
     if index:
         subprocess.run(["bcftools", "index", str(target)], check=True, capture_output=True)
     return target
@@ -103,10 +112,17 @@ def write_vcf(path: Path, text: str, *, compress: bool = False, index: bool = Fa
 def data_vcf_gz(tmp_path: Path) -> Path:
     """The shared 24-sample variants.vcf as an indexed bgzip file in ``tmp_path``."""
     return write_vcf(
-        tmp_path / "variants.vcf", (DATA / "variants.vcf").read_text(encoding="utf-8"), compress=True, index=True
+        tmp_path / "variants.vcf",
+        (DATA / "variants.vcf").read_text(encoding="utf-8"),
+        compress=True,
+        index=True,
     )
 
 
 def body(path: Path) -> list[str]:
     """Record lines of a plain-text VCF."""
-    return [line for line in path.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#")]
+    return [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    ]

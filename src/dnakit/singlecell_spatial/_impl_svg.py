@@ -11,8 +11,22 @@ from dnakit.exceptions import ConfigurationError
 
 # Okabe-Ito colour-blind-safe qualitative palette, then extra distinct colours.
 PALETTE = (
-    "#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442", "#000000",
-    "#999999", "#882255", "#44AA99", "#117733", "#332288", "#AA4499", "#DDCC77", "#88CCEE",
+    "#0072B2",
+    "#D55E00",
+    "#009E73",
+    "#CC79A7",
+    "#E69F00",
+    "#56B4E9",
+    "#F0E442",
+    "#000000",
+    "#999999",
+    "#882255",
+    "#44AA99",
+    "#117733",
+    "#332288",
+    "#AA4499",
+    "#DDCC77",
+    "#88CCEE",
 )
 WIDTH, HEIGHT, MARGIN = 640, 480, 40
 
@@ -74,7 +88,7 @@ def scatter_svg(
         f'<text x="{MARGIN}" y="22" font-size="14">{escape(title)}</text>',
         f'<rect x="{MARGIN}" y="{MARGIN}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#888888"/>',
     ]
-    for name, x, y, colour in zip(names, px, py, colours):
+    for name, x, y, colour in zip(names, px, py, colours, strict=False):
         cy = MARGIN + (y if invert_y else plot_h - y)
         parts.append(
             f'<circle cx="{MARGIN + x:.2f}" cy="{cy:.2f}" r="{radius}" fill="{colour}"><title>{escape(name)}</title></circle>'
@@ -106,9 +120,11 @@ def heatmap_svg(
         '<rect width="100%" height="100%" fill="#ffffff"/>',
         f'<text x="8" y="20" font-size="14">{escape(title)}</text>',
     ]
-    for i, (name, row) in enumerate(zip(row_names, matrix)):
+    for i, (name, row) in enumerate(zip(row_names, matrix, strict=False)):
         y = 40 + i * cell_h
-        parts.append(f'<text x="{label_w - 4}" y="{y + cell_h * 0.75:.1f}" font-size="{min(10, cell_h):.0f}" text-anchor="end">{escape(name)}</text>')
+        parts.append(
+            f'<text x="{label_w - 4}" y="{y + cell_h * 0.75:.1f}" font-size="{min(10, cell_h):.0f}" text-anchor="end">{escape(name)}</text>'
+        )
         for j, value in enumerate(row):
             parts.append(
                 f'<rect x="{label_w + j * cell_w:.2f}" y="{y:.2f}" width="{cell_w:.2f}" height="{cell_h:.2f}" '
@@ -125,14 +141,28 @@ def write_svg(svg: str, options: Mapping[str, object]) -> str | None:
     if target is None:
         return None
     if not isinstance(target, (str, Path)) or not str(target).strip():
-        raise ConfigurationError("options['output_path'] must be a path.", code="INVALID_OPTION", hint="Pass a file path ending in .svg.")
+        raise ConfigurationError(
+            "options['output_path'] must be a path.",
+            code="INVALID_OPTION",
+            hint="Pass a file path ending in .svg.",
+        )
     path = Path(target).expanduser()
     if path.suffix.lower() != ".svg":
-        raise ConfigurationError("output_path must end with .svg.", code="INVALID_OPTION", hint="Use a .svg file name.")
+        raise ConfigurationError(
+            "output_path must end with .svg.", code="INVALID_OPTION", hint="Use a .svg file name."
+        )
     if path.exists():
-        raise ConfigurationError(f"Output file already exists: {path}", code="OUTPUT_EXISTS", hint="Choose a new output_path.")
+        raise ConfigurationError(
+            f"Output file already exists: {path}",
+            code="OUTPUT_EXISTS",
+            hint="Choose a new output_path.",
+        )
     if not path.parent.is_dir():
-        raise ConfigurationError(f"Output directory does not exist: {path.parent}", code="OUTPUT_DIR", hint="Create the directory first.")
+        raise ConfigurationError(
+            f"Output directory does not exist: {path.parent}",
+            code="OUTPUT_DIR",
+            hint="Create the directory first.",
+        )
     path.write_text(svg, encoding="utf-8")
     return str(path)
 

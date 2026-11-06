@@ -87,7 +87,9 @@ def _stream(
         timeout_seconds=timeout_seconds,
     )
     result["operation"] = f"bedtools {subcommand}"
-    result["record_count"] = _p13.count_lines(output, skip_prefixes=skip_prefixes) if output.is_file() else 0
+    result["record_count"] = (
+        _p13.count_lines(output, skip_prefixes=skip_prefixes) if output.is_file() else 0
+    )
     return result
 
 
@@ -213,11 +215,18 @@ def bedtools_shuffle(
     args += _flag(same_chromosome, "-chrom")
     args += _cli.option("-seed", None if seed is None else _cli.integer(seed, "seed", minimum=0))
     args += _cli.option(
-        "-f", None if max_exclude_overlap is None else _fraction(max_exclude_overlap, "max_exclude_overlap")
+        "-f",
+        None
+        if max_exclude_overlap is None
+        else _fraction(max_exclude_overlap, "max_exclude_overlap"),
     )
     args += _flag(choose_chromosome_first, "-chromFirst") + _flag(bedpe, "-bedpe")
-    args += _cli.option("-maxTries", None if max_tries is None else _cli.integer(max_tries, "max_tries", minimum=1))
-    args += _flag(no_overlapping, "-noOverlapping") + _flag(allow_beyond_chrom_end, "-allowBeyondChromEnd")
+    args += _cli.option(
+        "-maxTries", None if max_tries is None else _cli.integer(max_tries, "max_tries", minimum=1)
+    )
+    args += _flag(no_overlapping, "-noOverlapping") + _flag(
+        allow_beyond_chrom_end, "-allowBeyondChromEnd"
+    )
     _check_program(bedtools_path)
     out = _cli.new_file(output_path, "output_path")
     return _stream("shuffle", args, out, bedtools_path, timeout_seconds)
@@ -358,10 +367,23 @@ def bedtools_pairtopair(
     """
     a = _cli.existing_file(a_path, "a_path")
     b = _cli.existing_file(b_path, "b_path")
-    args = ["-a", str(a), "-b", str(b), "-type", _cli.choice(overlap_type, _PAIR_TYPES, "overlap_type")]
-    args += _cli.option("-f", None if min_overlap is None else _fraction(min_overlap, "min_overlap"))
+    args = [
+        "-a",
+        str(a),
+        "-b",
+        str(b),
+        "-type",
+        _cli.choice(overlap_type, _PAIR_TYPES, "overlap_type"),
+    ]
+    args += _cli.option(
+        "-f", None if min_overlap is None else _fraction(min_overlap, "min_overlap")
+    )
     args += ["-slop", str(_cli.integer(slop, "slop", minimum=0))]
-    args += _flag(strand_aware_slop, "-ss") + _flag(ignore_strand, "-is") + _flag(require_different_names, "-rdn")
+    args += (
+        _flag(strand_aware_slop, "-ss")
+        + _flag(ignore_strand, "-is")
+        + _flag(require_different_names, "-rdn")
+    )
     _check_program(bedtools_path)
     out = _cli.new_file(output_path, "output_path")
     return _stream("pairtopair", args, out, bedtools_path, timeout_seconds)
@@ -396,12 +418,21 @@ def bedtools_multicov(
     intervals = _cli.existing_file(intervals_path, "intervals_path")
     args = ["-bams", *[str(path) for path in bams], "-bed", str(intervals)]
     args += _flag(split, "-split") + _strand(strand, "-s", "-S")
-    args += _cli.option("-f", None if min_overlap is None else _fraction(min_overlap, "min_overlap"))
+    args += _cli.option(
+        "-f", None if min_overlap is None else _fraction(min_overlap, "min_overlap")
+    )
     args += _flag(reciprocal, "-r")
     args += _cli.option(
-        "-q", None if min_mapping_quality is None else _cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)
+        "-q",
+        None
+        if min_mapping_quality is None
+        else _cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0),
     )
-    args += _flag(include_duplicates, "-D") + _flag(include_failed_qc, "-F") + _flag(proper_pairs_only, "-p")
+    args += (
+        _flag(include_duplicates, "-D")
+        + _flag(include_failed_qc, "-F")
+        + _flag(proper_pairs_only, "-p")
+    )
     _check_program(bedtools_path)
     out = _cli.new_file(output_path, "output_path")
     return _stream("multicov", args, out, bedtools_path, timeout_seconds)
@@ -488,8 +519,12 @@ def bedtools_coverage_profile(
     mode = _cli.choice(report, ("histogram", "depth"), "report")
     args = ["-a", str(a), "-b", str(b), "-hist" if mode == "histogram" else "-d"]
     args += _strand(strand, "-s", "-S")
-    args += _cli.option("-f", None if min_overlap_a is None else _fraction(min_overlap_a, "min_overlap_a"))
-    args += _cli.option("-F", None if min_overlap_b is None else _fraction(min_overlap_b, "min_overlap_b"))
+    args += _cli.option(
+        "-f", None if min_overlap_a is None else _fraction(min_overlap_a, "min_overlap_a")
+    )
+    args += _cli.option(
+        "-F", None if min_overlap_b is None else _fraction(min_overlap_b, "min_overlap_b")
+    )
     args += _flag(reciprocal, "-r") + _flag(either_fraction, "-e") + _flag(split, "-split")
     args += _flag(sorted_input, "-sorted")
     if genome_path is not None:
@@ -521,7 +556,11 @@ def bedtools_bam_to_bedpe(
     the smaller mapping quality.
     """
     bam = _cli.existing_file(bam_path, "bam_path")
-    args = ["-i", str(bam), "-bedpe"] + _flag(mate1_first, "-mate1") + _flag(edit_distance_score, "-ed")
+    args = (
+        ["-i", str(bam), "-bedpe"]
+        + _flag(mate1_first, "-mate1")
+        + _flag(edit_distance_score, "-ed")
+    )
     _check_program(bedtools_path)
     out = _cli.new_file(output_path, "output_path")
     return _stream("bamtobed", args, out, bedtools_path, timeout_seconds)
@@ -560,12 +599,20 @@ def bedtools_split(
     directory = _cli.new_directory(output_directory, "output_directory")
     args = ["split", "-i", str(source), "-n", str(number), "-p", stem, "-a", mode]
     result = _p13.run(
-        _PROGRAM, args, cwd=directory, expected=[], explicit=bedtools_path, hint=_HINT, timeout_seconds=timeout_seconds
+        _PROGRAM,
+        args,
+        cwd=directory,
+        expected=[],
+        explicit=bedtools_path,
+        hint=_HINT,
+        timeout_seconds=timeout_seconds,
     )
     files = sorted(directory.glob(f"{stem}.*.bed"))
     result["operation"] = "bedtools split"
     result["outputs"] = [str(path) for path in files]
-    result["files"] = [{"file": path.name, "record_count": _p13.count_lines(path)} for path in files]
+    result["files"] = [
+        {"file": path.name, "record_count": _p13.count_lines(path)} for path in files
+    ]
     if result["return_code"] == 0 and not files:
         result["status"] = "failed"
     return result

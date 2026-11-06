@@ -11,12 +11,17 @@ import pytest
 from dnakit.epigenome import deeptools_gc_bias as facade
 from dnakit.exceptions import ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 BAM = DATA / "reads.bam"
 GENOME_FA = DATA / "genome.fa"
 _ENV_BIN = Path(sys.executable).parent
-pytestmark = pytest.mark.skipif(not (_ENV_BIN / "computeGCBias").is_file() or not BAM.exists(),
-                                reason="deepTools or shared BAM missing")
+pytestmark = pytest.mark.skipif(
+    not (_ENV_BIN / "computeGCBias").is_file() or not BAM.exists(),
+    reason="deepTools or shared BAM missing",
+)
 
 
 @pytest.fixture(autouse=True)
@@ -43,9 +48,13 @@ def genome_2bit(tmp_path: Path) -> Path:
 
 def test_compute_then_correct_gc_bias(tmp_path: Path, genome_2bit: Path) -> None:
     freq = tmp_path / "freq.txt"
-    computed = facade.compute_gc_bias(str(BAM), str(genome_2bit), 120000, str(freq), fragment_length=150)
+    computed = facade.compute_gc_bias(
+        str(BAM), str(genome_2bit), 120000, str(freq), fragment_length=150
+    )
     assert computed["status"] == "completed", computed["log_tail"]
-    corrected = facade.correct_gc_bias(str(BAM), str(genome_2bit), 120000, str(freq), str(tmp_path / "corr.bam"))
+    corrected = facade.correct_gc_bias(
+        str(BAM), str(genome_2bit), 120000, str(freq), str(tmp_path / "corr.bam")
+    )
     assert corrected["status"] == "completed", corrected["log_tail"]
 
 

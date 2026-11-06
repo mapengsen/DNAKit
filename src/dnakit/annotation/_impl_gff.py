@@ -6,6 +6,7 @@ Coordinates are the 1-based, closed intervals of GFF3/GTF.  Nothing here reads a
 from __future__ import annotations
 
 import gzip
+import itertools
 import os
 import re
 import tempfile
@@ -20,7 +21,9 @@ from dnakit.sequence import CODON_TABLE, normalize_dna_sequence, reverse_complem
 MAX_TEXT_BYTES = 50_000_000
 MAX_FEATURES = 1_000_000
 
-GENE_TYPES = frozenset({"gene", "pseudogene", "ncrna_gene", "transposable_element_gene", "protein_coding_gene"})
+GENE_TYPES = frozenset(
+    {"gene", "pseudogene", "ncrna_gene", "transposable_element_gene", "protein_coding_gene"}
+)
 EXON_TYPES = frozenset({"exon"})
 CDS_TYPES = frozenset({"cds"})
 FIVE_UTR_TYPES = frozenset({"five_prime_utr", "5utr", "5'utr", "utr5", "5_utr"})
@@ -37,7 +40,16 @@ _GTF_LIKE = re.compile(r'(?:^|;)\s*[A-Za-z_][\w.]*\s+"[^"]*"\s*(?:;|$)')
 def is_transcript_type(feature_type: str) -> bool:
     lowered = feature_type.lower()
     return (
-        lowered in {"transcript", "primary_transcript", "pre_mirna", "mirna", "lncrna", "lnc_rna", "mirna_primary_transcript"}
+        lowered
+        in {
+            "transcript",
+            "primary_transcript",
+            "pre_mirna",
+            "mirna",
+            "lncrna",
+            "lnc_rna",
+            "mirna_primary_transcript",
+        }
         or lowered.endswith("rna")
         or lowered.endswith("_rna")
         or lowered.endswith("_transcript")
@@ -63,10 +75,14 @@ def read_text(value: object) -> str:
                 return read_text(value[key])
         if "path" in value:
             return read_text(Path(str(value["path"])))
-        raise InputFormatError("The annotation mapping needs a 'text' or 'path' key.", code="INVALID_ANNOTATION_INPUT")
+        raise InputFormatError(
+            "The annotation mapping needs a 'text' or 'path' key.", code="INVALID_ANNOTATION_INPUT"
+        )
     if isinstance(value, bytes):
         value = value.decode("utf-8", errors="replace")
-    is_path = isinstance(value, os.PathLike) or (isinstance(value, str) and "\n" not in value and "\t" not in value and value.strip() != "")
+    is_path = isinstance(value, os.PathLike) or (
+        isinstance(value, str) and "\n" not in value and "\t" not in value and value.strip() != ""
+    )
     if is_path:
         path = Path(value)  # type: ignore[arg-type]
         if not is_file(path):
@@ -75,14 +91,21 @@ def read_text(value: object) -> str:
         with opener(path, "rb") as stream:  # type: ignore[operator]
             data = stream.read(MAX_TEXT_BYTES + 1)
         if len(data) > MAX_TEXT_BYTES:
-            raise InputFormatError(f"Annotation exceeds {MAX_TEXT_BYTES} bytes.", code="FILE_TOO_LARGE")
+            raise InputFormatError(
+                f"Annotation exceeds {MAX_TEXT_BYTES} bytes.", code="FILE_TOO_LARGE"
+            )
         return data.decode("utf-8", errors="replace")
     if isinstance(value, str):
         if len(value) > MAX_TEXT_BYTES:
-            raise InputFormatError(f"Annotation exceeds {MAX_TEXT_BYTES} characters.", code="FILE_TOO_LARGE")
+            raise InputFormatError(
+                f"Annotation exceeds {MAX_TEXT_BYTES} characters.", code="FILE_TOO_LARGE"
+            )
         return value
-    raise InputFormatError(f"Unsupported annotation input type {type(value).__name__}.", code="INVALID_ANNOTATION_INPUT",
-                           hint="Pass GFF3/GTF text, a file path, or a list of feature mappings.")
+    raise InputFormatError(
+        f"Unsupported annotation input type {type(value).__name__}.",
+        code="INVALID_ANNOTATION_INPUT",
+        hint="Pass GFF3/GTF text, a file path, or a list of feature mappings.",
+    )
 
 
 def detect_format(text: str) -> str:
@@ -129,7 +152,7 @@ def parse_attributes(raw: str, fmt: str) -> dict[str, object]:
         if match is None or match.end() == position:
             if raw[position:].strip(" ;") == "":
                 break
-            raise ValueError(f"cannot parse GTF attributes near {raw[position:position + 30]!r}")
+            raise ValueError(f"cannot parse GTF attributes near {raw[position : position + 30]!r}")
         key = match.group(1)
         value = match.group(2) if match.group(2) is not None else (match.group(3) or "").strip()
         value = value.replace('\\"', '"')
@@ -158,13 +181,33 @@ def parse_lines(text: str, fmt: str) -> tuple[list[dict[str, object]], list[dict
             continue
         columns = line.rstrip("\r").split("\t")
         if len(columns) != 9:
-            issue(number, "error", "COLUMN_COUNT", f"expected 9 tab-separated columns, found {len(columns)}")
+            issue(
+                number,
+                "error",
+                "COLUMN_COUNT",
+                f"expected 9 tab-separated columns, found {len(columns)}",
+            )
             continue
-        seqid, source, ftype, start_text, end_text, score_text, strand, phase_text, attribute_text = columns
+        (
+            seqid,
+            source,
+            ftype,
+            start_text,
+            end_text,
+            score_text,
+            strand,
+            phase_text,
+            attribute_text,
+        ) = columns
         try:
             start, end = int(start_text), int(end_text)
         except ValueError:
-            issue(number, "error", "COORDINATE_NOT_INTEGER", f"start/end must be integers: {start_text!r}, {end_text!r}")
+            issue(
+                number,
+                "error",
+                "COORDINATE_NOT_INTEGER",
+                f"start/end must be integers: {start_text!r}, {end_text!r}",
+            )
             continue
         bad = False
         if not seqid.strip():
@@ -177,24 +220,38 @@ def parse_lines(text: str, fmt: str) -> tuple[list[dict[str, object]], list[dict
             issue(number, "error", "COORDINATE_RANGE", f"start must be >= 1, got {start}")
             bad = True
         if end < start:
-            issue(number, "error", "COORDINATE_ORDER", f"end ({end}) is smaller than start ({start})")
+            issue(
+                number, "error", "COORDINATE_ORDER", f"end ({end}) is smaller than start ({start})"
+            )
             bad = True
         if strand not in {"+", "-", ".", "?"}:
-            issue(number, "error", "INVALID_STRAND", f"strand must be one of + - . ?, got {strand!r}")
+            issue(
+                number, "error", "INVALID_STRAND", f"strand must be one of + - . ?, got {strand!r}"
+            )
             bad = True
         score: float | None = None
         if score_text != ".":
             try:
                 score = float(score_text)
             except ValueError:
-                issue(number, "error", "INVALID_SCORE", f"score must be a number or '.', got {score_text!r}")
+                issue(
+                    number,
+                    "error",
+                    "INVALID_SCORE",
+                    f"score must be a number or '.', got {score_text!r}",
+                )
                 bad = True
         phase: int | None = None
         if phase_text != ".":
             if phase_text in {"0", "1", "2"}:
                 phase = int(phase_text)
             else:
-                issue(number, "error", "INVALID_PHASE", f"phase must be 0, 1, 2 or '.', got {phase_text!r}")
+                issue(
+                    number,
+                    "error",
+                    "INVALID_PHASE",
+                    f"phase must be 0, 1, 2 or '.', got {phase_text!r}",
+                )
                 bad = True
         if ftype.lower() == "cds" and phase_text == ".":
             issue(number, "error", "CDS_WITHOUT_PHASE", "CDS features require a phase (0, 1 or 2)")
@@ -207,20 +264,39 @@ def parse_lines(text: str, fmt: str) -> tuple[list[dict[str, object]], list[dict
         if bad:
             continue
         if len(features) >= MAX_FEATURES:
-            raise InputFormatError(f"More than {MAX_FEATURES} features; split the annotation.", code="TOO_MANY_FEATURES")
-        features.append({"line": number, "seqid": seqid, "source": source, "type": ftype, "start": start, "end": end,
-                         "score": score, "strand": strand, "phase": phase, "attributes": attributes})
+            raise InputFormatError(
+                f"More than {MAX_FEATURES} features; split the annotation.",
+                code="TOO_MANY_FEATURES",
+            )
+        features.append(
+            {
+                "line": number,
+                "seqid": seqid,
+                "source": source,
+                "type": ftype,
+                "start": start,
+                "end": end,
+                "score": score,
+                "strand": strand,
+                "phase": phase,
+                "attributes": attributes,
+            }
+        )
     return features, issues
 
 
-def load_features(value: object, options: Mapping[str, object] | None = None, *, strict: bool = True) -> tuple[str, list[dict[str, object]]]:
+def load_features(
+    value: object, options: Mapping[str, object] | None = None, *, strict: bool = True
+) -> tuple[str, list[dict[str, object]]]:
     """Features from annotation text/path or from a list of feature mappings (as returned by ``parse``)."""
 
     settings = options or {}
     if isinstance(value, Mapping) and isinstance(value.get("features"), Sequence):
         value = value["features"]
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-        return str(settings.get("format", "gff3")), [normalize_feature(item, index) for index, item in enumerate(value)]
+        return str(settings.get("format", "gff3")), [
+            normalize_feature(item, index) for index, item in enumerate(value)
+        ]
     text = read_text(value)
     fmt = str(settings.get("format", "auto"))
     if fmt == "auto":
@@ -233,27 +309,51 @@ def load_features(value: object, options: Mapping[str, object] | None = None, *,
     if strict and errors:
         first = errors[0]
         raise InputFormatError(
-            f"Malformed {fmt.upper()} at line {first['line']}: {first['message']}", code="INVALID_ANNOTATION",
-            context={"line": first["line"], "error_count": len(errors)}, hint="Run annotation.validate for the complete list of problems, or pass strict=false.",
+            f"Malformed {fmt.upper()} at line {first['line']}: {first['message']}",
+            code="INVALID_ANNOTATION",
+            context={"line": first["line"], "error_count": len(errors)},
+            hint="Run annotation.validate for the complete list of problems, or pass strict=false.",
         )
     return fmt, features
 
 
 def normalize_feature(item: object, index: int) -> dict[str, object]:
     if not isinstance(item, Mapping):
-        raise InputFormatError(f"feature {index} must be a mapping.", code="INVALID_ANNOTATION_INPUT")
+        raise InputFormatError(
+            f"feature {index} must be a mapping.", code="INVALID_ANNOTATION_INPUT"
+        )
     seqid = item.get("seqid", item.get("chrom", item.get("chromosome")))
     start, end = item.get("start"), item.get("end")
-    if not isinstance(seqid, str) or not seqid or any(isinstance(v, bool) or not isinstance(v, int) for v in (start, end)):
-        raise InputFormatError(f"feature {index} needs a seqid and integer start/end.", code="INVALID_ANNOTATION_INPUT")
+    if (
+        not isinstance(seqid, str)
+        or not seqid
+        or any(isinstance(v, bool) or not isinstance(v, int) for v in (start, end))
+    ):
+        raise InputFormatError(
+            f"feature {index} needs a seqid and integer start/end.", code="INVALID_ANNOTATION_INPUT"
+        )
     if start < 1 or end < start:  # type: ignore[operator]
-        raise InputFormatError(f"feature {index} has an invalid interval {start}-{end}.", code="INVALID_ANNOTATION_INPUT")
+        raise InputFormatError(
+            f"feature {index} has an invalid interval {start}-{end}.",
+            code="INVALID_ANNOTATION_INPUT",
+        )
     attributes = item.get("attributes", {})
     if not isinstance(attributes, Mapping):
-        raise InputFormatError(f"feature {index}: attributes must be a mapping.", code="INVALID_ANNOTATION_INPUT")
-    return {"line": item.get("line", index + 1), "seqid": seqid, "source": str(item.get("source", ".")), "type": str(item.get("type", ".")),
-            "start": start, "end": end, "score": item.get("score"), "strand": str(item.get("strand", ".")), "phase": item.get("phase"),
-            "attributes": dict(attributes)}
+        raise InputFormatError(
+            f"feature {index}: attributes must be a mapping.", code="INVALID_ANNOTATION_INPUT"
+        )
+    return {
+        "line": item.get("line", index + 1),
+        "seqid": seqid,
+        "source": str(item.get("source", ".")),
+        "type": str(item.get("type", ".")),
+        "start": start,
+        "end": end,
+        "score": item.get("score"),
+        "strand": str(item.get("strand", ".")),
+        "phase": item.get("phase"),
+        "attributes": dict(attributes),
+    }
 
 
 # --- hierarchy ----------------------------------------------------------------------------------
@@ -275,7 +375,9 @@ def attribute(feature: Mapping[str, object], *names: str) -> str | None:
 
 
 def biotypes(feature: Mapping[str, object]) -> list[str]:
-    return [value.lower() for key in _BIOTYPE_KEYS for value in as_list(feature["attributes"].get(key))]  # type: ignore[union-attr]
+    return [
+        value.lower() for key in _BIOTYPE_KEYS for value in as_list(feature["attributes"].get(key))
+    ]  # type: ignore[union-attr]
 
 
 def feature_id(feature: Mapping[str, object], fmt: str) -> str | None:
@@ -306,7 +408,9 @@ def length(feature: Mapping[str, object]) -> int:
     return int(feature["end"]) - int(feature["start"]) + 1  # type: ignore[call-overload]
 
 
-def build_models(features: Sequence[Mapping[str, object]], fmt: str) -> dict[str, dict[str, object]]:
+def build_models(
+    features: Sequence[Mapping[str, object]], fmt: str
+) -> dict[str, dict[str, object]]:
     """Group features into ``{gene_id: {"feature", "transcripts": {tid: {...}}}}``.
 
     Transcripts are features of a transcript-like type (mRNA, transcript, *RNA, ...) or, in GTF, the distinct
@@ -326,8 +430,18 @@ def build_models(features: Sequence[Mapping[str, object]], fmt: str) -> dict[str
 
     def transcript_entry(transcript_id: str, gene_id: str) -> dict[str, object]:
         if transcript_id not in transcripts:
-            entry: dict[str, object] = {"id": transcript_id, "gene_id": gene_id, "feature": None, "exons": [], "cds": [], "five_prime_utr": [],
-                                        "three_prime_utr": [], "utr": [], "start_codon": [], "stop_codon": []}
+            entry: dict[str, object] = {
+                "id": transcript_id,
+                "gene_id": gene_id,
+                "feature": None,
+                "exons": [],
+                "cds": [],
+                "five_prime_utr": [],
+                "three_prime_utr": [],
+                "utr": [],
+                "start_codon": [],
+                "stop_codon": [],
+            }
             transcripts[transcript_id] = entry
             gene_entry(gene_id)["transcripts"][transcript_id] = entry  # type: ignore[index]
         return transcripts[transcript_id]
@@ -344,7 +458,9 @@ def build_models(features: Sequence[Mapping[str, object]], fmt: str) -> dict[str
         identifier = feature_id(feature, fmt)
         if identifier is None:
             continue
-        gene_id = next((p for p in parents(feature, fmt) if p in genes), (parents(feature, fmt) or [""])[0])
+        gene_id = next(
+            (p for p in parents(feature, fmt) if p in genes), (parents(feature, fmt) or [""])[0]
+        )
         transcript_entry(identifier, gene_id)["feature"] = feature
     for feature in features:
         ftype = str(feature["type"]).lower()
@@ -359,11 +475,24 @@ def build_models(features: Sequence[Mapping[str, object]], fmt: str) -> dict[str
                     gene_id = attribute(feature, "gene_id") or ""
                     entry = transcript_entry(parent, gene_id)
                 elif parent in by_id and str(by_id[parent]["type"]).lower() in GENE_TYPES:
-                    entry = transcript_entry(parent, parent)  # exon attached directly to a gene (non-standard but common)
+                    entry = transcript_entry(
+                        parent, parent
+                    )  # exon attached directly to a gene (non-standard but common)
                 else:
                     continue
-            bucket = ("exons" if ftype in EXON_TYPES else "cds" if ftype in CDS_TYPES else "five_prime_utr" if ftype in FIVE_UTR_TYPES
-                      else "three_prime_utr" if ftype in THREE_UTR_TYPES else "utr" if ftype in UTR_TYPES else ftype)
+            bucket = (
+                "exons"
+                if ftype in EXON_TYPES
+                else "cds"
+                if ftype in CDS_TYPES
+                else "five_prime_utr"
+                if ftype in FIVE_UTR_TYPES
+                else "three_prime_utr"
+                if ftype in THREE_UTR_TYPES
+                else "utr"
+                if ftype in UTR_TYPES
+                else ftype
+            )
             entry[bucket].append(feature)  # type: ignore[union-attr]
     return genes
 
@@ -386,10 +515,16 @@ def derive_introns(exons: Sequence[tuple[int, int]]) -> list[tuple[int, int]]:
     """Gaps between consecutive (sorted, non-overlapping) exons: ``(end_i + 1, start_{i+1} - 1)`` when non-empty."""
 
     ordered = sorted(exons)
-    return [(a_end + 1, b_start - 1) for (_, a_end), (b_start, _) in zip(ordered, ordered[1:]) if b_start - a_end > 1]
+    return [
+        (a_end + 1, b_start - 1)
+        for (_, a_end), (b_start, _) in itertools.pairwise(ordered)
+        if b_start - a_end > 1
+    ]
 
 
-def derive_utrs(exons: Sequence[tuple[int, int]], cds_span: tuple[int, int], strand: str) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+def derive_utrs(
+    exons: Sequence[tuple[int, int]], cds_span: tuple[int, int], strand: str
+) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
     """``(five_prime, three_prime)`` UTR intervals: exon parts left/right of the CDS span (swapped on the minus strand)."""
 
     left: list[tuple[int, int]] = []
@@ -423,7 +558,15 @@ def transcript_strand(entry: Mapping[str, object]) -> str:
 def transcript_seqid(entry: Mapping[str, object]) -> str | None:
     if entry["feature"] is not None:
         return str(entry["feature"]["seqid"])  # type: ignore[index]
-    for key in ("exons", "cds", "utr", "five_prime_utr", "three_prime_utr", "start_codon", "stop_codon"):
+    for key in (
+        "exons",
+        "cds",
+        "utr",
+        "five_prime_utr",
+        "three_prime_utr",
+        "start_codon",
+        "stop_codon",
+    ):
         for item in entry[key]:  # type: ignore[union-attr]
             return str(item["seqid"])
     return None
@@ -444,16 +587,34 @@ def transcript_model(entry: Mapping[str, object]) -> dict[str, object]:
             five, three = derive_utrs(exons, span, strand)
             derived = True
     feature = entry["feature"]
-    start = int(feature["start"]) if feature is not None else (min(s for s, _ in exons) if exons else None)  # type: ignore[index]
-    end = int(feature["end"]) if feature is not None else (max(e for _, e in exons) if exons else None)  # type: ignore[index]
+    start = (
+        int(feature["start"])
+        if feature is not None
+        else (min(s for s, _ in exons) if exons else None)
+    )  # type: ignore[index]
+    end = (
+        int(feature["end"])
+        if feature is not None
+        else (max(e for _, e in exons) if exons else None)
+    )  # type: ignore[index]
     cds_length = sum(e - s + 1 for s, e in cds)
     return {
-        "transcript_id": entry["id"], "type": feature["type"] if feature is not None else "transcript", "seqid": transcript_seqid(entry),
-        "start": start, "end": end, "strand": strand,
+        "transcript_id": entry["id"],
+        "type": feature["type"] if feature is not None else "transcript",
+        "seqid": transcript_seqid(entry),
+        "start": start,
+        "end": end,
+        "strand": strand,
         "name": attribute(feature, "Name", "transcript_name") if feature is not None else None,
-        "exons": [list(item) for item in exons], "introns": [list(item) for item in derive_introns(exons)],
-        "cds": [list(item) for item in cds], "five_prime_utr": [list(item) for item in five], "three_prime_utr": [list(item) for item in three],
-        "utr_derived": derived, "exon_count": len(exons), "spliced_length": sum(e - s + 1 for s, e in exons), "cds_length": cds_length,
+        "exons": [list(item) for item in exons],
+        "introns": [list(item) for item in derive_introns(exons)],
+        "cds": [list(item) for item in cds],
+        "five_prime_utr": [list(item) for item in five],
+        "three_prime_utr": [list(item) for item in three],
+        "utr_derived": derived,
+        "exon_count": len(exons),
+        "spliced_length": sum(e - s + 1 for s, e in exons),
+        "cds_length": cds_length,
         "protein_length_aa": cds_length // 3 if cds_length and cds_length % 3 == 0 else None,
     }
 
@@ -465,17 +626,25 @@ def gene_models(features: Sequence[Mapping[str, object]], fmt: str) -> list[dict
         transcripts = [transcript_model(entry) for entry in gene["transcripts"].values()]  # type: ignore[union-attr]
         starts = [t["start"] for t in transcripts if t["start"] is not None]
         ends = [t["end"] for t in transcripts if t["end"] is not None]
-        models.append({
-            "gene_id": gene_id or None,
-            "name": attribute(feature, "Name", "gene_name") if feature is not None else None,
-            "type": feature["type"] if feature is not None else None,
-            "seqid": feature["seqid"] if feature is not None else (transcripts[0]["seqid"] if transcripts else None),
-            "start": feature["start"] if feature is not None else (min(starts) if starts else None),
-            "end": feature["end"] if feature is not None else (max(ends) if ends else None),
-            "strand": feature["strand"] if feature is not None else (transcripts[0]["strand"] if transcripts else "."),
-            "biotype": (biotypes(feature) or [None])[0] if feature is not None else None,
-            "transcripts": transcripts,
-        })
+        models.append(
+            {
+                "gene_id": gene_id or None,
+                "name": attribute(feature, "Name", "gene_name") if feature is not None else None,
+                "type": feature["type"] if feature is not None else None,
+                "seqid": feature["seqid"]
+                if feature is not None
+                else (transcripts[0]["seqid"] if transcripts else None),
+                "start": feature["start"]
+                if feature is not None
+                else (min(starts) if starts else None),
+                "end": feature["end"] if feature is not None else (max(ends) if ends else None),
+                "strand": feature["strand"]
+                if feature is not None
+                else (transcripts[0]["strand"] if transcripts else "."),
+                "biotype": (biotypes(feature) or [None])[0] if feature is not None else None,
+                "transcripts": transcripts,
+            }
+        )
     return models
 
 
@@ -488,9 +657,15 @@ def public_feature(feature: Mapping[str, object]) -> dict[str, object]:
 
 def write_atomic(path: Path, text: str, *, overwrite: bool) -> None:
     if not path.parent.is_dir():
-        raise ConfigurationError(f"Output directory does not exist: {path.parent}", code="OUTPUT_DIR_MISSING")
+        raise ConfigurationError(
+            f"Output directory does not exist: {path.parent}", code="OUTPUT_DIR_MISSING"
+        )
     if path.exists() and not overwrite:
-        raise ConfigurationError(f"Refusing to overwrite existing file: {path}", code="OUTPUT_EXISTS", hint="Pass options={'overwrite': True}.")
+        raise ConfigurationError(
+            f"Refusing to overwrite existing file: {path}",
+            code="OUTPUT_EXISTS",
+            hint="Pass options={'overwrite': True}.",
+        )
     descriptor, name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
     temporary = Path(name)
     try:
@@ -503,7 +678,16 @@ def write_atomic(path: Path, text: str, *, overwrite: bool) -> None:
 
 
 def _escape_gff3(value: str) -> str:
-    for character, code in (("%", "%25"), (";", "%3B"), ("=", "%3D"), ("&", "%26"), (",", "%2C"), ("\t", "%09"), ("\n", "%0A"), ("\r", "%0D")):
+    for character, code in (
+        ("%", "%25"),
+        (";", "%3B"),
+        ("=", "%3D"),
+        ("&", "%26"),
+        (",", "%2C"),
+        ("\t", "%09"),
+        ("\n", "%0A"),
+        ("\r", "%0D"),
+    ):
         value = value.replace(character, code)
     return value
 
@@ -512,7 +696,10 @@ def format_attributes(attributes: Mapping[str, object], fmt: str) -> str:
     if not attributes:
         return "."
     if fmt == "gff3":
-        return ";".join(f"{_escape_gff3(str(key))}={','.join(_escape_gff3(item) for item in as_list(value))}" for key, value in attributes.items())
+        return ";".join(
+            f"{_escape_gff3(str(key))}={','.join(_escape_gff3(item) for item in as_list(value))}"
+            for key, value in attributes.items()
+        )
     parts = []
     for key, value in attributes.items():
         for item in as_list(value):
@@ -523,14 +710,27 @@ def format_attributes(attributes: Mapping[str, object], fmt: str) -> str:
 def feature_line(feature: Mapping[str, object], attributes: Mapping[str, object], fmt: str) -> str:
     score = "." if feature["score"] is None else format(feature["score"], "g")  # type: ignore[arg-type]
     phase = "." if feature["phase"] is None else str(feature["phase"])
-    return "\t".join((str(feature["seqid"]), str(feature["source"]), str(feature["type"]), str(feature["start"]), str(feature["end"]),
-                      score, str(feature["strand"]), phase, format_attributes(attributes, fmt)))
+    return "\t".join(
+        (
+            str(feature["seqid"]),
+            str(feature["source"]),
+            str(feature["type"]),
+            str(feature["start"]),
+            str(feature["end"]),
+            score,
+            str(feature["strand"]),
+            phase,
+            format_attributes(attributes, fmt),
+        )
+    )
 
 
 def to_gtf(features: Sequence[Mapping[str, object]], source_format: str) -> str:
     """GTF lines; ``gene_id``/``transcript_id`` are resolved through the hierarchy for GFF3 input."""
 
-    by_id = {identifier: f for f in features if (identifier := feature_id(f, source_format)) is not None}
+    by_id = {
+        identifier: f for f in features if (identifier := feature_id(f, source_format)) is not None
+    }
     lines = []
     for feature in features:
         ftype = str(feature["type"]).lower()
@@ -555,19 +755,29 @@ def to_gtf(features: Sequence[Mapping[str, object]], source_format: str) -> str:
             if transcript_id:
                 head["transcript_id"] = transcript_id
             if name is not None:
-                head["gene_name" if ftype in GENE_TYPES else "transcript_name" if is_transcript_type(ftype) else "Name"] = name
+                head[
+                    "gene_name"
+                    if ftype in GENE_TYPES
+                    else "transcript_name"
+                    if is_transcript_type(ftype)
+                    else "Name"
+                ] = name
             attributes = {**head, **attributes}
         lines.append(feature_line(feature, attributes, "gtf"))
     return "\n".join(lines) + ("\n" if lines else "")
 
 
-def to_gff3(features: Sequence[Mapping[str, object]], source_format: str, *, synthesize_parents: bool) -> str:
+def to_gff3(
+    features: Sequence[Mapping[str, object]], source_format: str, *, synthesize_parents: bool
+) -> str:
     lines = ["##gff-version 3"]
     if source_format == "gff3":
         lines += [feature_line(f, f["attributes"], "gff3") for f in features]  # type: ignore[arg-type]
         return "\n".join(lines) + "\n"
     have_gene = {attribute(f, "gene_id") for f in features if str(f["type"]).lower() in GENE_TYPES}
-    have_transcript = {attribute(f, "transcript_id") for f in features if is_transcript_type(str(f["type"]))}
+    have_transcript = {
+        attribute(f, "transcript_id") for f in features if is_transcript_type(str(f["type"]))
+    }
     groups: dict[str, list[Mapping[str, object]]] = defaultdict(list)
     transcript_gene: dict[str, str] = {}
     for feature in features:
@@ -576,28 +786,61 @@ def to_gff3(features: Sequence[Mapping[str, object]], source_format: str, *, syn
             transcript_id = attribute(feature, "transcript_id")
             if transcript_id:
                 groups[transcript_id].append(feature)
-                transcript_gene.setdefault(transcript_id, attribute(feature, "gene_id") or transcript_id)
+                transcript_gene.setdefault(
+                    transcript_id, attribute(feature, "gene_id") or transcript_id
+                )
     synthetic: list[dict[str, object]] = []
     if synthesize_parents:
         for transcript_id, children in groups.items():
             if transcript_id not in have_transcript:
-                synthetic.append({**dict(children[0]), "type": "mRNA" if any(str(c["type"]).lower() == "cds" for c in children) else "transcript",
-                                  "start": min(int(c["start"]) for c in children), "end": max(int(c["end"]) for c in children),  # type: ignore[call-overload]
-                                  "score": None, "phase": None, "attributes": {"transcript_id": transcript_id, "gene_id": transcript_gene[transcript_id]}})
+                synthetic.append(
+                    {
+                        **dict(children[0]),
+                        "type": "mRNA"
+                        if any(str(c["type"]).lower() == "cds" for c in children)
+                        else "transcript",
+                        "start": min(int(c["start"]) for c in children),
+                        "end": max(int(c["end"]) for c in children),  # type: ignore[call-overload]
+                        "score": None,
+                        "phase": None,
+                        "attributes": {
+                            "transcript_id": transcript_id,
+                            "gene_id": transcript_gene[transcript_id],
+                        },
+                    }
+                )
         by_gene: dict[str, list[Mapping[str, object]]] = defaultdict(list)
         for item in [*synthetic, *[f for f in features if is_transcript_type(str(f["type"]))]]:
             by_gene[attribute(item, "gene_id") or ""].append(item)
         for gene_id, members in by_gene.items():
             if gene_id and gene_id not in have_gene:
-                synthetic.append({**dict(members[0]), "type": "gene", "start": min(int(m["start"]) for m in members), "end": max(int(m["end"]) for m in members),  # type: ignore[call-overload]
-                                  "score": None, "phase": None, "attributes": {"gene_id": gene_id}})
+                synthetic.append(
+                    {
+                        **dict(members[0]),
+                        "type": "gene",
+                        "start": min(int(m["start"]) for m in members),
+                        "end": max(int(m["end"]) for m in members),  # type: ignore[call-overload]
+                        "score": None,
+                        "phase": None,
+                        "attributes": {"gene_id": gene_id},
+                    }
+                )
     counters: dict[tuple[str, str], int] = defaultdict(int)
     emitted: list[tuple[int, int, Mapping[str, object], dict[str, object]]] = []
     for order, feature in enumerate([*synthetic, *features]):
         ftype = str(feature["type"]).lower()
         attributes = dict(feature["attributes"])  # type: ignore[arg-type]
-        gene_id, transcript_id = attributes.pop("gene_id", None), attributes.pop("transcript_id", None)
-        name = attributes.pop("gene_name", None) if ftype in GENE_TYPES else attributes.pop("transcript_name", None) if is_transcript_type(ftype) else None
+        gene_id, transcript_id = (
+            attributes.pop("gene_id", None),
+            attributes.pop("transcript_id", None),
+        )
+        name = (
+            attributes.pop("gene_name", None)
+            if ftype in GENE_TYPES
+            else attributes.pop("transcript_name", None)
+            if is_transcript_type(ftype)
+            else None
+        )
         head: dict[str, object] = {}
         if ftype in GENE_TYPES:
             head["ID"] = gene_id
@@ -613,7 +856,14 @@ def to_gff3(features: Sequence[Mapping[str, object]], source_format: str, *, syn
                 head["Parent"] = transcript_id
         if name is not None:
             head["Name"] = name
-        emitted.append((0 if ftype in GENE_TYPES else 1 if is_transcript_type(ftype) else 2, order, feature, {**head, **attributes}))
+        emitted.append(
+            (
+                0 if ftype in GENE_TYPES else 1 if is_transcript_type(ftype) else 2,
+                order,
+                feature,
+                {**head, **attributes},
+            )
+        )
     # parents first, then children, keeping the original order within each rank
     for _, _, feature, attributes in sorted(emitted, key=lambda item: (item[0], item[1])):
         lines.append(feature_line(feature, attributes, "gff3"))
@@ -621,7 +871,11 @@ def to_gff3(features: Sequence[Mapping[str, object]], source_format: str, *, syn
 
 
 def bed_name(feature: Mapping[str, object], fmt: str) -> str:
-    return feature_id(feature, fmt) or attribute(feature, "Name", "gene_name", "gene_id", "transcript_id", "ID") or "."
+    return (
+        feature_id(feature, fmt)
+        or attribute(feature, "Name", "gene_name", "gene_id", "transcript_id", "ID")
+        or "."
+    )
 
 
 def bed6(features: Sequence[Mapping[str, object]], fmt: str, feature_type: str) -> str:
@@ -630,8 +884,18 @@ def bed6(features: Sequence[Mapping[str, object]], fmt: str, feature_type: str) 
     for feature in features:
         if str(feature["type"]).lower() == wanted:
             score = 0 if feature["score"] is None else int(float(feature["score"]))  # type: ignore[arg-type]
-            lines.append("\t".join((str(feature["seqid"]), str(int(feature["start"]) - 1), str(feature["end"]), bed_name(feature, fmt),  # type: ignore[call-overload]
-                                    str(score), str(feature["strand"] if feature["strand"] in {"+", "-"} else "."))))
+            lines.append(
+                "\t".join(
+                    (
+                        str(feature["seqid"]),
+                        str(int(feature["start"]) - 1),
+                        str(feature["end"]),
+                        bed_name(feature, fmt),  # type: ignore[call-overload]
+                        str(score),
+                        str(feature["strand"] if feature["strand"] in {"+", "-"} else "."),
+                    )
+                )
+            )
     return "\n".join(lines) + ("\n" if lines else "")
 
 
@@ -647,9 +911,24 @@ def bed12(features: Sequence[Mapping[str, object]], fmt: str) -> str:
             thick_start, thick_end = (span[0] - 1, span[1]) if span else (end, end)
             sizes = [e - s + 1 for s, e in exons]
             offsets = [s - 1 - start for s, _ in exons]
-            lines.append("\t".join((str(transcript_seqid(entry)), str(start), str(end), str(entry["id"]), "0", transcript_strand(entry) if transcript_strand(entry) in {"+", "-"} else ".",
-                                    str(thick_start), str(thick_end), "0", str(len(exons)), ",".join(map(str, sizes)) + ",", ",".join(map(str, offsets)) + ","))
-                         )
+            lines.append(
+                "\t".join(
+                    (
+                        str(transcript_seqid(entry)),
+                        str(start),
+                        str(end),
+                        str(entry["id"]),
+                        "0",
+                        transcript_strand(entry) if transcript_strand(entry) in {"+", "-"} else ".",
+                        str(thick_start),
+                        str(thick_end),
+                        "0",
+                        str(len(exons)),
+                        ",".join(map(str, sizes)) + ",",
+                        ",".join(map(str, offsets)) + ",",
+                    )
+                )
+            )
     return "\n".join(lines) + ("\n" if lines else "")
 
 
@@ -666,7 +945,11 @@ def read_sequences(value: object) -> list[tuple[str, str]]:
         else:
             entries = [(str(key), item) for key, item in value.items()]
     elif isinstance(value, (str, os.PathLike)):
-        text = read_text(value) if isinstance(value, os.PathLike) or ("\n" not in value and is_file(Path(value))) else value
+        text = (
+            read_text(value)
+            if isinstance(value, os.PathLike) or ("\n" not in value and is_file(Path(value)))
+            else value
+        )
         if text.lstrip().startswith(">"):
             identifier, chunks = None, []
             for line in text.splitlines():
@@ -674,7 +957,10 @@ def read_sequences(value: object) -> list[tuple[str, str]]:
                 if line.startswith(">"):
                     if identifier is not None:
                         entries.append((identifier, "".join(chunks)))
-                    identifier, chunks = (line[1:].split(None, 1) or [f"seq{len(entries) + 1}"])[0], []
+                    identifier, chunks = (
+                        (line[1:].split(None, 1) or [f"seq{len(entries) + 1}"])[0],
+                        [],
+                    )
                 elif line and identifier is not None:
                     chunks.append(line)
             if identifier is not None:
@@ -690,20 +976,32 @@ def read_sequences(value: object) -> list[tuple[str, str]]:
             else:
                 entries.append((f"seq{index}", item))
     else:
-        raise InputFormatError("Provide FASTA text, a sequence, or a list/mapping of sequences.", code="INVALID_SEQUENCE_INPUT")
+        raise InputFormatError(
+            "Provide FASTA text, a sequence, or a list/mapping of sequences.",
+            code="INVALID_SEQUENCE_INPUT",
+        )
     result = []
     for identifier, sequence in entries:
         try:
             result.append((identifier, normalize_dna_sequence(str(sequence))))
         except ValueError as exc:
-            raise InputFormatError(f"Sequence {identifier!r}: {exc}", code="INVALID_SEQUENCE") from exc
+            raise InputFormatError(
+                f"Sequence {identifier!r}: {exc}", code="INVALID_SEQUENCE"
+            ) from exc
     if not result:
         raise InputFormatError("No sequences were found.", code="INVALID_SEQUENCE_INPUT")
     return result
 
 
 def scan_orfs(
-    seqid: str, sequence: str, *, min_length: int, start_codons: Sequence[str], stop_codons: Sequence[str], require_stop: bool, both_strands: bool,
+    seqid: str,
+    sequence: str,
+    *,
+    min_length: int,
+    start_codons: Sequence[str],
+    stop_codons: Sequence[str],
+    require_stop: bool,
+    both_strands: bool,
 ) -> list[dict[str, object]]:
     """Open reading frames on one sequence (standard genetic code).
 
@@ -714,7 +1012,9 @@ def scan_orfs(
 
     starts, stops = set(start_codons), set(stop_codons)
     found: list[dict[str, object]] = []
-    strands = [("+", sequence)] + ([("-", reverse_complement_dna(sequence))] if both_strands else [])
+    strands = [("+", sequence)] + (
+        [("-", reverse_complement_dna(sequence))] if both_strands else []
+    )
     total = len(sequence)
     for strand, strand_sequence in strands:
         for frame in range(3):
@@ -722,27 +1022,53 @@ def scan_orfs(
             position = frame
             last_end = frame
             while position + 3 <= total:
-                codon = strand_sequence[position:position + 3]
+                codon = strand_sequence[position : position + 3]
                 last_end = position + 3
                 if begin is None and codon in starts:
                     begin = position
                 if codon in stops and begin is not None:
-                    found.append(_orf_record(seqid, strand, frame, strand_sequence, begin, position + 3, total, True))
+                    found.append(
+                        _orf_record(
+                            seqid, strand, frame, strand_sequence, begin, position + 3, total, True
+                        )
+                    )
                     begin = None
                 elif codon in stops:
                     begin = None
                 position += 3
             if begin is not None and not require_stop:
-                found.append(_orf_record(seqid, strand, frame, strand_sequence, begin, last_end, total, False))
+                found.append(
+                    _orf_record(
+                        seqid, strand, frame, strand_sequence, begin, last_end, total, False
+                    )
+                )
     result = [orf for orf in found if int(orf["length"]) >= min_length]  # type: ignore[call-overload]
     return sorted(result, key=lambda orf: (int(orf["start"]), int(orf["end"]), str(orf["strand"])))  # type: ignore[call-overload]
 
 
-def _orf_record(seqid: str, strand: str, frame: int, strand_sequence: str, begin: int, end: int, total: int, has_stop: bool) -> dict[str, object]:
-    codons = [strand_sequence[i:i + 3] for i in range(begin, end, 3)]
+def _orf_record(
+    seqid: str,
+    strand: str,
+    frame: int,
+    strand_sequence: str,
+    begin: int,
+    end: int,
+    total: int,
+    has_stop: bool,
+) -> dict[str, object]:
+    codons = [strand_sequence[i : i + 3] for i in range(begin, end, 3)]
     protein = "".join(CODON_TABLE.get(codon, "X") for codon in codons)
     if has_stop:
         protein = protein[:-1]
     start, stop = (begin + 1, end) if strand == "+" else (total - end + 1, total - begin)
-    return {"seqid": seqid, "strand": strand, "frame": (frame + 1) if strand == "+" else -(frame + 1), "start": start, "end": stop,
-            "length": end - begin, "has_stop": has_stop, "protein": protein, "protein_length": len(protein)}
+    return {
+        "seqid": seqid,
+        "strand": strand,
+        "frame": (frame + 1) if strand == "+" else -(frame + 1),
+        "start": start,
+        "end": stop,
+        "length": end - begin,
+        "has_stop": has_stop,
+        "protein": protein,
+        "protein_length": len(protein),
+    }

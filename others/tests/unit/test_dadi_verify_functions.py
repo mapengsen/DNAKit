@@ -42,7 +42,10 @@ def _no_network(monkeypatch):
 
 def _triallelic(size=5):
     """An unfolded triallelic spectrum: entries with i + j <= size - 1 are valid, the rest are masked."""
-    return [[float(3 + 2 * i + j) if i + j <= size - 1 else None for j in range(size)] for i in range(size)]
+    return [
+        [float(3 + 2 * i + j) if i + j <= size - 1 else None for j in range(size)]
+        for i in range(size)
+    ]
 
 
 def _nested(array):
@@ -53,7 +56,10 @@ def _nested(array):
     data = np.ma.getdata(array)
     if data.ndim == 1:
         return [None if mask[i] else float(data[i]) for i in range(data.shape[0])]
-    return [_nested(array_slice) for array_slice in [np.ma.masked_array(data[i], mask=mask[i]) for i in range(data.shape[0])]]
+    return [
+        _nested(array_slice)
+        for array_slice in [np.ma.masked_array(data[i], mask=mask[i]) for i in range(data.shape[0])]
+    ]
 
 
 def _png(path):
@@ -72,9 +78,15 @@ def test_triallelic_plot_writes_png_and_drawn_values(tmp_path):
     positive = [v for row in spectrum for v in row if v is not None and v > 0]
     assert result["vmin"] == min(positive)
     assert result["vmax"] == max(positive)
-    drawn = np.array([[np.nan if v is None else v for v in row] for row in result["spectrum"]], dtype=float)
-    expected = np.array([[np.nan if v is None else v for v in row] for row in spectrum], dtype=float)
-    assert np.allclose(drawn, np.where(expected >= result["vmin"], expected, np.nan), equal_nan=True)
+    drawn = np.array(
+        [[np.nan if v is None else v for v in row] for row in result["spectrum"]], dtype=float
+    )
+    expected = np.array(
+        [[np.nan if v is None else v for v in row] for row in spectrum], dtype=float
+    )
+    assert np.allclose(
+        drawn, np.where(expected >= result["vmin"], expected, np.nan), equal_nan=True
+    )
 
 
 @requires_dadi
@@ -83,10 +95,16 @@ def test_fold_matches_dadi_fold():
     import numpy as np
     from dadi.Triallele import plotting as upstream
 
-    spectrum = dadi.Spectrum(np.ma.masked_invalid(np.array([[np.nan if v is None else v for v in row] for row in _triallelic(6)])))
+    spectrum = dadi.Spectrum(
+        np.ma.masked_invalid(
+            np.array([[np.nan if v is None else v for v in row] for row in _triallelic(6)])
+        )
+    )
     assert not np.ma.getmaskarray(spectrum)[1, 2]
     upstream_folded = upstream._fold(spectrum.copy())
-    same_input = np.ma.array(np.ma.getdata(spectrum).copy(), mask=np.ma.getmaskarray(spectrum).copy())
+    same_input = np.ma.array(
+        np.ma.getdata(spectrum).copy(), mask=np.ma.getmaskarray(spectrum).copy()
+    )
     ours = module._fold(np, same_input)
     assert np.array_equal(np.ma.getmaskarray(ours), np.ma.getmaskarray(upstream_folded))
     keep = ~np.ma.getmaskarray(ours)
@@ -98,7 +116,9 @@ def test_folded_plot_rejects_an_already_folded_spectrum(tmp_path):
     spectrum = _triallelic(5)
     spectrum[1][2] = None
     with pytest.raises(ConfigurationError, match="already folded"):
-        module.plot_triallelic_spectrum(spectrum, str(tmp_path / "x.png"), folded=True, verbose=False)
+        module.plot_triallelic_spectrum(
+            spectrum, str(tmp_path / "x.png"), folded=True, verbose=False
+        )
 
 
 @requires_dadi
@@ -110,7 +130,9 @@ def test_upstream_single_trispectrum_fails_in_matplotlib():
     from dadi.Triallele import plotting as upstream
     from dadi.Triallele.TriSpectrum_mod import TriSpectrum
 
-    raw = np.ma.masked_invalid(np.array([[np.nan if v is None else v for v in row] for row in _triallelic(5)]))
+    raw = np.ma.masked_invalid(
+        np.array([[np.nan if v is None else v for v in row] for row in _triallelic(5)])
+    )
     spectrum = TriSpectrum(raw)
     with pytest.raises(ValueError, match="Normalize"):
         upstream.plot_single_trispectrum(spectrum, folded=False)
@@ -125,7 +147,9 @@ def test_comparison_residual_matches_the_formula(tmp_path):
     target = tmp_path / "comp.png"
     result = module.plot_triallelic_spectrum_comparison(first, second, str(target), verbose=False)
     assert _png(target)
-    residual = np.array([[np.nan if v is None else v for v in row] for row in result["residual"]], dtype=float)
+    residual = np.array(
+        [[np.nan if v is None else v for v in row] for row in result["residual"]], dtype=float
+    )
     a = np.array([[np.nan if v is None else v for v in row] for row in first], dtype=float)
     b = np.array([[np.nan if v is None else v for v in row] for row in second], dtype=float)
     expected = (a - b) / np.sqrt(a)
@@ -135,13 +159,19 @@ def test_comparison_residual_matches_the_formula(tmp_path):
 @requires_dadi
 def test_two_locus_faces_match_upstream_plot_3d(tmp_path, monkeypatch):
     import numpy as np
-    from mpl_toolkits.mplot3d import art3d, axes3d
     from dadi.TwoLocus import plotting as upstream
     from dadi.TwoLocus.TLSpectrum_mod import TLSpectrum
+    from mpl_toolkits.mplot3d import art3d, axes3d
 
     raw = np.ma.masked_invalid(
         np.array(
-            [[[np.nan if i + j + k >= 6 else float(1 + i + 2 * j + 3 * k) for k in range(4)] for j in range(4)] for i in range(4)]
+            [
+                [
+                    [np.nan if i + j + k >= 6 else float(1 + i + 2 * j + 3 * k) for k in range(4)]
+                    for j in range(4)
+                ]
+                for i in range(4)
+            ]
         )
     )
     fs = TLSpectrum(raw.copy())
@@ -176,7 +206,9 @@ def test_upstream_plot_3d_fails_on_axes3d_colorbar():
     from dadi.TwoLocus import plotting as upstream
     from dadi.TwoLocus.TLSpectrum_mod import TLSpectrum
 
-    raw = np.ma.masked_invalid(np.array([[[float(1 + i + j + k) for k in range(4)] for j in range(4)] for i in range(4)]))
+    raw = np.ma.masked_invalid(
+        np.array([[[float(1 + i + j + k) for k in range(4)] for j in range(4)] for i in range(4)])
+    )
     fs = TLSpectrum(raw)
     with pytest.raises(AttributeError, match="colorbar"):
         upstream.plot_3d(fs, show=False)
@@ -191,18 +223,36 @@ def test_dfe_mixture_point_pos_matches_dadi_components():
     values = [-1.1, 0.6, 0.4, 0.2, 0.5, 0.3, 0.2, 0.6]
     pdf_params, (rho, ppos1, gamma1, ppos2, gamma2, p2d) = values[:-6], values[-6:]
     ns, pts, theta = [4, 4], [10, 12, 14], 1.0
-    kwargs = dict(gamma_bounds=(1e-4, 2000.0), gamma_pts=5, additional_gammas=[gamma1, gamma2], verbose=False)
+    kwargs = dict(
+        gamma_bounds=(1e-4, 2000.0), gamma_pts=5, additional_gammas=[gamma1, gamma2], verbose=False
+    )
     s1 = Cache1D_mod.Cache1D(demo, ns, DemogSelModels.split_mig_sel_single_gamma, pts, **kwargs)
     s2 = Cache2D_mod.Cache2D(demo, ns, DemogSelModels.split_mig_sel, pts, **kwargs)
-    fs1 = s1.integrate_point_pos(list(pdf_params) + [ppos1, gamma1], None, PDFs.lognormal, theta, Npos=1, pts=None)
+    fs1 = s1.integrate_point_pos(
+        list(pdf_params) + [ppos1, gamma1], None, PDFs.lognormal, theta, Npos=1, pts=None
+    )
     fs2 = s2.integrate_point_pos(
-        list(pdf_params) + [rho, ppos1, gamma1, ppos2, gamma2], None, PDFs.biv_lognormal, theta, rho, None
+        list(pdf_params) + [rho, ppos1, gamma1, ppos2, gamma2],
+        None,
+        PDFs.biv_lognormal,
+        theta,
+        rho,
+        None,
     )
     expected = (1 - p2d) * fs1 + p2d * fs2
     result = module.dfe_mixture_point_pos_spectrum(
-        list(demo), ns, values, theta, grid_points=pts, gamma_points=5, gamma_max=2000.0, verbose=False
+        list(demo),
+        ns,
+        values,
+        theta,
+        grid_points=pts,
+        gamma_points=5,
+        gamma_max=2000.0,
+        verbose=False,
     )
-    got = np.array([[np.nan if v is None else v for v in row] for row in result["spectrum"]], dtype=float)
+    got = np.array(
+        [[np.nan if v is None else v for v in row] for row in result["spectrum"]], dtype=float
+    )
     expected_mask = np.ma.getmaskarray(expected)
     assert np.array_equal(np.isnan(got), expected_mask)
     keep = ~expected_mask
@@ -217,11 +267,15 @@ def test_upstream_mixture_point_pos_fails_on_none_rho():
     demo = (1.2, 0.8, 0.3, 0.5)
     values = [-1.1, 0.6, 0.4, 0.2, 0.5, 0.3, 0.2, 0.6]
     ns, pts = [4, 4], [10, 12, 14]
-    kwargs = dict(gamma_bounds=(1e-4, 2000.0), gamma_pts=5, additional_gammas=[0.5, 0.2], verbose=False)
+    kwargs = dict(
+        gamma_bounds=(1e-4, 2000.0), gamma_pts=5, additional_gammas=[0.5, 0.2], verbose=False
+    )
     s1 = Cache1D_mod.Cache1D(demo, ns, DemogSelModels.split_mig_sel_single_gamma, pts, **kwargs)
     s2 = Cache2D_mod.Cache2D(demo, ns, DemogSelModels.split_mig_sel, pts, **kwargs)
     with pytest.raises(TypeError):
-        mixtures.mixture_point_pos(values, None, s1, s2, PDFs.lognormal, PDFs.biv_lognormal, 1.0, None)
+        mixtures.mixture_point_pos(
+            values, None, s1, s2, PDFs.lognormal, PDFs.biv_lognormal, 1.0, None
+        )
 
 
 DEMES_GRAPH = """description: split with two demes
@@ -266,9 +320,9 @@ DEMES_OPTIONS = """parameters:
 def _repaired_options_loader(fname):
     import ruamel.yaml
 
-    with open(fname, "r") as handle:
+    with open(fname) as handle:
         options = ruamel.yaml.YAML(typ="safe").load(handle)
-    if "parameters" not in options.keys():
+    if "parameters" not in options:
         raise ValueError("parameters to fit must be specified")
     return options
 
@@ -277,7 +331,10 @@ def _sfs_nested(spectrum):
     import numpy as np
 
     mask = np.ma.getmaskarray(spectrum)
-    return [[None if mask[i, j] else float(spectrum[i, j]) for j in range(spectrum.shape[1])] for i in range(spectrum.shape[0])]
+    return [
+        [None if mask[i, j] else float(spectrum[i, j]) for j in range(spectrum.shape[1])]
+        for i in range(spectrum.shape[0])
+    ]
 
 
 def _demes_inputs(tmp_path):
@@ -316,9 +373,16 @@ def test_upstream_demes_optimize_fails_on_removed_yaml_load(tmp_path):
     from dadi.Demes import Inference
 
     graph, options, data = _demes_inputs(tmp_path)
-    with open("/dev/null", "w") as sink:
-        with pytest.raises(AttributeError, match="load"):
-            Inference.optimize(str(graph), str(options), data, [10, 12, 14], maxiter=1, verbose=0, output_stream=sink)
+    with open("/dev/null", "w") as sink, pytest.raises(AttributeError, match="load"):
+        Inference.optimize(
+            str(graph),
+            str(options),
+            data,
+            [10, 12, 14],
+            maxiter=1,
+            verbose=0,
+            output_stream=sink,
+        )
 
 
 @requires_dadi
@@ -328,11 +392,25 @@ def test_demes_output_is_a_new_file(tmp_path):
     graph, options, data = _demes_inputs(tmp_path)
     out = tmp_path / "fitted.yaml"
     result = module.optimize_demes_graph_parameters(
-        graph, options, _sfs_nested(data), ["A", "B"], [10, 12, 14], maxiter=2, output_path=out, verbose=False
+        graph,
+        options,
+        _sfs_nested(data),
+        ["A", "B"],
+        [10, 12, 14],
+        maxiter=2,
+        output_path=out,
+        verbose=False,
     )
     assert result["output_path"] == str(out)
     assert demes.load(str(out)).demes[1].name == "A"
     with pytest.raises(ConfigurationError):
         module.optimize_demes_graph_parameters(
-            graph, options, _sfs_nested(data), ["A", "B"], [10, 12, 14], maxiter=2, output_path=out, verbose=False
+            graph,
+            options,
+            _sfs_nested(data),
+            ["A", "B"],
+            [10, 12, 14],
+            maxiter=2,
+            output_path=out,
+            verbose=False,
         )

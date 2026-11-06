@@ -14,8 +14,9 @@ from __future__ import annotations
 
 import csv
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
@@ -173,17 +174,14 @@ def summarize_lca_signatures(
         [str(p) for p in databases], scaled, verbose=False
     )
     results: list[dict[str, Any]] = []
-    csv_fp = open(out, "w", newline="") if out is not None else None
+    csv_fp = open(out, "w", newline="") if out is not None else None  # noqa: SIM115 - closed explicitly below
     write_header = True
     try:
         for filename, sig, hashvals in summarizer.load_singletons_and_count(
             [str(p) for p in queries], ksize, db_scaled, ignore_abundance
         ):
             lineage_counts = summarizer.summarize(hashvals, dblist, threshold, ignore_abundance)
-            if not ignore_abundance:
-                total = float(sum(hashvals.values()))
-            else:
-                total = float(len(hashvals))
+            total = float(sum(hashvals.values())) if not ignore_abundance else float(len(hashvals))
             if csv_fp is not None:
                 summarizer.output_csv(
                     lineage_counts, total, csv_fp, filename, sig, write_header=write_header
@@ -321,7 +319,9 @@ def compare_lineage_assignment_csvs(
             if lca:
                 rank = lca[-1].rank
             incompatible_by_rank[rank] += 1
-        differences.append({"identifier": str(identifier), "verdict": verdict, "lca": _lineage(lca)})
+        differences.append(
+            {"identifier": str(identifier), "verdict": verdict, "lca": _lineage(lca)}
+        )
     n_incompatible = sum(1 for row in differences if row["verdict"] == "incompatible")
     return {
         "status": "completed",

@@ -15,9 +15,12 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 sourmash = pytest.importorskip("sourmash")
 numpy = pytest.importorskip("numpy")
 
-from dnakit import metagenomics_sourmash_facades3 as facades  # noqa: E402
+from dnakit import metagenomics_sourmash_facades3 as facades
 
-RANDOM_FASTA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data/random.fa"
+RANDOM_FASTA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data/random.fa"
+)
 
 
 def _sequence(length: int = 3000) -> str:
@@ -58,12 +61,18 @@ def lca_databases(signatures):
     db.insert(
         signatures["a"],
         ident="gA",
-        lineage=(LineagePair("superkingdom", "Bacteria", None), LineagePair("phylum", "Firmicutes", None)),
+        lineage=(
+            LineagePair("superkingdom", "Bacteria", None),
+            LineagePair("phylum", "Firmicutes", None),
+        ),
     )
     db.insert(
         signatures["b"],
         ident="gB",
-        lineage=(LineagePair("superkingdom", "Bacteria", None), LineagePair("phylum", "Bacteroidota", None)),
+        lineage=(
+            LineagePair("superkingdom", "Bacteria", None),
+            LineagePair("phylum", "Bacteroidota", None),
+        ),
     )
     path = root / "test.lca.json.gz"
     db.save(str(path))
@@ -138,7 +147,9 @@ def test_load_lca_database_describes_the_database(lca_databases):
 
 
 def test_load_lca_databases_returns_one_row_per_file(lca_databases):
-    result = facades.load_lca_databases([lca_databases["path"], lca_databases["path"]], verbose=False)
+    result = facades.load_lca_databases(
+        [lca_databases["path"], lca_databases["path"]], verbose=False
+    )
     assert len(result["databases"]) == 2
     assert result["databases"][0]["path"] == lca_databases["path"]
 
@@ -149,7 +160,10 @@ def test_classify_signature_lineage_finds_the_shared_lineage(signatures, lca_dat
     )
     [row] = result["classifications"]
     assert row["status"] == "found"
-    assert row["lineage"] == [{"rank": "superkingdom", "name": "Bacteria"}, {"rank": "phylum", "name": "Firmicutes"}]
+    assert row["lineage"] == [
+        {"rank": "superkingdom", "name": "Bacteria"},
+        {"rank": "phylum", "name": "Firmicutes"},
+    ]
 
 
 def test_classify_signature_lineage_majority_and_threshold(signatures, lca_databases):
@@ -178,13 +192,17 @@ def test_summarize_lineage_counts_aggregates_ancestors(signatures, lca_databases
     result = facades.summarize_lineage_counts(
         str(signatures["query"]), [lca_databases["path"]], threshold=1, verbose=False
     )
-    by_lineage = {tuple(item["name"] for item in row["lineage"]): row["count"] for row in result["counts"]}
+    by_lineage = {
+        tuple(item["name"] for item in row["lineage"]): row["count"] for row in result["counts"]
+    }
     assert by_lineage[("Bacteria",)] >= by_lineage[("Bacteria", "Firmicutes")]
     assert by_lineage[("Bacteria", "Firmicutes")] > 0
 
 
 def test_gather_lineage_assignments_lists_lineages_per_hash(signatures, lca_databases):
-    result = facades.gather_lineage_assignments(str(signatures["query"]), [lca_databases["path"]], verbose=False)
+    result = facades.gather_lineage_assignments(
+        str(signatures["query"]), [lca_databases["path"]], verbose=False
+    )
     assert result["assigned_hash_count"] == len(result["assignments"]) > 0
     first = result["assignments"][0]
     assert first["hashval"].isdigit()
@@ -239,7 +257,9 @@ def test_plot_comparison_matrix_rejects_bad_inputs(comparison_base, tmp_path):
     with pytest.raises(ConfigurationError):
         facades.plot_comparison_matrix(comparison_base, str(tmp_path / "x.gif"), verbose=False)
     with pytest.raises(ConfigurationError):
-        facades.plot_comparison_matrix(comparison_base, str(tmp_path / "x.png"), vmin=1.0, vmax=0.0, verbose=False)
+        facades.plot_comparison_matrix(
+            comparison_base, str(tmp_path / "x.png"), vmin=1.0, vmax=0.0, verbose=False
+        )
     existing = tmp_path / "exists.png"
     existing.write_bytes(b"x")
     with pytest.raises(ConfigurationError):

@@ -161,8 +161,9 @@ def test_build_argument_vector_and_kmer_parsing(reference: dict[str, Path]) -> N
     call = _calls(reference["dir"])[0]
     assert call[:2] == ["-p", "2"]
     assert call[-2:] == [str(reference["fa"]), str(prefix)]
-    assert ["--kmer-count", "2"] == call[
-        call.index("--kmer-count") : call.index("--kmer-count") + 2
+    assert call[call.index("--kmer-count") : call.index("--kmer-count") + 2] == [
+        "--kmer-count",
+        "2",
     ]
     assert ["--name-table", str(reference["names"])] == call[
         call.index("--name-table") : call.index("--name-table") + 2
@@ -312,7 +313,7 @@ def test_build_inspect_and_kreport_roundtrip(reference: dict[str, Path]) -> None
         and by_taxid[2]["clade_reads"] == 8
         and by_taxid[3]["depth"] == 2
     )
-    with pytest.raises(ConfigurationError, match="complete Centrifuge index|No complete"):
+    with pytest.raises(ConfigurationError, match=r"complete Centrifuge index|No complete"):
         cf.centrifuge_inspect(
             str(reference["dir"] / "nope"), str(reference["dir"] / "x.txt"), verbose=False
         )

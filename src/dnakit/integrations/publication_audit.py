@@ -131,7 +131,9 @@ def _publication_type(record: dict[str, Any]) -> tuple[str, dict[str, Any] | Non
     return "missing", None
 
 
-def _license_status(record: dict[str, Any], matched: dict[str, Any] | None) -> tuple[str, str | None]:
+def _license_status(
+    record: dict[str, Any], matched: dict[str, Any] | None
+) -> tuple[str, str | None]:
     values = [str(value) for value in record.get("licenses", []) if value]
     if matched and matched.get("license"):
         values.append(str(matched["license"]))
@@ -151,8 +153,13 @@ def _license_status(record: dict[str, Any], matched: dict[str, Any] | None) -> t
         "不清晰",
         "缺少",
     )
-    if decision in {"external_only", "blocked_or_unverified"} or any(term in text for term in restrictive_terms):
-        return "restricted_or_unverified", "Redistribution or linking terms require a separate license review."
+    if decision in {"external_only", "blocked_or_unverified"} or any(
+        term in text for term in restrictive_terms
+    ):
+        return (
+            "restricted_or_unverified",
+            "Redistribution or linking terms require a separate license review.",
+        )
     if values:
         return "declared", "; ".join(values)
     return "unknown", "The survey does not provide a license evidence record."
@@ -239,7 +246,10 @@ def audit_publication_evidence(
         item = _audit_one(source)
         if manuscript_category is not None and item["manuscript_category"] != manuscript_category:
             continue
-        if journal_citation_status is not None and item["journal_citation_status"] != journal_citation_status:
+        if (
+            journal_citation_status is not None
+            and item["journal_citation_status"] != journal_citation_status
+        ):
             continue
         result.append(item)
     return result
@@ -276,7 +286,11 @@ def publication_audit_summary(*, verbose: bool = True) -> dict[str, Any]:
         "manuscript_categories": categories,
         "journal_citation_status": citation_status,
         "license_status": licenses,
-        "ready_for_journal": sum(row["journal_citation_status"] == "journal_article" and row["manuscript_category"] == "manuscript_ready" for row in rows),
+        "ready_for_journal": sum(
+            row["journal_citation_status"] == "journal_article"
+            and row["manuscript_category"] == "manuscript_ready"
+            for row in rows
+        ),
         "scientific_validation": "not_assessed_by_publication_audit",
         "disclaimer": "A journal citation does not grant redistribution rights and does not validate a scientific result; report exact versions, databases, parameters and independent validation separately.",
     }

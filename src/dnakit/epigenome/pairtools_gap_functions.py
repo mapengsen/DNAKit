@@ -50,7 +50,12 @@ def _program(pairtools_path: str | None) -> str:
 @functools.lru_cache(maxsize=8)
 def _version(program: str) -> str:
     completed = subprocess.run(
-        [program, "--version"], capture_output=True, text=True, timeout=120, shell=False, check=False
+        [program, "--version"],
+        capture_output=True,
+        text=True,
+        timeout=120,
+        shell=False,
+        check=False,
     )
     return (completed.stdout or completed.stderr).strip()
 
@@ -100,7 +105,9 @@ def _run(
         cwd=cwd,
     )
     produced = [p for p in outputs if p.is_file()]
-    status = "completed" if completed.returncode == 0 and len(produced) == len(outputs) else "failed"
+    status = (
+        "completed" if completed.returncode == 0 and len(produced) == len(outputs) else "failed"
+    )
     return {
         "status": status,
         "backend": "pairtools",
@@ -149,10 +156,20 @@ def pairtools_dedup(
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
     flags, extra = _optional_outputs(
-        ("--output-dups", output_dups), ("--output-unmapped", output_unmapped), ("--output-stats", output_stats)
+        ("--output-dups", output_dups),
+        ("--output-unmapped", output_unmapped),
+        ("--output-stats", output_stats),
     )
-    arguments = ["-o", str(target), *flags, *_flag("--max-mismatch", max_mismatch), *_flag("--method", method),
-                 *_switch("--mark-dups", mark_dups), *_flag("--n-proc", n_proc), str(source)]
+    arguments = [
+        "-o",
+        str(target),
+        *flags,
+        *_flag("--max-mismatch", max_mismatch),
+        *_flag("--method", method),
+        *_switch("--mark-dups", mark_dups),
+        *_flag("--n-proc", n_proc),
+        str(source),
+    ]
     return _run(["dedup"], arguments, [target, *extra], pairtools_path)
 
 
@@ -174,10 +191,20 @@ def pairtools_filterbycov(
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
     flags, extra = _optional_outputs(
-        ("--output-highcov", output_highcov), ("--output-unmapped", output_unmapped), ("--output-stats", output_stats)
+        ("--output-highcov", output_highcov),
+        ("--output-unmapped", output_unmapped),
+        ("--output-stats", output_stats),
     )
-    arguments = ["-o", str(target), *flags, *_flag("--max-cov", max_cov), *_flag("--max-dist", max_dist),
-                 *_flag("--method", method), *_switch("--mark-multi", mark_multi), str(source)]
+    arguments = [
+        "-o",
+        str(target),
+        *flags,
+        *_flag("--max-cov", max_cov),
+        *_flag("--max-dist", max_dist),
+        *_flag("--method", method),
+        *_switch("--mark-multi", mark_multi),
+        str(source),
+    ]
     return _run(["filterbycov"], arguments, [target, *extra], pairtools_path)
 
 
@@ -193,7 +220,9 @@ def pairtools_flip(
     source = _existing(pairs_path, "pairs_path")
     chroms = _existing(chroms_path, "chroms_path")
     target = _new(output_path, "output_path")
-    return _run(["flip"], ["-c", str(chroms), "-o", str(target), str(source)], [target], pairtools_path)
+    return _run(
+        ["flip"], ["-c", str(chroms), "-o", str(target), str(source)], [target], pairtools_path
+    )
 
 
 def pairtools_header_generate(
@@ -212,8 +241,15 @@ def pairtools_header_generate(
     target = _new(output_path, "output_path")
     chroms = _existing(chroms_path, "chroms_path") if chroms_path is not None else None
     sam = _existing(sam_path, "sam_path") if sam_path is not None else None
-    arguments = ["-o", str(target), *_flag("--chroms-path", chroms), *_flag("--sam-path", sam),
-                 *_flag("--columns", columns), *_flag("--assembly", assembly), str(source)]
+    arguments = [
+        "-o",
+        str(target),
+        *_flag("--chroms-path", chroms),
+        *_flag("--sam-path", sam),
+        *_flag("--columns", columns),
+        *_flag("--assembly", assembly),
+        str(source),
+    ]
     return _run(["header", "generate"], arguments, [target], pairtools_path)
 
 
@@ -229,7 +265,12 @@ def pairtools_header_transfer(
     source = _existing(pairs_path, "pairs_path")
     reference = _existing(reference_path, "reference_path")
     target = _new(output_path, "output_path")
-    return _run(["header", "transfer"], ["-o", str(target), "-r", str(reference), str(source)], [target], pairtools_path)
+    return _run(
+        ["header", "transfer"],
+        ["-o", str(target), "-r", str(reference), str(source)],
+        [target],
+        pairtools_path,
+    )
 
 
 def pairtools_header_set_columns(
@@ -245,7 +286,12 @@ def pairtools_header_set_columns(
         raise ConfigurationError("columns must list at least one column name.")
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
-    return _run(["header", "set-columns"], ["-o", str(target), "-c", columns, str(source)], [target], pairtools_path)
+    return _run(
+        ["header", "set-columns"],
+        ["-o", str(target), "-c", columns, str(source)],
+        [target],
+        pairtools_path,
+    )
 
 
 def pairtools_header_validate_columns(
@@ -261,7 +307,14 @@ def pairtools_header_validate_columns(
     source = _existing(pairs_path, "pairs_path")
     reference = _existing(reference_path, "reference_path")
     target = _new(output_path, "output_path")
-    arguments = ["-o", str(target), "-r", str(reference), *_flag("-c", reference_columns), str(source)]
+    arguments = [
+        "-o",
+        str(target),
+        "-r",
+        str(reference),
+        *_flag("-c", reference_columns),
+        str(source),
+    ]
     return _run(["header", "validate-columns"], arguments, [target], pairtools_path)
 
 
@@ -296,9 +349,17 @@ def pairtools_merge(
         raise ConfigurationError("pairs_paths must list at least one .pairs file.")
     sources = [str(_existing(p, "pairs_paths")) for p in pairs_paths]
     target = _new(output_path, "output_path")
-    arguments = ["-o", str(target), *_flag("--max-nmerge", max_nmerge), *_flag("--tmpdir", tmpdir),
-                 *_flag("--memory", memory), *_flag("--nproc", nproc),
-                 *_switch("--keep-first-header", keep_first_header), *_switch("--concatenate", concatenate), *sources]
+    arguments = [
+        "-o",
+        str(target),
+        *_flag("--max-nmerge", max_nmerge),
+        *_flag("--tmpdir", tmpdir),
+        *_flag("--memory", memory),
+        *_flag("--nproc", nproc),
+        *_switch("--keep-first-header", keep_first_header),
+        *_switch("--concatenate", concatenate),
+        *sources,
+    ]
     return _run(["merge"], arguments, [target], pairtools_path)
 
 
@@ -323,9 +384,18 @@ def pairtools_parse(
     flags, extra = _optional_outputs(
         ("--output-stats", output_stats), ("--output-parsed-alignments", output_parsed_alignments)
     )
-    arguments = ["-c", str(chroms), "-o", str(target), *_flag("--assembly", assembly), *_flag("--min-mapq", min_mapq),
-                 *_flag("--max-molecule-size", max_molecule_size), *_flag("--add-columns", add_columns), *flags,
-                 str(sam)]
+    arguments = [
+        "-c",
+        str(chroms),
+        "-o",
+        str(target),
+        *_flag("--assembly", assembly),
+        *_flag("--min-mapq", min_mapq),
+        *_flag("--max-molecule-size", max_molecule_size),
+        *_flag("--add-columns", add_columns),
+        *flags,
+        str(sam),
+    ]
     return _run(["parse"], arguments, [target, *extra], pairtools_path)
 
 
@@ -346,8 +416,17 @@ def pairtools_parse2(
     chroms = _existing(chroms_path, "chroms_path")
     target = _new(output_path, "output_path")
     flags, extra = _optional_outputs(("--output-stats", output_stats))
-    arguments = ["-c", str(chroms), "-o", str(target), *_flag("--assembly", assembly), *_flag("--min-mapq", min_mapq),
-                 *_switch("--single-end", single_end), *flags, str(sam)]
+    arguments = [
+        "-c",
+        str(chroms),
+        "-o",
+        str(target),
+        *_flag("--assembly", assembly),
+        *_flag("--min-mapq", min_mapq),
+        *_switch("--single-end", single_end),
+        *flags,
+        str(sam),
+    ]
     return _run(["parse2"], arguments, [target, *extra], pairtools_path)
 
 
@@ -364,11 +443,20 @@ def pairtools_phase(
     """Phase pairs of a diploid genome using chromosome suffixes such as -1 and -2 (pairtools phase)."""
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
-    if phase_suffixes is not None:
-        if not phase_suffixes or any(not _SUFFIX.match(s) for s in phase_suffixes):
-            raise ConfigurationError("phase_suffixes must be one or more chromosome suffixes such as '-1' and '-2'.")
+    if phase_suffixes is not None and (
+        not phase_suffixes or any(not _SUFFIX.match(s) for s in phase_suffixes)
+    ):
+        raise ConfigurationError(
+            "phase_suffixes must be one or more chromosome suffixes such as '-1' and '-2'."
+        )
     # The positional input comes first: --phase-suffixes takes several values and would swallow it otherwise.
-    arguments = [str(source), "-o", str(target), *_flag("--min-mapq", min_mapq), *_switch("--report-scores", report_scores)]
+    arguments = [
+        str(source),
+        "-o",
+        str(target),
+        *_flag("--min-mapq", min_mapq),
+        *_switch("--report-scores", report_scores),
+    ]
     if phase_suffixes is not None:
         arguments += ["--phase-suffixes", *phase_suffixes]
     return _run(["phase"], arguments, [target], pairtools_path)
@@ -386,7 +474,9 @@ def pairtools_restrict(
     source = _existing(pairs_path, "pairs_path")
     frags = _existing(frags_path, "frags_path")
     target = _new(output_path, "output_path")
-    return _run(["restrict"], ["-f", str(frags), "-o", str(target), str(source)], [target], pairtools_path)
+    return _run(
+        ["restrict"], ["-f", str(frags), "-o", str(target), str(source)], [target], pairtools_path
+    )
 
 
 def pairtools_sample(
@@ -401,7 +491,11 @@ def pairtools_sample(
     """Keep a random fraction of the pairs of a .pairs file (pairtools sample)."""
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
-    if isinstance(fraction, bool) or not isinstance(fraction, (int, float)) or not 0 < fraction <= 1:
+    if (
+        isinstance(fraction, bool)
+        or not isinstance(fraction, (int, float))
+        or not 0 < fraction <= 1
+    ):
         raise ConfigurationError("fraction must be a number in (0, 1].")
     arguments = [str(fraction), str(source), "-o", str(target), *_flag("--seed", seed)]
     return _run(["sample"], arguments, [target], pairtools_path)
@@ -420,8 +514,14 @@ def pairtools_scaling(
     """Calculate contact-probability scaling (P(s)) of pairs, optionally restricted to a view (pairtools scaling)."""
     source = _existing(input_path, "input_path")
     target = _new(output_path, "output_path")
-    arguments = ["-o", str(target), *_flag("--view", view), *_flag("--dist-range", dist_range),
-                 *_flag("--n-dist-bins-decade", n_dist_bins_decade), str(source)]
+    arguments = [
+        "-o",
+        str(target),
+        *_flag("--view", view),
+        *_flag("--dist-range", dist_range),
+        *_flag("--n-dist-bins-decade", n_dist_bins_decade),
+        str(source),
+    ]
     return _run(["scaling"], arguments, [target], pairtools_path)
 
 
@@ -443,8 +543,15 @@ def pairtools_select(
     target = _new(output_path, "output_path")
     subset = _existing(chrom_subset, "chrom_subset") if chrom_subset is not None else None
     flags, extra = _optional_outputs(("--output-rest", output_rest))
-    arguments = [condition, str(source), "-o", str(target), *flags, *_flag("--chrom-subset", subset),
-                 *_flag("--remove-columns", remove_columns)]
+    arguments = [
+        condition,
+        str(source),
+        "-o",
+        str(target),
+        *flags,
+        *_flag("--chrom-subset", subset),
+        *_flag("--remove-columns", remove_columns),
+    ]
     return _run(["select"], arguments, [target, *extra], pairtools_path)
 
 
@@ -466,9 +573,19 @@ def pairtools_sort(
     """Sort a .pairs or .pairsam file by chromosome and position columns (pairtools sort)."""
     source = _existing(pairs_path, "pairs_path")
     target = _new(output_path, "output_path")
-    arguments = [str(source), "-o", str(target), *_flag("--c1", c1), *_flag("--c2", c2), *_flag("--p1", p1),
-                 *_flag("--p2", p2), *_flag("--pt", pair_type), *_flag("--nproc", nproc), *_flag("--tmpdir", tmpdir),
-                 *_flag("--memory", memory)]
+    arguments = [
+        str(source),
+        "-o",
+        str(target),
+        *_flag("--c1", c1),
+        *_flag("--c2", c2),
+        *_flag("--p1", p1),
+        *_flag("--p2", p2),
+        *_flag("--pt", pair_type),
+        *_flag("--nproc", nproc),
+        *_flag("--tmpdir", tmpdir),
+        *_flag("--memory", memory),
+    ]
     return _run(["sort"], arguments, [target], pairtools_path)
 
 
@@ -504,15 +621,22 @@ def pairtools_stats(
         raise ConfigurationError("Without merge=True, stats takes exactly one .pairs file.")
     sources = [str(_existing(p, "input_paths")) for p in input_paths]
     target = _new(output_path, "output_path")
-    arguments = [*sources, "-o", str(target), *_switch("--merge", merge),
-                 *_flag("--n-dist-bins-decade", n_dist_bins_decade)]
+    arguments = [
+        *sources,
+        "-o",
+        str(target),
+        *_switch("--merge", merge),
+        *_flag("--n-dist-bins-decade", n_dist_bins_decade),
+    ]
     return _run(["stats"], arguments, [target], pairtools_path)
 
 
 def pairtools_mark_split_pair_as_dup(columns: Sequence[str], *, verbose: bool = True) -> list[str]:
     """Mark one parsed .pairsam record (list of its columns) as a duplicate: pair type DD and its SAM records tagged."""
     if not columns or any(not isinstance(c, str) for c in columns):
-        raise ConfigurationError("columns must be a non-empty list of strings (one .pairsam record).")
+        raise ConfigurationError(
+            "columns must be a non-empty list of strings (one .pairsam record)."
+        )
     module = _upstream("pairtools.lib.dedup")
     return list(module.mark_split_pair_as_dup(list(columns)))
 

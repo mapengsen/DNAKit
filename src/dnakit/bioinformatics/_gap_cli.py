@@ -32,7 +32,9 @@ def program(name: str, *, explicit: str | None, hint: str) -> str:
     if explicit is not None:
         candidate = Path(explicit).expanduser()
         if not candidate.is_file():
-            raise BackendUnavailableError(f"{name} executable does not exist: {candidate}", hint=hint)
+            raise BackendUnavailableError(
+                f"{name} executable does not exist: {candidate}", hint=hint
+            )
         return str(candidate.resolve())
     found = shutil.which(name)
     if found is None:
@@ -137,7 +139,9 @@ def text(value: object, name: str) -> str:
     return value
 
 
-def integer(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int:
+def integer(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{name} must be an integer.")
     if minimum is not None and value < minimum:
@@ -147,7 +151,9 @@ def integer(value: object, name: str, *, minimum: int | None = None, maximum: in
     return value
 
 
-def number(value: object, name: str, *, minimum: float | None = None, maximum: float | None = None) -> float:
+def number(
+    value: object, name: str, *, minimum: float | None = None, maximum: float | None = None
+) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigurationError(f"{name} must be a number.")
     if minimum is not None and value < minimum:

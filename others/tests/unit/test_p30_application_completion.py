@@ -19,6 +19,7 @@ from dnakit.secondary_structure import viennarna_p30_functions as rna
 
 def _program(tmp_path: Path, body: str) -> str:
     import sys
+
     executable = tmp_path / "fake_program"
     executable.write_text(f"#!{sys.executable}\n" + body)
     executable.chmod(0o755)
@@ -36,7 +37,9 @@ def test_invalid_accession_cannot_become_command(value, tmp_path):
 def test_sra_retains_both_paired_output_files_and_local_input(tmp_path, kind):
     local = tmp_path / "reads.sra"
     local.write_bytes(b"SRA")
-    executable = _program(tmp_path, '''import sys
+    executable = _program(
+        tmp_path,
+        """import sys
 from pathlib import Path
 if '--version' in sys.argv:
     print('fasterq-dump 3.2.1'); raise SystemExit
@@ -44,9 +47,16 @@ p = Path(sys.argv[sys.argv.index('-o') + 1])
 assert Path(sys.argv[-1]).read_bytes() == b'SRA'
 for i in (1, 2):
     p.with_name(p.stem + '_' + str(i) + p.suffix).write_text('>read\\nACGT\\n')
-''')
-    result = sra.extract_sra_reads("SRR123", tmp_path / "out", output_format=kind,
-                                   local_sra=local, executable_path=executable, verbose=False)
+""",
+    )
+    result = sra.extract_sra_reads(
+        "SRR123",
+        tmp_path / "out",
+        output_format=kind,
+        local_sra=local,
+        executable_path=executable,
+        verbose=False,
+    )
     assert len(result["outputs"]) == 2
     assert result["network_operation"] is False
     assert all(Path(p).is_file() for p in result["outputs"])
@@ -70,13 +80,16 @@ def test_rna_rejects_invalid_sequences_before_starting_backend(sequence):
 @pytest.mark.parametrize("sequence", ["ACGU", "NNNNNN", "ACGTACGT"])
 def test_real_biotite_parser_with_controlled_rnafold_output(tmp_path, sequence):
     pytest.importorskip("biotite")
-    executable = _program(tmp_path, '''import sys
+    executable = _program(
+        tmp_path,
+        """import sys
 if '--version' in sys.argv:
     print('RNAfold 2.7.2'); raise SystemExit
 s = sys.stdin.readline().strip()
 print(s)
 print('.' * len(s) + ' (0.00)')
-''')
+""",
+    )
     result = rna.fold_rna(sequence, executable_path=executable, verbose=False)
     assert result["structures"][0]["dot_bracket"] == "." * len(sequence)
     assert result["structures"][0]["free_energy"] == 0
@@ -93,7 +106,11 @@ def test_installed_rnafold_matches_direct_upstream(sequence):
     import biotite.sequence as seq
     from biotite.application.viennarna import FoldApp
 
-    expected = FoldApp(path=executable).run(seq.NucleotideSequence(sequence.replace("U", "T"))).result(timeout=30)
+    expected = (
+        FoldApp(path=executable)
+        .run(seq.NucleotideSequence(sequence.replace("U", "T")))
+        .result(timeout=30)
+    )
     actual = rna.fold_rna(sequence, executable_path=executable, verbose=False)["structures"][0]
     assert actual["dot_bracket"] == expected.dot_bracket
     assert actual["free_energy"] == pytest.approx(expected.free_energy)
@@ -106,16 +123,22 @@ def test_biotite_application_dispatch_contract(monkeypatch):
     class Structure:
         dot_bracket = "...."
         free_energy = 0
+
         def base_pairs(self):
             class Pairs:
-                def tolist(self): return []
+                def tolist(self):
+                    return []
+
             return Pairs()
 
     class Future:
-        def result(self, timeout): return Structure()
+        def result(self, timeout):
+            return Structure()
 
     class Application:
-        def __init__(self, path): pass
+        def __init__(self, path):
+            pass
+
         def run(self, *inputs, **options):
             calls.append((inputs, options))
             return Future()
@@ -126,16 +149,23 @@ def test_biotite_application_dispatch_contract(monkeypatch):
     class Align:
         class Alignment:
             @staticmethod
-            def from_strings(rows, factory): return ("alignment", list(rows))
+            def from_strings(rows, factory):
+                return ("alignment", list(rows))
 
     class Apps:
         pass
 
-    for program, name in rna._APPS.values():
+    for _program, name in rna._APPS.values():
         setattr(Apps, name, Application)
     monkeypatch.setattr(rna.cli, "program", lambda *a, **k: "/fixed/tool")
     monkeypatch.setattr(rna.cli, "_version_of", lambda p: "2.7.2")
-    monkeypatch.setattr(rna, "require", lambda name, extra: Apps if "viennarna" in name else Align if name.endswith("align") else Seq)
+    monkeypatch.setattr(
+        rna,
+        "require",
+        lambda name, extra: (
+            Apps if "viennarna" in name else Align if name.endswith("align") else Seq
+        ),
+    )
     for name in ("fold_rna", "fold_rna_pseudoknots", "fold_rna_local"):
         getattr(rna, name)("ACGU", verbose=False)
         assert calls[-1][0] == ("ACGT",)
@@ -157,30 +187,47 @@ def test_missing_executable_has_install_hint():
         rna.fold_rna("ACGT", executable_path="/does/not/exist/RNAfold", verbose=False)
 
 
-@pytest.mark.parametrize('coordinates, succeeds', [([[1.0, 2.0]], True), ([[float('nan'), 2.0]], False)])
+@pytest.mark.parametrize(
+    "coordinates, succeeds", [([[1.0, 2.0]], True), ([[float("nan"), 2.0]], False)]
+)
 def test_single_base_plot_coordinates_are_rows_and_json_finite(monkeypatch, coordinates, succeeds):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
+
     class Future:
-        def result(self, timeout): return np.array(coordinates[0])
+        def result(self, timeout):
+            return np.array(coordinates[0])
+
     class Plot:
         class Layout:
             NAVIEW = 1
+
             @classmethod
-            def __class_getitem__(cls, key): return getattr(cls, key)
-        def __init__(self, path): pass
-        def run(self, *args, **kwargs): return Future()
+            def __class_getitem__(cls, key):
+                return getattr(cls, key)
+
+        def __init__(self, path):
+            pass
+
+        def run(self, *args, **kwargs):
+            return Future()
+
     class Apps:
         PlotApp = Plot
+
     class Structure:
         @staticmethod
-        def base_pairs_from_dot_bracket(value): return []
-    monkeypatch.setattr(rna.cli, 'program', lambda *a, **k: '/fixed/tool')
-    monkeypatch.setattr(rna.cli, '_version_of', lambda p: '2.7.2')
-    monkeypatch.setattr(rna, 'require', lambda name, extra: Apps if 'viennarna' in name else Structure)
+        def base_pairs_from_dot_bracket(value):
+            return []
+
+    monkeypatch.setattr(rna.cli, "program", lambda *a, **k: "/fixed/tool")
+    monkeypatch.setattr(rna.cli, "_version_of", lambda p: "2.7.2")
+    monkeypatch.setattr(
+        rna, "require", lambda name, extra: Apps if "viennarna" in name else Structure
+    )
     if succeeds:
-        result = rna.rna_structure_coordinates('.', verbose=False)
-        assert result['coordinates'] == coordinates
+        result = rna.rna_structure_coordinates(".", verbose=False)
+        assert result["coordinates"] == coordinates
         json.dumps(result, allow_nan=False)
     else:
-        with pytest.raises(DNAKitError, match='non-finite'):
-            rna.rna_structure_coordinates('.', verbose=False)
+        with pytest.raises(DNAKitError, match="non-finite"):
+            rna.rna_structure_coordinates(".", verbose=False)

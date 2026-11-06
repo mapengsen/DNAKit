@@ -45,14 +45,18 @@ _GSL_HINT = (
     "The bundled run_rms_tests.out needs the GSL shared libraries (libgsl.so.0 and libgslcblas.so.0): "
     "install GSL (apt install libgsl-dev, or conda install -c conda-forge gsl)."
 )
-_METHYLPY_HINT = "Install methylpy (python -m pip install methylpy) in the same environment as DNAKit."
+_METHYLPY_HINT = (
+    "Install methylpy (python -m pip install methylpy) in the same environment as DNAKit."
+)
 
 
 def _upstream(module: str) -> Any:
     try:
         return importlib.import_module(module)
     except ImportError as exc:
-        raise BackendUnavailableError(f"{module} could not be imported: {exc}", hint=_METHYLPY_HINT) from exc
+        raise BackendUnavailableError(
+            f"{module} could not be imported: {exc}", hint=_METHYLPY_HINT
+        ) from exc
 
 
 @functools.lru_cache(maxsize=1)
@@ -69,14 +73,17 @@ def _require(program: str, prefix: str | None = None) -> str:
         directory = prefix if prefix.endswith("/") else prefix + "/"
         candidate = Path(directory + program)
         if not candidate.is_file():
-            raise BackendUnavailableError(f"{program} was not found at {candidate}.", hint=_INSTALL.get(program, ""))
+            raise BackendUnavailableError(
+                f"{program} was not found at {candidate}.", hint=_INSTALL.get(program, "")
+            )
         return str(candidate)
     found = shutil.which(program)
     if found is None and (Path(sys.executable).parent / program).is_file():
         found = str(Path(sys.executable).parent / program)
     if found is None:
         raise BackendUnavailableError(
-            f"{program} was not found on PATH.", hint=_INSTALL.get(program, f"Install {program} and put it on PATH.")
+            f"{program} was not found on PATH.",
+            hint=_INSTALL.get(program, f"Install {program} and put it on PATH."),
         )
     return found
 
@@ -105,7 +112,9 @@ def _new(path: str | Path, name: str) -> str:
 
 def _forward(arguments: Mapping[str, Any]) -> dict[str, Any]:
     """Keep only the arguments the caller set, so upstream defaults apply to the rest."""
-    return {key: value for key, value in arguments.items() if key != "verbose" and value is not None}
+    return {
+        key: value for key, value in arguments.items() if key != "verbose" and value is not None
+    }
 
 
 def _call(
@@ -142,7 +151,9 @@ def _bundled_rms_binary() -> None:
     module = _upstream("methylpy.DMRfind")
     binary = Path(module.__file__).resolve().parent / "run_rms_tests.out"
     if not binary.is_file():
-        raise BackendUnavailableError("methylpy does not ship run_rms_tests.out in this installation.", hint=_METHYLPY_HINT)
+        raise BackendUnavailableError(
+            "methylpy does not ship run_rms_tests.out in this installation.", hint=_METHYLPY_HINT
+        )
 
 
 def methylpy_dmrfind(
@@ -283,13 +294,20 @@ def methylpy_quality_trim_se(
         base += [f"--quality-base={quality_base}"]
     base += ["-a", adapter_seq.upper()]
     logs: list[str] = []
-    for source, target in zip(sources, targets):
+    for source, target in zip(sources, targets, strict=False):
         completed = subprocess.run(
-            [*base, "-o", target, source], capture_output=True, text=True, shell=False, check=False, timeout=3600
+            [*base, "-o", target, source],
+            capture_output=True,
+            text=True,
+            shell=False,
+            check=False,
+            timeout=3600,
         )
         logs.append((completed.stderr or "")[-_MAX_TAIL:])
         if completed.returncode != 0:
-            raise BackendExecutionError(f"cutadapt failed on {source} with exit code {completed.returncode}.")
+            raise BackendExecutionError(
+                f"cutadapt failed on {source} with exit code {completed.returncode}."
+            )
     return {
         "status": "completed",
         "backend": "methylpy",
@@ -426,7 +444,10 @@ def methylpy_se_run_mapping(
     arguments["library_files"] = _existing_all(library_files, "library_files")
     for name in ("forward_reference", "reverse_reference", "reference_fasta"):
         arguments[name] = _existing(arguments[name], name)
-    programs: list[tuple[str, str | None]] = [("samtools", path_to_samtools), (aligner or "bowtie2", path_to_aligner)]
+    programs: list[tuple[str, str | None]] = [
+        ("samtools", path_to_samtools),
+        (aligner or "bowtie2", path_to_aligner),
+    ]
     if trim_reads is not False:
         programs.append(("cutadapt", path_to_cutadapt))
     return _call("methylpy.call_mc_se", "run_mapping", arguments, programs=programs)
@@ -479,7 +500,9 @@ def methylpy_se_build_ref(
     arguments = dict(locals())
     arguments["input_files"] = _existing_all(input_files, "input_files")
     builder = "bowtie-build" if (aligner or "bowtie2").lower() == "bowtie" else "bowtie2-build"
-    return _call("methylpy.call_mc_se", "build_ref", arguments, programs=[(builder, path_to_aligner)])
+    return _call(
+        "methylpy.call_mc_se", "build_ref", arguments, programs=[(builder, path_to_aligner)]
+    )
 
 
 def _pipeline_programs(
@@ -492,7 +515,10 @@ def _pipeline_programs(
     path_to_bgzip: str | None,
     path_to_tabix: str | None,
 ) -> list[tuple[str, str | None]]:
-    programs: list[tuple[str, str | None]] = [("samtools", path_to_samtools), (aligner or "bowtie2", path_to_aligner)]
+    programs: list[tuple[str, str | None]] = [
+        ("samtools", path_to_samtools),
+        (aligner or "bowtie2", path_to_aligner),
+    ]
     if trim_reads is not False:
         programs.append(("cutadapt", path_to_cutadapt))
     if bgzip:
@@ -501,7 +527,10 @@ def _pipeline_programs(
 
 
 def _calling_programs(
-    path_to_samtools: str | None, bgzip: bool | None, path_to_bgzip: str | None, path_to_tabix: str | None
+    path_to_samtools: str | None,
+    bgzip: bool | None,
+    path_to_bgzip: str | None,
+    path_to_tabix: str | None,
 ) -> list[tuple[str, str | None]]:
     programs: list[tuple[str, str | None]] = [("samtools", path_to_samtools)]
     if bgzip:
@@ -529,9 +558,17 @@ def methylpy_remove_clonal_bam(
         )
     jar = Path(path_to_picard) / "picard.jar"
     if not jar.is_file():
-        raise BackendUnavailableError(f"picard.jar was not found at {jar}.", hint=_INSTALL["picard"])
+        raise BackendUnavailableError(
+            f"picard.jar was not found at {jar}.", hint=_INSTALL["picard"]
+        )
     arguments.update(input_bam=source, output_bam=target)
-    return _call("methylpy.call_mc_se", "remove_clonal_bam", arguments, programs=[("java", None)], outputs=[target])
+    return _call(
+        "methylpy.call_mc_se",
+        "remove_clonal_bam",
+        arguments,
+        programs=[("java", None)],
+        outputs=[target],
+    )
 
 
 def methylpy_se_find_multi_mappers(
@@ -563,7 +600,12 @@ def methylpy_se_merge_sorted_multimap(
     arguments = dict(locals())
     arguments["files"] = _existing_all(files, "files")
     arguments["reference_fasta"] = _existing(reference_fasta, "reference_fasta")
-    return _call("methylpy.call_mc_se", "merge_sorted_multimap", arguments, programs=[("samtools", path_to_samtools)])
+    return _call(
+        "methylpy.call_mc_se",
+        "merge_sorted_multimap",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
+    )
 
 
 def methylpy_se_merge_sorted_multimap_max_mapq(
@@ -580,7 +622,10 @@ def methylpy_se_merge_sorted_multimap_max_mapq(
     arguments["files"] = _existing_all(files, "files")
     arguments["reference_fasta"] = _existing(reference_fasta, "reference_fasta")
     return _call(
-        "methylpy.call_mc_se", "merge_sorted_multimap_max_mapq", arguments, programs=[("samtools", path_to_samtools)]
+        "methylpy.call_mc_se",
+        "merge_sorted_multimap_max_mapq",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
     )
 
 
@@ -594,7 +639,13 @@ def methylpy_se_merge_bam_files(
     """Merge several BAM files into one with a corrected header (methylpy merge_bam_files, samtools merge)."""
     arguments = dict(locals())
     arguments["input_files"] = _existing_all(input_files, "input_files")
-    return _call("methylpy.call_mc_se", "merge_bam_files", arguments, programs=[("samtools", path_to_samtools)], outputs=[output])
+    return _call(
+        "methylpy.call_mc_se",
+        "merge_bam_files",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
+        outputs=[output],
+    )
 
 
 def methylpy_se_call_methylated_sites(
@@ -721,8 +772,16 @@ def methylpy_pe_run_methylation_pipeline(
     arguments["read2_files"] = _existing_all(read2_files, "read2_files")
     for name in ("forward_reference", "reverse_reference", "reference_fasta"):
         arguments[name] = _existing(arguments[name], name)
-    programs = _pipeline_programs(aligner, path_to_aligner, path_to_samtools, trim_reads, path_to_cutadapt,
-                                  bgzip, path_to_bgzip, path_to_tabix)
+    programs = _pipeline_programs(
+        aligner,
+        path_to_aligner,
+        path_to_samtools,
+        trim_reads,
+        path_to_cutadapt,
+        bgzip,
+        path_to_bgzip,
+        path_to_tabix,
+    )
     return _call("methylpy.call_mc_pe", "run_methylation_pipeline_pe", arguments, programs=programs)
 
 
@@ -759,7 +818,10 @@ def methylpy_pe_run_mapping(
     arguments["library_read2_files"] = _existing_all(library_read2_files, "library_read2_files")
     for name in ("forward_reference", "reverse_reference", "reference_fasta"):
         arguments[name] = _existing(arguments[name], name)
-    programs: list[tuple[str, str | None]] = [("samtools", path_to_samtools), (aligner or "bowtie2", path_to_aligner)]
+    programs: list[tuple[str, str | None]] = [
+        ("samtools", path_to_samtools),
+        (aligner or "bowtie2", path_to_aligner),
+    ]
     if trim_reads is not False:
         programs.append(("cutadapt", path_to_cutadapt))
     return _call("methylpy.call_mc_pe", "run_mapping_pe", arguments, programs=programs)
@@ -829,7 +891,12 @@ def methylpy_pe_merge_sorted_multimap(
     arguments = dict(locals())
     arguments["files"] = _existing_all(files, "files")
     arguments["reference_fasta"] = _existing(reference_fasta, "reference_fasta")
-    return _call("methylpy.call_mc_pe", "merge_sorted_multimap_pe", arguments, programs=[("samtools", path_to_samtools)])
+    return _call(
+        "methylpy.call_mc_pe",
+        "merge_sorted_multimap_pe",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
+    )
 
 
 def methylpy_pe_merge_sorted_multimap_max_mapq(
@@ -846,7 +913,10 @@ def methylpy_pe_merge_sorted_multimap_max_mapq(
     arguments["files"] = _existing_all(files, "files")
     arguments["reference_fasta"] = _existing(reference_fasta, "reference_fasta")
     return _call(
-        "methylpy.call_mc_pe", "merge_sorted_multimap_pe_max_mapq", arguments, programs=[("samtools", path_to_samtools)]
+        "methylpy.call_mc_pe",
+        "merge_sorted_multimap_pe_max_mapq",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
     )
 
 
@@ -860,8 +930,13 @@ def methylpy_pe_flip_read2_strand(
     """Flip the strand of read 2 in every mapped read pair so that both reads report the original strand (methylpy flip_read2_strand)."""
     arguments = dict(locals())
     arguments["input_file"] = _existing(input_file, "input_file")
-    return _call("methylpy.call_mc_pe", "flip_read2_strand", arguments, programs=[("samtools", path_to_samtools)],
-                 outputs=[output_file])
+    return _call(
+        "methylpy.call_mc_pe",
+        "flip_read2_strand",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
+        outputs=[output_file],
+    )
 
 
 def methylpy_pe_merge_bam_files(
@@ -874,8 +949,13 @@ def methylpy_pe_merge_bam_files(
     """Merge several paired-end BAM files into one with a corrected header (methylpy merge_bam_files of call_mc_pe)."""
     arguments = dict(locals())
     arguments["input_files"] = _existing_all(input_files, "input_files")
-    return _call("methylpy.call_mc_pe", "merge_bam_files", arguments, programs=[("samtools", path_to_samtools)],
-                 outputs=[output])
+    return _call(
+        "methylpy.call_mc_pe",
+        "merge_bam_files",
+        arguments,
+        programs=[("samtools", path_to_samtools)],
+        outputs=[output],
+    )
 
 
 def methylpy_pe_call_methylated_sites(

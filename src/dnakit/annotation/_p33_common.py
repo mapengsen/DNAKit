@@ -117,7 +117,9 @@ def check_genome_file(path: Path) -> dict[str, int]:
             try:
                 length = int(fields[1])
             except ValueError as exc:
-                raise ConfigurationError(f"{path.name} line {number_}: length is not an integer.") from exc
+                raise ConfigurationError(
+                    f"{path.name} line {number_}: length is not an integer."
+                ) from exc
             if length < 1:
                 raise ConfigurationError(f"{path.name} line {number_}: length must be positive.")
             sizes[fields[0]] = length

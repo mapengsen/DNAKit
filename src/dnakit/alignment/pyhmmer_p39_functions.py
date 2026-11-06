@@ -25,7 +25,16 @@ _EXTRA = "bio-pyhmmer"
 _MAX_SEQUENCES = 1_000_000
 _MAX_EMIT = 100_000
 _MSA_FORMATS = (
-    "stockholm", "pfam", "a2m", "psiblast", "selex", "afa", "clustal", "clustallike", "phylip", "phylips",
+    "stockholm",
+    "pfam",
+    "a2m",
+    "psiblast",
+    "selex",
+    "afa",
+    "clustal",
+    "clustallike",
+    "phylip",
+    "phylips",
 )
 _WEIGHT_METHODS = ("pb", "gsc", "blosum")
 _PREFERENCES = ("conscover", "origorder", "random")
@@ -98,7 +107,9 @@ def _read_hmms(pyhmmer: Any, path: Path) -> list[Any]:
         with pyhmmer.plan7.HMMFile(str(path)) as handle:
             hmms = list(handle)
     except (OSError, ValueError, EOFError) as exc:
-        raise ConfigurationError(f"{path.name} is not a readable HMMER profile file: {exc}") from exc
+        raise ConfigurationError(
+            f"{path.name} is not a readable HMMER profile file: {exc}"
+        ) from exc
     if not hmms:
         raise ConfigurationError(f"{path.name} holds no profile HMMs.")
     return hmms
@@ -106,7 +117,9 @@ def _read_hmms(pyhmmer: Any, path: Path) -> list[Any]:
 
 def _read_msa(pyhmmer: Any, path: Path, alphabet: Any, file_format: str | None) -> Any:
     try:
-        with pyhmmer.easel.MSAFile(str(path), format=file_format, digital=True, alphabet=alphabet) as handle:
+        with pyhmmer.easel.MSAFile(
+            str(path), format=file_format, digital=True, alphabet=alphabet
+        ) as handle:
             return handle.read()
     except (OSError, ValueError, EOFError) as exc:
         raise ConfigurationError(f"{path.name} is not a readable alignment file: {exc}") from exc
@@ -156,9 +169,14 @@ def _hit_rows(top_hits: Any, max_hits: int) -> list[dict[str, Any]]:
 
 
 def _thresholds(evalue: float, domain_evalue: float, bit_cutoffs: str | None) -> dict[str, Any]:
-    options: dict[str, Any] = {"E": _number(evalue, "evalue", 1e-300, 1e9), "domE": _number(domain_evalue, "domain_evalue", 1e-300, 1e9)}
+    options: dict[str, Any] = {
+        "E": _number(evalue, "evalue", 1e-300, 1e9),
+        "domE": _number(domain_evalue, "domain_evalue", 1e-300, 1e9),
+    }
     if bit_cutoffs is not None:
-        options["bit_cutoffs"] = _choice(bit_cutoffs, ("gathering", "noise", "trusted"), "bit_cutoffs")
+        options["bit_cutoffs"] = _choice(
+            bit_cutoffs, ("gathering", "noise", "trusted"), "bit_cutoffs"
+        )
     return options
 
 
@@ -287,7 +305,9 @@ def build_hmm_from_sequence(
     pyhmmer = require("pyhmmer", _EXTRA)
     alphabet = pyhmmer.easel.Alphabet.dna()
     try:
-        digital = pyhmmer.easel.TextSequence(name=name.encode("ascii"), sequence=sequence.upper()).digitize(alphabet)
+        digital = pyhmmer.easel.TextSequence(
+            name=name.encode("ascii"), sequence=sequence.upper()
+        ).digitize(alphabet)
         builder = pyhmmer.plan7.Builder(alphabet)
         hmm, _profile, _optimized = builder.build(digital, pyhmmer.plan7.Background(alphabet))
         with target.open("wb") as handle:
@@ -340,7 +360,11 @@ def emit_hmm_sequences(
     rows = []
     with target.open("w", encoding="ascii") as handle:
         for index in range(1, n + 1):
-            emitted = emitter.emit_sequence(rng) if kind == "core" else emitter.emit_sequence(hmm, randomness=rng)
+            emitted = (
+                emitter.emit_sequence(rng)
+                if kind == "core"
+                else emitter.emit_sequence(hmm, randomness=rng)
+            )
             text = hmm.alphabet.decode(emitted.sequence)
             rows.append(len(text))
             handle.write(f">{model}-sample{index}\n{text}\n")
@@ -427,7 +451,10 @@ def reverse_complement_alignment(
         "tool_version": _version(),
         "sequences": len(flipped.sequences),
         "columns": len(flipped.alignment[0]) if len(flipped.alignment) else 0,
-        "rows": {_text(name): row for name, row in zip(flipped.names, flipped.textize().alignment, strict=True)},
+        "rows": {
+            _text(name): row
+            for name, row in zip(flipped.names, flipped.textize().alignment, strict=True)
+        },
         "output": str(target),
     }
 
@@ -572,7 +599,9 @@ def build_sequence_ssi_index(
     extra = dict(aliases or {})
     for alias, key in extra.items():
         if key not in names or alias in names:
-            raise ConfigurationError(f"alias {alias!r} must point to an existing record and not repeat a record name.")
+            raise ConfigurationError(
+                f"alias {alias!r} must point to an existing record and not repeat a record name."
+            )
     try:
         with pyhmmer.easel.SSIWriter(str(target)) as writer:
             handle = writer.add_file(str(source), 1)
@@ -631,7 +660,9 @@ def fetch_sequence_by_ssi(
     }
 
 
-def pyhmmer_read_sequences(path: str, *, max_records: int = 1000, verbose: bool = True) -> dict[str, Any]:
+def pyhmmer_read_sequences(
+    path: str, *, max_records: int = 1000, verbose: bool = True
+) -> dict[str, Any]:
     """Read FASTA, GenBank or EMBL sequences using Easel SequenceFile, preserving upstream text."""
     source = _existing(path, "path")
     limit = _integer(max_records, "max_records", 1, _MAX_SEQUENCES)
@@ -641,42 +672,87 @@ def pyhmmer_read_sequences(path: str, *, max_records: int = 1000, verbose: bool 
         for sequence in handle:
             if len(records) == limit:
                 raise ConfigurationError("Sequence file exceeds max_records.")
-            records.append({"name": _text(sequence.name), "description": _text(sequence.description), "sequence": sequence.sequence})
+            records.append(
+                {
+                    "name": _text(sequence.name),
+                    "description": _text(sequence.description),
+                    "sequence": sequence.sequence,
+                }
+            )
     return {"status": "completed", "backend": "pyhmmer", "version": _version(), "records": records}
 
 
-def pyhmmer_write_sequences(records: Sequence[Mapping[str, str]], output_fasta: str, *, verbose: bool = True) -> dict[str, Any]:
+def pyhmmer_write_sequences(
+    records: Sequence[Mapping[str, str]], output_fasta: str, *, verbose: bool = True
+) -> dict[str, Any]:
     """Write sequence records to a new FASTA using Easel TextSequence.write."""
     target = _new(output_fasta, "output_fasta")
     module = require("pyhmmer", _EXTRA)
-    values = [module.easel.TextSequence(name=r["name"].encode(), sequence=r["sequence"], description=r.get("description", "").encode()) for r in records]
+    values = [
+        module.easel.TextSequence(
+            name=r["name"].encode(),
+            sequence=r["sequence"],
+            description=r.get("description", "").encode(),
+        )
+        for r in records
+    ]
     with target.open("wb") as handle:
         for sequence in values:
             sequence.write(handle)
-    return {"status": "completed", "backend": "pyhmmer", "version": _version(), "record_count": len(values), "outputs": [str(target)]}
+    return {
+        "status": "completed",
+        "backend": "pyhmmer",
+        "version": _version(),
+        "record_count": len(values),
+        "outputs": [str(target)],
+    }
 
 
-def pyhmmer_read_alignment(path: str, *, input_format: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def pyhmmer_read_alignment(
+    path: str, *, input_format: str | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Read a DNA multiple alignment with Easel MSAFile and return names and gapped sequences."""
     source = _existing(path, "path")
     module = require("pyhmmer", _EXTRA)
     msa = _read_msa(module, source, module.easel.Alphabet.dna(), input_format).textize()
-    return {"status": "completed", "backend": "pyhmmer", "version": _version(),
-            "records": [{"name": _text(n), "sequence": str(s)} for n, s in zip(msa.names, msa.alignment, strict=True)]}
+    return {
+        "status": "completed",
+        "backend": "pyhmmer",
+        "version": _version(),
+        "records": [
+            {"name": _text(n), "sequence": str(s)}
+            for n, s in zip(msa.names, msa.alignment, strict=True)
+        ],
+    }
 
 
-def pyhmmer_write_alignment(records: Mapping[str, str], output_alignment: str, *, output_format: str = "afa", verbose: bool = True) -> dict[str, Any]:
+def pyhmmer_write_alignment(
+    records: Mapping[str, str],
+    output_alignment: str,
+    *,
+    output_format: str = "afa",
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Write a multiple alignment in a supported Easel format (afa, Stockholm, A2M, Clustal, PHYLIP...)."""
     target = _new(output_alignment, "output_alignment")
     fmt = _choice(output_format, _MSA_FORMATS, "output_format")
     module = require("pyhmmer", _EXTRA)
-    msa = module.easel.TextMSA(sequences=[module.easel.TextSequence(name=n.encode(), sequence=s) for n, s in records.items()])
+    msa = module.easel.TextMSA(
+        sequences=[
+            module.easel.TextSequence(name=n.encode(), sequence=s) for n, s in records.items()
+        ]
+    )
     _write_msa(module, msa.digitize(module.easel.Alphabet.dna()), target, fmt)
-    return {"status": "completed", "backend": "pyhmmer", "version": _version(), "outputs": [str(target)], "record_count": len(records)}
+    return {
+        "status": "completed",
+        "backend": "pyhmmer",
+        "version": _version(),
+        "outputs": [str(target)],
+        "record_count": len(records),
+    }
 
 
 __all__ = [
-    "pyhmmer_read_sequences", "pyhmmer_write_sequences", "pyhmmer_read_alignment", "pyhmmer_write_alignment",
     "build_hmm_from_sequence",
     "build_sequence_ssi_index",
     "compute_alignment_weights",
@@ -687,6 +763,10 @@ __all__ = [
     "guess_file_alphabet",
     "pyhmmer_hmmscan",
     "pyhmmer_hmmsearch",
+    "pyhmmer_read_alignment",
+    "pyhmmer_read_sequences",
+    "pyhmmer_write_alignment",
+    "pyhmmer_write_sequences",
     "reverse_complement_alignment",
 ]
 

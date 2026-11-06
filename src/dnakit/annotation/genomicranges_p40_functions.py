@@ -30,11 +30,15 @@ def _read_bed(path: str | Path, name: str) -> list[dict[str, Any]]:
                 continue
             fields = line.rstrip("\r\n").split("\t") if "\t" in line else line.split()
             if len(fields) < 3:
-                raise ConfigurationError(f"{name} line {number}: a BED line needs chrom, start and end.")
+                raise ConfigurationError(
+                    f"{name} line {number}: a BED line needs chrom, start and end."
+                )
             try:
                 start, end = int(fields[2 - 1]), int(fields[3 - 1])
             except ValueError as exc:
-                raise ConfigurationError(f"{name} line {number}: start and end must be integers.") from exc
+                raise ConfigurationError(
+                    f"{name} line {number}: start and end must be integers."
+                ) from exc
             if start < 0 or end <= start:
                 raise ConfigurationError(f"{name} line {number}: need 0 <= start < end.")
             strand = fields[5] if len(fields) > 5 else "*"
@@ -46,8 +50,16 @@ def _read_bed(path: str | Path, name: str) -> list[dict[str, Any]]:
                     score = float(fields[4])
                 except ValueError:
                     score = None
-            rows.append({"chrom": fields[0], "start": start, "end": end, "strand": strand, "score": score,
-                         "name": fields[3] if len(fields) > 3 else None})
+            rows.append(
+                {
+                    "chrom": fields[0],
+                    "start": start,
+                    "end": end,
+                    "strand": strand,
+                    "score": score,
+                    "name": fields[3] if len(fields) > 3 else None,
+                }
+            )
             if len(rows) > 1_000_000:
                 raise ConfigurationError(f"{name} has more than 1,000,000 intervals.")
     if not rows:
@@ -55,8 +67,9 @@ def _read_bed(path: str | Path, name: str) -> list[dict[str, Any]]:
     return rows
 
 
-def _granges(rows: list[dict[str, Any]], *, seqlengths: Mapping[str, int] | None = None,
-             score: bool = False) -> Any:
+def _granges(
+    rows: list[dict[str, Any]], *, seqlengths: Mapping[str, int] | None = None, score: bool = False
+) -> Any:
     gr = require("genomicranges", _EXTRA)
     pd = require("pandas", _EXTRA)
     data: dict[str, Any] = {
@@ -82,8 +95,14 @@ def _records(ranges: Any, limit: int) -> list[dict[str, Any]]:
     names = list(ranges.get_seqnames())
     starts, ends, strands = ranges.get_start(), ranges.get_end(), ranges.get_strand()
     for i in range(min(len(names), limit)):
-        out.append({"chrom": str(names[i]), "start": int(starts[i]) - 1, "end": int(ends[i]),
-                    "strand": _STRAND_BACK.get(int(strands[i]), "*")})
+        out.append(
+            {
+                "chrom": str(names[i]),
+                "start": int(starts[i]) - 1,
+                "end": int(ends[i]),
+                "strand": _STRAND_BACK.get(int(strands[i]), "*"),
+            }
+        )
     return out
 
 
@@ -98,8 +117,14 @@ def _limit(value: int) -> int:
 
 
 def _result(operation: str, **fields: Any) -> dict[str, Any]:
-    return {"status": "completed", "operation": operation, "backend": "genomicranges",
-            "version": _version(), "coordinates": "BED, 0-based half-open", **fields}
+    return {
+        "status": "completed",
+        "operation": operation,
+        "backend": "genomicranges",
+        "version": _version(),
+        "coordinates": "BED, 0-based half-open",
+        **fields,
+    }
 
 
 def genomicranges_restrict_intervals(
@@ -123,7 +148,9 @@ def genomicranges_restrict_intervals(
     hi = None if end is None else _h.integer(end, "end", minimum=1)
     result = ranges.restrict(start=lo, end=hi, keep_all_ranges=bool(keep_all_ranges))
     records = _records(result, limit)
-    return _result("restrict", interval_count=len(result), intervals=records, truncated=len(result) > limit)
+    return _result(
+        "restrict", interval_count=len(result), intervals=records, truncated=len(result) > limit
+    )
 
 
 def genomicranges_narrow_intervals(
@@ -143,13 +170,20 @@ def genomicranges_narrow_intervals(
 
     limit = _limit(max_rows)
     ranges = _granges(_read_bed(source, "source"))
-    kwargs = {k: _h.integer(v, k, minimum=1) for k, v in (("start", start), ("width", width), ("end", end))
-              if v is not None}
+    kwargs = {
+        k: _h.integer(v, k, minimum=1)
+        for k, v in (("start", start), ("width", width), ("end", end))
+        if v is not None
+    }
     if len(kwargs) != 2:
         raise ConfigurationError("Give exactly two of start, width and end.")
     result = ranges.narrow(**kwargs)
-    return _result("narrow", interval_count=len(result), intervals=_records(result, limit),
-                   truncated=len(result) > limit)
+    return _result(
+        "narrow",
+        interval_count=len(result),
+        intervals=_records(result, limit),
+        truncated=len(result) > limit,
+    )
 
 
 def genomicranges_out_of_bound_intervals(
@@ -172,8 +206,12 @@ def genomicranges_out_of_bound_intervals(
     rows = _read_bed(source, "source")
     ranges = _granges(rows, seqlengths=lengths)
     indices = [int(i) for i in ranges.get_out_of_bound_index()]
-    return _result("get_out_of_bound_index", out_of_bound_count=len(indices), indices=indices[:limit],
-                   intervals=[_records(ranges, len(rows))[i] for i in indices[:limit]])
+    return _result(
+        "get_out_of_bound_index",
+        out_of_bound_count=len(indices),
+        indices=indices[:limit],
+        intervals=[_records(ranges, len(rows))[i] for i in indices[:limit]],
+    )
 
 
 def genomicranges_span_intervals(
@@ -186,8 +224,12 @@ def genomicranges_span_intervals(
 
     ranges = _granges(_read_bed(source, "source"))
     result = ranges.range(ignore_strand=bool(ignore_strand))
-    return _result("range", ignore_strand=bool(ignore_strand), interval_count=len(result),
-                   intervals=_records(result, _h.MAX_ROWS))
+    return _result(
+        "range",
+        ignore_strand=bool(ignore_strand),
+        interval_count=len(result),
+        intervals=_records(result, _h.MAX_ROWS),
+    )
 
 
 def genomicranges_is_disjoint(
@@ -200,7 +242,9 @@ def genomicranges_is_disjoint(
 
     rows = _read_bed(source, "source")
     flag = bool(_granges(rows).is_disjoint(ignore_strand=bool(ignore_strand)))
-    return _result("is_disjoint", ignore_strand=bool(ignore_strand), interval_count=len(rows), is_disjoint=flag)
+    return _result(
+        "is_disjoint", ignore_strand=bool(ignore_strand), interval_count=len(rows), is_disjoint=flag
+    )
 
 
 def genomicranges_disjoint_bins(
@@ -215,11 +259,17 @@ def genomicranges_disjoint_bins(
     limit = _limit(max_rows)
     rows = _read_bed(source, "source")
     bins = [int(b) for b in _granges(rows).disjoint_bins(ignore_strand=bool(ignore_strand))]
-    return _result("disjoint_bins", ignore_strand=bool(ignore_strand), bin_count=len(set(bins)),
-                   bins=bins[:limit],
-                   intervals=[{"chrom": r["chrom"], "start": r["start"], "end": r["end"], "bin": b}
-                              for r, b in list(zip(rows, bins))[:limit]],
-                   truncated=len(rows) > limit)
+    return _result(
+        "disjoint_bins",
+        ignore_strand=bool(ignore_strand),
+        bin_count=len(set(bins)),
+        bins=bins[:limit],
+        intervals=[
+            {"chrom": r["chrom"], "start": r["start"], "end": r["end"], "bin": b}
+            for r, b in list(zip(rows, bins, strict=False))[:limit]
+        ],
+        truncated=len(rows) > limit,
+    )
 
 
 def genomicranges_interval_coverage(
@@ -240,8 +290,11 @@ def genomicranges_interval_coverage(
 
     limit = _limit(max_runs)
     ranges = _granges(_read_bed(source, "source"))
-    kwargs: dict[str, Any] = {"shift": _h.integer(shift, "shift"), "weight": _h.integer(weight, "weight"),
-                              "ignore_strand": bool(ignore_strand)}
+    kwargs: dict[str, Any] = {
+        "shift": _h.integer(shift, "shift"),
+        "weight": _h.integer(weight, "weight"),
+        "ignore_strand": bool(ignore_strand),
+    }
     if width is not None:
         kwargs["width"] = _h.integer(width, "width", minimum=1)
     coverage = ranges.coverage(**kwargs)
@@ -251,11 +304,22 @@ def genomicranges_interval_coverage(
         for i in range(len(values)):
             if i + 1 == len(values) or values[i + 1] != values[i]:
                 if len(runs) < limit:
-                    runs.append({"chrom": str(chrom), "start": begin, "end": i + 1, "depth": float(values[i])})
+                    runs.append(
+                        {
+                            "chrom": str(chrom),
+                            "start": begin,
+                            "end": i + 1,
+                            "depth": float(values[i]),
+                        }
+                    )
                 begin = i + 1
-    return _result("coverage", chromosome_count=len(coverage), runs=runs,
-                   lengths={str(k): int(len(v)) for k, v in coverage.items()},
-                   max_depth=max((float(v.max()) for v in coverage.values()), default=0.0))
+    return _result(
+        "coverage",
+        chromosome_count=len(coverage),
+        runs=runs,
+        lengths={str(k): len(v) for k, v in coverage.items()},
+        max_depth=max((float(v.max()) for v in coverage.values()), default=0.0),
+    )
 
 
 def genomicranges_match_intervals(
@@ -275,8 +339,12 @@ def genomicranges_match_intervals(
     queries = _read_bed(query, "query")
     matches = subject.match(_granges(queries), ignore_strand=bool(ignore_strand))
     indices = [None if (x is None or int(x) < 0) else int(x) for x in matches]
-    return _result("match", query_count=len(queries), matched_count=sum(i is not None for i in indices),
-                   indices=indices)
+    return _result(
+        "match",
+        query_count=len(queries),
+        matched_count=sum(i is not None for i in indices),
+        indices=indices,
+    )
 
 
 def genomicranges_order_intervals(
@@ -291,7 +359,9 @@ def genomicranges_order_intervals(
     limit = _limit(max_rows)
     ranges = _granges(_read_bed(source, "source"))
     order = [int(i) for i in ranges.order(decreasing=bool(decreasing))]
-    return _result("order", decreasing=bool(decreasing), order=order[:limit], truncated=len(order) > limit)
+    return _result(
+        "order", decreasing=bool(decreasing), order=order[:limit], truncated=len(order) > limit
+    )
 
 
 def genomicranges_rank_intervals(
@@ -320,8 +390,11 @@ def genomicranges_tile_intervals(
     limit = _limit(max_rows)
     if (n is None) == (width is None):
         raise ConfigurationError("Give exactly one of n and width.")
-    kwargs = {"n": _h.integer(n, "n", minimum=1)} if n is not None else {
-        "width": _h.integer(width, "width", minimum=1)}
+    kwargs = (
+        {"n": _h.integer(n, "n", minimum=1)}
+        if n is not None
+        else {"width": _h.integer(width, "width", minimum=1)}
+    )
     tiles = _granges(_read_bed(source, "source")).tile(**kwargs)
     pieces = [_records(t, _h.MAX_ROWS) for t in tiles][:limit]
     return _result("tile", interval_count=len(tiles), tiles=pieces, truncated=len(tiles) > limit)
@@ -344,9 +417,14 @@ def genomicranges_binned_average(
     result = ranges.binned_average("score", _granges(bin_rows), outname="binned_average")
     values = result.get_mcols().get_column("binned_average")
     averages = [None if v is None else _h.plain(v) for v in values]
-    return _result("binned_average", bin_count=len(bin_rows),
-                   bins=[{"chrom": b["chrom"], "start": b["start"], "end": b["end"], "mean_score": a}
-                         for b, a in zip(bin_rows, averages)])
+    return _result(
+        "binned_average",
+        bin_count=len(bin_rows),
+        bins=[
+            {"chrom": b["chrom"], "start": b["start"], "end": b["end"], "mean_score": a}
+            for b, a in zip(bin_rows, averages, strict=False)
+        ],
+    )
 
 
 __all__ = [

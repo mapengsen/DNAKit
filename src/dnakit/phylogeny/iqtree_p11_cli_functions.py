@@ -58,7 +58,9 @@ def _model(value: str | None, name: str = "model") -> str | None:
         return None
     text = _cli.text(value, name)
     if _MODEL.fullmatch(text) is None:
-        raise ConfigurationError(f"{name} contains characters that are not valid in an IQ-TREE model string: {text!r}")
+        raise ConfigurationError(
+            f"{name} contains characters that are not valid in an IQ-TREE model string: {text!r}"
+        )
     return text
 
 
@@ -73,7 +75,9 @@ def _common(
 ) -> None:
     """Options shared by all analyses: sequence type, model, threads and random seed."""
     if sequence_type is not None:
-        arguments.extend(("--seqtype", _cli.choice(sequence_type, _SEQUENCE_TYPES, "sequence_type")))
+        arguments.extend(
+            ("--seqtype", _cli.choice(sequence_type, _SEQUENCE_TYPES, "sequence_type"))
+        )
     if model_flag and model is not None:
         arguments.extend(("-m", model))
     if threads == "AUTO":
@@ -189,7 +193,9 @@ def evaluate_tree_likelihood(
     ``tree_length``.
     """
     arguments = ["-s", _alignment(alignment), "-t", _p.file_path(tree, "tree")]
-    arguments.append("--tree-fix" if _p.flag(optimise_branch_lengths, "optimise_branch_lengths") else "--show-lh")
+    arguments.append(
+        "--tree-fix" if _p.flag(optimise_branch_lengths, "optimise_branch_lengths") else "--show-lh"
+    )
     _common(arguments, sequence_type=sequence_type, threads=threads, seed=seed, model=_model(model))
     return _iqtree(
         "evaluate_tree_likelihood",
@@ -244,7 +250,13 @@ def select_substitution_model(
         raise ConfigurationError("merge needs a partition file (partitions).")
     if not merging and merge_algorithm is not None:
         raise ConfigurationError("merge_algorithm is only used with merge=True.")
-    model_string = {"TESTONLY": "TESTMERGEONLY", "TEST": "TESTMERGE", "MF": "MF+MERGE", "MFP": "MFP+MERGE"}[keyword] if merging else keyword
+    model_string = (
+        {"TESTONLY": "TESTMERGEONLY", "TEST": "TESTMERGE", "MF": "MF+MERGE", "MFP": "MFP+MERGE"}[
+            keyword
+        ]
+        if merging
+        else keyword
+    )
     arguments = ["-s", _alignment(alignment)]
     if partitions is not None:
         mode = _cli.choice(partition_mode, tuple(_PARTITION_OPTIONS), "partition_mode")
@@ -259,10 +271,21 @@ def select_substitution_model(
     if model_set is not None:
         arguments.extend(("--mset", _model(model_set, "model_set") or ""))
     if model_subset is not None:
-        arguments.extend(("--msub", _cli.choice(model_subset, ("nuclear", "mitochondrial", "chloroplast", "viral"), "model_subset")))
+        arguments.extend(
+            (
+                "--msub",
+                _cli.choice(
+                    model_subset,
+                    ("nuclear", "mitochondrial", "chloroplast", "viral"),
+                    "model_subset",
+                ),
+            )
+        )
     if rate_models is not None:
         arguments.extend(("--mrate", _model(rate_models, "rate_models") or ""))
-    _p.opt_int(arguments, "--cmax", max_rate_categories, "max_rate_categories", minimum=2, maximum=50)
+    _p.opt_int(
+        arguments, "--cmax", max_rate_categories, "max_rate_categories", minimum=2, maximum=50
+    )
     _common(arguments, sequence_type=sequence_type, threads=threads, seed=seed, model_flag=False)
     result = _iqtree(
         "select_substitution_model",
@@ -276,7 +299,9 @@ def select_substitution_model(
     rows: list[dict[str, Any]] = []
     if "iqtree" in outputs:
         text = Path(outputs["iqtree"]).read_text(encoding="utf-8", errors="replace")
-        block = re.search(r"List of models sorted by \w+ scores:\s+Model\s+LogL[^\n]*\n(.*?)\n\n", text, re.DOTALL)
+        block = re.search(
+            r"List of models sorted by \w+ scores:\s+Model\s+LogL[^\n]*\n(.*?)\n\n", text, re.DOTALL
+        )
         if block:
             for line in block.group(1).splitlines()[:20]:
                 fields = line.split()
@@ -327,13 +352,24 @@ def infer_pathogen_tree(
     (``--sprta-zero-branch``) and ``sprta_alternative_placements`` (``--sprta-other-places``). The tree is
     ``outputs['treefile']``.
     """
-    arguments = ["-s", _alignment(alignment), "--pathogen-force" if _p.flag(force_cmaple, "force_cmaple") else "--pathogen"]
+    arguments = [
+        "-s",
+        _alignment(alignment),
+        "--pathogen-force" if _p.flag(force_cmaple, "force_cmaple") else "--pathogen",
+    ]
     _common(arguments, sequence_type=sequence_type, threads=threads, seed=seed, model=_model(model))
     if alrt_replicates is not None:
         arguments.extend(("--alrt", _replicates(alrt_replicates, "alrt_replicates", 0)))
     _p.switch(arguments, "--sprta", sprta, "sprta")
-    _p.switch(arguments, "--sprta-zero-branch", sprta_zero_length_branches, "sprta_zero_length_branches")
-    _p.switch(arguments, "--sprta-other-places", sprta_alternative_placements, "sprta_alternative_placements")
+    _p.switch(
+        arguments, "--sprta-zero-branch", sprta_zero_length_branches, "sprta_zero_length_branches"
+    )
+    _p.switch(
+        arguments,
+        "--sprta-other-places",
+        sprta_alternative_placements,
+        "sprta_alternative_placements",
+    )
     return _iqtree(
         "infer_pathogen_tree",
         arguments,
@@ -393,7 +429,14 @@ def compute_branch_support(
             raise ConfigurationError(f"replicates has no entry for {method}.")
         minimum = 1000 if method in ("ufboot", "ufjack") else 1
         arguments.extend((flag, _replicates(count, f"replicates[{method}]", minimum)))
-    _p.opt_num(arguments, "--jack-prop", jackknife_proportion, "jackknife_proportion", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        arguments,
+        "--jack-prop",
+        jackknife_proportion,
+        "jackknife_proportion",
+        minimum=0.0,
+        maximum=1.0,
+    )
     result = _iqtree(
         "compute_branch_support",
         arguments,
@@ -508,7 +551,11 @@ def likelihood_mapping(
     count = re.search(r"Number of quartets: (\d+)", text)
     result["quartets"] = int(count.group(1)) if count else None
     resolution: dict[str, Any] = {}
-    for label, key in (("fully resolved", "fully_resolved"), ("partly resolved", "partly_resolved"), ("unresolved", "unresolved")):
+    for label, key in (
+        ("fully resolved", "fully_resolved"),
+        ("partly resolved", "partly_resolved"),
+        ("unresolved", "unresolved"),
+    ):
         match = re.search(rf"Number of {label}\s+quartets[^:]*: (\d+) \(=([\d.]+)%\)", text)
         if match:
             resolution[key] = {"count": int(match.group(1)), "percent": float(match.group(2))}
@@ -540,8 +587,17 @@ def compute_site_concordance_factors(
     partitioned alignments. The annotated tree is ``outputs['cf.tree']``. Result key: ``branches``, one row per branch
     with ``id``, ``scf``, ``scf_n``, ``sdf1``, ``sdf1_n``, ``sdf2``, ``sdf2_n``, ``sn``, ``label`` and ``length``.
     """
-    flag = {"likelihood": "--scfl", "parsimony": "--scf"}[_cli.choice(method, ("likelihood", "parsimony"), "method")]
-    arguments = ["-s", _alignment(alignment), "-t", _p.file_path(tree, "tree"), flag, _replicates(quartets, "quartets")]
+    flag = {"likelihood": "--scfl", "parsimony": "--scf"}[
+        _cli.choice(method, ("likelihood", "parsimony"), "method")
+    ]
+    arguments = [
+        "-s",
+        _alignment(alignment),
+        "-t",
+        _p.file_path(tree, "tree"),
+        flag,
+        _replicates(quartets, "quartets"),
+    ]
     _p.opt_file(arguments, "-p", partitions, "partitions")
     _common(arguments, sequence_type=sequence_type, threads=threads, seed=seed, model=_model(model))
     result = _iqtree(
@@ -558,7 +614,12 @@ def compute_site_concordance_factors(
     branches = []
     for row in rows[1:]:
         padded = row + [""] * (len(names) - len(row))
-        branches.append({name: _p.number(value) if value != "" else None for name, value in zip(names, padded, strict=False)})
+        branches.append(
+            {
+                name: _p.number(value) if value != "" else None
+                for name, value in zip(names, padded, strict=False)
+            }
+        )
     result["branches"] = branches
     return result
 
@@ -619,7 +680,9 @@ def reconstruct_ancestral_sequences(
                 states.setdefault(fields[0], []).append(fields[2])
     result["nodes"] = list(states) if total <= 2_000_000 else None
     result["sites"] = sites
-    result["sequences"] = {node: "".join(values) for node, values in states.items()} if total <= 2_000_000 else None
+    result["sequences"] = (
+        {node: "".join(values) for node, values in states.items()} if total <= 2_000_000 else None
+    )
     return result
 
 
@@ -656,7 +719,10 @@ def run_symmetry_tests(
     if remove_partitions is not None:
         if partitions is None:
             raise ConfigurationError("remove_partitions needs a partition file (partitions).")
-        arguments.append("--symtest-remove-" + _cli.choice(remove_partitions, ("bad", "good"), "remove_partitions"))
+        arguments.append(
+            "--symtest-remove-"
+            + _cli.choice(remove_partitions, ("bad", "good"), "remove_partitions")
+        )
     else:
         arguments.append("--symtest-only" if _p.flag(only_test, "only_test") else "--symtest")
     if test_type is not None:
@@ -673,10 +739,23 @@ def run_symmetry_tests(
         timeout_seconds=timeout_seconds,
         required=("symtest.csv",),
     )
-    names = ("name", "sym_sig", "sym_non", "sym_pval", "mar_sig", "mar_non", "mar_pval", "int_sig", "int_non", "int_pval")
+    names = (
+        "name",
+        "sym_sig",
+        "sym_non",
+        "sym_pval",
+        "mar_sig",
+        "mar_non",
+        "mar_pval",
+        "int_sig",
+        "int_non",
+        "int_pval",
+    )
     tests: list[dict[str, Any]] = []
     lines = [
-        line for line in Path(result["outputs"]["symtest.csv"]).read_text(encoding="utf-8").splitlines() if line and line[0] != "#"
+        line
+        for line in Path(result["outputs"]["symtest.csv"]).read_text(encoding="utf-8").splitlines()
+        if line and line[0] != "#"
     ]
     for line in lines[1:]:
         fields = line.split(",")
@@ -773,19 +852,40 @@ def simulate_alignment(
         taxa = _cli.integer(random_tree_taxa, "random_tree_taxa", minimum=3, maximum=1_000_000)
         arguments.extend(("-t", f"RANDOM{{{generator}/{taxa}}}"))
     arguments.extend(("-m", _model(model) or "JC"))
-    arguments.extend(("--length", str(_cli.integer(length, "length", minimum=1, maximum=1_000_000_000))))
-    arguments.extend(("--num-alignments", str(_cli.integer(alignments, "alignments", minimum=1, maximum=100_000))))
-    arguments.extend(("-af", {"fasta": "fasta", "phylip": "phy"}[_cli.choice(output_format, ("fasta", "phylip"), "output_format")]))
+    arguments.extend(
+        ("--length", str(_cli.integer(length, "length", minimum=1, maximum=1_000_000_000)))
+    )
+    arguments.extend(
+        (
+            "--num-alignments",
+            str(_cli.integer(alignments, "alignments", minimum=1, maximum=100_000)),
+        )
+    )
+    arguments.extend(
+        (
+            "-af",
+            {"fasta": "fasta", "phylip": "phy"}[
+                _cli.choice(output_format, ("fasta", "phylip"), "output_format")
+            ],
+        )
+    )
     _p.opt_file(arguments, "-s", template_alignment, "template_alignment")
     _p.opt_file(arguments, "-p", partitions, "partitions")
     _p.opt_num(arguments, "--branch-scale", branch_scale, "branch_scale", minimum=0.0)
     if insertion_deletion_rates is not None:
         if len(insertion_deletion_rates) != 2:
-            raise ConfigurationError("insertion_deletion_rates must be (insertion rate, deletion rate).")
-        rates = [format(_cli.number(item, "insertion_deletion_rates", minimum=0.0), ".12g") for item in insertion_deletion_rates]
+            raise ConfigurationError(
+                "insertion_deletion_rates must be (insertion rate, deletion rate)."
+            )
+        rates = [
+            format(_cli.number(item, "insertion_deletion_rates", minimum=0.0), ".12g")
+            for item in insertion_deletion_rates
+        ]
         arguments.extend(("--indel", ",".join(rates)))
     if sequence_type is not None:
-        arguments.extend(("--seqtype", _cli.choice(sequence_type, _SEQUENCE_TYPES, "sequence_type")))
+        arguments.extend(
+            ("--seqtype", _cli.choice(sequence_type, _SEQUENCE_TYPES, "sequence_type"))
+        )
     _p.opt_int(arguments, "--seed", seed, "seed", minimum=0)
     executable = _cli.program("iqtree3", explicit=iqtree_path, hint=_HINT)
     directory = _cli.new_directory(output_directory, "output_directory")
@@ -793,9 +893,15 @@ def simulate_alignment(
     # AliSim writes <prefix>.treefile for a random tree and then refuses to continue unless --redo is given;
     # the output directory is fresh, so nothing of the user's can be overwritten.
     command = [*arguments, "--redo", "--quiet"]
-    _p.run_checked("simulate_alignment", executable, command, directory, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        "simulate_alignment", executable, command, directory, timeout_seconds=timeout_seconds
+    )
     files = sorted(
-        path for path in directory.iterdir() if path.is_file() and path.name.startswith(stem) and path.suffix in (".fa", ".phy", ".fasta")
+        path
+        for path in directory.iterdir()
+        if path.is_file()
+        and path.name.startswith(stem)
+        and path.suffix in (".fa", ".phy", ".fasta")
     )
     if not files:
         raise BackendExecutionError(
@@ -810,7 +916,11 @@ def simulate_alignment(
     else:
         header = first[0].split() if first else []
         sequences, sites = (int(header[0]), int(header[1])) if len(header) >= 2 else (0, 0)
-    outputs = {path.name: path for path in sorted(directory.iterdir()) if path.is_file() and path.name != _p.LOG_NAME}
+    outputs = {
+        path.name: path
+        for path in sorted(directory.iterdir())
+        if path.is_file() and path.name != _p.LOG_NAME
+    }
     return _p.result(
         "simulate_alignment",
         "iqtree3",
@@ -911,11 +1021,15 @@ def infer_polymorphism_aware_tree(
     model_string = _model(substitution_model, "substitution_model") or "HKY"
     model_string += "+P"
     if population_size is not None:
-        model_string += f"+N{_cli.integer(population_size, 'population_size', minimum=2, maximum=1000)}"
+        model_string += (
+            f"+N{_cli.integer(population_size, 'population_size', minimum=2, maximum=1000)}"
+        )
     if sampling is not None:
         model_string += "+" + _cli.choice(sampling, ("WB", "WH", "S"), "sampling")
     if gamma_categories is not None:
-        model_string += f"+G{_cli.integer(gamma_categories, 'gamma_categories', minimum=2, maximum=32)}"
+        model_string += (
+            f"+G{_cli.integer(gamma_categories, 'gamma_categories', minimum=2, maximum=32)}"
+        )
     arguments = ["-s", _p.file_path(counts, "counts"), "-m", model_string]
     _p.opt_file(arguments, "-t", tree, "tree")
     _common(arguments, sequence_type=None, threads=threads, seed=seed, model_flag=False)

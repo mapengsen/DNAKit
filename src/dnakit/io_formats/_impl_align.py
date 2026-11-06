@@ -1,6 +1,6 @@
 """Sequence-alignment format engines: PHYLIP, NEXUS (data + taxa + trees blocks) and aligned FASTA."""
 
-# ruff: noqa: E501, RUF012, B905
+# ruff: noqa: RUF012, B905
 
 from __future__ import annotations
 

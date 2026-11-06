@@ -24,9 +24,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from dnakit.bioinformatics._common import require as _require
-
 from dnakit._verbosity import register_public as _register_public_verbose
+from dnakit.bioinformatics._common import require as _require
 from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 
@@ -37,10 +36,10 @@ def _np():  # numpy is imported lazily: it is not a core dnakit dependency
 _HINT = "Install kipoi with: python -m pip install kipoi"
 
 __all__ = [
-    "prepare_kipoi_batch",
     "concatenate_kipoi_batches",
-    "kipoi_dataloader_example_kwargs",
     "kipoi_dataloader_default_args",
+    "kipoi_dataloader_example_kwargs",
+    "prepare_kipoi_batch",
     "test_kipoi_source_models",
 ]
 
@@ -48,9 +47,9 @@ __all__ = [
 def _kipoi() -> Any:
     try:
         import kipoi
-        import kipoi.cli.main  # noqa: F401  (prepare_batch and numpy_collate_concat live here)
-        import kipoi.sources  # noqa: F401  (load_component_descr)
-        import kipoi.specs  # noqa: F401  (example_kwargs, download_default_args, RemoteFile)
+        import kipoi.cli.main
+        import kipoi.sources
+        import kipoi.specs
     except ImportError as exc:
         raise BackendUnavailableError(f"kipoi could not be imported: {exc}", hint=_HINT) from exc
     return kipoi

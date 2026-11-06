@@ -19,164 +19,187 @@ from dnakit.bioinformatics._gatk_p01_core import Param as _Param
 from dnakit.bioinformatics._gatk_p01_core import Spec as _Spec
 
 _SPECS: dict[str, _Spec] = {
-    'gatk_index_feature_file': _Spec(
-        'gatk_index_feature_file',
-        {'default': 'IndexFeatureFile'},
+    "gatk_index_feature_file": _Spec(
+        "gatk_index_feature_file",
+        {"default": "IndexFeatureFile"},
         (
-            _Param('feature_path', 'in', 'input', req=True),
-            _Param('index_path', 'out', 'output'),
+            _Param("feature_path", "in", "input", req=True),
+            _Param("index_path", "out", "output"),
         ),
-        derived=(('index', 'feature_path', ('.idx', '.tbi', '.csi'), False),),
+        derived=(("index", "feature_path", (".idx", ".tbi", ".csi"), False),),
     ),
-    'gatk_sort_gff': _Spec(
-        'gatk_sort_gff',
-        {'default': 'SortGff'},
+    "gatk_sort_gff": _Spec(
+        "gatk_sort_gff",
+        {"default": "SortGff"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('sequence_dictionary', 'in', 'SEQUENCE_DICTIONARY'),
-        ),
-    ),
-    'gatk_gtf_to_bed': _Spec(
-        'gatk_gtf_to_bed',
-        {'default': 'GtfToBed'},
-        (
-            _Param('gtf_path', 'in', 'gtf-path', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('sequence_dictionary', 'in', 'sequence-dictionary', req=True),
-            _Param('sort_by_transcript', 'bool', 'sort-by-transcript'),
-            _Param('use_basic_transcript', 'bool', 'use-basic-transcript'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("sequence_dictionary", "in", "SEQUENCE_DICTIONARY"),
         ),
     ),
-    'gatk_bait_designer': _Spec(
-        'gatk_bait_designer',
-        {'default': 'BaitDesigner'},
+    "gatk_gtf_to_bed": _Spec(
+        "gatk_gtf_to_bed",
+        {"default": "GtfToBed"},
         (
-            _Param('targets', 'in', 'TARGETS', req=True),
-            _Param('reference_path', 'in', 'REFERENCE_SEQUENCE', req=True),
-            _Param('design_name', 'str', 'DESIGN_NAME', req=True),
-            _Param('output_dir', 'outd', 'OUTPUT_DIRECTORY', req=True),
-            _Param('bait_size', 'int', 'BAIT_SIZE', minimum=1),
-            _Param('bait_offset', 'int', 'BAIT_OFFSET', minimum=1),
-            _Param('design_strategy', 'choice', 'DESIGN_STRATEGY', choices=('CenteredConstrained', 'Fixed', 'Flanking')),
+            _Param("gtf_path", "in", "gtf-path", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("sequence_dictionary", "in", "sequence-dictionary", req=True),
+            _Param("sort_by_transcript", "bool", "sort-by-transcript"),
+            _Param("use_basic_transcript", "bool", "use-basic-transcript"),
         ),
     ),
-    'gatk_bwa_mem_index_image': _Spec(
-        'gatk_bwa_mem_index_image',
-        {'default': 'BwaMemIndexImageCreator'},
+    "gatk_bait_designer": _Spec(
+        "gatk_bait_designer",
+        {"default": "BaitDesigner"},
         (
-            _Param('reference_path', 'in', 'input', req=True),
-        ),
-        derived=(('image', 'reference_path', ('.img',), True),),
-    ),
-    'gatk_check_reference_compatibility': _Spec(
-        'gatk_check_reference_compatibility',
-        {'default': 'CheckReferenceCompatibility'},
-        (
-            _Param('references_to_compare', 'ins', 'references-to-compare', req=True),
-            _Param('alignment_path', 'in', 'input'),
-            _Param('variant_path', 'in', 'variant'),
-            _Param('output_path', 'out', 'output'),
-        ),
-        any_of=((None, ('alignment_path', 'variant_path')),),
-    ),
-    'gatk_compare_references': _Spec(
-        'gatk_compare_references',
-        {'default': 'CompareReferences'},
-        (
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('references_to_compare', 'ins', 'references-to-compare', req=True),
-            _Param('display_only_differing_sequences', 'bool', 'display-only-differing-sequences'),
-        ),
-        hook='tab_table',
-    ),
-    'gatk_compose_str_table': _Spec(
-        'gatk_compose_str_table',
-        {'default': 'ComposeSTRTableFile'},
-        (
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('max_period', 'int', 'max-period', minimum=1),
-            _Param('max_repeats', 'int', 'max-repeats', minimum=1),
-            _Param('decimation', 'str', 'decimation'),
+            _Param("targets", "in", "TARGETS", req=True),
+            _Param("reference_path", "in", "REFERENCE_SEQUENCE", req=True),
+            _Param("design_name", "str", "DESIGN_NAME", req=True),
+            _Param("output_dir", "outd", "OUTPUT_DIRECTORY", req=True),
+            _Param("bait_size", "int", "BAIT_SIZE", minimum=1),
+            _Param("bait_offset", "int", "BAIT_OFFSET", minimum=1),
+            _Param(
+                "design_strategy",
+                "choice",
+                "DESIGN_STRATEGY",
+                choices=("CenteredConstrained", "Fixed", "Flanking"),
+            ),
         ),
     ),
-    'gatk_count_reference_bases': _Spec(
-        'gatk_count_reference_bases',
-        {'count_bases': 'CountBasesInReference', 'non_n_size': 'NonNFastaSize'},
-        (
-            _Param('fasta_path', 'in', {'count_bases': 'reference', 'non_n_size': 'INPUT'}, req=True),
-            _Param('output_path', 'out', 'OUTPUT', v=('non_n_size',), req=('non_n_size',)),
-            _Param('intervals', 'in', 'INTERVALS', v=('non_n_size',)),
-        ),
-        selector='mode',
-        hook='base_counts',
+    "gatk_bwa_mem_index_image": _Spec(
+        "gatk_bwa_mem_index_image",
+        {"default": "BwaMemIndexImageCreator"},
+        (_Param("reference_path", "in", "input", req=True),),
+        derived=(("image", "reference_path", (".img",), True),),
     ),
-    'gatk_extract_reference_sequences': _Spec(
-        'gatk_extract_reference_sequences',
-        {'interval_list': 'ExtractSequences', 'intervals': 'FastaReferenceMaker'},
+    "gatk_check_reference_compatibility": _Spec(
+        "gatk_check_reference_compatibility",
+        {"default": "CheckReferenceCompatibility"},
         (
-            _Param('reference_path', 'in', {'interval_list': 'REFERENCE_SEQUENCE', 'intervals': 'reference'}, req=True),
-            _Param('output_path', 'out', {'interval_list': 'OUTPUT', 'intervals': 'output'}, req=True),
-            _Param('interval_list', 'in', 'INTERVAL_LIST', v=('interval_list',), req=('interval_list',)),
-            _Param('intervals', 'strs', 'intervals', v=('intervals',), req=('intervals',)),
-            _Param('line_length', 'int', {'interval_list': 'LINE_LENGTH', 'intervals': 'line-width'}, minimum=1),
+            _Param("references_to_compare", "ins", "references-to-compare", req=True),
+            _Param("alignment_path", "in", "input"),
+            _Param("variant_path", "in", "variant"),
+            _Param("output_path", "out", "output"),
         ),
-        selector='source',
+        any_of=((None, ("alignment_path", "variant_path")),),
     ),
-    'gatk_fasta_alternate_reference_maker': _Spec(
-        'gatk_fasta_alternate_reference_maker',
-        {'default': 'FastaAlternateReferenceMaker'},
+    "gatk_compare_references": _Spec(
+        "gatk_compare_references",
+        {"default": "CompareReferences"},
         (
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('snp_mask', 'in', 'snp-mask'),
-            _Param('use_iupac_sample', 'str', 'use-iupac-sample'),
-            _Param('line_width', 'int', 'line-width', minimum=1),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("references_to_compare", "ins", "references-to-compare", req=True),
+            _Param("display_only_differing_sequences", "bool", "display-only-differing-sequences"),
         ),
+        hook="tab_table",
     ),
-    'gatk_find_bad_genomic_kmers_spark': _Spec(
-        'gatk_find_bad_genomic_kmers_spark',
-        {'default': 'FindBadGenomicKmersSpark'},
+    "gatk_compose_str_table": _Spec(
+        "gatk_compose_str_table",
+        {"default": "ComposeSTRTableFile"},
         (
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('k_size', 'int', 'k-size', minimum=1),
-            _Param('kmer_max_dust_score', 'int', 'kmer-max-dust-score', minimum=0),
-            _Param('high_copy_fasta', 'in', 'high-copy-fasta'),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("max_period", "int", "max-period", minimum=1),
+            _Param("max_repeats", "int", "max-repeats", minimum=1),
+            _Param("decimation", "str", "decimation"),
         ),
     ),
-    'gatk_normalize_fasta': _Spec(
-        'gatk_normalize_fasta',
-        {'default': 'NormalizeFasta'},
+    "gatk_count_reference_bases": _Spec(
+        "gatk_count_reference_bases",
+        {"count_bases": "CountBasesInReference", "non_n_size": "NonNFastaSize"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('line_length', 'int', 'LINE_LENGTH', minimum=1),
-            _Param('truncate_sequence_names_at_whitespace', 'bool', 'TRUNCATE_SEQUENCE_NAMES_AT_WHITESPACE'),
+            _Param(
+                "fasta_path", "in", {"count_bases": "reference", "non_n_size": "INPUT"}, req=True
+            ),
+            _Param("output_path", "out", "OUTPUT", v=("non_n_size",), req=("non_n_size",)),
+            _Param("intervals", "in", "INTERVALS", v=("non_n_size",)),
+        ),
+        selector="mode",
+        hook="base_counts",
+    ),
+    "gatk_extract_reference_sequences": _Spec(
+        "gatk_extract_reference_sequences",
+        {"interval_list": "ExtractSequences", "intervals": "FastaReferenceMaker"},
+        (
+            _Param(
+                "reference_path",
+                "in",
+                {"interval_list": "REFERENCE_SEQUENCE", "intervals": "reference"},
+                req=True,
+            ),
+            _Param(
+                "output_path", "out", {"interval_list": "OUTPUT", "intervals": "output"}, req=True
+            ),
+            _Param(
+                "interval_list", "in", "INTERVAL_LIST", v=("interval_list",), req=("interval_list",)
+            ),
+            _Param("intervals", "strs", "intervals", v=("intervals",), req=("intervals",)),
+            _Param(
+                "line_length",
+                "int",
+                {"interval_list": "LINE_LENGTH", "intervals": "line-width"},
+                minimum=1,
+            ),
+        ),
+        selector="source",
+    ),
+    "gatk_fasta_alternate_reference_maker": _Spec(
+        "gatk_fasta_alternate_reference_maker",
+        {"default": "FastaAlternateReferenceMaker"},
+        (
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("snp_mask", "in", "snp-mask"),
+            _Param("use_iupac_sample", "str", "use-iupac-sample"),
+            _Param("line_width", "int", "line-width", minimum=1),
         ),
     ),
-    'gatk_scatter_intervals_by_ns': _Spec(
-        'gatk_scatter_intervals_by_ns',
-        {'default': 'ScatterIntervalsByNs'},
+    "gatk_find_bad_genomic_kmers_spark": _Spec(
+        "gatk_find_bad_genomic_kmers_spark",
+        {"default": "FindBadGenomicKmersSpark"},
         (
-            _Param('reference_path', 'in', 'REFERENCE', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('output_type', 'choice', 'OUTPUT_TYPE', choices=('N', 'ACGT', 'BOTH')),
-            _Param('max_to_merge', 'int', 'MAX_TO_MERGE', minimum=0),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("k_size", "int", "k-size", minimum=1),
+            _Param("kmer_max_dust_score", "int", "kmer-max-dust-score", minimum=0),
+            _Param("high_copy_fasta", "in", "high-copy-fasta"),
         ),
     ),
-    'gatk_shift_fasta': _Spec(
-        'gatk_shift_fasta',
-        {'default': 'ShiftFasta'},
+    "gatk_normalize_fasta": _Spec(
+        "gatk_normalize_fasta",
+        {"default": "NormalizeFasta"},
         (
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('shift_back_output', 'out', 'shift-back-output', req=True),
-            _Param('shift_offset_list', 'strs', 'shift-offset-list'),
-            _Param('interval_file_name', 'out', 'interval-file-name'),
-            _Param('line_width', 'int', 'line-width', minimum=1),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("line_length", "int", "LINE_LENGTH", minimum=1),
+            _Param(
+                "truncate_sequence_names_at_whitespace",
+                "bool",
+                "TRUNCATE_SEQUENCE_NAMES_AT_WHITESPACE",
+            ),
+        ),
+    ),
+    "gatk_scatter_intervals_by_ns": _Spec(
+        "gatk_scatter_intervals_by_ns",
+        {"default": "ScatterIntervalsByNs"},
+        (
+            _Param("reference_path", "in", "REFERENCE", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("output_type", "choice", "OUTPUT_TYPE", choices=("N", "ACGT", "BOTH")),
+            _Param("max_to_merge", "int", "MAX_TO_MERGE", minimum=0),
+        ),
+    ),
+    "gatk_shift_fasta": _Spec(
+        "gatk_shift_fasta",
+        {"default": "ShiftFasta"},
+        (
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("shift_back_output", "out", "shift-back-output", req=True),
+            _Param("shift_offset_list", "strs", "shift-offset-list"),
+            _Param("interval_file_name", "out", "interval-file-name"),
+            _Param("line_width", "int", "line-width", minimum=1),
         ),
     ),
 }
@@ -204,8 +227,8 @@ def gatk_index_feature_file(
     Output: The common result fields; `outputs.index` is the index.
     """
     return _core.execute(
-        _SPECS['gatk_index_feature_file'],
-        {'feature_path': feature_path, 'index_path': index_path},
+        _SPECS["gatk_index_feature_file"],
+        {"feature_path": feature_path, "index_path": index_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -238,8 +261,12 @@ def gatk_sort_gff(
     Output: The common result fields; `outputs.output_path` is the sorted GFF3.
     """
     return _core.execute(
-        _SPECS['gatk_sort_gff'],
-        {'input_path': input_path, 'output_path': output_path, 'sequence_dictionary': sequence_dictionary},
+        _SPECS["gatk_sort_gff"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "sequence_dictionary": sequence_dictionary,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -276,8 +303,14 @@ def gatk_gtf_to_bed(
     Output: The common result fields; `outputs.output_path` is the BED file.
     """
     return _core.execute(
-        _SPECS['gatk_gtf_to_bed'],
-        {'gtf_path': gtf_path, 'output_path': output_path, 'sequence_dictionary': sequence_dictionary, 'sort_by_transcript': sort_by_transcript, 'use_basic_transcript': use_basic_transcript},
+        _SPECS["gatk_gtf_to_bed"],
+        {
+            "gtf_path": gtf_path,
+            "output_path": output_path,
+            "sequence_dictionary": sequence_dictionary,
+            "sort_by_transcript": sort_by_transcript,
+            "use_basic_transcript": use_basic_transcript,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -318,8 +351,16 @@ def gatk_bait_designer(
     Output: The common result fields and `files` (file names inside `output_dir`).
     """
     return _core.execute(
-        _SPECS['gatk_bait_designer'],
-        {'targets': targets, 'reference_path': reference_path, 'design_name': design_name, 'output_dir': output_dir, 'bait_size': bait_size, 'bait_offset': bait_offset, 'design_strategy': design_strategy},
+        _SPECS["gatk_bait_designer"],
+        {
+            "targets": targets,
+            "reference_path": reference_path,
+            "design_name": design_name,
+            "output_dir": output_dir,
+            "bait_size": bait_size,
+            "bait_offset": bait_offset,
+            "design_strategy": design_strategy,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -348,8 +389,8 @@ def gatk_bwa_mem_index_image(
     Output: The common result fields; `outputs.image` is the index image.
     """
     return _core.execute(
-        _SPECS['gatk_bwa_mem_index_image'],
-        {'reference_path': reference_path},
+        _SPECS["gatk_bwa_mem_index_image"],
+        {"reference_path": reference_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -384,8 +425,13 @@ def gatk_check_reference_compatibility(
     Output: The common result fields (the table is in `log_tail` unless `output_path` is given).
     """
     return _core.execute(
-        _SPECS['gatk_check_reference_compatibility'],
-        {'references_to_compare': references_to_compare, 'alignment_path': alignment_path, 'variant_path': variant_path, 'output_path': output_path},
+        _SPECS["gatk_check_reference_compatibility"],
+        {
+            "references_to_compare": references_to_compare,
+            "alignment_path": alignment_path,
+            "variant_path": variant_path,
+            "output_path": output_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -418,8 +464,12 @@ def gatk_compare_references(
     Output: The common result fields plus `comparison_table` (rows of the printed table).
     """
     return _core.execute(
-        _SPECS['gatk_compare_references'],
-        {'reference_path': reference_path, 'references_to_compare': references_to_compare, 'display_only_differing_sequences': display_only_differing_sequences},
+        _SPECS["gatk_compare_references"],
+        {
+            "reference_path": reference_path,
+            "references_to_compare": references_to_compare,
+            "display_only_differing_sequences": display_only_differing_sequences,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -456,8 +506,14 @@ def gatk_compose_str_table(
     Output: The common result fields; `outputs.output_path` is the STR table.
     """
     return _core.execute(
-        _SPECS['gatk_compose_str_table'],
-        {'reference_path': reference_path, 'output_path': output_path, 'max_period': max_period, 'max_repeats': max_repeats, 'decimation': decimation},
+        _SPECS["gatk_compose_str_table"],
+        {
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "max_period": max_period,
+            "max_repeats": max_repeats,
+            "decimation": decimation,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -469,7 +525,7 @@ def gatk_compose_str_table(
 def gatk_count_reference_bases(
     fasta_path: str,
     *,
-    mode: str = 'count_bases',
+    mode: str = "count_bases",
     output_path: str | None = None,
     intervals: str | None = None,
     options: Mapping[str, Any] | None = None,
@@ -493,8 +549,8 @@ def gatk_count_reference_bases(
     Output: The common result fields and `mode`; `base_counts` and `total_bases` for `count_bases`, `outputs.output_path` for `non_n_size`.
     """
     return _core.execute(
-        _SPECS['gatk_count_reference_bases'],
-        {'fasta_path': fasta_path, 'output_path': output_path, 'intervals': intervals},
+        _SPECS["gatk_count_reference_bases"],
+        {"fasta_path": fasta_path, "output_path": output_path, "intervals": intervals},
         mode=mode,
         options=options,
         gatk_path=gatk_path,
@@ -507,7 +563,7 @@ def gatk_extract_reference_sequences(
     reference_path: str,
     output_path: str,
     *,
-    source: str = 'interval_list',
+    source: str = "interval_list",
     interval_list: str | None = None,
     intervals: Sequence[str] | None = None,
     line_length: int | None = None,
@@ -534,8 +590,14 @@ def gatk_extract_reference_sequences(
     Output: The common result fields and `mode`; `outputs.output_path` is the FASTA.
     """
     return _core.execute(
-        _SPECS['gatk_extract_reference_sequences'],
-        {'reference_path': reference_path, 'output_path': output_path, 'interval_list': interval_list, 'intervals': intervals, 'line_length': line_length},
+        _SPECS["gatk_extract_reference_sequences"],
+        {
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "interval_list": interval_list,
+            "intervals": intervals,
+            "line_length": line_length,
+        },
         mode=source,
         options=options,
         gatk_path=gatk_path,
@@ -574,8 +636,15 @@ def gatk_fasta_alternate_reference_maker(
     Output: The common result fields; `outputs.output_path` is the FASTA.
     """
     return _core.execute(
-        _SPECS['gatk_fasta_alternate_reference_maker'],
-        {'reference_path': reference_path, 'variant_path': variant_path, 'output_path': output_path, 'snp_mask': snp_mask, 'use_iupac_sample': use_iupac_sample, 'line_width': line_width},
+        _SPECS["gatk_fasta_alternate_reference_maker"],
+        {
+            "reference_path": reference_path,
+            "variant_path": variant_path,
+            "output_path": output_path,
+            "snp_mask": snp_mask,
+            "use_iupac_sample": use_iupac_sample,
+            "line_width": line_width,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -612,8 +681,14 @@ def gatk_find_bad_genomic_kmers_spark(
     Output: The common result fields; `outputs.output_path` is the k-mer list.
     """
     return _core.execute(
-        _SPECS['gatk_find_bad_genomic_kmers_spark'],
-        {'reference_path': reference_path, 'output_path': output_path, 'k_size': k_size, 'kmer_max_dust_score': kmer_max_dust_score, 'high_copy_fasta': high_copy_fasta},
+        _SPECS["gatk_find_bad_genomic_kmers_spark"],
+        {
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "k_size": k_size,
+            "kmer_max_dust_score": kmer_max_dust_score,
+            "high_copy_fasta": high_copy_fasta,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -648,8 +723,13 @@ def gatk_normalize_fasta(
     Output: The common result fields; `outputs.output_path` is the new FASTA.
     """
     return _core.execute(
-        _SPECS['gatk_normalize_fasta'],
-        {'input_path': input_path, 'output_path': output_path, 'line_length': line_length, 'truncate_sequence_names_at_whitespace': truncate_sequence_names_at_whitespace},
+        _SPECS["gatk_normalize_fasta"],
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "line_length": line_length,
+            "truncate_sequence_names_at_whitespace": truncate_sequence_names_at_whitespace,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -684,8 +764,13 @@ def gatk_scatter_intervals_by_ns(
     Output: The common result fields; `outputs.output_path` is the interval list.
     """
     return _core.execute(
-        _SPECS['gatk_scatter_intervals_by_ns'],
-        {'reference_path': reference_path, 'output_path': output_path, 'output_type': output_type, 'max_to_merge': max_to_merge},
+        _SPECS["gatk_scatter_intervals_by_ns"],
+        {
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "output_type": output_type,
+            "max_to_merge": max_to_merge,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -724,8 +809,15 @@ def gatk_shift_fasta(
     Output: The common result fields; `outputs` lists the FASTA and the shift-back file.
     """
     return _core.execute(
-        _SPECS['gatk_shift_fasta'],
-        {'reference_path': reference_path, 'output_path': output_path, 'shift_back_output': shift_back_output, 'shift_offset_list': shift_offset_list, 'interval_file_name': interval_file_name, 'line_width': line_width},
+        _SPECS["gatk_shift_fasta"],
+        {
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "shift_back_output": shift_back_output,
+            "shift_offset_list": shift_offset_list,
+            "interval_file_name": interval_file_name,
+            "line_width": line_width,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -735,9 +827,6 @@ def gatk_shift_fasta(
 
 
 __all__ = [
-    "gatk_index_feature_file",
-    "gatk_sort_gff",
-    "gatk_gtf_to_bed",
     "gatk_bait_designer",
     "gatk_bwa_mem_index_image",
     "gatk_check_reference_compatibility",
@@ -747,9 +836,12 @@ __all__ = [
     "gatk_extract_reference_sequences",
     "gatk_fasta_alternate_reference_maker",
     "gatk_find_bad_genomic_kmers_spark",
+    "gatk_gtf_to_bed",
+    "gatk_index_feature_file",
     "gatk_normalize_fasta",
     "gatk_scatter_intervals_by_ns",
     "gatk_shift_fasta",
+    "gatk_sort_gff",
 ]
 
 _register_public_verbose(globals(), tuple(__all__))

@@ -22,7 +22,15 @@ from dnakit.exceptions import BackendExecutionError, ConfigurationError
 
 _EXTRA = "bio-reads"
 _MAX_RECORDS = 1_000_000
-_ERRORS = (ValueError, KeyError, OSError, TypeError, AttributeError, IndexError, NotImplementedError)
+_ERRORS = (
+    ValueError,
+    KeyError,
+    OSError,
+    TypeError,
+    AttributeError,
+    IndexError,
+    NotImplementedError,
+)
 
 
 def _pysam() -> Any:
@@ -141,7 +149,7 @@ def _per_read(
 ) -> dict[str, Any]:
     chrom, first, last = _optional_region(contig, start, end)
     limit = _int(max_records, "max_records", 1, _MAX_RECORDS)
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     with handle:
         reads, truncated = _limited(_reads(handle, chrom, first, last), limit)
         rows = []
@@ -182,7 +190,7 @@ def fetch_mate_alignments(
 
     chrom, first, last = _optional_region(contig, start, end)
     limit = _int(max_records, "max_records", 1, _MAX_RECORDS)
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     pairs: list[dict[str, Any]] = []
     without: list[str] = []
     truncated = False
@@ -197,7 +205,9 @@ def fetch_mate_alignments(
             try:
                 mate = handle.mate(read)
             except _ERRORS as exc:
-                raise BackendExecutionError(f"pysam mate failed for {read.query_name}: {exc}") from exc
+                raise BackendExecutionError(
+                    f"pysam mate failed for {read.query_name}: {exc}"
+                ) from exc
             pairs.append({"read": read.to_dict(), "mate": mate.to_dict()})
     return {
         "status": "completed",
@@ -233,7 +243,7 @@ def count_base_coverage(
         raise ConfigurationError("start and end are required and end must be greater than start.")
     threshold = _int(quality_threshold, "quality_threshold", 0, 255)
     callback = _choice(read_callback, "read_callback", ("all", "nofilter"))
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     with handle:
         try:
             a, c, g, t = handle.count_coverage(
@@ -273,7 +283,7 @@ def count_spliced_junctions(
 
     chrom, first, last = _optional_region(contig, start, end)
     mode = _choice(method, "method", ("fast", "slow"))
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     with handle:
         reads = _reads(handle, chrom, first, last)
         try:
@@ -329,7 +339,7 @@ def pileup_columns(
     depth = _int(max_depth, "max_depth", 1, 10_000_000)
     limit = _int(max_columns, "max_columns", 1, _MAX_RECORDS)
     names = _flag(include_read_names, "include_read_names")
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     columns: list[dict[str, Any]] = []
     truncated = False
     with handle:
@@ -413,7 +423,7 @@ def find_alignments_by_name(
 def sam_header_to_dict(alignment_file: str | Path, *, verbose: bool = True) -> dict[str, Any]:
     """Return the header of a SAM, BAM or CRAM file as nested dictionaries (``AlignmentHeader.to_dict``)."""
 
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     with handle:
         header = handle.header.to_dict()
         text = str(handle.header)
@@ -446,14 +456,20 @@ def write_sam_header(
     try:
         if header_dict is not None:
             if reference_names is not None or reference_lengths is not None:
-                raise ConfigurationError("Give header_dict or reference_names/reference_lengths, not both.")
+                raise ConfigurationError(
+                    "Give header_dict or reference_names/reference_lengths, not both."
+                )
             header = pysam.AlignmentHeader.from_dict(dict(header_dict))
             mode = "from_dict"
         else:
             if reference_names is None or reference_lengths is None:
-                raise ConfigurationError("Give header_dict, or both reference_names and reference_lengths.")
+                raise ConfigurationError(
+                    "Give header_dict, or both reference_names and reference_lengths."
+                )
             if len(reference_names) != len(reference_lengths) or not reference_names:
-                raise ConfigurationError("reference_names and reference_lengths need the same length (> 0).")
+                raise ConfigurationError(
+                    "reference_names and reference_lengths need the same length (> 0)."
+                )
             names = [_text(n, "reference_names item") for n in reference_names]
             lengths = [_int(n, "reference_lengths item", 1, 2**31 - 1) for n in reference_lengths]
             header = pysam.AlignmentHeader.from_references(names, lengths)
@@ -491,7 +507,7 @@ def alignment_records_to_dicts(
 
     chrom, first, last = _optional_region(contig, start, end)
     limit = _int(max_records, "max_records", 1, _MAX_RECORDS)
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     with handle:
         reads, truncated = _limited(_reads(handle, chrom, first, last), limit)
         rows = [read.to_dict() for read in reads]
@@ -533,7 +549,9 @@ def write_alignments_from_dicts(
     try:
         header_obj = pysam.AlignmentHeader.from_dict(dict(header))
         built = [
-            pysam.AlignedSegment.from_dict({k: str(v) if k != "tags" else v for k, v in dict(r).items()}, header_obj)
+            pysam.AlignedSegment.from_dict(
+                {k: str(v) if k != "tags" else v for k, v in dict(r).items()}, header_obj
+            )
             for r in records
         ]
         with pysam.AlignmentFile(str(target), mode, header=header_obj) as out:
@@ -571,9 +589,15 @@ def read_aligned_pairs(
     only = _flag(matches_only, "matches_only")
     seq = _flag(with_seq, "with_seq")
     return _per_read(
-        "read_aligned_pairs", alignment_file, contig, start, end, max_records,
+        "read_aligned_pairs",
+        alignment_file,
+        contig,
+        start,
+        end,
+        max_records,
         lambda read: {"pairs": _plain(read.get_aligned_pairs(matches_only=only, with_seq=seq))},
-        matches_only=only, with_seq=seq,
+        matches_only=only,
+        with_seq=seq,
     )
 
 
@@ -592,7 +616,12 @@ def read_aligned_blocks(
     """
 
     return _per_read(
-        "read_aligned_blocks", alignment_file, contig, start, end, max_records,
+        "read_aligned_blocks",
+        alignment_file,
+        contig,
+        start,
+        end,
+        max_records,
         lambda read: {"blocks": [list(b) for b in read.get_blocks()]},
     )
 
@@ -640,7 +669,12 @@ def read_reference_overlap(
     if first is None or last is None:
         raise ConfigurationError("start and end are required.")
     return _per_read(
-        "read_reference_overlap", alignment_file, chrom, first, last, max_records,
+        "read_reference_overlap",
+        alignment_file,
+        chrom,
+        first,
+        last,
+        max_records,
         lambda read: {"overlap_bases": int(read.get_overlap(first, last) or 0)},
     )
 
@@ -662,7 +696,12 @@ def read_reference_positions(
 
     full = _flag(full_length, "full_length")
     return _per_read(
-        "read_reference_positions", alignment_file, contig, start, end, max_records,
+        "read_reference_positions",
+        alignment_file,
+        contig,
+        start,
+        end,
+        max_records,
         lambda read: {"positions": read.get_reference_positions(full_length=full)},
         full_length=full,
     )
@@ -685,7 +724,7 @@ def reconstruct_read_reference_sequence(
 
     chrom, first, last = _optional_region(contig, start, end)
     limit = _int(max_records, "max_records", 1, _MAX_RECORDS)
-    pysam, handle = _open(alignment_file)
+    _pysam, handle = _open(alignment_file)
     rows: list[dict[str, Any]] = []
     skipped: list[str] = []
     with handle:
@@ -695,7 +734,12 @@ def reconstruct_read_reference_sequence(
                 skipped.append(read.query_name)
                 continue
             try:
-                rows.append({"query_name": read.query_name, "reference_sequence": read.get_reference_sequence()})
+                rows.append(
+                    {
+                        "query_name": read.query_name,
+                        "reference_sequence": read.get_reference_sequence(),
+                    }
+                )
             except _ERRORS as exc:
                 raise BackendExecutionError(f"pysam get_reference_sequence failed: {exc}") from exc
     return {
@@ -770,7 +814,13 @@ def read_base_modifications(
         }
 
     return _per_read(
-        "read_base_modifications", alignment_file, contig, start, end, max_records, extract,
+        "read_base_modifications",
+        alignment_file,
+        contig,
+        start,
+        end,
+        max_records,
+        extract,
         forward=use_forward,
     )
 

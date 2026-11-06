@@ -47,7 +47,9 @@ def _executable(name: str, kraken2_path: str | None) -> str | None:
         return None
     folder = Path(kraken2_path).expanduser()
     if not folder.is_dir():
-        raise ConfigurationError(f"kraken2_path must be a folder that contains the Kraken 2 programs: {folder}")
+        raise ConfigurationError(
+            f"kraken2_path must be a folder that contains the Kraken 2 programs: {folder}"
+        )
     return str(folder / name)
 
 
@@ -88,7 +90,9 @@ def _built_database(value: str, name: str = "database") -> Path:
     path = _database_dir(value, name)
     missing = [item for item in _HASH_FILES if not (path / item).is_file()]
     if missing:
-        raise ConfigurationError(f"{name} is not a built Kraken 2 database (missing {', '.join(missing)}): {path}")
+        raise ConfigurationError(
+            f"{name} is not a built Kraken 2 database (missing {', '.join(missing)}): {path}"
+        )
     return path
 
 
@@ -132,7 +136,11 @@ def _report_rows(path: Path, *, minimizer_data: bool) -> list[dict[str, Any]]:
 
 def _summary(result: dict[str, Any]) -> None:
     log = result["log_tail"]
-    processed, classified, unclassified = _PROCESSED.search(log), _CLASSIFIED.search(log), _UNCLASSIFIED.search(log)
+    processed, classified, unclassified = (
+        _PROCESSED.search(log),
+        _CLASSIFIED.search(log),
+        _UNCLASSIFIED.search(log),
+    )
     if processed is not None:
         result["sequences_processed"] = int(processed.group(1))
     if classified is not None:
@@ -189,7 +197,12 @@ def kraken2_classify_reads(
     use_k2 = multiple or merge_policy is not None or interleaved
     program = "k2" if use_k2 else "kraken2"
     arguments = ["classify"] if use_k2 else []
-    arguments += ["--db", ",".join(str(path) for path in database_paths), "--output", str(output_path)]
+    arguments += [
+        "--db",
+        ",".join(str(path) for path in database_paths),
+        "--output",
+        str(output_path),
+    ]
     expected = [output_path]
     if report is not None:
         report_path = _gap_cli.new_file(report, "report")
@@ -204,19 +217,38 @@ def kraken2_classify_reads(
                 raise ConfigurationError(f"The folder for {name} does not exist.")
             arguments += [flag_name, str(_gap_cli.new_file(value, name))]
     if merge_policy is not None:
-        arguments += ["--merge-policy", _gap_cli.choice(merge_policy, _MERGE_POLICIES, "merge_policy")]
+        arguments += [
+            "--merge-policy",
+            _gap_cli.choice(merge_policy, _MERGE_POLICIES, "merge_policy"),
+        ]
     if _p14_cli.flag(paired, "paired") or _p14_cli.flag(interleaved, "interleaved"):
         if paired and interleaved:
             raise ConfigurationError("Choose paired or interleaved, not both.")
         arguments.append("--paired" if paired else "--interleaved")
     if confidence is not None:
-        arguments += ["--confidence", str(_gap_cli.number(confidence, "confidence", minimum=0.0, maximum=1.0))]
+        arguments += [
+            "--confidence",
+            str(_gap_cli.number(confidence, "confidence", minimum=0.0, maximum=1.0)),
+        ]
     if minimum_hit_groups is not None:
-        arguments += ["--minimum-hit-groups", str(_gap_cli.integer(minimum_hit_groups, "minimum_hit_groups", minimum=1))]
+        arguments += [
+            "--minimum-hit-groups",
+            str(_gap_cli.integer(minimum_hit_groups, "minimum_hit_groups", minimum=1)),
+        ]
     if minimum_base_quality is not None:
-        arguments += ["--minimum-base-quality", str(_gap_cli.integer(minimum_base_quality, "minimum_base_quality", minimum=0, maximum=93))]
+        arguments += [
+            "--minimum-base-quality",
+            str(
+                _gap_cli.integer(
+                    minimum_base_quality, "minimum_base_quality", minimum=0, maximum=93
+                )
+            ),
+        ]
     if threads is not None:
-        arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     for value, flag_name, name in (
         (quick, "--quick", "quick"),
         (use_names, "--use-names", "use_names"),
@@ -228,16 +260,24 @@ def kraken2_classify_reads(
         if _p14_cli.flag(value, name):
             arguments.append(flag_name)
     if report is None and (report_minimizer_data or report_zero_counts or use_mpa_style):
-        raise ConfigurationError("report_minimizer_data, report_zero_counts and use_mpa_style need report.")
+        raise ConfigurationError(
+            "report_minimizer_data, report_zero_counts and use_mpa_style need report."
+        )
     arguments += read_paths
     result = _run(
-        program, arguments, cwd=output_path.parent, expected=expected, kraken2_path=kraken2_path,
+        program,
+        arguments,
+        cwd=output_path.parent,
+        expected=expected,
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
     result["databases"] = [str(path) for path in database_paths]
     _summary(result)
     if report is not None and result["status"] == "completed" and not use_mpa_style:
-        result["report_rows"] = _report_rows(Path(report).expanduser().resolve(), minimizer_data=report_minimizer_data)
+        result["report_rows"] = _report_rows(
+            Path(report).expanduser().resolve(), minimizer_data=report_minimizer_data
+        )
     return result
 
 
@@ -273,7 +313,11 @@ def kraken2_inspect_database(
         if _p14_cli.flag(value, name):
             arguments.append(flag_name)
     result = _run(
-        "k2", arguments, cwd=output_path.parent, expected=[output_path], kraken2_path=kraken2_path,
+        "k2",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
     if result["status"] == "completed":
@@ -284,7 +328,22 @@ def kraken2_inspect_database(
             for line in lines:
                 fields = line.split("\t")
                 if not line.startswith("#") and len(fields) == 6:
-                    rows.append(dict(zip(("percent", "clade_minimizers", "taxon_minimizers", "rank", "taxid", "name"), fields, strict=True)))
+                    rows.append(
+                        dict(
+                            zip(
+                                (
+                                    "percent",
+                                    "clade_minimizers",
+                                    "taxon_minimizers",
+                                    "rank",
+                                    "taxid",
+                                    "name",
+                                ),
+                                fields,
+                                strict=True,
+                            )
+                        )
+                    )
                 if len(rows) >= _MAX_ROWS:
                     break
             for row in rows:
@@ -315,11 +374,21 @@ def kraken2_merge_classifications(
     report of the merged result. Writes new files. Requires Kraken 2 with the ``k2`` wrapper.
     """
     if isinstance(classification_files, str) or len(classification_files) < 2:
-        raise ConfigurationError("classification_files must list at least two classification files.")
-    files = [str(_gap_cli.existing_file(item, "classification_files")) for item in classification_files]
+        raise ConfigurationError(
+            "classification_files must list at least two classification files."
+        )
+    files = [
+        str(_gap_cli.existing_file(item, "classification_files")) for item in classification_files
+    ]
     database_paths = _database_list(databases)
     output_path = _gap_cli.new_file(output, "output")
-    arguments = ["merge-classifications", "--db", ",".join(str(path) for path in database_paths), "--output", str(output_path)]
+    arguments = [
+        "merge-classifications",
+        "--db",
+        ",".join(str(path) for path in database_paths),
+        "--output",
+        str(output_path),
+    ]
     expected = [output_path]
     if report is not None:
         report_path = _gap_cli.new_file(report, "report")
@@ -328,7 +397,10 @@ def kraken2_merge_classifications(
     elif use_mpa_style or report_zero_counts:
         raise ConfigurationError("use_mpa_style and report_zero_counts need report.")
     if threads is not None:
-        arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     for value, flag_name, name in (
         (use_names, "--use-names", "use_names"),
         (use_mpa_style, "--use-mpa-style", "use_mpa_style"),
@@ -338,7 +410,11 @@ def kraken2_merge_classifications(
             arguments.append(flag_name)
     arguments += files
     return _run(
-        "k2", arguments, cwd=output_path.parent, expected=expected, kraken2_path=kraken2_path,
+        "k2",
+        arguments,
+        cwd=output_path.parent,
+        expected=expected,
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
 
@@ -391,12 +467,16 @@ def kraken2_download_library(
         raise ConfigurationError("library may contain letters, digits and _ . : - only.")
     chosen = _backend(backend)
     k2_only = {
-        "assembly_source": assembly_source, "assembly_levels": assembly_levels, "blast_volumes": blast_volumes,
+        "assembly_source": assembly_source,
+        "assembly_levels": assembly_levels,
+        "blast_volumes": blast_volumes,
         "masker_threads": masker_threads,
     }
     if chosen == "kraken2-build":
         if any(value is not None for value in k2_only.values()) or has_annotation or resume:
-            raise ConfigurationError("assembly_source, assembly_levels, has_annotation, resume, blast_volumes and masker_threads need backend='k2'.")
+            raise ConfigurationError(
+                "assembly_source, assembly_levels, has_annotation, resume, blast_volumes and masker_threads need backend='k2'."
+            )
         arguments = ["--download-library", name, "--db", str(folder)]
         if _p14_cli.flag(use_ftp, "use_ftp"):
             arguments.append("--use-ftp")
@@ -405,11 +485,20 @@ def kraken2_download_library(
             raise ConfigurationError("use_ftp applies to backend='kraken2-build' only.")
         arguments = ["download-library", "--db", str(folder), "--library", name]
         if assembly_source is not None:
-            arguments += ["--assembly-source", _gap_cli.choice(assembly_source, _ASSEMBLY_SOURCES, "assembly_source")]
+            arguments += [
+                "--assembly-source",
+                _gap_cli.choice(assembly_source, _ASSEMBLY_SOURCES, "assembly_source"),
+            ]
         if assembly_levels is not None:
             if isinstance(assembly_levels, str) or not assembly_levels:
                 raise ConfigurationError("assembly_levels must be a non-empty list.")
-            arguments += ["--assembly-levels", *(_gap_cli.choice(item, _ASSEMBLY_LEVELS, "assembly_levels") for item in assembly_levels)]
+            arguments += [
+                "--assembly-levels",
+                *(
+                    _gap_cli.choice(item, _ASSEMBLY_LEVELS, "assembly_levels")
+                    for item in assembly_levels
+                ),
+            ]
         if _p14_cli.flag(has_annotation, "has_annotation"):
             arguments.append("--has-annotation")
         if _p14_cli.flag(resume, "resume"):
@@ -421,15 +510,26 @@ def kraken2_download_library(
         if masker_threads is not None:
             if no_masking:
                 raise ConfigurationError("masker_threads cannot be combined with no_masking.")
-            arguments += ["--masker-threads", str(_gap_cli.integer(masker_threads, "masker_threads", minimum=1, maximum=256))]
+            arguments += [
+                "--masker-threads",
+                str(_gap_cli.integer(masker_threads, "masker_threads", minimum=1, maximum=256)),
+            ]
     if _p14_cli.flag(protein, "protein"):
         arguments.append("--protein")
     if _p14_cli.flag(no_masking, "no_masking"):
         arguments.append("--no-masking")
     if threads is not None:
-        arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     result = _run(
-        chosen, arguments, cwd=folder, expected=[], kraken2_path=kraken2_path, timeout_seconds=_timeout(timeout_seconds)
+        chosen,
+        arguments,
+        cwd=folder,
+        expected=[],
+        kraken2_path=kraken2_path,
+        timeout_seconds=_timeout(timeout_seconds),
     )
     return _library_outputs(result, folder)
 
@@ -463,7 +563,9 @@ def kraken2_add_to_library(
     timeout = _timeout(timeout_seconds)
     if chosen == "kraken2-build":
         if threads is not None or masker_threads is not None:
-            raise ConfigurationError("threads and masker_threads for add-to-library need backend='k2'.")
+            raise ConfigurationError(
+                "threads and masker_threads for add-to-library need backend='k2'."
+            )
         runs = []
         for item in files:
             arguments = ["--add-to-library", item, "--db", str(folder)]
@@ -471,13 +573,24 @@ def kraken2_add_to_library(
                 arguments.append("--protein")
             if _p14_cli.flag(no_masking, "no_masking"):
                 arguments.append("--no-masking")
-            run = _run(chosen, arguments, cwd=folder, expected=[], kraken2_path=kraken2_path, timeout_seconds=timeout)
+            run = _run(
+                chosen,
+                arguments,
+                cwd=folder,
+                expected=[],
+                kraken2_path=kraken2_path,
+                timeout_seconds=timeout,
+            )
             runs.append(run)
             if run["status"] != "completed":
                 break
         result = dict(runs[-1])
         result["runs"] = runs
-        result["status"] = "completed" if len(runs) == len(files) and all(r["status"] == "completed" for r in runs) else "failed"
+        result["status"] = (
+            "completed"
+            if len(runs) == len(files) and all(r["status"] == "completed" for r in runs)
+            else "failed"
+        )
     else:
         arguments = ["add-to-library", "--db", str(folder), "--file", *files]
         if _p14_cli.flag(protein, "protein"):
@@ -485,10 +598,23 @@ def kraken2_add_to_library(
         if _p14_cli.flag(no_masking, "no_masking"):
             arguments.append("--no-masking")
         elif masker_threads is not None:
-            arguments += ["--masker-threads", str(_gap_cli.integer(masker_threads, "masker_threads", minimum=1, maximum=256))]
+            arguments += [
+                "--masker-threads",
+                str(_gap_cli.integer(masker_threads, "masker_threads", minimum=1, maximum=256)),
+            ]
         if threads is not None:
-            arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
-        result = _run(chosen, arguments, cwd=folder, expected=[], kraken2_path=kraken2_path, timeout_seconds=timeout)
+            arguments += [
+                "--threads",
+                str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+            ]
+        result = _run(
+            chosen,
+            arguments,
+            cwd=folder,
+            expected=[],
+            kraken2_path=kraken2_path,
+            timeout_seconds=timeout,
+        )
     return _library_outputs(result, folder)
 
 
@@ -511,14 +637,20 @@ def _kmer_options(
         if value is not None:
             arguments += [flag_name, str(_gap_cli.integer(value, name, minimum=1))]
     if minimizer_spaces is not None:
-        arguments += ["--minimizer-spaces", str(_gap_cli.integer(minimizer_spaces, "minimizer_spaces", minimum=0))]
+        arguments += [
+            "--minimizer-spaces",
+            str(_gap_cli.integer(minimizer_spaces, "minimizer_spaces", minimum=0)),
+        ]
     if load_factor is not None:
         value = _gap_cli.number(load_factor, "load_factor", minimum=0.0, maximum=1.0)
         if value <= 0.0:
             raise ConfigurationError("load_factor must be greater than 0.")
         arguments += ["--load-factor", str(value)]
     if threads is not None:
-        arguments += ["--threads", str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256))]
+        arguments += [
+            "--threads",
+            str(_gap_cli.integer(threads, "threads", minimum=1, maximum=256)),
+        ]
     if _p14_cli.flag(fast_build, "fast_build"):
         arguments.append("--fast-build")
     if _p14_cli.flag(protein, "protein"):
@@ -558,7 +690,16 @@ def kraken2_build_database(
     expected = [folder / item for item in _HASH_FILES]
     if any(path.exists() for path in expected):
         raise ConfigurationError(f"The database is already built: {folder}")
-    options = _kmer_options(kmer_length, minimizer_length, minimizer_spaces, load_factor, max_db_size, threads, fast_build, protein)
+    options = _kmer_options(
+        kmer_length,
+        minimizer_length,
+        minimizer_spaces,
+        load_factor,
+        max_db_size,
+        threads,
+        fast_build,
+        protein,
+    )
     if chosen == "kraken2-build":
         if parts is not None:
             raise ConfigurationError("parts needs backend='k2'.")
@@ -568,7 +709,11 @@ def kraken2_build_database(
         if parts is not None:
             arguments += ["--parts", str(_gap_cli.integer(parts, "parts", minimum=1))]
     return _run(
-        chosen, arguments, cwd=folder, expected=expected, kraken2_path=kraken2_path,
+        chosen,
+        arguments,
+        cwd=folder,
+        expected=expected,
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
 
@@ -603,7 +748,16 @@ def kraken2_build_standard_database(
     expected = [folder / item for item in _HASH_FILES]
     if any(path.exists() for path in expected):
         raise ConfigurationError(f"The database is already built: {folder}")
-    options = _kmer_options(kmer_length, minimizer_length, minimizer_spaces, load_factor, max_db_size, threads, fast_build, protein)
+    options = _kmer_options(
+        kmer_length,
+        minimizer_length,
+        minimizer_spaces,
+        load_factor,
+        max_db_size,
+        threads,
+        fast_build,
+        protein,
+    )
     if _p14_cli.flag(no_masking, "no_masking"):
         options.append("--no-masking")
     if chosen == "kraken2-build":
@@ -615,7 +769,11 @@ def kraken2_build_standard_database(
             raise ConfigurationError("use_ftp applies to backend='kraken2-build' only.")
         arguments = ["build", "--standard", "--db", str(folder), *options]
     return _run(
-        chosen, arguments, cwd=folder, expected=expected, kraken2_path=kraken2_path,
+        chosen,
+        arguments,
+        cwd=folder,
+        expected=expected,
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
 
@@ -674,7 +832,16 @@ def kraken2_build_special_database(
         raise ConfigurationError("The GTDB database and the gtdb_* options need backend='k2'.")
     if gtdb_options and kind != "gtdb":
         raise ConfigurationError("The gtdb_* options apply to special='gtdb' only.")
-    options = _kmer_options(kmer_length, minimizer_length, minimizer_spaces, load_factor, max_db_size, threads, fast_build, False)
+    options = _kmer_options(
+        kmer_length,
+        minimizer_length,
+        minimizer_spaces,
+        load_factor,
+        max_db_size,
+        threads,
+        fast_build,
+        False,
+    )
     if _p14_cli.flag(no_masking, "no_masking"):
         options.append("--no-masking")
     if chosen == "kraken2-build":
@@ -682,7 +849,11 @@ def kraken2_build_special_database(
     else:
         arguments = ["build", "--special", kind, "--db", str(folder), *gtdb_options, *options]
     return _run(
-        chosen, arguments, cwd=folder, expected=expected, kraken2_path=kraken2_path,
+        chosen,
+        arguments,
+        cwd=folder,
+        expected=expected,
+        kraken2_path=kraken2_path,
         timeout_seconds=_timeout(timeout_seconds),
     )
 

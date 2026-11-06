@@ -1,6 +1,5 @@
 """Deterministic toy inputs for the MMseqs2 P07 facade tests and documentation examples."""
 
-# ruff: noqa: E501
 from __future__ import annotations
 
 import random

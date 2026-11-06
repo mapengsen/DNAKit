@@ -45,7 +45,9 @@ def revcomp(seq: str) -> str:
 # --------------------------------------------------------------------------- option helpers
 
 
-def opt_int(options: Mapping[str, object], key: str, default: int, *, minimum: int, maximum: int) -> int:
+def opt_int(
+    options: Mapping[str, object], key: str, default: int, *, minimum: int, maximum: int
+) -> int:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int) or not minimum <= value <= maximum:
         raise ConfigurationError(
@@ -57,7 +59,12 @@ def opt_int(options: Mapping[str, object], key: str, default: int, *, minimum: i
 
 
 def opt_num(
-    options: Mapping[str, object], key: str, default: float | None, *, minimum: float, maximum: float
+    options: Mapping[str, object],
+    key: str,
+    default: float | None,
+    *,
+    minimum: float,
+    maximum: float,
 ) -> float | None:
     value = options.get(key, default)
     if value is None:
@@ -68,7 +75,8 @@ def opt_num(
         )
     if not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"option {key!r} must be in [{minimum}, {maximum}]; got {value!r}.", code="INVALID_OPTION"
+            f"option {key!r} must be in [{minimum}, {maximum}]; got {value!r}.",
+            code="INVALID_OPTION",
         )
     return float(value)
 
@@ -76,11 +84,15 @@ def opt_num(
 def opt_bool(options: Mapping[str, object], key: str, default: bool) -> bool:
     value = options.get(key, default)
     if not isinstance(value, bool):
-        raise ConfigurationError(f"option {key!r} must be a boolean; got {value!r}.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            f"option {key!r} must be a boolean; got {value!r}.", code="INVALID_OPTION"
+        )
     return value
 
 
-def opt_choice(options: Mapping[str, object], key: str, default: str, allowed: Sequence[str]) -> str:
+def opt_choice(
+    options: Mapping[str, object], key: str, default: str, allowed: Sequence[str]
+) -> str:
     value = options.get(key, default)
     if not isinstance(value, str) or value not in allowed:
         raise ConfigurationError(
@@ -115,10 +127,14 @@ def _looks_like_path(text: str) -> bool:
 def _read_text(source: Path) -> str:
     if not source.is_file():
         raise InputFormatError(
-            f"input file not found: {source}", code="INPUT_FILE_NOT_FOUND", hint="Pass an existing file or the text itself."
+            f"input file not found: {source}",
+            code="INPUT_FILE_NOT_FOUND",
+            hint="Pass an existing file or the text itself.",
         )
     if source.stat().st_size > MAX_TEXT_BYTES:
-        raise InputFormatError(f"input file exceeds {MAX_TEXT_BYTES} bytes.", code="INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"input file exceeds {MAX_TEXT_BYTES} bytes.", code="INPUT_TOO_LARGE"
+        )
     if source.suffix == ".gz":
         with gzip.open(source, "rt", encoding="utf-8", errors="replace") as handle:
             return handle.read(MAX_TEXT_BYTES + 1)
@@ -164,9 +180,13 @@ def decode_quality(qual: object, length: int, offset: int, where: str) -> tuple[
         try:
             scores = tuple(int(item) for item in qual)
         except (TypeError, ValueError) as exc:
-            raise InputFormatError(f"{where}: quality list must contain integers.", code="INVALID_QUALITY") from exc
+            raise InputFormatError(
+                f"{where}: quality list must contain integers.", code="INVALID_QUALITY"
+            ) from exc
     else:
-        raise InputFormatError(f"{where}: quality must be a string or list of integers.", code="INVALID_QUALITY")
+        raise InputFormatError(
+            f"{where}: quality must be a string or list of integers.", code="INVALID_QUALITY"
+        )
     if len(scores) != length:
         raise InputFormatError(
             f"{where}: quality length {len(scores)} differs from sequence length {length}.",
@@ -194,7 +214,8 @@ def parse_fastq_text(text: str, offset: int, limit: int) -> list[Rd]:
         lines.pop()
     if len(lines) % 4:
         raise InputFormatError(
-            "FASTQ text must consist of complete four-line records.", code="INVALID_FASTQ",
+            "FASTQ text must consist of complete four-line records.",
+            code="INVALID_FASTQ",
             hint="Each record is '@name', sequence, '+', quality.",
         )
     reads: list[Rd] = []
@@ -202,9 +223,15 @@ def parse_fastq_text(text: str, offset: int, limit: int) -> list[Rd]:
         header, seq, plus, qual = lines[index : index + 4]
         where = f"FASTQ record {index // 4 + 1}"
         if not header.startswith("@") or not plus.startswith("+"):
-            raise InputFormatError(f"{where}: missing '@' header or '+' separator.", code="INVALID_FASTQ")
+            raise InputFormatError(
+                f"{where}: missing '@' header or '+' separator.", code="INVALID_FASTQ"
+            )
         if len(reads) >= limit:
-            raise InputFormatError(f"more than max_reads={limit} reads.", code="TOO_MANY_READS", hint="Raise options['max_reads'].")
+            raise InputFormatError(
+                f"more than max_reads={limit} reads.",
+                code="TOO_MANY_READS",
+                hint="Raise options['max_reads'].",
+            )
         name, comment = _split_header(header[1:])
         seq = _clean_seq(seq, where)
         reads.append(Rd(name, seq, decode_quality(qual, len(seq), offset, where), comment))
@@ -218,7 +245,9 @@ def parse_fasta_text(text: str, limit: int) -> list[Rd]:
 
     def flush() -> None:
         if name is not None:
-            reads.append(Rd(name, _clean_seq("".join(parts), f"FASTA record {name}"), None, comment or ""))
+            reads.append(
+                Rd(name, _clean_seq("".join(parts), f"FASTA record {name}"), None, comment or "")
+            )
 
     for line in text.splitlines():
         line = line.strip()
@@ -231,7 +260,9 @@ def parse_fasta_text(text: str, limit: int) -> list[Rd]:
             name, comment = _split_header(line[1:])
             parts = []
         elif name is None:
-            raise InputFormatError("FASTA sequence appears before the first header.", code="INVALID_FASTA")
+            raise InputFormatError(
+                "FASTA sequence appears before the first header.", code="INVALID_FASTA"
+            )
         else:
             parts.append(line)
     flush()
@@ -247,7 +278,9 @@ def _record_to_read(item: object, index: int, offset: int) -> Rd:
     if isinstance(item, Mapping):
         seq_value = item.get("sequence", item.get("seq"))
         if not isinstance(seq_value, str):
-            raise InputFormatError(f"{where}: mapping needs a 'sequence' string.", code="INVALID_READ")
+            raise InputFormatError(
+                f"{where}: mapping needs a 'sequence' string.", code="INVALID_READ"
+            )
         seq = _clean_seq(seq_value, where)
         name = str(item.get("id", item.get("name", item.get("identifier", f"read{index + 1}"))))
         qual = item.get("quality", item.get("qual"))
@@ -258,9 +291,17 @@ def _record_to_read(item: object, index: int, offset: int) -> Rd:
         qual = getattr(item, "quality", None)
         scores = None if qual is None else decode_quality(qual, len(seq), offset, where)
         return Rd(str(item.identifier), seq, scores, "")
-    if isinstance(item, Sequence) and not isinstance(item, (bytes, bytearray)) and 2 <= len(item) <= 3:
+    if (
+        isinstance(item, Sequence)
+        and not isinstance(item, (bytes, bytearray))
+        and 2 <= len(item) <= 3
+    ):
         seq = _clean_seq(str(item[1]), where)
-        scores = decode_quality(item[2], len(seq), offset, where) if len(item) == 3 and item[2] is not None else None
+        scores = (
+            decode_quality(item[2], len(seq), offset, where)
+            if len(item) == 3 and item[2] is not None
+            else None
+        )
         return Rd(str(item[0]), seq, scores, "")
     raise InputFormatError(
         f"{where}: unsupported record type {type(item).__name__}.",
@@ -284,14 +325,17 @@ def parse_reads(value: object, options: Mapping[str, object], *, name: str = "in
         if "sequence" in value or "seq" in value:
             return [_record_to_read(value, 0, offset)]
         raise InputFormatError(
-            f"{name}: mapping has none of the keys {', '.join(_READS_KEYS)}.", code="INVALID_INPUT",
+            f"{name}: mapping has none of the keys {', '.join(_READS_KEYS)}.",
+            code="INVALID_INPUT",
             hint="Wrap the reads as {'reads': [...]}.",
         )
     text = as_text(value)
     if text is not None:
         stripped = text.lstrip()
         if not stripped:
-            raise InputFormatError(f"{name} is empty.", code="EMPTY_INPUT", hint="Provide at least one read.")
+            raise InputFormatError(
+                f"{name} is empty.", code="EMPTY_INPUT", hint="Provide at least one read."
+            )
         if stripped.startswith("@"):
             return parse_fastq_text(text, offset, limit)
         if stripped.startswith(">"):
@@ -299,15 +343,20 @@ def parse_reads(value: object, options: Mapping[str, object], *, name: str = "in
         lines = [line.strip() for line in text.splitlines() if line.strip()]
         if len(lines) > limit:
             raise InputFormatError(f"more than max_reads={limit} reads.", code="TOO_MANY_READS")
-        return [Rd(f"read{i + 1}", _clean_seq(line, f"line {i + 1}")) for i, line in enumerate(lines)]
+        return [
+            Rd(f"read{i + 1}", _clean_seq(line, f"line {i + 1}")) for i, line in enumerate(lines)
+        ]
     if isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
         if not value:
-            raise InputFormatError(f"{name} is empty.", code="EMPTY_INPUT", hint="Provide at least one read.")
+            raise InputFormatError(
+                f"{name} is empty.", code="EMPTY_INPUT", hint="Provide at least one read."
+            )
         if len(value) > limit:
             raise InputFormatError(f"more than max_reads={limit} reads.", code="TOO_MANY_READS")
         return [_record_to_read(item, index, offset) for index, item in enumerate(value)]
     raise InputFormatError(
-        f"{name}: unsupported input type {type(value).__name__}.", code="INVALID_INPUT",
+        f"{name}: unsupported input type {type(value).__name__}.",
+        code="INVALID_INPUT",
         hint="Use FASTQ/FASTA text, a path, or a list of reads.",
     )
 
@@ -340,7 +389,9 @@ def parse_pair(value: object, options: Mapping[str, object]) -> tuple[list[Rd], 
         return first, second
     if options.get("interleaved"):
         if len(first) % 2:
-            raise InputFormatError("interleaved input has an odd number of reads.", code="UNPAIRED_READS")
+            raise InputFormatError(
+                "interleaved input has an odd number of reads.", code="UNPAIRED_READS"
+            )
         return first[::2], first[1::2]
     return first, None
 
@@ -471,11 +522,21 @@ def round6(value: float | None) -> float | None:
     return None if value is None else round(value, 6)
 
 
-def run_op(module: str, operation: str, fn: Callable[[object, Mapping[str, object], list[str]], object], value: object, options: Mapping[str, object] | None) -> dict[str, object]:
+def run_op(
+    module: str,
+    operation: str,
+    fn: Callable[[object, Mapping[str, object], list[str]], object],
+    value: object,
+    options: Mapping[str, object] | None,
+) -> dict[str, object]:
     """Validate ``options``, run ``fn(value, options, warnings)`` and wrap the result in the candidate envelope."""
 
     if options is not None and not isinstance(options, Mapping):
-        raise ConfigurationError("options must be a mapping or None.", code="INVALID_OPTION", hint="Pass options={'key': value}.")
+        raise ConfigurationError(
+            "options must be a mapping or None.",
+            code="INVALID_OPTION",
+            hint="Pass options={'key': value}.",
+        )
     opts = dict(options or {})
     warnings: list[str] = []
     result = fn(value, opts, warnings)

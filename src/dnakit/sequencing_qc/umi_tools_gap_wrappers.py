@@ -17,7 +17,6 @@ from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _gap_cli
-from dnakit.bioinformatics._common import require
 from dnakit.exceptions import ConfigurationError
 
 _EXTRA = "bio-umi-tools"
@@ -43,7 +42,9 @@ def _flag(value: object, name: str) -> bool:
     return value
 
 
-def _run(sub: str, arguments: Sequence[str], *, cwd: Path, expected: Sequence[Path], explicit: str | None) -> dict[str, Any]:
+def _run(
+    sub: str, arguments: Sequence[str], *, cwd: Path, expected: Sequence[Path], explicit: str | None
+) -> dict[str, Any]:
     return _gap_cli.run(
         "umi_tools",
         [sub, *arguments],
@@ -104,7 +105,9 @@ def umi_extract_to_names(
     method = _gap_cli.choice(extract_method, _EXTRACT_METHODS, "extract_method")
     pattern = _token(bc_pattern, "bc_pattern")
     if method == "string" and (not _STRING_PATTERN.fullmatch(pattern) or "N" not in pattern):
-        raise ConfigurationError("bc_pattern for extract_method='string' uses C, N and X and must contain an N.")
+        raise ConfigurationError(
+            "bc_pattern for extract_method='string' uses C, N and X and must contain an N."
+        )
     arguments = [
         f"--extract-method={method}",
         f"--bc-pattern={pattern}",
@@ -125,7 +128,9 @@ def umi_extract_to_names(
     elif read2_out is not None or bc_pattern2 is not None:
         raise ConfigurationError("read2_out and bc_pattern2 need read2_in.")
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("extract", arguments, cwd=output_path.parent, expected=expected, explicit=umi_tools_path)
+    return _run(
+        "extract", arguments, cwd=output_path.parent, expected=expected, explicit=umi_tools_path
+    )
 
 
 def umi_whitelist_cells(
@@ -153,7 +158,9 @@ def umi_whitelist_cells(
     method_name = _gap_cli.choice(extract_method, _EXTRACT_METHODS, "extract_method")
     pattern = _token(bc_pattern, "bc_pattern")
     if method_name == "string" and (not _STRING_PATTERN.fullmatch(pattern) or "C" not in pattern):
-        raise ConfigurationError("bc_pattern for extract_method='string' uses C, N and X and must contain a C.")
+        raise ConfigurationError(
+            "bc_pattern for extract_method='string' uses C, N and X and must contain a C."
+        )
     arguments = [
         f"--extract-method={method_name}",
         f"--bc-pattern={pattern}",
@@ -161,11 +168,21 @@ def umi_whitelist_cells(
         f"--knee-method={_gap_cli.choice(knee_method, _KNEE_METHODS, 'knee_method')}",
     ]
     if expect_cells is not None:
-        arguments.append(f"--expect-cells={_gap_cli.integer(expect_cells, 'expect_cells', minimum=1)}")
+        arguments.append(
+            f"--expect-cells={_gap_cli.integer(expect_cells, 'expect_cells', minimum=1)}"
+        )
     if set_cell_number is not None:
-        arguments.append(f"--set-cell-number={_gap_cli.integer(set_cell_number, 'set_cell_number', minimum=1)}")
+        arguments.append(
+            f"--set-cell-number={_gap_cli.integer(set_cell_number, 'set_cell_number', minimum=1)}"
+        )
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("whitelist", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path)
+    return _run(
+        "whitelist",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        explicit=umi_tools_path,
+    )
 
 
 def umi_group_bam(
@@ -192,7 +209,9 @@ def umi_group_bam(
     """
     source = _gap_cli.existing_file(bam, "bam")
     output_path = _gap_cli.new_file(output_bam, "output_bam")
-    arguments = _umi_options(extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired)
+    arguments = _umi_options(
+        extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired
+    )
     arguments.append(f"--umi-group-tag={_token(umi_group_tag, 'umi_group_tag')}")
     arguments.append("--output-bam")
     expected = [output_path]
@@ -201,7 +220,9 @@ def umi_group_bam(
         arguments.append(f"--group-out={tsv}")
         expected.append(tsv)
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("group", arguments, cwd=output_path.parent, expected=expected, explicit=umi_tools_path)
+    return _run(
+        "group", arguments, cwd=output_path.parent, expected=expected, explicit=umi_tools_path
+    )
 
 
 def umi_dedup_bam(
@@ -227,7 +248,9 @@ def umi_dedup_bam(
     """
     source = _gap_cli.existing_file(bam, "bam")
     output_path = _gap_cli.new_file(output_bam, "output_bam")
-    arguments = _umi_options(extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired)
+    arguments = _umi_options(
+        extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired
+    )
     if _flag(ignore_umi, "ignore_umi"):
         arguments.append("--ignore-umi")
     if _flag(per_contig, "per_contig"):
@@ -235,7 +258,9 @@ def umi_dedup_bam(
     if gene_tag is not None:
         arguments += ["--per-gene", f"--gene-tag={_token(gene_tag, 'gene_tag')}"]
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("dedup", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path)
+    return _run(
+        "dedup", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path
+    )
 
 
 def umi_count_per_gene(
@@ -264,16 +289,24 @@ def umi_count_per_gene(
     output_path = _gap_cli.new_file(output, "output")
     if per_contig and gene_tag is not None:
         raise ConfigurationError("Give either gene_tag or per_contig, not both.")
-    arguments = _umi_options(extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired)
+    arguments = _umi_options(
+        extract_umi_method, umi_tag, umi_separator, method, edit_distance_threshold, paired
+    )
     if _flag(per_contig, "per_contig"):
         arguments.append("--per-contig")
     elif gene_tag is not None:
         arguments.append(f"--gene-tag={_token(gene_tag, 'gene_tag')}")
     else:
-        raise ConfigurationError("umi_count_per_gene needs gene_tag (the BAM tag that names each read's gene) or per_contig=True.")
-    arguments.append(f"--mapping-quality={_gap_cli.integer(mapping_quality, 'mapping_quality', minimum=0)}")
+        raise ConfigurationError(
+            "umi_count_per_gene needs gene_tag (the BAM tag that names each read's gene) or per_contig=True."
+        )
+    arguments.append(
+        f"--mapping-quality={_gap_cli.integer(mapping_quality, 'mapping_quality', minimum=0)}"
+    )
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("count", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path)
+    return _run(
+        "count", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path
+    )
 
 
 def umi_count_table(
@@ -305,7 +338,13 @@ def umi_count_table(
     if _flag(per_cell, "per_cell"):
         arguments.append("--per-cell")
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("count_tab", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path)
+    return _run(
+        "count_tab",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        explicit=umi_tools_path,
+    )
 
 
 def umi_prepare_bam_for_rsem(
@@ -331,7 +370,13 @@ def umi_prepare_bam_for_rsem(
     if _flag(sam, "sam"):
         arguments.append("--sam")
     arguments += [f"--stdin={source}", f"--stdout={output_path}"]
-    return _run("prepare-for-rsem", arguments, cwd=output_path.parent, expected=[output_path], explicit=umi_tools_path)
+    return _run(
+        "prepare-for-rsem",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        explicit=umi_tools_path,
+    )
 
 
 __all__ = [

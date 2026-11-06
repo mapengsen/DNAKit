@@ -83,14 +83,20 @@ def _segments(value: object, name: str = "bit_segments") -> list[list[int]]:
     for item in value:
         if isinstance(item, str):
             if not item or set(item) - {"0", "1"}:
-                raise ConfigurationError(f"every bit segment string in {name} must use only 0 and 1.")
+                raise ConfigurationError(
+                    f"every bit segment string in {name} must use only 0 and 1."
+                )
             rows.append([int(ch) for ch in item])
         elif isinstance(item, Sequence) and not isinstance(item, bytes) and item:
-            if not all(isinstance(bit, int) and not isinstance(bit, bool) and bit in (0, 1) for bit in item):
+            if not all(
+                isinstance(bit, int) and not isinstance(bit, bool) and bit in (0, 1) for bit in item
+            ):
                 raise ConfigurationError(f"bit segments in {name} may contain only 0 and 1.")
             rows.append(list(item))
         else:
-            raise ConfigurationError(f"every bit segment in {name} must be a non-empty list of 0/1 or a 0/1 string.")
+            raise ConfigurationError(
+                f"every bit segment in {name} must be a non-empty list of 0/1 or a 0/1 string."
+            )
     if len({len(row) for row in rows}) != 1:
         raise ConfigurationError(f"all bit segments in {name} must have the same length.")
     if len(rows) * len(rows[0]) > _MAX_BITS:
@@ -106,7 +112,9 @@ def _dna(value: object, name: str = "dna_sequences") -> list[list[str]]:
     rows = []
     for item in value:
         if not isinstance(item, str) or not item or set(item) - _NUCLEOTIDES:
-            raise ConfigurationError(f"every sequence in {name} must be a non-empty string of A, C, G and T (upper case).")
+            raise ConfigurationError(
+                f"every sequence in {name} must be a non-empty string of A, C, G and T (upper case)."
+            )
         rows.append(list(item))
     return rows
 
@@ -151,7 +159,9 @@ def _options(scheme: str, options: Mapping[str, Any] | None) -> dict[str, Any]:
         raise ConfigurationError("scheme_options must be a mapping.")
     unknown = set(options) - set(_SCHEME_OPTIONS[scheme])
     if unknown:
-        raise ConfigurationError(f"{scheme} accepts the options {list(_SCHEME_OPTIONS[scheme])}; got {sorted(unknown)}.")
+        raise ConfigurationError(
+            f"{scheme} accepts the options {list(_SCHEME_OPTIONS[scheme])}; got {sorted(unknown)}."
+        )
     return dict(options)
 
 
@@ -190,7 +200,9 @@ def _build(scheme: str, options: Mapping[str, Any] | None) -> Any:
     return model
 
 
-def _encode(scheme: str, options: Mapping[str, Any] | None, bit_segments: object, seed: int | None) -> dict[str, Any]:
+def _encode(
+    scheme: str, options: Mapping[str, Any] | None, bit_segments: object, seed: int | None
+) -> dict[str, Any]:
     rows = _segments(bit_segments)
     model = _build(scheme, options)
     work = copy.deepcopy(rows)
@@ -211,11 +223,19 @@ def _encode(scheme: str, options: Mapping[str, Any] | None, bit_segments: object
     return out
 
 
-def _decode(scheme: str, options: Mapping[str, Any] | None, dna_sequences: object, segment_length: int | None, bit_size: int | None) -> dict[str, Any]:
+def _decode(
+    scheme: str,
+    options: Mapping[str, Any] | None,
+    dna_sequences: object,
+    segment_length: int | None,
+    bit_size: int | None,
+) -> dict[str, Any]:
     rows = _dna(dna_sequences)
     model = _build(scheme, options)
     model.bit_size = 0 if bit_size is None else _integer(bit_size, "bit_size", 0, _MAX_BITS)
-    model.segment_length = 0 if segment_length is None else _integer(segment_length, "segment_length", 1, 10**7)
+    model.segment_length = (
+        0 if segment_length is None else _integer(segment_length, "segment_length", 1, 10**7)
+    )
     with _quiet(None):
         result = _call(model.decode, rows)
     segments = [[int(bit) for bit in segment] for segment in result]
@@ -231,7 +251,9 @@ def _decode(scheme: str, options: Mapping[str, Any] | None, dna_sequences: objec
     }
 
 
-def chamaeleo_encode_direct(bit_segments: Sequence[Sequence[int] | str], *, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_encode_direct(
+    bit_segments: Sequence[Sequence[int] | str], *, verbose: bool = True
+) -> dict[str, Any]:
     """Encode bit segments into DNA with the 2-bit direct mapping (00 to A, 01 to C, 10 to G, 11 to T).
 
     Segment lengths must be even. The result holds the DNA strings and the information density in bits per nucleotide.
@@ -240,13 +262,19 @@ def chamaeleo_encode_direct(bit_segments: Sequence[Sequence[int] | str], *, verb
     return {"operation": "chamaeleo_encode_direct"} | _encode("direct", None, bit_segments, None)
 
 
-def chamaeleo_decode_direct(dna_sequences: Sequence[str], *, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_decode_direct(
+    dna_sequences: Sequence[str], *, verbose: bool = True
+) -> dict[str, Any]:
     """Decode DNA sequences back into bit segments with the 2-bit direct mapping."""
 
-    return {"operation": "chamaeleo_decode_direct"} | _decode("direct", None, dna_sequences, None, None)
+    return {"operation": "chamaeleo_decode_direct"} | _decode(
+        "direct", None, dna_sequences, None, None
+    )
 
 
-def chamaeleo_encode_church(bit_segments: Sequence[Sequence[int] | str], *, seed: int | None = None, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_encode_church(
+    bit_segments: Sequence[Sequence[int] | str], *, seed: int | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Encode bits with Church et al. 2012: bit 0 is A or C, bit 1 is G or T, and a fourth identical base in a row is avoided.
 
     The choice between the two bases is random; pass ``seed`` for a reproducible result.
@@ -255,10 +283,14 @@ def chamaeleo_encode_church(bit_segments: Sequence[Sequence[int] | str], *, seed
     return {"operation": "chamaeleo_encode_church"} | _encode("church", None, bit_segments, seed)
 
 
-def chamaeleo_decode_church(dna_sequences: Sequence[str], *, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_decode_church(
+    dna_sequences: Sequence[str], *, verbose: bool = True
+) -> dict[str, Any]:
     """Decode Church et al. 2012 DNA (A or C is 0, G or T is 1) back into bit segments."""
 
-    return {"operation": "chamaeleo_decode_church"} | _decode("church", None, dna_sequences, None, None)
+    return {"operation": "chamaeleo_decode_church"} | _decode(
+        "church", None, dna_sequences, None, None
+    )
 
 
 def chamaeleo_encode_goldman(
@@ -301,10 +333,14 @@ def chamaeleo_decode_goldman(
     options: dict[str, Any] = {"support_nucleotide": support_nucleotide}
     if huffman_tree is not None:
         options["huffman_tree"] = list(huffman_tree)
-    return {"operation": "chamaeleo_decode_goldman"} | _decode("goldman", options, dna_sequences, segment_length, None)
+    return {"operation": "chamaeleo_decode_goldman"} | _decode(
+        "goldman", options, dna_sequences, segment_length, None
+    )
 
 
-def chamaeleo_goldman_huffman_tree(bit_segments: Sequence[Sequence[int] | str], *, multiple: int = 3, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_goldman_huffman_tree(
+    bit_segments: Sequence[Sequence[int] | str], *, multiple: int = 3, verbose: bool = True
+) -> dict[str, Any]:
     """Build the adaptive ternary Huffman code of Goldman coding from the byte frequencies of the data (256 codes, ``None`` for unused bytes)."""
 
     rows = _segments(bit_segments)
@@ -322,7 +358,12 @@ def chamaeleo_goldman_huffman_tree(bit_segments: Sequence[Sequence[int] | str], 
     }
 
 
-def chamaeleo_encode_grass(bit_segments: Sequence[Sequence[int] | str], *, base_values: Sequence[int] | None = None, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_encode_grass(
+    bit_segments: Sequence[Sequence[int] | str],
+    *,
+    base_values: Sequence[int] | None = None,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """Encode 16-bit blocks into three base-47 codewords (Grass et al. 2015, 9 nucleotides per block).
 
     Segment lengths must be multiples of 16. ``base_values`` is an optional custom list of 48 base values.
@@ -342,10 +383,14 @@ def chamaeleo_decode_grass(
     """Decode Grass et al. 2015 DNA (9 nucleotides per 16 bits) into bit segments."""
 
     options = {} if base_values is None else {"base_values": list(base_values)}
-    return {"operation": "chamaeleo_decode_grass"} | _decode("grass", options, dna_sequences, segment_length, None)
+    return {"operation": "chamaeleo_decode_grass"} | _decode(
+        "grass", options, dna_sequences, segment_length, None
+    )
 
 
-def chamaeleo_encode_blawat(bit_segments: Sequence[Sequence[int] | str], *, seed: int | None = None, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_encode_blawat(
+    bit_segments: Sequence[Sequence[int] | str], *, seed: int | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Encode 8-bit blocks into 5 nucleotides (Blawat et al. 2016) under GC-content and homopolymer constraints.
 
     Segment lengths must be multiples of 8. Where several codewords satisfy the constraints one is chosen at random; set ``seed``.
@@ -354,10 +399,14 @@ def chamaeleo_encode_blawat(bit_segments: Sequence[Sequence[int] | str], *, seed
     return {"operation": "chamaeleo_encode_blawat"} | _encode("blawat", None, bit_segments, seed)
 
 
-def chamaeleo_decode_blawat(dna_sequences: Sequence[str], *, segment_length: int | None = None, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_decode_blawat(
+    dna_sequences: Sequence[str], *, segment_length: int | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Decode Blawat et al. 2016 DNA (5 nucleotides per byte) into bit segments."""
 
-    return {"operation": "chamaeleo_decode_blawat"} | _decode("blawat", None, dna_sequences, segment_length, None)
+    return {"operation": "chamaeleo_decode_blawat"} | _decode(
+        "blawat", None, dna_sequences, segment_length, None
+    )
 
 
 def chamaeleo_encode_dna_fountain(
@@ -412,7 +461,9 @@ def chamaeleo_decode_dna_fountain(
         "c_dist": c_dist,
         "delta": delta,
     }
-    return {"operation": "chamaeleo_decode_dna_fountain"} | _decode("dna_fountain", options, dna_sequences, segment_length, None)
+    return {"operation": "chamaeleo_decode_dna_fountain"} | _decode(
+        "dna_fountain", options, dna_sequences, segment_length, None
+    )
 
 
 def chamaeleo_encode_yin_yang(
@@ -461,8 +512,13 @@ def chamaeleo_decode_yin_yang(
     (the first ``bit_length(total_count)`` bits) gives its position when the data was encoded with an index.
     """
 
-    options = {"total_count": _integer(total_count, "total_count", 1, _MAX_SEGMENTS), "virtual_nucleotide": virtual_nucleotide}
-    return {"operation": "chamaeleo_decode_yin_yang"} | _decode("yin_yang", options, dna_sequences, segment_length, None)
+    options = {
+        "total_count": _integer(total_count, "total_count", 1, _MAX_SEGMENTS),
+        "virtual_nucleotide": virtual_nucleotide,
+    }
+    return {"operation": "chamaeleo_decode_yin_yang"} | _decode(
+        "yin_yang", options, dna_sequences, segment_length, None
+    )
 
 
 # Screens and files ------------------------------------------------------------------------------------
@@ -483,10 +539,18 @@ def chamaeleo_screen_dna(
     """
 
     if not isinstance(sequence, str) or not sequence or set(sequence) - _NUCLEOTIDES:
-        raise ConfigurationError("sequence must be a non-empty upper-case DNA string of A, C, G and T.")
+        raise ConfigurationError(
+            "sequence must be a non-empty upper-case DNA string of A, C, G and T."
+        )
     screen = require("Chamaeleo.utils.screen", _EXTRA)
-    homo_limit = None if max_homopolymer is None else _integer(max_homopolymer, "max_homopolymer", 1, 10**6)
-    if max_gc_deviation is not None and (isinstance(max_gc_deviation, bool) or not isinstance(max_gc_deviation, (int, float)) or not 0 < max_gc_deviation <= 0.5):
+    homo_limit = (
+        None if max_homopolymer is None else _integer(max_homopolymer, "max_homopolymer", 1, 10**6)
+    )
+    if max_gc_deviation is not None and (
+        isinstance(max_gc_deviation, bool)
+        or not isinstance(max_gc_deviation, (int, float))
+        or not 0 < max_gc_deviation <= 0.5
+    ):
         raise ConfigurationError("max_gc_deviation must be a number in (0, 0.5].")
     content_limit = None if max_gc_deviation is None else 0.5 + float(max_gc_deviation)
     homopolymer_ok = None if homo_limit is None else bool(screen.homopolymer(sequence, homo_limit))
@@ -504,7 +568,9 @@ def chamaeleo_screen_dna(
     }
 
 
-def chamaeleo_read_dna_file(path: str | Path, *, max_sequences: int = 1_000_000, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_read_dna_file(
+    path: str | Path, *, max_sequences: int = 1_000_000, verbose: bool = True
+) -> dict[str, Any]:
     """Read DNA sequences from a text file with one sequence per line (``read_dna_file``)."""
 
     source = input_path(path)
@@ -524,7 +590,9 @@ def chamaeleo_read_dna_file(path: str | Path, *, max_sequences: int = 1_000_000,
     }
 
 
-def chamaeleo_write_dna_file(sequences: Sequence[str], output_path: str | Path, *, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_write_dna_file(
+    sequences: Sequence[str], output_path: str | Path, *, verbose: bool = True
+) -> dict[str, Any]:
     """Write DNA sequences to a text file, one per line (``write_dna_file``). The file must not exist yet."""
 
     rows = _dna(sequences, "sequences")
@@ -536,7 +604,12 @@ def chamaeleo_write_dna_file(sequences: Sequence[str], output_path: str | Path, 
     data_handle = require("Chamaeleo.utils.data_handle", _EXTRA)
     with _quiet(None):
         data_handle.write_dna_file(str(target), rows, need_logs=False)
-    return {"status": "completed", "operation": "chamaeleo_write_dna_file", "output_path": str(target), "sequence_count": len(rows)}
+    return {
+        "status": "completed",
+        "operation": "chamaeleo_write_dna_file",
+        "output_path": str(target),
+        "sequence_count": len(rows),
+    }
 
 
 # Pipelines --------------------------------------------------------------------------------------------
@@ -591,8 +664,16 @@ def chamaeleo_transcode_file_to_dna(
     model = _build(scheme, scheme_options)
     correction = _error_correction(error_correction, check_size)
     pipelines = require("Chamaeleo.utils.pipelines", _EXTRA)
-    pipeline = pipelines.TranscodePipeline(coding_scheme=model, error_correction=correction, need_logs=False)
-    kwargs: dict[str, Any] = {"direction": "t_c", "input_path": str(source), "output_path": str(target), "segment_length": seg, "index": index}
+    pipeline = pipelines.TranscodePipeline(
+        coding_scheme=model, error_correction=correction, need_logs=False
+    )
+    kwargs: dict[str, Any] = {
+        "direction": "t_c",
+        "input_path": str(source),
+        "output_path": str(target),
+        "segment_length": seg,
+        "index": index,
+    }
     if index_length is not None:
         kwargs["index_length"] = _integer(index_length, "index_length", 1, 64)
     with _quiet(seed):
@@ -657,14 +738,23 @@ def chamaeleo_transcode_dna_to_file(
     index = _flag(index, "index")
     correction = _error_correction(error_correction, check_size)
     pipelines = require("Chamaeleo.utils.pipelines", _EXTRA)
-    pipeline = pipelines.TranscodePipeline(coding_scheme=model, error_correction=correction, need_logs=False)
-    kwargs: dict[str, Any] = {"direction": "t_s", "input_path": str(source), "output_path": str(target), "index": index}
+    pipeline = pipelines.TranscodePipeline(
+        coding_scheme=model, error_correction=correction, need_logs=False
+    )
+    kwargs: dict[str, Any] = {
+        "direction": "t_s",
+        "input_path": str(source),
+        "output_path": str(target),
+        "index": index,
+    }
     if index_length is not None:
         kwargs["index_length"] = _integer(index_length, "index_length", 1, 64)
     with _quiet(None):
         data = _call(pipeline.transcode, **kwargs)
     if data["bit"] is None or not target.exists():
-        raise ConfigurationError("the DNA could not be decoded back into a file (all sequences failed error correction or decoding).")
+        raise ConfigurationError(
+            "the DNA could not be decoded back into a file (all sequences failed error correction or decoding)."
+        )
     return {
         "status": "completed",
         "operation": "chamaeleo_transcode_dna_to_file",
@@ -676,7 +766,9 @@ def chamaeleo_transcode_dna_to_file(
     }
 
 
-def _scheme_dict(schemes: Sequence[str], options: Mapping[str, Mapping[str, Any]] | None) -> dict[str, Any]:
+def _scheme_dict(
+    schemes: Sequence[str], options: Mapping[str, Mapping[str, Any]] | None
+) -> dict[str, Any]:
     if isinstance(schemes, (str, bytes)) or not schemes:
         raise ConfigurationError("coding_schemes must be a non-empty list of scheme names.")
     if len(set(schemes)) != len(schemes):
@@ -686,7 +778,9 @@ def _scheme_dict(schemes: Sequence[str], options: Mapping[str, Mapping[str, Any]
 
 def _file_dict(files: Mapping[str, str | Path]) -> dict[str, str]:
     if not isinstance(files, Mapping) or not files:
-        raise ConfigurationError("file_paths must be a non-empty mapping from a label to a file path.")
+        raise ConfigurationError(
+            "file_paths must be a non-empty mapping from a label to a file path."
+        )
     return {str(label): str(input_path(path)) for label, path in files.items()}
 
 
@@ -721,11 +815,25 @@ def chamaeleo_evaluate_robustness(
     files = _file_dict(file_paths)
     models = _scheme_dict(coding_schemes, scheme_options)
     if isinstance(error_corrections, (str, bytes)) or not error_corrections:
-        raise ConfigurationError("error_corrections must be a non-empty list (use None for no correction).")
-    corrections = {("none" if name is None else name): _error_correction(name, check_size) for name in error_corrections}
-    flags = [True] * len(models) if needed_indices is None else [_flag(item, "needed_indices") for item in needed_indices]
+        raise ConfigurationError(
+            "error_corrections must be a non-empty list (use None for no correction)."
+        )
+    corrections = {
+        ("none" if name is None else name): _error_correction(name, check_size)
+        for name in error_corrections
+    }
+    flags = (
+        [True] * len(models)
+        if needed_indices is None
+        else [_flag(item, "needed_indices") for item in needed_indices]
+    )
     rates = {}
-    for key, value in (("nucleotide_insertion", nucleotide_insertion), ("nucleotide_mutation", nucleotide_mutation), ("nucleotide_deletion", nucleotide_deletion), ("sequence_loss", sequence_loss)):
+    for key, value in (
+        ("nucleotide_insertion", nucleotide_insertion),
+        ("nucleotide_mutation", nucleotide_mutation),
+        ("nucleotide_deletion", nucleotide_deletion),
+        ("sequence_loss", sequence_loss),
+    ):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 <= value <= 1:
             raise ConfigurationError(f"{key} must be a number in [0, 1].")
         rates[key] = float(value)
@@ -792,7 +900,11 @@ def chamaeleo_profile_coding_features(
 
     files = _file_dict(file_paths)
     models = _scheme_dict(coding_schemes, scheme_options)
-    flags = [True] * len(models) if needed_indices is None else [_flag(item, "needed_indices") for item in needed_indices]
+    flags = (
+        [True] * len(models)
+        if needed_indices is None
+        else [_flag(item, "needed_indices") for item in needed_indices]
+    )
     target = None if log_path is None else _new(log_path, "log_path")
     pipelines = require("Chamaeleo.utils.pipelines", _EXTRA)
     pipeline = pipelines.BasicFeaturePipeline(
@@ -824,7 +936,9 @@ def chamaeleo_profile_coding_features(
     }
 
 
-def chamaeleo_choose_best_scheme(feature_log_path: str | Path, robustness_log_path: str | Path, *, verbose: bool = True) -> dict[str, Any]:
+def chamaeleo_choose_best_scheme(
+    feature_log_path: str | Path, robustness_log_path: str | Path, *, verbose: bool = True
+) -> dict[str, Any]:
     """Compare coding schemes from the logs of ``chamaeleo_profile_coding_features`` and ``chamaeleo_evaluate_robustness`` (``OptimalChoicePipeline.calculate_best``).
 
     Returns one row per scheme with the average information density, the share of sequences with 40 to 60 percent GC, the
@@ -846,7 +960,10 @@ def chamaeleo_choose_best_scheme(feature_log_path: str | Path, robustness_log_pa
     if len(lines) < 2:
         raise ConfigurationError("Chamaeleo produced no comparison table from these logs.")
     header = [cell.strip() for cell in lines[0].strip("|").split("|")]
-    rows = [dict(zip(header, (cell.strip() for cell in line.strip("|").split("|")), strict=False)) for line in lines[1:]]
+    rows = [
+        dict(zip(header, (cell.strip() for cell in line.strip("|").split("|")), strict=False))
+        for line in lines[1:]
+    ]
     return {
         "status": "completed",
         "operation": "chamaeleo_choose_best_scheme",

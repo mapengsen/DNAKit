@@ -14,7 +14,7 @@ models = pytest.importorskip("gtars.models")
 pytest.importorskip("gtars.tokenizers")
 pytest.importorskip("gtars.lola")
 
-from dnakit.annotation import gtars_p24_regions_functions as m  # noqa: E402
+from dnakit.annotation import gtars_p24_regions_functions as m
 
 A_ROWS = [("chr1", 100, 200), ("chr1", 150, 300), ("chr1", 500, 600), ("chr2", 10, 50)]
 B_ROWS = [("chr1", 180, 520), ("chr2", 40, 90), ("chr3", 5, 15)]

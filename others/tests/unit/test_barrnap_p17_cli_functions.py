@@ -21,10 +21,16 @@ import dnakit.annotation.barrnap_p17_cli_functions as barrnap_module
 from dnakit.annotation.barrnap_p17_cli_functions import predict_mrna_features_barrnap
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 
 requires_barrnap = pytest.mark.skipif(
-    any(shutil.which(name) is None for name in ("barrnap", "pyrodigal", "diamond", "transterm", "ziggypep")),
+    any(
+        shutil.which(name) is None
+        for name in ("barrnap", "pyrodigal", "diamond", "transterm", "ziggypep")
+    ),
     reason="barrnap 1.x with pyrodigal, diamond, transterm and ziggypep is not on PATH",
 )
 
@@ -97,10 +103,22 @@ def test_command_assembly_and_parsed_features(tmp_path: Path) -> None:
     assert arguments[-1] == str(tmp_path / "contigs.fa")
     assert result["gff_file"] == str(output)
     assert output.read_text().startswith("##gff-version 3")
-    assert result["feature_counts"] == {"mRNA": 1, "RBS": 1, "CDS": 1, "sig_pep": 1, "terminator": 1}
+    assert result["feature_counts"] == {
+        "mRNA": 1,
+        "RBS": 1,
+        "CDS": 1,
+        "sig_pep": 1,
+        "terminator": 1,
+    }
     assert result["feature_count"] == 5 and result["features_truncated"] is False
     cds = next(feature for feature in result["features"] if feature["type"] == "CDS")
-    assert (cds["seqid"], cds["start"], cds["end"], cds["strand"], cds["phase"]) == ("ctg1", 100, 1000, "+", "0")
+    assert (cds["seqid"], cds["start"], cds["end"], cds["strand"], cds["phase"]) == (
+        "ctg1",
+        100,
+        1000,
+        "+",
+        "0",
+    )
     assert cds["attributes"]["Name"] == "dxs"
     assert not list(tmp_path.glob("*.stderr"))
     json.dumps(result)
@@ -123,7 +141,11 @@ def test_include_rrna_genetic_code_and_database_dir(tmp_path: Path) -> None:
     assert "--rrna" in arguments and "--no-rrna" not in arguments
     assert arguments[arguments.index("--gcode") + 1] == "4"
     assert arguments[arguments.index("--dbdir") + 1] == str(database)
-    assert len(result["features"]) == 2 and result["feature_count"] == 5 and result["features_truncated"] is True
+    assert (
+        len(result["features"]) == 2
+        and result["feature_count"] == 5
+        and result["features_truncated"] is True
+    )
 
 
 def test_program_failure_is_reported_as_failed(tmp_path: Path) -> None:
@@ -155,9 +177,14 @@ def test_program_failure_is_reported_as_failed(tmp_path: Path) -> None:
     ],
 )
 def test_invalid_arguments_are_refused(tmp_path: Path, override: dict, message: str) -> None:
-    arguments = {"sequence_files": [_fasta(tmp_path)], "output_gff": str(tmp_path / "out.gff3")} | override
+    arguments = {
+        "sequence_files": [_fasta(tmp_path)],
+        "output_gff": str(tmp_path / "out.gff3"),
+    } | override
     with pytest.raises(ConfigurationError, match=message):
-        predict_mrna_features_barrnap(**arguments, barrnap_path=_fake_barrnap(tmp_path), verbose=False)
+        predict_mrna_features_barrnap(
+            **arguments, barrnap_path=_fake_barrnap(tmp_path), verbose=False
+        )
     assert not (tmp_path / "out.gff3").exists()
 
 
@@ -190,7 +217,9 @@ def test_real_barrnap_predicts_genes_on_the_shared_genome(tmp_path: Path) -> Non
     genome = DATA / "genome.fa"
     if not genome.is_file():
         pytest.skip("shared consistency/data/genome.fa is missing")
-    result = predict_mrna_features_barrnap([str(genome)], str(tmp_path / "mrna.gff3"), verbose=False)
+    result = predict_mrna_features_barrnap(
+        [str(genome)], str(tmp_path / "mrna.gff3"), verbose=False
+    )
     assert result["status"] == "completed", result["log_tail"]
     assert {"mRNA", "CDS"} <= set(result["feature_counts"])
     assert result["feature_counts"]["mRNA"] == result["feature_counts"]["CDS"]

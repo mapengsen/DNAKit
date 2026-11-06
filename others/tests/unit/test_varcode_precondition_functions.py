@@ -23,8 +23,8 @@ pytest.importorskip("varcode")
 pytest.importorskip("pyensembl")
 pysam = pytest.importorskip("pysam")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.molecular_lab import varcode_precondition_functions as vp  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.molecular_lab import varcode_precondition_functions as vp
 
 GENOME = (
     Path(__file__).resolve().parents[3]

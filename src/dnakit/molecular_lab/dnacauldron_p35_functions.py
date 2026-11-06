@@ -104,7 +104,9 @@ def _named_dna(value: object, name: str, *, minimum_items: int = 1) -> dict[str,
     if not isinstance(value, Mapping):
         raise ConfigurationError(f"{name} must be a mapping of name to DNA string.")
     if not minimum_items <= len(value) <= _MAX_PARTS:
-        raise ConfigurationError(f"{name} must contain between {minimum_items} and {_MAX_PARTS} items.")
+        raise ConfigurationError(
+            f"{name} must contain between {minimum_items} and {_MAX_PARTS} items."
+        )
     result: dict[str, str] = {}
     total = 0
     for key, text in value.items():
@@ -123,7 +125,9 @@ def _new_file(value: object, name: str, suffixes: Sequence[str] | None = None) -
     if suffixes is not None and target.suffix.lower() not in suffixes:
         raise ConfigurationError(f"{name} must end with {' or '.join(suffixes)}.")
     if target.exists():
-        raise ConfigurationError(f"Output file already exists and will not be overwritten: {target}")
+        raise ConfigurationError(
+            f"Output file already exists and will not be overwritten: {target}"
+        )
     target.parent.mkdir(parents=True, exist_ok=True)
     return target
 
@@ -172,7 +176,9 @@ def _run(action: Any, message: str) -> Any:
     ) as exc:
         node_error = type(exc).__name__ == "NodeNotFound"
         detail = str(exc) or type(exc).__name__
-        raise ConfigurationError(f"{message}: {'no connection in the mix: ' if node_error else ''}{detail}") from exc
+        raise ConfigurationError(
+            f"{message}: {'no connection in the mix: ' if node_error else ''}{detail}"
+        ) from exc
     except Exception as exc:  # networkx and Biopython raise their own classes
         if type(exc).__module__.split(".")[0] in {"networkx", "Bio"}:
             raise ConfigurationError(f"{message}: {exc}") from exc
@@ -274,7 +280,10 @@ def _apply_features(record: Any, features: object) -> int:
         if "label" in item:
             qualifiers["label"] = str(item["label"])
         biotools.annotate_record(
-            record, location=(start, end, strand), feature_type=feature_type, **{str(k): v for k, v in qualifiers.items()}
+            record,
+            location=(start, end, strand),
+            feature_type=feature_type,
+            **{str(k): v for k, v in qualifiers.items()},
         )
     return len(features)
 
@@ -287,7 +296,9 @@ def _record_from_spec(spec: object, name: str = "record") -> Any:
         raise ConfigurationError(f"{name} has unknown keys: {sorted(unknown)}.")
     topology = _choice(spec.get("topology", "linear"), f"{name}.topology", ("linear", "circular"))
     record = _make_record(
-        _name(spec.get("id"), f"{name}.id"), _dna(spec.get("sequence"), f"{name}.sequence"), topology
+        _name(spec.get("id"), f"{name}.id"),
+        _dna(spec.get("sequence"), f"{name}.sequence"),
+        topology,
     )
     _apply_features(record, spec.get("features"))
     return record
@@ -348,7 +359,9 @@ def annotate_dnacauldron_record(
         "record": _record_dict(rec),
         "features_added": added,
         "topology_set": topology,
-        "provenance": _provenance(method="dnacauldron.biotools.annotate_record / set_record_topology"),
+        "provenance": _provenance(
+            method="dnacauldron.biotools.annotate_record / set_record_topology"
+        ),
     }
 
 
@@ -368,7 +381,11 @@ def write_dnacauldron_records(
 
     biotools = require("dnacauldron.biotools", _EXTRA)
     fmt = _choice(output_format, "output_format", ("genbank", "fasta"))
-    if isinstance(records, (str, bytes)) or not isinstance(records, Sequence) or not 1 <= len(records) <= 500:
+    if (
+        isinstance(records, (str, bytes))
+        or not isinstance(records, Sequence)
+        or not 1 <= len(records) <= 500
+    ):
         raise ConfigurationError("records must be a list of 1 to 500 record dictionaries.")
     prepared = [_record_from_spec(item, f"records[{i}]") for i, item in enumerate(records)]
     ids = [rec.id for rec in prepared]
@@ -381,10 +398,12 @@ def write_dnacauldron_records(
     targets = [folder / f"{rec_id}{suffix}" for rec_id in ids]
     for target in targets:
         if target.exists():
-            raise ConfigurationError(f"Output file already exists and will not be overwritten: {target}")
+            raise ConfigurationError(
+                f"Output file already exists and will not be overwritten: {target}"
+            )
     folder.mkdir(parents=True, exist_ok=True)
     written = []
-    for rec, target in zip(prepared, targets):
+    for rec, target in zip(prepared, targets, strict=False):
         with open(target, "w", encoding="utf-8") as handle:
             biotools.write_record(rec, handle, fmt)
         written.append({"id": rec.id, "path": str(target), "bytes": target.stat().st_size})
@@ -417,8 +436,14 @@ def get_dnacauldron_repository_records(
     """
 
     dc = require("dnacauldron", _EXTRA)
-    _choice(topology, "topology", ("linear", "circular", "default_to_linear", "default_to_circular"))
-    if isinstance(record_ids, (str, bytes)) or not isinstance(record_ids, Sequence) or not 1 <= len(record_ids) <= 500:
+    _choice(
+        topology, "topology", ("linear", "circular", "default_to_linear", "default_to_circular")
+    )
+    if (
+        isinstance(record_ids, (str, bytes))
+        or not isinstance(record_ids, Sequence)
+        or not 1 <= len(record_ids) <= 500
+    ):
         raise ConfigurationError("record_ids must list 1 to 500 record IDs.")
     ids = [_name(item, "record id") for item in record_ids]
     paths = [str(_existing_file(item, "files item")) for item in (files or [])]
@@ -438,7 +463,9 @@ def get_dnacauldron_repository_records(
     )
     with _clean_ids(dc):
         found = _run(
-            lambda: [repository.get_record(ids[0])] if len(ids) == 1 else repository.get_records(ids),
+            lambda: (
+                [repository.get_record(ids[0])] if len(ids) == 1 else repository.get_records(ids)
+            ),
             "DNA Cauldron could not find the records",
         )
     return {
@@ -465,11 +492,13 @@ def _end_to_object(spec: object, name: str) -> Any:
     if spec is None:
         return None
     if not isinstance(spec, Mapping) or set(spec) - {"sequence", "strand"}:
-        raise ConfigurationError(f"{name} must be null or {{\"sequence\", \"strand\"}}.")
+        raise ConfigurationError(f'{name} must be null or {{"sequence", "strand"}}.')
     strand = spec.get("strand")
     if strand not in _STRANDS:
         raise ConfigurationError(f"{name}.strand must be 1 or -1.")
-    return fragment_module.StickyEnd(_dna(spec.get("sequence"), f"{name}.sequence", maximum=2000), strand=strand)
+    return fragment_module.StickyEnd(
+        _dna(spec.get("sequence"), f"{name}.sequence", maximum=2000), strand=strand
+    )
 
 
 def _end_dict(end: Any) -> dict[str, Any] | None:
@@ -481,9 +510,11 @@ def _end_dict(end: Any) -> dict[str, Any] | None:
 def _sticky_from_spec(spec: object, name: str = "fragment") -> Any:
     fragment_module = require("dnacauldron.Fragment", _EXTRA)
     if not isinstance(spec, Mapping) or set(spec) - {"sequence", "left_end", "right_end", "length"}:
-        raise ConfigurationError(f"{name} must be {{\"sequence\", \"left_end\", \"right_end\"}}.")
+        raise ConfigurationError(f'{name} must be {{"sequence", "left_end", "right_end"}}.')
     return fragment_module.StickyEndSeq(
-        _dna(spec.get("sequence"), f"{name}.sequence", minimum=0 if not spec.get("sequence") else 1),
+        _dna(
+            spec.get("sequence"), f"{name}.sequence", minimum=0 if not spec.get("sequence") else 1
+        ),
         left_end=_end_to_object(spec.get("left_end"), f"{name}.left_end"),
         right_end=_end_to_object(spec.get("right_end"), f"{name}.right_end"),
     )
@@ -532,7 +563,9 @@ def digest_dnacauldron_sticky_ends(
     else:
         record = _make_record("digested", text, "circular" if is_circular else "linear")
         fragments = _run(
-            lambda: dc.StickyEndFragment.list_from_record_digestion(record, chosen if len(chosen) > 1 else chosen[0]),
+            lambda: dc.StickyEndFragment.list_from_record_digestion(
+                record, chosen if len(chosen) > 1 else chosen[0]
+            ),
             "DNA Cauldron could not digest the record",
         )
         rows = [_sticky_dict(item.seq) for item in fragments]
@@ -567,7 +600,9 @@ def transform_dnacauldron_sticky_sequence(
     kind = _choice(operation, "operation", ("reverse_complement", "to_standard", "slice"))
     seq = _sticky_from_spec(fragment)
     if kind == "reverse_complement":
-        result = _run(seq.reverse_complement, "DNA Cauldron could not reverse-complement the fragment")
+        result = _run(
+            seq.reverse_complement, "DNA Cauldron could not reverse-complement the fragment"
+        )
         return {
             "status": "completed",
             "operation": "transform_dnacauldron_sticky_sequence",
@@ -576,7 +611,11 @@ def transform_dnacauldron_sticky_sequence(
             "provenance": _provenance(method="StickyEndSeq.reverse_complement"),
         }
     if kind == "to_standard":
-        text = str(seq.to_standard_sequence(discard_sticky_ends=_flag(discard_sticky_ends, "discard_sticky_ends")))
+        text = str(
+            seq.to_standard_sequence(
+                discard_sticky_ends=_flag(discard_sticky_ends, "discard_sticky_ends")
+            )
+        )
         return {
             "status": "completed",
             "operation": "transform_dnacauldron_sticky_sequence",
@@ -611,10 +650,14 @@ def check_dnacauldron_sticky_end_compatibility(
     ``circular=True`` the last fragment is also checked against the first.
     """
 
-    if isinstance(fragments, (str, bytes)) or not isinstance(fragments, Sequence) or not 2 <= len(fragments) <= 200:
+    if (
+        isinstance(fragments, (str, bytes))
+        or not isinstance(fragments, Sequence)
+        or not 2 <= len(fragments) <= 200
+    ):
         raise ConfigurationError("fragments must list 2 to 200 sticky-end fragments.")
     objects = [_sticky_from_spec(item, f"fragments[{i}]") for i, item in enumerate(fragments)]
-    pairs = list(zip(range(len(objects)), range(1, len(objects))))
+    pairs = list(zip(range(len(objects)), range(1, len(objects)), strict=False))
     if _flag(circular, "circular"):
         pairs.append((len(objects) - 1, 0))
     rows = []
@@ -696,7 +739,9 @@ def check_dnacauldron_homology(
 
     dc = require("dnacauldron", _EXTRA)
     first = _dna(sequence, "sequence", maximum=10_000)
-    second = None if other_sequence is None else _dna(other_sequence, "other_sequence", maximum=10_000)
+    second = (
+        None if other_sequence is None else _dna(other_sequence, "other_sequence", maximum=10_000)
+    )
     checker = _homology_checker(dc, min_size, max_size, min_tm, max_tm, max_distance)
     distance = None
     if second is not None:
@@ -714,7 +759,12 @@ def check_dnacauldron_homology(
 
 
 def _homology_checker(
-    dc: Any, min_size: int, max_size: int | None, min_tm: float, max_tm: float | None, max_distance: int
+    dc: Any,
+    min_size: int,
+    max_size: int | None,
+    min_tm: float,
+    max_tm: float | None,
+    max_distance: int,
 ) -> Any:
     _integer(min_size, "min_size", minimum=1, maximum=10_000)
     if max_size is not None:
@@ -724,7 +774,11 @@ def _homology_checker(
         _number(max_tm, "max_tm", minimum=min_tm, maximum=100_000)
     _integer(max_distance, "max_distance", minimum=0, maximum=100)
     return dc.HomologyChecker(
-        min_size=min_size, max_size=max_size, min_tm=min_tm, max_tm=max_tm, max_distance=max_distance
+        min_size=min_size,
+        max_size=max_size,
+        min_tm=min_tm,
+        max_tm=max_tm,
+        max_distance=max_distance,
     )
 
 
@@ -757,7 +811,11 @@ def _build_mix(
     records = [_make_record(key, text, topology) for key, text in sorted(named.items())]
     if kind == "restriction_ligation":
         names = _enzyme_names(enzymes)
-        filters = [dc.NoRestrictionSiteFilter(item) for item in names] if _flag(filter_site_fragments, "filter_site_fragments") else []
+        filters = (
+            [dc.NoRestrictionSiteFilter(item) for item in names]
+            if _flag(filter_site_fragments, "filter_site_fragments")
+            else []
+        )
         return _run(
             lambda: dc.RestrictionLigationMix(
                 parts=records, enzymes=names, fragment_filters=filters, name=mix_name
@@ -774,7 +832,9 @@ def _build_mix(
     oligo_records = [_make_record(key, text, "linear") for key, text in sorted(oligos.items())]
     lcr = importlib.import_module("dnacauldron.AssemblyMix.LigaseCyclingReactionMix")
     return _run(
-        lambda: lcr.LigaseCyclingReactionMix(records, oligo_records, homology_checker=checker, name=mix_name),
+        lambda: lcr.LigaseCyclingReactionMix(
+            records, oligo_records, homology_checker=checker, name=mix_name
+        ),
         "DNA Cauldron could not build the ligase cycling mix",
     )
 
@@ -799,14 +859,22 @@ def _fragment_row(index: int, fragment: Any) -> dict[str, Any]:
 
 def _construct_row(record: Any) -> dict[str, Any]:
     seq = record.seq
-    sequence = str(seq.to_standard_sequence()).upper() if hasattr(seq, "to_standard_sequence") else str(seq).upper()
+    sequence = (
+        str(seq.to_standard_sequence()).upper()
+        if hasattr(seq, "to_standard_sequence")
+        else str(seq).upper()
+    )
     fragments = getattr(record, "fragments", None)
     return {
         "id": str(record.id),
         "sequence": sequence,
         "length": len(sequence),
         "topology": str(record.annotations.get("topology", "linear")),
-        "parts": [] if fragments is None else [_label(item) if hasattr(item, "original_part") else str(item.id) for item in fragments],
+        "parts": []
+        if fragments is None
+        else [
+            _label(item) if hasattr(item, "original_part") else str(item.id) for item in fragments
+        ],
     }
 
 
@@ -891,11 +959,17 @@ def compute_dnacauldron_slots_graph(
         max_distance=0,
     )
     graph = _run(
-        lambda: mix.slots_graph(with_overhangs=_flag(with_overhangs, "with_overhangs"), directed=_flag(directed, "directed")),
+        lambda: mix.slots_graph(
+            with_overhangs=_flag(with_overhangs, "with_overhangs"),
+            directed=_flag(directed, "directed"),
+        ),
         "DNA Cauldron could not compute the slots graph",
     )
     slot_nodes = {_node_name(slot) for slot in mix.compute_slots()}
-    nodes = [{"id": _node_name(n), "kind": "slot" if _node_name(n) in slot_nodes else "overhang"} for n in graph.nodes()]
+    nodes = [
+        {"id": _node_name(n), "kind": "slot" if _node_name(n) in slot_nodes else "overhang"}
+        for n in graph.nodes()
+    ]
     edges = [[_node_name(a), _node_name(b)] for a, b in graph.edges()]
     return {
         "status": "completed",
@@ -963,7 +1037,9 @@ def compute_dnacauldron_connections_graph(
     graph = mix.filtered_connections_graph
     if len(mix.fragments_dict) > _MAX_NODES:
         raise ConfigurationError(f"The mix has more than {_MAX_NODES} fragments.")
-    fragments = [_fragment_row(index, mix.fragments_dict[index]) for index in sorted(mix.fragments_dict)]
+    fragments = [
+        _fragment_row(index, mix.fragments_dict[index]) for index in sorted(mix.fragments_dict)
+    ]
     edges = sorted([int(a), int(b)] for a, b in graph.edges())
     return {
         "status": "completed",
@@ -973,16 +1049,16 @@ def compute_dnacauldron_connections_graph(
         "fragments": fragments,
         "edge_count": len(edges),
         "edges": edges,
-        "provenance": _provenance(method="AssemblyMix.compute_connections_graph / filtered_connections_graph"),
+        "provenance": _provenance(
+            method="AssemblyMix.compute_connections_graph / filtered_connections_graph"
+        ),
     }
 
 
 def _with_pyplot() -> Any:
     matplotlib = require("matplotlib", "bio-plots")
-    try:
+    with contextlib.suppress(Exception):  # pragma: no cover - backend already chosen
         matplotlib.use("Agg", force=False)
-    except Exception:  # pragma: no cover - backend already chosen
-        pass
     return require("matplotlib.pyplot", "bio-plots")
 
 
@@ -1052,7 +1128,9 @@ def plot_dnacauldron_connections_graph(
     with _quiet_fonts():
         figure, axis = pyplot.subplots(1, 1, figsize=(size, size))
         try:
-            _run(lambda: mix.plot_connections_graph(ax=axis), "DNA Cauldron could not plot the graph")
+            _run(
+                lambda: mix.plot_connections_graph(ax=axis), "DNA Cauldron could not plot the graph"
+            )
         except Exception:
             pyplot.close(figure)
             raise
@@ -1322,8 +1400,12 @@ def enumerate_dnacauldron_linear_assemblies(
     rows = []
     for item in found:
         row = _construct_row(item)
-        row["left_end"] = None if getattr(item.seq, "left_end", None) is None else str(item.seq.left_end)
-        row["right_end"] = None if getattr(item.seq, "right_end", None) is None else str(item.seq.right_end)
+        row["left_end"] = (
+            None if getattr(item.seq, "left_end", None) is None else str(item.seq.left_end)
+        )
+        row["right_end"] = (
+            None if getattr(item.seq, "right_end", None) is None else str(item.seq.right_end)
+        )
         rows.append(row)
     return {
         "status": "completed",
@@ -1385,7 +1467,9 @@ def transform_dnacauldron_fragment_chain(
         rows = []
         for cycle in itertools.islice(nx.simple_cycles(mix.filtered_connections_graph), limit):
             chain = chain_class([mix.fragments_dict[i] for i in cycle], is_cycle=True)
-            result = chain.reverse_complement() if kind == "reverse_complement" else chain.standardized()
+            result = (
+                chain.reverse_complement() if kind == "reverse_complement" else chain.standardized()
+            )
             rows.append(
                 {
                     "before": [_label(f) for f in chain.fragments],
@@ -1439,8 +1523,13 @@ def select_dnacauldron_connectors(
     )
     topology_used = "circular" if topology == "auto" else topology
     records = [_make_record(key, text, topology_used) for key, text in sorted(names.items())]
-    selected = _run(lambda: mix.autoselect_connectors(records), "DNA Cauldron could not select connectors")
-    assemblies = _run(lambda: list(itertools.islice(mix.compute_circular_assemblies(), 20)), "DNA Cauldron could not assemble")
+    selected = _run(
+        lambda: mix.autoselect_connectors(records), "DNA Cauldron could not select connectors"
+    )
+    assemblies = _run(
+        lambda: list(itertools.islice(mix.compute_circular_assemblies(), 20)),
+        "DNA Cauldron could not assemble",
+    )
     return {
         "status": "completed",
         "operation": "select_dnacauldron_connectors",
@@ -1495,14 +1584,21 @@ def simulate_dnacauldron_lcr_assembly(
     else:
         _integer(min_parts, "min_parts", minimum=1, maximum=1000)
         generator = iter(_linear_assemblies(mix, min_parts, limit, flag))
-    found = _run(lambda: list(itertools.islice(generator, limit)), "DNA Cauldron could not simulate the assembly")
+    found = _run(
+        lambda: list(itertools.islice(generator, limit)),
+        "DNA Cauldron could not simulate the assembly",
+    )
     oligo_ids = {oligo.id for oligo in mix.bridging_oligos}
     rows = []
     for item in found:
         row = _construct_row(item)
-        fragments = [f for f in getattr(item, "fragments", []) if str(f.id) not in oligo_ids or hasattr(f, "original_part")]
+        fragments = [
+            f
+            for f in getattr(item, "fragments", [])
+            if str(f.id) not in oligo_ids or hasattr(f, "original_part")
+        ]
         part_fragments = [f for f in fragments if hasattr(f, "original_part")]
-        pairs = list(zip(part_fragments, part_fragments[1:]))
+        pairs = list(itertools.pairwise(part_fragments))
         if circular and len(part_fragments) > 1:
             pairs.append((part_fragments[-1], part_fragments[0]))
         used = []
@@ -1559,7 +1655,10 @@ def find_dnacauldron_bridging_oligo(
         max_distance=max_distance,
     )
     by_id = {fragment.original_part.id: fragment for fragment in mix.fragments}
-    hit = _run(lambda: mix.find_oligo_homology(by_id["left"], by_id["right"]), "DNA Cauldron could not search the oligos")
+    hit = _run(
+        lambda: mix.find_oligo_homology(by_id["left"], by_id["right"]),
+        "DNA Cauldron could not search the oligos",
+    )
     result: dict[str, Any] = {
         "status": "completed",
         "operation": "find_dnacauldron_bridging_oligo",
@@ -1599,9 +1698,14 @@ def plot_dnacauldron_cuts(
     mode = _choice(linear, "linear", ("auto", "true", "false"))
     width = _number(figure_width, "figure_width", minimum=1, maximum=40)
     rec = _record_from_spec(record)
-    is_linear = rec.annotations.get("topology", "linear") == "linear" if mode == "auto" else mode == "true"
+    is_linear = (
+        rec.annotations.get("topology", "linear") == "linear" if mode == "auto" else mode == "true"
+    )
     restriction = require("Bio.Restriction", _EXTRA)
-    cuts = {item: [int(c) for c in getattr(restriction, item).search(rec.seq, linear=is_linear)] for item in names}
+    cuts = {
+        item: [int(c) for c in getattr(restriction, item).search(rec.seq, linear=is_linear)]
+        for item in names
+    }
     pyplot = _with_pyplot()
     with _quiet_fonts():
         result = _run(
@@ -1615,7 +1719,9 @@ def plot_dnacauldron_cuts(
         "operation": "plot_dnacauldron_cuts",
         "path": str(target),
         "data": {"linear": is_linear, "length": len(rec.seq), "cuts": cuts},
-        "provenance": _provenance(method="dnacauldron.Assembly.AssemblyReportWriter.plot_cuts.plot_cuts"),
+        "provenance": _provenance(
+            method="dnacauldron.Assembly.AssemblyReportWriter.plot_cuts.plot_cuts"
+        ),
     }
 
 
@@ -1641,20 +1747,28 @@ def list_dnacauldron_record_overhangs(
         rec = _record_from_spec(record)
     else:
         rec = _run(
-            lambda: require("dnacauldron.biotools", _EXTRA).load_record(str(_existing_file(genbank_path, "genbank_path"))),
+            lambda: require("dnacauldron.biotools", _EXTRA).load_record(
+                str(_existing_file(genbank_path, "genbank_path"))
+            ),
             "DNA Cauldron could not read the file",
         )
     found = _run(
-        lambda: utils.list_overhangs_from_record_annotations(rec, with_locations=_flag(with_locations, "with_locations")),
+        lambda: utils.list_overhangs_from_record_annotations(
+            rec, with_locations=_flag(with_locations, "with_locations")
+        ),
         "DNA Cauldron could not read the overhangs",
     )
-    rows: list[Any] = [[int(start), str(o)] for start, o in found] if with_locations else [str(o) for o in found]
+    rows: list[Any] = (
+        [[int(start), str(o)] for start, o in found] if with_locations else [str(o) for o in found]
+    )
     return {
         "status": "completed",
         "operation": "list_dnacauldron_record_overhangs",
         "overhang_count": len(rows),
         "overhangs": rows,
-        "provenance": _provenance(method="dnacauldron.utils.list_overhangs_from_record_annotations"),
+        "provenance": _provenance(
+            method="dnacauldron.utils.list_overhangs_from_record_annotations"
+        ),
     }
 
 
@@ -1676,9 +1790,13 @@ def get_dnacauldron_insert_overhangs(
 
     module = require("dnacauldron.utils.insert_parts_on_backbones", _EXTRA)
     name = _enzyme_names(enzyme)[0]
-    rec = _make_record("part", _dna(sequence, "sequence"), _choice(topology, "topology", ("linear", "circular")))
+    rec = _make_record(
+        "part", _dna(sequence, "sequence"), _choice(topology, "topology", ("linear", "circular"))
+    )
     pair = _run(
-        lambda: module.get_overhangs_from_record(rec, enzyme=name, standardize=_flag(standardize, "standardize")),
+        lambda: module.get_overhangs_from_record(
+            rec, enzyme=name, standardize=_flag(standardize, "standardize")
+        ),
         "DNA Cauldron could not find the insert overhangs (the part needs exactly one site-free fragment)",
     )
     return {
@@ -1688,7 +1806,9 @@ def get_dnacauldron_insert_overhangs(
         "standardized": bool(standardize),
         "left_overhang": str(pair[0]),
         "right_overhang": str(pair[1]),
-        "provenance": _provenance(method="dnacauldron.utils.insert_parts_on_backbones.get_overhangs_from_record"),
+        "provenance": _provenance(
+            method="dnacauldron.utils.insert_parts_on_backbones.get_overhangs_from_record"
+        ),
     }
 
 
@@ -1706,7 +1826,14 @@ def _simulate_plan_in_memory(records: Mapping[str, str], assemblies: list[Any], 
 
 
 def _flaw_rows(simulation: Any) -> list[dict[str, Any]]:
-    return [{"message": str(flaw.message), "suggestion": str(getattr(flaw, "suggestion", "")), "data": _plain_data(flaw.data)} for flaw in simulation.errors]
+    return [
+        {
+            "message": str(flaw.message),
+            "suggestion": str(getattr(flaw, "suggestion", "")),
+            "data": _plain_data(flaw.data),
+        }
+        for flaw in simulation.errors
+    ]
 
 
 def _plain_data(value: Any) -> Any:
@@ -1734,12 +1861,17 @@ def anneal_dnacauldron_oligo_pair(
     """
 
     dc = require("dnacauldron", _EXTRA)
-    records = {"oligo_1": _dna(oligo, "oligo", maximum=2000), "oligo_2": _dna(other_oligo, "other_oligo", maximum=2000)}
+    records = {
+        "oligo_1": _dna(oligo, "oligo", maximum=2000),
+        "oligo_2": _dna(other_oligo, "other_oligo", maximum=2000),
+    }
     assembly = dc.OligoPairAnnealing(parts=["oligo_1", "oligo_2"], name="annealed")
     repository = dc.SequenceRepository()
     for key, text in records.items():
         repository.add_record((key, text))
-    simulation = _run(lambda: assembly.simulate(repository), "DNA Cauldron could not anneal the oligos")
+    simulation = _run(
+        lambda: assembly.simulate(repository), "DNA Cauldron could not anneal the oligos"
+    )
     if simulation.errors:
         raise ConfigurationError("; ".join(str(flaw.message) for flaw in simulation.errors))
     return {
@@ -1771,17 +1903,30 @@ def simulate_dnacauldron_basic_assembly(
     dc = require("dnacauldron", _EXTRA)
     records = _named_dna(parts, "parts")
     if not isinstance(adapter_oligos, Mapping) or not 1 <= len(adapter_oligos) <= 100:
-        raise ConfigurationError("adapter_oligos must map 1 to 100 adapter names to a pair of oligos.")
+        raise ConfigurationError(
+            "adapter_oligos must map 1 to 100 adapter names to a pair of oligos."
+        )
     assemblies: list[Any] = []
     for adapter, pair in adapter_oligos.items():
         label = _name(adapter, "adapter name")
         if isinstance(pair, (str, bytes)) or not isinstance(pair, Sequence) or len(pair) != 2:
             raise ConfigurationError(f"adapter_oligos[{label!r}] must be a list of two oligos.")
         for index, text in enumerate(pair, start=1):
-            records[f"{label}__oligo_{index}"] = _dna(text, f"adapter_oligos[{label!r}][{index - 1}]", maximum=2000)
-        assemblies.append(dc.OligoPairAnnealing(parts=[f"{label}__oligo_1", f"{label}__oligo_2"], name=label))
-    if isinstance(assembly_parts, (str, bytes)) or not isinstance(assembly_parts, Sequence) or len(assembly_parts) % 3 or not assembly_parts:
-        raise ConfigurationError("assembly_parts must list adapter, part, adapter triplets (a multiple of 3 names).")
+            records[f"{label}__oligo_{index}"] = _dna(
+                text, f"adapter_oligos[{label!r}][{index - 1}]", maximum=2000
+            )
+        assemblies.append(
+            dc.OligoPairAnnealing(parts=[f"{label}__oligo_1", f"{label}__oligo_2"], name=label)
+        )
+    if (
+        isinstance(assembly_parts, (str, bytes))
+        or not isinstance(assembly_parts, Sequence)
+        or len(assembly_parts) % 3
+        or not assembly_parts
+    ):
+        raise ConfigurationError(
+            "assembly_parts must list adapter, part, adapter triplets (a multiple of 3 names)."
+        )
     ordered = [_name(item, "assembly_parts item") for item in assembly_parts]
     unknown = [item for item in ordered if item not in records and item not in adapter_oligos]
     if unknown:
@@ -1808,7 +1953,9 @@ def simulate_dnacauldron_basic_assembly(
         "constructs": constructs,
         "errors": _flaw_rows(basic),
         "outcomes": {k: int(v) for k, v in sorted(simulation.compute_stats().items())},
-        "provenance": _provenance(method="BASICAssembly.simulate (adapters via OligoPairAnnealing)"),
+        "provenance": _provenance(
+            method="BASICAssembly.simulate (adapters via OligoPairAnnealing)"
+        ),
     }
 
 
@@ -1884,17 +2031,32 @@ def write_dnacauldron_assembly_plan(
     dc = require("dnacauldron", _EXTRA)
     classes = require("dnacauldron.Assembly", _EXTRA).ASSEMBLY_CLASS_DICT
     kind = _choice(assembly_class, "assembly_class", tuple(classes))
-    if isinstance(assemblies, (str, bytes)) or not isinstance(assemblies, Sequence) or not 1 <= len(assemblies) <= 1000:
+    if (
+        isinstance(assemblies, (str, bytes))
+        or not isinstance(assemblies, Sequence)
+        or not 1 <= len(assemblies) <= 1000
+    ):
         raise ConfigurationError("assemblies must list 1 to 1000 assemblies.")
     built = []
     for index, item in enumerate(assemblies):
         if not isinstance(item, Mapping) or set(item) - {"name", "parts"}:
-            raise ConfigurationError(f"assemblies[{index}] must be {{\"name\", \"parts\"}}.")
+            raise ConfigurationError(f'assemblies[{index}] must be {{"name", "parts"}}.')
         part_names = item.get("parts")
-        if isinstance(part_names, (str, bytes)) or not isinstance(part_names, Sequence) or not part_names:
+        if (
+            isinstance(part_names, (str, bytes))
+            or not isinstance(part_names, Sequence)
+            or not part_names
+        ):
             raise ConfigurationError(f"assemblies[{index}].parts must be a non-empty list.")
-        built.append(classes[kind](name=_name(item.get("name"), f"assemblies[{index}].name"), parts=[_name(p, "part") for p in part_names]))
-    plan = _run(lambda: dc.AssemblyPlan(built, logger=None), "DNA Cauldron could not build the plan")
+        built.append(
+            classes[kind](
+                name=_name(item.get("name"), f"assemblies[{index}].name"),
+                parts=[_name(p, "part") for p in part_names],
+            )
+        )
+    plan = _run(
+        lambda: dc.AssemblyPlan(built, logger=None), "DNA Cauldron could not build the plan"
+    )
     frame = plan.to_dataframe()
     rows = [{"assembly": str(index), "parts": str(row["parts"])} for index, row in frame.iterrows()]
     written = None
@@ -1931,14 +2093,26 @@ def tabulate_dnacauldron_plan_constructs(
     plan_file = _existing_file(plan_path, "plan_path")
     sequences = _existing_dir(sequences_path, "sequences_path")
     repository = dc.SequenceRepository()
-    _run(lambda: repository.import_records(folder=str(sequences)), "DNA Cauldron could not read the sequences")
+    _run(
+        lambda: repository.import_records(folder=str(sequences)),
+        "DNA Cauldron could not read the sequences",
+    )
     if connectors_path is not None:
         root = _existing_dir(connectors_path, "connectors_path")
         for sub in sorted(root.iterdir()):
             if sub.is_dir():
-                _run(lambda s=sub: repository.import_records(folder=str(s), collection=s.name), "DNA Cauldron could not read the connectors")
-    plan = _run(lambda: dc.AssemblyPlan.from_spreadsheet(str(plan_file), logger=None), "DNA Cauldron could not read the plan")
-    simulation = _run(lambda: plan.simulate(sequence_repository=repository), "DNA Cauldron could not simulate the plan")
+                _run(
+                    lambda s=sub: repository.import_records(folder=str(s), collection=s.name),
+                    "DNA Cauldron could not read the connectors",
+                )
+    plan = _run(
+        lambda: dc.AssemblyPlan.from_spreadsheet(str(plan_file), logger=None),
+        "DNA Cauldron could not read the plan",
+    )
+    simulation = _run(
+        lambda: plan.simulate(sequence_repository=repository),
+        "DNA Cauldron could not simulate the plan",
+    )
     rows = [_plain_data(item) for item in simulation.compute_all_construct_data_dicts()]
     return {
         "status": "completed",

@@ -34,9 +34,17 @@ _MODES = {
     "sewage": "--sewage",
     "iontorrent": "--iontorrent",
 }
-_PRIMARY = ("contigs.fasta", "scaffolds.fasta", "transcripts.fasta", "hard_filtered_transcripts.fasta",
-            "soft_filtered_transcripts.fasta", "gene_clusters.fasta", "assembly_graph.fastg",
-            "assembly_graph_with_scaffolds.gfa", "spades.log")
+_PRIMARY = (
+    "contigs.fasta",
+    "scaffolds.fasta",
+    "transcripts.fasta",
+    "hard_filtered_transcripts.fasta",
+    "soft_filtered_transcripts.fasta",
+    "gene_clusters.fasta",
+    "assembly_graph.fastg",
+    "assembly_graph_with_scaffolds.gfa",
+    "spades.log",
+)
 
 
 def _files(values: Sequence[str] | None, name: str, *, limit: int = 1) -> list[str]:
@@ -45,7 +53,9 @@ def _files(values: Sequence[str] | None, name: str, *, limit: int = 1) -> list[s
     if isinstance(values, str) or not values:
         raise ConfigurationError(f"{name} must be a non-empty list of files.")
     if len(values) > limit:
-        raise ConfigurationError(f"{name} accepts at most {limit} file(s) here; concatenate lanes first.")
+        raise ConfigurationError(
+            f"{name} accepts at most {limit} file(s) here; concatenate lanes first."
+        )
     return [str(_gap_cli.existing_file(item, name)) for item in values]
 
 
@@ -130,9 +140,18 @@ def spades_assemble(
     if memory_gb is not None:
         arguments += ["-m", str(_gap_cli.integer(memory_gb, "memory_gb", minimum=1))]
     if phred_offset is not None:
-        arguments += ["--phred-offset", _gap_cli.choice(str(phred_offset), ("33", "64"), "phred_offset")]
-    result = _run("spades.py", arguments, cwd=folder, expected=[], spades_path=spades_path,
-                  timeout_seconds=timeout_seconds)
+        arguments += [
+            "--phred-offset",
+            _gap_cli.choice(str(phred_offset), ("33", "64"), "phred_offset"),
+        ]
+    result = _run(
+        "spades.py",
+        arguments,
+        cwd=folder,
+        expected=[],
+        spades_path=spades_path,
+        timeout_seconds=timeout_seconds,
+    )
     found = [str(folder / name) for name in _PRIMARY if (folder / name).is_file()]
     result["mode"] = selected
     result["outputs"] = found

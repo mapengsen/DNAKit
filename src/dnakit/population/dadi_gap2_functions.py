@@ -137,7 +137,14 @@ def vourlaki_visual_validation_png(
         axis_wild = figure.add_subplot(3, 2, 5)
         axis_domesticate = figure.add_subplot(3, 2, 6)
         for index, (label, wild, change, change_pos) in enumerate(_VALIDATION_PANELS):
-            params = [_VOURLAKI_ALPHA, _VOURLAKI_BETA, wild, _VOURLAKI_GAMMA_POS, change, change_pos]
+            params = [
+                _VOURLAKI_ALPHA,
+                _VOURLAKI_BETA,
+                wild,
+                _VOURLAKI_GAMMA_POS,
+                change,
+                change_pos,
+            ]
             fs = plotting_vourlaki(params, None, s1, s2, 1.0, None)
             axis = figure.add_subplot(3, 2, index + 1)
             dadi.Plotting.plot_single_2d_sfs(fs, ax=axis, show=False)
@@ -167,7 +174,9 @@ def vourlaki_visual_validation_png(
         figure.tight_layout()
         figure.savefig(str(target), format="png", dpi=_PNG_DPI)
     except (ValueError, TypeError, IndexError, KeyError, AttributeError, ZeroDivisionError) as exc:
-        raise ConfigurationError(f"dadi could not draw the Vourlaki validation figure: {exc}") from exc
+        raise ConfigurationError(
+            f"dadi could not draw the Vourlaki validation figure: {exc}"
+        ) from exc
     finally:
         if figure is not None:
             plt.close(figure)
@@ -242,7 +251,9 @@ def plot_3d_spectrum_mayavi(
     mlab = _mayavi_mlab()
     toplot = (~np.ma.getmaskarray(array)) & (np.ma.getdata(array) >= low)
     values = np.ma.getdata(array)[toplot].astype(float)
-    normalized = np.minimum((np.log(values) - math.log(low)) / (math.log(high) - math.log(low)), 1.0)
+    normalized = np.minimum(
+        (np.log(values) - math.log(low)) / (math.log(high) - math.log(low)), 1.0
+    )
     xs, ys, zs = np.indices(array.shape)
     figure = mlab.figure(bgcolor=(1, 1, 1), size=(800, 800))
     mlab.clf(figure)

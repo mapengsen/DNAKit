@@ -10,11 +10,11 @@ pd = pytest.importorskip("pandas")
 pytest.importorskip("sklearn")
 pytest.importorskip("seaborn")
 
-from gimmemotifs.maelstrom.moap import moap  # noqa: E402
-from gimmemotifs.maelstrom.rank import rankagg  # noqa: E402
+from gimmemotifs.maelstrom.moap import moap
+from gimmemotifs.maelstrom.rank import rankagg
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.regulation import gimmemotifs_p28_maelstrom_functions as module  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.regulation import gimmemotifs_p28_maelstrom_functions as module
 
 
 @pytest.fixture

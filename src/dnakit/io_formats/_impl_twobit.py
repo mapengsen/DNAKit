@@ -13,7 +13,7 @@ written as N (ambiguity codes are not preserved, like UCSC ``faToTwoBit``).  Onl
 (32-bit offsets) is supported.
 """
 
-# ruff: noqa: E501, RUF012, B905
+# ruff: noqa: RUF012, B905
 
 from __future__ import annotations
 

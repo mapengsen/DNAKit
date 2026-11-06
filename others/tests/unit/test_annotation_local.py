@@ -14,7 +14,10 @@ from dnakit.exceptions import ConfigurationError
 def test_convert_annotation_coordinates() -> None:
     result = convert_annotation_coordinates(
         {"records": [{"chrom": "chr1", "start": 2, "end": 5, "id": "g1"}]},
-        options={"coordinate_system": "1-based-closed", "target_coordinate_system": "0-based-half-open"},
+        options={
+            "coordinate_system": "1-based-closed",
+            "target_coordinate_system": "0-based-half-open",
+        },
         verbose=False,
     )
     assert result["result"]["records"][0]["start"] == 1
@@ -33,7 +36,11 @@ def test_make_intergenic_regions_respects_one_based_gaps() -> None:
         options={"coordinate_system": "1-based-closed"},
         verbose=False,
     )
-    assert [(row["start"], row["end"]) for row in result["result"]["regions"]] == [(1, 1), (5, 6), (9, 10)]
+    assert [(row["start"], row["end"]) for row in result["result"]["regions"]] == [
+        (1, 1),
+        (5, 6),
+        (9, 10),
+    ]
 
 
 def test_make_promoter_regions_is_strand_aware() -> None:

@@ -337,8 +337,10 @@ def sample_sequences_seqtk(
         raise ConfigurationError("sample_size must be positive.")
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ConfigurationError("seed must be a non-negative integer.")
-    if not isinstance(program, str) or not program.strip() or any(
-        char in program for char in "\x00\r\n"
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(char in program for char in "\x00\r\n")
     ):
         raise ConfigurationError("program must be a non-empty executable name.")
     config = _config(1, timeout_seconds, max_output_bytes, max_artifact_bytes)
@@ -377,7 +379,11 @@ def compress_index_vcf_htslib(
 
     source_path = input_path(source)
     for value, name in ((bgzip_program, "bgzip_program"), (tabix_program, "tabix_program")):
-        if not isinstance(value, str) or not value.strip() or any(char in value for char in "\x00\r\n"):
+        if (
+            not isinstance(value, str)
+            or not value.strip()
+            or any(char in value for char in "\x00\r\n")
+        ):
             raise ConfigurationError(f"{name} must be a non-empty executable name.")
     config = _config(1, timeout_seconds, max_output_bytes, max_artifact_bytes)
     directory = workspace(output_directory)
@@ -416,8 +422,10 @@ def phase_variants_whatshap(
     variants_path = input_path(variants)
     alignment_path = input_path(alignment)
     reference_path = input_path(reference)
-    if not isinstance(program, str) or not program.strip() or any(
-        char in program for char in "\x00\r\n"
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(char in program for char in "\x00\r\n")
     ):
         raise ConfigurationError("program must be a non-empty executable name.")
     config = _config(1, timeout_seconds, max_output_bytes, max_artifact_bytes)
@@ -462,8 +470,10 @@ def sort_bam_bamtools(
     """Sort a BAM file with caller-installed BamTools."""
 
     source_path = input_path(source)
-    if not isinstance(program, str) or not program.strip() or any(
-        char in program for char in "\x00\r\n"
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(char in program for char in "\x00\r\n")
     ):
         raise ConfigurationError("program must be a non-empty executable name.")
     config = _config(1, timeout_seconds, max_output_bytes, max_artifact_bytes)
@@ -490,10 +500,10 @@ __all__ = [
     "call_chip_peaks",
     "call_variants",
     "compress_index_vcf_htslib",
-    "mark_duplicates_picard",
     "map_reads",
-    "prepare_bam",
+    "mark_duplicates_picard",
     "phase_variants_whatshap",
+    "prepare_bam",
     "run_dna_seq_workflow",
     "run_rna_seq_workflow",
     "sample_sequences_seqtk",

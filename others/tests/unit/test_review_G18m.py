@@ -972,6 +972,7 @@ def test_methylpy_merge_allc_tables_plain_output_and_snp_columns(tmp_path: Path)
 
 
 def test_methylpy_merge_allc_tables_order_does_not_depend_on_hash_seed(tmp_path: Path) -> None:
+    pytest.importorskip("methylpy")
     a, b, _ = _methylpy_allc_inputs(tmp_path)
     code = (
         "import sys\n"
@@ -1516,6 +1517,7 @@ def test_macs3_extract_validation() -> None:
 
 
 def test_macs3_digest_and_extract_do_not_depend_on_hash_seed() -> None:
+    pytest.importorskip("MACS3")
     code = (
         "import json\n"
         "from dnakit.epigenome import MACS3_review_functions as m\n"

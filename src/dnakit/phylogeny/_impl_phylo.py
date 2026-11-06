@@ -34,7 +34,7 @@ MAX_BOOTSTRAP_WORK = 30_000_000
 class Node:
     """A tree node (root has ``parent`` None)."""
 
-    __slots__ = ("name", "length", "children", "parent")
+    __slots__ = ("children", "length", "name", "parent")
 
     def __init__(self, name: str = "", length: float | None = None) -> None:
         self.name = name
@@ -62,14 +62,23 @@ def options_dict(options: Mapping[str, object] | None) -> dict[str, object]:
 def get_int(settings: Mapping[str, object], key: str, default: int, *, low: int, high: int) -> int:
     value = settings.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
-        raise ConfigurationError(f"options.{key} must be an integer in [{low}, {high}].", code="PHYLOGENY_OPTION", hint=f"Set options['{key}'] to an integer in [{low}, {high}].")
+        raise ConfigurationError(
+            f"options.{key} must be an integer in [{low}, {high}].",
+            code="PHYLOGENY_OPTION",
+            hint=f"Set options['{key}'] to an integer in [{low}, {high}].",
+        )
     return value
 
 
-def get_choice(settings: Mapping[str, object], key: str, default: str, allowed: Sequence[str]) -> str:
+def get_choice(
+    settings: Mapping[str, object], key: str, default: str, allowed: Sequence[str]
+) -> str:
     value = settings.get(key, default)
     if not isinstance(value, str) or value.lower() not in allowed:
-        raise ConfigurationError(f"options.{key} must be one of {', '.join(allowed)}; got {value!r}.", code="PHYLOGENY_OPTION")
+        raise ConfigurationError(
+            f"options.{key} must be one of {', '.join(allowed)}; got {value!r}.",
+            code="PHYLOGENY_OPTION",
+        )
     return value.lower()
 
 
@@ -96,7 +105,12 @@ def read_text(value: object, what: str = "input") -> str | None:
     path: Path | None = None
     if isinstance(value, Path):
         path = value
-    elif isinstance(value, str) and "\n" not in value and 0 < len(value) < 4096 and not value.lstrip().startswith(("(", ">", "#")):
+    elif (
+        isinstance(value, str)
+        and "\n" not in value
+        and 0 < len(value) < 4096
+        and not value.lstrip().startswith(("(", ">", "#"))
+    ):
         try:
             if Path(value).is_file():
                 path = Path(value)
@@ -104,13 +118,21 @@ def read_text(value: object, what: str = "input") -> str | None:
             path = None
     if path is not None:
         if not path.is_file():
-            raise InputFormatError(f"{what} file does not exist: {path}", code="PHYLOGENY_INPUT_FILE")
+            raise InputFormatError(
+                f"{what} file does not exist: {path}", code="PHYLOGENY_INPUT_FILE"
+            )
         if path.stat().st_size > MAX_TEXT_BYTES:
-            raise InputFormatError(f"{what} file is larger than {MAX_TEXT_BYTES} bytes.", code="PHYLOGENY_INPUT_TOO_LARGE")
+            raise InputFormatError(
+                f"{what} file is larger than {MAX_TEXT_BYTES} bytes.",
+                code="PHYLOGENY_INPUT_TOO_LARGE",
+            )
         return path.read_text(encoding="utf-8", errors="replace")
     if isinstance(value, str):
         if len(value) > MAX_TEXT_BYTES:
-            raise InputFormatError(f"{what} is larger than {MAX_TEXT_BYTES} characters.", code="PHYLOGENY_INPUT_TOO_LARGE")
+            raise InputFormatError(
+                f"{what} is larger than {MAX_TEXT_BYTES} characters.",
+                code="PHYLOGENY_INPUT_TOO_LARGE",
+            )
         return value
     return None
 
@@ -135,7 +157,6 @@ def parse_newick(text: str) -> Node:
     stack: list[Node] = []
     current = root
     count = 1
-    expect_label = False  # True after ')' or at a leaf start
 
     def skip_space() -> None:
         nonlocal pos
@@ -176,7 +197,9 @@ def parse_newick(text: str) -> Node:
             try:
                 value = float(text[start:pos])
             except ValueError:
-                raise InputFormatError(f"invalid branch length {text[start:pos]!r} in Newick.", code="NEWICK_FORMAT") from None
+                raise InputFormatError(
+                    f"invalid branch length {text[start:pos]!r} in Newick.", code="NEWICK_FORMAT"
+                ) from None
             if not math.isfinite(value):
                 raise InputFormatError("non-finite branch length in Newick.", code="NEWICK_FORMAT")
             return value
@@ -189,7 +212,6 @@ def parse_newick(text: str) -> Node:
         current = Node()
         root.add(current)
         count += 1
-        expect_label = False
     else:
         # a single-leaf tree such as "A;"
         root.name = read_label()
@@ -241,26 +263,44 @@ def parse_newick(text: str) -> Node:
             current.name = read_label()
             current.length = read_length()
             if pos < n and text[pos] not in ",()" and not text[pos].isspace() and text[pos] != ";":
-                raise InputFormatError(f"unexpected character {text[pos]!r} in Newick.", code="NEWICK_FORMAT")
+                raise InputFormatError(
+                    f"unexpected character {text[pos]!r} in Newick.", code="NEWICK_FORMAT"
+                )
         if count > MAX_TREE_NODES:
-            raise InputFormatError("Newick tree has too many nodes.", code="PHYLOGENY_INPUT_TOO_LARGE")
+            raise InputFormatError(
+                "Newick tree has too many nodes.", code="PHYLOGENY_INPUT_TOO_LARGE"
+            )
     if stack:
-        raise InputFormatError("unbalanced '(' in Newick.", code="NEWICK_FORMAT", hint="Check that every '(' has a matching ')'.")
+        raise InputFormatError(
+            "unbalanced '(' in Newick.",
+            code="NEWICK_FORMAT",
+            hint="Check that every '(' has a matching ')'.",
+        )
     if text[pos:].strip().strip(";"):
-        raise InputFormatError("unexpected text after the Newick tree.", code="NEWICK_FORMAT", hint="Pass one tree per call.")
+        raise InputFormatError(
+            "unexpected text after the Newick tree.",
+            code="NEWICK_FORMAT",
+            hint="Pass one tree per call.",
+        )
     names = [leaf.name for leaf in leaves(root)]
     if any(not name for name in names):
         raise InputFormatError("every leaf needs a name.", code="NEWICK_FORMAT")
     duplicates = sorted(name for name, c in Counter(names).items() if c > 1)
     if duplicates:
-        raise InputFormatError(f"duplicate leaf names: {', '.join(duplicates[:10])}.", code="NEWICK_FORMAT")
+        raise InputFormatError(
+            f"duplicate leaf names: {', '.join(duplicates[:10])}.", code="NEWICK_FORMAT"
+        )
     return root
 
 
 def load_tree(value: object, what: str = "tree") -> Node:
     text = read_text(value, what)
     if text is None:
-        raise InputFormatError(f"{what} must be Newick text or a path to a Newick file.", code="NEWICK_FORMAT", hint="Pass a string such as '((A:1,B:1):1,C:2);'.")
+        raise InputFormatError(
+            f"{what} must be Newick text or a path to a Newick file.",
+            code="NEWICK_FORMAT",
+            hint="Pass a string such as '((A:1,B:1):1,C:2);'.",
+        )
     return parse_newick(text)
 
 
@@ -339,7 +379,9 @@ def depths(root: Node) -> tuple[dict[int, int], dict[int, float | None]]:
         for child in node.children:
             edge_depth[id(child)] = edge_depth[id(node)] + 1
             base = distance[id(node)]
-            distance[id(child)] = None if base is None or child.length is None else base + child.length
+            distance[id(child)] = (
+                None if base is None or child.length is None else base + child.length
+            )
     return edge_depth, distance
 
 
@@ -363,7 +405,9 @@ def tree_statistics(root: Node) -> dict[str, Any]:
         "leaves": [n.name for n in leaf_nodes],
         "root_degree": len(root.children),
         "rooted_binary": all(len(n.children) == 2 for n in internal),
-        "polytomy_count": sum(1 for n in internal if len(n.children) > 2 and not (n is root and len(n.children) == 3)),
+        "polytomy_count": sum(
+            1 for n in internal if len(n.children) > 2 and not (n is root and len(n.children) == 3)
+        ),
         "max_depth_edges": max(leaf_depths),
         "mean_leaf_depth_edges": sum(leaf_depths) / len(leaf_depths),
         "sackin_index": sum(leaf_depths),
@@ -385,17 +429,25 @@ def tree_statistics(root: Node) -> dict[str, Any]:
         stats["treeness"] = internal_length / total if total else None
     if stats["rooted_binary"] and len(leaf_nodes) > 1:
         sizes = {k: len(v) for k, v in clade_leaf_sets(root).items()}
-        stats["colless_index"] = sum(abs(sizes[id(n.children[0])] - sizes[id(n.children[1])]) for n in internal)
+        stats["colless_index"] = sum(
+            abs(sizes[id(n.children[0])] - sizes[id(n.children[1])]) for n in internal
+        )
     return stats
 
 
 def patristic_matrix(root: Node) -> tuple[list[str], list[list[float]]]:
     leaf_nodes = leaves(root)
     if len(leaf_nodes) > 1_000:
-        raise InputFormatError("patristic matrices are limited to 1,000 leaves.", code="PHYLOGENY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            "patristic matrices are limited to 1,000 leaves.", code="PHYLOGENY_INPUT_TOO_LARGE"
+        )
     nonroot = [n for n in preorder(root) if n is not root]
     if any(n.length is None for n in nonroot):
-        raise InputFormatError("every branch needs a length for patristic distances.", code="NEWICK_FORMAT", hint="Provide a Newick tree with branch lengths.")
+        raise InputFormatError(
+            "every branch needs a length for patristic distances.",
+            code="NEWICK_FORMAT",
+            hint="Provide a Newick tree with branch lengths.",
+        )
     _, dist = depths(root)
     # distance via lowest common ancestor on parent chains
     chains: list[list[Node]] = []
@@ -413,13 +465,19 @@ def patristic_matrix(root: Node) -> tuple[list[str], list[list[float]]]:
         for j in range(i + 1, len(names)):
             for node in chains[j]:
                 if id(node) in ancestors:
-                    d = (dist[id(leaf_nodes[i])] or 0.0) + (dist[id(leaf_nodes[j])] or 0.0) - 2 * (dist[id(node)] or 0.0)
+                    d = (
+                        (dist[id(leaf_nodes[i])] or 0.0)
+                        + (dist[id(leaf_nodes[j])] or 0.0)
+                        - 2 * (dist[id(node)] or 0.0)
+                    )
                     matrix[i][j] = matrix[j][i] = d
                     break
     return names, matrix
 
 
-def annotate_tree(root: Node, metadata: Mapping[str, object] | None, max_clade: int) -> dict[str, Any]:
+def annotate_tree(
+    root: Node, metadata: Mapping[str, object] | None, max_clade: int
+) -> dict[str, Any]:
     nodes = list(preorder(root))
     index = {id(n): i for i, n in enumerate(nodes)}
     edge_depth, distance = depths(root)
@@ -427,7 +485,10 @@ def annotate_tree(root: Node, metadata: Mapping[str, object] | None, max_clade: 
     if metadata is not None:
         unknown = sorted(set(metadata) - {n.name for n in nodes if n.is_leaf})
         if unknown:
-            raise ConfigurationError(f"options.metadata names unknown leaves: {', '.join(map(str, unknown[:10]))}.", code="PHYLOGENY_OPTION")
+            raise ConfigurationError(
+                f"options.metadata names unknown leaves: {', '.join(map(str, unknown[:10]))}.",
+                code="PHYLOGENY_OPTION",
+            )
     labelled = 0
     for node in nodes:
         if not node.is_leaf and not node.name:
@@ -485,7 +546,8 @@ def robinson_foulds(a: Node, b: Node, rooted: bool) -> dict[str, Any]:
         only_a, only_b = sorted(ua - ub), sorted(ub - ua)
         raise InputFormatError(
             f"the trees have different leaf sets (only in first: {only_a[:5]}, only in second: {only_b[:5]}).",
-            code="RF_LEAF_MISMATCH", hint="Prune both trees to the shared leaves first.",
+            code="RF_LEAF_MISMATCH",
+            hint="Prune both trees to the shared leaves first.",
         )
     rf = len(sa ^ sb)
     denominator = len(sa) + len(sb)
@@ -513,7 +575,11 @@ def parse_alignment(value: object) -> tuple[list[str], list[str]]:
     pairs: list[tuple[str, str]] = []
     if text is not None:
         if not text.lstrip().startswith(">"):
-            raise InputFormatError("alignment text must be FASTA.", code="ALIGNMENT_FORMAT", hint="Pass FASTA text, {name: sequence} or a list of {'name','sequence'}.")
+            raise InputFormatError(
+                "alignment text must be FASTA.",
+                code="ALIGNMENT_FORMAT",
+                hint="Pass FASTA text, {name: sequence} or a list of {'name','sequence'}.",
+            )
         name: str | None = None
         parts: list[str] = []
         for line in text.splitlines():
@@ -539,23 +605,40 @@ def parse_alignment(value: object) -> tuple[list[str], list[str]]:
     elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         for index, item in enumerate(value):
             if isinstance(item, Mapping) and isinstance(item.get("sequence", item.get("seq")), str):
-                pairs.append((str(item.get("name", item.get("id", f"seq_{index + 1}"))), item.get("sequence", item.get("seq"))))  # type: ignore[arg-type]
+                pairs.append(
+                    (
+                        str(item.get("name", item.get("id", f"seq_{index + 1}"))),
+                        item.get("sequence", item.get("seq")),
+                    )
+                )  # type: ignore[arg-type]
             else:
-                raise InputFormatError(f"alignment record {index} must be a mapping with 'name' and 'sequence'.", code="ALIGNMENT_FORMAT")
+                raise InputFormatError(
+                    f"alignment record {index} must be a mapping with 'name' and 'sequence'.",
+                    code="ALIGNMENT_FORMAT",
+                )
     else:
-        raise InputFormatError("alignment must be FASTA text, a mapping or a list of records.", code="ALIGNMENT_FORMAT")
+        raise InputFormatError(
+            "alignment must be FASTA text, a mapping or a list of records.", code="ALIGNMENT_FORMAT"
+        )
     if any(not isinstance(seq, str) for _, seq in pairs):
         raise InputFormatError("alignment sequences must be strings.", code="ALIGNMENT_FORMAT")
     if len(pairs) < 2:
-        raise InputFormatError("an alignment needs at least two sequences.", code="ALIGNMENT_FORMAT")
+        raise InputFormatError(
+            "an alignment needs at least two sequences.", code="ALIGNMENT_FORMAT"
+        )
     if len(pairs) > MAX_TAXA_ALIGNMENT:
-        raise InputFormatError(f"alignments are limited to {MAX_TAXA_ALIGNMENT} sequences.", code="PHYLOGENY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"alignments are limited to {MAX_TAXA_ALIGNMENT} sequences.",
+            code="PHYLOGENY_INPUT_TOO_LARGE",
+        )
     names = [name for name, _ in pairs]
     if len(set(names)) != len(names):
         raise InputFormatError("sequence names must be unique.", code="ALIGNMENT_FORMAT")
     seqs = [seq.upper().replace("U", "T") for _, seq in pairs]
     if len({len(s) for s in seqs}) != 1 or not seqs[0]:
-        raise InputFormatError("all sequences must have the same non-zero length (aligned).", code="ALIGNMENT_FORMAT")
+        raise InputFormatError(
+            "all sequences must have the same non-zero length (aligned).", code="ALIGNMENT_FORMAT"
+        )
     if len(seqs[0]) * len(seqs) > MAX_ALIGNMENT_COLUMNS:
         raise InputFormatError("alignment is too large.", code="PHYLOGENY_INPUT_TOO_LARGE")
     return names, seqs
@@ -575,17 +658,23 @@ def jc_distance(p: float) -> float | None:
 
 def pairwise_counts(a: str, b: str) -> tuple[int, int]:
     mismatches = compared = 0
-    for x, y in zip(a, b):
+    for x, y in zip(a, b, strict=False):
         if x in _BASES and y in _BASES:
             compared += 1
             mismatches += x != y
     return mismatches, compared
 
 
-def distance_from_counts(mismatches: int, compared: int, kind: str, saturation: float | None, pair: str) -> float:
+def distance_from_counts(
+    mismatches: int, compared: int, kind: str, saturation: float | None, pair: str
+) -> float:
     if compared == 0:
         if saturation is None:
-            raise InputFormatError(f"sequences {pair} share no comparable (A/C/G/T) sites.", code="DISTANCE_UNDEFINED", hint="Remove one of the sequences or set options.saturation_distance.")
+            raise InputFormatError(
+                f"sequences {pair} share no comparable (A/C/G/T) sites.",
+                code="DISTANCE_UNDEFINED",
+                hint="Remove one of the sequences or set options.saturation_distance.",
+            )
         return saturation
     p = mismatches / compared
     if kind == "p":
@@ -593,12 +682,18 @@ def distance_from_counts(mismatches: int, compared: int, kind: str, saturation: 
     d = jc_distance(p)
     if d is None:
         if saturation is None:
-            raise InputFormatError(f"Jukes-Cantor distance is undefined for sequences {pair} (p = {p:.3f} >= 0.75).", code="DISTANCE_SATURATED", hint="Use options.distance='p' or set options.saturation_distance.")
+            raise InputFormatError(
+                f"Jukes-Cantor distance is undefined for sequences {pair} (p = {p:.3f} >= 0.75).",
+                code="DISTANCE_SATURATED",
+                hint="Use options.distance='p' or set options.saturation_distance.",
+            )
         return saturation
     return d
 
 
-def distance_matrix_from_alignment(names: Sequence[str], seqs: Sequence[str], kind: str, saturation: float | None) -> tuple[list[list[float]], list[list[int]]]:
+def distance_matrix_from_alignment(
+    names: Sequence[str], seqs: Sequence[str], kind: str, saturation: float | None
+) -> tuple[list[list[float]], list[list[int]]]:
     n = len(names)
     matrix = [[0.0] * n for _ in range(n)]
     compared_matrix = [[0] * n for _ in range(n)]
@@ -606,7 +701,9 @@ def distance_matrix_from_alignment(names: Sequence[str], seqs: Sequence[str], ki
         compared_matrix[i][i] = sum(1 for c in seqs[i] if c in _BASES)
         for j in range(i + 1, n):
             mismatches, compared = pairwise_counts(seqs[i], seqs[j])
-            matrix[i][j] = matrix[j][i] = distance_from_counts(mismatches, compared, kind, saturation, f"{names[i]}/{names[j]}")
+            matrix[i][j] = matrix[j][i] = distance_from_counts(
+                mismatches, compared, kind, saturation, f"{names[i]}/{names[j]}"
+            )
             compared_matrix[i][j] = compared_matrix[j][i] = compared
     return matrix, compared_matrix
 
@@ -619,31 +716,55 @@ def parse_distance_matrix(value: object) -> tuple[list[str], list[list[float]]]:
         names_raw = value.get("names", value.get("labels"))
         if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)):
             raise InputFormatError("'matrix' must be a list of rows.", code="DISTANCE_MATRIX")
-        names = [str(x) for x in names_raw] if isinstance(names_raw, Sequence) and not isinstance(names_raw, (str, bytes)) else [f"t{i + 1}" for i in range(len(raw))]
+        names = (
+            [str(x) for x in names_raw]
+            if isinstance(names_raw, Sequence) and not isinstance(names_raw, (str, bytes))
+            else [f"t{i + 1}" for i in range(len(raw))]
+        )
         matrix = [[_number(x) for x in row] for row in raw]  # type: ignore[union-attr]
-    elif isinstance(value, Mapping) and value and all(isinstance(v, Mapping) for v in value.values()):
+    elif (
+        isinstance(value, Mapping) and value and all(isinstance(v, Mapping) for v in value.values())
+    ):
         names = [str(k) for k in value]
         matrix = []
         for a in value:
             row = value[a]
-            matrix.append([0.0 if a == b else _number(row[b] if b in row else value[b][a] if a in value[b] else None) for b in value])  # type: ignore[index]
+            matrix.append(
+                [
+                    0.0 if a == b else _number(row[b] if b in row else value[b].get(a, None))
+                    for b in value
+                ]
+            )  # type: ignore[index]
     else:
-        raise InputFormatError("distance matrix must be {'names': [...], 'matrix': [[...]]} or a nested {a: {b: d}} mapping.", code="DISTANCE_MATRIX")
+        raise InputFormatError(
+            "distance matrix must be {'names': [...], 'matrix': [[...]]} or a nested {a: {b: d}} mapping.",
+            code="DISTANCE_MATRIX",
+        )
     n = len(names)
     if n < 2:
         raise InputFormatError("a distance matrix needs at least two taxa.", code="DISTANCE_MATRIX")
     if n > MAX_TAXA_MATRIX:
-        raise InputFormatError(f"distance matrices are limited to {MAX_TAXA_MATRIX} taxa.", code="PHYLOGENY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"distance matrices are limited to {MAX_TAXA_MATRIX} taxa.",
+            code="PHYLOGENY_INPUT_TOO_LARGE",
+        )
     if len(set(names)) != n:
         raise InputFormatError("taxon names must be unique.", code="DISTANCE_MATRIX")
     if len(matrix) != n or any(len(row) != n for row in matrix):
-        raise InputFormatError("the matrix must be square with one row per name.", code="DISTANCE_MATRIX")
+        raise InputFormatError(
+            "the matrix must be square with one row per name.", code="DISTANCE_MATRIX"
+        )
     for i in range(n):
         if abs(matrix[i][i]) > 1e-12:
-            raise InputFormatError("the diagonal of a distance matrix must be zero.", code="DISTANCE_MATRIX")
+            raise InputFormatError(
+                "the diagonal of a distance matrix must be zero.", code="DISTANCE_MATRIX"
+            )
         for j in range(i + 1, n):
             if abs(matrix[i][j] - matrix[j][i]) > 1e-9 * max(1.0, abs(matrix[i][j])):
-                raise InputFormatError(f"the matrix is not symmetric at ({names[i]}, {names[j]}).", code="DISTANCE_MATRIX")
+                raise InputFormatError(
+                    f"the matrix is not symmetric at ({names[i]}, {names[j]}).",
+                    code="DISTANCE_MATRIX",
+                )
             if matrix[i][j] < 0:
                 raise InputFormatError("distances must be non-negative.", code="DISTANCE_MATRIX")
     return names, matrix
@@ -651,7 +772,9 @@ def parse_distance_matrix(value: object) -> tuple[list[str], list[list[float]]]:
 
 def _number(value: object) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-        raise InputFormatError("distance matrix entries must be finite numbers.", code="DISTANCE_MATRIX")
+        raise InputFormatError(
+            "distance matrix entries must be finite numbers.", code="DISTANCE_MATRIX"
+        )
     return float(value)
 
 
@@ -708,7 +831,7 @@ def neighbor_joining(names: Sequence[str], matrix: Sequence[Sequence[float]]) ->
         (d(i, j) + d(j, k) - d(i, k)) / 2.0,
         (d(i, k) + d(j, k) - d(i, j)) / 2.0,
     )
-    for index, length in zip((i, j, k), lengths):
+    for index, length in zip((i, j, k), lengths, strict=False):
         nodes[index].length = length
         root.add(nodes[index])
     return root
@@ -754,7 +877,15 @@ def build_tree(names: Sequence[str], matrix: Sequence[Sequence[float]], method: 
 # --------------------------------------------------------------------------- bootstrap
 
 
-def bootstrap_support(names: Sequence[str], seqs: Sequence[str], method: str, kind: str, replicates: int, seed: int, saturation: float) -> dict[str, Any]:
+def bootstrap_support(
+    names: Sequence[str],
+    seqs: Sequence[str],
+    method: str,
+    kind: str,
+    replicates: int,
+    seed: int,
+    saturation: float,
+) -> dict[str, Any]:
     n, length = len(names), len(seqs[0])
     matrix, _ = distance_matrix_from_alignment(names, seqs, kind, saturation)
     reference = build_tree(names, matrix, method)
@@ -766,11 +897,16 @@ def bootstrap_support(names: Sequence[str], seqs: Sequence[str], method: str, ki
     pairs = [(i, j) for i in range(n) for j in range(i + 1, n)]
     work = len(pairs) * len(patterns) * replicates
     if work > MAX_BOOTSTRAP_WORK:
-        raise InputFormatError(f"bootstrap work ({work}) exceeds the limit {MAX_BOOTSTRAP_WORK}; reduce replicates or taxa.", code="PHYLOGENY_INPUT_TOO_LARGE")
+        raise InputFormatError(
+            f"bootstrap work ({work}) exceeds the limit {MAX_BOOTSTRAP_WORK}; reduce replicates or taxa.",
+            code="PHYLOGENY_INPUT_TOO_LARGE",
+        )
     mis: dict[tuple[int, int], list[int]] = {}
     cmp_: dict[tuple[int, int], list[int]] = {}
     for i, j in pairs:
-        mis[(i, j)] = [1 if (p[i] in _BASES and p[j] in _BASES and p[i] != p[j]) else 0 for p in patterns]
+        mis[(i, j)] = [
+            1 if (p[i] in _BASES and p[j] in _BASES and p[i] != p[j]) else 0 for p in patterns
+        ]
         cmp_[(i, j)] = [1 if (p[i] in _BASES and p[j] in _BASES) else 0 for p in patterns]
     rng = random.Random(seed)
     hits: Counter[frozenset[str]] = Counter()
@@ -782,13 +918,17 @@ def bootstrap_support(names: Sequence[str], seqs: Sequence[str], method: str, ki
     import bisect
 
     for _ in range(replicates):
-        draws = Counter(bisect.bisect_right(cumulative, rng.randrange(length)) for _ in range(length))
+        draws = Counter(
+            bisect.bisect_right(cumulative, rng.randrange(length)) for _ in range(length)
+        )
         weights = [draws.get(k, 0) for k in range(len(patterns))]
         rep = [[0.0] * n for _ in range(n)]
         for i, j in pairs:
-            m = sum(w * x for w, x in zip(weights, mis[(i, j)]))
-            c = sum(w * x for w, x in zip(weights, cmp_[(i, j)]))
-            rep[i][j] = rep[j][i] = distance_from_counts(m, c, kind, saturation, f"{names[i]}/{names[j]}")
+            m = sum(w * x for w, x in zip(weights, mis[(i, j)], strict=False))
+            c = sum(w * x for w, x in zip(weights, cmp_[(i, j)], strict=False))
+            rep[i][j] = rep[j][i] = distance_from_counts(
+                m, c, kind, saturation, f"{names[i]}/{names[j]}"
+            )
         tree = build_tree(names, rep, method)
         splits, _ = split_set(tree, rooted=(method == "upgma"))
         for split in ref_splits & splits:
@@ -819,7 +959,10 @@ def label_support(root: Node, support: Mapping[frozenset[str], float], rooted: b
 def tree_to_json(root: Node) -> dict[str, Any]:
     out: dict[int, dict[str, Any]] = {}
     for node in postorder(root):
-        entry: dict[str, Any] = {"name": node.name or None, "branch_length": node.length if node.parent is not None else None}
+        entry: dict[str, Any] = {
+            "name": node.name or None,
+            "branch_length": node.length if node.parent is not None else None,
+        }
         if node.children:
             entry["children"] = [out[id(c)] for c in node.children]
         out[id(node)] = entry
@@ -830,8 +973,14 @@ def edge_list(root: Node) -> list[dict[str, Any]]:
     nodes = list(preorder(root))
     index = {id(n): i for i, n in enumerate(nodes)}
     return [
-        {"parent": index[id(n.parent)], "child": index[id(n)], "child_name": n.name or None, "length": n.length}
-        for n in nodes if n.parent is not None
+        {
+            "parent": index[id(n.parent)],
+            "child": index[id(n)],
+            "child_name": n.name or None,
+            "length": n.length,
+        }
+        for n in nodes
+        if n.parent is not None
     ]
 
 
@@ -853,7 +1002,10 @@ def tree_svg(root: Node, use_lengths: bool, width: int = 640) -> tuple[str, int]
     if use_lengths:
         x_of = {k: (v if v is not None else 0.0) for k, v in distance.items()}
         if any(v is None for v in distance.values()):
-            raise InputFormatError("branch lengths are missing; use options.branch_lengths=False for a cladogram.", code="NEWICK_FORMAT")
+            raise InputFormatError(
+                "branch lengths are missing; use options.branch_lengths=False for a cladogram.",
+                code="NEWICK_FORMAT",
+            )
     else:
         x_of = {k: float(v) for k, v in edge_depth.items()}
     max_x = max(x_of.values()) or 1.0
@@ -869,16 +1021,24 @@ def tree_svg(root: Node, use_lengths: bool, width: int = 640) -> tuple[str, int]
             ys = [y[id(c)] for c in node.children]
             y[id(node)] = (min(ys) + max(ys)) / 2.0
     px = lambda node: left + plot_width * x_of[id(node)] / max_x  # noqa: E731
-    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">']
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">'
+    ]
     parts.append('<g stroke="#333" stroke-width="1" fill="none">')
     for node in preorder(root):
         if node.children:
             ys = [y[id(c)] for c in node.children]
-            parts.append(f'<line x1="{px(node):.1f}" y1="{min(ys):.1f}" x2="{px(node):.1f}" y2="{max(ys):.1f}"/>')
+            parts.append(
+                f'<line x1="{px(node):.1f}" y1="{min(ys):.1f}" x2="{px(node):.1f}" y2="{max(ys):.1f}"/>'
+            )
         if node.parent is not None:
-            parts.append(f'<line x1="{px(node.parent):.1f}" y1="{y[id(node)]:.1f}" x2="{px(node):.1f}" y2="{y[id(node)]:.1f}"/>')
+            parts.append(
+                f'<line x1="{px(node.parent):.1f}" y1="{y[id(node)]:.1f}" x2="{px(node):.1f}" y2="{y[id(node)]:.1f}"/>'
+            )
     parts.append("</g>")
     for leaf in leaf_nodes:
-        parts.append(f'<text x="{px(leaf) + 4:.1f}" y="{y[id(leaf)] + 4:.1f}" font-size="12" font-family="sans-serif">{escape(leaf.name)}</text>')
+        parts.append(
+            f'<text x="{px(leaf) + 4:.1f}" y="{y[id(leaf)] + 4:.1f}" font-size="12" font-family="sans-serif">{escape(leaf.name)}</text>'
+        )
     parts.append("</svg>")
     return "\n".join(parts), len(leaf_nodes)

@@ -43,7 +43,9 @@ def test_validation(seqs):
     with pytest.raises(ConfigurationError):
         m.mafft_align(str(seqs / "all.fa"), str(seqs / "o.fa"), strategy="bogus", verbose=False)
     with pytest.raises(BackendUnavailableError):
-        m.mafft_align(str(seqs / "all.fa"), str(seqs / "o.fa"), mafft_path=str(seqs / "none"), verbose=False)
+        m.mafft_align(
+            str(seqs / "all.fa"), str(seqs / "o.fa"), mafft_path=str(seqs / "none"), verbose=False
+        )
 
 
 @needs
@@ -65,20 +67,47 @@ def test_add_seed_profile_partition_distance(seqs):
     base = seqs / "base.fa"
     m.mafft_align(str(seqs / "first.fa"), str(base), strategy="fftnsi", verbose=False)
     width = len(next(iter(read_fasta(base).values())))
-    added = m.mafft_add_sequences(str(base), str(seqs / "rest.fa"), str(seqs / "add.fa"), verbose=False)
+    added = m.mafft_add_sequences(
+        str(base), str(seqs / "rest.fa"), str(seqs / "add.fa"), verbose=False
+    )
     assert added["sequence_count"] == 8
-    frag = m.mafft_add_sequences(str(base), str(seqs / "frag.fa"), str(seqs / "fr.fa"), mode="addfragments", keep_length=True, verbose=False)
+    frag = m.mafft_add_sequences(
+        str(base),
+        str(seqs / "frag.fa"),
+        str(seqs / "fr.fa"),
+        mode="addfragments",
+        keep_length=True,
+        verbose=False,
+    )
     assert len(read_fasta(seqs / "fr.fa")["frag"]) == width and frag["mode"] == "addfragments"
-    assert m.mafft_seed_alignment(str(seqs / "rest.fa"), [str(base)], str(seqs / "seed.fa"), verbose=False)["sequence_count"] == 8
+    assert (
+        m.mafft_seed_alignment(
+            str(seqs / "rest.fa"), [str(base)], str(seqs / "seed.fa"), verbose=False
+        )["sequence_count"]
+        == 8
+    )
     other = seqs / "other.fa"
     m.mafft_align(str(seqs / "rest.fa"), str(other), strategy="fftnsi", verbose=False)
     if shutil.which("mafft-profile"):
-        assert m.mafft_profile_alignment(str(base), str(other), str(seqs / "prof.fa"), verbose=False)["sequence_count"] == 8
-    pt = m.mafft_partition_tree_align(str(seqs / "all.fa"), str(seqs / "pt.fa"), partition_size=4, verbose=False)
+        assert (
+            m.mafft_profile_alignment(str(base), str(other), str(seqs / "prof.fa"), verbose=False)[
+                "sequence_count"
+            ]
+            == 8
+        )
+    pt = m.mafft_partition_tree_align(
+        str(seqs / "all.fa"), str(seqs / "pt.fa"), partition_size=4, verbose=False
+    )
     assert pt["sequence_count"] == 8
     if shutil.which("mafft-distance"):
         d = m.mafft_pairwise_distances(str(seqs / "all.fa"), str(seqs / "d.txt"), verbose=False)
         assert d["pair_count"] == 28 and d["distances"][0]["length_i"] > 100
     if shutil.which("ruby") and shutil.which("mafft-sparsecore.rb"):
-        sc = m.mafft_sparsecore_align(str(seqs / "all.fa"), str(seqs / "sc.fa"), core_size=5, core_candidates="100%", verbose=False)
+        sc = m.mafft_sparsecore_align(
+            str(seqs / "all.fa"),
+            str(seqs / "sc.fa"),
+            core_size=5,
+            core_candidates="100%",
+            verbose=False,
+        )
         assert sc["sequence_count"] == 8

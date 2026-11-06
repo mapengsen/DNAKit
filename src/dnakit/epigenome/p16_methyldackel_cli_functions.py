@@ -17,8 +17,15 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _p16_cli as cli
 from dnakit.exceptions import ConfigurationError
 
-_TOOL = cli.Tool("methyldackel", "MethylDackel", "Install MethylDackel (conda install -c bioconda methyldackel) and put it on PATH or pass methyldackel_path.",
-                 "0.6.1", "https://github.com/dpryan79/MethylDackel", ("--version",), None)
+_TOOL = cli.Tool(
+    "methyldackel",
+    "MethylDackel",
+    "Install MethylDackel (conda install -c bioconda methyldackel) and put it on PATH or pass methyldackel_path.",
+    "0.6.1",
+    "https://github.com/dpryan79/MethylDackel",
+    ("--version",),
+    None,
+)
 _BOUNDS = re.compile(r"^\d+,\d+,\d+,\d+$")
 _SUGGESTION = re.compile(r"--(OT|OB|CTOT|CTOB)\s+(\d+,\d+,\d+,\d+)")
 
@@ -27,7 +34,9 @@ def _bounds(value: str | None, name: str) -> list[str]:
     if value is None:
         return []
     if not isinstance(value, str) or not _BOUNDS.match(value):
-        raise ConfigurationError(f"{name} must be four comma-separated integers such as '1,100,1,100'.")
+        raise ConfigurationError(
+            f"{name} must be four comma-separated integers such as '1,100,1,100'."
+        )
     return [f"--{name}", value]
 
 
@@ -36,13 +45,23 @@ def _prefix(value: str) -> Path:
     if not prefix.parent.is_dir():
         raise ConfigurationError(f"The folder of the output prefix does not exist: {prefix.parent}")
     if any(prefix.parent.glob(prefix.name + "[._]*")):
-        raise ConfigurationError(f"Files with the prefix {prefix} already exist and will not be overwritten.")
+        raise ConfigurationError(
+            f"Files with the prefix {prefix} already exist and will not be overwritten."
+        )
     return prefix
 
 
-def _filters(min_mapq: int, min_base_quality: int, region: str | None, regions_bed: str | None, threads: int) -> list[str]:
-    arguments = ["-q", str(cli.integer(min_mapq, "min_mapq", minimum=0, maximum=255)),
-                 "-p", str(cli.integer(min_base_quality, "min_base_quality", minimum=1, maximum=93)), "-@", str(cli.threads_value(threads))]
+def _filters(
+    min_mapq: int, min_base_quality: int, region: str | None, regions_bed: str | None, threads: int
+) -> list[str]:
+    arguments = [
+        "-q",
+        str(cli.integer(min_mapq, "min_mapq", minimum=0, maximum=255)),
+        "-p",
+        str(cli.integer(min_base_quality, "min_base_quality", minimum=1, maximum=93)),
+        "-@",
+        str(cli.threads_value(threads)),
+    ]
     if region is not None:
         arguments += ["-r", cli.text(region, "region")]
     if regions_bed is not None:
@@ -84,31 +103,59 @@ def extract_methylation_report_methyldackel(
     ref = cli.existing_file(reference, "reference")
     bam = cli.existing_file(alignment, "alignment")
     prefix = _prefix(output_prefix)
-    mode = cli.choice(report, ("cytosine_report", "merge_context", "fraction", "per_cytosine"), "report")
-    arguments = ["extract", *_filters(min_mapq, min_base_quality, region, regions_bed, threads),
-                 "-d", str(cli.integer(min_depth, "min_depth", minimum=1)), "-o", str(prefix)]
+    mode = cli.choice(
+        report, ("cytosine_report", "merge_context", "fraction", "per_cytosine"), "report"
+    )
+    arguments = [
+        "extract",
+        *_filters(min_mapq, min_base_quality, region, regions_bed, threads),
+        "-d",
+        str(cli.integer(min_depth, "min_depth", minimum=1)),
+        "-o",
+        str(prefix),
+    ]
     if mode == "cytosine_report":
         arguments.append("--cytosine_report")
     elif mode == "merge_context":
         arguments.append("--mergeContext")
     elif mode == "fraction":
         arguments.append("--fraction")
-    for enabled, name, switch in ((include_chg, "include_chg", "--CHG"), (include_chh, "include_chh", "--CHH")):
+    for enabled, name, switch in (
+        (include_chg, "include_chg", "--CHG"),
+        (include_chh, "include_chh", "--CHH"),
+    ):
         if cli.flag(enabled, name):
             arguments.append(switch)
     if not cli.flag(include_cpg, "include_cpg"):
         arguments.append("--noCpG")
     arguments += _bounds(inclusion_bounds_ot, "OT") + _bounds(inclusion_bounds_ob, "OB")
     arguments += [str(ref), str(bam)]
-    main = Path(str(prefix) + (".cytosine_report.txt" if mode == "cytosine_report" else
-                               ("_CpG.bedGraph" if mode == "merge_context" and include_cpg else
-                                "_CpG.meth.bedGraph" if mode == "fraction" and include_cpg else
-                                "_CpG.bedGraph" if mode == "per_cytosine" and include_cpg else
-                                "_CHG.bedGraph" if include_chg else "_CHH.bedGraph")))
-    record = cli.invoke(_TOOL, arguments, cwd=prefix.parent, expected=[main], explicit=methyldackel_path)
+    main = Path(
+        str(prefix)
+        + (
+            ".cytosine_report.txt"
+            if mode == "cytosine_report"
+            else (
+                "_CpG.bedGraph"
+                if mode == "merge_context" and include_cpg
+                else "_CpG.meth.bedGraph"
+                if mode == "fraction" and include_cpg
+                else "_CpG.bedGraph"
+                if mode == "per_cytosine" and include_cpg
+                else "_CHG.bedGraph"
+                if include_chg
+                else "_CHH.bedGraph"
+            )
+        )
+    )
+    record = cli.invoke(
+        _TOOL, arguments, cwd=prefix.parent, expected=[main], explicit=methyldackel_path
+    )
     outputs = sorted(str(p) for p in prefix.parent.glob(prefix.name + "[._]*"))
     head = [line.rstrip("\n") for _, line in zip(range(20), cli.open_text(main), strict=False)]
-    return cli.finish(record, "extract_methylation_report_methyldackel", report=mode, files=outputs, head=head)
+    return cli.finish(
+        record, "extract_methylation_report_methyldackel", report=mode, files=outputs, head=head
+    )
 
 
 def merge_cytosine_context_methyldackel(
@@ -126,9 +173,16 @@ def merge_cytosine_context_methyldackel(
     ref = cli.existing_file(reference, "reference")
     source = cli.existing_file(per_cytosine_metrics, "per_cytosine_metrics")
     target = cli.new_file(output_path, "output_path")
-    record = cli.invoke(_TOOL, ["mergeContext", "-o", str(target), str(ref), str(source)], cwd=target.parent,
-                        expected=[target], explicit=methyldackel_path)
-    return cli.finish(record, "merge_cytosine_context_methyldackel", sites=max(cli.count_lines(target) - 1, 0))
+    record = cli.invoke(
+        _TOOL,
+        ["mergeContext", "-o", str(target), str(ref), str(source)],
+        cwd=target.parent,
+        expected=[target],
+        explicit=methyldackel_path,
+    )
+    return cli.finish(
+        record, "merge_cytosine_context_methyldackel", sites=max(cli.count_lines(target) - 1, 0)
+    )
 
 
 def methylation_bias_methyldackel(
@@ -156,16 +210,25 @@ def methylation_bias_methyldackel(
     ref = cli.existing_file(reference, "reference")
     bam = cli.existing_file(alignment, "alignment")
     prefix = _prefix(output_prefix)
-    arguments = ["mbias", *_filters(min_mapq, min_base_quality, region, regions_bed, threads),
-                 "-D", str(cli.integer(max_depth, "max_depth", minimum=1))]
-    for enabled, name, switch in ((include_chg, "include_chg", "--CHG"), (include_chh, "include_chh", "--CHH")):
+    arguments = [
+        "mbias",
+        *_filters(min_mapq, min_base_quality, region, regions_bed, threads),
+        "-D",
+        str(cli.integer(max_depth, "max_depth", minimum=1)),
+    ]
+    for enabled, name, switch in (
+        (include_chg, "include_chg", "--CHG"),
+        (include_chh, "include_chh", "--CHH"),
+    ):
         if cli.flag(enabled, name):
             arguments.append(switch)
     arguments += [str(ref), str(bam), str(prefix)]
     record = cli.invoke(_TOOL, arguments, cwd=prefix.parent, explicit=methyldackel_path)
     svgs = sorted(str(p) for p in prefix.parent.glob(prefix.name + "_*.svg"))
     if not svgs:
-        raise cli.BackendExecutionError("MethylDackel mbias wrote no SVG files.", context={"log_tail": record["log_tail"]})
+        raise cli.BackendExecutionError(
+            "MethylDackel mbias wrote no SVG files.", context={"log_tail": record["log_tail"]}
+        )
     record["outputs"] = svgs
     bounds = {name: value for name, value in _SUGGESTION.findall(record["log_tail"])}
     return cli.finish(record, "methylation_bias_methyldackel", suggested_bounds=bounds)
@@ -188,11 +251,30 @@ def summarize_per_read_methylation_methyldackel(
     ref = cli.existing_file(reference, "reference")
     bam = cli.existing_file(alignment, "alignment")
     target = cli.new_file(output_path, "output_path")
-    arguments = ["perRead", *_filters(min_mapq, min_base_quality, region, regions_bed, threads), "-o", str(target), str(ref), str(bam)]
-    record = cli.invoke(_TOOL, arguments, cwd=target.parent, expected=[target], explicit=methyldackel_path)
-    rows = cli.read_table(target, header=False, names=["read", "chrom", "position", "methylation_percent", "informative_bases"],
-                          text_columns=frozenset({"read", "chrom"}), limit=1000)
-    return cli.finish(record, "summarize_per_read_methylation_methyldackel", reads=cli.count_lines(target), rows=rows)
+    arguments = [
+        "perRead",
+        *_filters(min_mapq, min_base_quality, region, regions_bed, threads),
+        "-o",
+        str(target),
+        str(ref),
+        str(bam),
+    ]
+    record = cli.invoke(
+        _TOOL, arguments, cwd=target.parent, expected=[target], explicit=methyldackel_path
+    )
+    rows = cli.read_table(
+        target,
+        header=False,
+        names=["read", "chrom", "position", "methylation_percent", "informative_bases"],
+        text_columns=frozenset({"read", "chrom"}),
+        limit=1000,
+    )
+    return cli.finish(
+        record,
+        "summarize_per_read_methylation_methyldackel",
+        reads=cli.count_lines(target),
+        rows=rows,
+    )
 
 
 def convert_mappability_bigwig_to_bbm_methyldackel(
@@ -225,16 +307,33 @@ def convert_mappability_bigwig_to_bbm_methyldackel(
     with tempfile.TemporaryDirectory(dir=prefix.parent) as scratch:
         link = Path(scratch) / (wig.stem + ".bw")
         link.symlink_to(wig)
-        arguments = ["extract", "-M", str(link), "-O", "-t", str(cli.number(mappability_threshold, "mappability_threshold", minimum=0.0)),
-                     "-b", str(cli.integer(min_mappable_bases, "min_mappable_bases", minimum=1)), "-o", str(prefix)]
+        arguments = [
+            "extract",
+            "-M",
+            str(link),
+            "-O",
+            "-t",
+            str(cli.number(mappability_threshold, "mappability_threshold", minimum=0.0)),
+            "-b",
+            str(cli.integer(min_mappable_bases, "min_mappable_bases", minimum=1)),
+            "-o",
+            str(prefix),
+        ]
         if region is not None:
             arguments += ["-r", cli.text(region, "region")]
         arguments += [str(ref), str(bam)]
         produced = Path(scratch) / (wig.stem + ".bbm")
-        record = cli.invoke(_TOOL, arguments, cwd=prefix.parent, expected=[produced], explicit=methyldackel_path)
+        record = cli.invoke(
+            _TOOL, arguments, cwd=prefix.parent, expected=[produced], explicit=methyldackel_path
+        )
         shutil.move(str(produced), str(bbm))
     record["outputs"] = [str(bbm)]
-    return cli.finish(record, "convert_mappability_bigwig_to_bbm_methyldackel", bbm=str(bbm), bbm_bytes=bbm.stat().st_size)
+    return cli.finish(
+        record,
+        "convert_mappability_bigwig_to_bbm_methyldackel",
+        bbm=str(bbm),
+        bbm_bytes=bbm.stat().st_size,
+    )
 
 
 __all__ = [

@@ -42,24 +42,49 @@ def fail(message: str, code: str, hint: str, *, config: bool = False) -> Any:
     raise (ConfigurationError if config else InputFormatError)(message, code=code, hint=hint)
 
 
-def option_number(options: Mapping[str, object], name: str, default: float | None, *,
-                  minimum: float | None = None, maximum: float | None = None) -> float | None:
+def option_number(
+    options: Mapping[str, object],
+    name: str,
+    default: float | None,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+) -> float | None:
     """Read a finite numeric option (``None`` allowed when default is None)."""
 
     value = options.get(name, default)
     if value is None:
         return None
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
-        fail(f"options.{name} must be a finite number.", "VARIANTS_BAD_OPTION", f"Pass a number for options.{name}.", config=True)
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(float(value))
+    ):
+        fail(
+            f"options.{name} must be a finite number.",
+            "VARIANTS_BAD_OPTION",
+            f"Pass a number for options.{name}.",
+            config=True,
+        )
     value = float(value)
     if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
-        fail(f"options.{name}={value} is outside [{minimum}, {maximum}].", "VARIANTS_BAD_OPTION",
-             f"Pass options.{name} within the documented range.", config=True)
+        fail(
+            f"options.{name}={value} is outside [{minimum}, {maximum}].",
+            "VARIANTS_BAD_OPTION",
+            f"Pass options.{name} within the documented range.",
+            config=True,
+        )
     return value
 
 
-def option_int(options: Mapping[str, object], name: str, default: int | None, *,
-               minimum: int | None = None, maximum: int | None = None) -> int | None:
+def option_int(
+    options: Mapping[str, object],
+    name: str,
+    default: int | None,
+    *,
+    minimum: int | None = None,
+    maximum: int | None = None,
+) -> int | None:
     """Read an integer option."""
 
     value = options.get(name, default)
@@ -69,25 +94,45 @@ def option_int(options: Mapping[str, object], name: str, default: int | None, *,
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         else:
-            fail(f"options.{name} must be an integer.", "VARIANTS_BAD_OPTION", f"Pass an integer for options.{name}.", config=True)
+            fail(
+                f"options.{name} must be an integer.",
+                "VARIANTS_BAD_OPTION",
+                f"Pass an integer for options.{name}.",
+                config=True,
+            )
     if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
-        fail(f"options.{name}={value} is outside [{minimum}, {maximum}].", "VARIANTS_BAD_OPTION",
-             f"Pass options.{name} within the documented range.", config=True)
+        fail(
+            f"options.{name}={value} is outside [{minimum}, {maximum}].",
+            "VARIANTS_BAD_OPTION",
+            f"Pass options.{name} within the documented range.",
+            config=True,
+        )
     return int(value)
 
 
 def option_bool(options: Mapping[str, object], name: str, default: bool) -> bool:
     value = options.get(name, default)
     if not isinstance(value, bool):
-        fail(f"options.{name} must be boolean.", "VARIANTS_BAD_OPTION", f"Pass true or false for options.{name}.", config=True)
+        fail(
+            f"options.{name} must be boolean.",
+            "VARIANTS_BAD_OPTION",
+            f"Pass true or false for options.{name}.",
+            config=True,
+        )
     return value
 
 
-def option_choice(options: Mapping[str, object], name: str, default: str, choices: Sequence[str]) -> str:
+def option_choice(
+    options: Mapping[str, object], name: str, default: str, choices: Sequence[str]
+) -> str:
     value = options.get(name, default)
     if not isinstance(value, str) or value not in choices:
-        fail(f"options.{name} must be one of {list(choices)}.", "VARIANTS_BAD_OPTION",
-             f"Pass one of {list(choices)} for options.{name}.", config=True)
+        fail(
+            f"options.{name} must be one of {list(choices)}.",
+            "VARIANTS_BAD_OPTION",
+            f"Pass one of {list(choices)} for options.{name}.",
+            config=True,
+        )
     return value
 
 
@@ -117,9 +162,17 @@ class VariantSet:
 
 def _read_path(path: Path) -> str:
     if not path.is_file():
-        fail(f"file not found: {path}", "VARIANTS_FILE_NOT_FOUND", "Pass an existing VCF path, VCF text or variant records.")
+        fail(
+            f"file not found: {path}",
+            "VARIANTS_FILE_NOT_FOUND",
+            "Pass an existing VCF path, VCF text or variant records.",
+        )
     if path.stat().st_size > MAX_FILE_BYTES:
-        fail(f"file is larger than {MAX_FILE_BYTES} bytes: {path}", "VARIANTS_FILE_TOO_LARGE", "Split the file or pass a region subset.")
+        fail(
+            f"file is larger than {MAX_FILE_BYTES} bytes: {path}",
+            "VARIANTS_FILE_TOO_LARGE",
+            "Split the file or pass a region subset.",
+        )
     data = path.read_bytes()
     return _decode(data)
 
@@ -129,11 +182,17 @@ def _decode(data: bytes) -> str:
         try:
             data = gzip.decompress(data)
         except (OSError, EOFError) as exc:
-            raise InputFormatError("invalid gzip/bgzip VCF data.", code="VARIANTS_BAD_GZIP", hint="Pass an uncompressed VCF or a valid .vcf.gz.") from exc
+            raise InputFormatError(
+                "invalid gzip/bgzip VCF data.",
+                code="VARIANTS_BAD_GZIP",
+                hint="Pass an uncompressed VCF or a valid .vcf.gz.",
+            ) from exc
     try:
         return data.decode("utf-8")
     except UnicodeDecodeError as exc:
-        raise InputFormatError("VCF data is not UTF-8 text.", code="VARIANTS_BAD_ENCODING", hint="Pass UTF-8 VCF text.") from exc
+        raise InputFormatError(
+            "VCF data is not UTF-8 text.", code="VARIANTS_BAD_ENCODING", hint="Pass UTF-8 VCF text."
+        ) from exc
 
 
 def _looks_like_vcf(text: str) -> bool:
@@ -156,7 +215,9 @@ def _alt_list(value: object) -> list[str]:
     return []
 
 
-def _record_from_mapping(item: Mapping[str, Any], index: int) -> tuple[dict[str, Any], list[str] | None, dict[str, Any]]:
+def _record_from_mapping(
+    item: Mapping[str, Any], index: int
+) -> tuple[dict[str, Any], list[str] | None, dict[str, Any]]:
     """Convert a user record (statistics-style or VCF-like) to the internal form."""
 
     def pick(*names: str, default: Any = None) -> Any:
@@ -168,22 +229,44 @@ def _record_from_mapping(item: Mapping[str, Any], index: int) -> tuple[dict[str,
     chrom = pick("chrom", "CHROM", "chromosome")
     pos = pick("pos", "POS", "position")
     ref = pick("ref", "REF")
-    if chrom in (None, "") or isinstance(pos, bool) or not isinstance(pos, int) or pos < 1 or not isinstance(ref, str) or not ref:
-        fail(f"variant record {index} needs chrom, a positive integer pos and ref.", "VARIANTS_BAD_RECORD",
-             "Records need chrom, pos, ref and alt (VCF-style, 1-based).")
+    if (
+        chrom in (None, "")
+        or isinstance(pos, bool)
+        or not isinstance(pos, int)
+        or pos < 1
+        or not isinstance(ref, str)
+        or not ref
+    ):
+        fail(
+            f"variant record {index} needs chrom, a positive integer pos and ref.",
+            "VARIANTS_BAD_RECORD",
+            "Records need chrom, pos, ref and alt (VCF-style, 1-based).",
+        )
     alts = _alt_list(pick("alt", "ALT", "alts", default=[]))
     if not alts:
-        fail(f"variant record {index} has no alternate allele.", "VARIANTS_BAD_RECORD", "Provide at least one alt allele.")
+        fail(
+            f"variant record {index} has no alternate allele.",
+            "VARIANTS_BAD_RECORD",
+            "Provide at least one alt allele.",
+        )
     qual = pick("qual", "QUAL", "quality")
     if qual in (None, ".", ""):
         qual = None
     elif isinstance(qual, bool) or not isinstance(qual, (int, float, str)):
-        fail(f"variant record {index} has a non-numeric qual.", "VARIANTS_BAD_RECORD", "qual must be a number or null.")
+        fail(
+            f"variant record {index} has a non-numeric qual.",
+            "VARIANTS_BAD_RECORD",
+            "qual must be a number or null.",
+        )
     else:
         try:
             qual = float(qual)
         except ValueError:
-            fail(f"variant record {index} has a non-numeric qual.", "VARIANTS_BAD_RECORD", "qual must be a number or null.")
+            fail(
+                f"variant record {index} has a non-numeric qual.",
+                "VARIANTS_BAD_RECORD",
+                "qual must be a number or null.",
+            )
     flt = pick("filter", "FILTER", default=".")
     if isinstance(flt, (list, tuple)):
         flt = ";".join(str(x) for x in flt) or "."
@@ -196,7 +279,11 @@ def _record_from_mapping(item: Mapping[str, Any], index: int) -> tuple[dict[str,
                 parsed[key] = val if "=" in part else True
         info = parsed
     if not isinstance(info, Mapping):
-        fail(f"variant record {index} has an invalid info field.", "VARIANTS_BAD_RECORD", "info must be a mapping or a VCF INFO string.")
+        fail(
+            f"variant record {index} has an invalid info field.",
+            "VARIANTS_BAD_RECORD",
+            "info must be a mapping or a VCF INFO string.",
+        )
     names: list[str] | None = None
     calls: list[dict[str, str]] = []
     samples = pick("samples", "sample_genotypes")
@@ -204,16 +291,24 @@ def _record_from_mapping(item: Mapping[str, Any], index: int) -> tuple[dict[str,
     if isinstance(samples, Mapping):
         names = [str(key) for key in samples]
         for value in samples.values():
-            calls.append({str(k): _call_to_str(v) for k, v in value.items()} if isinstance(value, Mapping) else {"GT": _call_to_str(value)})
+            calls.append(
+                {str(k): _call_to_str(v) for k, v in value.items()}
+                if isinstance(value, Mapping)
+                else {"GT": _call_to_str(value)}
+            )
     elif isinstance(samples, Sequence) and not isinstance(samples, (str, bytes)):
         for value in samples:
-            calls.append({str(k): _call_to_str(v) for k, v in value.items()} if isinstance(value, Mapping) else {"GT": _call_to_str(value)})
+            calls.append(
+                {str(k): _call_to_str(v) for k, v in value.items()}
+                if isinstance(value, Mapping)
+                else {"GT": _call_to_str(value)}
+            )
     elif genotypes is not None:
         values = [genotypes] if isinstance(genotypes, (str, int)) else list(genotypes)
         calls = [{"GT": _call_to_str(v)} for v in values]
     if genotypes is not None and calls and not any("GT" in c for c in calls):
         values = [genotypes] if isinstance(genotypes, (str, int)) else list(genotypes)
-        for call, gt in zip(calls, values):
+        for call, gt in zip(calls, values, strict=False):
             call["GT"] = _call_to_str(gt)
     fmt: list[str] = []
     for call in calls:
@@ -224,26 +319,71 @@ def _record_from_mapping(item: Mapping[str, Any], index: int) -> tuple[dict[str,
         fmt.remove("GT")
         fmt.insert(0, "GT")
     record = {
-        "chrom": str(chrom), "pos": pos, "id": None if pick("id", "ID") in (None, ".", "") else str(pick("id", "ID")),
-        "ref": ref, "alts": alts, "qual": qual, "filter": str(flt) if flt not in (None, "") else ".",
-        "info": dict(info), "format": fmt, "calls": calls,
+        "chrom": str(chrom),
+        "pos": pos,
+        "id": None if pick("id", "ID") in (None, ".", "") else str(pick("id", "ID")),
+        "ref": ref,
+        "alts": alts,
+        "qual": qual,
+        "filter": str(flt) if flt not in (None, "") else ".",
+        "info": dict(info),
+        "format": fmt,
+        "calls": calls,
     }
-    extras = {k: v for k, v in item.items() if k not in {
-        "chrom", "CHROM", "chromosome", "pos", "POS", "position", "ref", "REF", "alt", "ALT", "alts", "qual", "QUAL",
-        "quality", "filter", "FILTER", "info", "INFO", "id", "ID", "samples", "sample_genotypes", "genotypes", "GT",
-        "genotype", "format", "original_alt_index"}}
+    extras = {
+        k: v
+        for k, v in item.items()
+        if k
+        not in {
+            "chrom",
+            "CHROM",
+            "chromosome",
+            "pos",
+            "POS",
+            "position",
+            "ref",
+            "REF",
+            "alt",
+            "ALT",
+            "alts",
+            "qual",
+            "QUAL",
+            "quality",
+            "filter",
+            "FILTER",
+            "info",
+            "INFO",
+            "id",
+            "ID",
+            "samples",
+            "sample_genotypes",
+            "genotypes",
+            "GT",
+            "genotype",
+            "format",
+            "original_alt_index",
+        }
+    }
     return record, names, extras
 
 
 def _from_records(items: Sequence[object], metadata: Mapping[str, Any] | None = None) -> VariantSet:
     if len(items) > MAX_RECORDS:
-        fail(f"more than {MAX_RECORDS} records.", "VARIANTS_TOO_MANY_RECORDS", "Process the callset in chunks.")
+        fail(
+            f"more than {MAX_RECORDS} records.",
+            "VARIANTS_TOO_MANY_RECORDS",
+            "Process the callset in chunks.",
+        )
     metadata = metadata or {}
     records: list[dict[str, Any]] = []
     names: list[str] | None = None
     for index, item in enumerate(items):
         if not isinstance(item, Mapping):
-            fail(f"variant record {index} must be a mapping.", "VARIANTS_BAD_RECORD", "Pass a list of variant mappings.")
+            fail(
+                f"variant record {index} must be a mapping.",
+                "VARIANTS_BAD_RECORD",
+                "Pass a list of variant mappings.",
+            )
         record, rec_names, extras = _record_from_mapping(item, index)
         if extras:
             # keep user annotations (gene, consequence, af, ...) in a sidecar so they survive transformations
@@ -252,18 +392,28 @@ def _from_records(items: Sequence[object], metadata: Mapping[str, Any] | None = 
             names = rec_names
         records.append(record)
     declared = metadata.get("samples", metadata.get("sample_names"))
-    if isinstance(declared, Sequence) and not isinstance(declared, (str, bytes)) and all(isinstance(x, str) for x in declared):
+    if (
+        isinstance(declared, Sequence)
+        and not isinstance(declared, (str, bytes))
+        and all(isinstance(x, str) for x in declared)
+    ):
         names = list(declared)
     width = max((len(r["calls"]) for r in records), default=0)
     if names is None or len(names) != width:
         if names is not None and len(names) != width:
-            fail("declared sample names do not match the number of genotype columns.", "VARIANTS_SAMPLE_MISMATCH",
-                 "Provide one sample name per genotype column.")
+            fail(
+                "declared sample names do not match the number of genotype columns.",
+                "VARIANTS_SAMPLE_MISMATCH",
+                "Provide one sample name per genotype column.",
+            )
         names = [f"sample_{i + 1}" for i in range(width)]
     for record in records:
         if len(record["calls"]) not in (0, width):
-            fail("records have different numbers of sample genotypes.", "VARIANTS_SAMPLE_MISMATCH",
-                 "Every record needs one genotype per sample.")
+            fail(
+                "records have different numbers of sample genotypes.",
+                "VARIANTS_SAMPLE_MISMATCH",
+                "Every record needs one genotype per sample.",
+            )
         if not record["calls"]:
             record["calls"] = [{} for _ in range(width)]
     return VariantSet(records=records, samples=names, header=[])
@@ -274,16 +424,32 @@ def _from_vcf_text(text: str) -> VariantSet:
     records: list[dict[str, Any]] = []
     names = list(parsed["samples"])
     if len(parsed["records"]) > MAX_RECORDS:
-        fail(f"more than {MAX_RECORDS} records.", "VARIANTS_TOO_MANY_RECORDS", "Process the callset in chunks.")
+        fail(
+            f"more than {MAX_RECORDS} records.",
+            "VARIANTS_TOO_MANY_RECORDS",
+            "Process the callset in chunks.",
+        )
     for raw in parsed["records"]:
-        calls = [{k: ("." if v is None else str(v)) for k, v in sample.items()} for sample in raw.get("samples", [])]
+        calls = [
+            {k: ("." if v is None else str(v)) for k, v in sample.items()}
+            for sample in raw.get("samples", [])
+        ]
         if len(calls) < len(names):
             calls += [{} for _ in range(len(names) - len(calls))]
-        records.append({
-            "chrom": raw["chrom"], "pos": raw["pos"], "id": raw["id"], "ref": raw["ref"], "alts": list(raw["alt"]),
-            "qual": raw["qual"], "filter": raw["filter"], "info": dict(raw["info"]),
-            "format": list(raw.get("format", [])), "calls": calls[: len(names)] if names else [],
-        })
+        records.append(
+            {
+                "chrom": raw["chrom"],
+                "pos": raw["pos"],
+                "id": raw["id"],
+                "ref": raw["ref"],
+                "alts": list(raw["alt"]),
+                "qual": raw["qual"],
+                "filter": raw["filter"],
+                "info": dict(raw["info"]),
+                "format": list(raw.get("format", [])),
+                "calls": calls[: len(names)] if names else [],
+            }
+        )
     header = [line for line in parsed["headers"] if not line.startswith("#CHROM")]
     return VariantSet(records=records, samples=names, header=header)
 
@@ -302,8 +468,11 @@ def load_variant_set(value: object, *, what: str = "input") -> VariantSet:
             return _from_vcf_text(value)
         if value and len(value) < 4096 and os.path.isfile(value):
             return _from_vcf_text(_read_path(Path(value)))
-        fail(f"{what} is neither VCF text nor an existing file path.", "VARIANTS_BAD_INPUT",
-             "Pass VCF text (with tab-separated columns), a readable VCF path, or a list of variant records.")
+        fail(
+            f"{what} is neither VCF text nor an existing file path.",
+            "VARIANTS_BAD_INPUT",
+            "Pass VCF text (with tab-separated columns), a readable VCF path, or a list of variant records.",
+        )
     if isinstance(value, Mapping):
         for key in ("vcf", "text", "content"):
             if key in value and isinstance(value[key], (str, bytes, Path)):
@@ -315,18 +484,31 @@ def load_variant_set(value: object, *, what: str = "input") -> VariantSet:
                     return _from_records(list(inner), value)
         if any(k in value for k in ("chrom", "CHROM", "chromosome")):
             return _from_records([value], None)
-        fail(f"{what} mapping has no records/variants/vcf key.", "VARIANTS_BAD_INPUT",
-             "Use {'records': [...]} or {'vcf': '<text>'}.")
+        fail(
+            f"{what} mapping has no records/variants/vcf key.",
+            "VARIANTS_BAD_INPUT",
+            "Use {'records': [...]} or {'vcf': '<text>'}.",
+        )
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         items = list(value)
-        if items and all(isinstance(x, str) for x in items) and any(_looks_like_vcf(x) for x in items):
+        if (
+            items
+            and all(isinstance(x, str) for x in items)
+            and any(_looks_like_vcf(x) for x in items)
+        ):
             return _from_vcf_text("\n".join(items))
         if all(isinstance(x, Mapping) for x in items):
             return _from_records(items, None)
-        fail(f"{what} sequence must contain only variant mappings or VCF lines.", "VARIANTS_BAD_INPUT",
-             "Pass a list of variant records or VCF lines.")
-    fail(f"unsupported {what} type {type(value).__name__}.", "VARIANTS_BAD_INPUT",
-         "Pass VCF text, a VCF path, or a list of variant records.")
+        fail(
+            f"{what} sequence must contain only variant mappings or VCF lines.",
+            "VARIANTS_BAD_INPUT",
+            "Pass a list of variant records or VCF lines.",
+        )
+    fail(
+        f"unsupported {what} type {type(value).__name__}.",
+        "VARIANTS_BAD_INPUT",
+        "Pass VCF text, a VCF path, or a list of variant records.",
+    )
     raise AssertionError("unreachable")
 
 
@@ -364,8 +546,16 @@ def to_vcf_text(vs: VariantSet) -> str:
         columns += ["FORMAT", *vs.samples]
     lines = [*header, "\t".join(columns)]
     for rec in vs.records:
-        row = [rec["chrom"], str(rec["pos"]), rec["id"] or ".", rec["ref"], ",".join(rec["alts"]) or ".",
-               _qual_text(rec["qual"]), rec["filter"] or ".", _info_text(rec["info"])]
+        row = [
+            rec["chrom"],
+            str(rec["pos"]),
+            rec["id"] or ".",
+            rec["ref"],
+            ",".join(rec["alts"]) or ".",
+            _qual_text(rec["qual"]),
+            rec["filter"] or ".",
+            _info_text(rec["info"]),
+        ]
         if vs.samples:
             fmt = rec["format"] or ["GT"]
             row.append(":".join(fmt))
@@ -382,11 +572,19 @@ def record_view(rec: Mapping[str, Any], samples: Sequence[str]) -> dict[str, Any
     """JSON-friendly view of an internal record."""
 
     view: dict[str, Any] = {
-        "chrom": rec["chrom"], "pos": rec["pos"], "id": rec["id"], "ref": rec["ref"], "alt": list(rec["alts"]),
-        "qual": rec["qual"], "filter": rec["filter"], "info": dict(rec["info"]),
+        "chrom": rec["chrom"],
+        "pos": rec["pos"],
+        "id": rec["id"],
+        "ref": rec["ref"],
+        "alt": list(rec["alts"]),
+        "qual": rec["qual"],
+        "filter": rec["filter"],
+        "info": dict(rec["info"]),
     }
     if samples:
-        view["genotypes"] = {name: dict(call) for name, call in zip(samples, rec["calls"])}
+        view["genotypes"] = {
+            name: dict(call) for name, call in zip(samples, rec["calls"], strict=False)
+        }
     if rec.get("extra"):
         view.update({k: v for k, v in rec["extra"].items() if k not in view})
     if rec.get("hgvs_g"):
@@ -401,11 +599,21 @@ def write_output(options: Mapping[str, object], text: str) -> str | None:
     if target is None:
         return None
     if not isinstance(target, (str, Path)) or not str(target):
-        fail("options.output must be a path.", "VARIANTS_BAD_OPTION", "Pass a file path string.", config=True)
+        fail(
+            "options.output must be a path.",
+            "VARIANTS_BAD_OPTION",
+            "Pass a file path string.",
+            config=True,
+        )
     path = Path(target)
     overwrite = option_bool(options, "overwrite", False)
     if path.exists() and not overwrite:
-        fail(f"output exists: {path}", "VARIANTS_OUTPUT_EXISTS", "Pass options.overwrite=true or choose a new path.", config=True)
+        fail(
+            f"output exists: {path}",
+            "VARIANTS_OUTPUT_EXISTS",
+            "Pass options.overwrite=true or choose a new path.",
+            config=True,
+        )
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.suffix == ".gz":
         with gzip.open(path, "wt", encoding="utf-8") as handle:
@@ -430,7 +638,11 @@ def parse_gt(text: object) -> tuple[list[int | None], bool]:
     if value in {"", "."}:
         return [None], False
     if not _GT_RE.match(value):
-        fail(f"invalid genotype {value!r}.", "VARIANTS_BAD_GENOTYPE", "Genotypes look like 0/1, 1|0, ./. or 1.")
+        fail(
+            f"invalid genotype {value!r}.",
+            "VARIANTS_BAD_GENOTYPE",
+            "Genotypes look like 0/1, 1|0, ./. or 1.",
+        )
     alleles = [None if p == "." else int(p) for p in re.split(r"[/|]", value)]
     return alleles, "|" in value
 
@@ -496,8 +708,11 @@ def allele_counts(rec: Mapping[str, Any]) -> tuple[list[int], int]:
             if allele is None:
                 continue
             if allele >= len(counts):
-                fail(f"genotype allele {allele} exceeds ALT count at {rec['chrom']}:{rec['pos']}.", "VARIANTS_BAD_GENOTYPE",
-                     "Genotype indices must not exceed the number of ALT alleles.")
+                fail(
+                    f"genotype allele {allele} exceeds ALT count at {rec['chrom']}:{rec['pos']}.",
+                    "VARIANTS_BAD_GENOTYPE",
+                    "Genotype indices must not exceed the number of ALT alleles.",
+                )
             counts[allele] += 1
             total += 1
     return counts, total
@@ -560,7 +775,11 @@ def classify_alleles(ref: str, alt: str, *, sv_min_length: int = 50) -> dict[str
     _, tref, talt = trim_alleles(ref, alt)
     change = len(alt) - len(ref)
     if abs(change) >= sv_min_length:
-        return {"type": "SV", "subtype": "insertion" if change > 0 else "deletion", "length_change": change}
+        return {
+            "type": "SV",
+            "subtype": "insertion" if change > 0 else "deletion",
+            "length_change": change,
+        }
     if not tref and talt:
         return {"type": "indel", "subtype": "insertion", "length_change": change}
     if tref and not talt:
@@ -604,7 +823,7 @@ class Reference:
         index = pos - offset
         if index < 0 or length < 0 or index + length > len(seq):
             return None
-        return seq[index:index + length]
+        return seq[index : index + length]
 
 
 def _parse_fasta(text: str) -> dict[str, str]:
@@ -617,10 +836,18 @@ def _parse_fasta(text: str) -> dict[str, str]:
         if line.startswith(">"):
             current = line[1:].split()[0] if line[1:].strip() else ""
             if not current:
-                fail("FASTA record without a name.", "VARIANTS_BAD_REFERENCE", "Give every FASTA record a name.")
+                fail(
+                    "FASTA record without a name.",
+                    "VARIANTS_BAD_REFERENCE",
+                    "Give every FASTA record a name.",
+                )
             seqs.setdefault(current, [])
         elif current is None:
-            fail("FASTA text must start with '>'.", "VARIANTS_BAD_REFERENCE", "Pass a FASTA string, a path, a sequence or a contig mapping.")
+            fail(
+                "FASTA text must start with '>'.",
+                "VARIANTS_BAD_REFERENCE",
+                "Pass a FASTA string, a path, a sequence or a contig mapping.",
+            )
         else:
             seqs[current].append(line.upper())
     return {name: "".join(parts) for name, parts in seqs.items()}
@@ -635,19 +862,31 @@ def load_reference(value: object, start: int = 1) -> Reference | None:
         seqs = {}
         for name, seq in value.items():
             if not isinstance(seq, str):
-                fail("reference mapping values must be sequences.", "VARIANTS_BAD_REFERENCE", "Use {'chr1': 'ACGT...'}.")
+                fail(
+                    "reference mapping values must be sequences.",
+                    "VARIANTS_BAD_REFERENCE",
+                    "Use {'chr1': 'ACGT...'}.",
+                )
             seqs[str(name)] = seq.upper()
         return Reference(seqs)
-    if isinstance(value, Path) or (isinstance(value, str) and "\n" not in value and not value.startswith(">")
-                                   and not re.fullmatch(r"[A-Za-z*-]+", value) and os.path.isfile(value)):
+    if isinstance(value, Path) or (
+        isinstance(value, str)
+        and "\n" not in value
+        and not value.startswith(">")
+        and not re.fullmatch(r"[A-Za-z*-]+", value)
+        and os.path.isfile(value)
+    ):
         return Reference(_parse_fasta(_read_path(Path(value))))
     if isinstance(value, str):
         if value.lstrip().startswith(">"):
             return Reference(_parse_fasta(value))
         if re.fullmatch(r"[A-Za-z]+", value):
             return Reference({"*": value.upper()}, start=start)
-    fail("unsupported reference.", "VARIANTS_BAD_REFERENCE",
-         "Pass options.reference as a plain sequence, FASTA text, a FASTA path or {contig: sequence}.")
+    fail(
+        "unsupported reference.",
+        "VARIANTS_BAD_REFERENCE",
+        "Pass options.reference as a plain sequence, FASTA text, a FASTA path or {contig: sequence}.",
+    )
     raise AssertionError("unreachable")
 
 
@@ -659,7 +898,9 @@ def reference_from_options(options: Mapping[str, object]) -> Reference | None:
 # ---------------------------------------------------------------------------
 # normalisation (trim + left-align, Tan et al. 2015)
 # ---------------------------------------------------------------------------
-def normalize_alleles(chrom: str, pos: int, alleles: Sequence[str], ref: Reference | None) -> tuple[int, list[str], bool]:
+def normalize_alleles(
+    chrom: str, pos: int, alleles: Sequence[str], ref: Reference | None
+) -> tuple[int, list[str], bool]:
     """Trim and (when ``ref`` is given) left-align a set of alleles (index 0 = REF).
 
     Algorithm of Tan, Abecasis & Kang (2015): repeatedly drop the shared last base; whenever an allele
@@ -704,8 +945,14 @@ def normalize_alleles(chrom: str, pos: int, alleles: Sequence[str], ref: Referen
     return pos, alleles, ref is not None
 
 
-def normalize_set(vs: VariantSet, ref: Reference | None, *, check_ref: str = "warn", split: bool = False,
-                  sort: bool = True) -> tuple[VariantSet, dict[str, Any]]:
+def normalize_set(
+    vs: VariantSet,
+    ref: Reference | None,
+    *,
+    check_ref: str = "warn",
+    split: bool = False,
+    sort: bool = True,
+) -> tuple[VariantSet, dict[str, Any]]:
     """Normalise every record of ``vs``; returns the new set and a report."""
 
     warnings: list[str] = []
@@ -723,10 +970,16 @@ def normalize_set(vs: VariantSet, ref: Reference | None, *, check_ref: str = "wa
         if ref is not None:
             actual = ref.fetch(rec["chrom"], rec["pos"], len(rec["ref"]))
             if actual is None or actual.upper() != rec["ref"].upper():
-                message = (f"{rec['chrom']}:{rec['pos']} REF {rec['ref']} is not found in the reference"
-                           f" (reference has {actual!r}); record left unchanged.")
+                message = (
+                    f"{rec['chrom']}:{rec['pos']} REF {rec['ref']} is not found in the reference"
+                    f" (reference has {actual!r}); record left unchanged."
+                )
                 if check_ref == "error":
-                    fail(message, "VARIANTS_REF_MISMATCH", "Fix the REF allele or pass the matching reference.")
+                    fail(
+                        message,
+                        "VARIANTS_REF_MISMATCH",
+                        "Fix the REF allele or pass the matching reference.",
+                    )
                 warnings.append(message)
                 out.append(new)
                 skipped += 1
@@ -735,8 +988,13 @@ def normalize_set(vs: VariantSet, ref: Reference | None, *, check_ref: str = "wa
         if (pos, norm) != (rec["pos"], [a.upper() for a in alleles]):
             changed += 1
             if len(changes) < 100:
-                changes.append({"chrom": rec["chrom"], "from": f"{rec['pos']} {rec['ref']}>{','.join(rec['alts'])}",
-                                "to": f"{pos} {norm[0]}>{','.join(norm[1:])}"})
+                changes.append(
+                    {
+                        "chrom": rec["chrom"],
+                        "from": f"{rec['pos']} {rec['ref']}>{','.join(rec['alts'])}",
+                        "to": f"{pos} {norm[0]}>{','.join(norm[1:])}",
+                    }
+                )
         new["pos"], new["ref"], new["alts"] = pos, norm[0], norm[1:]
         out.append(new)
     result = VariantSet(records=out, samples=list(vs.samples), header=list(vs.header))
@@ -744,8 +1002,14 @@ def normalize_set(vs: VariantSet, ref: Reference | None, *, check_ref: str = "wa
         result = split_multiallelic_set(result)
     if sort:
         sort_records(result.records)
-    return result, {"changed_records": changed, "unchanged_or_skipped": len(vs.records) - changed,
-                    "skipped_records": skipped, "left_aligned": ref is not None, "changes": changes, "warnings": warnings}
+    return result, {
+        "changed_records": changed,
+        "unchanged_or_skipped": len(vs.records) - changed,
+        "skipped_records": skipped,
+        "left_aligned": ref is not None,
+        "changes": changes,
+        "warnings": warnings,
+    }
 
 
 def sort_records(records: list[dict[str, Any]]) -> None:
@@ -757,8 +1021,14 @@ def sort_records(records: list[dict[str, Any]]) -> None:
 # ---------------------------------------------------------------------------
 # HGVS (genomic, g.) strings for simple variants
 # ---------------------------------------------------------------------------
-def build_hgvs_genomic(accession: str, pos: int, ref: str, alt: str, reference: Reference | None = None,
-                       chrom: str | None = None) -> str:
+def build_hgvs_genomic(
+    accession: str,
+    pos: int,
+    ref: str,
+    alt: str,
+    reference: Reference | None = None,
+    chrom: str | None = None,
+) -> str:
     """Build an HGVS ``g.`` description for one VCF-style SNV, MNV, insertion, deletion or delins.
 
     With a reference the indel is first 3'-shifted (HGVS rule) and an insertion that repeats the preceding
@@ -768,7 +1038,11 @@ def build_hgvs_genomic(accession: str, pos: int, ref: str, alt: str, reference: 
 
     ref, alt = ref.upper(), alt.upper()
     if is_symbolic(alt):
-        fail(f"cannot build HGVS for symbolic allele {alt}.", "VARIANTS_HGVS_UNSUPPORTED", "Only sequence alleles are supported.")
+        fail(
+            f"cannot build HGVS for symbolic allele {alt}.",
+            "VARIANTS_HGVS_UNSUPPORTED",
+            "Only sequence alleles are supported.",
+        )
     offset, tref, talt = trim_alleles(ref, alt)
     start = pos + offset
     prefix = f"{accession}:g."
@@ -798,7 +1072,11 @@ def build_hgvs_genomic(accession: str, pos: int, ref: str, alt: str, reference: 
             if nxt is None or nxt.upper() != seq[0]:
                 break
             seq, after = seq[1:] + seq[0], after + 1
-        before = reference.fetch(chrom, after - len(seq) + 1, len(seq)) if after - len(seq) + 1 >= 1 else None
+        before = (
+            reference.fetch(chrom, after - len(seq) + 1, len(seq))
+            if after - len(seq) + 1 >= 1
+            else None
+        )
         if before is not None and before.upper() == seq:
             first = after - len(seq) + 1
             return f"{prefix}{first}dup" if first == after else f"{prefix}{first}_{after}dup"
@@ -858,14 +1136,24 @@ def load_many(value: object) -> list[VariantSet]:
     if isinstance(value, Mapping) and "inputs" in value:
         value = value["inputs"]
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
-        fail("merge input must be a list of VCFs / call sets.", "VARIANTS_BAD_INPUT",
-             "Pass a list with two or more VCF texts, paths or {'records': [...]} mappings.")
+        fail(
+            "merge input must be a list of VCFs / call sets.",
+            "VARIANTS_BAD_INPUT",
+            "Pass a list with two or more VCF texts, paths or {'records': [...]} mappings.",
+        )
     items = list(value)
-    if items and all(isinstance(x, Mapping) and any(k in x for k in ("chrom", "CHROM")) for x in items):
-        fail("got a single record list, but merging needs two or more call sets.", "VARIANTS_BAD_INPUT",
-             "Wrap each call set: [{'records': [...]}, {'records': [...]}].")
+    if items and all(
+        isinstance(x, Mapping) and any(k in x for k in ("chrom", "CHROM")) for x in items
+    ):
+        fail(
+            "got a single record list, but merging needs two or more call sets.",
+            "VARIANTS_BAD_INPUT",
+            "Wrap each call set: [{'records': [...]}, {'records': [...]}].",
+        )
     if len(items) < 2:
-        fail("merging needs at least two call sets.", "VARIANTS_BAD_INPUT", "Pass two or more VCFs.")
+        fail(
+            "merging needs at least two call sets.", "VARIANTS_BAD_INPUT", "Pass two or more VCFs."
+        )
     return [load_variant_set(item, what=f"call set {i}") for i, item in enumerate(items)]
 
 
@@ -888,8 +1176,11 @@ def merge_sets(sets: Sequence[VariantSet], mode: str = "samples") -> VariantSet:
     if mode == "records":
         names = list(sets[0].samples)
         if any(vs.samples != names for vs in sets):
-            fail("records mode requires identical sample lists in all inputs.", "VARIANTS_SAMPLE_MISMATCH",
-                 "Use mode='samples' to merge different samples.")
+            fail(
+                "records mode requires identical sample lists in all inputs.",
+                "VARIANTS_SAMPLE_MISMATCH",
+                "Use mode='samples' to merge different samples.",
+            )
         seen: set[tuple[Any, ...]] = set()
         records = []
         for vs in sets:
@@ -904,8 +1195,11 @@ def merge_sets(sets: Sequence[VariantSet], mode: str = "samples") -> VariantSet:
     for vs in sets:
         for name in vs.samples:
             if name in names:
-                fail(f"duplicate sample name {name!r} across inputs.", "VARIANTS_DUPLICATE_SAMPLE",
-                     "Rename samples so that every sample name is unique before merging.")
+                fail(
+                    f"duplicate sample name {name!r} across inputs.",
+                    "VARIANTS_DUPLICATE_SAMPLE",
+                    "Rename samples so that every sample name is unique before merging.",
+                )
             names.append(name)
     offsets = []
     cursor = 0
@@ -918,7 +1212,12 @@ def merge_sets(sets: Sequence[VariantSet], mode: str = "samples") -> VariantSet:
             key = (rec["chrom"], rec["pos"], rec["ref"], tuple(rec["alts"]))
             slot = merged.get(key)
             if slot is None:
-                slot = merged[key] = {"rec": deepcopy(rec), "calls": [None] * len(names), "filters": [], "quals": []}
+                slot = merged[key] = {
+                    "rec": deepcopy(rec),
+                    "calls": [None] * len(names),
+                    "filters": [],
+                    "quals": [],
+                }
                 slot["rec"]["calls"] = []
             slot["filters"].append(rec["filter"])
             if rec["qual"] is not None:
@@ -964,11 +1263,15 @@ def hwe_exact_pvalue(n_aa: int, n_ab: int, n_bb: int, *, mid_p: bool = False) ->
     counts (given the allele counts) that are not more likely than the observed one."""
 
     if min(n_aa, n_ab, n_bb) < 0:
-        fail("genotype counts must be non-negative.", "VARIANTS_BAD_COUNTS", "Pass non-negative integer counts.")
+        fail(
+            "genotype counts must be non-negative.",
+            "VARIANTS_BAD_COUNTS",
+            "Pass non-negative integer counts.",
+        )
     n = n_aa + n_ab + n_bb
     if n == 0:
         return 1.0
-    hom_rare, hom_common = sorted((n_aa, n_bb))
+    hom_rare, _hom_common = sorted((n_aa, n_bb))
     rare = 2 * hom_rare + n_ab
     probs = [0.0] * (rare + 1)
     mid = rare * (2 * n - rare) // (2 * n)
@@ -1014,16 +1317,31 @@ def _region_list(value: object) -> list[tuple[str, int, int]]:
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, Sequence):
-        fail("options.regions must be a list of 'chr:start-end' strings.", "VARIANTS_BAD_OPTION", "Example: ['chr1:1000-2000'].", config=True)
+        fail(
+            "options.regions must be a list of 'chr:start-end' strings.",
+            "VARIANTS_BAD_OPTION",
+            "Example: ['chr1:1000-2000'].",
+            config=True,
+        )
     out = []
     for item in value:
         match = re.fullmatch(r"([^:]+)(?::(\d+)(?:-(\d+))?)?", str(item).replace(",", ""))
         if not match:
-            fail(f"invalid region {item!r}.", "VARIANTS_BAD_OPTION", "Use chrom, chrom:pos or chrom:start-end.", config=True)
+            fail(
+                f"invalid region {item!r}.",
+                "VARIANTS_BAD_OPTION",
+                "Use chrom, chrom:pos or chrom:start-end.",
+                config=True,
+            )
         start = int(match.group(2)) if match.group(2) else 1
         end = int(match.group(3)) if match.group(3) else (start if match.group(2) else 10**12)
         if end < start:
-            fail(f"invalid region {item!r}: end < start.", "VARIANTS_BAD_OPTION", "Use start <= end.", config=True)
+            fail(
+                f"invalid region {item!r}: end < start.",
+                "VARIANTS_BAD_OPTION",
+                "Use start <= end.",
+                config=True,
+            )
         out.append((match.group(1), start, end))
     return out
 
@@ -1066,8 +1384,12 @@ def filter_set(vs: VariantSet, options: Mapping[str, object]) -> tuple[VariantSe
             types = [types]
         allowed = {"SNV", "MNV", "indel", "SV"}
         if not isinstance(types, Sequence) or any(t not in allowed for t in types):
-            fail(f"options.variant_types must be a list from {sorted(allowed)}.", "VARIANTS_BAD_OPTION",
-                 "Use SNV, MNV, indel or SV.", config=True)
+            fail(
+                f"options.variant_types must be a list from {sorted(allowed)}.",
+                "VARIANTS_BAD_OPTION",
+                "Use SNV, MNV, indel or SV.",
+                config=True,
+            )
     chroms = options.get("chroms")
     if chroms is not None:
         chroms = {str(c) for c in ([chroms] if isinstance(chroms, str) else chroms)}
@@ -1082,7 +1404,9 @@ def filter_set(vs: VariantSet, options: Mapping[str, object]) -> tuple[VariantSe
             for call in new["calls"]:
                 gq = number_or_none(call.get("GQ"))
                 dp = call_depth(call)
-                if (min_gq is not None and (gq is None or gq < min_gq)) or (min_sdp is not None and (dp is None or dp < min_sdp)):
+                if (min_gq is not None and (gq is None or gq < min_gq)) or (
+                    min_sdp is not None and (dp is None or dp < min_sdp)
+                ):
                     if call.get("GT") not in (None, ".", "./.", ".|."):
                         masked += 1
                     call["GT"] = "./."
@@ -1097,12 +1421,18 @@ def filter_set(vs: VariantSet, options: Mapping[str, object]) -> tuple[VariantSe
         if max_depth is not None and depth is not None and depth > max_depth:
             failed.append("high_depth")
         if max_missing is not None and new["calls"]:
-            missing = sum(1 for c in new["calls"] if not is_called(call_gt(c)[0])) / len(new["calls"])
+            missing = sum(1 for c in new["calls"] if not is_called(call_gt(c)[0])) / len(
+                new["calls"]
+            )
             if missing > max_missing:
                 failed.append("high_missing")
         if min_af is not None or max_af is not None:
             freq = alt_frequency(new)
-            if freq is None or (min_af is not None and freq < min_af) or (max_af is not None and freq > max_af):
+            if (
+                freq is None
+                or (min_af is not None and freq < min_af)
+                or (max_af is not None and freq > max_af)
+            ):
                 failed.append("af_out_of_range")
         if min_hwe is not None:
             p_value = site_hwe(new)
@@ -1114,7 +1444,9 @@ def filter_set(vs: VariantSet, options: Mapping[str, object]) -> tuple[VariantSe
                 failed.append("variant_type")
         if chroms is not None and rec["chrom"] not in chroms:
             failed.append("chrom")
-        if regions is not None and not any(rec["chrom"] == c and s <= rec["pos"] <= e for c, s, e in regions):
+        if regions is not None and not any(
+            rec["chrom"] == c and s <= rec["pos"] <= e for c, s, e in regions
+        ):
             failed.append("region")
         for reason in failed:
             reasons[reason] += 1
@@ -1127,8 +1459,16 @@ def filter_set(vs: VariantSet, options: Mapping[str, object]) -> tuple[VariantSe
             new["filter"] = "PASS"
         out.append(new)
     result = VariantSet(out, list(vs.samples), list(vs.header))
-    return result, {"input_records": len(vs.records), "output_records": len(out), "failed_records": sum(1 for r in out if r["filter"] not in {"PASS", "."}) if mode == "flag" else len(vs.records) - len(out),
-                    "reason_counts": dict(sorted(reasons.items())), "genotypes_masked": masked, "mode": mode}
+    return result, {
+        "input_records": len(vs.records),
+        "output_records": len(out),
+        "failed_records": sum(1 for r in out if r["filter"] not in {"PASS", "."})
+        if mode == "flag"
+        else len(vs.records) - len(out),
+        "reason_counts": dict(sorted(reasons.items())),
+        "genotypes_masked": masked,
+        "mode": mode,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -1170,16 +1510,28 @@ def sample_qc(vs: VariantSet) -> list[dict[str, Any]]:
                         indel += 1
         total = len(vs.records)
         called = total - counts["missing"]
-        rows.append({
-            "sample": name, "n_sites": total, "n_called": called, "n_missing": counts["missing"],
-            "call_rate": called / total if total else None,
-            "n_hom_ref": counts["hom_ref"], "n_het": counts["het"], "n_hom_alt": counts["hom_alt"],
-            "het_hom_alt_ratio": counts["het"] / counts["hom_alt"] if counts["hom_alt"] else None,
-            "n_snv": snv, "n_indel": indel, "n_transitions": ti, "n_transversions": tv,
-            "ti_tv": ti / tv if tv else None,
-            "mean_depth": sum(depths) / len(depths) if depths else None,
-            "mean_genotype_quality": sum(gqs) / len(gqs) if gqs else None,
-        })
+        rows.append(
+            {
+                "sample": name,
+                "n_sites": total,
+                "n_called": called,
+                "n_missing": counts["missing"],
+                "call_rate": called / total if total else None,
+                "n_hom_ref": counts["hom_ref"],
+                "n_het": counts["het"],
+                "n_hom_alt": counts["hom_alt"],
+                "het_hom_alt_ratio": counts["het"] / counts["hom_alt"]
+                if counts["hom_alt"]
+                else None,
+                "n_snv": snv,
+                "n_indel": indel,
+                "n_transitions": ti,
+                "n_transversions": tv,
+                "ti_tv": ti / tv if tv else None,
+                "mean_depth": sum(depths) / len(depths) if depths else None,
+                "mean_genotype_quality": sum(gqs) / len(gqs) if gqs else None,
+            }
+        )
     return rows
 
 
@@ -1193,15 +1545,25 @@ def site_qc(vs: VariantSet) -> list[dict[str, Any]]:
         gcounts = genotype_counts(rec) if n else {}
         called = n - gcounts.get("missing", 0) if n else 0
         depths = [d for d in (call_depth(c) for c in rec["calls"]) if d is not None]
-        rows.append({
-            "chrom": rec["chrom"], "pos": rec["pos"], "ref": rec["ref"], "alt": list(rec["alts"]),
-            "n_samples": n, "call_rate": called / n if n else None, "an": an, "ac": counts[1:],
-            "af": [c / an for c in counts[1:]] if an else None,
-            "n_het": gcounts.get("het"), "n_hom_alt": gcounts.get("hom_alt"),
-            "hwe_pvalue": site_hwe(rec) if n else None,
-            "mean_depth": sum(depths) / len(depths) if depths else None,
-            "qual": rec["qual"], "filter": rec["filter"],
-        })
+        rows.append(
+            {
+                "chrom": rec["chrom"],
+                "pos": rec["pos"],
+                "ref": rec["ref"],
+                "alt": list(rec["alts"]),
+                "n_samples": n,
+                "call_rate": called / n if n else None,
+                "an": an,
+                "ac": counts[1:],
+                "af": [c / an for c in counts[1:]] if an else None,
+                "n_het": gcounts.get("het"),
+                "n_hom_alt": gcounts.get("hom_alt"),
+                "hwe_pvalue": site_hwe(rec) if n else None,
+                "mean_depth": sum(depths) / len(depths) if depths else None,
+                "qual": rec["qual"],
+                "filter": rec["filter"],
+            }
+        )
     return rows
 
 
@@ -1238,12 +1600,18 @@ def summarize_set(vs: VariantSet) -> dict[str, Any]:
     samples = sample_qc(vs) if vs.samples else []
     rates = [row["call_rate"] for row in samples if row["call_rate"] is not None]
     return {
-        "n_records": len(vs.records), "n_alt_alleles": alleles, "n_multiallelic_sites": multi,
-        "n_samples": len(vs.samples), "samples": list(vs.samples),
-        "type_counts": dict(sorted(by_type.items())), "subtype_counts": dict(sorted(by_subtype.items())),
+        "n_records": len(vs.records),
+        "n_alt_alleles": alleles,
+        "n_multiallelic_sites": multi,
+        "n_samples": len(vs.samples),
+        "samples": list(vs.samples),
+        "type_counts": dict(sorted(by_type.items())),
+        "subtype_counts": dict(sorted(by_subtype.items())),
         "by_chromosome": dict(sorted(by_chrom.items(), key=lambda kv: chrom_key(kv[0]))),
         "filter_counts": dict(sorted(by_filter.items())),
-        "transitions": ti, "transversions": tv, "ti_tv": ti / tv if tv else None,
+        "transitions": ti,
+        "transversions": tv,
+        "ti_tv": ti / tv if tv else None,
         "mean_qual": sum(quals) / len(quals) if quals else None,
         "indel_length_counts": {str(k): v for k, v in sorted(indel_lengths.items())},
         "mean_sample_call_rate": sum(rates) / len(rates) if rates else None,
@@ -1254,7 +1622,9 @@ def summarize_set(vs: VariantSet) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # comparison
 # ---------------------------------------------------------------------------
-def _allele_sequences(rec: Mapping[str, Any], alleles: Sequence[int | None]) -> tuple[str, ...] | None:
+def _allele_sequences(
+    rec: Mapping[str, Any], alleles: Sequence[int | None]
+) -> tuple[str, ...] | None:
     if not is_called(alleles):
         return None
     pool = [rec["ref"], *rec["alts"]]
@@ -1281,7 +1651,9 @@ def compare_sets(left: VariantSet, right: VariantSet, *, match: str = "exact") -
                 out.setdefault((rec["chrom"], rec["pos"]), (rec, 0))
             else:
                 for index, alt in enumerate(rec["alts"], 1):
-                    out.setdefault((rec["chrom"], rec["pos"], rec["ref"].upper(), alt.upper()), (rec, index))
+                    out.setdefault(
+                        (rec["chrom"], rec["pos"], rec["ref"].upper(), alt.upper()), (rec, index)
+                    )
         return out
 
     lk, rk = keys(left), keys(right)
@@ -1296,7 +1668,11 @@ def compare_sets(left: VariantSet, right: VariantSet, *, match: str = "exact") -
     order = lambda k: (chrom_key(str(k[0])), k[1:])  # noqa: E731
     precision = len(shared) / len(rk) if rk else None
     recall = len(shared) / len(lk) if lk else None
-    f1 = 2 * precision * recall / (precision + recall) if precision and recall else (0.0 if precision is not None and recall is not None else None)
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if precision and recall
+        else (0.0 if precision is not None and recall is not None else None)
+    )
     common = [name for name in left.samples if name in right.samples]
     concordance: dict[str, Any] = {}
     if common and match == "exact":
@@ -1304,12 +1680,16 @@ def compare_sets(left: VariantSet, right: VariantSet, *, match: str = "exact") -
         right_idx = {name: right.samples.index(name) for name in common}
         right_sites: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
         for rrec in right.records:
-            right_sites.setdefault((rrec["chrom"], rrec["pos"], rrec["ref"].upper()), []).append(rrec)
+            right_sites.setdefault((rrec["chrom"], rrec["pos"], rrec["ref"].upper()), []).append(
+                rrec
+            )
         for name in common:
             conc = disc = nonref_conc = nonref_total = 0
             for lrec in left.records:
                 for rrec in right_sites.get((lrec["chrom"], lrec["pos"], lrec["ref"].upper()), []):
-                    if not set(a.upper() for a in lrec["alts"]) & set(a.upper() for a in rrec["alts"]):
+                    if not set(a.upper() for a in lrec["alts"]) & set(
+                        a.upper() for a in rrec["alts"]
+                    ):
                         continue
                     lg = _allele_sequences(lrec, call_gt(lrec["calls"][left_idx[name]])[0])
                     rg = _allele_sequences(rrec, call_gt(rrec["calls"][right_idx[name]])[0])
@@ -1325,14 +1705,22 @@ def compare_sets(left: VariantSet, right: VariantSet, *, match: str = "exact") -
                         nonref_conc += int(lg == rg)
             total = conc + disc
             concordance[name] = {
-                "compared_genotypes": total, "concordant": conc, "discordant": disc,
+                "compared_genotypes": total,
+                "concordant": conc,
+                "discordant": disc,
                 "genotype_concordance": conc / total if total else None,
                 "non_reference_concordance": nonref_conc / nonref_total if nonref_total else None,
             }
     return {
-        "match": match, "left_count": len(lk), "right_count": len(rk), "shared_count": len(shared),
-        "only_left_count": len(only_left), "only_right_count": len(only_right),
-        "precision_right_vs_left": precision, "recall_right_vs_left": recall, "f1": f1,
+        "match": match,
+        "left_count": len(lk),
+        "right_count": len(rk),
+        "shared_count": len(shared),
+        "only_left_count": len(only_left),
+        "only_right_count": len(only_right),
+        "precision_right_vs_left": precision,
+        "recall_right_vs_left": recall,
+        "f1": f1,
         "jaccard": len(shared) / len(set(lk) | set(rk)) if (lk or rk) else 1.0,
         "shared": [show(k) for k in sorted(shared, key=order)],
         "only_left": [show(k) for k in sorted(only_left, key=order)],

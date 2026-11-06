@@ -30,8 +30,8 @@ pgv = pytest.importorskip(
 )
 _mpl.rcParams.update(_saved_rc)
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.visualization import pygenomeviz_gap_functions as pg  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.visualization import pygenomeviz_gap_functions as pg
 
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 

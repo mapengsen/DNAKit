@@ -62,8 +62,21 @@ _MAX_FILE_BYTES = 50_000_000
 _MAX_BOWTIE_BASES = 10_000_000
 _IUPAC = frozenset("ACGTWSMKRYBDHVN")
 _IUPAC_CLASS = {
-    "A": "A", "C": "C", "G": "G", "T": "T", "W": "AT", "S": "CG", "M": "AC", "K": "GT",
-    "R": "AG", "Y": "CT", "B": "CGT", "D": "AGT", "H": "ACT", "V": "ACG", "N": "ACGT",
+    "A": "A",
+    "C": "C",
+    "G": "G",
+    "T": "T",
+    "W": "AT",
+    "S": "CG",
+    "M": "AC",
+    "K": "GT",
+    "R": "AG",
+    "Y": "CT",
+    "B": "CGT",
+    "D": "AGT",
+    "H": "ACT",
+    "V": "ACG",
+    "N": "ACGT",
 }
 _IUPAC_COMPLEMENT = str.maketrans("ACGTWSMKRYBDHVN", "TGCAWSKMYRVHDBN")
 _BLAST_TASKS = ("blastn", "blastn-short", "dc-megablast", "megablast")
@@ -97,7 +110,9 @@ def _flag(value: object, name: str) -> bool:
     return value
 
 
-def _iupac_text(value: object, name: str = "sequence", *, maximum: int = _MAX_DNA, allow_empty: bool = False) -> str:
+def _iupac_text(
+    value: object, name: str = "sequence", *, maximum: int = _MAX_DNA, allow_empty: bool = False
+) -> str:
     """Return an upper-case IUPAC DNA string (whitespace removed); reject anything else."""
 
     if not isinstance(value, str):
@@ -179,7 +194,9 @@ def _named_sequences(value: object) -> list[tuple[str, str]]:
         text = _iupac_text(sequence, f"sequence {name!r}")
         total += len(text)
         if total > _MAX_CONSTRAINT_TOTAL_BASES:
-            raise ConfigurationError(f"sequences exceed {_MAX_CONSTRAINT_TOTAL_BASES} bases in total.")
+            raise ConfigurationError(
+                f"sequences exceed {_MAX_CONSTRAINT_TOTAL_BASES} bases in total."
+            )
         pairs.append((name, text))
     return pairs
 
@@ -250,7 +267,9 @@ def _execute(
     return result.output
 
 
-def _program_version(program: str, executable: str, arguments: Sequence[str], cwd: Path, verbose: bool) -> str | None:
+def _program_version(
+    program: str, executable: str, arguments: Sequence[str], cwd: Path, verbose: bool
+) -> str | None:
     output = _execute(program, executable, arguments, cwd=cwd, verbose=verbose)
     match = _VERSION.search(output)
     return match.group(1) if match else None
@@ -297,7 +316,10 @@ def generate_random_dna_with_composition(
             raise ConfigurationError("probas must be a non-empty mapping of base to probability.")
         if set(probas) - set("ACGT") or len(set(probas)) != len(probas):
             raise ConfigurationError("probas keys must be distinct bases among A, C, G and T.")
-        weights = {str(key): _number(value, f"probas[{key}]", minimum=0.0, maximum=1.0) for key, value in probas.items()}
+        weights = {
+            str(key): _number(value, f"probas[{key}]", minimum=0.0, maximum=1.0)
+            for key, value in probas.items()
+        }
         if abs(sum(weights.values()) - 1.0) > 1e-6:
             raise ConfigurationError("probas must sum to 1.")
     seed_value = None if seed is None else _integer(seed, "seed", minimum=0, maximum=2**32 - 1)
@@ -363,7 +385,9 @@ def gc_fraction_or_windows(
         "gc_fraction": None,
         "window_count": len(values),
         "window_gc_fractions": values,
-        "provenance": _provenance(method="dnachisel.biotools.gc_content.gc_content, sliding window"),
+        "provenance": _provenance(
+            method="dnachisel.biotools.gc_content.gc_content, sliding window"
+        ),
     }
 
 
@@ -411,7 +435,9 @@ def load_dna_record(
         try:
             record = seqio.read(str(path), biopython_formats[selected])
         except ValueError as exc:
-            raise ConfigurationError(f"Could not read exactly one {selected} record: {exc}") from exc
+            raise ConfigurationError(
+                f"Could not read exactly one {selected} record: {exc}"
+            ) from exc
     if name is not None:
         if not isinstance(name, str) or not name.strip():
             raise ConfigurationError("name must be a non-empty string.")
@@ -432,7 +458,9 @@ def load_dna_record(
         "length": len(sequence),
         "topology": "linear" if linear_flag else "circular",
         "feature_count": len(record.features),
-        "provenance": _provenance(method=f"Bio.SeqIO {selected}" if selected != "snapgene" else "snapgene_reader"),
+        "provenance": _provenance(
+            method=f"Bio.SeqIO {selected}" if selected != "snapgene" else "snapgene_reader"
+        ),
     }
 
 
@@ -457,7 +485,9 @@ def annotate_pattern_occurrences_features(
 
     text = _iupac_text(sequence, "sequence", allow_empty=True)
     motif = _iupac_text(pattern, "pattern", maximum=1000)
-    if not isinstance(feature_type, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_']{0,39}", feature_type):
+    if not isinstance(feature_type, str) or not re.fullmatch(
+        r"[A-Za-z][A-Za-z0-9_']{0,39}", feature_type
+    ):
         raise ConfigurationError("feature_type must be a GenBank feature key such as misc_feature.")
     if not isinstance(prefix, str) or len(prefix) > 20:
         raise ConfigurationError("prefix must be a string of at most 20 characters.")
@@ -469,7 +499,15 @@ def annotate_pattern_occurrences_features(
     def scan(expression: str, strand: int) -> None:
         for match in re.finditer(r"(?=(" + expression + "))", text):
             start = match.start()
-            occurrences.append({"type": feature_type, "start": start, "end": start + len(motif), "strand": strand, "label": label})
+            occurrences.append(
+                {
+                    "type": feature_type,
+                    "start": start,
+                    "end": start + len(motif),
+                    "strand": strand,
+                    "label": label,
+                }
+            )
 
     forward = "".join(f"[{_IUPAC_CLASS[symbol]}]" for symbol in motif)
     scan(forward, 1)
@@ -548,7 +586,10 @@ def list_common_restriction_enzymes_filtered(
         names = sorted(
             str(name)
             for name in dnachisel.list_common_enzymes(
-                site_length=lengths, opt_temp=temps, min_suppliers=suppliers, site_unlike=tuple(unlike)
+                site_length=lengths,
+                opt_temp=temps,
+                min_suppliers=suppliers,
+                site_unlike=tuple(unlike),
             )
         )
     except (KeyError, TypeError, ValueError) as exc:
@@ -567,7 +608,12 @@ def list_common_restriction_enzymes_filtered(
 
 
 def _int_items(values: object, name: str, *, minimum: int, maximum: int) -> tuple[int, ...]:
-    if isinstance(values, (str, bytes)) or not isinstance(values, Sequence) or not values or len(values) > 20:
+    if (
+        isinstance(values, (str, bytes))
+        or not isinstance(values, Sequence)
+        or not values
+        or len(values) > 20
+    ):
         raise ConfigurationError(f"{name} must be a list of 1 to 20 integers.")
     return tuple(_integer(item, name, minimum=minimum, maximum=maximum) for item in values)
 
@@ -577,13 +623,19 @@ def _int_items(values: object, name: str, *, minimum: int, maximum: int) -> tupl
 # ---------------------------------------------------------------------------
 
 
-def _breach_frame(constraints: object, pairs: list[tuple[str, str]], *, display_locations: bool) -> tuple[Any, list[dict[str, Any]], list[str]]:
+def _breach_frame(
+    constraints: object, pairs: list[tuple[str, str]], *, display_locations: bool
+) -> tuple[Any, list[dict[str, Any]], list[str]]:
     dnachisel = require("dnachisel", _EXTRA)
-    breaches = require("dnachisel.reports.constraints_reports.constraints_breaches_dataframe", _EXTRA)
+    breaches = require(
+        "dnachisel.reports.constraints_reports.constraints_breaches_dataframe", _EXTRA
+    )
     specs = _dnachisel_specs(constraints, "constraints", dnachisel)
     if not specs:
         raise ConfigurationError("Provide at least one constraint.")
-    frame = breaches.constraints_breaches_dataframe(specs, pairs, display_constraints_locations=display_locations)
+    frame = breaches.constraints_breaches_dataframe(
+        specs, pairs, display_constraints_locations=display_locations
+    )
     labels = [str(column) for column in frame.columns]
     rows = []
     for name, row in frame.iterrows():
@@ -618,7 +670,9 @@ def constraints_breaches_table(
         "sequence_count": len(rows),
         "constraint_labels": labels,
         "rows": rows,
-        "provenance": _provenance(method="dnachisel.reports.constraints_reports.constraints_breaches_dataframe"),
+        "provenance": _provenance(
+            method="dnachisel.reports.constraints_reports.constraints_breaches_dataframe"
+        ),
     }
 
 
@@ -661,7 +715,9 @@ def plot_constraint_breaches_png(
         "sequence_length": len(text),
         "breaches": locations,
         "constraint_labels": labels,
-        "provenance": _provenance(method="dnachisel.reports.constraints_reports.plot_breaches_record"),
+        "provenance": _provenance(
+            method="dnachisel.reports.constraints_reports.plot_breaches_record"
+        ),
     }
 
 
@@ -688,7 +744,9 @@ def write_constraint_breaches_pdf(
         raise ConfigurationError("output_path must end with .pdf.")
     frame, rows, labels = _breach_frame(constraints, pairs, display_locations=False)
     records = breach_plots.records_from_breaches_dataframe(frame, pairs)
-    breach_plots.breaches_records_to_pdf(records, pdf_path=str(target), figure_width=width, logger=None)
+    breach_plots.breaches_records_to_pdf(
+        records, pdf_path=str(target), figure_width=width, logger=None
+    )
     return {
         "status": "completed",
         "operation": "write_constraint_breaches_pdf",
@@ -697,7 +755,9 @@ def write_constraint_breaches_pdf(
         "sequence_count": len(pairs),
         "constraint_labels": labels,
         "rows": rows,
-        "provenance": _provenance(method="dnachisel.reports.constraints_reports.breaches_records_to_pdf"),
+        "provenance": _provenance(
+            method="dnachisel.reports.constraints_reports.breaches_records_to_pdf"
+        ),
     }
 
 
@@ -735,13 +795,17 @@ def write_dnachisel_optimization_report(
         raise ConfigurationError("Provide at least one constraint or objective.")
     flag = _flag(circular, "circular")
     if not isinstance(project_name, str) or not project_name.strip() or len(project_name) > 120:
-        raise ConfigurationError("project_name must be a non-empty string of at most 120 characters.")
+        raise ConfigurationError(
+            "project_name must be a non-empty string of at most 120 characters."
+        )
     target = _fresh_path(output_dir, "output_dir")
     problem = _dnachisel_problem(dnachisel, text, specs_c, specs_o, flag)
     try:
         _solve(problem, has_objectives=bool(specs_o))
     except dnachisel.NoSolutionError as exc:
-        raise ConfigurationError(f"No solution: {exc}. Use write_dnachisel_no_solution_report.") from exc
+        raise ConfigurationError(
+            f"No solution: {exc}. Use write_dnachisel_no_solution_report."
+        ) from exc
     reports.write_optimization_report(str(target), problem, project_name=project_name)
     return {
         "status": "completed",
@@ -754,7 +818,9 @@ def write_dnachisel_optimization_report(
         "constraints_before_after": _csv_rows(target / "constraints_before_and_after.csv"),
         "objectives_before_after": _csv_rows(target / "objectives_before_and_after.csv"),
         "circular": flag,
-        "provenance": _provenance(method="dnachisel.reports.optimization_reports.write_optimization_report"),
+        "provenance": _provenance(
+            method="dnachisel.reports.optimization_reports.write_optimization_report"
+        ),
     }
 
 
@@ -810,7 +876,9 @@ def write_dnachisel_no_solution_report(
             "message": str(error),
             "location": [int(start), int(end), strand],
             "circular": flag,
-            "provenance": _provenance(method="dnachisel.reports.optimization_reports.write_no_solution_report"),
+            "provenance": _provenance(
+                method="dnachisel.reports.optimization_reports.write_no_solution_report"
+            ),
         }
     return {
         "status": "solved",
@@ -862,7 +930,9 @@ def plot_optimization_changes_png(
     figure = axes.figure
     figure.savefig(str(target), bbox_inches="tight")
     plt.close(figure)
-    segments = find_sequence_difference_segments(str(problem.sequence_before), str(problem.sequence))
+    segments = find_sequence_difference_segments(
+        str(problem.sequence_before), str(problem.sequence)
+    )
     return {
         "status": "completed",
         "operation": "plot_optimization_changes_png",
@@ -871,7 +941,9 @@ def plot_optimization_changes_png(
         "changed_segments": segments["segments"],
         "edits": int(problem.number_of_edits()),
         "all_constraints_pass": bool(problem.all_constraints_pass()),
-        "provenance": _provenance(method="dnachisel.reports.optimization_reports.plot_optimization_changes"),
+        "provenance": _provenance(
+            method="dnachisel.reports.optimization_reports.plot_optimization_changes"
+        ),
     }
 
 
@@ -924,7 +996,11 @@ def blast_sequence_hits(
     hits = _integer(num_alignments, "num_alignments", minimum=1, maximum=10_000)
     threads = _integer(num_threads, "num_threads", minimum=1, maximum=64)
     gapless = _flag(ungapped, "ungapped")
-    culling = None if culling_limit is None else _integer(culling_limit, "culling_limit", minimum=1, maximum=10_000)
+    culling = (
+        None
+        if culling_limit is None
+        else _integer(culling_limit, "culling_limit", minimum=1, maximum=10_000)
+    )
     evalue = None if e_value is None else _number(e_value, "e_value", minimum=0.0, maximum=1e9)
     if task is not None and task not in _BLAST_TASKS:
         raise ConfigurationError(f"task must be one of {', '.join(_BLAST_TASKS)}.")
@@ -934,7 +1010,9 @@ def blast_sequence_hits(
     subject: Path | None = None
     if blast_db is not None:
         if not isinstance(blast_db, str) or not blast_db.strip() or blast_db.startswith("-"):
-            raise ConfigurationError("blast_db must be a database path that does not start with '-'.")
+            raise ConfigurationError(
+                "blast_db must be a database path that does not start with '-'."
+            )
         database = blast_db
     else:
         subject = Path(subject_fasta).expanduser().resolve() if subject_fasta is not None else None
@@ -947,14 +1025,22 @@ def blast_sequence_hits(
         query.write_text(f">query\n{text}\n", encoding="utf-8")
         out = work / "blast.xml"
         arguments = [
-            "-query", str(query),
-            "-out", str(out),
-            "-outfmt", "5",
-            "-max_target_seqs", str(hits),
-            "-word_size", str(word),
-            "-num_threads", str(threads),
-            "-perc_identity", str(identity),
-            "-dust", dust,
+            "-query",
+            str(query),
+            "-out",
+            str(out),
+            "-outfmt",
+            "5",
+            "-max_target_seqs",
+            str(hits),
+            "-word_size",
+            str(word),
+            "-num_threads",
+            str(threads),
+            "-perc_identity",
+            str(identity),
+            "-dust",
+            dust,
         ]
         if database is not None:
             arguments += ["-db", database]
@@ -976,25 +1062,33 @@ def blast_sequence_hits(
         for record in records:
             alignments = []
             for alignment in record.alignments:
-                alignments.append({
-                    "title": str(alignment.title),
-                    "length": int(alignment.length),
-                    "hsps": [
-                        {
-                            "identities": int(item.identities),
-                            "align_length": int(item.align_length),
-                            "gaps": int(item.gaps or 0),
-                            "query_start": int(item.query_start),
-                            "query_end": int(item.query_end),
-                            "subject_start": int(item.sbjct_start),
-                            "subject_end": int(item.sbjct_end),
-                            "score": float(item.score),
-                            "evalue": float(item.expect),
-                        }
-                        for item in alignment.hsps
-                    ],
-                })
-            parsed.append({"query_id": str(record.query), "query_length": int(record.query_length), "alignments": alignments})
+                alignments.append(
+                    {
+                        "title": str(alignment.title),
+                        "length": int(alignment.length),
+                        "hsps": [
+                            {
+                                "identities": int(item.identities),
+                                "align_length": int(item.align_length),
+                                "gaps": int(item.gaps or 0),
+                                "query_start": int(item.query_start),
+                                "query_end": int(item.query_end),
+                                "subject_start": int(item.sbjct_start),
+                                "subject_end": int(item.sbjct_end),
+                                "score": float(item.score),
+                                "evalue": float(item.expect),
+                            }
+                            for item in alignment.hsps
+                        ],
+                    }
+                )
+            parsed.append(
+                {
+                    "query_id": str(record.query),
+                    "query_length": int(record.query_length),
+                    "alignments": alignments,
+                }
+            )
     return {
         "status": "completed",
         "operation": "blast_sequence_hits",
@@ -1004,7 +1098,9 @@ def blast_sequence_hits(
         "subject_fasta": None if subject is None else str(subject),
         "queries": parsed,
         "hit_count": sum(len(item["alignments"]) for item in parsed),
-        "provenance": _provenance(method="blastn -outfmt 5 parsed by Bio.Blast.NCBIXML", executable=executable),
+        "provenance": _provenance(
+            method="blastn -outfmt 5 parsed by Bio.Blast.NCBIXML", executable=executable
+        ),
     }
 
 
@@ -1032,7 +1128,9 @@ def create_bowtie_index(
     executable = _external_program("bowtie-build", bowtie_build_path, _BOWTIE_HINT)
     target.mkdir(parents=True, exist_ok=False)
     fasta = target / "sequences.fa"
-    fasta.write_text("".join(f">{index}\n{item}\n" for index, item in enumerate(texts)), encoding="utf-8")
+    fasta.write_text(
+        "".join(f">{index}\n{item}\n" for index, item in enumerate(texts)), encoding="utf-8"
+    )
     prefix = target / "bowtie"
     version = _program_version("bowtie-build", executable, ["--version"], target, verbose)
     _execute(
@@ -1077,8 +1175,10 @@ def find_bowtie_matches(
     mismatches = _integer(max_mismatches, "max_mismatches", minimum=0, maximum=3)
     prefix = Path(index_prefix).expanduser()
     if not Path(f"{prefix}.1.ebwt").is_file():
-        raise ConfigurationError(f"No Bowtie index found at prefix {prefix}; run create_bowtie_index first.")
-    kmers = [text[i:i + k] for i in range(len(text) - k + 1)]
+        raise ConfigurationError(
+            f"No Bowtie index found at prefix {prefix}; run create_bowtie_index first."
+        )
+    kmers = [text[i : i + k] for i in range(len(text) - k + 1)]
     if not kmers:
         return {
             "status": "completed",
@@ -1093,15 +1193,25 @@ def find_bowtie_matches(
     with tempfile.TemporaryDirectory(prefix="dnakit_bowtie_") as directory:
         work = Path(directory)
         reads = work / "kmers.fa"
-        reads.write_text("".join(f">{index}\n{kmer}\n" for index, kmer in enumerate(kmers)), encoding="utf-8")
+        reads.write_text(
+            "".join(f">{index}\n{kmer}\n" for index, kmer in enumerate(kmers)), encoding="utf-8"
+        )
         version = _program_version("bowtie", executable, ["--version"], work, verbose)
         output = _execute(
             "bowtie",
             executable,
             [
-                "--best", "-k", "1", "-v", str(mismatches),
-                str(prefix), "--quiet", "--suppress", "2,3,4,5,6,7",
-                "-f", str(reads),
+                "--best",
+                "-k",
+                "1",
+                "-v",
+                str(mismatches),
+                str(prefix),
+                "--quiet",
+                "--suppress",
+                "2,3,4,5,6,7",
+                "-f",
+                str(reads),
             ],
             cwd=work,
             verbose=verbose,
@@ -1122,7 +1232,9 @@ def find_bowtie_matches(
         "kmer_length": k,
         "match_count": len(matches),
         "matches": matches,
-        "provenance": _provenance(method="bowtie --best -k 1 -v <mismatches> on k-mers", executable=executable),
+        "provenance": _provenance(
+            method="bowtie --best -k 1 -v <mismatches> on k-mers", executable=executable
+        ),
     }
 
 

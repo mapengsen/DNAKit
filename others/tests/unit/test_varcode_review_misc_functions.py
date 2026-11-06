@@ -26,7 +26,10 @@ from dnakit.exceptions import (
 
 misc = importlib.import_module("dnakit.molecular_lab.varcode_review_misc_functions")
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 GENOME = DATA / "genome.fa"
 
 

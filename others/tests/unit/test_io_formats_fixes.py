@@ -134,7 +134,9 @@ def test_options_are_validated_and_size_is_capped(tmp_path: Path) -> None:
     assert result_of("decompress_map", bomb, max_bytes=100_000)["original_bytes"] == 100_000
 
 
-def test_files_are_written_only_with_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_files_are_written_only_with_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.chdir(tmp_path)
     result_of("compress_map", "abc")
     assert list(tmp_path.iterdir()) == []
@@ -202,8 +204,12 @@ def test_the_functions_no_longer_use_the_shared_runtime(monkeypatch: pytest.Monk
     monkeypatch.setattr(runtime, "run_candidate_operation", boom)
     for fmt in FORMATS:
         assert roundtrip(fmt, "abc") == b"abc"
-        assert "run_candidate_operation" not in inspect.getsource(getattr(io_formats, f"compress_{fmt}"))
-        assert "run_candidate_operation" not in inspect.getsource(getattr(io_formats, f"decompress_{fmt}"))
+        assert "run_candidate_operation" not in inspect.getsource(
+            getattr(io_formats, f"compress_{fmt}")
+        )
+        assert "run_candidate_operation" not in inspect.getsource(
+            getattr(io_formats, f"decompress_{fmt}")
+        )
 
 
 # ---------------------------------------------------------------------------------------------
@@ -370,7 +376,9 @@ def errors_of(function: str, text: object, **options: object) -> list[str]:
 
 
 def test_validate_map_reports_non_numeric_fields_with_line_field_and_value() -> None:
-    errors = errors_of("validate_map", "1\trs1\tx\t100\n1\trs2\t0\tabc\n1\trs3\t0\t-5\n1\trs4\tnan\t7\n")
+    errors = errors_of(
+        "validate_map", "1\trs1\tx\t100\n1\trs2\t0\tabc\n1\trs3\t0\t-5\n1\trs4\tnan\t7\n"
+    )
     assert len(errors) == 4
     assert errors[0].startswith("line 1:") and "'cM'" in errors[0] and "'x'" in errors[0]
     assert errors[1].startswith("line 2:") and "'bp'" in errors[1] and "'abc'" in errors[1]
@@ -391,29 +399,40 @@ def test_validate_map_with_record_input_does_not_leak_python_messages() -> None:
     errors = errors_of("validate_map", [{"chrom": "1", "id": "rs1", "cm": "x", "pos": 5}])
     assert "'cm'" in errors[0] and "'x'" in errors[0]
     assert "could not convert" not in errors[0] and "ValueError" not in errors[0]
-    assert result_of("validate_map", [{"chrom": "1", "id": "rs1", "cm": 0.5, "pos": 5.0}])["valid"] is True
+    assert (
+        result_of("validate_map", [{"chrom": "1", "id": "rs1", "cm": 0.5, "pos": 5.0}])["valid"]
+        is True
+    )
     with pytest.raises(InputFormatError) as caught:
         io_formats.read_map("1\trs1\tx\t5\n")
     assert "could not convert" not in str(caught.value) and "'cM'" in str(caught.value)
 
 
 def test_validate_ped_reports_non_numeric_sex_and_phenotype() -> None:
-    errors = errors_of("validate_ped", "f1 i1 0 0 x 1 A A\nf1 i2 0 0 1 case A A\nf1 i3 0 0 1.5x 2.5 A A\n")
+    errors = errors_of(
+        "validate_ped", "f1 i1 0 0 x 1 A A\nf1 i2 0 0 1 case A A\nf1 i3 0 0 1.5x 2.5 A A\n"
+    )
     assert len(errors) == 3
     assert errors[0].startswith("line 1:") and "'sex'" in errors[0] and "'x'" in errors[0]
     assert errors[1].startswith("line 2:") and "'phenotype'" in errors[1] and "'case'" in errors[1]
     assert errors[2].startswith("line 3:") and "'1.5x'" in errors[2]
-    assert not any("could not convert" in e or "is not an integer" == e for e in errors)
+    assert not any("could not convert" in e or e == "is not an integer" for e in errors)
 
 
 def test_validate_ped_reports_every_problem_of_a_row() -> None:
-    errors = errors_of("validate_ped", "f1 i1 0 0 x y A A\nf1 i2 0 0 q 1 A A C C\nf1 i3 0 0 1 1 A\n")
+    errors = errors_of(
+        "validate_ped", "f1 i1 0 0 x y A A\nf1 i2 0 0 q 1 A A C C\nf1 i3 0 0 1 1 A\n"
+    )
     line1 = [e for e in errors if e.startswith("line 1:")]
     assert len(line1) == 2 and "'sex'" in line1[0] and "'phenotype'" in line1[1]
     line2 = [e for e in errors if e.startswith("line 2:")]
-    assert len(line2) == 2 and any("variants" in e for e in line2) and any("'sex'" in e for e in line2)
+    assert (
+        len(line2) == 2 and any("variants" in e for e in line2) and any("'sex'" in e for e in line2)
+    )
     assert any(e.startswith("line 3:") and "6 + 2k" in e for e in errors)
-    errors = errors_of("validate_ped", [{"fid": "f", "iid": "i", "sex": "x", "pheno": "y", "genotypes": []}])
+    errors = errors_of(
+        "validate_ped", [{"fid": "f", "iid": "i", "sex": "x", "pheno": "y", "genotypes": []}]
+    )
     assert "could not convert" not in errors[0] and "'sex'" in errors[0]
 
 
@@ -428,8 +447,13 @@ def test_validate_paf_reports_every_problem_of_a_line() -> None:
     # consistent numbers: all the semantic problems are still listed together
     semantic = errors_of("validate_paf", "q\t10\t0\t20\t*\tt\t10\t0\t5\t9\t5\t300\n")
     assert len(semantic) == 4  # query end, strand, matches, mapq
-    assert result_of("validate_paf", "q\t10\t0\t5\t+\tt\t10\t0\t5\t5\t5\t1\ttp:A:P\n")["valid"] is True
-    two_lines = errors_of("validate_paf", "q\t10\t0\t5\t*\tt\t10\t0\t5\t5\t5\t999\nq\t10\t0\t5\t+\tt\t10\t0\t5\t5\t5\t1\ta\n")
+    assert (
+        result_of("validate_paf", "q\t10\t0\t5\t+\tt\t10\t0\t5\t5\t5\t1\ttp:A:P\n")["valid"] is True
+    )
+    two_lines = errors_of(
+        "validate_paf",
+        "q\t10\t0\t5\t*\tt\t10\t0\t5\t5\t5\t999\nq\t10\t0\t5\t+\tt\t10\t0\t5\t5\t5\t1\ta\n",
+    )
     assert [e.split(":")[0] for e in two_lines] == ["line 1", "line 1", "line 2"]
 
 
@@ -502,7 +526,12 @@ def test_write_phylip_checks_the_alphabet_of_the_datatype() -> None:
     ok = result_of("write_phylip", {"a": "ACGTNRYacgt-?.", "b": "ACGTNRYacgt-?."})
     assert ok["record_count"] == 2
     assert result_of("write_phylip", {"a": "ACGU"}, datatype="rna")["record_count"] == 1
-    assert result_of("write_phylip", {"a": "MKVLX*", "b": "MKV--?"}, datatype="protein")["record_count"] == 2
+    assert (
+        result_of("write_phylip", {"a": "MKVLX*", "b": "MKV--?"}, datatype="protein")[
+            "record_count"
+        ]
+        == 2
+    )
     assert result_of("write_phylip", {"a": "12 34"}, datatype="any")["record_count"] == 1
     with pytest.raises(InputFormatError):
         io_formats.write_phylip({"a": "MKVLZ1"}, options={"datatype": "protein"})

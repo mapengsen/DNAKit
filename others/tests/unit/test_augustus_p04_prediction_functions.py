@@ -14,10 +14,15 @@ import pytest
 from dnakit.annotation import augustus_p04_prediction_functions as m
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 GENOME = DATA / "genome.fa"
 HAVE = shutil.which("augustus") is not None and shutil.which("etraining") is not None
-requires_augustus = pytest.mark.skipif(not HAVE, reason="AUGUSTUS (conda install -c bioconda augustus) is not on PATH")
+requires_augustus = pytest.mark.skipif(
+    not HAVE, reason="AUGUSTUS (conda install -c bioconda augustus) is not on PATH"
+)
 
 
 def _config_source() -> Path | None:
@@ -50,7 +55,13 @@ def mini_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 def test_missing_program_raises_install_hint(tmp_path: Path) -> None:
     with pytest.raises(BackendUnavailableError):
-        m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "o.gtf"), augustus_bin_dir=str(tmp_path), verbose=False)
+        m.augustus_predict_genes(
+            str(GENOME),
+            "human",
+            str(tmp_path / "o.gtf"),
+            augustus_bin_dir=str(tmp_path),
+            verbose=False,
+        )
 
 
 def test_validation_errors(tmp_path: Path) -> None:
@@ -59,7 +70,9 @@ def test_validation_errors(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "o"), sample=5, verbose=False)
     with pytest.raises(ConfigurationError):
-        m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "o"), strand="left", verbose=False)
+        m.augustus_predict_genes(
+            str(GENOME), "human", str(tmp_path / "o"), strand="left", verbose=False
+        )
     existing = tmp_path / "exists"
     existing.write_text("x")
     with pytest.raises(ConfigurationError):
@@ -72,15 +85,34 @@ def test_validation_errors(tmp_path: Path) -> None:
 
 @requires_augustus
 def test_predict_genes_modes(tmp_path: Path, mini_config: Path) -> None:
-    plain = m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "plain.gtf"), verbose=False)
+    plain = m.augustus_predict_genes(
+        str(GENOME), "human", str(tmp_path / "plain.gtf"), verbose=False
+    )
     assert plain["status"] == "completed" and plain["version"] and plain["genes"] >= 1
     assert plain["transcripts"] == plain["genes"]
-    mea = m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "mea.gtf"), mea=True, protein_sequences=True, verbose=False)
-    assert "--mea=1" in mea["command"] and "# protein sequence" in Path(mea["outputs"]["predictions"]).read_text()
-    gff3 = m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "p.gff3"), gff3=True, verbose=False)
+    mea = m.augustus_predict_genes(
+        str(GENOME),
+        "human",
+        str(tmp_path / "mea.gtf"),
+        mea=True,
+        protein_sequences=True,
+        verbose=False,
+    )
+    assert (
+        "--mea=1" in mea["command"]
+        and "# protein sequence" in Path(mea["outputs"]["predictions"]).read_text()
+    )
+    gff3 = m.augustus_predict_genes(
+        str(GENOME), "human", str(tmp_path / "p.gff3"), gff3=True, verbose=False
+    )
     assert "ID=g1" in Path(gff3["outputs"]["predictions"]).read_text() and gff3["transcripts"] >= 1
     sampled = m.augustus_predict_genes(
-        str(GENOME), "human", str(tmp_path / "s.gtf"), alternatives_from_sampling=True, sample=3, verbose=False
+        str(GENOME),
+        "human",
+        str(tmp_path / "s.gtf"),
+        alternatives_from_sampling=True,
+        sample=3,
+        verbose=False,
     )
     assert "--sample=3" in sampled["command"]
 
@@ -88,9 +120,13 @@ def test_predict_genes_modes(tmp_path: Path, mini_config: Path) -> None:
 @requires_augustus
 def test_join_functions(tmp_path: Path, mini_config: Path) -> None:
     first = m.augustus_predict_genes(str(GENOME), "human", str(tmp_path / "a.gtf"), verbose=False)
-    joined = m.augustus_join_segment_predictions([first["outputs"]["predictions"]] * 2, str(tmp_path / "j.gtf"), verbose=False)
+    joined = m.augustus_join_segment_predictions(
+        [first["outputs"]["predictions"]] * 2, str(tmp_path / "j.gtf"), verbose=False
+    )
     assert joined["input_files"] == 2 and 1 <= joined["genes"] <= 2 * first["genes"]
-    merged = m.augustus_join_gene_sets([first["outputs"]["predictions"]], str(tmp_path / "m.gtf"), verbose=False)
+    merged = m.augustus_join_gene_sets(
+        [first["outputs"]["predictions"]], str(tmp_path / "m.gtf"), verbose=False
+    )
     assert merged["transcripts"] == first["transcripts"]
 
 
@@ -102,19 +138,36 @@ def test_train_optimize_and_parameter_set(tmp_path: Path, mini_config: Path) -> 
     m.augustus_predict_genes(str(GENOME), "human", str(gtf), verbose=False)
     genbank = tmp_path / "train.gb"
     conv.augustus_gff_to_genbank(str(gtf), str(GENOME), 500, str(genbank), verbose=False)
-    trained = m.augustus_train_species("toy", str(genbank), set_stop_codon_frequencies=True, verbose=False)
+    trained = m.augustus_train_species(
+        "toy", str(genbank), set_stop_codon_frequencies=True, verbose=False
+    )
     assert "toy_exon_probs.pbl" in trained["parameter_files"]
     assert abs(sum(trained["stop_codon_frequencies"].values()) - 1.0) < 0.01
     with pytest.raises(ConfigurationError):
         m.augustus_train_species("toy", str(genbank), method="other", verbose=False)
     if os.environ.get("DNAKIT_AUGUSTUS_SLOW") == "1":  # about five minutes
-        optimized = m.augustus_optimize_parameters("toy", str(genbank), str(tmp_path / "opt"), rounds=1, kfold=2, pstep=2, cleanup=True, verbose=False)
+        optimized = m.augustus_optimize_parameters(
+            "toy",
+            str(genbank),
+            str(tmp_path / "opt"),
+            rounds=1,
+            kfold=2,
+            pstep=2,
+            cleanup=True,
+            verbose=False,
+        )
         assert optimized["status"] == "completed"
     chosen = m.augustus_choose_parameter_set(str(GENOME), ["human", "toy"], verbose=False)
     assert chosen["species"] in {"human", "toy"}
     table = m.augustus_choose_parameter_set(
-        str(GENOME), ["human", "toy"], mode="metagenomic", classification_path=str(tmp_path / "cls.tsv"), verbose=False
+        str(GENOME),
+        ["human", "toy"],
+        mode="metagenomic",
+        classification_path=str(tmp_path / "cls.tsv"),
+        verbose=False,
     )
     assert table["sequences_classified"] >= 1
-    predicted = m.augustus_predict_genes(str(GENOME), "toy", str(tmp_path / "toy.gtf"), verbose=False)
+    predicted = m.augustus_predict_genes(
+        str(GENOME), "toy", str(tmp_path / "toy.gtf"), verbose=False
+    )
     assert predicted["status"] == "completed"

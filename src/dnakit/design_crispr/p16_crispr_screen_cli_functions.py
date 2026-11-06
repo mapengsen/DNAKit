@@ -17,12 +17,33 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _p16_cli as cli
 from dnakit.exceptions import ConfigurationError
 
-_MAGECK = cli.Tool("mageck", "mageck", "Install MAGeCK (pip install mageck or conda install -c bioconda mageck) and put it on PATH or pass mageck_path.",
-                   "0.5.9.5", "https://doi.org/10.1186/s13059-014-0554-4", ("--version",), None)
-_DRUGZ = cli.Tool("drugz", sys.executable, "Download drugz.py from https://github.com/hart-lab/drugz (needs pandas, scipy and six) and pass drugz_script.",
-                  "1.1.0.2", "https://doi.org/10.1186/s13073-019-0665-3", ("--version",), None)
-_CAS = cli.Tool("cas-offinder", "cas-offinder", "Install Cas-OFFinder (conda install -c bioconda cas-offinder) with an OpenCL runtime (pocl) and put it on PATH or pass cas_offinder_path.",
-                "2.4.1", "https://doi.org/10.1093/bioinformatics/btu048", ("--version",), r"v(\d+(?:\.\d+)+)")
+_MAGECK = cli.Tool(
+    "mageck",
+    "mageck",
+    "Install MAGeCK (pip install mageck or conda install -c bioconda mageck) and put it on PATH or pass mageck_path.",
+    "0.5.9.5",
+    "https://doi.org/10.1186/s13059-014-0554-4",
+    ("--version",),
+    None,
+)
+_DRUGZ = cli.Tool(
+    "drugz",
+    sys.executable,
+    "Download drugz.py from https://github.com/hart-lab/drugz (needs pandas, scipy and six) and pass drugz_script.",
+    "1.1.0.2",
+    "https://doi.org/10.1186/s13073-019-0665-3",
+    ("--version",),
+    None,
+)
+_CAS = cli.Tool(
+    "cas-offinder",
+    "cas-offinder",
+    "Install Cas-OFFinder (conda install -c bioconda cas-offinder) with an OpenCL runtime (pocl) and put it on PATH or pass cas_offinder_path.",
+    "2.4.1",
+    "https://doi.org/10.1093/bioinformatics/btu048",
+    ("--version",),
+    r"v(\d+(?:\.\d+)+)",
+)
 _NORM = ("none", "median", "total", "control")
 
 
@@ -32,7 +53,9 @@ def _prefix(value: str, suffixes: Sequence[str]) -> Path:
         raise ConfigurationError(f"The folder of the output prefix does not exist: {prefix.parent}")
     for suffix in suffixes:
         if Path(str(prefix) + suffix).exists():
-            raise ConfigurationError(f"Output already exists and will not be overwritten: {prefix}{suffix}")
+            raise ConfigurationError(
+                f"Output already exists and will not be overwritten: {prefix}{suffix}"
+            )
     return prefix
 
 
@@ -70,12 +93,26 @@ def count_sgrnas_mageck(
     if inputs is None or (fastq is not None and alignment_files is not None):
         raise ConfigurationError("Give exactly one of fastq and alignment_files.")
     files = cli.existing_files(list(inputs), "fastq" if fastq is not None else "alignment_files")
-    arguments = ["count", "--list-seq", str(lib), "--output-prefix", str(prefix), "--fastq", *map(str, files),
-                 "--norm-method", cli.choice(normalization, _NORM, "normalization")]
+    arguments = [
+        "count",
+        "--list-seq",
+        str(lib),
+        "--output-prefix",
+        str(prefix),
+        "--fastq",
+        *map(str, files),
+        "--norm-method",
+        cli.choice(normalization, _NORM, "normalization"),
+    ]
     if sample_labels is not None:
         arguments += ["--sample-label", _labels(sample_labels, "sample_labels")]
     if trim_5 is not None:
-        arguments += ["--trim-5", str(trim_5) if isinstance(trim_5, str) else str(cli.integer(trim_5, "trim_5", minimum=0))]
+        arguments += [
+            "--trim-5",
+            str(trim_5)
+            if isinstance(trim_5, str)
+            else str(cli.integer(trim_5, "trim_5", minimum=0)),
+        ]
     if sgrna_length is not None:
         arguments += ["--sgrna-len", str(cli.integer(sgrna_length, "sgrna_length", minimum=1))]
     if cli.flag(reverse_complement, "reverse_complement"):
@@ -83,9 +120,15 @@ def count_sgrnas_mageck(
     if cli.flag(count_n, "count_n"):
         arguments.append("--count-n")
     expected = [Path(str(prefix) + ".count.txt"), Path(str(prefix) + ".countsummary.txt")]
-    record = cli.invoke(_MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path)
-    return cli.finish(record, "count_sgrnas_mageck", summary=cli.read_table(expected[1], text_columns=frozenset({"Label", "File"})),
-                      count_table=str(expected[0]))
+    record = cli.invoke(
+        _MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path
+    )
+    return cli.finish(
+        record,
+        "count_sgrnas_mageck",
+        summary=cli.read_table(expected[1], text_columns=frozenset({"Label", "File"})),
+        count_table=str(expected[0]),
+    )
 
 
 def rank_genes_mageck(
@@ -118,9 +161,19 @@ def rank_genes_mageck(
     """
     table = cli.existing_file(count_table, "count_table")
     prefix = _prefix(output_prefix, [".gene_summary.txt", ".sgrna_summary.txt"])
-    arguments = ["test", "--count-table", str(table), "--output-prefix", str(prefix), "--treatment-id", _labels(treatment, "treatment"),
-                 "--norm-method", cli.choice(normalization, _NORM, "normalization"),
-                 "--adjust-method", cli.choice(adjust_method, ("fdr", "holm", "pounds"), "adjust_method")]
+    arguments = [
+        "test",
+        "--count-table",
+        str(table),
+        "--output-prefix",
+        str(prefix),
+        "--treatment-id",
+        _labels(treatment, "treatment"),
+        "--norm-method",
+        cli.choice(normalization, _NORM, "normalization"),
+        "--adjust-method",
+        cli.choice(adjust_method, ("fdr", "holm", "pounds"), "adjust_method"),
+    ]
     if control is not None:
         arguments += ["--control-id", _labels(control, "control")]
     if day0_label is not None:
@@ -130,7 +183,14 @@ def rank_genes_mageck(
     if cli.flag(paired, "paired"):
         arguments.append("--paired")
     if gene_lfc_method is not None:
-        arguments += ["--gene-lfc-method", cli.choice(gene_lfc_method, ("median", "alphamedian", "mean", "alphamean", "secondbest"), "gene_lfc_method")]
+        arguments += [
+            "--gene-lfc-method",
+            cli.choice(
+                gene_lfc_method,
+                ("median", "alphamedian", "mean", "alphamean", "secondbest"),
+                "gene_lfc_method",
+            ),
+        ]
     if cnv_normalization is not None:
         arguments += ["--cnv-norm", str(cli.existing_file(cnv_normalization, "cnv_normalization"))]
         if cell_line is not None:
@@ -140,13 +200,23 @@ def rank_genes_mageck(
     if control_sgrna is not None:
         arguments += ["--control-sgrna", str(cli.existing_file(control_sgrna, "control_sgrna"))]
     if remove_zero is not None:
-        arguments += ["--remove-zero", cli.choice(remove_zero, ("none", "control", "treatment", "both", "any"), "remove_zero")]
+        arguments += [
+            "--remove-zero",
+            cli.choice(remove_zero, ("none", "control", "treatment", "both", "any"), "remove_zero"),
+        ]
     if cli.flag(write_normalized_counts, "write_normalized_counts"):
         arguments.append("--normcounts-to-file")
     expected = [Path(str(prefix) + ".gene_summary.txt"), Path(str(prefix) + ".sgrna_summary.txt")]
-    record = cli.invoke(_MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path)
-    return cli.finish(record, "rank_genes_mageck", genes=cli.read_table(expected[0], limit=20, text_columns=frozenset({"id"})),
-                      gene_summary=str(expected[0]), sgrna_summary=str(expected[1]))
+    record = cli.invoke(
+        _MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path
+    )
+    return cli.finish(
+        record,
+        "rank_genes_mageck",
+        genes=cli.read_table(expected[0], limit=20, text_columns=frozenset({"id"})),
+        gene_summary=str(expected[0]),
+        sgrna_summary=str(expected[1]),
+    )
 
 
 def estimate_gene_essentiality_mageck(
@@ -176,8 +246,19 @@ def estimate_gene_essentiality_mageck(
     table = cli.existing_file(count_table, "count_table")
     design = cli.existing_file(design_matrix, "design_matrix")
     prefix = _prefix(output_prefix, [".gene_summary.txt", ".sgrna_summary.txt"])
-    arguments = ["mle", "--count-table", str(table), "--design-matrix", str(design), "--output-prefix", str(prefix),
-                 "--norm-method", cli.choice(normalization, _NORM, "normalization"), "--threads", str(cli.threads_value(threads))]
+    arguments = [
+        "mle",
+        "--count-table",
+        str(table),
+        "--design-matrix",
+        str(design),
+        "--output-prefix",
+        str(prefix),
+        "--norm-method",
+        cli.choice(normalization, _NORM, "normalization"),
+        "--threads",
+        str(cli.threads_value(threads)),
+    ]
     if beta_labels is not None:
         arguments += ["--beta-labels", _labels(beta_labels, "beta_labels")]
     if include_samples is not None:
@@ -191,13 +272,22 @@ def estimate_gene_essentiality_mageck(
     if control_sgrna is not None:
         arguments += ["--control-sgrna", str(cli.existing_file(control_sgrna, "control_sgrna"))]
     if permutation_rounds is not None:
-        arguments += ["--permutation-round", str(cli.integer(permutation_rounds, "permutation_rounds", minimum=1))]
+        arguments += [
+            "--permutation-round",
+            str(cli.integer(permutation_rounds, "permutation_rounds", minimum=1)),
+        ]
     if cli.flag(remove_outliers, "remove_outliers"):
         arguments.append("--remove-outliers")
     expected = [Path(str(prefix) + ".gene_summary.txt"), Path(str(prefix) + ".sgrna_summary.txt")]
-    record = cli.invoke(_MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path)
-    return cli.finish(record, "estimate_gene_essentiality_mageck",
-                      genes=cli.read_table(expected[0], limit=20, text_columns=frozenset({"Gene"})), gene_summary=str(expected[0]))
+    record = cli.invoke(
+        _MAGECK, arguments, cwd=prefix.parent, expected=expected, explicit=mageck_path
+    )
+    return cli.finish(
+        record,
+        "estimate_gene_essentiality_mageck",
+        genes=cli.read_table(expected[0], limit=20, text_columns=frozenset({"Gene"})),
+        gene_summary=str(expected[0]),
+    )
 
 
 def enrich_pathways_mageck(
@@ -221,19 +311,39 @@ def enrich_pathways_mageck(
     ranking = cli.existing_file(gene_ranking, "gene_ranking")
     gmt = cli.existing_file(gene_sets, "gene_sets")
     prefix = _prefix(output_prefix, [".pathway_summary.txt"])
-    arguments = ["pathway", "--gene-ranking", str(ranking), "--gmt-file", str(gmt), "--output-prefix", str(prefix),
-                 "--method", cli.choice(method, ("gsea", "rra"), "method")]
+    arguments = [
+        "pathway",
+        "--gene-ranking",
+        str(ranking),
+        "--gmt-file",
+        str(gmt),
+        "--output-prefix",
+        str(prefix),
+        "--method",
+        cli.choice(method, ("gsea", "rra"), "method"),
+    ]
     if cli.flag(single_ranking, "single_ranking"):
         arguments.append("--single-ranking")
     if ranking_column is not None:
-        arguments += ["--ranking-column", str(ranking_column) if isinstance(ranking_column, int) else cli.text(ranking_column, "ranking_column")]
+        arguments += [
+            "--ranking-column",
+            str(ranking_column)
+            if isinstance(ranking_column, int)
+            else cli.text(ranking_column, "ranking_column"),
+        ]
     if sort_criteria is not None:
         arguments += ["--sort-criteria", cli.choice(sort_criteria, ("neg", "pos"), "sort_criteria")]
     if permutations is not None:
         arguments += ["--permutation", str(cli.integer(permutations, "permutations", minimum=1))]
     summary = Path(str(prefix) + ".pathway_summary.txt")
-    record = cli.invoke(_MAGECK, arguments, cwd=prefix.parent, expected=[summary], explicit=mageck_path)
-    return cli.finish(record, "enrich_pathways_mageck", pathways=cli.read_table(summary, limit=20, text_columns=frozenset({"Pathway"})))
+    record = cli.invoke(
+        _MAGECK, arguments, cwd=prefix.parent, expected=[summary], explicit=mageck_path
+    )
+    return cli.finish(
+        record,
+        "enrich_pathways_mageck",
+        pathways=cli.read_table(summary, limit=20, text_columns=frozenset({"Pathway"})),
+    )
 
 
 def plot_screen_results_mageck(
@@ -255,14 +365,28 @@ def plot_screen_results_mageck(
     table = cli.existing_file(count_table, "count_table")
     summary = cli.existing_file(gene_summary, "gene_summary")
     prefix = _prefix(output_prefix, ["_sgrnacounts.pdf", ".R"])
-    arguments = ["plot", "--count-table", str(table), "--gene-summary", str(summary), "--output-prefix", str(prefix),
-                 "--genes", _labels(genes, "genes"), "--norm-method", cli.choice(normalization, _NORM, "normalization")]
+    arguments = [
+        "plot",
+        "--count-table",
+        str(table),
+        "--gene-summary",
+        str(summary),
+        "--output-prefix",
+        str(prefix),
+        "--genes",
+        _labels(genes, "genes"),
+        "--norm-method",
+        cli.choice(normalization, _NORM, "normalization"),
+    ]
     if samples is not None:
         arguments += ["--samples", _labels(samples, "samples")]
     record = cli.invoke(_MAGECK, arguments, cwd=prefix.parent, explicit=mageck_path)
     produced = sorted(str(p) for p in prefix.parent.glob(prefix.name + "*") if p.is_file())
     if not any(path.endswith(".pdf") for path in produced):
-        raise cli.BackendExecutionError("mageck plot produced no PDF (is Rscript installed?).", context={"log_tail": record["log_tail"]})
+        raise cli.BackendExecutionError(
+            "mageck plot produced no PDF (is Rscript installed?).",
+            context={"log_tail": record["log_tail"]},
+        )
     record["outputs"] = produced
     return cli.finish(record, "plot_screen_results_mageck", genes=list(genes))
 
@@ -295,10 +419,28 @@ def score_drug_gene_interactions_drugz(
     table = cli.existing_file(count_table, "count_table")
     script = cli.existing_file(drugz_script, "drugz_script")
     target = cli.new_file(output_path, "output_path")
-    controls, drugs = _labels(control_samples, "control_samples"), _labels(drug_samples, "drug_samples")
-    arguments = [str(script), "-i", str(table), "-o", str(target), "-c", controls, "-x", drugs,
-                 "-p", str(cli.integer(pseudocount, "pseudocount", minimum=0)), "--minobs", str(cli.integer(min_observations, "min_observations", minimum=1)),
-                 "--half_window_size", str(cli.integer(half_window_size, "half_window_size", minimum=1)), "-q"]
+    controls, drugs = (
+        _labels(control_samples, "control_samples"),
+        _labels(drug_samples, "drug_samples"),
+    )
+    arguments = [
+        str(script),
+        "-i",
+        str(table),
+        "-o",
+        str(target),
+        "-c",
+        controls,
+        "-x",
+        drugs,
+        "-p",
+        str(cli.integer(pseudocount, "pseudocount", minimum=0)),
+        "--minobs",
+        str(cli.integer(min_observations, "min_observations", minimum=1)),
+        "--half_window_size",
+        str(cli.integer(half_window_size, "half_window_size", minimum=1)),
+        "-q",
+    ]
     expected = [target]
     if fold_change_path is not None:
         fold = cli.new_file(fold_change_path, "fold_change_path")
@@ -308,7 +450,13 @@ def score_drug_gene_interactions_drugz(
         arguments += ["-r", _labels(remove_genes, "remove_genes")]
     if cli.flag(unpaired, "unpaired"):
         arguments.append("-unpaired")
-    record = cli.invoke(_DRUGZ, arguments, cwd=target.parent, expected=expected, explicit=drugz_python or sys.executable)
+    record = cli.invoke(
+        _DRUGZ,
+        arguments,
+        cwd=target.parent,
+        expected=expected,
+        explicit=drugz_python or sys.executable,
+    )
     rows = cli.read_table(target, limit=20, text_columns=frozenset({"GENE"}))
     record["version"] = "drugz.py (script run by " + Path(drugz_python or sys.executable).name + ")"
     return cli.finish(record, "score_drug_gene_interactions_drugz", unpaired=unpaired, genes=rows)
@@ -336,22 +484,44 @@ def search_offtargets_cas_offinder(
     target = cli.new_file(output_path, "output_path")
     spec = cli.text(pattern, "pattern").upper()
     if not isinstance(guides, Mapping) or not guides:
-        raise ConfigurationError("guides must be a non-empty mapping of guide sequence to maximum mismatches.")
+        raise ConfigurationError(
+            "guides must be a non-empty mapping of guide sequence to maximum mismatches."
+        )
     lines = [str(source), spec]
     for sequence, mismatches in guides.items():
         guide = cli.text(sequence, "guides").upper()
         if len(guide) != len(spec):
-            raise ConfigurationError(f"Guide {guide!r} must have the same length as pattern ({len(spec)}).")
-        lines.append(f"{guide} {cli.integer(mismatches, 'mismatches', minimum=0, maximum=len(spec))}")
+            raise ConfigurationError(
+                f"Guide {guide!r} must have the same length as pattern ({len(spec)})."
+            )
+        lines.append(
+            f"{guide} {cli.integer(mismatches, 'mismatches', minimum=0, maximum=len(spec))}"
+        )
     if not (isinstance(device, str) and device[:1] in {"C", "G", "A"}):
         raise ConfigurationError("device must start with C, G or A.")
     spec_file = target.with_name(target.name + ".input.txt")
     spec_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    record = cli.invoke(_CAS, [str(spec_file), device, str(target)], cwd=target.parent, expected=[target], explicit=cas_offinder_path)
-    sites = cli.read_table(target, header=False, names=["guide", "chrom", "position", "site", "strand", "mismatches"],
-                           text_columns=frozenset({"guide", "chrom", "site", "strand"}), limit=1000)
-    return cli.finish(record, "search_offtargets_cas_offinder", site_count=cli.count_lines(target), sites=sites,
-                      input_file=str(spec_file))
+    record = cli.invoke(
+        _CAS,
+        [str(spec_file), device, str(target)],
+        cwd=target.parent,
+        expected=[target],
+        explicit=cas_offinder_path,
+    )
+    sites = cli.read_table(
+        target,
+        header=False,
+        names=["guide", "chrom", "position", "site", "strand", "mismatches"],
+        text_columns=frozenset({"guide", "chrom", "site", "strand"}),
+        limit=1000,
+    )
+    return cli.finish(
+        record,
+        "search_offtargets_cas_offinder",
+        site_count=cli.count_lines(target),
+        sites=sites,
+        input_file=str(spec_file),
+    )
 
 
 __all__ = [
@@ -359,9 +529,9 @@ __all__ = [
     "enrich_pathways_mageck",
     "estimate_gene_essentiality_mageck",
     "plot_screen_results_mageck",
+    "rank_genes_mageck",
     "score_drug_gene_interactions_drugz",
     "search_offtargets_cas_offinder",
-    "rank_genes_mageck",
 ]
 
 _register_public_verbose(globals(), tuple(__all__))

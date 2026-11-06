@@ -23,10 +23,14 @@ MAX_READS_PER_SAMPLE = 5_000_000
 
 
 # ----------------------------------------------------------------------------- option helpers
-def opt_str(options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None) -> str:
+def opt_str(
+    options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None
+) -> str:
     value = options.get(key, default)
     if not isinstance(value, str) or not value.strip():
-        raise ConfigurationError(f"Option {key!r} must be a non-empty string.", code="MICROBIOME_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be a non-empty string.", code="MICROBIOME_OPTION_INVALID"
+        )
     value = value.strip().lower()
     if allowed is not None and value not in allowed:
         raise ConfigurationError(
@@ -37,24 +41,38 @@ def opt_str(options: Mapping[str, object], key: str, default: str, allowed: Sequ
     return value
 
 
-def opt_float(options: Mapping[str, object], key: str, default: float, minimum: float = -math.inf, maximum: float = math.inf) -> float:
+def opt_float(
+    options: Mapping[str, object],
+    key: str,
+    default: float,
+    minimum: float = -math.inf,
+    maximum: float = math.inf,
+) -> float:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-        raise ConfigurationError(f"Option {key!r} must be a finite number.", code="MICROBIOME_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be a finite number.", code="MICROBIOME_OPTION_INVALID"
+        )
     if not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"Option {key!r}={value} is outside [{minimum}, {maximum}].", code="MICROBIOME_OPTION_INVALID"
+            f"Option {key!r}={value} is outside [{minimum}, {maximum}].",
+            code="MICROBIOME_OPTION_INVALID",
         )
     return float(value)
 
 
-def opt_int(options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int) -> int:
+def opt_int(
+    options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int
+) -> int:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int):
-        raise ConfigurationError(f"Option {key!r} must be an integer.", code="MICROBIOME_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be an integer.", code="MICROBIOME_OPTION_INVALID"
+        )
     if not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"Option {key!r}={value} is outside [{minimum}, {maximum}].", code="MICROBIOME_OPTION_INVALID"
+            f"Option {key!r}={value} is outside [{minimum}, {maximum}].",
+            code="MICROBIOME_OPTION_INVALID",
         )
     return value
 
@@ -62,7 +80,9 @@ def opt_int(options: Mapping[str, object], key: str, default: int, minimum: int,
 def opt_bool(options: Mapping[str, object], key: str, default: bool) -> bool:
     value = options.get(key, default)
     if not isinstance(value, bool):
-        raise ConfigurationError(f"Option {key!r} must be a boolean.", code="MICROBIOME_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be a boolean.", code="MICROBIOME_OPTION_INVALID"
+        )
     return value
 
 
@@ -85,7 +105,9 @@ class Table:
 
 def _number(value: object, where: str) -> float:
     if isinstance(value, bool):
-        raise InputFormatError("Abundance values must be numbers.", code="MICROBIOME_TABLE_INVALID", hint=where)
+        raise InputFormatError(
+            "Abundance values must be numbers.", code="MICROBIOME_TABLE_INVALID", hint=where
+        )
     try:
         number = float(value)  # type: ignore[arg-type]
     except (TypeError, ValueError) as exc:
@@ -101,7 +123,9 @@ def _number(value: object, where: str) -> float:
     return number
 
 
-def _check_shape(samples: Sequence[str], taxa: Sequence[str], counts: Sequence[Sequence[float]]) -> None:
+def _check_shape(
+    samples: Sequence[str], taxa: Sequence[str], counts: Sequence[Sequence[float]]
+) -> None:
     if not samples or not taxa:
         raise InputFormatError("The abundance table is empty.", code="MICROBIOME_TABLE_EMPTY")
     if len(samples) > MAX_SAMPLES or len(taxa) > MAX_TAXA or len(samples) * len(taxa) > MAX_CELLS:
@@ -111,9 +135,13 @@ def _check_shape(samples: Sequence[str], taxa: Sequence[str], counts: Sequence[S
             hint=f"At most {MAX_SAMPLES} samples, {MAX_TAXA} taxa and {MAX_CELLS} cells.",
         )
     if len(set(samples)) != len(samples) or len(set(taxa)) != len(taxa):
-        raise InputFormatError("Sample and taxon identifiers must be unique.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "Sample and taxon identifiers must be unique.", code="MICROBIOME_TABLE_INVALID"
+        )
     if len(counts) != len(samples) or any(len(row) != len(taxa) for row in counts):
-        raise InputFormatError("Count matrix shape does not match samples x taxa.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "Count matrix shape does not match samples x taxa.", code="MICROBIOME_TABLE_INVALID"
+        )
 
 
 def _looks_like_path(text: str) -> bool:
@@ -146,7 +174,12 @@ def parse_delimited_table(text: str, orientation: str = "taxa_rows") -> Table:
     lines = [line for line in text.splitlines() if line.strip()]
     header_index = None
     for index, line in enumerate(lines):
-        if line.startswith("#") and not line.startswith("#OTU") and not line.startswith("#Feature") and not line.startswith("#ID"):
+        if (
+            line.startswith("#")
+            and not line.startswith("#OTU")
+            and not line.startswith("#Feature")
+            and not line.startswith("#ID")
+        ):
             continue
         header_index = index
         break
@@ -155,7 +188,10 @@ def parse_delimited_table(text: str, orientation: str = "taxa_rows") -> Table:
     sep = "\t" if "\t" in lines[header_index] else ","
     header = [cell.strip() for cell in lines[header_index].lstrip("#").split(sep)]
     if len(header) < 2:
-        raise InputFormatError("The header needs an identifier column and at least one data column.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "The header needs an identifier column and at least one data column.",
+            code="MICROBIOME_TABLE_INVALID",
+        )
     labels: list[str] = []
     rows: list[list[float]] = []
     for line in lines[header_index + 1 :]:
@@ -164,7 +200,8 @@ def parse_delimited_table(text: str, orientation: str = "taxa_rows") -> Table:
         cells = [cell.strip() for cell in line.split(sep)]
         if len(cells) != len(header):
             raise InputFormatError(
-                f"Row {cells[0]!r} has {len(cells)} fields, expected {len(header)}.", code="MICROBIOME_TABLE_INVALID"
+                f"Row {cells[0]!r} has {len(cells)} fields, expected {len(header)}.",
+                code="MICROBIOME_TABLE_INVALID",
             )
         labels.append(cells[0])
         rows.append([_number(cell, f"row {cells[0]!r}") for cell in cells[1:]])
@@ -184,7 +221,9 @@ def parse_table(value: object, options: Mapping[str, object]) -> Table:
     if isinstance(value, Mapping):
         if "counts" in value:
             counts = [[_number(c, "counts") for c in row] for row in value["counts"]]  # type: ignore[union-attr]
-            samples = [str(s) for s in value.get("samples", [f"sample{i + 1}" for i in range(len(counts))])]  # type: ignore[union-attr]
+            samples = [
+                str(s) for s in value.get("samples", [f"sample{i + 1}" for i in range(len(counts))])
+            ]  # type: ignore[union-attr]
             width = len(counts[0]) if counts else 0
             taxa = [str(t) for t in value.get("taxa", [f"taxon{i + 1}" for i in range(width)])]  # type: ignore[union-attr]
             table = Table(samples, taxa, counts)
@@ -195,13 +234,17 @@ def parse_table(value: object, options: Mapping[str, object]) -> Table:
             for row in value.values():
                 if not isinstance(row, Mapping):
                     raise InputFormatError(
-                        "A sample-to-taxon mapping needs mapping values.", code="MICROBIOME_TABLE_INVALID"
+                        "A sample-to-taxon mapping needs mapping values.",
+                        code="MICROBIOME_TABLE_INVALID",
                     )
                 for name in row:
                     if str(name) not in seen:
                         seen.add(str(name))
                         taxa.append(str(name))
-            counts = [[_number(row.get(t, row.get(str(t), 0)), f"sample {s!r}") for t in taxa] for s, row in zip(samples, value.values())]
+            counts = [
+                [_number(row.get(t, row.get(str(t), 0)), f"sample {s!r}") for t in taxa]
+                for s, row in zip(samples, value.values(), strict=False)
+            ]
             table = Table(samples, taxa, counts)
     elif isinstance(value, (str, bytes, Path)):
         orientation = opt_str(options, "orientation", "taxa_rows", ("taxa_rows", "samples_rows"))
@@ -209,11 +252,15 @@ def parse_table(value: object, options: Mapping[str, object]) -> Table:
     elif isinstance(value, Sequence):
         counts = [[_number(c, "counts") for c in row] for row in value]
         width = len(counts[0]) if counts else 0
-        samples = [str(s) for s in options.get("samples", [f"sample{i + 1}" for i in range(len(counts))])]  # type: ignore[union-attr]
+        samples = [
+            str(s) for s in options.get("samples", [f"sample{i + 1}" for i in range(len(counts))])
+        ]  # type: ignore[union-attr]
         taxa = [str(t) for t in options.get("taxa", [f"taxon{i + 1}" for i in range(width)])]  # type: ignore[union-attr]
         table = Table(samples, taxa, counts)
     else:
-        raise InputFormatError("Unsupported abundance table input.", code="MICROBIOME_TABLE_INVALID")
+        raise InputFormatError(
+            "Unsupported abundance table input.", code="MICROBIOME_TABLE_INVALID"
+        )
     _check_shape(table.samples, table.taxa, table.counts)
     return table
 
@@ -255,7 +302,9 @@ def alpha_metrics(row: Sequence[float], log_base: float = math.e) -> dict[str, f
         "shannon": shannon,
         "simpson": 1.0 - sum_sq,
         "inverse_simpson": 1.0 / sum_sq,
-        "pielou_evenness": shannon / (math.log(observed) / math.log(log_base)) if observed > 1 else None,
+        "pielou_evenness": shannon / (math.log(observed) / math.log(log_base))
+        if observed > 1
+        else None,
         "chao1": observed + f1 * (f1 - 1) / (2.0 * (f2 + 1)) if integer else None,
         "goods_coverage": 1.0 - f1 / total if integer else None,
     }
@@ -268,19 +317,21 @@ def _clr(row: Sequence[float], pseudocount: float) -> list[float]:
     return [v - mean for v in logs]
 
 
-def beta_distance(a: Sequence[float], b: Sequence[float], metric: str, pseudocount: float = 1.0) -> float:
+def beta_distance(
+    a: Sequence[float], b: Sequence[float], metric: str, pseudocount: float = 1.0
+) -> float:
     if metric == "braycurtis":
         denom = sum(a) + sum(b)
-        return sum(abs(x - y) for x, y in zip(a, b)) / denom if denom else 0.0
+        return sum(abs(x - y) for x, y in zip(a, b, strict=False)) / denom if denom else 0.0
     if metric == "jaccard":
-        union = sum(1 for x, y in zip(a, b) if x > 0 or y > 0)
-        inter = sum(1 for x, y in zip(a, b) if x > 0 and y > 0)
+        union = sum(1 for x, y in zip(a, b, strict=False) if x > 0 or y > 0)
+        inter = sum(1 for x, y in zip(a, b, strict=False) if x > 0 and y > 0)
         return 1.0 - inter / union if union else 0.0
     if metric == "aitchison":
         ca, cb = _clr(a, pseudocount), _clr(b, pseudocount)
-        return math.sqrt(sum((x - y) ** 2 for x, y in zip(ca, cb)))
+        return math.sqrt(sum((x - y) ** 2 for x, y in zip(ca, cb, strict=False)))
     if metric == "euclidean":
-        return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+        return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b, strict=False)))
     raise ConfigurationError("Unknown beta-diversity metric.", code="MICROBIOME_OPTION_INVALID")
 
 
@@ -289,7 +340,9 @@ def distance_matrix(table: Table, metric: str, pseudocount: float = 1.0) -> list
     out = [[0.0] * n for _ in range(n)]
     for i in range(n):
         for j in range(i + 1, n):
-            out[i][j] = out[j][i] = beta_distance(table.counts[i], table.counts[j], metric, pseudocount)
+            out[i][j] = out[j][i] = beta_distance(
+                table.counts[i], table.counts[j], metric, pseudocount
+            )
     return out
 
 
@@ -301,18 +354,23 @@ def rarefy(table: Table, depth: int, seed: int, drop_short: bool = True) -> tupl
     samples: list[str] = []
     rows: list[list[float]] = []
     dropped: list[str] = []
-    for name, row in zip(table.samples, table.counts):
+    for name, row in zip(table.samples, table.counts, strict=False):
         if not all(_is_int(x) for x in row):
-            raise ConfigurationError("Rarefaction needs integer counts.", code="MICROBIOME_TABLE_INVALID")
+            raise ConfigurationError(
+                "Rarefaction needs integer counts.", code="MICROBIOME_TABLE_INVALID"
+            )
         total = int(round(sum(row)))
         if total > MAX_READS_PER_SAMPLE:
-            raise ConfigurationError("Sample depth exceeds the rarefaction limit.", code="MICROBIOME_TABLE_TOO_LARGE")
+            raise ConfigurationError(
+                "Sample depth exceeds the rarefaction limit.", code="MICROBIOME_TABLE_TOO_LARGE"
+            )
         if total < depth:
             if drop_short:
                 dropped.append(name)
                 continue
             raise ConfigurationError(
-                f"Sample {name!r} has {total} reads, fewer than depth {depth}.", code="MICROBIOME_DEPTH_TOO_HIGH"
+                f"Sample {name!r} has {total} reads, fewer than depth {depth}.",
+                code="MICROBIOME_DEPTH_TOO_HIGH",
             )
         population = [i for i, x in enumerate(row) for _ in range(int(round(x)))]
         picked = rng.sample(population, depth)
@@ -326,11 +384,28 @@ def rarefy(table: Table, depth: int, seed: int, drop_short: bool = True) -> tupl
 
 # ----------------------------------------------------------------------------- taxonomy
 _PREFIX_RANK = {
-    "d": "domain", "k": "domain", "p": "phylum", "c": "class", "o": "order", "f": "family", "g": "genus", "s": "species",
+    "d": "domain",
+    "k": "domain",
+    "p": "phylum",
+    "c": "class",
+    "o": "order",
+    "f": "family",
+    "g": "genus",
+    "s": "species",
 }
 _POSITIONAL = ("domain", "phylum", "class", "order", "family", "genus", "species")
 _RANK_ORDER = _POSITIONAL
-_PLACEHOLDER = {"", "unassigned", "unclassified", "unknown", "uncultured", "ambiguous", "incertae sedis", "na", "none"}
+_PLACEHOLDER = {
+    "",
+    "unassigned",
+    "unclassified",
+    "unknown",
+    "uncultured",
+    "ambiguous",
+    "incertae sedis",
+    "na",
+    "none",
+}
 
 
 def parse_taxonomy(text: str) -> dict[str, object]:
@@ -353,7 +428,7 @@ def parse_taxonomy(text: str) -> dict[str, object]:
                 code="MICROBIOME_TAXONOMY_INVALID",
                 hint="Use rank prefixes such as 'g__Escherichia'.",
             )
-        for rank, part in zip(_POSITIONAL, parts):
+        for rank, part in zip(_POSITIONAL, parts, strict=False):
             ranks[rank] = None if part.lower() in _PLACEHOLDER else part
     assigned = [(rank, ranks[rank]) for rank in _RANK_ORDER if ranks[rank]]
     return {
@@ -371,7 +446,7 @@ def pearson(x: Sequence[float], y: Sequence[float]) -> float | None:
     syy = sum((b - my) ** 2 for b in y)
     if sxx == 0 or syy == 0:
         return None
-    return sum((a - mx) * (b - my) for a, b in zip(x, y)) / math.sqrt(sxx * syy)
+    return sum((a - mx) * (b - my) for a, b in zip(x, y, strict=False)) / math.sqrt(sxx * syy)
 
 
 def average_ranks(values: Sequence[float]) -> list[float]:
@@ -443,7 +518,9 @@ def kmer_ani(a: set[str], b: set[str], k: int) -> dict[str, float | None]:
     }
 
 
-def parse_sequences(value: object, minimum: int = 1, maximum: int = 200, max_bases: int = 100_000_000) -> list[tuple[str, str]]:
+def parse_sequences(
+    value: object, minimum: int = 1, maximum: int = 200, max_bases: int = 100_000_000
+) -> list[tuple[str, str]]:
     """Accept a list of strings, an id->sequence mapping, or FASTA text/path; returns (id, ACGTN sequence)."""
 
     items: list[tuple[str, str]] = []
@@ -457,13 +534,20 @@ def parse_sequences(value: object, minimum: int = 1, maximum: int = 200, max_bas
                 if line.startswith(">"):
                     if name is not None:
                         items.append((name, "".join(chunks)))
-                    name, chunks = (line[1:].split()[0] if line[1:].strip() else f"seq{len(items) + 1}"), []
+                    name, chunks = (
+                        (line[1:].split()[0] if line[1:].strip() else f"seq{len(items) + 1}"),
+                        [],
+                    )
                 else:
                     chunks.append(line.strip())
             if name is not None:
                 items.append((name, "".join(chunks)))
         else:
-            items = [(f"seq{i + 1}", line.strip()) for i, line in enumerate(text.splitlines()) if line.strip()]
+            items = [
+                (f"seq{i + 1}", line.strip())
+                for i, line in enumerate(text.splitlines())
+                if line.strip()
+            ]
     elif isinstance(value, Sequence):
         items = [(f"seq{i + 1}", str(v)) for i, v in enumerate(value)]
     else:
@@ -472,11 +556,15 @@ def parse_sequences(value: object, minimum: int = 1, maximum: int = 200, max_bas
     for name, seq in items:
         seq = re.sub(r"\s+", "", seq).upper().replace("U", "T")
         if not seq or set(seq) - set("ACGTRYSWKMBDHVN"):
-            raise InputFormatError(f"Sequence {name!r} is empty or has non-DNA characters.", code="MICROBIOME_SEQUENCE_INVALID")
+            raise InputFormatError(
+                f"Sequence {name!r} is empty or has non-DNA characters.",
+                code="MICROBIOME_SEQUENCE_INVALID",
+            )
         cleaned.append((name, seq))
     if len(cleaned) < minimum or len(cleaned) > maximum:
         raise InputFormatError(
-            f"Expected between {minimum} and {maximum} sequences, got {len(cleaned)}.", code="MICROBIOME_INPUT_INVALID"
+            f"Expected between {minimum} and {maximum} sequences, got {len(cleaned)}.",
+            code="MICROBIOME_INPUT_INVALID",
         )
     if sum(len(s) for _, s in cleaned) > max_bases:
         raise ConfigurationError("Input sequences are too long.", code="MICROBIOME_INPUT_TOO_LARGE")
@@ -491,19 +579,36 @@ def reverse_complement(seq: str) -> str:
 def svg_stacked_bars(table: Table, top_n: int) -> str:
     """Stacked relative-abundance bars (one per sample), top_n taxa by total abundance plus 'Other'."""
 
-    palette = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac"]
-    totals = [sum(table.counts[s][t] for s in range(len(table.samples))) for t in range(len(table.taxa))]
+    palette = [
+        "#4e79a7",
+        "#f28e2b",
+        "#e15759",
+        "#76b7b2",
+        "#59a14f",
+        "#edc948",
+        "#b07aa1",
+        "#ff9da7",
+        "#9c755f",
+        "#bab0ac",
+    ]
+    totals = [
+        sum(table.counts[s][t] for s in range(len(table.samples))) for t in range(len(table.taxa))
+    ]
     order = sorted(range(len(table.taxa)), key=lambda t: (-totals[t], table.taxa[t]))
     top = order[:top_n]
     bar_w, gap, height, left, bottom = 28, 8, 200, 40, 60
     width = left + len(table.samples) * (bar_w + gap) + 200
-    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + bottom + 20}">']
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + bottom + 20}">'
+    ]
     for s, name in enumerate(table.samples):
         row = table.counts[s]
         total = sum(row) or 1.0
         x = left + s * (bar_w + gap)
         y = height
-        values = [(table.taxa[t], row[t] / total, palette[i % len(palette)]) for i, t in enumerate(top)]
+        values = [
+            (table.taxa[t], row[t] / total, palette[i % len(palette)]) for i, t in enumerate(top)
+        ]
         other = 1.0 - sum(v for _, v, _ in values)
         if other > 1e-12:
             values.append(("Other", other, "#cccccc"))
@@ -519,11 +624,17 @@ def svg_stacked_bars(table: Table, top_n: int) -> str:
         parts.append(f'<text x="{x}" y="{height + 14}" font-size="9">{_esc(name)}</text>')
     lx = left + len(table.samples) * (bar_w + gap) + 10
     for i, t in enumerate(top):
-        parts.append(f'<rect x="{lx}" y="{10 + 14 * i}" width="10" height="10" fill="{palette[i % len(palette)]}"/>')
-        parts.append(f'<text x="{lx + 14}" y="{19 + 14 * i}" font-size="10">{_esc(table.taxa[t])}</text>')
+        parts.append(
+            f'<rect x="{lx}" y="{10 + 14 * i}" width="10" height="10" fill="{palette[i % len(palette)]}"/>'
+        )
+        parts.append(
+            f'<text x="{lx + 14}" y="{19 + 14 * i}" font-size="10">{_esc(table.taxa[t])}</text>'
+        )
     parts.append("</svg>")
     return "".join(parts)
 
 
 def _esc(text: str) -> str:
-    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    return (
+        text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    )

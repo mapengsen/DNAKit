@@ -43,27 +43,84 @@ _MAX_ROWS = 1_000_000
 
 #: run-folder tables readable by ``shasta_read_run_table``: name -> (file name, what it holds)
 TABLES: dict[str, tuple[str, str]] = {
-    "read_summary": ("ReadSummary.csv", "per read: lengths, marker count, Palindromic, Chimeric, alignment candidates, read graph neighbours"),
-    "read_low_hash_statistics": ("ReadLowHashStatistics.csv", "per read: MinHash/LowHash feature statistics"),
-    "read_length_histogram": ("ReadLengthHistogram.csv", "read length histogram with cumulative bases"),
-    "binned_read_length_histogram": ("Binned-ReadLengthHistogram.csv", "binned read length histogram"),
-    "duplicate_reads": ("DuplicateReads.csv", "reads with duplicate names and whether they were discarded"),
-    "low_hash_bucket_histogram": ("LowHashBucketHistogram.csv", "MinHash/LowHash bucket sizes per iteration"),
-    "suppressed_alignment_candidates": ("SuppressedAlignmentCandidates.csv", "alignment candidates suppressed during candidate search"),
-    "aligned_fraction_histogram": ("AlignedFractionHistogram.csv", "histogram of the aligned fraction of marker alignments"),
-    "alignment_marker_count_histogram": ("AlignmentMarkerCountHistogram.csv", "histogram of aligned marker counts"),
-    "alignment_skip_histogram": ("AlignmentSkipHistogram.csv", "histogram of the largest marker skip of alignments"),
-    "alignment_drift_histogram": ("AlignmentDriftHistogram.csv", "histogram of the largest marker drift of alignments"),
-    "alignment_trim_histogram": ("AlignmentTrimHistogram.csv", "histogram of the unaligned marker count at the alignment ends"),
+    "read_summary": (
+        "ReadSummary.csv",
+        "per read: lengths, marker count, Palindromic, Chimeric, alignment candidates, read graph neighbours",
+    ),
+    "read_low_hash_statistics": (
+        "ReadLowHashStatistics.csv",
+        "per read: MinHash/LowHash feature statistics",
+    ),
+    "read_length_histogram": (
+        "ReadLengthHistogram.csv",
+        "read length histogram with cumulative bases",
+    ),
+    "binned_read_length_histogram": (
+        "Binned-ReadLengthHistogram.csv",
+        "binned read length histogram",
+    ),
+    "duplicate_reads": (
+        "DuplicateReads.csv",
+        "reads with duplicate names and whether they were discarded",
+    ),
+    "low_hash_bucket_histogram": (
+        "LowHashBucketHistogram.csv",
+        "MinHash/LowHash bucket sizes per iteration",
+    ),
+    "suppressed_alignment_candidates": (
+        "SuppressedAlignmentCandidates.csv",
+        "alignment candidates suppressed during candidate search",
+    ),
+    "aligned_fraction_histogram": (
+        "AlignedFractionHistogram.csv",
+        "histogram of the aligned fraction of marker alignments",
+    ),
+    "alignment_marker_count_histogram": (
+        "AlignmentMarkerCountHistogram.csv",
+        "histogram of aligned marker counts",
+    ),
+    "alignment_skip_histogram": (
+        "AlignmentSkipHistogram.csv",
+        "histogram of the largest marker skip of alignments",
+    ),
+    "alignment_drift_histogram": (
+        "AlignmentDriftHistogram.csv",
+        "histogram of the largest marker drift of alignments",
+    ),
+    "alignment_trim_histogram": (
+        "AlignmentTrimHistogram.csv",
+        "histogram of the unaligned marker count at the alignment ends",
+    ),
     "read_graph_components": ("ReadGraphComponents.csv", "connected components of the read graph"),
-    "disjoint_sets_histogram": ("DisjointSetsHistogram.csv", "coverage histogram of the marker disjoint sets before marker graph vertex creation"),
-    "marker_graph_vertex_coverage_histogram": ("MarkerGraphVertexCoverageHistogram.csv", "marker graph vertex coverage histogram"),
-    "marker_graph_edge_coverage_histogram": ("MarkerGraphEdgeCoverageHistogram.csv", "marker graph edge coverage histogram"),
-    "anchor_coverage_histogram": ("AnchorCoverageHistogram.csv", "Mode 3 anchor coverage histogram"),
-    "reads_by_segment": ("ReadsBySegment.csv", "oriented reads contributing to each assembled segment (--write_reads_by_segment)"),
-    "assembly_chains": ("Assembly.csv", "Mode 3 assembly chains: bubble chain, sequence length, coverage"),
+    "disjoint_sets_histogram": (
+        "DisjointSetsHistogram.csv",
+        "coverage histogram of the marker disjoint sets before marker graph vertex creation",
+    ),
+    "marker_graph_vertex_coverage_histogram": (
+        "MarkerGraphVertexCoverageHistogram.csv",
+        "marker graph vertex coverage histogram",
+    ),
+    "marker_graph_edge_coverage_histogram": (
+        "MarkerGraphEdgeCoverageHistogram.csv",
+        "marker graph edge coverage histogram",
+    ),
+    "anchor_coverage_histogram": (
+        "AnchorCoverageHistogram.csv",
+        "Mode 3 anchor coverage histogram",
+    ),
+    "reads_by_segment": (
+        "ReadsBySegment.csv",
+        "oriented reads contributing to each assembled segment (--write_reads_by_segment)",
+    ),
+    "assembly_chains": (
+        "Assembly.csv",
+        "Mode 3 assembly chains: bubble chain, sequence length, coverage",
+    ),
     "components": ("Components.csv", "Mode 3 components: reads, segments, sequence, N50"),
-    "oriented_reads_by_component": ("OrientedReadsByComponent.csv", "Mode 3 oriented reads of each component"),
+    "oriented_reads_by_component": (
+        "OrientedReadsByComponent.csv",
+        "Mode 3 oriented reads of each component",
+    ),
     "journeys": ("Journeys.csv", "Mode 3 journeys of the oriented reads on the anchor graph"),
 }
 _ASSEMBLY_OUTPUTS: dict[str, str] = {
@@ -80,13 +137,17 @@ def _resolve(shasta_path: str | None) -> str | None:
     return os.environ.get(_ENV) or None
 
 
-def _opt_int(name: str, value: int | None, flag: str, *, minimum: int | None = 0, maximum: int | None = None) -> list[str]:
+def _opt_int(
+    name: str, value: int | None, flag: str, *, minimum: int | None = 0, maximum: int | None = None
+) -> list[str]:
     if value is None:
         return []
     return [flag, str(_cli.integer(value, name, minimum=minimum, maximum=maximum))]
 
 
-def _opt_float(name: str, value: float | None, flag: str, *, minimum: float = 0.0, maximum: float | None = None) -> list[str]:
+def _opt_float(
+    name: str, value: float | None, flag: str, *, minimum: float = 0.0, maximum: float | None = None
+) -> list[str]:
     if value is None:
         return []
     return [flag, f"{_cli.number(value, name, minimum=minimum, maximum=maximum):g}"]
@@ -113,7 +174,9 @@ def _checked_options(options: Mapping[str, Any] | None, explicit_flags: set[str]
     arguments: list[str] = []
     for key, value in (options or {}).items():
         if not isinstance(key, str) or key not in _OPTIONS:
-            raise ConfigurationError(f"Unknown Shasta option {key!r}; the accepted names are Section.name as in `shasta --help` (0.14.0).")
+            raise ConfigurationError(
+                f"Unknown Shasta option {key!r}; the accepted names are Section.name as in `shasta --help` (0.14.0)."
+            )
         flag = f"--{key}"
         if flag in explicit_flags:
             raise ConfigurationError(f"{key} is already set by a named parameter of this function.")
@@ -153,7 +216,9 @@ def _summary_fields(summary: dict[str, Any] | None) -> dict[str, Any]:
         "reads_used": reads.get("Number of reads"),
         "read_bases": reads.get("Number of read bases"),
         "read_n50": reads.get("Read N50"),
-        "reads_flagged_palindromic": reads.get("Number of reads flagged as palindromic by self alignment"),
+        "reads_flagged_palindromic": reads.get(
+            "Number of reads flagged as palindromic by self alignment"
+        ),
         "reads_flagged_chimeric": reads.get("Number of reads flagged as chimeric"),
         "assembled_segments": segments.get("Number of segments assembled"),
         "assembled_bases": segments.get("Total assembled segment length"),
@@ -250,35 +315,62 @@ def shasta_assemble(
     read_files = [_cli.existing_file(item, "reads") for item in inputs]
     run_dir = Path(output_directory).expanduser().resolve()
     if run_dir.exists():
-        raise ConfigurationError(f"output_directory must not exist yet (Shasta creates it): {run_dir}")
+        raise ConfigurationError(
+            f"output_directory must not exist yet (Shasta creates it): {run_dir}"
+        )
     if not run_dir.parent.is_dir():
-        raise ConfigurationError(f"The folder for output_directory does not exist: {run_dir.parent}")
+        raise ConfigurationError(
+            f"The folder for output_directory does not exist: {run_dir.parent}"
+        )
     config_file = Path(config).expanduser()
     if config_file.is_file():
         config_value = str(config_file.resolve())
     elif isinstance(config, str) and _CONFIG_NAME.fullmatch(config):
         config_value = config
     else:
-        raise ConfigurationError("config must be a built-in configuration name or an existing configuration file.")
+        raise ConfigurationError(
+            "config must be a built-in configuration name or an existing configuration file."
+        )
     if desired_coverage is not None and (
-        isinstance(desired_coverage, bool) or not re.fullmatch(r"[0-9]+(\.[0-9]+)?[A-Za-z]{0,2}", str(desired_coverage))
+        isinstance(desired_coverage, bool)
+        or not re.fullmatch(r"[0-9]+(\.[0-9]+)?[A-Za-z]{0,2}", str(desired_coverage))
     ):
-        raise ConfigurationError("desired_coverage must be a number of bases such as 120000000 or '120Mb'.")
+        raise ConfigurationError(
+            "desired_coverage must be a number of bases such as 120000000 or '120Mb'."
+        )
     if simplify_max_length is not None and not isinstance(simplify_max_length, str):
-        simplify_max_length = ",".join(str(_cli.integer(item, "simplify_max_length", minimum=1)) for item in simplify_max_length)
-    if simplify_max_length is not None and not re.fullmatch(r"[0-9]+(,[0-9]+)*", simplify_max_length):
+        simplify_max_length = ",".join(
+            str(_cli.integer(item, "simplify_max_length", minimum=1))
+            for item in simplify_max_length
+        )
+    if simplify_max_length is not None and not re.fullmatch(
+        r"[0-9]+(,[0-9]+)*", simplify_max_length
+    ):
         raise ConfigurationError("simplify_max_length must look like '10,100,1000'.")
     if consensus_caller is not None:
         _cli.text(consensus_caller, "consensus_caller")
 
-    arguments = ["--input", *[str(path) for path in read_files], "--config", config_value, "--assemblyDirectory", str(run_dir)]
+    arguments = [
+        "--input",
+        *[str(path) for path in read_files],
+        "--config",
+        config_value,
+        "--assemblyDirectory",
+        str(run_dir),
+    ]
     arguments += ["--command", "assemble"]
     if anchors_path is not None:
         arguments += ["--anchors", str(_cli.existing_file(anchors_path, "anchors_path"))]
     if memory_mode is not None:
-        arguments += ["--memoryMode", _cli.choice(memory_mode, ("anonymous", "filesystem"), "memory_mode")]
+        arguments += [
+            "--memoryMode",
+            _cli.choice(memory_mode, ("anonymous", "filesystem"), "memory_mode"),
+        ]
     if memory_backing is not None:
-        arguments += ["--memoryBacking", _cli.choice(memory_backing, ("4K", "2M", "disk"), "memory_backing")]
+        arguments += [
+            "--memoryBacking",
+            _cli.choice(memory_backing, ("4K", "2M", "disk"), "memory_backing"),
+        ]
     arguments += _opt_int("threads", threads, "--threads", minimum=0, maximum=4096)
     named: list[str] = []
     named += _opt_choice("assembly_mode", assembly_mode, "--Assembly.mode", (0, 2, 3))
@@ -288,26 +380,71 @@ def shasta_assemble(
         if not isinstance(palindromic_flagging, bool):
             raise ConfigurationError("palindromic_flagging must be True, False or None.")
         named += [] if palindromic_flagging else ["--Reads.palindromicReads.skipFlagging"]
-    named += _opt_choice("kmer_generation_method", kmer_generation_method, "--Kmers.generationMethod", (0, 1, 2, 3, 4))
+    named += _opt_choice(
+        "kmer_generation_method",
+        kmer_generation_method,
+        "--Kmers.generationMethod",
+        (0, 1, 2, 3, 4),
+    )
     named += _opt_int("kmer_length", kmer_length, "--Kmers.k", minimum=1, maximum=32)
     named += _opt_float("kmer_probability", kmer_probability, "--Kmers.probability", maximum=1.0)
     named += _opt_int("minhash_m", minhash_m, "--MinHash.m", minimum=1)
-    named += _opt_float("minhash_hash_fraction", minhash_hash_fraction, "--MinHash.hashFraction", maximum=1.0)
-    named += _opt_int("minhash_iteration_count", minhash_iteration_count, "--MinHash.minHashIterationCount")
+    named += _opt_float(
+        "minhash_hash_fraction", minhash_hash_fraction, "--MinHash.hashFraction", maximum=1.0
+    )
+    named += _opt_int(
+        "minhash_iteration_count", minhash_iteration_count, "--MinHash.minHashIterationCount"
+    )
     named += _opt_bool("minhash_all_pairs", minhash_all_pairs, "--MinHash.allPairs")
     named += _opt_choice("align_method", align_method, "--Align.alignMethod", (0, 1, 3, 4, 5, 6))
-    named += _opt_choice("read_graph_creation_method", read_graph_creation_method, "--ReadGraph.creationMethod", (0, 2, 3, 4))
-    named += _opt_choice("strand_separation_method", strand_separation_method, "--ReadGraph.strandSeparationMethod", (0, 1, 2))
-    named += _opt_int("max_chimeric_read_distance", max_chimeric_read_distance, "--ReadGraph.maxChimericReadDistance")
-    named += _opt_bool("flag_inconsistent_alignments", flag_inconsistent_alignments, "--ReadGraph.flagInconsistentAlignments")
-    named += _opt_int("marker_graph_min_coverage", marker_graph_min_coverage, "--MarkerGraph.minCoverage")
-    named += _opt_int("marker_graph_max_coverage", marker_graph_max_coverage, "--MarkerGraph.maxCoverage")
-    named += _opt_int("marker_graph_min_edge_coverage", marker_graph_min_edge_coverage, "--MarkerGraph.minEdgeCoverage")
-    named += _opt_bool("cleanup_duplicate_markers", cleanup_duplicate_markers, "--MarkerGraph.cleanupDuplicateMarkers")
-    named += [] if simplify_max_length is None else ["--MarkerGraph.simplifyMaxLength", simplify_max_length]
+    named += _opt_choice(
+        "read_graph_creation_method",
+        read_graph_creation_method,
+        "--ReadGraph.creationMethod",
+        (0, 2, 3, 4),
+    )
+    named += _opt_choice(
+        "strand_separation_method",
+        strand_separation_method,
+        "--ReadGraph.strandSeparationMethod",
+        (0, 1, 2),
+    )
+    named += _opt_int(
+        "max_chimeric_read_distance",
+        max_chimeric_read_distance,
+        "--ReadGraph.maxChimericReadDistance",
+    )
+    named += _opt_bool(
+        "flag_inconsistent_alignments",
+        flag_inconsistent_alignments,
+        "--ReadGraph.flagInconsistentAlignments",
+    )
+    named += _opt_int(
+        "marker_graph_min_coverage", marker_graph_min_coverage, "--MarkerGraph.minCoverage"
+    )
+    named += _opt_int(
+        "marker_graph_max_coverage", marker_graph_max_coverage, "--MarkerGraph.maxCoverage"
+    )
+    named += _opt_int(
+        "marker_graph_min_edge_coverage",
+        marker_graph_min_edge_coverage,
+        "--MarkerGraph.minEdgeCoverage",
+    )
+    named += _opt_bool(
+        "cleanup_duplicate_markers",
+        cleanup_duplicate_markers,
+        "--MarkerGraph.cleanupDuplicateMarkers",
+    )
+    named += (
+        []
+        if simplify_max_length is None
+        else ["--MarkerGraph.simplifyMaxLength", simplify_max_length]
+    )
     named += _opt_choice("detangle_method", detangle_method, "--Assembly.detangleMethod", (0, 1, 2))
     named += [] if consensus_caller is None else ["--Assembly.consensusCaller", consensus_caller]
-    named += _opt_bool("write_reads_by_segment", write_reads_by_segment, "--Assembly.writeReadsByAssembledSegment")
+    named += _opt_bool(
+        "write_reads_by_segment", write_reads_by_segment, "--Assembly.writeReadsByAssembledSegment"
+    )
     named += _opt_bool("store_coverage_data", store_coverage_data, "--Assembly.storeCoverageData")
     explicit_flags = {item for item in named if item.startswith("--")}
     extra = _checked_options(options, explicit_flags)
@@ -325,8 +462,17 @@ def shasta_assemble(
         hint=_HINT,
         timeout_seconds=timeout_seconds,
     )
-    produced = sorted(path for path in run_dir.rglob("*") if path.is_file()) if run_dir.is_dir() else []
-    fasta = next((run_dir / name for name in ("Assembly.fasta", "Assembly-Haploid.fasta") if (run_dir / name).is_file()), None)
+    produced = (
+        sorted(path for path in run_dir.rglob("*") if path.is_file()) if run_dir.is_dir() else []
+    )
+    fasta = next(
+        (
+            run_dir / name
+            for name in ("Assembly.fasta", "Assembly-Haploid.fasta")
+            if (run_dir / name).is_file()
+        ),
+        None,
+    )
     gfa = run_dir / "Assembly.gfa"
     result["operation"] = "shasta_assemble"
     result["assembly_directory"] = str(run_dir)
@@ -341,7 +487,9 @@ def shasta_assemble(
 def _run_directory(value: str) -> Path:
     path = Path(value).expanduser().resolve()
     if not path.is_dir():
-        raise ConfigurationError(f"run_directory must be an existing Shasta assembly folder: {path}")
+        raise ConfigurationError(
+            f"run_directory must be an existing Shasta assembly folder: {path}"
+        )
     return path
 
 
@@ -389,7 +537,9 @@ def shasta_read_run_table(
     name, meaning = TABLES[table]
     path = directory / name
     if not path.is_file():
-        raise ConfigurationError(f"{name} does not exist in {directory}; this run did not write the {table} table.")
+        raise ConfigurationError(
+            f"{name} does not exist in {directory}; this run did not write the {table} table."
+        )
     rows: list[dict[str, Any]] = []
     total = 0
     with path.open(newline="", encoding="utf-8", errors="replace") as handle:
@@ -401,7 +551,12 @@ def shasta_read_run_table(
                 continue
             total += 1
             if len(rows) < max_rows:
-                rows.append({column: _convert(record[index]) if index < len(record) else None for index, column in enumerate(columns)})
+                rows.append(
+                    {
+                        column: _convert(record[index]) if index < len(record) else None
+                        for index, column in enumerate(columns)
+                    }
+                )
     return {
         "status": "completed",
         "operation": "shasta_read_run_table",
@@ -453,7 +608,9 @@ def shasta_read_assembly_output(
         raise ConfigurationError("file_name must be a plain file name inside the run folder.")
     path = directory / name
     if not path.is_file():
-        raise ConfigurationError(f"{name} does not exist in {directory}; this run did not write it.")
+        raise ConfigurationError(
+            f"{name} does not exist in {directory}; this run did not write it."
+        )
     is_fasta = path.name.endswith((".fasta", ".fa"))
     records: list[dict[str, Any]] = []
     lengths: list[int] = []
@@ -463,7 +620,11 @@ def shasta_read_assembly_output(
     def add(record_name: str, length: int, gc: int, sequence: str | None) -> None:
         lengths.append(length)
         if len(records) < max_records:
-            entry: dict[str, Any] = {"name": record_name, "length": length, "gc_fraction": None if length == 0 or sequence is None else round(gc / length, 6)}
+            entry: dict[str, Any] = {
+                "name": record_name,
+                "length": length,
+                "gc_fraction": None if length == 0 or sequence is None else round(gc / length, 6),
+            }
             if include_sequences and sequence is not None:
                 entry["sequence"] = sequence
             records.append(entry)
@@ -476,7 +637,12 @@ def shasta_read_assembly_output(
             def flush() -> None:
                 if current is not None:
                     sequence = "".join(parts)
-                    add(current.split()[0] if current.split() else current, len(sequence), sum(c in "GCgc" for c in sequence), sequence)
+                    add(
+                        current.split()[0] if current.split() else current,
+                        len(sequence),
+                        sum(c in "GCgc" for c in sequence),
+                        sequence,
+                    )
 
             for line in handle:
                 line = line.rstrip("\n")
@@ -499,7 +665,15 @@ def shasta_read_assembly_output(
                 elif fields[0] == "L" and len(fields) >= 6:
                     link_count += 1
                     if len(links) < max_records:
-                        links.append({"from": fields[1], "from_orient": fields[2], "to": fields[3], "to_orient": fields[4], "overlap": fields[5]})
+                        links.append(
+                            {
+                                "from": fields[1],
+                                "from_orient": fields[2],
+                                "to": fields[3],
+                                "to_orient": fields[4],
+                                "overlap": fields[5],
+                            }
+                        )
     result: dict[str, Any] = {
         "status": "completed",
         "operation": "shasta_read_assembly_output",
@@ -518,6 +692,6 @@ def shasta_read_assembly_output(
     return result
 
 
-__all__ = ["shasta_assemble", "shasta_read_run_table", "shasta_read_assembly_output"]
+__all__ = ["shasta_assemble", "shasta_read_assembly_output", "shasta_read_run_table"]
 
 _register_public_verbose(globals(), tuple(__all__))

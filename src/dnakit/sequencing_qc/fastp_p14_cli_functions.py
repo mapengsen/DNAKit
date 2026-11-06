@@ -127,9 +127,8 @@ def fastp_process_reads(
         if umi_location is None:
             raise ConfigurationError("umi=True needs umi_location.")
         arguments += ["--umi_loc", _gap_cli.choice(umi_location, _UMI_LOCATIONS, "umi_location")]
-        if umi_location in ("read1", "read2"):
-            if umi_length is None:
-                raise ConfigurationError("umi_length is required when umi_location is read1 or read2.")
+        if umi_location in ("read1", "read2") and umi_length is None:
+            raise ConfigurationError("umi_length is required when umi_location is read1 or read2.")
         if umi_length is not None:
             arguments += ["--umi_len", str(_gap_cli.integer(umi_length, "umi_length", minimum=1))]
         if umi_prefix is not None:
@@ -139,18 +138,38 @@ def fastp_process_reads(
         if umi_delimiter is not None:
             arguments += ["--umi_delim", _gap_cli.text(umi_delimiter, "umi_delimiter")]
     elif any(item is not None for item in (umi_length, umi_prefix, umi_skip, umi_delimiter)):
-        raise ConfigurationError("umi_length, umi_prefix, umi_skip and umi_delimiter need umi=True.")
+        raise ConfigurationError(
+            "umi_length, umi_prefix, umi_skip and umi_delimiter need umi=True."
+        )
     numbers = (
         ("complexity_threshold", complexity_threshold, "--complexity_threshold", 0, 100),
         ("index_filter_threshold", index_filter_threshold, "--filter_by_index_threshold", 0, None),
         ("overlap_length_required", overlap_length_required, "--overlap_len_require", 1, None),
         ("overlap_diff_limit", overlap_diff_limit, "--overlap_diff_limit", 0, None),
-        ("overlap_diff_percent_limit", overlap_diff_percent_limit, "--overlap_diff_percent_limit", 0, 100),
-        ("overrepresentation_sampling", overrepresentation_sampling, "--overrepresentation_sampling", 1, 10000),
+        (
+            "overlap_diff_percent_limit",
+            overlap_diff_percent_limit,
+            "--overlap_diff_percent_limit",
+            0,
+            100,
+        ),
+        (
+            "overrepresentation_sampling",
+            overrepresentation_sampling,
+            "--overrepresentation_sampling",
+            1,
+            10000,
+        ),
         ("cut_window_size", cut_window_size, "--cut_window_size", 1, 1000),
         ("cut_mean_quality", cut_mean_quality, "--cut_mean_quality", 1, 36),
         ("qualified_quality_phred", qualified_quality_phred, "--qualified_quality_phred", 0, 93),
-        ("unqualified_percent_limit", unqualified_percent_limit, "--unqualified_percent_limit", 0, 100),
+        (
+            "unqualified_percent_limit",
+            unqualified_percent_limit,
+            "--unqualified_percent_limit",
+            0,
+            100,
+        ),
         ("n_base_limit", n_base_limit, "--n_base_limit", 0, None),
         ("average_quality", average_quality, "--average_qual", 0, 93),
         ("length_required", length_required, "--length_required", 0, None),
@@ -164,7 +183,11 @@ def fastp_process_reads(
         (disable_adapter_trimming, "--disable_adapter_trimming", "disable_adapter_trimming"),
         (low_complexity_filter, "--low_complexity_filter", "low_complexity_filter"),
         (correction, "--correction", "correction"),
-        (overrepresentation_analysis, "--overrepresentation_analysis", "overrepresentation_analysis"),
+        (
+            overrepresentation_analysis,
+            "--overrepresentation_analysis",
+            "overrepresentation_analysis",
+        ),
         (trim_poly_x, "--trim_poly_x", "trim_poly_x"),
         (cut_front, "--cut_front", "cut_front"),
         (cut_tail, "--cut_tail", "cut_tail"),
@@ -175,8 +198,15 @@ def fastp_process_reads(
     if (correction or detect_adapter_for_pe) and read2 is None:
         raise ConfigurationError("correction and detect_adapter_for_pe need paired reads (read2).")
     result = _p14_cli.run(
-        "fastp", arguments, cwd=next(iter(folders)), expected=expected, explicit=fastp_path, hint=_HINT,
-        timeout_seconds=_gap_cli.number(timeout_seconds, "timeout_seconds", minimum=1.0, maximum=86_400.0),
+        "fastp",
+        arguments,
+        cwd=next(iter(folders)),
+        expected=expected,
+        explicit=fastp_path,
+        hint=_HINT,
+        timeout_seconds=_gap_cli.number(
+            timeout_seconds, "timeout_seconds", minimum=1.0, maximum=86_400.0
+        ),
     )
     if result["status"] == "completed":
         report = json.loads(Path(json_path).read_text(encoding="utf-8"))
@@ -187,7 +217,10 @@ def fastp_process_reads(
             "filtering_result": report.get("filtering_result"),
             "duplication_rate": (report.get("duplication") or {}).get("rate"),
             "adapter_cutting": report.get("adapter_cutting"),
-            "overrepresented": {key: value for key, value in report.items() if "overrepresented" in key} or None,
+            "overrepresented": {
+                key: value for key, value in report.items() if "overrepresented" in key
+            }
+            or None,
         }
     return result
 

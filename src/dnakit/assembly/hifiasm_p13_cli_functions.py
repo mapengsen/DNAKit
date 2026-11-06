@@ -43,8 +43,14 @@ def _optional_int(flag: str, value: int | None, name: str, *, minimum: int | Non
     return [] if value is None else [flag, str(_cli.integer(value, name, minimum=minimum))]
 
 
-def _optional_float(flag: str, value: float | None, name: str, *, minimum: float = 0.0, maximum: float | None = None) -> list[str]:
-    return [] if value is None else [flag, f"{_cli.number(value, name, minimum=minimum, maximum=maximum):g}"]
+def _optional_float(
+    flag: str, value: float | None, name: str, *, minimum: float = 0.0, maximum: float | None = None
+) -> list[str]:
+    return (
+        []
+        if value is None
+        else [flag, f"{_cli.number(value, name, minimum=minimum, maximum=maximum):g}"]
+    )
 
 
 def _switch(on: bool, flag: str, name: str) -> list[str]:
@@ -139,22 +145,30 @@ def hifiasm_assemble(
     hifiasm's default of 37 reserves 16 GB of memory, ``0`` disables the filter for small genomes) and ``threads``
     (``-t``).
     """
-    reads = _files(list(reads_paths) if not isinstance(reads_paths, str) else [reads_paths], "reads_paths")
+    reads = _files(
+        list(reads_paths) if not isinstance(reads_paths, str) else [reads_paths], "reads_paths"
+    )
     prefix = Path(output_prefix).expanduser().resolve()
     if not prefix.parent.is_dir():
         raise ConfigurationError(f"The folder for output_prefix does not exist: {prefix.parent}")
     existing = sorted(path.name for path in prefix.parent.glob(f"{prefix.name}.*"))
     if existing:
-        raise ConfigurationError(f"Files with this output_prefix already exist and will not be overwritten: {existing[:5]}")
+        raise ConfigurationError(
+            f"Files with this output_prefix already exist and will not be overwritten: {existing[:5]}"
+        )
     ultra_long = _files(ultra_long_paths, "ultra_long_paths")
     hic1 = _files(hic_reads1_paths, "hic_reads1_paths")
     hic2 = _files(hic_reads2_paths, "hic_reads2_paths")
     if bool(hic1) != bool(hic2):
         raise ConfigurationError("hic_reads1_paths and hic_reads2_paths must be given together.")
     if (paternal_kmers_path is None) != (maternal_kmers_path is None):
-        raise ConfigurationError("paternal_kmers_path and maternal_kmers_path must be given together.")
+        raise ConfigurationError(
+            "paternal_kmers_path and maternal_kmers_path must be given together."
+        )
     if (paternal_reads_list_path is None) != (maternal_reads_list_path is None):
-        raise ConfigurationError("paternal_reads_list_path and maternal_reads_list_path must be given together.")
+        raise ConfigurationError(
+            "paternal_reads_list_path and maternal_reads_list_path must be given together."
+        )
     if hic1 and paternal_kmers_path is not None:
         raise ConfigurationError("Hi-C partitioning and trio binning cannot be combined.")
     if purge_level is not None and not 0 <= purge_level <= 3:
@@ -169,17 +183,30 @@ def hifiasm_assemble(
     args += _switch(primary_assembly, "--primary", "primary_assembly")
     if ultra_long:
         args += ["--ul", ",".join(str(path) for path in ultra_long)]
-    args += _optional_float("--ul-rate", ultra_long_error_rate, "ultra_long_error_rate", maximum=1.0)
+    args += _optional_float(
+        "--ul-rate", ultra_long_error_rate, "ultra_long_error_rate", maximum=1.0
+    )
     args += _optional_int("--ul-cut", min_ultra_long_length, "min_ultra_long_length")
     if hic1:
-        args += ["--h1", ",".join(str(path) for path in hic1), "--h2", ",".join(str(path) for path in hic2)]
+        args += [
+            "--h1",
+            ",".join(str(path) for path in hic1),
+            "--h2",
+            ",".join(str(path) for path in hic2),
+        ]
     args += _optional_int("--l-msjoin", misjoin_min_size, "misjoin_min_size")
     if paternal_kmers_path is not None and maternal_kmers_path is not None:
         args += ["-1", str(_cli.existing_file(paternal_kmers_path, "paternal_kmers_path"))]
         args += ["-2", str(_cli.existing_file(maternal_kmers_path, "maternal_kmers_path"))]
     if paternal_reads_list_path is not None and maternal_reads_list_path is not None:
-        args += ["-3", str(_cli.existing_file(paternal_reads_list_path, "paternal_reads_list_path"))]
-        args += ["-4", str(_cli.existing_file(maternal_reads_list_path, "maternal_reads_list_path"))]
+        args += [
+            "-3",
+            str(_cli.existing_file(paternal_reads_list_path, "paternal_reads_list_path")),
+        ]
+        args += [
+            "-4",
+            str(_cli.existing_file(maternal_reads_list_path, "maternal_reads_list_path")),
+        ]
     args += _switch(dual_scaffold, "--dual-scaf", "dual_scaffold")
     args += _optional_int("--scaf-gap", scaffold_max_gap, "scaffold_max_gap")
     args += _optional_int("-l", purge_level, "purge_level")
@@ -191,7 +218,9 @@ def hifiasm_assemble(
     args += _optional_int("--lowQ", low_quality_percent, "low_quality_percent")
     args += _optional_int("--b-cov", break_low_coverage, "break_low_coverage")
     args += _optional_int("--h-cov", break_high_coverage, "break_high_coverage", minimum=-1)
-    args += _optional_float("--m-rate", break_exact_overlap_rate, "break_exact_overlap_rate", maximum=1.0)
+    args += _optional_float(
+        "--m-rate", break_exact_overlap_rate, "break_exact_overlap_rate", maximum=1.0
+    )
     if telomere_motif is not None:
         args += ["--telo-m", _cli.text(telomere_motif, "telomere_motif")]
     args += _optional_int("--chem-c", chimeric_read_support, "chimeric_read_support")
@@ -213,12 +242,20 @@ def hifiasm_assemble(
     produced = sorted(prefix.parent.glob(f"{prefix.name}.*"))
     result["operation"] = "hifiasm"
     result["outputs"] = [str(path) for path in produced]
-    graphs = [path for path in produced if path.name.endswith(".gfa") and ".noseq." not in path.name]
+    graphs = [
+        path for path in produced if path.name.endswith(".gfa") and ".noseq." not in path.name
+    ]
     result["assembly_graphs"] = [str(path) for path in graphs]
     result["bed_reports"] = [str(path) for path in produced if path.suffix == ".bed"]
-    result["error_corrected_reads"] = next((str(path) for path in produced if path.name.endswith(".ec.fa")), None)
-    result["overlaps_paf"] = next((str(path) for path in produced if path.name.endswith(".ovlp.paf")), None)
-    result["contig_summary"] = [_graph_summary(path) for path in graphs if path.name.endswith("p_ctg.gfa")]
+    result["error_corrected_reads"] = next(
+        (str(path) for path in produced if path.name.endswith(".ec.fa")), None
+    )
+    result["overlaps_paf"] = next(
+        (str(path) for path in produced if path.name.endswith(".ovlp.paf")), None
+    )
+    result["contig_summary"] = [
+        _graph_summary(path) for path in graphs if path.name.endswith("p_ctg.gfa")
+    ]
     if result["return_code"] == 0 and not graphs:
         result["status"] = "failed"
     elif result["return_code"] == 0:

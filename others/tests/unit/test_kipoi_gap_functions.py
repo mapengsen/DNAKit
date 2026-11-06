@@ -147,7 +147,9 @@ def _write_model(
     (directory / "model.yaml").write_text(model_yaml)
     (directory / "model.py").write_text(MODEL_PY)
     (directory / "dataloader.py").write_text(DATALOADER_PY)
-    (directory / "dataloader.yaml").write_text(DATALOADER_REMOTE_YAML if remote_example else DATALOADER_YAML)
+    (directory / "dataloader.yaml").write_text(
+        DATALOADER_REMOTE_YAML if remote_example else DATALOADER_YAML
+    )
     (directory / "example.fa").write_text(EXAMPLE_FA)
     return directory
 
@@ -163,7 +165,9 @@ def zoo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 def _example_inputs(zoo: Path) -> np.ndarray:
     dataloader_cls = kg.load_kipoi_dataloader("zoo/toy/.", source="dir")
-    batches = list(dataloader_cls(fasta_file=str(zoo / "toy" / "example.fa")).batch_iter(batch_size=3))
+    batches = list(
+        dataloader_cls(fasta_file=str(zoo / "toy" / "example.fa")).batch_iter(batch_size=3)
+    )
     return np.concatenate([batch["inputs"] for batch in batches])
 
 
@@ -217,7 +221,9 @@ def test_unknown_local_model_raises_backend_error(kipoi: object, zoo: Path) -> N
 
 def test_load_dataloader_class_batches_fasta(kipoi: object, zoo: Path) -> None:
     dataloader_cls = kg.load_kipoi_dataloader("zoo/toy/.", source="dir")
-    batches = list(dataloader_cls(fasta_file=str(zoo / "toy" / "example.fa")).batch_iter(batch_size=2))
+    batches = list(
+        dataloader_cls(fasta_file=str(zoo / "toy" / "example.fa")).batch_iter(batch_size=2)
+    )
     assert [batch["inputs"].shape for batch in batches] == [(2, 20, 4), (1, 20, 4)]
     names = [name for batch in batches for name in batch["metadata"]["name"]]
     assert names == ["a", "b", "c"]
@@ -302,21 +308,30 @@ def test_predict_writes_tsv_matching_model_output(kipoi: object, zoo: Path, tmp_
     assert [float(line) for line in lines[1:]] == pytest.approx(EXPECTED_PREDICTIONS.tolist())
 
 
-def test_predict_refuses_hdf5_existing_and_missing_folder(kipoi: object, zoo: Path, tmp_path: Path) -> None:
+def test_predict_refuses_hdf5_existing_and_missing_folder(
+    kipoi: object, zoo: Path, tmp_path: Path
+) -> None:
     arguments = {"fasta_file": str(zoo / "toy" / "example.fa")}
     with pytest.raises(ConfigurationError, match="TSV"):
-        kg.predict_kipoi_model("zoo/toy", str(tmp_path / "out.h5"), source="dir", dataloader_args=arguments)
+        kg.predict_kipoi_model(
+            "zoo/toy", str(tmp_path / "out.h5"), source="dir", dataloader_args=arguments
+        )
     existing = tmp_path / "exists.tsv"
     existing.write_text("x")
     with pytest.raises(ConfigurationError, match="must not exist"):
         kg.predict_kipoi_model("zoo/toy", str(existing), source="dir", dataloader_args=arguments)
     with pytest.raises(ConfigurationError, match="does not exist"):
         kg.predict_kipoi_model(
-            "zoo/toy", str(tmp_path / "missing" / "out.tsv"), source="dir", dataloader_args=arguments
+            "zoo/toy",
+            str(tmp_path / "missing" / "out.tsv"),
+            source="dir",
+            dataloader_args=arguments,
         )
 
 
-def test_predict_rejects_bad_batch_size_and_arguments(kipoi: object, zoo: Path, tmp_path: Path) -> None:
+def test_predict_rejects_bad_batch_size_and_arguments(
+    kipoi: object, zoo: Path, tmp_path: Path
+) -> None:
     out = str(tmp_path / "out.tsv")
     with pytest.raises(ConfigurationError, match="batch_size"):
         kg.predict_kipoi_model("zoo/toy", out, source="dir", batch_size=0)
@@ -372,8 +387,12 @@ def test_validate_reports_remote_expected_file_without_downloading(
     assert "not downloaded" in result["note"]
 
 
-def test_example_kwargs_return_local_example_as_written(kipoi: object, zoo: Path, tmp_path: Path) -> None:
-    result = kg.get_kipoi_example_kwargs("zoo/toy", source="dir", output_dir=str(tmp_path / "examples"))
+def test_example_kwargs_return_local_example_as_written(
+    kipoi: object, zoo: Path, tmp_path: Path
+) -> None:
+    result = kg.get_kipoi_example_kwargs(
+        "zoo/toy", source="dir", output_dir=str(tmp_path / "examples")
+    )
     json.dumps(result)
     assert result["example_kwargs"] == {"fasta_file": "example.fa"}
 
@@ -384,7 +403,9 @@ def test_example_kwargs_remote_dry_run_names_target_without_download(
     _write_model(tmp_path / "remote", remote_example=True)
     monkeypatch.chdir(tmp_path)
     cache = tmp_path / "cache"
-    result = kg.get_kipoi_example_kwargs("remote", source="dir", output_dir=str(cache), dry_run=True)
+    result = kg.get_kipoi_example_kwargs(
+        "remote", source="dir", output_dir=str(cache), dry_run=True
+    )
     assert result["dry_run"] is True
     assert result["example_kwargs"]["fasta_file"] == str(cache.absolute() / "example_remote.fa")
     assert not (cache / "example_remote.fa").exists()

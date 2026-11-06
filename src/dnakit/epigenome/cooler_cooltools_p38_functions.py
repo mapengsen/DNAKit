@@ -80,9 +80,7 @@ def _bins_from_chromsizes(chromsizes: Mapping[str, int], binsize: int) -> Any:
     return cooler.binnify(series, size)
 
 
-def cooler_region_bin_ids(
-    cool_path: str, region: str, *, verbose: bool = True
-) -> dict[str, Any]:
+def cooler_region_bin_ids(cool_path: str, region: str, *, verbose: bool = True) -> dict[str, Any]:
     """Map a genomic region to cooler bin IDs, using ``cooler.Cooler.offset`` and ``Cooler.extent``.
 
     ``region`` is a UCSC-style string such as ``chr1`` or ``chr1:1,000,000-2,000,000``. Returns the ID of
@@ -137,8 +135,8 @@ def query_cooler_bins(
         "status": "completed",
         "operation": "query_cooler_bins",
         "region": region,
-        "bin_count": int(len(table)),
-        "returned": min(int(len(table)), cap),
+        "bin_count": len(table),
+        "returned": min(len(table), cap),
         "columns": [str(c) for c in table.columns],
         "bins": h.records(table.reset_index(), cap),
         "provenance": h.provenance("cooler", "cooler.Cooler.bins().fetch"),
@@ -190,8 +188,8 @@ def sanitize_cooler_pixels(
     return {
         "status": "completed",
         "operation": "sanitize_cooler_pixels",
-        "input_rows": int(len(frame)),
-        "output_rows": int(len(clean)),
+        "input_rows": len(frame),
+        "output_rows": len(clean),
         "tril_action": action,
         "output_path": None if target is None else str(target),
         "pixels": h.records(clean, cap),
@@ -245,8 +243,8 @@ def sanitize_cooler_records(
         "status": "completed",
         "operation": "sanitize_cooler_records",
         "schema": layout,
-        "input_rows": int(len(frame)),
-        "output_rows": int(len(clean)),
+        "input_rows": len(frame),
+        "output_rows": len(clean),
         "output_path": None if target is None else str(target),
         "records": h.records(clean, cap),
         "provenance": h.provenance("cooler", "cooler.create.sanitize_records"),
@@ -288,7 +286,9 @@ def detect_cooler_file_type(path: str, *, verbose: bool = True) -> dict[str, Any
         "is_multires": is_multires,
         "is_scool": is_scool,
         "file_type": kind,
-        "provenance": h.provenance("cooler", "cooler.fileops.is_cooler / is_multires_file / is_scool_file"),
+        "provenance": h.provenance(
+            "cooler", "cooler.fileops.is_cooler / is_multires_file / is_scool_file"
+        ),
     }
 
 
@@ -319,7 +319,9 @@ def build_dot_calling_kernels(
         source = "recommend_kernels"
     else:
         if kernel_half_width is None or donut_inner_half_width is None:
-            raise ConfigurationError("Give binsize, or both kernel_half_width and donut_inner_half_width.")
+            raise ConfigurationError(
+                "Give binsize, or both kernel_half_width and donut_inner_half_width."
+            )
         w = h.integer(kernel_half_width, "kernel_half_width", 1, 50)
         p = h.integer(donut_inner_half_width, "donut_inner_half_width", 0, w)
         kinds = [h.choice(k, "kernel type", _KERNEL_TYPES) for k in kernel_types]
@@ -335,7 +337,9 @@ def build_dot_calling_kernels(
         "width": int(first.shape[0]),
         "kernel_half_width": int((first.shape[0] - 1) // 2),
         "kernels": {name: [[int(v) for v in row] for row in k] for name, k in kernels.items()},
-        "provenance": h.provenance("cooltools", "cooltools.api.dotfinder.recommend_kernels / lib.numutils.get_kernel"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.api.dotfinder.recommend_kernels / lib.numutils.get_kernel"
+        ),
     }
 
 
@@ -409,20 +413,37 @@ def _dot_setup(
             raise ConfigurationError(str(exc)) from exc
     else:
         w = h.integer(kernel_half_width, "kernel_half_width", 2, 20)
-        p = h.integer(donut_inner_half_width if donut_inner_half_width is not None else 1,
-                      "donut_inner_half_width", 1, w - 1)
-        kernels = {k: numutils.get_kernel(w, p, k) for k in ("donut", "vertical", "horizontal", "lowleft")}
+        p = h.integer(
+            donut_inner_half_width if donut_inner_half_width is not None else 1,
+            "donut_inner_half_width",
+            1,
+            w - 1,
+        )
+        kernels = {
+            k: numutils.get_kernel(w, p, k) for k in ("donut", "vertical", "horizontal", "lowleft")
+        }
     half = int((max(len(k) for k in kernels.values()) - 1) // 2)
-    separation = dotfinder.bp_to_bins(h.integer(max_loci_separation, "max_loci_separation", 1, 1_000_000_000), binsize)
+    separation = dotfinder.bp_to_bins(
+        h.integer(max_loci_separation, "max_loci_separation", 1, 1_000_000_000), binsize
+    )
     tile_bins = dotfinder.bp_to_bins(h.integer(tile_size, "tile_size", 1, 1_000_000_000), binsize)
     bins = h.integer(n_lambda_bins, "n_lambda_bins", 40, 50)
     base = 2 ** (1 / 3)
-    ledges = np.concatenate(([-np.inf], np.logspace(0, bins - 1, num=bins, base=base, dtype=np.float64), [np.inf]))
+    ledges = np.concatenate(
+        ([-np.inf], np.logspace(0, bins - 1, num=bins, base=base, dtype=np.float64), [np.inf])
+    )
     view = common.make_cooler_view(clr)
     tiles = list(dotfinder.generate_tiles_diag_band(clr, view, half, tile_bins, separation))
     return {
-        "clr": clr, "expected": expected, "weight": name, "value_col": value_col, "kernels": kernels,
-        "separation": separation, "ledges": ledges, "tiles": tiles, "dotfinder": dotfinder,
+        "clr": clr,
+        "expected": expected,
+        "weight": name,
+        "value_col": value_col,
+        "kernels": kernels,
+        "separation": separation,
+        "ledges": ledges,
+        "tiles": tiles,
+        "dotfinder": dotfinder,
     }
 
 
@@ -461,27 +482,55 @@ def calculate_dot_calling_stage(
     fdr = h.number(lambda_bin_fdr, "lambda_bin_fdr", 1e-6, 1.0)
     nans = h.integer(max_nans_tolerated, "max_nans_tolerated", 0, 1000)
     pandas = require("pandas", _COOLER_EXTRA)
-    s = _dot_setup(cool_path, expected_path, weight, expected_value_col, kernel_half_width,
-                   donut_inner_half_width, max_loci_separation, tile_size, n_lambda_bins)
+    s = _dot_setup(
+        cool_path,
+        expected_path,
+        weight,
+        expected_value_col,
+        kernel_half_width,
+        donut_inner_half_width,
+        max_loci_separation,
+        tile_size,
+        n_lambda_bins,
+    )
     df = s["dotfinder"]
-    common = dict(clr=s["clr"], expected_indexed=s["expected"], expected_value_col=s["value_col"],
-                  clr_weight_name=s["weight"], kernels=s["kernels"], max_nans_tolerated=nans)
+    common = dict(
+        clr=s["clr"],
+        expected_indexed=s["expected"],
+        expected_value_col=s["value_col"],
+        clr_weight_name=s["weight"],
+        kernels=s["kernels"],
+        max_nans_tolerated=nans,
+    )
     try:
         if which == "scored":
-            parts = [df.score_tile(tile, band_to_cover=s["separation"], **common) for tile in s["tiles"]]
-            table = pandas.concat(parts, ignore_index=True).sort_values(["bin1_id", "bin2_id"]) if parts else pandas.DataFrame()
+            parts = [
+                df.score_tile(tile, band_to_cover=s["separation"], **common) for tile in s["tiles"]
+            ]
+            table = (
+                pandas.concat(parts, ignore_index=True).sort_values(["bin1_id", "bin2_id"])
+                if parts
+                else pandas.DataFrame()
+            )
             table = table.drop_duplicates().reset_index(drop=True)
         else:
             hist = df.scoring_and_histogramming_step(
-                tiles=s["tiles"], ledges=s["ledges"], loci_separation_bins=s["separation"], nproc=1, **common
+                tiles=s["tiles"],
+                ledges=s["ledges"],
+                loci_separation_bins=s["separation"],
+                nproc=1,
+                **common,
             )
             if which == "histogram":
                 frames = []
                 for kernel, matrix in hist.items():
                     long = matrix.copy()
                     long.columns = [str(c) for c in long.columns]
-                    long = long.reset_index().melt(id_vars=long.index.name or "count",
-                                                    var_name="lambda_bin", value_name="n_pixels")
+                    long = long.reset_index().melt(
+                        id_vars=long.index.name or "count",
+                        var_name="lambda_bin",
+                        value_name="n_pixels",
+                    )
                     long.insert(0, "kernel", kernel)
                     frames.append(long)
                 table = pandas.concat(frames, ignore_index=True)
@@ -489,18 +538,34 @@ def calculate_dot_calling_stage(
                 thresholds, qvalues = df.determine_thresholds(hist, fdr)
                 if which == "thresholds":
                     table = pandas.concat(
-                        [pandas.DataFrame({"kernel": k, "lambda_bin": [str(i) for i in v.index],
-                                           "threshold_count": v.to_numpy()}) for k, v in thresholds.items()],
-                        ignore_index=True)
+                        [
+                            pandas.DataFrame(
+                                {
+                                    "kernel": k,
+                                    "lambda_bin": [str(i) for i in v.index],
+                                    "threshold_count": v.to_numpy(),
+                                }
+                            )
+                            for k, v in thresholds.items()
+                        ],
+                        ignore_index=True,
+                    )
                 else:
                     pixels = df.scoring_and_extraction_step(
-                        tiles=s["tiles"], ledges=s["ledges"], thresholds=thresholds,
-                        loci_separation_bins=s["separation"], nproc=1, **common)
+                        tiles=s["tiles"],
+                        ledges=s["ledges"],
+                        thresholds=thresholds,
+                        loci_separation_bins=s["separation"],
+                        nproc=1,
+                        **common,
+                    )
                     table = pixels
                     if which == "qvalues":
                         table = df.annotate_pixels_with_qvalues(pixels, qvalues)
                         cooler = require("cooler", _COOLER_EXTRA)
-                        table = cooler.annotate(table, s["clr"].bins()[["chrom", "start", "end"]], replace=True)
+                        table = cooler.annotate(
+                            table, s["clr"].bins()[["chrom", "start", "end"]], replace=True
+                        )
     except (ValueError, KeyError, TypeError) as exc:
         raise ConfigurationError(f"cooltools dot calling failed at stage {which}: {exc}") from exc
     _write_table(table, target)
@@ -511,10 +576,12 @@ def calculate_dot_calling_stage(
         "kernels": list(s["kernels"]),
         "tiles": len(s["tiles"]),
         "lambda_bin_fdr": fdr,
-        "rows": int(len(table)),
+        "rows": len(table),
         "columns": [str(c) for c in table.columns],
         "output_path": str(target),
-        "provenance": h.provenance("cooltools", "cooltools.api.dotfinder lambda-binning (HiCCUPS-like) stages"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.api.dotfinder lambda-binning (HiCCUPS-like) stages"
+        ),
     }
 
 
@@ -552,11 +619,13 @@ def cluster_dot_pixels(
     return {
         "status": "completed",
         "operation": "cluster_dot_pixels",
-        "input_pixels": int(len(frame)),
-        "clusters": int(len(centroids)),
+        "input_pixels": len(frame),
+        "clusters": len(centroids),
         "clustering_radius": radius,
         "output_path": str(target),
-        "provenance": h.provenance("cooltools", "cooltools.api.dotfinder.clustering_step and clust_2D_pixels"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.api.dotfinder.clustering_step and clust_2D_pixels"
+        ),
     }
 
 
@@ -588,8 +657,12 @@ def filter_dot_centroids(
             frame,
             obs_raw_name=h.text(count_column, "count_column"),
             enrichment_factor_vh=h.number(enrichment_factor_vh, "enrichment_factor_vh", 0, 1000),
-            enrichment_factor_d_and_ll=h.number(enrichment_factor_d_and_ll, "enrichment_factor_d_and_ll", 0, 1000),
-            enrichment_factor_d_or_ll=h.number(enrichment_factor_d_or_ll, "enrichment_factor_d_or_ll", 0, 1000),
+            enrichment_factor_d_and_ll=h.number(
+                enrichment_factor_d_and_ll, "enrichment_factor_d_and_ll", 0, 1000
+            ),
+            enrichment_factor_d_or_ll=h.number(
+                enrichment_factor_d_or_ll, "enrichment_factor_d_or_ll", 0, 1000
+            ),
             FDR_orphan_threshold=h.number(fdr_orphan_threshold, "fdr_orphan_threshold", 0, 4),
         )
     except ValueError as exc:
@@ -598,10 +671,12 @@ def filter_dot_centroids(
     return {
         "status": "completed",
         "operation": "filter_dot_centroids",
-        "input_centroids": int(len(frame)),
-        "kept_centroids": int(len(kept)),
+        "input_centroids": len(frame),
+        "kept_centroids": len(kept),
         "output_path": str(target),
-        "provenance": h.provenance("cooltools", "cooltools.api.dotfinder.cluster_filtering_hiccups"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.api.dotfinder.cluster_filtering_hiccups"
+        ),
     }
 
 
@@ -628,7 +703,9 @@ def count_block_pixels(
         "total_pixels": total,
         "bad_pixels": bad,
         "valid_pixels": total - bad,
-        "provenance": h.provenance("cooltools", "cooltools.api.expected.count_all/bad_pixels_per_block"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.api.expected.count_all/bad_pixels_per_block"
+        ),
     }
 
 
@@ -665,7 +742,9 @@ def combine_logbinned_expected(
             binned_exp_slope=slope,
             Pc_name=h.text(pc_name, "pc_name"),
             spread_funcs=h.choice(spread_funcs, "spread_funcs", ("logstd", "std", "minmax")),
-            spread_funcs_slope=h.choice(spread_funcs_slope, "spread_funcs_slope", ("std", "minmax")),
+            spread_funcs_slope=h.choice(
+                spread_funcs_slope, "spread_funcs_slope", ("std", "minmax")
+            ),
             minmax_drop_bins=h.integer(minmax_drop_bins, "minmax_drop_bins", 0, 100),
         )
     except (ValueError, KeyError, TypeError) as exc:
@@ -675,9 +754,9 @@ def combine_logbinned_expected(
     return {
         "status": "completed",
         "operation": "combine_logbinned_expected",
-        "rows": int(len(scal)),
+        "rows": len(scal),
         "columns": [str(c) for c in scal.columns],
-        "slope_rows": None if slope_df is None else int(len(slope_df)),
+        "slope_rows": None if slope_df is None else len(slope_df),
         "output_path": str(target),
         "preview": h.records(scal, 5),
         "provenance": h.provenance("cooltools", "cooltools.api.expected.combine_binned_expected"),
@@ -712,7 +791,9 @@ def interpolate_logbinned_expected(
     binned = _read_table(bin_source, "binned_expected_path")
     try:
         out = expected.interpolate_expected(
-            exp, binned, columns=cols,
+            exp,
+            binned,
+            columns=cols,
             kind=h.choice(kind, "kind", ("linear", "nearest", "slinear", "quadratic", "cubic")),
             by_region=h.flag(by_region, "by_region"),
         )
@@ -722,7 +803,7 @@ def interpolate_logbinned_expected(
     return {
         "status": "completed",
         "operation": "interpolate_logbinned_expected",
-        "rows": int(len(out)),
+        "rows": len(out),
         "columns": [str(c) for c in out.columns],
         "output_path": str(target),
         "preview": h.records(out, 5),
@@ -764,7 +845,11 @@ def snip_expected_around_features(
     view = common.make_cooler_view(clr)
     try:
         snipper = snipping.ExpectedSnipper(
-            clr, exp_table, view_df=view, min_diag=diag, expected_value_col=h.text(expected_value_col, "expected_value_col")
+            clr,
+            exp_table,
+            view_df=view,
+            min_diag=diag,
+            expected_value_col=h.text(expected_value_col, "expected_value_col"),
         )
     except ValueError as exc:
         raise ConfigurationError(str(exc)) from exc
@@ -783,10 +868,17 @@ def snip_expected_around_features(
             matrix = snipper.snip(selected[chrom], chrom, chrom, (lo, hi, lo, hi))
         except (AssertionError, ValueError, IndexError):
             matrix = None
-        snippets.append({
-            "chrom": chrom, "start": int(row.start), "end": int(row.end), "window": [lo, hi],
-            "matrix": None if matrix is None else [[h.plain(float(v)) for v in r] for r in matrix],
-        })
+        snippets.append(
+            {
+                "chrom": chrom,
+                "start": int(row.start),
+                "end": int(row.end),
+                "window": [lo, hi],
+                "matrix": None
+                if matrix is None
+                else [[h.plain(float(v)) for v in r] for r in matrix],
+            }
+        )
     return {
         "status": "completed",
         "operation": "snip_expected_around_features",
@@ -823,7 +915,10 @@ def iterative_correction_rectangular(
     if not numpy.isfinite(array).all() or (array < 0).any():
         raise ConfigurationError("matrix must contain finite non-negative values.")
     corrected, col_bias, row_bias, report = numutils.iterative_correction_asymmetric(
-        array, max_iter=h.integer(max_iter, "max_iter", 1, 100_000), tol=h.number(tol, "tol", 1e-12, 1.0), verbose=False
+        array,
+        max_iter=h.integer(max_iter, "max_iter", 1, 100_000),
+        tol=h.number(tol, "tol", 1e-12, 1.0),
+        verbose=False,
     )
     return {
         "status": "completed",
@@ -834,7 +929,9 @@ def iterative_correction_rectangular(
         "corrected": [[h.plain(float(v)) for v in r] for r in corrected],
         "row_bias": [h.plain(float(v)) for v in row_bias],
         "column_bias": [h.plain(float(v)) for v in col_bias],
-        "provenance": h.provenance("cooltools", "cooltools.lib.numutils.iterative_correction_asymmetric"),
+        "provenance": h.provenance(
+            "cooltools", "cooltools.lib.numutils.iterative_correction_asymmetric"
+        ),
     }
 
 

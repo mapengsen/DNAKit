@@ -17,7 +17,8 @@ from dnakit.epigenome import macs3_gap_functions as m
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 READS = DATA / "reads.bam"
 _READ_LENGTH = 50

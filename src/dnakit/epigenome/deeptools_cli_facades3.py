@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.epigenome.deeptools_cli_facades import _existing, _new, _run
@@ -48,7 +49,16 @@ def estimate_read_filtering(
     """Estimate how much of each BAM file is removed by filtering (deepTools estimateReadFiltering)."""
     paths = _many(bams, "bams")
     out = _new(output, "output")
-    args = ["-b", *paths, "-o", str(out), "--binSize", str(bin_size), "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        *paths,
+        "-o",
+        str(out),
+        "--binSize",
+        str(bin_size),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("estimateReadFiltering", args, [out], deeptools_path)
 
 

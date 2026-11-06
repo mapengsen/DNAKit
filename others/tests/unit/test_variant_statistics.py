@@ -24,8 +24,14 @@ def _variants() -> dict:
 
 
 def test_variant_statistics_are_reproducible() -> None:
-    assert calculate_allele_frequency(_variants(), verbose=False)["result"]["aggregate_frequency"] == 0.5
-    assert calculate_heterozygosity(_variants(), verbose=False)["result"]["observed_heterozygosity"] == 1 / 3
+    assert (
+        calculate_allele_frequency(_variants(), verbose=False)["result"]["aggregate_frequency"]
+        == 0.5
+    )
+    assert (
+        calculate_heterozygosity(_variants(), verbose=False)["result"]["observed_heterozygosity"]
+        == 1 / 3
+    )
     assert calculate_missingness(_variants(), verbose=False)["result"]["missingness"] == 0.0
     transition = calculate_transition_transversion(_variants(), verbose=False)["result"]
     assert transition["transitions"] == 1

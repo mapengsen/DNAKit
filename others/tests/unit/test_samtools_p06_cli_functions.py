@@ -16,7 +16,9 @@ pytestmark = [requires_samtools, requires_data]
 
 
 def _samtools(*arguments: str) -> str:
-    return subprocess.run(["samtools", *arguments], check=True, capture_output=True, text=True).stdout
+    return subprocess.run(
+        ["samtools", *arguments], check=True, capture_output=True, text=True
+    ).stdout
 
 
 def _fastq(tmp_path: Path) -> Path:
@@ -53,7 +55,9 @@ def test_fastq_region_equals_fqidx_and_faidx_dash_f(tmp_path: Path) -> None:
     out = tmp_path / "a.fq"
     m.samtools_extract_fastq_regions(source, out, regions=["read00002:10-30"], verbose=False)
     assert out.read_text(encoding="utf-8") == _samtools("fqidx", str(source), "read00002:10-30")
-    assert out.read_text(encoding="utf-8") == _samtools("faidx", "-f", str(source), "read00002:10-30")
+    assert out.read_text(encoding="utf-8") == _samtools(
+        "faidx", "-f", str(source), "read00002:10-30"
+    )
 
 
 def test_fastq_reverse_complement_and_strand_mark(tmp_path: Path) -> None:
@@ -62,7 +66,12 @@ def test_fastq_reverse_complement_and_strand_mark(tmp_path: Path) -> None:
     reverse = tmp_path / "r.fq"
     m.samtools_extract_fastq_regions(source, forward, regions=["read00003:1-12"], verbose=False)
     m.samtools_extract_fastq_regions(
-        source, reverse, regions=["read00003:1-12"], reverse_complement=True, mark_strand="sign", verbose=False
+        source,
+        reverse,
+        regions=["read00003:1-12"],
+        reverse_complement=True,
+        mark_strand="sign",
+        verbose=False,
     )
     seq, qual = next(iter(_records(forward).values()))
     name, (rseq, rqual) = next(iter(_records(reverse).items()))
@@ -88,8 +97,12 @@ def test_fastq_region_file_index_path_and_missing_region(tmp_path: Path) -> None
         )
     assert not (tmp_path / "bad.fq").exists()
     skipped = m.samtools_extract_fastq_regions(
-        source, tmp_path / "skip.fq", regions=["nosuchread:1-5", "read00000:1-5"],
-        continue_on_missing=True, index_path=index, verbose=False,
+        source,
+        tmp_path / "skip.fq",
+        regions=["nosuchread:1-5", "read00000:1-5"],
+        continue_on_missing=True,
+        index_path=index,
+        verbose=False,
     )
     assert skipped["records"][-1]["name"] == "read00000:1-5"
 
@@ -102,13 +115,19 @@ def test_fastq_validation_and_missing_program(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         m.samtools_extract_fastq_regions(source, out, regions=["-bad"], verbose=False)
     with pytest.raises(ConfigurationError):
-        m.samtools_extract_fastq_regions(source, out, regions=["a"], mark_strand="weird", verbose=False)
+        m.samtools_extract_fastq_regions(
+            source, out, regions=["a"], mark_strand="weird", verbose=False
+        )
     out.write_text("", encoding="utf-8")
     with pytest.raises(ConfigurationError):
         m.samtools_extract_fastq_regions(source, out, regions=["read00000"], verbose=False)
     with pytest.raises(BackendUnavailableError):
         m.samtools_extract_fastq_regions(
-            source, tmp_path / "y.fq", regions=["read00000"], samtools_path=str(tmp_path / "nope"), verbose=False
+            source,
+            tmp_path / "y.fq",
+            regions=["read00000"],
+            samtools_path=str(tmp_path / "nope"),
+            verbose=False,
         )
 
 
@@ -136,7 +155,9 @@ def test_coverage_histogram_region_and_filters(tmp_path: Path) -> None:
     direct = _samtools("coverage", "-m", "-q", "10", "-r", "chr2:1-20000", "-w", "40", str(bam))
     assert (tmp_path / "region.txt").read_text(encoding="utf-8") == direct
     with pytest.raises(ConfigurationError):
-        m.samtools_coverage_histogram([bam], tmp_path / "bad.txt", required_flags="not a flag", verbose=False)
+        m.samtools_coverage_histogram(
+            [bam], tmp_path / "bad.txt", required_flags="not a flag", verbose=False
+        )
     with pytest.raises(ConfigurationError):
         m.samtools_coverage_histogram([], tmp_path / "bad2.txt", verbose=False)
 
@@ -144,7 +165,9 @@ def test_coverage_histogram_region_and_filters(tmp_path: Path) -> None:
 def test_checksum_is_order_agnostic_and_merges(tmp_path: Path) -> None:
     bam = DATA / "reads.bam"
     shuffled = tmp_path / "byname.bam"
-    subprocess.run(["samtools", "sort", "-n", "-o", str(shuffled), str(bam)], check=True, capture_output=True)
+    subprocess.run(
+        ["samtools", "sort", "-n", "-o", str(shuffled), str(bam)], check=True, capture_output=True
+    )
     first = m.samtools_checksum([bam], tmp_path / "a.chk", verbose=False)
     second = m.samtools_checksum([shuffled], tmp_path / "b.chk", verbose=False)
     assert first["groups"] == second["groups"]
@@ -152,7 +175,9 @@ def test_checksum_is_order_agnostic_and_merges(tmp_path: Path) -> None:
     assert (tmp_path / "a.chk").read_text(encoding="utf-8").splitlines()[3:] == _samtools(
         "checksum", str(bam)
     ).splitlines()[3:]
-    ordered = m.samtools_checksum([bam], tmp_path / "o.chk", in_order=True, check_position=True, verbose=False)
+    ordered = m.samtools_checksum(
+        [bam], tmp_path / "o.chk", in_order=True, check_position=True, verbose=False
+    )
     assert ordered["groups"][0]["combined"] != first["groups"][0]["combined"]
     merged = m.samtools_checksum(
         [tmp_path / "a.chk", tmp_path / "b.chk"], tmp_path / "m.chk", merge=True, verbose=False
@@ -162,7 +187,9 @@ def test_checksum_is_order_agnostic_and_merges(tmp_path: Path) -> None:
 
 def test_checksum_tabs_and_limits(tmp_path: Path) -> None:
     bam = DATA / "reads.bam"
-    tabbed = m.samtools_checksum([bam], tmp_path / "t.chk", tab_separated=True, max_records=100, verbose=False)
+    tabbed = m.samtools_checksum(
+        [bam], tmp_path / "t.chk", tab_separated=True, max_records=100, verbose=False
+    )
     assert tabbed["groups"][0]["count"] == 100
     assert "\t" in (tmp_path / "t.chk").read_text(encoding="utf-8").splitlines()[-1]
     with pytest.raises(ConfigurationError):

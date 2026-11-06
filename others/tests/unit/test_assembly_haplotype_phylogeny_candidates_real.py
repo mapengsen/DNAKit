@@ -13,8 +13,8 @@ import dnakit.assembly as asm
 import dnakit.haplotypes as hap
 import dnakit.phylogeny as phylo
 from dnakit.assembly import _impl_assembly
-from dnakit.haplotypes import _impl_haplotypes
 from dnakit.exceptions import ConfigurationError, InputFormatError
+from dnakit.haplotypes import _impl_haplotypes
 
 
 def result_of(envelope: object) -> dict:
@@ -30,17 +30,30 @@ PAN = {"G1": ["a", "b", "c"], "G2": ["a", "b", "d"], "G3": ["a", "e"]}
 
 
 def test_add_genome_to_pangenome() -> None:
-    res = result_of(asm.add_genome_to_pangenome({"A": ["g1", "g2"], "B": ["g2", "g3"]}, options={"genome": "C", "genes": ["g2", "g4"]}))
+    res = result_of(
+        asm.add_genome_to_pangenome(
+            {"A": ["g1", "g2"], "B": ["g2", "g3"]}, options={"genome": "C", "genes": ["g2", "g4"]}
+        )
+    )
     assert res["genomes"] == ["A", "B", "C"]
     assert res["genes"] == ["g1", "g2", "g3", "g4"]
     assert res["matrix"] == [[1, 0, 0], [1, 1, 1], [0, 1, 0], [0, 0, 1]]
-    assert (res["new_gene_count"], res["pangenome_size_before"], res["pangenome_size_after"]) == (1, 3, 4)
+    assert (res["new_gene_count"], res["pangenome_size_before"], res["pangenome_size_after"]) == (
+        1,
+        3,
+        4,
+    )
 
 
 def test_build_pangenome_partition_counts() -> None:
     res = result_of(asm.build_pangenome(PAN, options={"cloud_threshold": 0.5}))
     # a in 3/3 (core); b in 2/3 (shell); c, d, e in 1/3 < 0.5 (cloud)
-    assert (res["pangenome_size"], res["core_count"], res["shell_count"], res["cloud_count"]) == (5, 1, 1, 3)
+    assert (res["pangenome_size"], res["core_count"], res["shell_count"], res["cloud_count"]) == (
+        5,
+        1,
+        1,
+        3,
+    )
     assert res["genes_per_genome"] == {"G1": 3, "G2": 3, "G3": 2}
     assert res["unique_genes_per_genome"] == {"G1": 1, "G2": 1, "G3": 1}
 
@@ -56,16 +69,32 @@ def test_extract_core_pangenome(threshold: float, core: list[str]) -> None:
 
 
 def test_extract_accessory_pangenome() -> None:
-    res = result_of(asm.extract_accessory_pangenome(PAN, options={"core_threshold": 0.66, "cloud_threshold": 0.5}))
+    res = result_of(
+        asm.extract_accessory_pangenome(
+            PAN, options={"core_threshold": 0.66, "cloud_threshold": 0.5}
+        )
+    )
     assert res["accessory_genes"] == ["c", "d", "e"]
     assert res["cloud_genes"] == ["c", "d", "e"] and res["shell_genes"] == []
 
 
 def test_pangenome_matrix_forms_agree() -> None:
-    explicit = {"genomes": ["G1", "G2", "G3"], "genes": ["a", "b", "c", "d", "e"], "matrix": [[1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]}
-    nested = {"a": {"G1": 1, "G2": 1, "G3": 1}, "b": {"G1": 1, "G2": 1, "G3": 0}, "c": {"G1": 1}, "d": {"G2": 1}, "e": {"G3": 1}}
+    explicit = {
+        "genomes": ["G1", "G2", "G3"],
+        "genes": ["a", "b", "c", "d", "e"],
+        "matrix": [[1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]],
+    }
+    nested = {
+        "a": {"G1": 1, "G2": 1, "G3": 1},
+        "b": {"G1": 1, "G2": 1, "G3": 0},
+        "c": {"G1": 1},
+        "d": {"G2": 1},
+        "e": {"G3": 1},
+    }
     for form in (explicit, nested):
-        assert result_of(asm.extract_core_pangenome(form, options={"core_threshold": 1.0}))["core_genes"] == ["a"]
+        assert result_of(asm.extract_core_pangenome(form, options={"core_threshold": 1.0}))[
+            "core_genes"
+        ] == ["a"]
 
 
 def test_pangenome_openness_new_gene_curve_and_fit() -> None:
@@ -86,16 +115,23 @@ def test_pangenome_openness_new_gene_curve_and_fit() -> None:
 
 
 def test_heaps_fit_recovers_exact_power_law() -> None:
-    deltas = [50.0 * n ** -0.5 for n in range(2, 8)]
+    deltas = [50.0 * n**-0.5 for n in range(2, 8)]
     fit = _impl_assembly.fit_heaps(deltas)
     assert fit["alpha"] == pytest.approx(0.5)
     assert fit["kappa"] == pytest.approx(50.0)
 
 
 def test_pangenome_openness_seeded_permutations_are_reproducible() -> None:
-    sets = {f"g{i}": [f"core{j}" for j in range(5)] + [f"acc{i}_{j}" for j in range(4)] for i in range(6)}
-    first = result_of(asm.calculate_pangenome_openness(sets, options={"n_permutations": 20, "seed": 3}))
-    second = result_of(asm.calculate_pangenome_openness(sets, options={"n_permutations": 20, "seed": 3}))
+    sets = {
+        f"g{i}": [f"core{j}" for j in range(5)] + [f"acc{i}_{j}" for j in range(4)]
+        for i in range(6)
+    }
+    first = result_of(
+        asm.calculate_pangenome_openness(sets, options={"n_permutations": 20, "seed": 3})
+    )
+    second = result_of(
+        asm.calculate_pangenome_openness(sets, options={"n_permutations": 20, "seed": 3})
+    )
     assert first == second
     # every genome adds exactly 4 private genes regardless of order: delta = 4 for N >= 2 -> alpha = 0 (open)
     assert first["alpha"] == pytest.approx(0.0, abs=1e-9)
@@ -122,7 +158,9 @@ def test_estimate_size_from_jellyfish_text_and_explicit_options() -> None:
 
 def test_estimate_size_counts_kmers_of_sequences() -> None:
     # "AAAAAAAA" has 6 AAA k-mers (canonical AAA); every k-mer instance has coverage 6 => one distinct k-mer at 6
-    res = result_of(asm.estimate_size("AAAAAAAA", options={"k": 3, "min_coverage": 1, "peak_coverage": 6}))
+    res = result_of(
+        asm.estimate_size("AAAAAAAA", options={"k": 3, "min_coverage": 1, "peak_coverage": 6})
+    )
     assert res["genome_size"] == pytest.approx(1.0)
 
 
@@ -142,13 +180,19 @@ def test_estimate_repeats_from_histogram() -> None:
 
 
 def test_calculate_assembly_completeness() -> None:
-    by_length = result_of(asm.calculate_assembly_completeness([100, 50], options={"reference_length": 200}))
+    by_length = result_of(
+        asm.calculate_assembly_completeness([100, 50], options={"reference_length": 200})
+    )
     assert by_length["length_ratio"] == pytest.approx(0.75)
     assert by_length["length_completeness"] == pytest.approx(0.75)
-    capped = result_of(asm.calculate_assembly_completeness([300], options={"reference_length": 200}))
+    capped = result_of(
+        asm.calculate_assembly_completeness([300], options={"reference_length": 200})
+    )
     assert capped["length_ratio"] == pytest.approx(1.5) and capped["length_completeness"] == 1.0
     # reference ACGTACGT (k=4): canonical k-mers {ACGT, CGTA, GTAC}; assembly ACGTA has ACGT, CGTA -> 2/3
-    kmer = result_of(asm.calculate_assembly_completeness("ACGTA", options={"reference": "ACGTACGT", "k": 4}))
+    kmer = result_of(
+        asm.calculate_assembly_completeness("ACGTA", options={"reference": "ACGTACGT", "k": 4})
+    )
     assert kmer["kmer_completeness"] == pytest.approx(2 / 3)
     assert (kmer["reference_distinct_kmers"], kmer["shared_kmers"]) == (3, 2)
 
@@ -157,8 +201,18 @@ def test_calculate_busco_completeness() -> None:
     line = "C:98.5%[S:97.0%,D:1.5%],F:0.5%,M:1.0%,n:1614"
     res = result_of(asm.calculate_busco_completeness(f"# BUSCO\n\t{line}\n"))
     assert res["complete_percent"] == pytest.approx(100 * (1566 + 24) / 1614)
-    assert (res["single"], res["duplicated"], res["fragmented"], res["missing"], res["n"]) == (1566, 24, 8, 16, 1614)
-    counts = result_of(asm.calculate_busco_completeness({"single": 90, "duplicated": 5, "fragmented": 3, "missing": 2}))
+    assert (res["single"], res["duplicated"], res["fragmented"], res["missing"], res["n"]) == (
+        1566,
+        24,
+        8,
+        16,
+        1614,
+    )
+    counts = result_of(
+        asm.calculate_busco_completeness(
+            {"single": 90, "duplicated": 5, "fragmented": 3, "missing": 2}
+        )
+    )
     assert counts["complete_percent"] == pytest.approx(95.0)
     assert counts["summary"] == "C:95.0%[S:90.0%,D:5.0%],F:3.0%,M:2.0%,n:100"
 
@@ -191,7 +245,9 @@ def test_assembly_contiguity_stats_auN_and_gaps() -> None:
     res = result_of(asm.compare_assemblies([">a\nACGTNNNNAC\n>b\nNNAC\n", [10, 20]]))
     left = res["left"]
     assert left["gap_count"] == 2 and left["n_bases"] == 6  # runs NNNN and NN
-    assert left["gc_fraction"] == pytest.approx(4 / 8)  # C,G,C (contig a) + C (contig b) of 8 ACGT bases
+    assert left["gc_fraction"] == pytest.approx(
+        4 / 8
+    )  # C,G,C (contig a) + C (contig b) of 8 ACGT bases
     assert left["aun"] == pytest.approx((100 + 16) / 14)
     assert res["right"]["aun"] == pytest.approx((100 + 400) / 30)
 
@@ -199,7 +255,10 @@ def test_assembly_contiguity_stats_auN_and_gaps() -> None:
 def test_identify_repeats_in_assembly() -> None:
     seq = "GATTACACCGATTACA"
     res = result_of(asm.identify_repeats_in_assembly({"c": seq}, options={"k": 5}))
-    assert res["repeats"]["c"] == [{"start": 0, "end": 7, "length": 7}, {"start": 9, "end": 16, "length": 7}]
+    assert res["repeats"]["c"] == [
+        {"start": 0, "end": 7, "length": 7},
+        {"start": 9, "end": 16, "length": 7},
+    ]
     assert res["repeat_bases"] == 14 and res["repeat_fraction"] == pytest.approx(14 / 16)
 
 
@@ -243,7 +302,11 @@ GFA_B = "S\tp\tACGT\nS\tq\tGTTT\nS\tr\tCCCC\nL\tp\t+\tq\t-\t0M\nL\tq\t+\tr\t+\t0
 def test_compare_assembly_graphs() -> None:
     res = result_of(asm.compare_assembly_graphs([GFA_A, GFA_B]))
     assert res["compared_by"] == "canonical segment sequence"
-    assert res["shared_segments"] == 2 and res["right_only_segments"] == 1 and res["left_only_segments"] == 0
+    assert (
+        res["shared_segments"] == 2
+        and res["right_only_segments"] == 1
+        and res["left_only_segments"] == 0
+    )
     assert res["segment_jaccard"] == pytest.approx(2 / 3)
     assert res["shared_links"] == 1 and res["link_jaccard"] == pytest.approx(1 / 2)
     assert res["identical"] is False
@@ -265,13 +328,21 @@ def test_parse_output_fasta_and_gfa() -> None:
     assert res["format"] == "fasta" and res["header_convention"] == "spades"
     assert [r["length"] for r in res["records"]] == [8, 4]
     assert [r["coverage"] for r in res["records"]] == [5.5, 2.0]
-    assert res["records"][0]["gc_fraction"] == pytest.approx(0.5) and res["records"][1]["gc_fraction"] == 1.0
+    assert (
+        res["records"][0]["gc_fraction"] == pytest.approx(0.5)
+        and res["records"][1]["gc_fraction"] == 1.0
+    )
     assert res["stats"]["n50"] == 8
     mega = result_of(asm.parse_output(">k141_0 flag=1 multi=2.5000 len=4\nACGT\n"))
     assert mega["header_convention"] == "megahit" and mega["records"][0]["multiplicity"] == 2.5
-    gfa = result_of(asm.parse_output("S\ts1\tACGT\tDP:f:3.5\nS\ts2\t*\tLN:i:100\nL\ts1\t+\ts2\t+\t0M\n"))
+    gfa = result_of(
+        asm.parse_output("S\ts1\tACGT\tDP:f:3.5\nS\ts2\t*\tLN:i:100\nL\ts1\t+\ts2\t+\t0M\n")
+    )
     assert gfa["format"] == "gfa" and gfa["link_count"] == 1
-    assert gfa["records"] == [{"name": "s1", "length": 4, "depth": 3.5}, {"name": "s2", "length": 100, "depth": None}]
+    assert gfa["records"] == [
+        {"name": "s1", "length": 4, "depth": 3.5},
+        {"name": "s2", "length": 100, "depth": None},
+    ]
 
 
 def test_parse_log_counts_levels() -> None:
@@ -283,7 +354,11 @@ def test_parse_log_counts_levels() -> None:
 
 
 def test_remove_contamination() -> None:
-    res = result_of(asm.remove_contamination({"c1": "AAAA", "c2": "CCCCCC", "c3": "GG"}, options={"contaminants": ["c2", "zz"]}))
+    res = result_of(
+        asm.remove_contamination(
+            {"c1": "AAAA", "c2": "CCCCCC", "c3": "GG"}, options={"contaminants": ["c2", "zz"]}
+        )
+    )
     assert res["kept"] == ["c1", "c3"] and res["removed"] == ["c2"] and res["not_found"] == ["zz"]
     assert res["fasta"] == ">c1\nAAAA\n>c3\nGG\n"
     assert (res["stats_before"]["total_length"], res["stats_after"]["total_length"]) == (12, 6)
@@ -294,19 +369,63 @@ def test_scaffold_with_explicit_layout() -> None:
     layout = [{"name": "S1", "contigs": ["c1", {"contig": "c2", "orientation": "-"}]}]
     res = result_of(asm.scaffold(contigs, options={"layout": layout, "gap": 5}))
     # c2 reverse-complemented: GGTT -> AACC
-    assert res["scaffolds"] == [{"name": "S1", "sequence": "AACC" + "N" * 5 + "AACC", "length": 13, "contig_count": 2}]
-    assert [(row["type"], row["start"], row["end"]) for row in res["agp"]] == [("contig", 0, 4), ("gap", 4, 9), ("contig", 9, 13)]
+    assert res["scaffolds"] == [
+        {"name": "S1", "sequence": "AACC" + "N" * 5 + "AACC", "length": 13, "contig_count": 2}
+    ]
+    assert [(row["type"], row["start"], row["end"]) for row in res["agp"]] == [
+        ("contig", 0, 4),
+        ("gap", 4, 9),
+        ("contig", 9, 13),
+    ]
     assert res["unplaced_contigs"] == ["c3"]
 
 
 @pytest.mark.parametrize(
     ("tool", "settings", "argv"),
     [
-        ("flye", {"reads": "r.fq", "genome_size": "5m", "threads": 4}, ["flye", "--nano-hq", "r.fq", "--genome-size", "5m", "--out-dir", "out", "--threads", "4"]),
-        ("hifiasm", {"reads": "r.fq", "threads": 2}, ["hifiasm", "-o", "out/assembly", "-t", "2", "r.fq"]),
-        ("megahit", {"read1": "a.fq", "read2": "b.fq"}, ["megahit", "-o", "out/megahit", "-t", "1", "-1", "a.fq", "-2", "b.fq"]),
-        ("unicycler", {"read1": "a.fq", "mode": "bold"}, ["unicycler", "-1", "a.fq", "-o", "out/unicycler", "-m", "bold", "-t", "1"]),
-        ("shasta", {"reads": "r.fq"}, ["shasta", "--input", "r.fq", "--config", "Nanopore-May2022", "--assemblyDirectory", "out"]),
+        (
+            "flye",
+            {"reads": "r.fq", "genome_size": "5m", "threads": 4},
+            [
+                "flye",
+                "--nano-hq",
+                "r.fq",
+                "--genome-size",
+                "5m",
+                "--out-dir",
+                "out",
+                "--threads",
+                "4",
+            ],
+        ),
+        (
+            "hifiasm",
+            {"reads": "r.fq", "threads": 2},
+            ["hifiasm", "-o", "out/assembly", "-t", "2", "r.fq"],
+        ),
+        (
+            "megahit",
+            {"read1": "a.fq", "read2": "b.fq"},
+            ["megahit", "-o", "out/megahit", "-t", "1", "-1", "a.fq", "-2", "b.fq"],
+        ),
+        (
+            "unicycler",
+            {"read1": "a.fq", "mode": "bold"},
+            ["unicycler", "-1", "a.fq", "-o", "out/unicycler", "-m", "bold", "-t", "1"],
+        ),
+        (
+            "shasta",
+            {"reads": "r.fq"},
+            [
+                "shasta",
+                "--input",
+                "r.fq",
+                "--config",
+                "Nanopore-May2022",
+                "--assemblyDirectory",
+                "out",
+            ],
+        ),
     ],
 )
 def test_build_command(tool: str, settings: dict, argv: list[str]) -> None:
@@ -325,13 +444,31 @@ def test_run_delegates_to_installed_assembler(tmp_path: Path) -> None:
     fake.chmod(0o755)
     reads = tmp_path / "reads.fq"
     reads.write_text("@r\nACGT\n+\nIIII\n", encoding="ascii")
-    out = asm.run({"tool": "shasta", "reads": str(reads), "output_directory": str(tmp_path / "out"), "program": str(fake)})
+    out = asm.run(
+        {
+            "tool": "shasta",
+            "reads": str(reads),
+            "output_directory": str(tmp_path / "out"),
+            "program": str(fake),
+        }
+    )
     assert out["status"] == "ok"
-    assert out["result"]["backend"] == "shasta" and "Assembly.fasta" in out["result"]["result"]["artifacts"]
+    assert (
+        out["result"]["backend"] == "shasta"
+        and "Assembly.fasta" in out["result"]["result"]["artifacts"]
+    )
 
 
 def test_run_without_program_is_not_implemented(tmp_path: Path) -> None:
-    out = asm.run({"tool": "flye", "reads": "r.fq", "genome_size": "5m", "output_directory": str(tmp_path), "program": "no-such-flye-binary"})
+    out = asm.run(
+        {
+            "tool": "flye",
+            "reads": "r.fq",
+            "genome_size": "5m",
+            "output_directory": str(tmp_path),
+            "program": "no-such-flye-binary",
+        }
+    )
     assert out["status"] == "not_implemented"
     assert "no-such-flye-binary" in out["required_dependency"]
 
@@ -348,7 +485,12 @@ TRIO = {
 
 def test_analyze_trio_inheritance() -> None:
     res = result_of(hap.analyze_trio_inheritance(TRIO))
-    assert [s["status"] for s in res["sites"]] == ["consistent", "consistent", "inconsistent", "missing"]
+    assert [s["status"] for s in res["sites"]] == [
+        "consistent",
+        "consistent",
+        "inconsistent",
+        "missing",
+    ]
     assert (res["informative_sites"], res["consistent"], res["inconsistent"]) == (3, 2, 1)
     assert res["mendelian_error_rate"] == pytest.approx(1 / 3)
     assert res["inconsistent_indices"] == [2]
@@ -358,15 +500,36 @@ def test_analyze_trio_inheritance() -> None:
 
 def test_calculate_pedigree_likelihood() -> None:
     ped = [{"id": "f"}, {"id": "m"}, {"id": "c", "father": "f", "mother": "m"}]
-    het = result_of(hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"f": [1], "m": [1], "c": [1]}}))
+    het = result_of(
+        hap.calculate_pedigree_likelihood(
+            {"pedigree": ped, "genotypes": {"f": [1], "m": [1], "c": [1]}}
+        )
+    )
     assert het["likelihood"] == pytest.approx(0.125)  # 0.5 * 0.5 * P(child Aa | Aa x Aa) = 0.5
-    rare = result_of(hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"f": ["0/0"], "m": ["1/1"], "c": ["0/1"]}}, options={"allele_frequency": 0.2}))
+    rare = result_of(
+        hap.calculate_pedigree_likelihood(
+            {"pedigree": ped, "genotypes": {"f": ["0/0"], "m": ["1/1"], "c": ["0/1"]}},
+            options={"allele_frequency": 0.2},
+        )
+    )
     assert rare["likelihood"] == pytest.approx(0.64 * 0.04 * 1.0)
-    unobserved_father = result_of(hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"m": [2], "c": [2]}}))
-    assert unobserved_father["likelihood"] == pytest.approx(0.125)  # (0.5*0.5 + 0.25*1) * P(mother = 2) = 0.5 * 0.25
-    impossible = result_of(hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"f": [0], "m": [0], "c": [2]}}))
+    unobserved_father = result_of(
+        hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"m": [2], "c": [2]}})
+    )
+    assert unobserved_father["likelihood"] == pytest.approx(
+        0.125
+    )  # (0.5*0.5 + 0.25*1) * P(mother = 2) = 0.5 * 0.25
+    impossible = result_of(
+        hap.calculate_pedigree_likelihood(
+            {"pedigree": ped, "genotypes": {"f": [0], "m": [0], "c": [2]}}
+        )
+    )
     assert impossible["impossible"] is True and impossible["log10_likelihood"] is None
-    two_sites = result_of(hap.calculate_pedigree_likelihood({"pedigree": ped, "genotypes": {"f": [1, 1], "m": [1, 1], "c": [1, 1]}}))
+    two_sites = result_of(
+        hap.calculate_pedigree_likelihood(
+            {"pedigree": ped, "genotypes": {"f": [1, 1], "m": [1, 1], "c": [1, 1]}}
+        )
+    )
     assert two_sites["log10_likelihood"] == pytest.approx(2 * math.log10(0.125))
 
 
@@ -376,18 +539,33 @@ def test_cluster_haplotypes() -> None:
     assert [c["indices"] for c in res["clusters"]] == [[0, 1], [2, 3]]
     assert result_of(hap.cluster(haps, options={"max_distance": 0}))["cluster_count"] == 4
     assert result_of(hap.cluster(haps, options={"max_distance": 4}))["cluster_count"] == 1
-    assert result_of(hap.cluster(["00N0", "0000", "1111"], options={"max_distance": 0}))["cluster_count"] == 2
+    assert (
+        result_of(hap.cluster(["00N0", "0000", "1111"], options={"max_distance": 0}))[
+            "cluster_count"
+        ]
+        == 2
+    )
 
 
 def test_compare_haplotypes_hamming_and_switch_error() -> None:
     res = result_of(hap.compare(["0011", "0101"]))
     assert res["distance"] == 2 and res["differing_positions"] == [1, 2]
     assert res["distance_matrix"] == [[0, 2], [2, 0]]
-    sw = result_of(hap.compare({"truth": ["0000", "1111"], "inferred": ["0011", "1100"]}, options={"mode": "switch_error"}))
+    sw = result_of(
+        hap.compare(
+            {"truth": ["0000", "1111"], "inferred": ["0011", "1100"]},
+            options={"mode": "switch_error"},
+        )
+    )
     # relative orientation along the 4 het sites: same, same, flipped, flipped -> 1 switch over 3 intervals
     assert (sw["heterozygous_sites"], sw["switches"]) == (4, 1)
     assert sw["switch_error_rate"] == pytest.approx(1 / 3)
-    perfect = result_of(hap.compare({"truth": ["0000", "1111"], "inferred": ["1111", "0000"]}, options={"mode": "switch_error"}))
+    perfect = result_of(
+        hap.compare(
+            {"truth": ["0000", "1111"], "inferred": ["1111", "0000"]},
+            options={"mode": "switch_error"},
+        )
+    )
     assert perfect["switches"] == 0
 
 
@@ -395,9 +573,17 @@ def test_construct_ld_blocks() -> None:
     haps = ["0000", "0011", "1100", "1111"]
     res = result_of(hap.construct(haps))
     assert [b["sites"] for b in res["blocks"]] == [[0, 1], [2, 3]]
-    assert [b["sites"] for b in result_of(hap.construct(haps, options={"statistic": "r2", "threshold": 0.9}))["blocks"]] == [[0, 1], [2, 3]]
+    assert [
+        b["sites"]
+        for b in result_of(hap.construct(haps, options={"statistic": "r2", "threshold": 0.9}))[
+            "blocks"
+        ]
+    ] == [[0, 1], [2, 3]]
     positions = result_of(hap.construct(haps, options={"positions": [100, 200, 300, 400]}))
-    assert (positions["blocks"][1]["start_position"], positions["blocks"][1]["end_position"]) == (300, 400)
+    assert (positions["blocks"][1]["start_position"], positions["blocks"][1]["end_position"]) == (
+        300,
+        400,
+    )
     # site 0 is monomorphic here and is excluded; sites 1-2 and 3 are analysed
     mono = result_of(hap.construct(["0010", "0100", "0010", "0100"]))
     assert mono["sites_excluded_monomorphic_or_low_maf"] == [0, 3]
@@ -428,16 +614,26 @@ def test_detect_compound_heterozygotes() -> None:
     }
     res = result_of(hap.detect_compound_heterozygotes(trio))
     assert res["mode"] == "trio"
-    assert res["compound_heterozygous_genes"] == [{"gene": "G1", "paternal": [0], "maternal": [1], "undetermined": []}]
+    assert res["compound_heterozygous_genes"] == [
+        {"gene": "G1", "paternal": [0], "maternal": [1], "undetermined": []}
+    ]
     assert res["undetermined_origin_sites"] == 1  # G2: both parents het
-    phased = result_of(hap.detect_compound_heterozygotes({"genes": ["G1", "G1", "G2", "G2"], "child": ["0|1", "1|0", "0|1", "0|1"]}))
+    phased = result_of(
+        hap.detect_compound_heterozygotes(
+            {"genes": ["G1", "G1", "G2", "G2"], "child": ["0|1", "1|0", "0|1", "0|1"]}
+        )
+    )
     assert [g["gene"] for g in phased["compound_heterozygous_genes"]] == ["G1"]
     with pytest.raises(InputFormatError):
         hap.detect_compound_heterozygotes({"genes": ["G1"], "child": ["0/1"]})
 
 
 def test_detect_denovo_variants() -> None:
-    trio = {"child": ["0/1", "0/1", "1/1", "0/0"], "father": ["0/0", "0/1", "0/0", "0/0"], "mother": ["0/0", "0/0", "0/1", "0/0"]}
+    trio = {
+        "child": ["0/1", "0/1", "1/1", "0/0"],
+        "father": ["0/0", "0/1", "0/0", "0/0"],
+        "mother": ["0/0", "0/0", "0/1", "0/0"],
+    }
     res = result_of(hap.detect_denovo_variants(trio))
     assert [d["index"] for d in res["denovo"]] == [0]
     assert res["denovo"][0]["novel_alleles"] == [1]
@@ -447,17 +643,28 @@ def test_detect_denovo_variants() -> None:
 
 def test_frequency() -> None:
     res = result_of(hap.frequency(["01", "01", "10", "11"]))
-    assert [(r["haplotype"], r["count"]) for r in res["haplotypes"]] == [("01", 2), ("10", 1), ("11", 1)]
+    assert [(r["haplotype"], r["count"]) for r in res["haplotypes"]] == [
+        ("01", 2),
+        ("10", 1),
+        ("11", 1),
+    ]
     assert res["haplotypes"][0]["frequency"] == pytest.approx(0.5)
     assert res["haplotype_diversity"] == pytest.approx(4 / 3 * (1 - (0.25 + 0.0625 + 0.0625)))
     by_sample = result_of(hap.frequency({"s1": ["01", "10"], "s2": ["01", "01"]}))
-    assert by_sample["total"] == 4 and by_sample["haplotypes"][0] == {"haplotype": "01", "count": 3, "frequency": 0.75}
+    assert by_sample["total"] == 4 and by_sample["haplotypes"][0] == {
+        "haplotype": "01",
+        "count": 3,
+        "frequency": 0.75,
+    }
     counts = result_of(hap.frequency({"AB": 6, "ab": 2}))
     assert counts["haplotypes"][1]["frequency"] == pytest.approx(0.25)
 
 
 def test_infer_parentage() -> None:
-    data = {"child": ["0/0", "1/1", "0/1"], "candidates": {"A": ["0/1", "1/1", "0/0"], "B": ["1/1", "0/0", "0/1"]}}
+    data = {
+        "child": ["0/0", "1/1", "0/1"],
+        "candidates": {"A": ["0/1", "1/1", "0/0"], "B": ["1/1", "0/0", "0/1"]},
+    }
     res = result_of(hap.infer_parentage(data))
     assert res["candidates"]["A"]["mismatches"] == 0 and res["candidates"]["B"]["mismatches"] == 2
     assert res["not_excluded"] == ["A"] and res["best_candidates"] == ["A"]
@@ -483,7 +690,9 @@ def test_reconstruct_em_resolves_double_heterozygote() -> None:
     res = result_of(hap.reconstruct(genotypes, options={"tolerance": 1e-12}))
     # 4 chromosomes of each 00 and 11 are certain; the double heterozygote is 00/11 (not 01/10): f(00) = f(11) = 0.5
     freqs = {row["haplotype"]: row["frequency"] for row in res["frequencies"]}
-    assert freqs["00"] == pytest.approx(0.5, abs=1e-6) and freqs["11"] == pytest.approx(0.5, abs=1e-6)
+    assert freqs["00"] == pytest.approx(0.5, abs=1e-6) and freqs["11"] == pytest.approx(
+        0.5, abs=1e-6
+    )
     assert res["converged"] is True
     assert res["individuals"]["e"]["haplotypes"] == ["00", "11"]
     assert res["individuals"]["a"]["haplotypes"] == ["00", "00"]
@@ -503,7 +712,12 @@ def test_select_haplotypes() -> None:
     res = result_of(hap.select(sample, options={"min_frequency": 0.15}))
     assert [r["haplotype"] for r in res["selected"]] == ["01", "10"]
     assert res["covered_frequency"] == pytest.approx(0.9)
-    assert [r["haplotype"] for r in result_of(hap.select(sample, options={"min_frequency": 0.0, "top_n": 1}))["selected"]] == ["01"]
+    assert [
+        r["haplotype"]
+        for r in result_of(hap.select(sample, options={"min_frequency": 0.0, "top_n": 1}))[
+            "selected"
+        ]
+    ] == ["01"]
 
 
 def test_simulate_haplotypes_is_deterministic_and_respects_support() -> None:
@@ -518,7 +732,9 @@ def test_simulate_haplotypes_is_deterministic_and_respects_support() -> None:
 
 def test_visualize_haplotypes(tmp_path: Path) -> None:
     target = tmp_path / "haps.svg"
-    res = result_of(hap.visualize({"h1": "01", "h2": "10", "h3": "1N"}, options={"output": str(target)}))
+    res = result_of(
+        hap.visualize({"h1": "01", "h2": "10", "h3": "1N"}, options={"output": str(target)})
+    )
     assert res["svg"].count("<rect") == 6 and (res["haplotype_count"], res["site_count"]) == (3, 2)
     assert "#999999" in res["svg"] and target.read_text(encoding="utf-8") == res["svg"]
 
@@ -528,11 +744,23 @@ def test_visualize_haplotypes(tmp_path: Path) -> None:
 
 WIKI_NJ = {
     "names": ["a", "b", "c", "d", "e"],
-    "matrix": [[0, 5, 9, 9, 8], [5, 0, 10, 10, 9], [9, 10, 0, 8, 7], [9, 10, 8, 0, 3], [8, 9, 7, 3, 0]],
+    "matrix": [
+        [0, 5, 9, 9, 8],
+        [5, 0, 10, 10, 9],
+        [9, 10, 0, 8, 7],
+        [9, 10, 8, 0, 3],
+        [8, 9, 7, 3, 0],
+    ],
 }
 WIKI_UPGMA = {
     "names": ["a", "b", "c", "d", "e"],
-    "matrix": [[0, 17, 21, 31, 23], [17, 0, 30, 34, 21], [21, 30, 0, 28, 39], [31, 34, 28, 0, 43], [23, 21, 39, 43, 0]],
+    "matrix": [
+        [0, 17, 21, 31, 23],
+        [17, 0, 30, 34, 21],
+        [21, 30, 0, 28, 39],
+        [31, 34, 28, 0, 43],
+        [23, 21, 39, 43, 0],
+    ],
 }
 
 
@@ -568,16 +796,23 @@ def test_calculate_tree_statistics() -> None:
     assert res["leaves"] == ["A", "B", "C"] and res["rooted_binary"] is True
     assert res["total_branch_length"] == pytest.approx(10.0)
     # root-to-tip: A 1 + 3 = 4, B 2 + 3 = 5, C 4
-    assert (res["min_root_to_tip"], res["max_root_to_tip"]) == (pytest.approx(4.0), pytest.approx(5.0))
+    assert (res["min_root_to_tip"], res["max_root_to_tip"]) == (
+        pytest.approx(4.0),
+        pytest.approx(5.0),
+    )
     assert res["mean_root_to_tip"] == pytest.approx(13 / 3) and res["ultrametric"] is False
     assert res["treeness"] == pytest.approx(3 / 10)
-    assert res["sackin_index"] == 2 + 2 + 1 and res["colless_index"] == 1  # |2-1| at the root, |1-1| below
+    assert (
+        res["sackin_index"] == 2 + 2 + 1 and res["colless_index"] == 1
+    )  # |2-1| at the root, |1-1| below
     ultra = result_of(phylo.calculate("((A:1,B:1):3,C:4);"))
     assert ultra["ultrametric"] is True and ultra["treeness"] == pytest.approx(3 / 9)
     caterpillar = result_of(phylo.calculate("(((A,B),C),D);"))
     assert caterpillar["has_branch_lengths"] is False and caterpillar["max_depth_edges"] == 3
     star = result_of(phylo.calculate("(A:1,B:1,C:1,D:1);"))
-    assert star["root_degree"] == 4 and star["polytomy_count"] == 1 and star["rooted_binary"] is False
+    assert (
+        star["root_degree"] == 4 and star["polytomy_count"] == 1 and star["rooted_binary"] is False
+    )
 
 
 def test_calculate_distance_matrix_p_and_jukes_cantor() -> None:
@@ -609,19 +844,39 @@ def test_compare_robinson_foulds() -> None:
     assert res["normalized_rf"] == pytest.approx(2 / 6) and res["max_rf_binary"] == 6
     quartet = result_of(phylo.compare({"a": "((A,B),(C,D));", "b": "((A,C),(B,D));"}))
     assert quartet["robinson_foulds"] == 2 and quartet["normalized_rf"] == 1.0
-    assert result_of(phylo.compare(["((A,B),(C,D));", "(A,(B,(C,D)));"]))["robinson_foulds"] == 0  # same unrooted split AB|CD
-    rooted = result_of(phylo.compare(["((A,B),(C,D));", "(A,(B,(C,D)));"], options={"rooted": True}))
-    assert rooted["robinson_foulds"] == 2  # rooted clades {AB, CD} vs {CD, BCD}: AB and BCD are unique
-    ignoring_lengths = result_of(phylo.compare(["((A:1,B:2):3,(C:1,D:1):1);", "((B:9,A:9):1,(D:1,C:1):1);"]))
+    assert (
+        result_of(phylo.compare(["((A,B),(C,D));", "(A,(B,(C,D)));"]))["robinson_foulds"] == 0
+    )  # same unrooted split AB|CD
+    rooted = result_of(
+        phylo.compare(["((A,B),(C,D));", "(A,(B,(C,D)));"], options={"rooted": True})
+    )
+    assert (
+        rooted["robinson_foulds"] == 2
+    )  # rooted clades {AB, CD} vs {CD, BCD}: AB and BCD are unique
+    ignoring_lengths = result_of(
+        phylo.compare(["((A:1,B:2):3,(C:1,D:1):1);", "((B:9,A:9):1,(D:1,C:1):1);"])
+    )
     assert ignoring_lengths["robinson_foulds"] == 0
 
 
 def test_annotate_tree() -> None:
-    res = result_of(phylo.annotate("((A:1,B:2):3,C:4);", options={"metadata": {"A": "x", "B": "x", "C": "y"}}))
+    res = result_of(
+        phylo.annotate("((A:1,B:2):3,C:4);", options={"metadata": {"A": "x", "B": "x", "C": "y"}})
+    )
     nodes = res["nodes"]
-    assert [n["name"] for n in nodes] == ["N0", "N1", "A", "B", "C"]  # unnamed internal nodes are labelled
+    assert [n["name"] for n in nodes] == [
+        "N0",
+        "N1",
+        "A",
+        "B",
+        "C",
+    ]  # unnamed internal nodes are labelled
     internal = nodes[1]
-    assert internal["leaf_count"] == 2 and internal["clade"] == ["A", "B"] and internal["root_distance"] == 3.0
+    assert (
+        internal["leaf_count"] == 2
+        and internal["clade"] == ["A", "B"]
+        and internal["root_distance"] == 3.0
+    )
     assert internal["metadata_values"] == ["x"] and internal["metadata_homogeneous"] is True
     assert nodes[0]["metadata_homogeneous"] is False and nodes[0]["leaf_count"] == 3
     assert nodes[3]["depth_edges"] == 2 and nodes[3]["root_distance"] == pytest.approx(5.0)
@@ -635,11 +890,17 @@ def test_export_formats(tmp_path: Path) -> None:
     newick = result_of(phylo.export(tree))
     assert newick["content"] == "((A:1,B:2):3,'C d':4);"
     nexus = result_of(phylo.export(tree, options={"format": "nexus"}))["content"]
-    assert "DIMENSIONS NTAX=3;" in nexus and "TAXLABELS A B 'C d';" in nexus and nexus.startswith("#NEXUS")
+    assert (
+        "DIMENSIONS NTAX=3;" in nexus
+        and "TAXLABELS A B 'C d';" in nexus
+        and nexus.startswith("#NEXUS")
+    )
     as_json = result_of(phylo.export(tree, options={"format": "json"}))["content"]
     assert as_json["children"][0]["children"][1] == {"name": "B", "branch_length": 2.0}
     edges = result_of(phylo.export(tree, options={"format": "edgelist"}))["content"]
-    assert (edges[0]["parent"], edges[0]["child"], edges[0]["length"]) == (0, 1, 3.0) and len(edges) == 4
+    assert (edges[0]["parent"], edges[0]["child"], edges[0]["length"]) == (0, 1, 3.0) and len(
+        edges
+    ) == 4
     target = tmp_path / "t.nwk"
     result_of(phylo.export("(A,B);", options={"output": str(target)}))
     assert target.read_text(encoding="utf-8") == "(A,B);"
@@ -667,11 +928,17 @@ def test_test_bootstrap_support_is_reproducible_and_hand_checkable() -> None:
     # a replicate recovers AB|CD when it draws more AB|CD columns than AC|BD columns: P(>5 of 10) = 0.633
     # (+ ties), so the support is far from 1
     conflicting = {"A": "AAAAAAGGGG", "B": "AAAAAATTTT", "C": "CCCCCCGGGG", "D": "CCCCCCTTTT"}
-    first = result_of(phylo.test(conflicting, options={"replicates": 400, "seed": 1, "distance": "p"}))
-    again = result_of(phylo.test(conflicting, options={"replicates": 400, "seed": 1, "distance": "p"}))
+    first = result_of(
+        phylo.test(conflicting, options={"replicates": 400, "seed": 1, "distance": "p"})
+    )
+    again = result_of(
+        phylo.test(conflicting, options={"replicates": 400, "seed": 1, "distance": "p"})
+    )
     assert first == again
     assert 0.5 < first["clades"][0]["support"] < 0.9
-    other_seed = result_of(phylo.test(conflicting, options={"replicates": 400, "seed": 2, "distance": "p"}))
+    other_seed = result_of(
+        phylo.test(conflicting, options={"replicates": 400, "seed": 2, "distance": "p"})
+    )
     assert other_seed["clades"][0]["support"] != 1.0
 
 
@@ -679,7 +946,11 @@ def test_plot_tree_svg(tmp_path: Path) -> None:
     target = tmp_path / "tree.svg"
     res = result_of(phylo.plot("((A:1,B:2):3,C:4);", options={"output": str(target)}))
     assert res["leaf_count"] == 3 and res["svg"].count("<text") == 3
-    assert ">A<" in res["svg"] and ">C<" in res["svg"] and target.read_text(encoding="utf-8") == res["svg"]
+    assert (
+        ">A<" in res["svg"]
+        and ">C<" in res["svg"]
+        and target.read_text(encoding="utf-8") == res["svg"]
+    )
     clado = result_of(phylo.plot("((A,B),C);", options={"branch_lengths": False}))
     assert clado["svg"].count("<text") == 3
     with pytest.raises(InputFormatError):
@@ -724,22 +995,49 @@ def test_infer_with_ml_method_is_not_implemented() -> None:
         (lambda: phylo.compare(["((A,B),C);", "((A,B),D);"]), InputFormatError),
         (lambda: phylo.compare(["(A,B);"]), InputFormatError),
         (lambda: phylo.build({"names": ["a", "b"], "matrix": [[0, 1], [2, 0]]}), InputFormatError),
-        (lambda: phylo.build({"names": ["a", "b"], "matrix": [[0, 1], [1, 0]]}, options={"method": "ml"}), ConfigurationError),
+        (
+            lambda: phylo.build(
+                {"names": ["a", "b"], "matrix": [[0, 1], [1, 0]]}, options={"method": "ml"}
+            ),
+            ConfigurationError,
+        ),
         (lambda: phylo.infer({"A": "ACGT", "B": "ACG"}), InputFormatError),
         (lambda: phylo.test(ALN, options={"replicates": 0}), ConfigurationError),
         (lambda: asm.calculate_assembly_completeness([100]), ConfigurationError),
         (lambda: asm.calculate_busco_completeness("no summary here"), InputFormatError),
-        (lambda: asm.estimate_size({5: 100, 4: 200, 3: 300}), InputFormatError),  # monotone: no valley
+        (
+            lambda: asm.estimate_size({5: 100, 4: 200, 3: 300}),
+            InputFormatError,
+        ),  # monotone: no valley
         (lambda: asm.calculate_pangenome_openness(PAN), InputFormatError),  # only three genomes
-        (lambda: asm.extract_core_pangenome(PAN, options={"core_threshold": 1.5}), ConfigurationError),
+        (
+            lambda: asm.extract_core_pangenome(PAN, options={"core_threshold": 1.5}),
+            ConfigurationError,
+        ),
         (lambda: asm.extract_core_pangenome("not a matrix"), InputFormatError),
-        (lambda: asm.remove_contamination({"c": "AC"}, options={"contaminants": ["c"]}), ConfigurationError),
-        (lambda: asm.scaffold({"c": "ACGT"}, options={"layout": [{"contigs": ["zz"]}]}), ConfigurationError),
+        (
+            lambda: asm.remove_contamination({"c": "AC"}, options={"contaminants": ["c"]}),
+            ConfigurationError,
+        ),
+        (
+            lambda: asm.scaffold({"c": "ACGT"}, options={"layout": [{"contigs": ["zz"]}]}),
+            ConfigurationError,
+        ),
         (lambda: asm.build_command({"tool": "bwa", "output_directory": "o"}), ConfigurationError),
         (lambda: asm.identify_repeats_in_assembly([100, 200]), InputFormatError),  # lengths only
         (lambda: asm.compare_assemblies([100, 200]), InputFormatError),
-        (lambda: hap.analyze_trio_inheritance({"child": ["0/1"], "father": ["0/0", "0/1"], "mother": ["0/0"]}), InputFormatError),
-        (lambda: hap.analyze_trio_inheritance({"child": ["0/x"], "father": ["0/0"], "mother": ["0/0"]}), InputFormatError),
+        (
+            lambda: hap.analyze_trio_inheritance(
+                {"child": ["0/1"], "father": ["0/0", "0/1"], "mother": ["0/0"]}
+            ),
+            InputFormatError,
+        ),
+        (
+            lambda: hap.analyze_trio_inheritance(
+                {"child": ["0/x"], "father": ["0/0"], "mother": ["0/0"]}
+            ),
+            InputFormatError,
+        ),
         (lambda: hap.phase({"child": ["0/1"]}), InputFormatError),
         (lambda: hap.construct(["01", "012"]), InputFormatError),
         (lambda: hap.compare(["01"]), InputFormatError),
@@ -747,14 +1045,21 @@ def test_infer_with_ml_method_is_not_implemented() -> None:
         (lambda: hap.reconstruct({"a": [0, None]}), InputFormatError),
         (lambda: hap.frequency("not-a-list-of-haplotypes"), InputFormatError),
         (lambda: hap.simulate({"01": -1}), InputFormatError),
-        (lambda: hap.calculate_pedigree_likelihood({"pedigree": [{"id": "c", "father": "f"}], "genotypes": {"c": [1]}}), InputFormatError),
+        (
+            lambda: hap.calculate_pedigree_likelihood(
+                {"pedigree": [{"id": "c", "father": "f"}], "genotypes": {"c": [1]}}
+            ),
+            InputFormatError,
+        ),
     ],
 )
 def test_invalid_inputs_raise_dnakit_errors(call, error) -> None:
     with pytest.raises(error) as info:
         call()
     assert getattr(info.value, "code", None)
-    assert getattr(info.value, "hint", None) is not None or isinstance(info.value, (InputFormatError, ConfigurationError))
+    assert getattr(info.value, "hint", None) is not None or isinstance(
+        info.value, (InputFormatError, ConfigurationError)
+    )
 
 
 def test_every_ok_envelope_has_module_operation_and_status() -> None:

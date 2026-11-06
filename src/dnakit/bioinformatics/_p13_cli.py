@@ -23,7 +23,12 @@ from typing import Any
 
 from dnakit.backends.external import execute_bounded_command
 from dnakit.bioinformatics import _gap_cli as _cli
-from dnakit.exceptions import BackendExecutionError, BackendTimeoutError, ConfigurationError, DNAKitError
+from dnakit.exceptions import (
+    BackendExecutionError,
+    BackendTimeoutError,
+    ConfigurationError,
+    DNAKitError,
+)
 
 LOG_TAIL_CHARS = _cli.LOG_TAIL_CHARS
 _VERSION = re.compile(r"\d+(?:\.\d+)+")
@@ -129,7 +134,7 @@ def run_to_file(
         if stdin_path is not None:
             stdin_handle = stdin_path.open("rb")
             opened.append(stdin_handle)
-        log_file = tempfile.TemporaryFile()
+        log_file = tempfile.TemporaryFile()  # noqa: SIM115 - closed explicitly below
         opened.append(log_file)
         if output is not None:
             stdout_handle = output.open("xb")
@@ -151,7 +156,9 @@ def run_to_file(
         try:
             while process.poll() is None:
                 if time.monotonic() > deadline:
-                    raise BackendTimeoutError(f"{name} exceeded its time limit of {timeout_seconds} s.")
+                    raise BackendTimeoutError(
+                        f"{name} exceeded its time limit of {timeout_seconds} s."
+                    )
                 if output is not None and output.stat().st_size > _cli.MAX_ARTIFACT_BYTES:
                     raise BackendExecutionError(f"{name} exceeded the output size limit.")
                 time.sleep(0.02)
@@ -170,7 +177,9 @@ def run_to_file(
         for handle in opened:
             with contextlib.suppress(OSError):
                 handle.close()
-    wanted = [path for path in ((output,) if output is not None else ()) if path is not None] + list(extra_outputs)
+    wanted = [
+        path for path in ((output,) if output is not None else ()) if path is not None
+    ] + list(extra_outputs)
     produced = [str(path) for path in wanted if path.is_file()]
     complete = process.returncode in success_codes and len(produced) == len(wanted)
     shown = [name, *arguments]

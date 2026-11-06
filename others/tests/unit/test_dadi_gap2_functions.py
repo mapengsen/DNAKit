@@ -22,7 +22,6 @@ import pytest
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.population import dadi_gap2_functions as module
 
-
 requires_pkg = pytest.mark.skipif(
     importlib.util.find_spec("dadi") is None,
     reason="dadi is not installed",

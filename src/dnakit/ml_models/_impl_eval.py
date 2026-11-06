@@ -286,7 +286,9 @@ def validate_dataset(value: object, options: Mapping[str, object]) -> dict[str, 
     label_col = get_str(options, "label_column", "label") or "label"
     id_col = get_str(options, "id_column", "id") or "id"
     split_col = get_str(options, "split_column", None)
-    alphabet_text = "".join(dict.fromkeys(str(options.get("alphabet", "ACGTN")).upper()))  # order as given
+    alphabet_text = "".join(
+        dict.fromkeys(str(options.get("alphabet", "ACGTN")).upper())
+    )  # order as given
     alphabet = set(alphabet_text)
     min_len = get_int(options, "min_length", 1, low=0)
     max_len = get_int(options, "max_length", 10_000_000, low=1)

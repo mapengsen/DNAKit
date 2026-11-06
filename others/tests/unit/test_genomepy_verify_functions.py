@@ -17,8 +17,8 @@ ucsc = pytest.importorskip("genomepy.providers.ucsc")
 ensembl = pytest.importorskip("genomepy.providers.ensembl")
 gencode = pytest.importorskip("genomepy.providers.gencode")
 
-from dnakit.databases import genomepy_verify_functions as gv  # noqa: E402
-from dnakit.exceptions import ConfigurationError  # noqa: E402
+from dnakit.databases import genomepy_verify_functions as gv
+from dnakit.exceptions import ConfigurationError
 
 PUBLIC = [
     gv.genomepy_ucsc_assembly_accessions,
@@ -69,7 +69,9 @@ def test_assembly_accessions_match_upstream_add_accessions1(monkeypatch):
     ours = gv.genomepy_ucsc_assembly_accessions(genomes, EQUIVALENCES)
     assert set(ours) == set(genomes)
     for name in genomes:
-        assert ours[name].get("assembly_accession") == upstream[name].get("assembly_accession"), name
+        assert ours[name].get("assembly_accession") == upstream[name].get("assembly_accession"), (
+            name
+        )
     assert ours["hg38"]["assembly_accession"] == "GCA_000001405.28"
     assert ours["ce11"]["assembly_accession"] == "GCA_000002985.3"
     assert ours["xenTro10"]["assembly_accession"] is None
@@ -103,7 +105,9 @@ def test_sourcename_accessions_match_upstream_add_accessions2():
     upstream = ucsc.add_accessions2(copy.deepcopy(genomes))
     ours = gv.genomepy_ucsc_sourcename_accessions(genomes)
     for name in genomes:
-        assert ours[name].get("assembly_accession") == upstream[name].get("assembly_accession"), name
+        assert ours[name].get("assembly_accession") == upstream[name].get("assembly_accession"), (
+            name
+        )
     assert ours["dm6"]["assembly_accession"] == "GCF_000001215.4"
     assert "assembly_accession" not in ours["rn7"]
 
@@ -155,7 +159,9 @@ def test_gencode_add_grch37_matches_upstream():
     ftp = "ftp://ftp.ebi.ac.uk/pub/databases/gencode"
     catalogue = {
         "GRCh38": {
-            "annotations": [f"{ftp}/Gencode_human/release_41/GRCh38_mapping/gencode.v41.annotation.gtf.gz"],
+            "annotations": [
+                f"{ftp}/Gencode_human/release_41/GRCh38_mapping/gencode.v41.annotation.gtf.gz"
+            ],
             "taxonomy_id": 9606,
             "species": "Homo sapiens",
             "text_search": "human",
@@ -174,7 +180,9 @@ def test_gencode_add_grch37_rejects_catalogue_without_human_assembly():
     with pytest.raises(ConfigurationError):
         gv.genomepy_gencode_add_grch37({"mm10": {"annotations": []}}, "ftp://x")
     with pytest.raises(ConfigurationError):
-        gv.genomepy_gencode_add_grch37({"GRCh38": {"annotations": ["no-release-here.gtf"]}}, "ftp://x")
+        gv.genomepy_gencode_add_grch37(
+            {"GRCh38": {"annotations": ["no-release-here.gtf"]}}, "ftp://x"
+        )
     with pytest.raises(ConfigurationError):
         gv.genomepy_gencode_add_grch37({"GRCh38": {"annotations": ["a/release_41/b"]}}, " ")
 

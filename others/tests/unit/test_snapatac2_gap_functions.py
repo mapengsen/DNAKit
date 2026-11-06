@@ -16,8 +16,8 @@ import pytest
 
 pytest.importorskip("snapatac2")
 
-from dnakit.epigenome import snapatac2_gap_functions as module  # noqa: E402
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DownloadError  # noqa: E402
+from dnakit.epigenome import snapatac2_gap_functions as module
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError, DownloadError
 
 
 @pytest.fixture(autouse=True)
@@ -142,7 +142,9 @@ def test_pbmc5k_and_multiome_validate_and_forward(monkeypatch, tmp_path):
         datasets, "pbmc10k_multiome", lambda **kwargs: calls.append(("10k", kwargs)) or target
     )
     assert module.fetch_snapatac2_pbmc5k(data_type="annotated_h5ad")["paths"] == [str(target)]
-    assert module.fetch_snapatac2_pbmc10k_multiome(modality="ATAC", data_type="fragment")["paths"] == [str(target)]
+    assert module.fetch_snapatac2_pbmc10k_multiome(modality="ATAC", data_type="fragment")[
+        "paths"
+    ] == [str(target)]
     assert calls == [
         ("5k", {"type": "annotated_h5ad"}),
         ("10k", {"modality": "ATAC", "type": "fragment"}),
@@ -220,7 +222,9 @@ def test_genome_files_single_kind_and_bad_input(monkeypatch, tmp_path):
 
     calls = []
     monkeypatch.setattr(
-        genome, "load", lambda dataset, **kwargs: calls.append(kwargs["file"]) or tmp_path / "x.gff3"
+        genome,
+        "load",
+        lambda dataset, **kwargs: calls.append(kwargs["file"]) or tmp_path / "x.gff3",
     )
     result = module.fetch_snapatac2_genome_files("mm10", kind="annotation")
     assert calls == ["gencode_vM25_GRCm38.gff3.gz"]
@@ -279,8 +283,10 @@ def _assert_png(result, path: Path) -> None:
 
 def test_render_figure_png_uses_figure_size(tmp_path):
     target = tmp_path / "figure.png"
-    figure = {"data": [{"type": "scatter", "x": [0, 1, 2], "y": [1, 3, 2], "mode": "lines+markers"}],
-              "layout": {"title": {"text": "Check"}}}
+    figure = {
+        "data": [{"type": "scatter", "x": [0, 1, 2], "y": [1, 3, 2], "mode": "lines+markers"}],
+        "layout": {"title": {"text": "Check"}},
+    }
     result = module.render_snapatac2_figure_png(figure, str(target), width=640, height=320)
     _assert_png(result, target)
     assert _png_size(target) == (640, 320)
@@ -292,11 +298,15 @@ def test_plot_outputs_must_be_new_png_files(tmp_path):
     existing = tmp_path / "exists.png"
     existing.write_bytes(b"x")
     with pytest.raises(ConfigurationError):
-        module.render_snapatac2_figure_png({"data": [{"type": "scatter", "x": [0], "y": [0]}]}, str(existing))
+        module.render_snapatac2_figure_png(
+            {"data": [{"type": "scatter", "x": [0], "y": [0]}]}, str(existing)
+        )
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_valid_cells_png([3, 2, 1], str(tmp_path / "figure.pdf"))
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_valid_cells_png([3, 2, 1], str(tmp_path / "missing_folder" / "figure.png"))
+        module.plot_snapatac2_valid_cells_png(
+            [3, 2, 1], str(tmp_path / "missing_folder" / "figure.png")
+        )
 
 
 def test_render_figure_rejects_non_figures(tmp_path):
@@ -310,8 +320,12 @@ def test_heatmap_png_clusters_and_labels_rows(tmp_path):
     target = tmp_path / "heatmap.png"
     matrix = [[0.0, 1.0, 2.0], [0.1, 1.1, 2.1], [5.0, 0.0, 0.5]]
     result = module.plot_snapatac2_heatmap_png(
-        matrix, str(target), row_names=["r1", "r2", "r3"], column_names=["c1", "c2", "c3"],
-        cluster_rows=True, cluster_columns=True,
+        matrix,
+        str(target),
+        row_names=["r1", "r2", "r3"],
+        column_names=["c1", "c2", "c3"],
+        cluster_rows=True,
+        cluster_columns=True,
     )
     _assert_png(result, target)
     heat = _trace(result, "heatmap")[0]
@@ -323,8 +337,12 @@ def test_heatmap_png_clusters_and_labels_rows(tmp_path):
 def test_heatmap_png_without_clustering_keeps_input_order(tmp_path):
     target = tmp_path / "plain.png"
     result = module.plot_snapatac2_heatmap_png(
-        [[1.0, 2.0], [3.0, 4.0]], str(target), row_names=["a", "b"], column_names=["x", "y"],
-        cluster_rows=False, cluster_columns=False,
+        [[1.0, 2.0], [3.0, 4.0]],
+        str(target),
+        row_names=["a", "b"],
+        column_names=["x", "y"],
+        cluster_rows=False,
+        cluster_columns=False,
     )
     _assert_png(result, target)
     assert result["data"]["yaxis_ticktext"] == ["a", "b"]
@@ -338,15 +356,21 @@ def test_heatmap_validation(tmp_path):
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_heatmap_png([[1.0, 2.0], [3.0]], str(tmp_path / "b.png"))
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_heatmap_png([[1.0, 2.0], [3.0, 4.0]], str(tmp_path / "c.png"), linkage="bogus")
+        module.plot_snapatac2_heatmap_png(
+            [[1.0, 2.0], [3.0, 4.0]], str(tmp_path / "c.png"), linkage="bogus"
+        )
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_heatmap_png([[1.0, 2.0], [3.0, 4.0]], str(tmp_path / "d.png"), row_names=["only"])
+        module.plot_snapatac2_heatmap_png(
+            [[1.0, 2.0], [3.0, 4.0]], str(tmp_path / "d.png"), row_names=["only"]
+        )
 
 
 def test_kde2d_png_draws_density_contour(tmp_path):
     rng = np.random.default_rng(0)
     target = tmp_path / "kde.png"
-    result = module.plot_snapatac2_kde2d_png(rng.gamma(2, 1000, 300), rng.normal(5, 1, 300), str(target), log_x=True)
+    result = module.plot_snapatac2_kde2d_png(
+        rng.gamma(2, 1000, 300), rng.normal(5, 1, 300), str(target), log_x=True
+    )
     _assert_png(result, target)
     assert _trace(result, "contour")
     assert result["data"]["xaxis_type"] == "log"
@@ -355,7 +379,9 @@ def test_kde2d_png_draws_density_contour(tmp_path):
 
 def test_kde2d_rejects_non_positive_values_on_log_axis(tmp_path):
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_kde2d_png([1.0, 0.0, 2.0], [1.0, 2.0, 3.0], str(tmp_path / "k.png"), log_x=True)
+        module.plot_snapatac2_kde2d_png(
+            [1.0, 0.0, 2.0], [1.0, 2.0, 3.0], str(tmp_path / "k.png"), log_x=True
+        )
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_kde2d_png([1.0, 2.0], [1.0, 2.0, 3.0], str(tmp_path / "k2.png"))
 
@@ -363,8 +389,12 @@ def test_kde2d_rejects_non_positive_values_on_log_axis(tmp_path):
 def test_scatter_png_groups_points_by_colour(tmp_path):
     target = tmp_path / "scatter.png"
     result = module.plot_snapatac2_scatter_png(
-        [0.0, 1.0, 2.0, 3.0], [0.2, 0.8, 1.4, 0.1], str(target), color=["A", "B", "A", "B"],
-        x_label="UMAP-1", y_label="UMAP-2",
+        [0.0, 1.0, 2.0, 3.0],
+        [0.2, 0.8, 1.4, 0.1],
+        str(target),
+        color=["A", "B", "A", "B"],
+        x_label="UMAP-1",
+        y_label="UMAP-2",
     )
     _assert_png(result, target)
     groups = {trace["name"]: trace for trace in _trace(result, "scatter")}
@@ -375,7 +405,9 @@ def test_scatter_png_groups_points_by_colour(tmp_path):
 
 def test_scatter_png_numeric_colour_draws_colour_scale(tmp_path):
     target = tmp_path / "numeric.png"
-    result = module.plot_snapatac2_scatter_png([0.0, 1.0, 2.0], [0.2, 0.8, 1.4], str(target), color=[1.0, 2.0, 3.0])
+    result = module.plot_snapatac2_scatter_png(
+        [0.0, 1.0, 2.0], [0.2, 0.8, 1.4], str(target), color=[1.0, 2.0, 3.0]
+    )
     _assert_png(result, target)
     assert _trace(result, "scatter")[0]["y"] == [0.2, 0.8, 1.4]
 
@@ -384,7 +416,9 @@ def test_scatter_png_rejects_mismatched_lengths(tmp_path):
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_scatter_png([0.0, 1.0], [0.2], str(tmp_path / "s.png"))
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_scatter_png([0.0, 1.0], [0.2, 0.3], str(tmp_path / "s2.png"), color=["A"])
+        module.plot_snapatac2_scatter_png(
+            [0.0, 1.0], [0.2, 0.3], str(tmp_path / "s2.png"), color=["A"]
+        )
 
 
 def test_scatter3d_png_draws_three_dimensional_points(tmp_path):
@@ -410,10 +444,12 @@ def _network(edges_extra: list[dict] | None = None):
 def test_network_scores_png_averages_scores_by_distance_bin(tmp_path):
     types, edges = _network()
     target = tmp_path / "scores.png"
-    result = module.plot_snapatac2_network_scores_png(types, edges, str(target), score_name="regr_score")
+    result = module.plot_snapatac2_network_scores_png(
+        types, edges, str(target), score_name="regr_score"
+    )
     _assert_png(result, target)
     bars = _trace(result, "bar")[0]
-    values = dict(zip(bars["x"], bars["y"]))
+    values = dict(zip(bars["x"], bars["y"], strict=False))
     assert values["500 - 2K"] == pytest.approx(0.3)
     assert values["50K - 100K"] == pytest.approx(0.9)
 
@@ -430,17 +466,27 @@ def test_network_edge_stat_png_draws_violins_per_node_type_pair(tmp_path):
 def test_network_inputs_are_validated(tmp_path):
     types, edges = _network()
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_network_scores_png(types, edges, str(tmp_path / "a.png"), score_name="weight")
-    with pytest.raises(ConfigurationError):
         module.plot_snapatac2_network_scores_png(
-            types, [{"source": 0, "target": 5, "distance": 1.0}], str(tmp_path / "b.png"), score_name="cor_score"
+            types, edges, str(tmp_path / "a.png"), score_name="weight"
         )
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_network_scores_png(
-            types, [{"source": 0, "target": 1, "regr_score": 0.5}], str(tmp_path / "c.png"), score_name="regr_score"
+            types,
+            [{"source": 0, "target": 5, "distance": 1.0}],
+            str(tmp_path / "b.png"),
+            score_name="cor_score",
         )
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_network_edge_stat_png(types, [{"source": 0, "target": 1}], str(tmp_path / "d.png"))
+        module.plot_snapatac2_network_scores_png(
+            types,
+            [{"source": 0, "target": 1, "regr_score": 0.5}],
+            str(tmp_path / "c.png"),
+            score_name="regr_score",
+        )
+    with pytest.raises(ConfigurationError):
+        module.plot_snapatac2_network_edge_stat_png(
+            types, [{"source": 0, "target": 1}], str(tmp_path / "d.png")
+        )
 
 
 def test_valid_cells_png_plots_ranked_counts(tmp_path):
@@ -471,7 +517,9 @@ def test_tsse_png_counts_cells_above_fragment_threshold(tmp_path):
 def test_frag_size_distr_png_skips_size_zero(tmp_path):
     target = tmp_path / "fragments.png"
     distribution = [0, 5, 12, 18, 9, 3]
-    result = module.plot_snapatac2_frag_size_distr_png(distribution, str(target), max_recorded_size=10)
+    result = module.plot_snapatac2_frag_size_distr_png(
+        distribution, str(target), max_recorded_size=10
+    )
     _assert_png(result, target)
     trace = _trace(result, "scatter")[0]
     assert trace["x"] == [1, 2, 3, 4, 5]
@@ -502,7 +550,12 @@ def test_regions_png_groups_selected_peaks(tmp_path):
     peaks = ["chr1:0-5000", "chr1:5000-10000", "chr1:10000-15000", "chr2:0-5000"]
     target = tmp_path / "regions.png"
     result = module.plot_snapatac2_regions_png(
-        counts, peaks, ["A", "B"] * 3, {"first": peaks[:2], "second": [peaks[3]]}, str(target), groupby="cell_type",
+        counts,
+        peaks,
+        ["A", "B"] * 3,
+        {"first": peaks[:2], "second": [peaks[3]]},
+        str(target),
+        groupby="cell_type",
     )
     _assert_png(result, target)
     heat = _trace(result, "heatmap")[0]
@@ -515,11 +568,21 @@ def test_regions_png_groups_selected_peaks(tmp_path):
 def test_regions_png_validates_names_and_selection(tmp_path):
     counts = np.ones((4, 2))
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_regions_png(counts, ["chr1-0-5", "chr1:0-5"], list("ABAB"), {"g": ["chr1:0-5"]},
-                                          str(tmp_path / "a.png"))
+        module.plot_snapatac2_regions_png(
+            counts,
+            ["chr1-0-5", "chr1:0-5"],
+            list("ABAB"),
+            {"g": ["chr1:0-5"]},
+            str(tmp_path / "a.png"),
+        )
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_regions_png(counts, ["chr1:0-5", "chr1:5-10"], list("ABAB"), {"g": ["chr9:1-2"]},
-                                          str(tmp_path / "b.png"))
+        module.plot_snapatac2_regions_png(
+            counts,
+            ["chr1:0-5", "chr1:5-10"],
+            list("ABAB"),
+            {"g": ["chr9:1-2"]},
+            str(tmp_path / "b.png"),
+        )
 
 
 def test_umap_png_groups_cells_and_handles_three_dimensions(tmp_path):
@@ -542,7 +605,12 @@ def test_motif_enrichment_png_clusters_groups(tmp_path):
     ids = ["MA0001.1", "MA0002.1", "MA0003.1", "MA0004.1"]
 
     def table(log_fc, adjusted, raw):
-        return {"id": ids, "log2(fold change)": log_fc, "adjusted p-value": adjusted, "p-value": raw}
+        return {
+            "id": ids,
+            "log2(fold change)": log_fc,
+            "adjusted p-value": adjusted,
+            "p-value": raw,
+        }
 
     enrichment = {
         "c1": table([1.5, -0.8, 0.2, 2.0], [0.001, 0.2, 0.5, 0.01], [1e-5, 0.05, 0.3, 1e-3]),
@@ -560,7 +628,9 @@ def test_motif_enrichment_png_clusters_groups(tmp_path):
     with pytest.raises(ConfigurationError):
         module.plot_snapatac2_motif_enrichment_png(bad_order, str(tmp_path / "bad.png"))
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_motif_enrichment_png({"c1": {"id": ids}, "c2": {"id": ids}}, str(tmp_path / "bad2.png"))
+        module.plot_snapatac2_motif_enrichment_png(
+            {"c1": {"id": ids}, "c2": {"id": ids}}, str(tmp_path / "bad2.png")
+        )
 
 
 @pytest.fixture()
@@ -580,8 +650,13 @@ def fragment_h5ad(tmp_path):
     with gzip.open(fragments, "wt") as handle:
         handle.writelines(lines)
     path = tmp_path / "fragments.h5ad"
-    data = snap.pp.import_fragments(str(fragments), chrom_sizes={"chr1": 100000}, file=str(path),
-                                    min_num_fragments=1, sorted_by_barcode=False)
+    data = snap.pp.import_fragments(
+        str(fragments),
+        chrom_sizes={"chr1": 100000},
+        file=str(path),
+        min_num_fragments=1,
+        sorted_by_barcode=False,
+    )
     data.obs["group"] = ["A", "B"] * 4
     data.close()
     return path
@@ -589,8 +664,9 @@ def fragment_h5ad(tmp_path):
 
 def test_coverage_png_draws_one_track_per_group(tmp_path, fragment_h5ad):
     target = tmp_path / "coverage.png"
-    result = module.plot_snapatac2_coverage_png(str(fragment_h5ad), str(target), region="chr1:1-100000",
-                                                groupby="group")
+    result = module.plot_snapatac2_coverage_png(
+        str(fragment_h5ad), str(target), region="chr1:1-100000", groupby="group"
+    )
     _assert_png(result, target)
     assert [track["group"] for track in result["data"]["tracks"]] == ["A", "B"]
     assert result["data"]["positions"] == 99999
@@ -599,14 +675,20 @@ def test_coverage_png_draws_one_track_per_group(tmp_path, fragment_h5ad):
 
 def test_coverage_png_validates_region_and_groupby(tmp_path, fragment_h5ad):
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_coverage_png(str(fragment_h5ad), str(tmp_path / "a.png"), region="chr1:50-10",
-                                           groupby="group")
+        module.plot_snapatac2_coverage_png(
+            str(fragment_h5ad), str(tmp_path / "a.png"), region="chr1:50-10", groupby="group"
+        )
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_coverage_png(str(fragment_h5ad), str(tmp_path / "b.png"), region="chr1:1-100",
-                                           groupby="missing")
+        module.plot_snapatac2_coverage_png(
+            str(fragment_h5ad), str(tmp_path / "b.png"), region="chr1:1-100", groupby="missing"
+        )
     with pytest.raises(ConfigurationError):
-        module.plot_snapatac2_coverage_png(str(tmp_path / "nope.h5ad"), str(tmp_path / "c.png"),
-                                           region="chr1:1-100", groupby="group")
+        module.plot_snapatac2_coverage_png(
+            str(tmp_path / "nope.h5ad"),
+            str(tmp_path / "c.png"),
+            region="chr1:1-100",
+            groupby="group",
+        )
 
 
 def test_plot_verbose_keyword_is_accepted(tmp_path):

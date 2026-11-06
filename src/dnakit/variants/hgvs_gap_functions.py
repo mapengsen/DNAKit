@@ -9,7 +9,8 @@ connection on its own.
 from __future__ import annotations
 
 import importlib
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
@@ -29,15 +30,21 @@ def _parser() -> Any:
 
 def _parse(variant: str, name: str = "variant") -> Any:
     if not isinstance(variant, str) or not variant.strip():
-        raise ConfigurationError(f"{name} must be an HGVS string such as NM_000399.3:c.2689_2690insA.")
+        raise ConfigurationError(
+            f"{name} must be an HGVS string such as NM_000399.3:c.2689_2690insA."
+        )
     try:
         return _parser().parse_hgvs_variant(variant.strip())
     except Exception as exc:  # hgvs raises several parser-specific exceptions
-        raise ConfigurationError(f"{name} is not a valid HGVS variant: {variant!r} ({exc})") from exc
+        raise ConfigurationError(
+            f"{name} is not a valid HGVS variant: {variant!r} ({exc})"
+        ) from exc
 
 
 def _span(span: Sequence[int], name: str = "span") -> tuple[int, int]:
-    if len(span) != 2 or any(isinstance(value, bool) or not isinstance(value, int) for value in span):
+    if len(span) != 2 or any(
+        isinstance(value, bool) or not isinstance(value, int) for value in span
+    ):
         raise ConfigurationError(f"{name} must be a pair of integers (start, end).")
     start, end = int(span[0]), int(span[1])
     if start < 0 or end < start:
@@ -47,7 +54,9 @@ def _span(span: Sequence[int], name: str = "span") -> tuple[int, int]:
 
 def _mapper(mapper: Any) -> Any:
     if mapper is None:
-        raise ConfigurationError("mapper must be an hgvs AlignmentMapper built on a UTA database connection.")
+        raise ConfigurationError(
+            "mapper must be an hgvs AlignmentMapper built on a UTA database connection."
+        )
     return mapper
 
 
@@ -82,12 +91,16 @@ def hgvs_pointer_line(variant: str, span: Sequence[int], *, verbose: bool = True
     context = require("hgvs.utils.context", _EXTRA)
     parsed = _parse(variant)
     if getattr(parsed, "posedit", None) is None or parsed.type not in ("g", "c", "n"):
-        raise ConfigurationError("pointer lines need a genomic, coding or non-coding variant (g., c. or n.).")
+        raise ConfigurationError(
+            "pointer lines need a genomic, coding or non-coding variant (g., c. or n.)."
+        )
     start, end = _span(span)
     try:
         return context.pointer_line(parsed, (start, end))
     except AttributeError as exc:
-        raise ConfigurationError(f"{variant!r} has no simple position to point at ({exc}).") from exc
+        raise ConfigurationError(
+            f"{variant!r} has no simple position to point at ({exc})."
+        ) from exc
 
 
 def format_sequence_blocks(
@@ -106,7 +119,11 @@ def format_sequence_blocks(
     context = require("hgvs.utils.context", _EXTRA)
     if not isinstance(sequence, str) or not sequence:
         raise ConfigurationError("sequence must be a non-empty string.")
-    if isinstance(group_size, bool) or not isinstance(group_size, int) or not 1 <= group_size <= _MAX_GROUP_SIZE:
+    if (
+        isinstance(group_size, bool)
+        or not isinstance(group_size, int)
+        or not 1 <= group_size <= _MAX_GROUP_SIZE
+    ):
         raise ConfigurationError(f"group_size must be an integer from 1 to {_MAX_GROUP_SIZE}.")
     first = 0 if start is None else start
     last = len(sequence) if end is None else end
@@ -162,7 +179,9 @@ def hgvs_variant_context_with_alignment(
     if margin < 0:
         raise ConfigurationError("margin must not be negative.")
     try:
-        return context.variant_context_w_alignment(_mapper(mapper), parsed, margin=margin, tx_ac=transcript)
+        return context.variant_context_w_alignment(
+            _mapper(mapper), parsed, margin=margin, tx_ac=transcript
+        )
     except RuntimeError as exc:
         raise ConfigurationError(str(exc)) from exc
 

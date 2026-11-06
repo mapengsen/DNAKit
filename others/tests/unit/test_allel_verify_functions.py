@@ -94,7 +94,9 @@ def test_header_only_vcf_writes_no_store(tmp_path):
 @requires_allel
 def test_missing_vcf_is_a_configuration_error(tmp_path):
     with pytest.raises(ConfigurationError):
-        module.allel_vcf_to_zarr(str(tmp_path / "missing.vcf"), str(tmp_path / "x.zarr"), verbose=False)
+        module.allel_vcf_to_zarr(
+            str(tmp_path / "missing.vcf"), str(tmp_path / "x.zarr"), verbose=False
+        )
 
 
 @requires_allel

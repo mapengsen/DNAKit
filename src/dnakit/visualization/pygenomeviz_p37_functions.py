@@ -91,8 +91,10 @@ def _types(value: str | Sequence[str] | None, name: str) -> list[str] | None:
 def _range(value: Sequence[int] | None, name: str) -> tuple[int, int] | None:
     if value is None:
         return None
-    if isinstance(value, (str, bytes)) or len(value) != 2 or not all(
-        isinstance(item, int) and not isinstance(item, bool) for item in value
+    if (
+        isinstance(value, (str, bytes))
+        or len(value) != 2
+        or not all(isinstance(item, int) and not isinstance(item, bool) for item in value)
     ):
         raise ConfigurationError(f"{name} must be None or two integers (start, end).")
     return (min(value), max(value))
@@ -125,11 +127,15 @@ def _open_text(path: Path) -> io.TextIOBase:
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as archive:
             return io.StringIO(archive.read(archive.namelist()[0]).decode("utf-8"))
-    return open(path, encoding="utf-8")  # noqa: SIM115
+    return open(path, encoding="utf-8")
 
 
 def _stem(path: Path) -> str:
-    return path.with_suffix("").with_suffix("").name if path.suffix in (".gz", ".bz2", ".zip") else path.with_suffix("").name
+    return (
+        path.with_suffix("").with_suffix("").name
+        if path.suffix in (".gz", ".bz2", ".zip")
+        else path.with_suffix("").name
+    )
 
 
 def _detect(path: Path, file_format: str) -> str:
@@ -161,13 +167,23 @@ def _records(path: Path, file_format: str) -> list[Any]:
         with _open_text(path) as handle:
             records = list(seqio.parse(handle, file_format))
     except Exception as exc:
-        raise ConfigurationError(f"{path.name} could not be parsed as {file_format}: {exc}") from exc
+        raise ConfigurationError(
+            f"{path.name} could not be parsed as {file_format}: {exc}"
+        ) from exc
     if not records:
         raise ConfigurationError(f"{path.name} has no {file_format} records.")
     return records
 
 
-def _feature_row(seqid: str, kind: str, start: int, end: int, strand: int | None, identifier: str, qualifiers: Mapping[str, Any]) -> dict[str, Any]:
+def _feature_row(
+    seqid: str,
+    kind: str,
+    start: int,
+    end: int,
+    strand: int | None,
+    identifier: str,
+    qualifiers: Mapping[str, Any],
+) -> dict[str, Any]:
     return {
         "seqid": seqid,
         "type": kind,
@@ -175,7 +191,10 @@ def _feature_row(seqid: str, kind: str, start: int, end: int, strand: int | None
         "end": int(end),
         "strand": strand,
         "id": identifier,
-        "qualifiers": {str(k): [str(v) for v in (values if isinstance(values, list) else [values])] for k, values in qualifiers.items()},
+        "qualifiers": {
+            str(k): [str(v) for v in (values if isinstance(values, list) else [values])]
+            for k, values in qualifiers.items()
+        },
     }
 
 
@@ -204,7 +223,9 @@ def _gff_records(path: Path) -> tuple[list[dict[str, Any]], dict[str, int], list
             score = None if parts[5] in (".", "") else float(parts[5])
             phase = None if parts[7] in (".", "") else int(parts[7])
         except ValueError as exc:
-            raise ConfigurationError(f"{path.name} has an invalid GFF line: {line[:80]!r}.") from exc
+            raise ConfigurationError(
+                f"{path.name} has an invalid GFF line: {line[:80]!r}."
+            ) from exc
         attrs: dict[str, list[str]] = {}
         for attribute in parts[8].split(";"):
             if attribute and "=" in attribute:
@@ -237,7 +258,13 @@ def _gff_records(path: Path) -> tuple[list[dict[str, Any]], dict[str, int], list
 def _gff_feature(record: dict[str, Any]) -> dict[str, Any]:
     identifier = record["attrs"].get("ID", [""])[0]
     return _feature_row(
-        record["seqid"], record["type"], record["start"] - 1, record["end"], record["strand"], identifier, record["attrs"]
+        record["seqid"],
+        record["type"],
+        record["start"] - 1,
+        record["end"],
+        record["strand"],
+        identifier,
+        record["attrs"],
     )
 
 
@@ -253,7 +280,10 @@ def _gff_select(
             continue
         if strand is not None and record["strand"] != strand:
             continue
-        if target_range is not None and not target_range[0] <= record["start"] <= record["end"] <= target_range[1]:
+        if (
+            target_range is not None
+            and not target_range[0] <= record["start"] <= record["end"] <= target_range[1]
+        ):
             continue
         chosen.append(record)
     return chosen
@@ -308,11 +338,17 @@ def read_gff_contig_sizes(source: str | Path, *, verbose: bool = True) -> dict[s
 
     path = input_path(source)
     records, sizes, seqids = _gff_records(path)
-    headers = {line.split()[1] for line in _open_text(path).read().splitlines() if line.startswith("##sequence-region")}
+    headers = {
+        line.split()[1]
+        for line in _open_text(path).read().splitlines()
+        if line.startswith("##sequence-region")
+    }
     return {
         "status": "completed",
         "operation": "read_gff_contig_sizes",
-        "contigs": [{"id": seqid, "size": sizes[seqid], "from_header": seqid in headers} for seqid in seqids],
+        "contigs": [
+            {"id": seqid, "size": sizes[seqid], "from_header": seqid in headers} for seqid in seqids
+        ],
         "record_count": len(records),
         "provenance": _provenance(),
     }
@@ -348,9 +384,14 @@ def list_contig_features(
                     continue
                 per_contig.setdefault(str(record.id), []).append(
                     _feature_row(
-                        str(record.id), feature.type, int(feature.location.start), int(feature.location.end),
-                        feature.location.strand, "", feature.qualifiers,
-                    )  # fmt: skip
+                        str(record.id),
+                        feature.type,
+                        int(feature.location.start),
+                        int(feature.location.end),
+                        feature.location.strand,
+                        "",
+                        feature.qualifiers,
+                    )
                 )
     elif kind == "gff":
         records, _, seqids = _gff_records(path)
@@ -391,7 +432,9 @@ def extract_genome_features(
     path = input_path(source)
     kind = _detect(path, file_format)
     window = _range(target_range, "target_range")
-    listing = list_contig_features(path, file_format=kind, feature_type=feature_type, strand=strand, verbose=False)
+    listing = list_contig_features(
+        path, file_format=kind, feature_type=feature_type, strand=strand, verbose=False
+    )
     contigs = listing["contigs"]
     if kind == "gff":
         records, _, seqids = _gff_records(path)
@@ -400,7 +443,12 @@ def extract_genome_features(
             raise ConfigurationError(f"seqid {chosen!r} was not found in {path.name}.")
         rows = [
             _gff_feature(item)
-            for item in _gff_select([r for r in records if r["seqid"] == chosen], _types(feature_type, "feature_type"), _strand(strand), window)
+            for item in _gff_select(
+                [r for r in records if r["seqid"] == chosen],
+                _types(feature_type, "feature_type"),
+                _strand(strand),
+                window,
+            )
         ]
     else:
         nonempty = [name for name, items in contigs.items() if items]
@@ -408,7 +456,9 @@ def extract_genome_features(
         if chosen is None:
             raise ConfigurationError("the GenBank file has no matching feature.")
         rows = [
-            row for row in contigs.get(chosen, []) if window is None or window[0] <= row["start"] <= row["end"] <= window[1]
+            row
+            for row in contigs.get(chosen, [])
+            if window is None or window[0] <= row["start"] <= row["end"] <= window[1]
         ]
     return {
         "status": "completed",
@@ -455,7 +505,11 @@ def extract_gff_exon_features(
             if parent_id is None:
                 continue
             parents[parent_id] = record
-        if record["type"] == "exon" and parent_id is not None and parent_id == record["attrs"].get("Parent", [None])[0]:
+        if (
+            record["type"] == "exon"
+            and parent_id is not None
+            and parent_id == record["attrs"].get("Parent", [None])[0]
+        ):
             exons[parent_id].append(record)
     rows: list[dict[str, Any]] = []
     for name, parent in parents.items():
@@ -500,7 +554,9 @@ def select_features_within_range(
         raise ConfigurationError("target_range and a list of features are required.")
     kept = []
     for feature in features:
-        if not isinstance(feature, Mapping) or not all(isinstance(feature.get(k), int) for k in ("start", "end")):
+        if not isinstance(feature, Mapping) or not all(
+            isinstance(feature.get(k), int) for k in ("start", "end")
+        ):
             raise ConfigurationError("every feature needs integer start and end.")
         if window[0] <= feature["start"] <= feature["end"] <= window[1]:
             kept.append(dict(feature))
@@ -526,7 +582,9 @@ def write_genome_fasta(
     path = input_path(source)
     target = _new_file(output_path, "output_path")
     contigs = read_contig_sequences(path, file_format=file_format, verbose=False)["contigs"]
-    target.write_text("".join(f">{item['id']}\n{item['sequence']}\n" for item in contigs), encoding="utf-8")
+    target.write_text(
+        "".join(f">{item['id']}\n{item['sequence']}\n" for item in contigs), encoding="utf-8"
+    )
     return {
         "status": "completed",
         "operation": "write_genome_fasta",
@@ -562,14 +620,23 @@ def write_genbank_cds_fasta(
             strand = -1 if row["strand"] == -1 else 1
             location_id = f"|{seqid}|{row['start']}_{row['end']}_{strand}|"
             protein_id = row["qualifiers"].get("protein_id", [None])[0]
-            name = f"GENE{counter:06d}{location_id}" if protein_id is None else f"GENE{counter:06d}_{protein_id}{location_id}"
+            name = (
+                f"GENE{counter:06d}{location_id}"
+                if protein_id is None
+                else f"GENE{counter:06d}_{protein_id}{location_id}"
+            )
             counter += 1
             product = row["qualifiers"].get("product", [""])[0]
             lines.append(f">{name} {product}".rstrip() if product else f">{name}")
             lines.append(translation)
             written += 1
     target.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
-    return {"status": "completed", "operation": "write_genbank_cds_fasta", "output_path": str(target), "cds_written": written}
+    return {
+        "status": "completed",
+        "operation": "write_genbank_cds_fasta",
+        "output_path": str(target),
+        "cds_written": written,
+    }
 
 
 def calc_genbank_gc_content(
@@ -605,7 +672,9 @@ def calc_genbank_gc_content(
     positions = [*range(0, size, step), size]
     values = []
     for position in positions:
-        subsequence = sequence[max(position - int(window / 2), 0) : min(position + int(window / 2), size)]
+        subsequence = sequence[
+            max(position - int(window / 2), 0) : min(position + int(window / 2), size)
+        ]
         values.append(float(seq_utils.gc_fraction(subsequence) * 100) if subsequence else 0.0)
     return {
         "status": "completed",
@@ -680,7 +749,9 @@ def _drop_overlaps(coords: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
     kept: list[dict[str, Any]] = []
     for rows in groups.values():
         for first in rows:
-            if not any(_contained(first, second) and _tsv_key(first) != _tsv_key(second) for second in rows):
+            if not any(
+                _contained(first, second) and _tsv_key(first) != _tsv_key(second) for second in rows
+            ):
                 kept.append(first)
     return kept
 
@@ -698,8 +769,23 @@ def _parse_blast(path: Path, query_id: str, ref_id: str) -> list[dict[str, Any]]
                 qstart, qend, sstart, send = (int(value) for value in row[6:10])
                 evalue = float(row[10]) if len(row) >= 11 else None
             except (ValueError, IndexError) as exc:
-                raise ConfigurationError(f"{path.name} is not a BLAST tabular (outfmt 6) file.") from exc
-            coords.append(_coord(query_id, row[0], qstart - 1, qend, ref_id, row[1], sstart - 1, send, identity, evalue))
+                raise ConfigurationError(
+                    f"{path.name} is not a BLAST tabular (outfmt 6) file."
+                ) from exc
+            coords.append(
+                _coord(
+                    query_id,
+                    row[0],
+                    qstart - 1,
+                    qend,
+                    ref_id,
+                    row[1],
+                    sstart - 1,
+                    send,
+                    identity,
+                    evalue,
+                )
+            )
     return _drop_overlaps(coords)
 
 
@@ -711,16 +797,39 @@ def _parse_mummer(path: Path, query_id: str, ref_id: str, seqtype: str) -> list[
                 continue
             if seqtype == "nucleotide":
                 if len(row) != 9:
-                    raise ConfigurationError(f"{path.name} is not a nucmer show-coords file (9 columns).")
+                    raise ConfigurationError(
+                        f"{path.name} is not a nucmer show-coords file (9 columns)."
+                    )
             elif len(row) != 13:
-                raise ConfigurationError(f"{path.name} is not a promer show-coords file (13 columns).")
+                raise ConfigurationError(
+                    f"{path.name} is not a promer show-coords file (13 columns)."
+                )
             else:
                 row = row[0:7] + row[11:13]
             try:
-                rstart, rend, qstart, qend, identity = int(row[0]) - 1, int(row[1]), int(row[2]) - 1, int(row[3]), float(row[6])
+                rstart, rend, qstart, qend, identity = (
+                    int(row[0]) - 1,
+                    int(row[1]),
+                    int(row[2]) - 1,
+                    int(row[3]),
+                    float(row[6]),
+                )
             except ValueError as exc:
                 raise ConfigurationError(f"{path.name} has non-numeric coordinates.") from exc
-            coords.append(_coord(query_id, str(row[8]), qstart, qend, ref_id, str(row[7]), rstart, rend, identity, None))
+            coords.append(
+                _coord(
+                    query_id,
+                    str(row[8]),
+                    qstart,
+                    qend,
+                    ref_id,
+                    str(row[7]),
+                    rstart,
+                    rend,
+                    identity,
+                    None,
+                )
+            )
     return _drop_overlaps(coords)
 
 
@@ -732,7 +841,9 @@ def _parse_pmauve(path: Path, names: Sequence[str], ref_index: int) -> list[dict
             raise ConfigurationError(f"{path.name} is empty.")
         genome_count = len(header) // 2
         if len(names) < genome_count:
-            raise ConfigurationError(f"names must list {genome_count} sequence names for this backbone file.")
+            raise ConfigurationError(
+                f"names must list {genome_count} sequence names for this backbone file."
+            )
         if not 0 <= ref_index < genome_count:
             raise ConfigurationError("ref_index is outside the genomes of the backbone file.")
         rows = []
@@ -758,7 +869,20 @@ def _parse_pmauve(path: Path, names: Sequence[str], ref_index: int) -> list[dict
             rstart, rend = row[idx + 2], row[idx + 3]
             if rstart < 0 and rend < 0:
                 rstart, rend = abs(rend), abs(rstart)
-            coords.append(_coord(names[i], names[i], qstart, qend, names[i + 1], names[i + 1], rstart, rend, None, None))
+            coords.append(
+                _coord(
+                    names[i],
+                    names[i],
+                    qstart,
+                    qend,
+                    names[i + 1],
+                    names[i + 1],
+                    rstart,
+                    rend,
+                    None,
+                    None,
+                )
+            )
     return _drop_overlaps(coords)
 
 
@@ -790,7 +914,9 @@ def parse_alignment_coordinates(
         coords = _parse_mummer(path, str(query_id), str(ref_id), seqtype)
     else:
         if names is None or isinstance(names, (str, bytes)):
-            raise ConfigurationError("names (the sequence names in file order) is required for progressive_mauve.")
+            raise ConfigurationError(
+                "names (the sequence names in file order) is required for progressive_mauve."
+            )
         coords = _parse_pmauve(path, [str(item) for item in names], int(ref_index))
     return {
         "status": "completed",
@@ -816,10 +942,17 @@ def write_alignment_coordinates_tsv(
     for row in rows:
         lines.append("\t".join("na" if value is None else str(value) for value in _tsv_key(row)))
     target.write_text("\n".join(lines), encoding="utf-8")
-    return {"status": "completed", "operation": "write_alignment_coordinates_tsv", "output_path": str(target), "alignment_count": len(rows)}
+    return {
+        "status": "completed",
+        "operation": "write_alignment_coordinates_tsv",
+        "output_path": str(target),
+        "alignment_count": len(rows),
+    }
 
 
-def read_alignment_coordinates_tsv(coords_file: str | Path, *, verbose: bool = True) -> dict[str, Any]:
+def read_alignment_coordinates_tsv(
+    coords_file: str | Path, *, verbose: bool = True
+) -> dict[str, Any]:
     """Read alignment coordinates from the pyGenomeViz TSV written by ``write_alignment_coordinates_tsv`` (``AlignCoord.read``)."""
 
     path = input_path(coords_file)
@@ -828,20 +961,35 @@ def read_alignment_coordinates_tsv(coords_file: str | Path, *, verbose: bool = T
         reader = csv.reader(handle, delimiter="\t")
         header = next(reader, None)
         if header is None or tuple(header) != _TSV_HEADER:
-            raise ConfigurationError(f"{path.name} does not have the alignment coordinate TSV header.")
+            raise ConfigurationError(
+                f"{path.name} does not have the alignment coordinate TSV header."
+            )
         for row in reader:
             if not row:
                 continue
             try:
                 coords.append(
                     _coord(
-                        row[0], row[1], int(row[2]), int(row[3]), row[5], row[6], int(row[7]), int(row[8]),
-                        None if row[10] == "na" else float(row[10]), None if row[11] == "na" else float(row[11]),
-                    )  # fmt: skip
+                        row[0],
+                        row[1],
+                        int(row[2]),
+                        int(row[3]),
+                        row[5],
+                        row[6],
+                        int(row[7]),
+                        int(row[8]),
+                        None if row[10] == "na" else float(row[10]),
+                        None if row[11] == "na" else float(row[11]),
+                    )
                 )
             except (ValueError, IndexError) as exc:
                 raise ConfigurationError(f"{path.name} has an invalid row: {row[:3]}.") from exc
-    return {"status": "completed", "operation": "read_alignment_coordinates_tsv", "alignment_count": len(coords), "coords": coords}
+    return {
+        "status": "completed",
+        "operation": "read_alignment_coordinates_tsv",
+        "alignment_count": len(coords),
+        "coords": coords,
+    }
 
 
 def filter_alignment_coordinates(
@@ -895,7 +1043,9 @@ def _fasta_inputs(values: Sequence[str | Path], minimum: int = 2) -> list[Path]:
         raise ConfigurationError("FASTA file names (without suffix) must be unique.")
     for name in names:
         if not re.fullmatch(r"[A-Za-z0-9._-]+", name):
-            raise ConfigurationError(f"file name {name!r} must use only letters, digits, '.', '_' and '-'.")
+            raise ConfigurationError(
+                f"file name {name!r} must use only letters, digits, '.', '_' and '-'."
+            )
     return paths
 
 
@@ -985,7 +1135,10 @@ def align_genomes_last(
     files = _fasta_inputs(seq_files)
     _positive(threads, "threads")
     folder = _check_new_folder(str(output_dir))
-    programs = {name: _located(last_dir, name, _LAST_HINT) for name in ("lastdb", "lastal", "last-split", "maf-convert")}
+    programs = {
+        name: _located(last_dir, name, _LAST_HINT)
+        for name in ("lastdb", "lastal", "last-split", "maf-convert")
+    }
     folder.mkdir(parents=True, exist_ok=True)
     steps = _Steps("last")
     coords: list[dict[str, Any]] = []
@@ -994,17 +1147,38 @@ def align_genomes_last(
         query, ref = files[index], files[index + 1]
         prefix = f"{index + 1:02d}_{_stem(query)}_vs_{_stem(ref)}"
         database = folder / f"{_stem(ref)}_lastdb"
-        code, _ = steps.run(programs["lastdb"], [str(database), str(ref), "-P", str(threads)], cwd=folder, timeout_seconds=timeout_seconds)
+        code, _ = steps.run(
+            programs["lastdb"],
+            [str(database), str(ref), "-P", str(threads)],
+            cwd=folder,
+            timeout_seconds=timeout_seconds,
+        )
         if code != 0:
             return _failure(steps, "last")
         stages = [
-            ("lastal", [str(database), str(query), "-P", str(threads), "-D", "1e9", "--split-f=MAF+"], f"{prefix}_many-to-one.maf"),
-            ("last-split", ["-r", str(folder / f"{prefix}_many-to-one.maf")], f"{prefix}_one-to-one.maf"),
-            ("maf-convert", ["-n", "blasttab", str(folder / f"{prefix}_one-to-one.maf")], f"{prefix}.tsv"),
+            (
+                "lastal",
+                [str(database), str(query), "-P", str(threads), "-D", "1e9", "--split-f=MAF+"],
+                f"{prefix}_many-to-one.maf",
+            ),
+            (
+                "last-split",
+                ["-r", str(folder / f"{prefix}_many-to-one.maf")],
+                f"{prefix}_one-to-one.maf",
+            ),
+            (
+                "maf-convert",
+                ["-n", "blasttab", str(folder / f"{prefix}_one-to-one.maf")],
+                f"{prefix}.tsv",
+            ),
         ]
         for program, arguments, filename in stages:
             code, text = steps.run(
-                programs[program], arguments, cwd=folder, timeout_seconds=timeout_seconds, max_output_bytes=_LARGE_OUTPUT
+                programs[program],
+                arguments,
+                cwd=folder,
+                timeout_seconds=timeout_seconds,
+                max_output_bytes=_LARGE_OUTPUT,
             )
             if code != 0:
                 return _failure(steps, "last")
@@ -1022,7 +1196,13 @@ def align_genomes_last(
 
 def _feature_kws(item: Mapping[str, Any]) -> dict[str, Any]:
     kws: dict[str, Any] = {}
-    for key, kind in (("label", str), ("facecolor", str), ("edgecolor", str), ("plotstyle", str), ("linewidth", float)):
+    for key, kind in (
+        ("label", str),
+        ("facecolor", str),
+        ("edgecolor", str),
+        ("plotstyle", str),
+        ("linewidth", float),
+    ):
         if key in item:
             kws[key] = kind(item[key])
     return kws
@@ -1056,7 +1236,9 @@ def draw_genome_segment_features(
     _positive(dpi, "dpi")
     pgv = _require_isolated("pygenomeviz", _EXTRA)
     plt = require("matplotlib.pyplot", _EXTRA)
-    graph = pgv.GenomeViz(fig_width=fig_width, fig_track_height=1.0, feature_track_ratio=1.0, plot_size_thr=0)
+    graph = pgv.GenomeViz(
+        fig_width=fig_width, fig_track_height=1.0, feature_track_ratio=1.0, plot_size_thr=0
+    )
     track = graph.add_feature_track(str(segment_name), size=size)
     drawn = []
     for item in features:
@@ -1100,14 +1282,28 @@ def export_genome_html_viewer(
     Needs pyGenomeViz 0.4.x. The output is a single HTML file that embeds the SVG figure and the viewer script.
     """
 
-    from dnakit.visualization.pygenomeviz_gap_functions import _draw_cds, _genome_viz, _genomes, _genome_summary
+    from dnakit.visualization.pygenomeviz_gap_functions import (
+        _draw_cds,
+        _genome_summary,
+        _genome_viz,
+        _genomes,
+    )
 
     genomes = _genomes([str(item) for item in gbk_resources], minimum=1)
     target = _new_file(html_path, "html_path", (".html", ".htm"))
     pgv = _require_isolated("pygenomeviz", _EXTRA)
-    graph = _genome_viz(pgv, fig_width=fig_width, fig_track_height=1.0, align_type="left", tick_style=None, link_track_ratio=5.0)
+    graph = _genome_viz(
+        pgv,
+        fig_width=fig_width,
+        fig_track_height=1.0,
+        align_type="left",
+        tick_style=None,
+        link_track_ratio=5.0,
+    )
     for gbk in genomes:
-        track = graph.add_feature_track(gbk.name, size=gbk.range_size, start_pos=gbk.min_range, labelsize=20)
+        track = graph.add_feature_track(
+            gbk.name, size=gbk.range_size, start_pos=gbk.min_range, labelsize=20
+        )
         _draw_cds(track, gbk, plotstyle="bigarrow", facecolor="orange", linewidth=0.0)
     graph.savefig_html(target)
     return {

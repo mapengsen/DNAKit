@@ -8,8 +8,8 @@ import pytest
 
 pytest.importorskip("Bio")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.regulation import biopython_p19_motif_functions as m  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.regulation import biopython_p19_motif_functions as m
 
 SITES = ["TACAA", "TACGC", "TACAC", "TACCC", "AACCC", "AATGC", "AATGC"]
 
@@ -47,7 +47,9 @@ def test_motif_matrices_infinity_and_counts_input() -> None:
     counts = {base: list(values) for base, values in plain["counts"].items()}
     again = m.motif_matrices(counts=counts, verbose=False)
     assert again["pwm"] == plain["pwm"]
-    background = m.motif_matrices(SITES, pseudocounts=1, background={"A": 0.3, "C": 0.2, "G": 0.2, "T": 0.3}, verbose=False)
+    background = m.motif_matrices(
+        SITES, pseudocounts=1, background={"A": 0.3, "C": 0.2, "G": 0.2, "T": 0.3}, verbose=False
+    )
     assert background["background"]["A"] == pytest.approx(0.3)
     with pytest.raises(ConfigurationError):
         m.motif_matrices(verbose=False)
@@ -62,7 +64,10 @@ def test_motif_matrices_infinity_and_counts_input() -> None:
 def test_anticonsensus() -> None:
     from_sites = m.motif_anticonsensus(SITES, verbose=False)
     counts = m.motif_matrices(SITES, verbose=False)["counts"]
-    assert m.motif_anticonsensus(counts=counts, verbose=False)["anticonsensus"] == from_sites["anticonsensus"]
+    assert (
+        m.motif_anticonsensus(counts=counts, verbose=False)["anticonsensus"]
+        == from_sites["anticonsensus"]
+    )
     assert str(_motif().anticonsensus) == from_sites["anticonsensus"]
 
 
@@ -73,7 +78,10 @@ def test_pssm_search_matches_biopython_both_strands() -> None:
     result = m.pssm_search(sequence, SITES, threshold=3.0, verbose=False)
     pssm = _motif(0.5).pssm
     expected = [(int(p), float(s)) for p, s in pssm.search(Seq(sequence), threshold=3.0)]
-    assert [(h["position"], h["score"]) for h in result["hits"]] == pytest.approx(expected, rel=1e-6)
+    assert [h["position"] for h in result["hits"]] == [position for position, _ in expected]
+    assert [h["score"] for h in result["hits"]] == pytest.approx(
+        [score for _, score in expected], rel=1e-6
+    )
     assert any(h["strand"] == "-" for h in result["hits"])
     for hit in result["hits"]:
         window = sequence[hit["start"] : hit["end"]]
@@ -96,7 +104,9 @@ def test_pssm_score_statistics_match_biopython() -> None:
     assert result["std"] == pytest.approx(pssm.std())
     assert result["max"] == pytest.approx(pssm.max)
     assert result["min"] == pytest.approx(pssm.min)
-    skewed = m.pssm_score_statistics(SITES, background={"A": 0.4, "C": 0.1, "G": 0.1, "T": 0.4}, verbose=False)
+    skewed = m.pssm_score_statistics(
+        SITES, background={"A": 0.4, "C": 0.1, "G": 0.1, "T": 0.4}, verbose=False
+    )
     assert skewed["mean"] != pytest.approx(result["mean"])
     unseen = m.pssm_score_statistics(SITES, pseudocounts=None, verbose=False)
     assert unseen["min"] is None  # -inf
@@ -139,13 +149,19 @@ def test_weblogo_validation(tmp_path) -> None:
     with pytest.raises(ConfigurationError):
         m.weblogo_service_logo(SITES, tmp_path / "x.png", image_format="gif", verbose=False)
     with pytest.raises(ConfigurationError):
-        m.weblogo_service_logo(SITES, tmp_path / "x.png", options={"not_an_option": "1"}, verbose=False)
+        m.weblogo_service_logo(
+            SITES, tmp_path / "x.png", options={"not_an_option": "1"}, verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        m.weblogo_service_logo(SITES, tmp_path / "x.png", options={"show_errorbars": "yes"}, verbose=False)
+        m.weblogo_service_logo(
+            SITES, tmp_path / "x.png", options={"show_errorbars": "yes"}, verbose=False
+        )
 
 
 @pytest.mark.skipif(os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="live WebLogo service test")
 def test_weblogo_service_live(tmp_path) -> None:
-    result = m.weblogo_service_logo(SITES, tmp_path / "logo.png", options={"logo_title": "test"}, verbose=False)
+    result = m.weblogo_service_logo(
+        SITES, tmp_path / "logo.png", options={"logo_title": "test"}, verbose=False
+    )
     assert result["bytes"] > 1000
     assert (tmp_path / "logo.png").read_bytes()[:4] == b"\x89PNG"

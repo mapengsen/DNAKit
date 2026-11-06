@@ -70,7 +70,9 @@ def _pattern(value: int | str, name: str) -> str:
     """A number, optionally with a comparison prefix: ``50``, ``'>=50'``, ``'<100'``, ``'!0'``."""
     text = str(value)
     if isinstance(value, bool) or not _PATTERN.fullmatch(text):
-        raise ConfigurationError(f"{name} must be a number, optionally prefixed by >, >=, <, <= or !.")
+        raise ConfigurationError(
+            f"{name} must be a number, optionally prefixed by >, >=, <, <= or !."
+        )
     return text
 
 
@@ -105,7 +107,13 @@ def bamtools_convert_alignments(
     if _p14_cli.flag(print_mapping_quality, "print_mapping_quality"):
         arguments.append("-mapqual")
     arguments += ["-out", str(output_path)]
-    return _bamtools("convert", arguments, cwd=output_path.parent, expected=[output_path], bamtools_path=bamtools_path)
+    return _bamtools(
+        "convert",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        bamtools_path=bamtools_path,
+    )
 
 
 def bamtools_count_alignments(
@@ -123,9 +131,18 @@ def bamtools_count_alignments(
     with tempfile.TemporaryDirectory(prefix="dnakit_bamtools_") as folder:
         work = Path(folder)
         result = _bamtools(
-            "count", arguments, cwd=work, expected=[], bamtools_path=bamtools_path, stdout_file=work / "count.txt"
+            "count",
+            arguments,
+            cwd=work,
+            expected=[],
+            bamtools_path=bamtools_path,
+            stdout_file=work / "count.txt",
         )
-        match = _COUNT.match((work / "count.txt").read_text(encoding="utf-8").splitlines()[0]) if result["status"] == "completed" else None
+        match = (
+            _COUNT.match((work / "count.txt").read_text(encoding="utf-8").splitlines()[0])
+            if result["status"] == "completed"
+            else None
+        )
     result["outputs"] = []
     result["count"] = int(match.group(1)) if match is not None else None
     if result["status"] == "completed" and match is None:
@@ -175,8 +192,15 @@ def bamtools_filter_alignments(
     arguments += _region(region)
     criteria: list[str] = []
     if alignment_flag is not None:
-        criteria += ["-alignmentFlag", str(_gap_cli.integer(alignment_flag, "alignment_flag", minimum=0, maximum=65535))]
-    for flag_name, value in (("insertSize", insert_size), ("length", length), ("mapQuality", map_quality)):
+        criteria += [
+            "-alignmentFlag",
+            str(_gap_cli.integer(alignment_flag, "alignment_flag", minimum=0, maximum=65535)),
+        ]
+    for flag_name, value in (
+        ("insertSize", insert_size),
+        ("length", length),
+        ("mapQuality", map_quality),
+    ):
         if value is not None:
             criteria += [f"-{flag_name}", _pattern(value, flag_name)]
     if name is not None:
@@ -188,10 +212,18 @@ def bamtools_filter_alignments(
             raise ConfigurationError("tag must look like 'NM:<4' or 'RG:group1'.")
         criteria += ["-tag", tag]
     for flag_name, value in (
-        ("isDuplicate", is_duplicate), ("isFailedQC", is_failed_qc), ("isFirstMate", is_first_mate),
-        ("isMapped", is_mapped), ("isMateMapped", is_mate_mapped), ("isMateReverseStrand", is_mate_reverse_strand),
-        ("isPaired", is_paired), ("isPrimaryAlignment", is_primary_alignment), ("isProperPair", is_proper_pair),
-        ("isReverseStrand", is_reverse_strand), ("isSecondMate", is_second_mate), ("isSingleton", is_singleton),
+        ("isDuplicate", is_duplicate),
+        ("isFailedQC", is_failed_qc),
+        ("isFirstMate", is_first_mate),
+        ("isMapped", is_mapped),
+        ("isMateMapped", is_mate_mapped),
+        ("isMateReverseStrand", is_mate_reverse_strand),
+        ("isPaired", is_paired),
+        ("isPrimaryAlignment", is_primary_alignment),
+        ("isProperPair", is_proper_pair),
+        ("isReverseStrand", is_reverse_strand),
+        ("isSecondMate", is_second_mate),
+        ("isSingleton", is_singleton),
     ):
         if value is not None:
             criteria += [f"-{flag_name}", "true" if _p14_cli.flag(value, flag_name) else "false"]
@@ -202,7 +234,13 @@ def bamtools_filter_alignments(
     elif not criteria:
         raise ConfigurationError("Give at least one filter criterion or a script.")
     arguments += criteria + ["-out", str(output_path)]
-    return _bamtools("filter", arguments, cwd=output_path.parent, expected=[output_path], bamtools_path=bamtools_path)
+    return _bamtools(
+        "filter",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        bamtools_path=bamtools_path,
+    )
 
 
 def bamtools_index_bam_bti(
@@ -220,7 +258,11 @@ def bamtools_index_bam_bti(
     if target.exists():
         raise ConfigurationError(f"The index already exists: {target}")
     return _bamtools(
-        "index", ["-in", str(source), "-bti"], cwd=source.parent, expected=[target], bamtools_path=bamtools_path
+        "index",
+        ["-in", str(source), "-bti"],
+        cwd=source.parent,
+        expected=[target],
+        bamtools_path=bamtools_path,
     )
 
 
@@ -248,7 +290,13 @@ def bamtools_sample_alignments(
     if seed is not None:
         arguments += ["-seed", str(_gap_cli.integer(seed, "seed", minimum=0, maximum=2**32 - 1))]
     arguments += ["-out", str(output_path)]
-    return _bamtools("random", arguments, cwd=output_path.parent, expected=[output_path], bamtools_path=bamtools_path)
+    return _bamtools(
+        "random",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        bamtools_path=bamtools_path,
+    )
 
 
 def bamtools_resolve_pairs(
@@ -300,17 +348,40 @@ def bamtools_resolve_pairs(
         if chosen == "twoPass" and expected[0].parent != cwd:
             raise ConfigurationError("stats and output must be in the same folder.")
     if min_mapping_quality is not None:
-        arguments += ["-minMQ", str(_gap_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0, maximum=255))]
+        arguments += [
+            "-minMQ",
+            str(
+                _gap_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0, maximum=255)
+            ),
+        ]
     if chosen != "markPairs":
         if confidence_interval is not None:
-            arguments += ["-ci", str(_gap_cli.number(confidence_interval, "confidence_interval", minimum=0.0, maximum=1.0))]
+            arguments += [
+                "-ci",
+                str(
+                    _gap_cli.number(
+                        confidence_interval, "confidence_interval", minimum=0.0, maximum=1.0
+                    )
+                ),
+            ]
         if unused_model_threshold is not None:
-            arguments += ["-umt", str(_gap_cli.number(unused_model_threshold, "unused_model_threshold", minimum=0.0, maximum=1.0))]
+            arguments += [
+                "-umt",
+                str(
+                    _gap_cli.number(
+                        unused_model_threshold, "unused_model_threshold", minimum=0.0, maximum=1.0
+                    )
+                ),
+            ]
     elif confidence_interval is not None or unused_model_threshold is not None:
-        raise ConfigurationError("confidence_interval and unused_model_threshold do not apply to mode='markPairs'.")
+        raise ConfigurationError(
+            "confidence_interval and unused_model_threshold do not apply to mode='markPairs'."
+        )
     if _p14_cli.flag(force, "force"):
         arguments.append("-force")
-    result = _bamtools("resolve", arguments, cwd=cwd, expected=expected, bamtools_path=bamtools_path)
+    result = _bamtools(
+        "resolve", arguments, cwd=cwd, expected=expected, bamtools_path=bamtools_path
+    )
     result["mode"] = chosen
     return result
 
@@ -336,7 +407,13 @@ def bamtools_revert_alignments(
     if _p14_cli.flag(keep_qualities, "keep_qualities"):
         arguments.append("-keepQualities")
     arguments += ["-out", str(output_path)]
-    return _bamtools("revert", arguments, cwd=output_path.parent, expected=[output_path], bamtools_path=bamtools_path)
+    return _bamtools(
+        "revert",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        bamtools_path=bamtools_path,
+    )
 
 
 def bamtools_split_alignments(
@@ -365,12 +442,16 @@ def bamtools_split_alignments(
     if not stub.parent.is_dir():
         raise ConfigurationError(f"The folder for output_stub does not exist: {stub.parent}")
     if any(stub.parent.glob(f"{stub.name}.*")):
-        raise ConfigurationError(f"Files with the prefix {stub.name}. already exist in {stub.parent}")
+        raise ConfigurationError(
+            f"Files with the prefix {stub.name}. already exist in {stub.parent}"
+        )
     mode = _gap_cli.choice(by, _SPLIT_MODES, "by")
     arguments = ["-in", str(source), "-stub", str(stub)]
     if mode == "tag":
         if tag is None or not _TAG_NAME.fullmatch(tag):
-            raise ConfigurationError("tag must be a two-character BAM tag name such as 'RG' when by='tag'.")
+            raise ConfigurationError(
+                "tag must be a two-character BAM tag name such as 'RG' when by='tag'."
+            )
         arguments += ["-tag", tag]
     else:
         if tag is not None:
@@ -388,8 +469,12 @@ def bamtools_split_alignments(
         if mode != "tag":
             raise ConfigurationError("tag_list_delimiter is only used with by='tag'.")
         arguments += ["-tagListDelim", _gap_cli.text(tag_list_delimiter, "tag_list_delimiter")]
-    result = _bamtools("split", arguments, cwd=stub.parent, expected=[], bamtools_path=bamtools_path)
-    produced = sorted(str(path) for path in stub.parent.glob(f"{stub.name}.*.bam") if path.is_file())
+    result = _bamtools(
+        "split", arguments, cwd=stub.parent, expected=[], bamtools_path=bamtools_path
+    )
+    produced = sorted(
+        str(path) for path in stub.parent.glob(f"{stub.name}.*.bam") if path.is_file()
+    )
     result["outputs"] = produced
     if result["status"] == "completed" and not produced:
         result["status"] = "failed"

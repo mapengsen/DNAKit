@@ -162,7 +162,9 @@ def test_assemble_megahit_writes_final_contigs(tmp_path: Path) -> None:
         encoding="ascii",
     )
     executable.chmod(0o755)
-    result = assemble_megahit(reads, tmp_path / "megahit-output", program=str(executable), verbose=False)
+    result = assemble_megahit(
+        reads, tmp_path / "megahit-output", program=str(executable), verbose=False
+    )
     assert result["backend"] == "megahit"
     assert "megahit/final.contigs.fa" in result["result"]["artifacts"]
 
@@ -180,7 +182,9 @@ def test_assemble_hifiasm_writes_primary_contig_graph(tmp_path: Path) -> None:
         encoding="ascii",
     )
     executable.chmod(0o755)
-    result = assemble_hifiasm(reads, tmp_path / "hifiasm-output", program=str(executable), verbose=False)
+    result = assemble_hifiasm(
+        reads, tmp_path / "hifiasm-output", program=str(executable), verbose=False
+    )
     assert result["backend"] == "hifiasm"
     assert "assembly.bp.p_ctg.gfa" in result["result"]["artifacts"]
 

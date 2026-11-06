@@ -84,4 +84,6 @@ def test_existing_report_is_never_overwritten(tmp_path):
 def test_missing_plan_is_rejected(tmp_path):
     _, parts, _ = _write_plan(tmp_path)
     with pytest.raises(ConfigurationError):
-        module.simulate_dnacauldron_plan(tmp_path / "none.csv", parts, tmp_path / "r", verbose=False)
+        module.simulate_dnacauldron_plan(
+            tmp_path / "none.csv", parts, tmp_path / "r", verbose=False
+        )

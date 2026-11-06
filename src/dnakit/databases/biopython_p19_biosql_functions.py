@@ -70,7 +70,9 @@ def _server(
         path = Path(database).expanduser().resolve()
         creating = schema_sql is not None
         if creating and path.exists():
-            raise ConfigurationError(f"database already exists, schema_sql would not be applied: {path}")
+            raise ConfigurationError(
+                f"database already exists, schema_sql would not be applied: {path}"
+            )
         if not creating and not path.is_file():
             raise ConfigurationError(f"BioSQL SQLite database not found: {path}")
         if creating and not path.parent.is_dir():
@@ -96,7 +98,9 @@ def _server(
         try:
             server = biosql.open_database(driver=driver, **settings)
         except ImportError as exc:
-            raise ConfigurationError(f"The database driver {driver} is not installed: {exc}") from exc
+            raise ConfigurationError(
+                f"The database driver {driver} is not installed: {exc}"
+            ) from exc
     try:
         yield server
     finally:
@@ -152,7 +156,9 @@ def biosql_load_records(
         "created_namespace": not existed,
         "records_loaded": int(count),
         "records_in_namespace": int(total),
-        "provenance": _provenance(parser="BioSQL.BioSeqDatabase.BioSeqDatabase.load; BioSQL.Loader.DatabaseLoader"),
+        "provenance": _provenance(
+            parser="BioSQL.BioSeqDatabase.BioSeqDatabase.load; BioSQL.Loader.DatabaseLoader"
+        ),
     }
 
 
@@ -161,7 +167,9 @@ def _summary(record: Any, include_sequence: bool, max_sequence_length: int) -> d
     for key, value in record.annotations.items():
         if isinstance(value, (str, int, float, bool)) or value is None:
             annotations[key] = value
-        elif isinstance(value, (list, tuple)) and all(isinstance(item, (str, int, float)) for item in value):
+        elif isinstance(value, (list, tuple)) and all(
+            isinstance(item, (str, int, float)) for item in value
+        ):
             annotations[key] = list(value)
     text = None
     length = len(record.seq)
@@ -221,7 +229,9 @@ def biosql_get_record(
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= _MAX_SEQUENCE:
         raise ConfigurationError(f"max_sequence_length must be an integer in [1, {_MAX_SEQUENCE}].")
     target = cli.new_file(output_path, "output_path") if output_path is not None else None
-    if target is not None and (not isinstance(output_format, str) or not _FORMAT.fullmatch(output_format)):
+    if target is not None and (
+        not isinstance(output_format, str) or not _FORMAT.fullmatch(output_format)
+    ):
         raise ConfigurationError("output_format must be a Bio.SeqIO format name.")
     with _server(driver, database, host, user, password, port) as server:
         if space not in server:
@@ -236,7 +246,9 @@ def biosql_get_record(
                     "version": lambda: db.get_Seq_by_ver(identifier),
                 }.get(id_type, lambda: db.lookup(**{id_type: identifier}))()
         except (KeyError, IndexError) as exc:
-            raise ConfigurationError(f"no record with {id_type} {identifier!r} in {space!r}.") from exc
+            raise ConfigurationError(
+                f"no record with {id_type} {identifier!r} in {space!r}."
+            ) from exc
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             summary = _summary(record, include_sequence, limit)
@@ -246,7 +258,9 @@ def biosql_get_record(
                     seqio.write(record, str(target), output_format)
                 except ValueError as exc:
                     target.unlink(missing_ok=True)
-                    raise ConfigurationError(f"the record cannot be written as {output_format}: {exc}") from exc
+                    raise ConfigurationError(
+                        f"the record cannot be written as {output_format}: {exc}"
+                    ) from exc
     return {
         "status": "completed",
         "operation": "biosql_get_record",
@@ -303,8 +317,10 @@ def biosql_get_subsequence(
                 warnings.simplefilter("ignore")
                 record = db.lookup(**{id_type: identifier})
         except (KeyError, IndexError) as exc:
-            raise ConfigurationError(f"no record with {id_type} {identifier!r} in {space!r}.") from exc
-        seqid = record._primary_id  # noqa: SLF001 - internal bioentry id of the DBSeqRecord
+            raise ConfigurationError(
+                f"no record with {id_type} {identifier!r} in {space!r}."
+            ) from exc
+        seqid = record._primary_id
         length = len(record.seq)
         if end > length:
             raise ConfigurationError(f"end {end} is beyond the sequence length {length}.")
@@ -341,7 +357,11 @@ def biosql_list_entries(
     ids (``Adaptor.list_bioentry_ids``, ``list_bioentry_display_ids``), at most ``max_entries``.
     """
 
-    if isinstance(max_entries, bool) or not isinstance(max_entries, int) or not 1 <= max_entries <= _MAX_LISTED:
+    if (
+        isinstance(max_entries, bool)
+        or not isinstance(max_entries, int)
+        or not 1 <= max_entries <= _MAX_LISTED
+    ):
         raise ConfigurationError(f"max_entries must be an integer in [1, {_MAX_LISTED}].")
     with _server(driver, database, host, user, password, port) as server:
         adaptor = server.adaptor
@@ -351,10 +371,17 @@ def biosql_list_entries(
                 "status": "completed",
                 "operation": "biosql_list_entries",
                 "namespaces": [
-                    {"name": name, "entry_count": len(adaptor.list_bioentry_ids(adaptor.fetch_dbid_by_dbname(name)))}
+                    {
+                        "name": name,
+                        "entry_count": len(
+                            adaptor.list_bioentry_ids(adaptor.fetch_dbid_by_dbname(name))
+                        ),
+                    }
                     for name in names
                 ],
-                "provenance": _provenance(parser="BioSQL.BioSeqDatabase.Adaptor.list_biodatabase_names"),
+                "provenance": _provenance(
+                    parser="BioSQL.BioSeqDatabase.Adaptor.list_biodatabase_names"
+                ),
             }
         space = _namespace(namespace)
         if space not in server:

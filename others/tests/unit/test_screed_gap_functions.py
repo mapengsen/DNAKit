@@ -14,7 +14,7 @@ from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 pytest.importorskip("screed")
 
-from dnakit.fasta_fastq import screed_gap_functions as facades  # noqa: E402
+from dnakit.fasta_fastq import screed_gap_functions as facades
 
 FASTA = ">s1 desc\nACGTACGT\n>s2\nGGGCCCAAA\n"
 FASTQ = "@r1 x\nACGTNN\n+\nIIIIII\n"
@@ -50,13 +50,17 @@ def test_create_database_from_fasta(fasta_file, tmp_path):
 
 
 def test_create_database_from_fastq(fastq_file, tmp_path):
-    result = facades.create_screed_database(str(fastq_file), str(tmp_path / "reads.db"), verbose=False)
+    result = facades.create_screed_database(
+        str(fastq_file), str(tmp_path / "reads.db"), verbose=False
+    )
     assert result["input_format"] == "FASTQ"
     assert result["record_count"] == 1
 
 
 def test_dump_fasta_round_trips_sequences(fasta_file, tmp_path):
-    database = facades.create_screed_database(str(fasta_file), str(tmp_path / "seqs"), verbose=False)["database"]
+    database = facades.create_screed_database(
+        str(fasta_file), str(tmp_path / "seqs"), verbose=False
+    )["database"]
     out = tmp_path / "back.fa"
     result = facades.dump_screed_fasta(database, str(out), verbose=False)
     assert result["record_count"] == 2
@@ -66,7 +70,9 @@ def test_dump_fasta_round_trips_sequences(fasta_file, tmp_path):
 
 
 def test_dump_fastq_from_fastq_database(fastq_file, tmp_path):
-    database = facades.create_screed_database(str(fastq_file), str(tmp_path / "reads"), verbose=False)["database"]
+    database = facades.create_screed_database(
+        str(fastq_file), str(tmp_path / "reads"), verbose=False
+    )["database"]
     out = tmp_path / "back.fq"
     result = facades.dump_screed_fastq(database, str(out), verbose=False)
     assert result["record_count"] == 1
@@ -77,7 +83,9 @@ def test_dump_fastq_from_fastq_database(fastq_file, tmp_path):
 
 
 def test_dump_fastq_needs_quality_values(fasta_file, tmp_path):
-    database = facades.create_screed_database(str(fasta_file), str(tmp_path / "seqs"), verbose=False)["database"]
+    database = facades.create_screed_database(
+        str(fasta_file), str(tmp_path / "seqs"), verbose=False
+    )["database"]
     with pytest.raises(ConfigurationError):
         facades.dump_screed_fastq(database, str(tmp_path / "out.fq"), verbose=False)
 
@@ -96,16 +104,22 @@ def test_existing_outputs_are_refused(fasta_file, tmp_path):
     existing.write_text("x", encoding="utf-8")
     with pytest.raises(ConfigurationError):
         facades.create_screed_database(str(fasta_file), str(existing), verbose=False)
-    database = facades.create_screed_database(str(fasta_file), str(tmp_path / "seqs"), verbose=False)["database"]
+    database = facades.create_screed_database(
+        str(fasta_file), str(tmp_path / "seqs"), verbose=False
+    )["database"]
     with pytest.raises(ConfigurationError):
         facades.dump_screed_fasta(database, str(existing), verbose=False)
 
 
 def test_missing_input_is_reported(tmp_path):
     with pytest.raises(ConfigurationError):
-        facades.create_screed_database(str(tmp_path / "none.fa"), str(tmp_path / "x"), verbose=False)
+        facades.create_screed_database(
+            str(tmp_path / "none.fa"), str(tmp_path / "x"), verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facades.dump_screed_fasta(str(tmp_path / "none_screed"), str(tmp_path / "x.fa"), verbose=False)
+        facades.dump_screed_fasta(
+            str(tmp_path / "none_screed"), str(tmp_path / "x.fa"), verbose=False
+        )
 
 
 def test_missing_screed_gives_install_hint(monkeypatch, fasta_file, tmp_path):

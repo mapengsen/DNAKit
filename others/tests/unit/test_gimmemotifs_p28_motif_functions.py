@@ -5,12 +5,12 @@ import pytest
 pytest.importorskip("gimmemotifs")
 np = pytest.importorskip("numpy")
 
-from gimmemotifs.comparison import MotifComparer  # noqa: E402
-from gimmemotifs.fasta import Fasta  # noqa: E402
-from gimmemotifs.motif import Motif  # noqa: E402
+from gimmemotifs.comparison import MotifComparer
+from gimmemotifs.fasta import Fasta
+from gimmemotifs.motif import Motif
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.regulation import gimmemotifs_p28_motif_functions as module  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.regulation import gimmemotifs_p28_motif_functions as module
 
 PFM_A = [[10, 0, 0, 0], [0, 10, 0, 0], [0, 0, 8, 2], [1, 1, 1, 7]]
 PFM_B = [[0, 10, 0, 0], [0, 0, 10, 0], [1, 1, 1, 7], [5, 5, 0, 0], [0, 0, 0, 10]]

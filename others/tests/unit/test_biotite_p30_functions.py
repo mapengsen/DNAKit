@@ -48,12 +48,12 @@ def test_profile_counts_probability_score():
     assert counts["counts"] == profile.symbols.tolist()
     assert counts["gap_counts"] == profile.gaps.tolist()
     seq = bseq.NucleotideSequence("ACGTACGT")
-    assert m.sequence_profile_probability(ALIGNED, "ACGTACGT", **QUIET)["probability"] == pytest.approx(
-        profile.sequence_probability(seq)
-    )
-    assert m.sequence_profile_score(ALIGNED, "ACGTACGT", pseudocount=1, **QUIET)["score"] == pytest.approx(
-        profile.sequence_score(seq, pseudocount=1)
-    )
+    assert m.sequence_profile_probability(ALIGNED, "ACGTACGT", **QUIET)[
+        "probability"
+    ] == pytest.approx(profile.sequence_probability(seq))
+    assert m.sequence_profile_score(ALIGNED, "ACGTACGT", pseudocount=1, **QUIET)[
+        "score"
+    ] == pytest.approx(profile.sequence_score(seq, pseudocount=1))
     with pytest.raises(ConfigurationError):
         m.sequence_profile_probability(ALIGNED, "ACG", **QUIET)
 
@@ -68,9 +68,7 @@ def test_alignment_from_strings_trace():
 
 def test_kmer_index_and_match():
     refs = ["ACGTACGTTAGC", "TTACGTA"]
-    table = balign.KmerTable.from_sequences(
-        4, [bseq.NucleotideSequence(x) for x in refs]
-    )
+    table = balign.KmerTable.from_sequences(4, [bseq.NucleotideSequence(x) for x in refs])
     code = int(table.kmer_alphabet.encode("ACGT"))
     index = m.kmer_index(refs, k=4, **QUIET)
     row = next(item for item in index["kmers"] if item["kmer"] == "ACGT")
@@ -153,9 +151,9 @@ def test_alignment_edit_and_identity_functions():
         balign.get_sequence_identity(alignment)
     )
     assert m.alignment_score(ALIGNED[:2], **QUIET)["score"] == balign.score(_alignment(ALIGNED[:2]))
-    assert m.alignment_score(ALIGNED[:2], terminal_penalty=False, gap_penalty=-5, **QUIET)["score"] == balign.score(
-        _alignment(ALIGNED[:2]), (1, -1), -5, False
-    )
+    assert m.alignment_score(ALIGNED[:2], terminal_penalty=False, gap_penalty=-5, **QUIET)[
+        "score"
+    ] == balign.score(_alignment(ALIGNED[:2]), (1, -1), -5, False)
     with pytest.raises(ConfigurationError):
         m.alignment_pairwise_identity(ALIGNED, mode="bad", **QUIET)
 
@@ -163,7 +161,9 @@ def test_alignment_edit_and_identity_functions():
 @pytest.mark.parametrize("coloring", ["type", "similarity"])
 def test_plot_alignment_modes(tmp_path, coloring):
     pytest.importorskip("matplotlib")
-    result = m.plot_sequence_alignment(ALIGNED, str(tmp_path / f"{coloring}.png"), coloring=coloring, **QUIET)
+    result = m.plot_sequence_alignment(
+        ALIGNED, str(tmp_path / f"{coloring}.png"), coloring=coloring, **QUIET
+    )
     assert Path(result["image"]).stat().st_size > 1000
     assert result["columns"] == 8
 
@@ -171,7 +171,9 @@ def test_plot_alignment_modes(tmp_path, coloring):
 def test_plot_alignment_values_and_errors(tmp_path):
     pytest.importorskip("matplotlib")
     values = [[0.5] * 3 for _ in range(8)]
-    result = m.plot_sequence_alignment(ALIGNED, str(tmp_path / "v.svg"), coloring="values", values=values, **QUIET)
+    result = m.plot_sequence_alignment(
+        ALIGNED, str(tmp_path / "v.svg"), coloring="values", values=values, **QUIET
+    )
     assert Path(result["image"]).is_file()
     with pytest.raises(ConfigurationError):
         m.plot_sequence_alignment(ALIGNED, str(tmp_path / "w.png"), coloring="values", **QUIET)
@@ -195,7 +197,9 @@ def test_structure_base_pairs_edges_stacking():
     assert pairs["pair_count"] == 5
     assert pairs["base_pairs"][0]["base_1"]["res_id"] == 1
     assert pairs["base_pairs"][0]["base_2"]["res_id"] == 14
-    detail = s.nucleic_acid_base_pairs(rna, annotate_edges=True, annotate_glycosidic_bond=True, **QUIET)
+    detail = s.nucleic_acid_base_pairs(
+        rna, annotate_edges=True, annotate_glycosidic_bond=True, **QUIET
+    )
     assert detail["base_pairs"][0]["edge_1"] == "watson_crick"
     assert detail["base_pairs"][0]["glycosidic_bond"] == "cis"
     stacking = s.nucleic_acid_base_stacking(rna, **QUIET)
@@ -228,7 +232,9 @@ def test_plot_secondary_structure_needs_rnaplot(tmp_path):
 
     if shutil.which("RNAplot") is None:
         with pytest.raises(Exception, match="RNAplot"):
-            s.plot_nucleotide_secondary_structure("GGGAAACCC", "(((...)))", str(tmp_path / "p.png"), **QUIET)
+            s.plot_nucleotide_secondary_structure(
+                "GGGAAACCC", "(((...)))", str(tmp_path / "p.png"), **QUIET
+            )
     else:
         result = s.plot_nucleotide_secondary_structure(
             "GGGAAACCC", "(((...)))", str(tmp_path / "p.png"), **QUIET

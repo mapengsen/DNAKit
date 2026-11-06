@@ -29,7 +29,8 @@ from dnakit.exceptions import (
 )
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 GENES = DATA / "genes.fa"
 

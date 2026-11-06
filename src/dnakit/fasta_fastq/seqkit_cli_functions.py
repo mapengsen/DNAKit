@@ -64,7 +64,9 @@ _OPERATIONS: Mapping[str, _Operation] = {
     "fastx_extended_statistics_n50_quality": _Operation(
         "stats", frozenset({"--all", "--tabular", "--fq-encoding", "--N"})
     ),
-    "sequence_set_digest": _Operation("sum", frozenset({"--include-id", "--remove-gaps", "--rna2dna"})),
+    "sequence_set_digest": _Operation(
+        "sum", frozenset({"--include-id", "--remove-gaps", "--rna2dna"})
+    ),
     "read_feature_histogram_monitor": _Operation(
         "watch",
         frozenset(
@@ -83,7 +85,9 @@ _OPERATIONS: Mapping[str, _Operation] = {
     "retrieve_fastq_records_by_fasta": _Operation(
         "fa2fq", frozenset({"--fasta-file", "--only-positive-strand"})
     ),
-    "mean_read_quality": _Operation("fx2tab", frozenset({"--name", "--avg-qual", "--qual-ascii-base"})),
+    "mean_read_quality": _Operation(
+        "fx2tab", frozenset({"--name", "--avg-qual", "--qual-ascii-base"})
+    ),
     "local_alignment_search_short_queries": _Operation(
         "fish", frozenset({"--query-fastx", "--min-qual", "--aln-params", "--all", "--stranded"})
     ),
@@ -128,7 +132,9 @@ _OPERATIONS: Mapping[str, _Operation] = {
     "replace_sequence_regex": _Operation(
         "replace", frozenset({"--by-seq", "--pattern", "--replacement", "--ignore-case"})
     ),
-    "bam_alignment_statistics": _Operation("bam", frozenset({"--stat", "--idx-stat", "--quiet-mode"})),
+    "bam_alignment_statistics": _Operation(
+        "bam", frozenset({"--stat", "--idx-stat", "--quiet-mode"})
+    ),
     "bam_feature_histogram": _Operation(
         "bam", frozenset({"--field", "--bins", "--log", "--dump", "--img", "--quiet-mode"})
     ),
@@ -163,7 +169,9 @@ def _text(value: object, name: str) -> str:
     return value
 
 
-def _int(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int:
+def _int(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{name} must be an integer.")
     if minimum is not None and value < minimum:
@@ -387,7 +395,9 @@ def _number(value: str) -> object:
     return number if math.isfinite(number) else value
 
 
-def _row(names: Sequence[str], fields: Sequence[str], text_keys: frozenset[str]) -> dict[str, object]:
+def _row(
+    names: Sequence[str], fields: Sequence[str], text_keys: frozenset[str]
+) -> dict[str, object]:
     return {
         name: value if name in text_keys else _number(value)
         for name, value in zip(names, fields, strict=False)
@@ -397,7 +407,9 @@ def _row(names: Sequence[str], fields: Sequence[str], text_keys: frozenset[str])
 def _file_rows(
     path: Path, names: Sequence[str], *, text_keys: frozenset[str] = frozenset(), header: bool
 ) -> list[dict[str, object]]:
-    lines = [line for line in path.read_text(encoding="utf-8", errors="replace").splitlines() if line]
+    lines = [
+        line for line in path.read_text(encoding="utf-8", errors="replace").splitlines() if line
+    ]
     if header:
         if not lines:
             return []
@@ -421,7 +433,9 @@ def _table_lines(text: str, first_column: str) -> list[str]:
     return []
 
 
-def _log_table(text: str, first_column: str, *, text_keys: frozenset[str] = frozenset()) -> list[dict[str, object]]:
+def _log_table(
+    text: str, first_column: str, *, text_keys: frozenset[str] = frozenset()
+) -> list[dict[str, object]]:
     """Parse a tab-separated block that SeqKit prints to stderr (or stdout) after a header line."""
     block = _table_lines(text, first_column)
     if not block:
@@ -483,7 +497,9 @@ def seqkit_flanking_sequences(
     down = _int(down_stream, "down_stream", minimum=0)
     flank_only = _flag(only_flank, "only_flank")
     if flank_only and (up > 0) == (down > 0):
-        raise ConfigurationError("only_flank needs exactly one of up_stream or down_stream above 0.")
+        raise ConfigurationError(
+            "only_flank needs exactly one of up_stream or down_stream above 0."
+        )
     if feature_types is not None and fmt != "gtf":
         raise ConfigurationError("feature_types only applies to feature_format='gtf'.")
     options = [f"--{fmt}={features}"]
@@ -543,7 +559,9 @@ def seqkit_extended_stats(
         verbose=verbose,
     )
     rows = _file_rows(target, (), text_keys=frozenset({"file", "format", "type"}), header=True)
-    return _result("fastx_extended_statistics_n50_quality", run, outputs={"output": target}, records=rows)
+    return _result(
+        "fastx_extended_statistics_n50_quality", run, outputs={"output": target}, records=rows
+    )
 
 
 def seqkit_sequence_digest(
@@ -579,7 +597,9 @@ def seqkit_sequence_digest(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    rows = _file_rows(target, ("digest", "file"), text_keys=frozenset({"digest", "file"}), header=False)
+    rows = _file_rows(
+        target, ("digest", "file"), text_keys=frozenset({"digest", "file"}), header=False
+    )
     return _result("sequence_set_digest", run, outputs={"output": target}, records=rows)
 
 
@@ -629,7 +649,9 @@ def seqkit_read_feature_histogram(
     )
     rows = _log_table(run.text, "Bin")
     outputs = {"image": image} if image is not None else {}
-    return _result("read_feature_histogram_monitor", run, outputs=outputs, records=rows, field=chosen)
+    return _result(
+        "read_feature_histogram_monitor", run, outputs=outputs, records=rows, field=chosen
+    )
 
 
 def seqkit_fastq_records_for_fasta(
@@ -748,7 +770,9 @@ def seqkit_fish_search(
     block = _table_lines(run.text, "Ref")
     out.write_text("".join(f"{line}\n" for line in block), encoding="utf-8")
     rows = _log_table(run.text, "Ref", text_keys=frozenset({"Ref", "Query", "Strand"}))
-    return _result("local_alignment_search_short_queries", run, outputs={"output": out}, records=rows)
+    return _result(
+        "local_alignment_search_short_queries", run, outputs={"output": out}, records=rows
+    )
 
 
 def seqkit_grep_motif(
@@ -871,7 +895,9 @@ def seqkit_duplicate_records(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("duplicate_records", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "duplicate_records", run, outputs={"output": target}, record_count=_record_count(target)
+    )
 
 
 def seqkit_range_records(
@@ -900,7 +926,12 @@ def seqkit_range_records(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("select_records_by_position", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "select_records_by_position",
+        run,
+        outputs={"output": target},
+        record_count=_record_count(target),
+    )
 
 
 def seqkit_head_genome(
@@ -927,7 +958,12 @@ def seqkit_head_genome(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("first_genome_by_name_prefix", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "first_genome_by_name_prefix",
+        run,
+        outputs={"output": target},
+        record_count=_record_count(target),
+    )
 
 
 def seqkit_split_by_region(
@@ -1007,7 +1043,12 @@ def seqkit_concat_by_id(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("concatenate_same_id_sequences", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "concatenate_same_id_sequences",
+        run,
+        outputs={"output": target},
+        record_count=_record_count(target),
+    )
 
 
 def seqkit_rename_duplicate_ids(
@@ -1045,7 +1086,12 @@ def seqkit_rename_duplicate_ids(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("make_duplicate_ids_unique", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "make_duplicate_ids_unique",
+        run,
+        outputs={"output": target},
+        record_count=_record_count(target),
+    )
 
 
 def seqkit_replace_sequence_regex(
@@ -1083,7 +1129,12 @@ def seqkit_replace_sequence_regex(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("replace_sequence_regex", run, outputs={"output": target}, record_count=_record_count(target))
+    return _result(
+        "replace_sequence_regex",
+        run,
+        outputs={"output": target},
+        record_count=_record_count(target),
+    )
 
 
 def seqkit_bam_alignment_stats(
@@ -1110,7 +1161,9 @@ def seqkit_bam_alignment_stats(
     )
     first = "AlnPerc" if mode == "--idx-stat" else "PrimAlnPerc"
     rows = _log_table(run.text, first, text_keys=frozenset({"File"}))
-    return _result("bam_alignment_statistics", run, outputs={}, records=rows, index_based=mode == "--idx-stat")
+    return _result(
+        "bam_alignment_statistics", run, outputs={}, records=rows, index_based=mode == "--idx-stat"
+    )
 
 
 def seqkit_bam_feature_histogram(
@@ -1181,7 +1234,9 @@ def seqkit_bam_top_records(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    return _result("bam_top_records_by_field", run, outputs={"bam": target}, field=field, top_size=size)
+    return _result(
+        "bam_top_records_by_field", run, outputs={"bam": target}, field=field, top_size=size
+    )
 
 
 def seqkit_bam_bundles(
@@ -1258,7 +1313,9 @@ def seqkit_merge_slides_to_bed(
         seqkit_path=seqkit_path,
         verbose=verbose,
     )
-    rows = _file_rows(target, ("chrom", "start", "end"), text_keys=frozenset({"chrom"}), header=False)
+    rows = _file_rows(
+        target, ("chrom", "start", "end"), text_keys=frozenset({"chrom"}), header=False
+    )
     return _result("merge_sliding_windows_to_bed", run, outputs={"output": target}, records=rows)
 
 
@@ -1271,8 +1328,8 @@ __all__ = [
     "seqkit_count_matching_records",
     "seqkit_duplicate_records",
     "seqkit_extended_stats",
-    "seqkit_fish_search",
     "seqkit_fastq_records_for_fasta",
+    "seqkit_fish_search",
     "seqkit_flanking_sequences",
     "seqkit_grep_motif",
     "seqkit_head_genome",

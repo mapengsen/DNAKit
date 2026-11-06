@@ -12,16 +12,16 @@ from dnakit.alignment import (
     search_mmseqs_protein,
 )
 from dnakit.annotation import annotate_bakta, annotate_prokka, predict_checkm2
-from dnakit.microbiome import classify_kraken2
+from dnakit.assembly import assemble_unicycler
+from dnakit.epigenome import extract_methylation_methyldackel
 from dnakit.microbiome import (
     classify_centrifuge,
     classify_gtdbtk,
     classify_kaiju,
+    classify_kraken2,
     estimate_bracken_abundance,
     profile_humann,
 )
-from dnakit.epigenome import extract_methylation_methyldackel
-from dnakit.assembly import assemble_unicycler
 from dnakit.tools import default_tool_registry
 
 
@@ -111,9 +111,13 @@ def test_diamond_and_mmseqs_facades_capture_outputs(tmp_path: Path) -> None:
         result = function(query, reference, tmp_path / output, program=str(diamond), verbose=False)
         assert "reference.dmnd" in result["result"]["artifacts"]
         assert "hits.tsv" in result["result"]["artifacts"]
-    result = search_mmseqs_protein(query, reference, tmp_path / "mmseqs-search", program=str(mmseqs), verbose=False)
+    result = search_mmseqs_protein(
+        query, reference, tmp_path / "mmseqs-search", program=str(mmseqs), verbose=False
+    )
     assert "hits.tsv" in result["result"]["artifacts"]
-    result = cluster_mmseqs_protein(reference, tmp_path / "mmseqs-cluster", program=str(mmseqs), verbose=False)
+    result = cluster_mmseqs_protein(
+        reference, tmp_path / "mmseqs-cluster", program=str(mmseqs), verbose=False
+    )
     assert "clusters_cluster.tsv" in result["result"]["artifacts"]
 
 
@@ -137,18 +141,30 @@ def test_annotation_and_kraken_facades_capture_outputs(tmp_path: Path) -> None:
     checkm2 = _fake_program(tmp_path / "fake-checkm2")
     kraken2 = _fake_program(tmp_path / "fake-kraken2")
 
-    assert "annotation/annotation.gff" in annotate_prokka(
-        assembly, tmp_path / "prokka", program=str(prokka), verbose=False
-    )["result"]["artifacts"]
-    assert "bakta/annotation.gff3" in annotate_bakta(
-        assembly, database, tmp_path / "bakta", program=str(bakta), verbose=False
-    )["result"]["artifacts"]
-    assert "checkm2/quality_report.tsv" in predict_checkm2(
-        bins, checkm_database, tmp_path / "checkm2", program=str(checkm2), verbose=False
-    )["result"]["artifacts"]
-    assert "report.tsv" in classify_kraken2(
-        reads, kraken_database, tmp_path / "kraken", program=str(kraken2), verbose=False
-    )["result"]["artifacts"]
+    assert (
+        "annotation/annotation.gff"
+        in annotate_prokka(assembly, tmp_path / "prokka", program=str(prokka), verbose=False)[
+            "result"
+        ]["artifacts"]
+    )
+    assert (
+        "bakta/annotation.gff3"
+        in annotate_bakta(
+            assembly, database, tmp_path / "bakta", program=str(bakta), verbose=False
+        )["result"]["artifacts"]
+    )
+    assert (
+        "checkm2/quality_report.tsv"
+        in predict_checkm2(
+            bins, checkm_database, tmp_path / "checkm2", program=str(checkm2), verbose=False
+        )["result"]["artifacts"]
+    )
+    assert (
+        "report.tsv"
+        in classify_kraken2(
+            reads, kraken_database, tmp_path / "kraken", program=str(kraken2), verbose=False
+        )["result"]["artifacts"]
+    )
 
 
 def test_taxonomy_and_unicycler_facades_capture_outputs(tmp_path: Path) -> None:
@@ -170,18 +186,35 @@ def test_taxonomy_and_unicycler_facades_capture_outputs(tmp_path: Path) -> None:
     kaiju = _fake_program(tmp_path / "fake-kaiju")
     unicycler = _fake_program(tmp_path / "fake-unicycler")
 
-    assert "bracken.tsv" in estimate_bracken_abundance(
-        report, database, tmp_path / "bracken", program=str(bracken), verbose=False
-    )["result"]["artifacts"]
-    assert "assignments.tsv" in classify_centrifuge(
-        index_prefix, reads, tmp_path / "centrifuge", program=str(centrifuge), verbose=False
-    )["result"]["artifacts"]
-    assert "assignments.tsv" in classify_kaiju(
-        reads, protein_database, taxonomy_nodes, tmp_path / "kaiju", program=str(kaiju), verbose=False
-    )["result"]["artifacts"]
-    assert "unicycler/assembly.fasta" in assemble_unicycler(
-        reads, tmp_path / "unicycler", program=str(unicycler), verbose=False
-    )["result"]["artifacts"]
+    assert (
+        "bracken.tsv"
+        in estimate_bracken_abundance(
+            report, database, tmp_path / "bracken", program=str(bracken), verbose=False
+        )["result"]["artifacts"]
+    )
+    assert (
+        "assignments.tsv"
+        in classify_centrifuge(
+            index_prefix, reads, tmp_path / "centrifuge", program=str(centrifuge), verbose=False
+        )["result"]["artifacts"]
+    )
+    assert (
+        "assignments.tsv"
+        in classify_kaiju(
+            reads,
+            protein_database,
+            taxonomy_nodes,
+            tmp_path / "kaiju",
+            program=str(kaiju),
+            verbose=False,
+        )["result"]["artifacts"]
+    )
+    assert (
+        "unicycler/assembly.fasta"
+        in assemble_unicycler(reads, tmp_path / "unicycler", program=str(unicycler), verbose=False)[
+            "result"
+        ]["artifacts"]
+    )
 
 
 def test_gtdbtk_humann_and_methyldackel_facades_capture_outputs(tmp_path: Path) -> None:
@@ -200,12 +233,18 @@ def test_gtdbtk_humann_and_methyldackel_facades_capture_outputs(tmp_path: Path) 
     humann = _fake_program(tmp_path / "fake-humann")
     methyldackel = _fake_program(tmp_path / "fake-MethylDackel")
 
-    assert "gtdbtk/gtdbtk.bac120.summary.tsv" in classify_gtdbtk(
-        genomes, database, tmp_path / "gtdbtk", program=str(gtdbtk), verbose=False
-    )["result"]["artifacts"]
-    assert "humann/sample_genefamilies.tsv" in profile_humann(
-        reads, tmp_path / "humann", program=str(humann), verbose=False
-    )["result"]["artifacts"]
+    assert (
+        "gtdbtk/gtdbtk.bac120.summary.tsv"
+        in classify_gtdbtk(
+            genomes, database, tmp_path / "gtdbtk", program=str(gtdbtk), verbose=False
+        )["result"]["artifacts"]
+    )
+    assert (
+        "humann/sample_genefamilies.tsv"
+        in profile_humann(reads, tmp_path / "humann", program=str(humann), verbose=False)["result"][
+            "artifacts"
+        ]
+    )
     methylation = extract_methylation_methyldackel(
         reference, alignment, tmp_path / "methylation", program=str(methyldackel), verbose=False
     )

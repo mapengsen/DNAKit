@@ -17,9 +17,9 @@ torch = pytest.importorskip("torch")
 numpy = pytest.importorskip("numpy")
 enformer_pytorch = pytest.importorskip("enformer_pytorch")
 
-from enformer_pytorch import Enformer, EnformerConfig  # noqa: E402
+from enformer_pytorch import Enformer, EnformerConfig
 
-from dnakit.predictions import enformer_pytorch_gap_functions as facades  # noqa: E402
+from dnakit.predictions import enformer_pytorch_gap_functions as facades
 
 TINY = {
     "dim": 96,
@@ -108,16 +108,28 @@ def test_frozen_embeddings_match_trainable_forward(tiny_weights, tmp_path):
 def test_embeddings_reject_bad_inputs(tiny_weights, tmp_path):
     out = tmp_path / "bad.npy"
     with pytest.raises(ConfigurationError):
-        facades.enformer_embeddings(tiny_weights, ["ACGT", "ACG"], str(out), config=TINY, verbose=False)
+        facades.enformer_embeddings(
+            tiny_weights, ["ACGT", "ACG"], str(out), config=TINY, verbose=False
+        )
     with pytest.raises(ConfigurationError):
         facades.enformer_embeddings(tiny_weights, ["ACGX"], str(out), config=TINY, verbose=False)
     with pytest.raises(ConfigurationError):
         facades.enformer_embeddings(
-            tiny_weights, ["ACGT" * 64], str(out), config=TINY, freeze=True, train_last_n_layers_only=1, verbose=False
+            tiny_weights,
+            ["ACGT" * 64],
+            str(out),
+            config=TINY,
+            freeze=True,
+            train_last_n_layers_only=1,
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         facades.enformer_embeddings(
-            tiny_weights, ["ACGT" * 64], str(out), config={"dim": 5, "unknown_option": 1}, verbose=False
+            tiny_weights,
+            ["ACGT" * 64],
+            str(out),
+            config={"dim": 5, "unknown_option": 1},
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         facades.enformer_embeddings(
@@ -137,5 +149,7 @@ def test_missing_torch_gives_install_hint(monkeypatch, tiny_weights, tmp_path):
 
     monkeypatch.setattr("dnakit.bioinformatics._common.importlib.import_module", blocked)
     with pytest.raises(BackendUnavailableError) as info:
-        facades.enformer_embeddings(tiny_weights, ["ACGT" * 64], str(tmp_path / "x.npy"), config=TINY, verbose=False)
+        facades.enformer_embeddings(
+            tiny_weights, ["ACGT" * 64], str(tmp_path / "x.npy"), config=TINY, verbose=False
+        )
     assert "enformer" in (info.value.hint or "")

@@ -32,7 +32,7 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
 from dnakit.exceptions import ConfigurationError
 from dnakit.population.backends import _DADI_EXTRA, _integer, _number, _provenance
-from dnakit.population.dadi_functions import _new_file, _nested, _numbers, _sizes
+from dnakit.population.dadi_functions import _nested, _new_file, _numbers, _sizes
 
 _PLOT_DPI = 100
 _MAX_GRID_SIZE = 200
@@ -69,7 +69,9 @@ def _cell(value: object, name: str) -> Any:
 def _masked(np: Any, value: object, name: str, ndims: tuple[int, ...]) -> Any:
     """A nested list as a masked array; None marks an entry that dadi masks."""
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value:
-        raise ConfigurationError(f"{name} must be a non-empty nested list; masked entries are None.")
+        raise ConfigurationError(
+            f"{name} must be a non-empty nested list; masked entries are None."
+        )
     try:
         raw = np.array(_cell(value, name), dtype=float)
     except ValueError as exc:
@@ -100,9 +102,7 @@ def _colour_limits(
     np: Any, arrays: Sequence[Any], vmin: object, vmax: object
 ) -> tuple[float, float]:
     """Log-scale limits: vmin defaults to the smallest positive count, vmax to the largest."""
-    present = [
-        np.ma.getdata(item)[~np.ma.getmaskarray(item)] for item in arrays
-    ]
+    present = [np.ma.getdata(item)[~np.ma.getmaskarray(item)] for item in arrays]
     values = np.concatenate(present) if present else np.array([])
     if values.size == 0:
         raise ConfigurationError("the spectrum has no unmasked entries to draw.")
@@ -335,12 +335,42 @@ def plot_triallelic_spectrum_comparison(
 def _voxel_faces(ii: int, jj: int, kk: int) -> list[list[list[float]]]:
     """The six faces of voxel (ii, jj, kk), in the order dadi's TwoLocus plot_3d builds them."""
     return [
-        [[ii - 0.5, jj + 0.5, kk + 0.5], [ii + 0.5, jj + 0.5, kk + 0.5], [ii + 0.5, jj - 0.5, kk + 0.5], [ii - 0.5, jj - 0.5, kk + 0.5]],
-        [[ii - 0.5, jj + 0.5, kk - 0.5], [ii + 0.5, jj + 0.5, kk - 0.5], [ii + 0.5, jj - 0.5, kk - 0.5], [ii - 0.5, jj - 0.5, kk - 0.5]],
-        [[ii - 0.5, jj + 0.5, kk + 0.5], [ii + 0.5, jj + 0.5, kk + 0.5], [ii + 0.5, jj + 0.5, kk - 0.5], [ii - 0.5, jj + 0.5, kk - 0.5]],
-        [[ii - 0.5, jj - 0.5, kk + 0.5], [ii + 0.5, jj - 0.5, kk + 0.5], [ii + 0.5, jj - 0.5, kk - 0.5], [ii - 0.5, jj - 0.5, kk - 0.5]],
-        [[ii + 0.5, jj - 0.5, kk + 0.5], [ii + 0.5, jj + 0.5, kk + 0.5], [ii + 0.5, jj + 0.5, kk - 0.5], [ii + 0.5, jj - 0.5, kk - 0.5]],
-        [[ii - 0.5, jj - 0.5, kk + 0.5], [ii - 0.5, jj + 0.5, kk + 0.5], [ii - 0.5, jj + 0.5, kk - 0.5], [ii - 0.5, jj - 0.5, kk - 0.5]],
+        [
+            [ii - 0.5, jj + 0.5, kk + 0.5],
+            [ii + 0.5, jj + 0.5, kk + 0.5],
+            [ii + 0.5, jj - 0.5, kk + 0.5],
+            [ii - 0.5, jj - 0.5, kk + 0.5],
+        ],
+        [
+            [ii - 0.5, jj + 0.5, kk - 0.5],
+            [ii + 0.5, jj + 0.5, kk - 0.5],
+            [ii + 0.5, jj - 0.5, kk - 0.5],
+            [ii - 0.5, jj - 0.5, kk - 0.5],
+        ],
+        [
+            [ii - 0.5, jj + 0.5, kk + 0.5],
+            [ii + 0.5, jj + 0.5, kk + 0.5],
+            [ii + 0.5, jj + 0.5, kk - 0.5],
+            [ii - 0.5, jj + 0.5, kk - 0.5],
+        ],
+        [
+            [ii - 0.5, jj - 0.5, kk + 0.5],
+            [ii + 0.5, jj - 0.5, kk + 0.5],
+            [ii + 0.5, jj - 0.5, kk - 0.5],
+            [ii - 0.5, jj - 0.5, kk - 0.5],
+        ],
+        [
+            [ii + 0.5, jj - 0.5, kk + 0.5],
+            [ii + 0.5, jj + 0.5, kk + 0.5],
+            [ii + 0.5, jj + 0.5, kk - 0.5],
+            [ii + 0.5, jj - 0.5, kk - 0.5],
+        ],
+        [
+            [ii - 0.5, jj - 0.5, kk + 0.5],
+            [ii - 0.5, jj + 0.5, kk + 0.5],
+            [ii - 0.5, jj + 0.5, kk - 0.5],
+            [ii - 0.5, jj - 0.5, kk - 0.5],
+        ],
     ]
 
 
@@ -401,7 +431,9 @@ def plot_two_locus_spectrum_3d(
     cells = np.argwhere(drawn)
     if cells.size:
         values = data[drawn]
-        normalized[drawn] = np.minimum((np.log(values) - np.log(low)) / (np.log(high) - np.log(low)), 1)
+        normalized[drawn] = np.minimum(
+            (np.log(values) - np.log(low)) / (np.log(high) - np.log(low)), 1
+        )
     cube = matplotlib.colormaps["cubehelix_r"]
     scrunched_cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
         "cubehelix_r_scrunched", cube(np.linspace(*_SCRUNCH, 256))
@@ -417,7 +449,9 @@ def plot_two_locus_spectrum_3d(
     ax = figure.add_subplot(projection="3d")
     try:
         poly3d = require("mpl_toolkits.mplot3d.art3d", _DADI_EXTRA)
-        polycoll = poly3d.Poly3DCollection(polys, facecolor=polycolors, edgecolor="k", linewidths=0.5)
+        polycoll = poly3d.Poly3DCollection(
+            polys, facecolor=polycolors, edgecolor="k", linewidths=0.5
+        )
         ax.add_collection3d(polycoll)
         ax.set_xlim3d(-0.5, drawn.shape[0] - 0.5)
         ax.set_ylim3d(-0.5, drawn.shape[1] - 0.5)
@@ -648,14 +682,26 @@ def optimize_demes_graph_parameters(
         )
         if method == "fmin":
             xopt, fopt, _, _, _ = scipy_optimize.fmin(
-                obj_fun, p0, args=args, disp=False, maxiter=iterations, maxfun=iterations, full_output=True
+                obj_fun,
+                p0,
+                args=args,
+                disp=False,
+                maxiter=iterations,
+                maxfun=iterations,
+                full_output=True,
             )
         elif method == "powell":
             xopt, fopt, _, _, _, _ = scipy_optimize.fmin_powell(
-                obj_fun, p0, args=args, disp=False, maxiter=iterations, maxfun=iterations, full_output=True
+                obj_fun,
+                p0,
+                args=args,
+                disp=False,
+                maxiter=iterations,
+                maxfun=iterations,
+                full_output=True,
             )
         else:
-            bounds = list(zip(np.log(lower_bound) + 1, np.log(upper_bound) + 1))
+            bounds = list(zip(np.log(lower_bound) + 1, np.log(upper_bound) + 1, strict=False))
             xopt, fopt, _ = scipy_optimize.fmin_l_bfgs_b(
                 obj_fun,
                 p0,

@@ -63,7 +63,9 @@ TENX_EXTRA_ADAPTERS = {
 # --------------------------------------------------------------------------- generic plumbing
 
 
-def by_mate(value: object, options: Mapping[str, object], fn: Callable[[list[Rd]], dict[str, Any]]) -> dict[str, Any]:
+def by_mate(
+    value: object, options: Mapping[str, object], fn: Callable[[list[Rd]], dict[str, Any]]
+) -> dict[str, Any]:
     """Apply ``fn`` to a single read set, or to read1 and read2 of a pair separately."""
 
     first, second = parse_pair(value, options)
@@ -72,7 +74,9 @@ def by_mate(value: object, options: Mapping[str, object], fn: Callable[[list[Rd]
     return {"paired": True, "read1": fn(first), "read2": fn(second)}
 
 
-def tenx_regions(value: object, options: Mapping[str, object]) -> tuple[dict[str, list[Rd]], dict[str, Any]]:
+def tenx_regions(
+    value: object, options: Mapping[str, object]
+) -> tuple[dict[str, list[Rd]], dict[str, Any]]:
     """Split 10x Chromium reads into barcode, UMI and RNA regions.
 
     ``value`` is ``{'read1': ..., 'read2': ...}`` where read 1 = cell barcode + UMI and read 2 = cDNA.
@@ -100,14 +104,24 @@ def tenx_regions(value: object, options: Mapping[str, object]) -> tuple[dict[str
         )
 
     def cut(read: Rd, start: int, stop: int) -> Rd:
-        return Rd(read.name, read.seq[start:stop], None if read.qual is None else read.qual[start:stop], read.comment)
+        return Rd(
+            read.name,
+            read.seq[start:stop],
+            None if read.qual is None else read.qual[start:stop],
+            read.comment,
+        )
 
     regions = {
         "barcode": [cut(r, 0, bc_len) for r in first],
         "umi": [cut(r, bc_len, bc_len + umi_len) for r in first],
         "rna_read": list(second),
     }
-    meta = {"chemistry": chemistry, "barcode_length": bc_len, "umi_length": umi_len, "read_pairs": len(first)}
+    meta = {
+        "chemistry": chemistry,
+        "barcode_length": bc_len,
+        "umi_length": umi_len,
+        "read_pairs": len(first),
+    }
     return regions, meta
 
 
@@ -152,14 +166,22 @@ def op_yield(value: object, options: Mapping[str, object], warnings: Warnings) -
     else:
         r1, r2 = _yield(first), _yield(second)
         total_bases = r1["bases"] + r2["bases"]
-        result = {"paired": True, "read_pairs": len(first), "read1": r1, "read2": r2, "total_bases": total_bases}
+        result = {
+            "paired": True,
+            "read_pairs": len(first),
+            "read1": r1,
+            "read2": r2,
+            "total_bases": total_bases,
+        }
     if genome is not None:
         result["genome_size"] = genome
         result["expected_coverage"] = round6(total_bases / genome)
     return result
 
 
-def op_yield_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_yield_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     regions, meta = tenx_regions(value, options)
     barcodes = Counter(r.seq for r in regions["barcode"])
     per_barcode = sorted(barcodes.values())
@@ -173,7 +195,9 @@ def op_yield_tenx(value: object, options: Mapping[str, object], warnings: Warnin
         matched = match_to_whitelist(barcodes, whitelist, mm)
         valid = sum(c for b, c in barcodes.items() if isinstance(matched[b], tuple))
         result["valid_barcode_fraction"] = round6(valid / len(regions["barcode"]))
-        result["valid_barcode_definition"] = f"Barcode equals a whitelist entry or has a unique whitelist neighbour within {mm} mismatches."
+        result["valid_barcode_definition"] = (
+            f"Barcode equals a whitelist entry or has a unique whitelist neighbour within {mm} mismatches."
+        )
     return result
 
 
@@ -199,11 +223,15 @@ def _length_stats(reads: list[Rd], options: Mapping[str, object]) -> dict[str, A
         "n90": nx(lengths, 0.9),
         "l50": lx(lengths, 0.5),
         "bin_width": width,
-        "histogram": [{"start": s, "end": s + width - 1, "count": binned[s]} for s in sorted(binned)],
+        "histogram": [
+            {"start": s, "end": s + width - 1, "count": binned[s]} for s in sorted(binned)
+        ],
     }
 
 
-def op_read_length(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_read_length(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return by_mate(value, options, lambda reads: _length_stats(reads, options))
 
 
@@ -290,9 +318,7 @@ def _qscore_summary(reads: list[Rd], read_method: str) -> dict[str, Any]:
         "median_q": round6(hist_percentile(counts, 0.5)),
         "min_q": kth(counts, 0),
         "max_q": kth(counts, n - 1),
-        "fraction_bases_at_least": {
-            f"Q{t}": round6(sum(counts[t:]) / n) for t in (10, 20, 30, 40)
-        },
+        "fraction_bases_at_least": {f"Q{t}": round6(sum(counts[t:]) / n) for t in (10, 20, 30, 40)},
         "read_q_method": read_method,
         "reads": len(read_scores),
         "mean_read_q": round6(mean(read_scores)),
@@ -303,7 +329,9 @@ def _qscore_summary(reads: list[Rd], read_method: str) -> dict[str, Any]:
     }
 
 
-def op_qscore_summary(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_qscore_summary(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     method = opt_choice(options, "read_q_method", "probability", ("probability", "arithmetic"))
     return by_mate(value, options, lambda reads: _qscore_summary(reads, method))
 
@@ -326,10 +354,14 @@ def _basecalling(reads: list[Rd], min_mean_q: float) -> dict[str, Any]:
         "reads_with_no_calls": sum(1 for r in reads if "N" in r.seq),
         "mean_q": round6(mean(all_q)),
         "q30_fraction": round6(sum(1 for q in all_q if q >= 30) / len(all_q)),
-        "expected_errors_per_read": round6(mean([sum(q_to_p(q) for q in r.qual or ()) for r in qreads])),
+        "expected_errors_per_read": round6(
+            mean([sum(q_to_p(q) for q in r.qual or ()) for r in qreads])
+        ),
         "min_mean_q": min_mean_q,
         "reads_below_min_mean_q": sum(1 for m in read_means if m < min_mean_q),
-        "fraction_reads_below_min_mean_q": round6(sum(1 for m in read_means if m < min_mean_q) / len(read_means)),
+        "fraction_reads_below_min_mean_q": round6(
+            sum(1 for m in read_means if m < min_mean_q) / len(read_means)
+        ),
         "illumina_filter_flag_reads": len(flags),
     }
     if flags:
@@ -340,7 +372,9 @@ def _basecalling(reads: list[Rd], min_mean_q: float) -> dict[str, Any]:
     return result
 
 
-def op_basecalling_qc(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_basecalling_qc(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     min_q = opt_num(options, "min_mean_quality", 20.0, minimum=0, maximum=MAX_PHRED) or 0.0
     return by_mate(value, options, lambda reads: _basecalling(reads, min_q))
 
@@ -354,10 +388,19 @@ def _error_profile(reads: list[Rd]) -> dict[str, Any]:
         n = sum(counts)
         rate = sum(q_to_p(q) * c for q, c in enumerate(counts)) / n
         cumulative += rate
-        per_position.append({"position": index + 1, "bases": n, "expected_error_rate": rate, "cumulative_expected_errors": cumulative})
+        per_position.append(
+            {
+                "position": index + 1,
+                "bases": n,
+                "expected_error_rate": rate,
+                "cumulative_expected_errors": cumulative,
+            }
+        )
     total_bases = sum(sum(c) for c in hist)
     expected = sum(row["expected_error_rate"] * row["bases"] for row in per_position)
-    n_by_pos = [sum(1 for r in reads if len(r.seq) > i and r.seq[i] == "N") for i in range(len(hist))]
+    n_by_pos = [
+        sum(1 for r in reads if len(r.seq) > i and r.seq[i] == "N") for i in range(len(hist))
+    ]
     for row, ns in zip(per_position, n_by_pos, strict=False):
         row["n_fraction"] = ns / row["bases"] if row["bases"] else 0.0
     return {
@@ -370,7 +413,9 @@ def _error_profile(reads: list[Rd]) -> dict[str, Any]:
     }
 
 
-def op_error_profile(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_error_profile(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return by_mate(value, options, _error_profile)
 
 
@@ -388,7 +433,11 @@ def _gc_bias(reads: list[Rd], reference_gc: float | None) -> dict[str, Any]:
         if fraction is not None:
             percents.append(fraction * 100.0)
     if not percents:
-        raise InputFormatError("no read contains an unambiguous A/C/G/T base.", code="NO_ACGT", hint="Check the input sequences.")
+        raise InputFormatError(
+            "no read contains an unambiguous A/C/G/T base.",
+            code="NO_ACGT",
+            hint="Check the input sequences.",
+        )
     n = len(percents)
     bins = Counter(round(p) for p in percents)
     mu = sum(percents) / n
@@ -396,7 +445,10 @@ def _gc_bias(reads: list[Rd], reference_gc: float | None) -> dict[str, Any]:
     deviation = None
     theoretical: list[float] = []
     if sd > 0:
-        theoretical = [n * (_norm_cdf((i + 0.5 - mu) / sd) - _norm_cdf((i - 0.5 - mu) / sd)) for i in range(101)]
+        theoretical = [
+            n * (_norm_cdf((i + 0.5 - mu) / sd) - _norm_cdf((i - 0.5 - mu) / sd))
+            for i in range(101)
+        ]
         deviation = 100.0 * sum(abs(bins.get(i, 0) - theoretical[i]) for i in range(101)) / n
     maxlen = max(len(r.seq) for r in reads)
     by_position = []
@@ -430,7 +482,9 @@ def op_gc_bias(value: object, options: Mapping[str, object], warnings: Warnings)
 # --------------------------------------------------------------------------- adapters
 
 
-def adapters_option(options: Mapping[str, object], extra: Mapping[str, str] | None = None) -> dict[str, str]:
+def adapters_option(
+    options: Mapping[str, object], extra: Mapping[str, str] | None = None
+) -> dict[str, str]:
     raw = options.get("adapters")
     adapters: dict[str, str] = {}
     if raw is None:
@@ -446,10 +500,15 @@ def adapters_option(options: Mapping[str, object], extra: Mapping[str, str] | No
     elif isinstance(raw, str):
         items = [(raw, raw)]
     else:
-        raise ConfigurationError("options['adapters'] must be a mapping name->sequence or a list of sequences.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options['adapters'] must be a mapping name->sequence or a list of sequences.",
+            code="INVALID_OPTION",
+        )
     for name, seq in items:
         if not isinstance(seq, str) or not re.fullmatch(r"[ACGTacgt]+", seq):
-            raise ConfigurationError(f"adapter {name!r} must be an A/C/G/T string.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"adapter {name!r} must be an A/C/G/T string.", code="INVALID_OPTION"
+            )
         adapters[name] = seq.upper()
     if not adapters:
         raise ConfigurationError("options['adapters'] is empty.", code="INVALID_OPTION")
@@ -474,7 +533,9 @@ def find_first(seq: str, kmer: str, mismatches: int) -> int:
     return -1
 
 
-def _adapter_content(reads: list[Rd], adapters: Mapping[str, str], k: int, mismatches: int) -> dict[str, Any]:
+def _adapter_content(
+    reads: list[Rd], adapters: Mapping[str, str], k: int, mismatches: int
+) -> dict[str, Any]:
     maxlen = max(len(r.seq) for r in reads)
     n = len(reads)
     per_adapter: dict[str, Any] = {}
@@ -513,13 +574,19 @@ def _adapter_content(reads: list[Rd], adapters: Mapping[str, str], k: int, misma
     }
 
 
-def op_adapter_content(value: object, options: Mapping[str, object], warnings: Warnings, *, tenx: bool = False) -> dict[str, Any]:
+def op_adapter_content(
+    value: object, options: Mapping[str, object], warnings: Warnings, *, tenx: bool = False
+) -> dict[str, Any]:
     k = opt_int(options, "kmer_size", 12, minimum=4, maximum=64)
     mm = opt_int(options, "max_mismatches", 0, minimum=0, maximum=3)
     adapters = adapters_option(options, TENX_EXTRA_ADAPTERS if tenx else None)
     if tenx:
         regions, meta = tenx_regions(value, options)
-        return {**meta, "region": "rna_read (read 2)", **_adapter_content(regions["rna_read"], adapters, k, mm)}
+        return {
+            **meta,
+            "region": "rna_read (read 2)",
+            **_adapter_content(regions["rna_read"], adapters, k, mm),
+        }
     return by_mate(value, options, lambda reads: _adapter_content(reads, adapters, k, mm))
 
 
@@ -541,10 +608,15 @@ def _keys(value: object, options: Mapping[str, object]) -> tuple[list[str], bool
     first, second = parse_pair(value, options)
     if second is None:
         return [_dup_key(r, prefix, canonical) for r in first], False
-    return [_dup_key(a, prefix, canonical) + "|" + _dup_key(b, prefix, canonical) for a, b in zip(first, second, strict=False)], True
+    return [
+        _dup_key(a, prefix, canonical) + "|" + _dup_key(b, prefix, canonical)
+        for a, b in zip(first, second, strict=False)
+    ], True
 
 
-def op_duplicate_rate(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_duplicate_rate(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     keys, paired = _keys(value, options)
     counts = Counter(keys)
     n = len(keys)
@@ -556,15 +628,23 @@ def op_duplicate_rate(value: object, options: Mapping[str, object], warnings: Wa
         "duplicate_reads": duplicates,
         "duplicate_rate": round6(duplicates / n),
         "unique_fraction": round6(len(counts) / n),
-        "most_common": [{"sequence": s[:80], "count": c} for s, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:5]],
+        "most_common": [
+            {"sequence": s[:80], "count": c}
+            for s, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:5]
+        ],
         "definition": "duplicate_rate = (reads - distinct sequences) / reads; sequences are compared exactly "
         "(read pairs by the concatenation of both mates).",
     }
 
 
 _DUP_BINS = [(str(i), i, i) for i in range(1, 10)] + [
-    (">10", 10, 49), (">50", 50, 99), (">100", 100, 499), (">500", 500, 999),
-    (">1k", 1000, 4999), (">5k", 5000, 9999), (">10k+", 10000, 10**12),
+    (">10", 10, 49),
+    (">50", 50, 99),
+    (">100", 100, 499),
+    (">500", 500, 999),
+    (">1k", 1000, 4999),
+    (">5k", 5000, 9999),
+    (">10k+", 10000, 10**12),
 ]
 
 
@@ -596,15 +676,22 @@ def dup_levels(counts: Counter[str]) -> dict[str, Any]:
     }
 
 
-def op_duplication(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_duplication(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     keys, paired = _keys(value, options)
     return {"paired": paired, **dup_levels(Counter(keys))}
 
 
-def op_duplication_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_duplication_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     regions, meta = tenx_regions(value, options)
     prefix = opt_int(options, "cdna_prefix_length", 25, minimum=1, maximum=1000)
-    keys = [f"{b.seq}|{u.seq}|{c.seq[:prefix]}" for b, u, c in zip(regions["barcode"], regions["umi"], regions["rna_read"], strict=False)]
+    keys = [
+        f"{b.seq}|{u.seq}|{c.seq[:prefix]}"
+        for b, u, c in zip(regions["barcode"], regions["umi"], regions["rna_read"], strict=False)
+    ]
     counts = Counter(keys)
     n = len(keys)
     result = dup_levels(counts)
@@ -649,15 +736,24 @@ def solve_library_size(total: int, unique: int) -> float | None:
     return 0.5 * (low + high)
 
 
-def op_library_complexity(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_library_complexity(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     total = unique = None
     if isinstance(value, Mapping) and "total_reads" in value and "unique_reads" in value:
         total, unique = value["total_reads"], value["unique_reads"]
     elif "total_reads" in options and "unique_reads" in options:
         total, unique = options["total_reads"], options["unique_reads"]
     if total is not None:
-        if isinstance(total, bool) or isinstance(unique, bool) or not isinstance(total, int) or not isinstance(unique, int):
-            raise ConfigurationError("total_reads and unique_reads must be integers.", code="INVALID_OPTION")
+        if (
+            isinstance(total, bool)
+            or isinstance(unique, bool)
+            or not isinstance(total, int)
+            or not isinstance(unique, int)
+        ):
+            raise ConfigurationError(
+                "total_reads and unique_reads must be integers.", code="INVALID_OPTION"
+            )
         source = "counts"
     else:
         keys, _ = _keys(value, options)
@@ -672,13 +768,17 @@ def op_library_complexity(value: object, options: Mapping[str, object], warnings
     }
     if size is None:
         result["estimated_library_size"] = None
-        warnings.append("Every read is distinct (or only one read given): the library size is unbounded by this data.")
+        warnings.append(
+            "Every read is distinct (or only one read given): the library size is unbounded by this data."
+        )
     else:
         result["estimated_library_size"] = round6(size)
         result["predicted_unique_reads"] = {
             f"{f}x": round6(size * (1.0 - math.exp(-f * total / size))) for f in (0.5, 1, 2, 5, 10)
         }
-    result["definition"] = "Lander-Waterman / Picard EstimateLibraryComplexity: find X with unique/X = 1 - exp(-total/X)."
+    result["definition"] = (
+        "Lander-Waterman / Picard EstimateLibraryComplexity: find X with unique/X = 1 - exp(-total/X)."
+    )
     return result
 
 
@@ -694,7 +794,8 @@ def match_to_whitelist(
     big = len(wl) > 5000
     if big and max_mismatches > 1:
         raise ConfigurationError(
-            "max_mismatches > 1 is only supported for whitelists up to 5000 entries.", code="INVALID_OPTION"
+            "max_mismatches > 1 is only supported for whitelists up to 5000 entries.",
+            code="INVALID_OPTION",
         )
     out: dict[str, tuple[str, int] | str | None] = {}
     wl_list = sorted(wl)
@@ -747,9 +848,16 @@ def whitelist_option(options: Mapping[str, object]) -> list[str]:
         return []
     if isinstance(raw, str):
         text = as_text(raw) or ""
-        raw = [line.split()[0] for line in text.splitlines() if line.strip() and not line.startswith("#")]
+        raw = [
+            line.split()[0]
+            for line in text.splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
     if not isinstance(raw, Sequence) or isinstance(raw, (bytes, bytearray)):
-        raise ConfigurationError("options['whitelist'] must be a list of barcodes or newline text.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options['whitelist'] must be a list of barcodes or newline text.",
+            code="INVALID_OPTION",
+        )
     if len(raw) > 100_000:
         raise ConfigurationError("whitelist has more than 100000 barcodes.", code="INVALID_OPTION")
     cleaned = []
@@ -774,17 +882,31 @@ def header_index(read: Rd) -> str:
     return token
 
 
-def _barcode_region(reads: Sequence[Rd], options: Mapping[str, object], default_len: int | None) -> tuple[list[str], list[tuple[int, ...] | None], str]:
-    location = opt_choice(options, "barcode_location", "read_start", ("read_start", "read_end", "header"))
+def _barcode_region(
+    reads: Sequence[Rd], options: Mapping[str, object], default_len: int | None
+) -> tuple[list[str], list[tuple[int, ...] | None], str]:
+    location = opt_choice(
+        options, "barcode_location", "read_start", ("read_start", "read_end", "header")
+    )
     if location == "header":
         return [header_index(r) for r in reads], [None] * len(reads), location
     length = opt_int(options, "barcode_length", default_len or 8, minimum=1, maximum=64)
     short = [r.name for r in reads if len(r.seq) < length]
     if short:
-        raise InputFormatError(f"{len(short)} reads are shorter than barcode_length={length}.", code="READ_TOO_SHORT")
+        raise InputFormatError(
+            f"{len(short)} reads are shorter than barcode_length={length}.", code="READ_TOO_SHORT"
+        )
     if location == "read_start":
-        return [r.seq[:length] for r in reads], [None if r.qual is None else r.qual[:length] for r in reads], location
-    return [r.seq[-length:] for r in reads], [None if r.qual is None else r.qual[-length:] for r in reads], location
+        return (
+            [r.seq[:length] for r in reads],
+            [None if r.qual is None else r.qual[:length] for r in reads],
+            location,
+        )
+    return (
+        [r.seq[-length:] for r in reads],
+        [None if r.qual is None else r.qual[-length:] for r in reads],
+        location,
+    )
 
 
 def _barcode_quality(reads: list[Rd], options: Mapping[str, object]) -> dict[str, Any]:
@@ -796,7 +918,10 @@ def _barcode_quality(reads: list[Rd], options: Mapping[str, object]) -> dict[str
         "barcode_source": location,
         "distinct_barcodes": len(counts),
         "reads_with_N_in_barcode": sum(1 for b in barcodes if "N" in b),
-        "top_barcodes": [{"barcode": b, "reads": c} for b, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]],
+        "top_barcodes": [
+            {"barcode": b, "reads": c}
+            for b, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
+        ],
         "barcode_entropy_bits": round6(-sum((c / n) * math.log2(c / n) for c in counts.values())),
     }
     scored = [q for q in quals if q]
@@ -839,17 +964,30 @@ def _barcode_quality(reads: list[Rd], options: Mapping[str, object]) -> dict[str
     return result
 
 
-def op_barcode_quality(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_barcode_quality(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     return _barcode_quality(reads, options)
 
 
-def op_barcode_quality_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_barcode_quality_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     regions, meta = tenx_regions(value, options)
     bc_reads = regions["barcode"]
-    result = {**meta, "cell_barcode": _barcode_quality(bc_reads, {**options, "barcode_location": "read_start", "barcode_length": meta["barcode_length"]})}
+    result = {
+        **meta,
+        "cell_barcode": _barcode_quality(
+            bc_reads,
+            {**options, "barcode_location": "read_start", "barcode_length": meta["barcode_length"]},
+        ),
+    }
     umi = regions["umi"]
-    umi_summary: dict[str, Any] = {"distinct_umis": len({u.seq for u in umi}), "reads_with_N_in_umi": sum(1 for u in umi if "N" in u.seq)}
+    umi_summary: dict[str, Any] = {
+        "distinct_umis": len({u.seq for u in umi}),
+        "reads_with_N_in_umi": sum(1 for u in umi if "N" in u.seq),
+    }
     flat = [q for u in umi if u.qual for q in u.qual]
     if flat:
         umi_summary["mean_quality"] = round6(sum(flat) / len(flat))
@@ -875,16 +1013,27 @@ def _parse_samples(options: Mapping[str, object]) -> dict[str, str]:
         items = []
         for entry in raw:
             if not isinstance(entry, Mapping) or "sample" not in entry or "barcode" not in entry:
-                raise ConfigurationError("samples list entries must be {'sample':..., 'barcode':...}.", code="INVALID_OPTION")
+                raise ConfigurationError(
+                    "samples list entries must be {'sample':..., 'barcode':...}.",
+                    code="INVALID_OPTION",
+                )
             items.append((str(entry["sample"]), entry["barcode"]))
     else:
-        raise ConfigurationError("options['samples'] must be a mapping or a list.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options['samples'] must be a mapping or a list.", code="INVALID_OPTION"
+        )
     samples: dict[str, str] = {}
     for name, barcode in items:
-        if not isinstance(barcode, str) or not re.fullmatch(r"[ACGTacgt]+(\+[ACGTacgt]+)?", barcode):
-            raise ConfigurationError(f"invalid barcode {barcode!r} for sample {name!r}.", code="INVALID_OPTION")
+        if not isinstance(barcode, str) or not re.fullmatch(
+            r"[ACGTacgt]+(\+[ACGTacgt]+)?", barcode
+        ):
+            raise ConfigurationError(
+                f"invalid barcode {barcode!r} for sample {name!r}.", code="INVALID_OPTION"
+            )
         if not re.fullmatch(r"[A-Za-z0-9_.\-]{1,64}", name):
-            raise ConfigurationError(f"sample name {name!r} must match [A-Za-z0-9_.-]{{1,64}}.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"sample name {name!r} must match [A-Za-z0-9_.-]{{1,64}}.", code="INVALID_OPTION"
+            )
         samples[name] = barcode.upper()
     if not samples:
         raise ConfigurationError("options['samples'] is empty.", code="INVALID_OPTION")
@@ -898,7 +1047,9 @@ def _barcode_distance(observed: str, expected: str) -> int | None:
     return hamming(a, b)
 
 
-def assign_reads(reads: Sequence[Rd], options: Mapping[str, object]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def assign_reads(
+    reads: Sequence[Rd], options: Mapping[str, object]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     samples = _parse_samples(options)
     mm = opt_int(options, "max_mismatches", 1, minimum=0, maximum=4)
     gap = opt_int(options, "min_distance_gap", 1, minimum=0, maximum=8)
@@ -918,7 +1069,8 @@ def assign_reads(reads: Sequence[Rd], options: Mapping[str, object]) -> tuple[li
             if not ranked:
                 raise InputFormatError(
                     f"observed barcode {barcode!r} has a different length from every sample barcode.",
-                    code="BARCODE_LENGTH_MISMATCH", hint="Set barcode_length or fix the sample sheet.",
+                    code="BARCODE_LENGTH_MISMATCH",
+                    hint="Set barcode_length or fix the sample sheet.",
                 )
             best = ranked[0]
             if best[0] > mm:
@@ -928,7 +1080,15 @@ def assign_reads(reads: Sequence[Rd], options: Mapping[str, object]) -> tuple[li
             else:
                 cache[barcode] = (best[1], best[0], "assigned")
         sample, dist, status = cache[barcode]
-        rows.append({"id": read.name, "barcode": barcode, "sample": sample, "distance": dist, "status": status})
+        rows.append(
+            {
+                "id": read.name,
+                "barcode": barcode,
+                "sample": sample,
+                "distance": dist,
+                "status": status,
+            }
+        )
     counts = Counter(r["sample"] for r in rows if r["sample"])
     unassigned = sum(1 for r in rows if r["status"] == "unassigned")
     ambiguous = sum(1 for r in rows if r["status"] == "ambiguous")
@@ -945,19 +1105,30 @@ def assign_reads(reads: Sequence[Rd], options: Mapping[str, object]) -> tuple[li
     }
     codes = [c.replace("+", "") for c in samples.values()]
     if len(codes) > 1:
-        closest = min(hamming(a, b) for i, a in enumerate(codes) for b in codes[i + 1 :] if len(a) == len(b)) if any(
-            len(a) == len(b) for i, a in enumerate(codes) for b in codes[i + 1 :]
-        ) else None
+        closest = (
+            min(
+                hamming(a, b)
+                for i, a in enumerate(codes)
+                for b in codes[i + 1 :]
+                if len(a) == len(b)
+            )
+            if any(len(a) == len(b) for i, a in enumerate(codes) for b in codes[i + 1 :])
+            else None
+        )
         summary["min_distance_between_sample_barcodes"] = closest
     return rows, summary
 
 
-def op_assign_barcodes(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_assign_barcodes(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     rows, summary = assign_reads(reads, options)
     limit = opt_int(options, "max_listed", 100_000, minimum=1, maximum=1_000_000)
     if len(rows) > limit:
-        warnings.append(f"per-read assignments truncated to the first {limit} reads (see max_listed).")
+        warnings.append(
+            f"per-read assignments truncated to the first {limit} reads (see max_listed)."
+        )
     d = summary.get("min_distance_between_sample_barcodes")
     if d is not None and d <= 2 * summary["max_mismatches"]:
         warnings.append(
@@ -990,7 +1161,9 @@ def overlap_insert_size(r1: str, r2: str, min_overlap: int, max_mismatch_rate: f
     for overlap, o, a_start, b_start in sorted(candidates, key=lambda c: (-c[0], c[1])):
         budget = max_mismatch_rate * overlap
         mism = 0
-        for x, y in zip(r1[a_start : a_start + overlap], rc2[b_start : b_start + overlap], strict=False):
+        for x, y in zip(
+            r1[a_start : a_start + overlap], rc2[b_start : b_start + overlap], strict=False
+        ):
             if x != y:
                 mism += 1
                 if mism > budget:
@@ -1000,18 +1173,25 @@ def overlap_insert_size(r1: str, r2: str, min_overlap: int, max_mismatch_rate: f
     return None
 
 
-def insert_sizes(value: object, options: Mapping[str, object], warnings: Warnings) -> tuple[list[int], dict[str, Any]]:
+def insert_sizes(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> tuple[list[int], dict[str, Any]]:
     """Collect fragment lengths from paired reads, SAM text, a 10x fragments table or numbers."""
 
     meta: dict[str, Any] = {}
-    if isinstance(options.get("insert_sizes"), Sequence) and not isinstance(options.get("insert_sizes"), (str, bytes)):
+    if isinstance(options.get("insert_sizes"), Sequence) and not isinstance(
+        options.get("insert_sizes"), (str, bytes)
+    ):
         value = options["insert_sizes"]
     if isinstance(value, Mapping) and "insert_sizes" in value:
         value = value["insert_sizes"]
     if isinstance(value, Mapping) and "alignments" in value:
         value = value["alignments"]
-    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)) and value and all(
-        isinstance(v, (int, float)) and not isinstance(v, bool) for v in value
+    if (
+        isinstance(value, Sequence)
+        and not isinstance(value, (str, bytes))
+        and value
+        and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value)
     ):
         sizes = [int(v) for v in value]
         if any(v <= 0 for v in sizes):
@@ -1019,29 +1199,50 @@ def insert_sizes(value: object, options: Mapping[str, object], warnings: Warning
         meta["source"] = "numbers"
         return sizes, meta
     if isinstance(value, Mapping) or (
-        isinstance(value, Sequence) and not isinstance(value, (str, bytes)) and value and not isinstance(value[0], str)
+        isinstance(value, Sequence)
+        and not isinstance(value, (str, bytes))
+        and value
+        and not isinstance(value[0], str)
     ):
         first, second = parse_pair(value, options)
         if second is None:
-            raise InputFormatError("insert size from reads needs a read pair (read1/read2).", code="PAIR_REQUIRED")
+            raise InputFormatError(
+                "insert size from reads needs a read pair (read1/read2).", code="PAIR_REQUIRED"
+            )
         min_ov = opt_int(options, "min_overlap", 10, minimum=3, maximum=1000)
         rate = opt_num(options, "max_mismatch_rate", 0.1, minimum=0.0, maximum=0.5) or 0.0
         sizes = []
         no_overlap = 0
         pair_limit = opt_int(options, "max_pairs", 200_000, minimum=1, maximum=5_000_000)
         if len(first) > pair_limit:
-            warnings.append(f"only the first {pair_limit} of {len(first)} pairs were used for overlap sizing (max_pairs).")
+            warnings.append(
+                f"only the first {pair_limit} of {len(first)} pairs were used for overlap sizing (max_pairs)."
+            )
         for a, b in zip(first[:pair_limit], second[:pair_limit], strict=False):
             size = overlap_insert_size(a.seq, b.seq, min_ov, rate)
             if size is None:
                 no_overlap += 1
             else:
                 sizes.append(size)
-        meta.update({"source": "read-pair overlap", "pairs": min(len(first), pair_limit), "pairs_without_overlap": no_overlap, "min_overlap": min_ov, "max_mismatch_rate": rate})
+        meta.update(
+            {
+                "source": "read-pair overlap",
+                "pairs": min(len(first), pair_limit),
+                "pairs_without_overlap": no_overlap,
+                "min_overlap": min_ov,
+                "max_mismatch_rate": rate,
+            }
+        )
         if no_overlap:
-            warnings.append(f"{no_overlap} pairs have no detectable overlap (insert longer than both reads combined) and are excluded.")
+            warnings.append(
+                f"{no_overlap} pairs have no detectable overlap (insert longer than both reads combined) and are excluded."
+            )
         return sizes, meta
-    text = as_text(value) if not isinstance(value, Sequence) or isinstance(value, str) else "\n".join(str(v) for v in value)
+    text = (
+        as_text(value)
+        if not isinstance(value, Sequence) or isinstance(value, str)
+        else "\n".join(str(v) for v in value)
+    )
     if text is None:
         raise InputFormatError("unsupported insert-size input.", code="INVALID_INPUT")
     sizes = []
@@ -1063,15 +1264,22 @@ def insert_sizes(value: object, options: Mapping[str, object], warnings: Warning
                 continue
             if tlen != 0:
                 sizes.append(abs(tlen))
-        elif len(fields) >= 3 and fields[1].isdigit() and fields[2].isdigit():  # 10x fragments / BED
+        elif (
+            len(fields) >= 3 and fields[1].isdigit() and fields[2].isdigit()
+        ):  # 10x fragments / BED
             mode = "fragments (end - start)"
             start, end = int(fields[1]), int(fields[2])
             weight = int(fields[4]) if len(fields) >= 5 and fields[4].isdigit() else 1
             if end <= start:
-                raise InputFormatError(f"fragment end <= start: {line[:80]!r}", code="INVALID_FRAGMENT")
+                raise InputFormatError(
+                    f"fragment end <= start: {line[:80]!r}", code="INVALID_FRAGMENT"
+                )
             sizes.extend([end - start] * min(weight, 1_000_000))
         else:
-            raise InputFormatError(f"unrecognised line (not SAM, fragments or BED): {line[:80]!r}", code="INVALID_INPUT")
+            raise InputFormatError(
+                f"unrecognised line (not SAM, fragments or BED): {line[:80]!r}",
+                code="INVALID_INPUT",
+            )
         if len(sizes) > 10_000_000:
             raise InputFormatError("too many fragments.", code="INPUT_TOO_LARGE")
     if mode is None:
@@ -1109,24 +1317,47 @@ def _size_summary(sizes: list[int], max_insert: int) -> dict[str, Any]:
     }
 
 
-def op_insert_size(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_insert_size(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     sizes, meta = insert_sizes(value, options, warnings)
-    return {**meta, **_size_summary(sizes, opt_int(options, "max_insert_size", 100_000, minimum=1, maximum=10_000_000))}
+    return {
+        **meta,
+        **_size_summary(
+            sizes, opt_int(options, "max_insert_size", 100_000, minimum=1, maximum=10_000_000)
+        ),
+    }
 
 
-def op_insert_size_distribution(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_insert_size_distribution(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     sizes, meta = insert_sizes(value, options, warnings)
     max_insert = opt_int(options, "max_insert_size", 100_000, minimum=1, maximum=10_000_000)
     summary = _size_summary(sizes, max_insert)
     kept = [s for s in sizes if s <= max_insert]
     span = summary["max"] - summary["min"] + 1
-    width = opt_int(options, "bin_width", 1 if span <= 2000 else math.ceil(span / 400), minimum=1, maximum=1_000_000)
+    width = opt_int(
+        options,
+        "bin_width",
+        1 if span <= 2000 else math.ceil(span / 400),
+        minimum=1,
+        maximum=1_000_000,
+    )
     binned: Counter[int] = Counter((s // width) * width for s in kept)
     running = 0
     rows = []
     for start in sorted(binned):
         running += binned[start]
-        rows.append({"start": start, "end": start + width - 1, "count": binned[start], "fraction": round6(binned[start] / len(kept)), "cumulative_fraction": round6(running / len(kept))})
+        rows.append(
+            {
+                "start": start,
+                "end": start + width - 1,
+                "count": binned[start],
+                "fraction": round6(binned[start] / len(kept)),
+                "cumulative_fraction": round6(running / len(kept)),
+            }
+        )
     return {**meta, **summary, "bin_width": width, "histogram": rows}
 
 
@@ -1160,22 +1391,32 @@ def _reference_sets(options: Mapping[str, object], k: int) -> dict[str, set[str]
         items = [(r.name, r.seq) for r in records]
     for name, seq in items:
         if not isinstance(seq, str) or len(seq) > 50_000_000:
-            raise ConfigurationError(f"reference {name!r} must be a sequence string (<= 50 Mb).", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"reference {name!r} must be a sequence string (<= 50 Mb).", code="INVALID_OPTION"
+            )
         sets[name] = set(_canonical_kmers(seq.upper(), k))
         if not sets[name]:
-            raise ConfigurationError(f"reference {name!r} yields no {k}-mers.", code="INVALID_OPTION", hint="Use a longer reference or a smaller kmer_size.")
+            raise ConfigurationError(
+                f"reference {name!r} yields no {k}-mers.",
+                code="INVALID_OPTION",
+                hint="Use a longer reference or a smaller kmer_size.",
+            )
     if not sets:
         raise ConfigurationError("options['references'] is empty.", code="INVALID_OPTION")
     return sets
 
 
-def _contamination(reads: list[Rd], options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def _contamination(
+    reads: list[Rd], options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     k = opt_int(options, "kmer_size", 21, minimum=4, maximum=64)
     min_fraction = opt_num(options, "min_kmer_fraction", 0.5, minimum=0.01, maximum=1.0) or 0.5
     refs = _reference_sets(options, k)
     expected = options.get("expected_reference")
     if expected is not None and expected not in refs:
-        raise ConfigurationError(f"expected_reference {expected!r} is not one of the references.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            f"expected_reference {expected!r} is not one of the references.", code="INVALID_OPTION"
+        )
     hits_by_ref: Counter[str] = Counter()
     only_other = no_hit = multi = skipped = 0
     for r in reads:
@@ -1183,7 +1424,11 @@ def _contamination(reads: list[Rd], options: Mapping[str, object], warnings: War
         if not kmers:
             skipped += 1
             continue
-        hit = [name for name, kset in refs.items() if sum(1 for x in kmers if x in kset) / len(kmers) >= min_fraction]
+        hit = [
+            name
+            for name, kset in refs.items()
+            if sum(1 for x in kmers if x in kset) / len(kmers) >= min_fraction
+        ]
         for name in hit:
             hits_by_ref[name] += 1
         if not hit:
@@ -1194,14 +1439,19 @@ def _contamination(reads: list[Rd], options: Mapping[str, object], warnings: War
             only_other += 1
     scored = len(reads) - skipped
     if skipped:
-        warnings.append(f"{skipped} reads have no usable {k}-mer (too short or ambiguous) and were skipped.")
+        warnings.append(
+            f"{skipped} reads have no usable {k}-mer (too short or ambiguous) and were skipped."
+        )
     if scored == 0:
         raise InputFormatError(f"no read is long enough for kmer_size={k}.", code="READ_TOO_SHORT")
     result: dict[str, Any] = {
         "reads_screened": scored,
         "kmer_size": k,
         "min_kmer_fraction": min_fraction,
-        "hits": {name: {"reads": hits_by_ref[name], "fraction": round6(hits_by_ref[name] / scored)} for name in refs},
+        "hits": {
+            name: {"reads": hits_by_ref[name], "fraction": round6(hits_by_ref[name] / scored)}
+            for name in refs
+        },
         "reads_without_hit": no_hit,
         "reads_with_multiple_hits": multi,
         "definition": "A read hits a reference when at least min_kmer_fraction of its canonical k-mers occur in that reference "
@@ -1210,18 +1460,28 @@ def _contamination(reads: list[Rd], options: Mapping[str, object], warnings: War
     if expected is not None:
         result["expected_reference"] = expected
         result["contamination_fraction"] = round6(only_other / scored)
-        result["contamination_definition"] = "Fraction of screened reads that hit at least one non-expected reference and not the expected one."
+        result["contamination_definition"] = (
+            "Fraction of screened reads that hit at least one non-expected reference and not the expected one."
+        )
     return result
 
 
-def op_contamination(value: object, options: Mapping[str, object], warnings: Warnings, *, tenx: bool = False) -> dict[str, Any]:
+def op_contamination(
+    value: object, options: Mapping[str, object], warnings: Warnings, *, tenx: bool = False
+) -> dict[str, Any]:
     if tenx:
         regions, meta = tenx_regions(value, options)
-        return {**meta, "region": "rna_read (read 2)", **_contamination(regions["rna_read"], options, warnings)}
+        return {
+            **meta,
+            "region": "rna_read (read 2)",
+            **_contamination(regions["rna_read"], options, warnings),
+        }
     return by_mate(value, options, lambda reads: _contamination(reads, options, warnings))
 
 
-def op_cross_sample_contamination(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_cross_sample_contamination(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     if not isinstance(value, Mapping) or len(value) < 2:
         raise InputFormatError(
             "input must be a mapping sample name -> reads with at least two samples.",
@@ -1235,7 +1495,9 @@ def op_cross_sample_contamination(value: object, options: Mapping[str, object], 
         reads = parse_reads(reads_value, options, name=str(name))
         kmers = {x for r in reads for x in _canonical_kmers(r.seq, k)}
         if not kmers:
-            raise InputFormatError(f"sample {name!r} has no usable {k}-mers.", code="READ_TOO_SHORT")
+            raise InputFormatError(
+                f"sample {name!r} has no usable {k}-mers.", code="READ_TOO_SHORT"
+            )
         sets[str(name)] = kmers
     names = list(sets)
     matrix: dict[str, dict[str, float]] = {a: {} for a in names}
@@ -1253,7 +1515,9 @@ def op_cross_sample_contamination(value: object, options: Mapping[str, object], 
         "kmer_size": k,
         "threshold": threshold,
         "containment": matrix,
-        "flagged_pairs": sorted(flagged, key=lambda f: (-f["containment"], f["sample"], f["found_in"])),
+        "flagged_pairs": sorted(
+            flagged, key=lambda f: (-f["containment"], f["sample"], f["found_in"])
+        ),
         "definition": "containment[a][b] = |K(a) intersect K(b)| / |K(a)| over canonical k-mers. Heuristic: samples that are "
         "expected to be biologically unrelated should share almost no k-mers, so high containment suggests cross-"
         "contamination or index swapping. Related samples (same species, same amplicon) share k-mers legitimately.",
@@ -1263,7 +1527,9 @@ def op_cross_sample_contamination(value: object, options: Mapping[str, object], 
 # --------------------------------------------------------------------------- index hopping
 
 
-def op_index_hopping(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_index_hopping(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     raw = options.get("expected_pairs", options.get("samples"))
     if raw is None:
@@ -1274,7 +1540,9 @@ def op_index_hopping(value: object, options: Mapping[str, object], warnings: War
         )
     samples = _parse_samples({"samples": raw})
     if not all("+" in code for code in samples.values()):
-        raise ConfigurationError("index-hopping needs dual indexes written as 'i7+i5'.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "index-hopping needs dual indexes written as 'i7+i5'.", code="INVALID_OPTION"
+        )
     i7s = {c.split("+")[0] for c in samples.values()}
     i5s = {c.split("+")[1] for c in samples.values()}
     expected = set(samples.values())
@@ -1282,11 +1550,18 @@ def op_index_hopping(value: object, options: Mapping[str, object], warnings: War
     for r in reads:
         token = header_index(r)
         if "+" not in token:
-            raise InputFormatError(f"read {r.name!r} has a single index ({token}); dual indexes expected.", code="NO_HEADER_INDEX")
+            raise InputFormatError(
+                f"read {r.name!r} has a single index ({token}); dual indexes expected.",
+                code="NO_HEADER_INDEX",
+            )
         counts[token] += 1
     n = len(reads)
     valid = sum(c for t, c in counts.items() if t in expected)
-    hopped = {t: c for t, c in counts.items() if t not in expected and t.split("+")[0] in i7s and t.split("+")[1] in i5s}
+    hopped = {
+        t: c
+        for t, c in counts.items()
+        if t not in expected and t.split("+")[0] in i7s and t.split("+")[1] in i5s
+    }
     other = sum(c for t, c in counts.items() if t not in expected and t not in hopped)
     hopped_total = sum(hopped.values())
     return {
@@ -1294,9 +1569,14 @@ def op_index_hopping(value: object, options: Mapping[str, object], warnings: War
         "expected_combination_reads": valid,
         "index_hopped_reads": hopped_total,
         "unknown_index_reads": other,
-        "index_hopping_rate": round6(hopped_total / (valid + hopped_total)) if valid + hopped_total else None,
+        "index_hopping_rate": round6(hopped_total / (valid + hopped_total))
+        if valid + hopped_total
+        else None,
         "unknown_index_fraction": round6(other / n),
-        "hopped_combinations": [{"index": t, "reads": c} for t, c in sorted(hopped.items(), key=lambda kv: (-kv[1], kv[0]))[:20]],
+        "hopped_combinations": [
+            {"index": t, "reads": c}
+            for t, c in sorted(hopped.items(), key=lambda kv: (-kv[1], kv[0]))[:20]
+        ],
         "reads_per_expected_sample": {name: counts.get(code, 0) for name, code in samples.items()},
         "definition": "A read is index-hopped when its i7 and i5 are each used in the sample sheet but the pair is not. "
         "rate = hopped / (hopped + expected-pair reads). Reads whose indexes are not in the sheet are reported separately; "
@@ -1386,14 +1666,20 @@ def group_umis(counts: Mapping[str, int], threshold: int, method: str) -> list[l
 
 
 def _umi_counts(value: object, options: Mapping[str, object]) -> Counter[str]:
-    if isinstance(value, Mapping) and value and all(isinstance(v, int) and not isinstance(v, bool) for v in value.values()) and not any(
-        k in value for k in ("reads", "records")
+    if (
+        isinstance(value, Mapping)
+        and value
+        and all(isinstance(v, int) and not isinstance(v, bool) for v in value.values())
+        and not any(k in value for k in ("reads", "records"))
     ):
         counts = Counter({str(k): int(v) for k, v in value.items()})
     elif isinstance(value, Mapping) and "umis" in value:
         return _umi_counts(value["umis"], options)
-    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)) and value and all(
-        isinstance(v, str) and UMI_RE.match(v.upper()) for v in value
+    elif (
+        isinstance(value, Sequence)
+        and not isinstance(value, (str, bytes))
+        and value
+        and all(isinstance(v, str) and UMI_RE.match(v.upper()) for v in value)
     ):
         counts = Counter(v.upper() for v in value)
     else:
@@ -1405,11 +1691,16 @@ def _umi_counts(value: object, options: Mapping[str, object]) -> Counter[str]:
         if not UMI_RE.match(umi) or c < 1:
             raise InputFormatError(f"invalid UMI or count: {umi!r}: {c}.", code="INVALID_UMI")
     if len(counts) > 5_000:
-        raise InputFormatError("more than 5000 distinct UMIs (the network is quadratic); reduce the input.", code="INPUT_TOO_LARGE")
+        raise InputFormatError(
+            "more than 5000 distinct UMIs (the network is quadratic); reduce the input.",
+            code="INPUT_TOO_LARGE",
+        )
     return counts
 
 
-def op_correct_umi_errors(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_correct_umi_errors(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     counts = _umi_counts(value, options)
     method = opt_choice(options, "method", "directional", ("directional", "adjacency", "cluster"))
     threshold = opt_int(options, "threshold", 1, minimum=0, maximum=4)
@@ -1422,7 +1713,12 @@ def op_correct_umi_errors(value: object, options: Mapping[str, object], warnings
         "distinct_umis_after": len(groups),
         "reads": sum(counts.values()),
         "groups": [
-            {"representative": g[0], "members": [*g[1:]], "reads": sum(counts[m] for m in g), "member_counts": {m: counts[m] for m in g}}
+            {
+                "representative": g[0],
+                "members": [*g[1:]],
+                "reads": sum(counts[m] for m in g),
+                "member_counts": {m: counts[m] for m in g},
+            }
             for g in groups
         ],
         "corrections": {u: r for u, r in mapping.items() if u != r},
@@ -1452,7 +1748,9 @@ def _consensus(members: Sequence[Rd]) -> tuple[str, str | None]:
     return "".join(seq), ("".join(qual) if len(qual) == len(seq) and qual else None)
 
 
-def op_collapse_umi_reads(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_collapse_umi_reads(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     group_by = opt_choice(options, "group_by", "umi_and_start", ("umi", "umi_and_start"))
     start_len = opt_int(options, "start_length", 10, minimum=1, maximum=1000)
@@ -1472,8 +1770,14 @@ def op_collapse_umi_reads(value: object, options: Mapping[str, object], warnings
     for (umi, start), members in sorted(groups.items()):
         seq, qual = _consensus(members)
         rows.append(
-            {"umi": umi, "start": start or None, "reads": len(members), "read_names": [m.name for m in members][:20],
-             "consensus_sequence": seq, "consensus_quality": qual}
+            {
+                "umi": umi,
+                "start": start or None,
+                "reads": len(members),
+                "read_names": [m.name for m in members][:20],
+                "consensus_sequence": seq,
+                "consensus_quality": qual,
+            }
         )
     return {
         "reads_in": len(reads),
@@ -1489,7 +1793,9 @@ def op_collapse_umi_reads(value: object, options: Mapping[str, object], warnings
     }
 
 
-def op_extract_umi(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_extract_umi(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     pattern = options.get("pattern")
     sep = options.get("umi_separator", "_")
@@ -1501,7 +1807,8 @@ def op_extract_umi(value: object, options: Mapping[str, object], warnings: Warni
         if not isinstance(pattern, str) or not re.fullmatch(r"[NXC]+", pattern):
             raise ConfigurationError(
                 "pattern must consist of N (UMI base), C (cell-barcode base) and X (discarded base).",
-                code="INVALID_OPTION", hint="Example: pattern='CCCCCCNNNNNNXX'.",
+                code="INVALID_OPTION",
+                hint="Example: pattern='CCCCCCNNNNNNXX'.",
             )
         location = "5prime"
         length = len(pattern)
@@ -1510,7 +1817,10 @@ def op_extract_umi(value: object, options: Mapping[str, object], warnings: Warni
     out = []
     for r in reads:
         if len(r.seq) <= length:
-            raise InputFormatError(f"read {r.name!r} ({len(r.seq)} bases) is not longer than the UMI region ({length}).", code="READ_TOO_SHORT")
+            raise InputFormatError(
+                f"read {r.name!r} ({len(r.seq)} bases) is not longer than the UMI region ({length}).",
+                code="READ_TOO_SHORT",
+            )
         if location == "5prime":
             region, rest = r.seq[:length], r.seq[length:]
             rq = None if r.qual is None else r.qual[length:]
@@ -1524,8 +1834,13 @@ def op_extract_umi(value: object, options: Mapping[str, object], warnings: Warni
             umi, cell = region, ""
         name = f"{r.name}{sep}{umi}" if append else r.name
         out.append(
-            {"id": name, "umi": umi, "cell_barcode": cell or None, "sequence": rest,
-             "quality": None if rq is None else "".join(chr(q + 33) for q in rq)}
+            {
+                "id": name,
+                "umi": umi,
+                "cell_barcode": cell or None,
+                "sequence": rest,
+                "quality": None if rq is None else "".join(chr(q + 33) for q in rq),
+            }
         )
     counts = Counter(o["umi"] for o in out)
     return {
@@ -1549,16 +1864,26 @@ def _seed_index(ref: str, k: int) -> dict[str, list[int]]:
     return index
 
 
-def op_read_error_model(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_read_error_model(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     reference = options.get("reference")
     if reference is None:
-        need_quality(reads, "a quality-based error model (or pass options['reference'] for an observed model)")
+        need_quality(
+            reads,
+            "a quality-based error model (or pass options['reference'] for an observed model)",
+        )
         model = _error_profile(reads)
-        model["note"] = "No reference supplied: the model is derived from reported Phred scores only. " + model["note"]
+        model["note"] = (
+            "No reference supplied: the model is derived from reported Phred scores only. "
+            + model["note"]
+        )
         return {"model": model}
     if not isinstance(reference, str):
-        raise ConfigurationError("options['reference'] must be a sequence string.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options['reference'] must be a sequence string.", code="INVALID_OPTION"
+        )
     ref_text = as_text(reference) or reference
     if ref_text.lstrip().startswith(">"):
         ref_text = "".join(r.seq for r in parse_fasta_text(ref_text, 1_000_000))
@@ -1566,7 +1891,9 @@ def op_read_error_model(value: object, options: Mapping[str, object], warnings: 
     if not 20 <= len(ref) <= 5_000_000:
         raise ConfigurationError("reference must be 20 to 5,000,000 bases.", code="INVALID_OPTION")
     if len(reads) > 200_000:
-        raise InputFormatError("at most 200000 reads are aligned for the error model.", code="INPUT_TOO_LARGE")
+        raise InputFormatError(
+            "at most 200000 reads are aligned for the error model.", code="INPUT_TOO_LARGE"
+        )
     k = opt_int(options, "seed_length", 11, minimum=6, maximum=32)
     max_rate = opt_num(options, "max_mismatch_fraction", 0.2, minimum=0.0, maximum=0.5) or 0.0
     index = _seed_index(ref, k)
@@ -1588,7 +1915,11 @@ def op_read_error_model(value: object, options: Mapping[str, object], warnings: 
             for diag, _ in votes.most_common(3):
                 if diag < 0 or diag + len(seq) > len(ref):
                     continue
-                mism = sum(1 for a, b in zip(seq, ref[diag : diag + len(seq)], strict=False) if a != b and a != "N")
+                mism = sum(
+                    1
+                    for a, b in zip(seq, ref[diag : diag + len(seq)], strict=False)
+                    if a != b and a != "N"
+                )
                 if best is None or mism < best[0]:
                     best = (mism, strand, diag, seq)
         if best is None or best[0] > max_rate * len(r.seq):
@@ -1610,7 +1941,8 @@ def op_read_error_model(value: object, options: Mapping[str, object], warnings: 
     if aligned == 0:
         raise InputFormatError(
             "no read could be placed on the reference (ungapped seed-and-extend).",
-            code="NO_ALIGNMENTS", hint="Check the reference, the seed_length and max_mismatch_fraction.",
+            code="NO_ALIGNMENTS",
+            hint="Check the reference, the seed_length and max_mismatch_fraction.",
         )
     total = sum(bases_at.values())
     errors = sum(mismatches_at.values())
@@ -1623,13 +1955,20 @@ def op_read_error_model(value: object, options: Mapping[str, object], warnings: 
             "mismatches": errors,
             "overall_mismatch_rate": round6(errors / total),
             "per_position_mismatch_rate": [
-                {"position": p + 1, "bases": bases_at[p], "mismatch_rate": round6(mismatches_at[p] / bases_at[p])}
+                {
+                    "position": p + 1,
+                    "bases": bases_at[p],
+                    "mismatch_rate": round6(mismatches_at[p] / bases_at[p]),
+                }
                 for p in sorted(bases_at)
             ],
             "substitution_counts": {f"{a}>{b}": c for (a, b), c in sorted(substitutions.items())},
             "empirical_error_by_reported_q": {
-                str(q): {"bases": by_q_tot[q], "empirical_error_rate": round6(by_q_err[q] / by_q_tot[q]),
-                         "reported_error_rate": round6(q_to_p(q))}
+                str(q): {
+                    "bases": by_q_tot[q],
+                    "empirical_error_rate": round6(by_q_err[q] / by_q_tot[q]),
+                    "reported_error_rate": round6(q_to_p(q)),
+                }
                 for q in sorted(by_q_tot)
             },
             "definition": "Each read is placed on the reference by k-mer seed voting (both strands, top 3 diagonals) and "
@@ -1643,8 +1982,16 @@ def op_read_error_model(value: object, options: Mapping[str, object], warnings: 
 
 
 _PLATFORM_RULES: list[tuple[str, re.Pattern[str]]] = [
-    ("oxford_nanopore", re.compile(r"(^|\s)(runid|ch|start_time|read)=|^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")),
-    ("pacbio", re.compile(r"^m\d+[A-Za-z0-9]*_\d{6}_\d{6}/\d+/|^[A-Za-z0-9_.\-]+/\d+/(ccs|\d+_\d+)(/|$)")),
+    (
+        "oxford_nanopore",
+        re.compile(
+            r"(^|\s)(runid|ch|start_time|read)=|^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        ),
+    ),
+    (
+        "pacbio",
+        re.compile(r"^m\d+[A-Za-z0-9]*_\d{6}_\d{6}/\d+/|^[A-Za-z0-9_.\-]+/\d+/(ccs|\d+_\d+)(/|$)"),
+    ),
     ("illumina", re.compile(r"^[A-Za-z0-9_\-]+:\d+:[A-Za-z0-9\-]+:\d+:\d+:\d+:\d+")),
     ("mgi_dnbseq", re.compile(r"^[A-Z]{1,3}\d{8,12}[A-Z]?L\d+C\d+R\d+")),
     ("ion_torrent", re.compile(r"^[A-Z0-9]{5}:\d+:\d+(\s|/|$)")),
@@ -1669,13 +2016,23 @@ def _platform(reads: list[Rd]) -> dict[str, Any]:
     first = reads[0]
     if best == "illumina":
         parts = first.name.split(":")
-        evidence = {"instrument_id": parts[0], "run_number": parts[1], "flowcell": parts[2], "lane": parts[3]}
+        evidence = {
+            "instrument_id": parts[0],
+            "run_number": parts[1],
+            "flowcell": parts[2],
+            "lane": parts[3],
+        }
     uniform = lengths[0] == lengths[-1]
     return {
         "platform": best if best_n / n >= 0.5 else "unknown",
         "confidence_fraction": round6(best_n / n),
         "read_name_votes": dict(votes),
-        "read_length": {"min": lengths[0], "median": round6(percentile(lengths, 0.5)), "max": lengths[-1], "uniform": uniform},
+        "read_length": {
+            "min": lengths[0],
+            "median": round6(percentile(lengths, 0.5)),
+            "max": lengths[-1],
+            "uniform": uniform,
+        },
         "evidence": evidence,
         "definition": "Rule-based: the read-name (header) format of each read is matched against known layouts (Illumina "
         "instrument:run:flowcell:lane:tile:x:y, Oxford Nanopore runid=/ch=/UUID, PacBio movie/zmw/ccs, MGI/BGI "
@@ -1684,11 +2041,15 @@ def _platform(reads: list[Rd]) -> dict[str, Any]:
     }
 
 
-def op_detect_platform(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_detect_platform(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return by_mate(value, options, _platform)
 
 
-def op_detect_platform_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_detect_platform_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     first, second = parse_pair(value, options)
     if second is None:
         raise InputFormatError("detect_platform_tenx needs read1 and read2.", code="PAIR_REQUIRED")
@@ -1706,7 +2067,8 @@ def op_detect_platform_tenx(value: object, options: Mapping[str, object], warnin
         "layout": layout[0] if layout else None,
         "compatible_chemistries": layout[1] if layout else None,
         "note": "Chemistry is inferred only from the modal read-1 length (24/26/28). Cell Ranger's whitelist-based "
-        "autodetection needs the 10x barcode whitelists and is not performed." + ("" if layout else " Read-1 length matches no known layout."),
+        "autodetection needs the 10x barcode whitelists and is not performed."
+        + ("" if layout else " Read-1 length matches no known layout."),
     }
     return result
 
@@ -1721,48 +2083,72 @@ def op_tenx_per_region(
     return {**meta, "regions": _per_region(regions, fn)}
 
 
-def op_quality_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_quality_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return op_tenx_per_region(value, options, _quality)
 
 
-def op_basecalling_qc_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_basecalling_qc_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     min_q = opt_num(options, "min_mean_quality", 20.0, minimum=0, maximum=MAX_PHRED) or 0.0
     return op_tenx_per_region(value, options, lambda reads: _basecalling(reads, min_q))
 
 
-def op_error_profile_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_error_profile_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return op_tenx_per_region(value, options, _error_profile)
 
 
-def op_gc_bias_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_gc_bias_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     regions, meta = tenx_regions(value, options)
     ref = opt_num(options, "reference_gc", None, minimum=0.0, maximum=1.0)
     return {**meta, "region": "rna_read (read 2)", **_gc_bias(regions["rna_read"], ref)}
 
 
-def op_read_length_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_read_length_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     first, second = parse_pair(value, options)
     if second is None:
-        raise InputFormatError("10x functions need a read pair: {'read1': ..., 'read2': ...}.", code="PAIR_REQUIRED")
-    return {"read_pairs": len(first), "read1": _length_stats(first, options), "read2": _length_stats(second, options)}
+        raise InputFormatError(
+            "10x functions need a read pair: {'read1': ..., 'read2': ...}.", code="PAIR_REQUIRED"
+        )
+    return {
+        "read_pairs": len(first),
+        "read1": _length_stats(first, options),
+        "read2": _length_stats(second, options),
+    }
 
 
 # --------------------------------------------------------------------------- thin variants and demultiplexing
 
 
-def op_adapter_content_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_adapter_content_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return op_adapter_content(value, options, warnings, tenx=True)
 
 
-def op_contamination_tenx(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_contamination_tenx(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     return op_contamination(value, options, warnings, tenx=True)
 
 
-def op_demultiplex(value: object, options: Mapping[str, object], warnings: Warnings) -> dict[str, Any]:
+def op_demultiplex(
+    value: object, options: Mapping[str, object], warnings: Warnings
+) -> dict[str, Any]:
     reads = parse_reads(value, options)
     samples = _parse_samples(options)
     if "unassigned" in samples:
-        raise ConfigurationError("'unassigned' is reserved and cannot be a sample name.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "'unassigned' is reserved and cannot be a sample name.", code="INVALID_OPTION"
+        )
     rows, summary = assign_reads(reads, options)
     location = summary["barcode_location"]
     trim = opt_bool(options, "trim_barcode", True) and location != "header"
@@ -1774,23 +2160,35 @@ def op_demultiplex(value: object, options: Mapping[str, object], warnings: Warni
         blen = len(row["barcode"])
         seq, qual = read.seq, read.qual
         if trim and key != "unassigned":
-            seq, qual = (seq[blen:], None if qual is None else qual[blen:]) if location == "read_start" else (
-                seq[:-blen], None if qual is None else qual[:-blen]
+            seq, qual = (
+                (seq[blen:], None if qual is None else qual[blen:])
+                if location == "read_start"
+                else (seq[:-blen], None if qual is None else qual[:-blen])
             )
         groups[key].append(
-            {"id": read.name, "sequence": seq, "quality": None if qual is None else "".join(chr(q + 33) for q in qual)}
+            {
+                "id": read.name,
+                "sequence": seq,
+                "quality": None if qual is None else "".join(chr(q + 33) for q in qual),
+            }
         )
     written: dict[str, str] = {}
     out_dir = options.get("output_directory")
     if out_dir is not None:
         directory = Path(str(out_dir))
         if not directory.is_dir():
-            raise ConfigurationError(f"output_directory {directory} does not exist.", code="INVALID_OPTION")
+            raise ConfigurationError(
+                f"output_directory {directory} does not exist.", code="INVALID_OPTION"
+            )
         fastq = all(rec["quality"] is not None for recs in groups.values() for rec in recs)
         for name, recs in groups.items():
             target = directory / f"{name}.{'fastq' if fastq else 'fasta'}"
             if target.exists():
-                raise ConfigurationError(f"{target} already exists.", code="OUTPUT_EXISTS", hint="Use an empty output_directory.")
+                raise ConfigurationError(
+                    f"{target} already exists.",
+                    code="OUTPUT_EXISTS",
+                    hint="Use an empty output_directory.",
+                )
             if fastq:
                 text = "".join(f"@{r['id']}\n{r['sequence']}\n+\n{r['quality']}\n" for r in recs)
             else:
@@ -1798,10 +2196,14 @@ def op_demultiplex(value: object, options: Mapping[str, object], warnings: Warni
             target.write_text(text, encoding="utf-8")
             written[name] = str(target)
     if any(len(v) > limit for v in groups.values()):
-        warnings.append(f"returned reads per sample truncated to the first {limit} (see max_listed); counts are complete.")
+        warnings.append(
+            f"returned reads per sample truncated to the first {limit} (see max_listed); counts are complete."
+        )
     return {
         **{k: v for k, v in summary.items()},
         "barcode_trimmed": trim,
-        "samples": {name: {"reads": len(recs), "records": recs[:limit]} for name, recs in groups.items()},
+        "samples": {
+            name: {"reads": len(recs), "records": recs[:limit]} for name, recs in groups.items()
+        },
         "written_files": written or None,
     }

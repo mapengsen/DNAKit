@@ -79,7 +79,9 @@ def simulate_dnacauldron_plan(
     dnacauldron = require("dnacauldron", _EXTRA)
     plan_file = _existing_file(assembly_plan_path, "assembly_plan_path")
     sequences = _existing_dir(sequences_path, "sequences_path")
-    connectors = None if connectors_path is None else _existing_dir(connectors_path, "connectors_path")
+    connectors = (
+        None if connectors_path is None else _existing_dir(connectors_path, "connectors_path")
+    )
     target = _new_report(target_path)
     repository = dnacauldron.SequenceRepository()
     repository.import_records(folder=str(sequences))

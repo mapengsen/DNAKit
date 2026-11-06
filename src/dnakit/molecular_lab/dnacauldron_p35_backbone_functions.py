@@ -1,4 +1,5 @@
 """Tabulate imported DNA Cauldron backbone-choice results (pack P35)."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -7,11 +8,13 @@ from typing import Any
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
 from dnakit.exceptions import ConfigurationError
-from dnakit.molecular_lab.dnacauldron_p35_functions import _record_from_spec, _provenance
+from dnakit.molecular_lab.dnacauldron_p35_functions import _provenance, _record_from_spec
 
 
 def tabulate_dnacauldron_backbone_choices(
-    choices: Sequence[Mapping[str, Any]], *, verbose: bool = True,
+    choices: Sequence[Mapping[str, Any]],
+    *,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Return BackboneChoice.list_to_infos_spreadsheet as JSON records.
 
@@ -20,8 +23,14 @@ def tabulate_dnacauldron_backbone_choices(
     in the same record format, and ``error`` (text). This reports caller-supplied
     insertion results; it does not run backbone selection or infer successful cloning.
     """
-    if isinstance(choices, (str, bytes)) or not isinstance(choices, Sequence) or len(choices) > 100000:
-        raise ConfigurationError("choices must be a list of at most 100000 backbone-choice records.")
+    if (
+        isinstance(choices, (str, bytes))
+        or not isinstance(choices, Sequence)
+        or len(choices) > 100000
+    ):
+        raise ConfigurationError(
+            "choices must be a list of at most 100000 backbone-choice records."
+        )
     dc = require("dnacauldron.utils", "bio-dnacauldron")
     built = []
     for index, item in enumerate(choices):
@@ -34,15 +43,31 @@ def tabulate_dnacauldron_backbone_choices(
         if error is not None and not isinstance(error, str):
             raise ConfigurationError("error must be text or null.")
         record = _record_from_spec(item["record"])
-        backbone = None if item.get("backbone_record") is None else _record_from_spec(item["backbone_record"])
-        final = None if item.get("final_record") is None else _record_from_spec(item["final_record"])
-        built.append(dc.BackboneChoice(record, already_on_backbone=already,
-                                       backbone_record=backbone, final_record=final,
-                                       error=None if error is None else ValueError(error)))
+        backbone = (
+            None
+            if item.get("backbone_record") is None
+            else _record_from_spec(item["backbone_record"])
+        )
+        final = (
+            None if item.get("final_record") is None else _record_from_spec(item["final_record"])
+        )
+        built.append(
+            dc.BackboneChoice(
+                record,
+                already_on_backbone=already,
+                backbone_record=backbone,
+                final_record=final,
+                error=None if error is None else ValueError(error),
+            )
+        )
     table = dc.BackboneChoice.list_to_infos_spreadsheet(built)
-    return {"status": "completed", "count": len(table), "columns": list(table.columns),
-            "choices": table.to_dict(orient="records"),
-            "provenance": _provenance(method="BackboneChoice.list_to_infos_spreadsheet")}
+    return {
+        "status": "completed",
+        "count": len(table),
+        "columns": list(table.columns),
+        "choices": table.to_dict(orient="records"),
+        "provenance": _provenance(method="BackboneChoice.list_to_infos_spreadsheet"),
+    }
 
 
 __all__ = ["tabulate_dnacauldron_backbone_choices"]

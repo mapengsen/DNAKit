@@ -30,14 +30,18 @@ def _directory(value: str | Path, name: str) -> Path:
 
 
 def _simple_name(value: str, name: str) -> str:
-    if not isinstance(value, str) or not value.strip() or any(
-        char in value for char in ("/", "\\", "\x00", "\n", "\r")
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or any(char in value for char in ("/", "\\", "\x00", "\n", "\r"))
     ):
         raise ConfigurationError(f"{name} must be a simple output name.")
     return value.strip()
 
 
-def _result(operation: str, backend: str, value: dict[str, object], *, verbose: bool) -> dict[str, object]:
+def _result(
+    operation: str, backend: str, value: dict[str, object], *, verbose: bool
+) -> dict[str, object]:
     return serialize_for_agent(
         {
             "status": "completed",
@@ -84,8 +88,13 @@ def annotate_prokka(
     run(
         program,
         (
-            "--outdir", str(annotation), "--prefix", prefix,
-            "--cpus", str(threads), str(assembly_path),
+            "--outdir",
+            str(annotation),
+            "--prefix",
+            prefix,
+            "--cpus",
+            str(threads),
+            str(assembly_path),
         ),
         directory,
         config,
@@ -129,7 +138,11 @@ def annotate_bakta(
     database_path = _directory(database, "database")
     program = _program(program, "program")
     threads = _threads(threads)
-    if isinstance(min_contig_length, bool) or not isinstance(min_contig_length, int) or not 1 <= min_contig_length <= 1_000_000:
+    if (
+        isinstance(min_contig_length, bool)
+        or not isinstance(min_contig_length, int)
+        or not 1 <= min_contig_length <= 1_000_000
+    ):
         raise ConfigurationError("min_contig_length must be an integer in [1, 1000000].")
     if translation_table not in {4, 11, 25}:
         raise ConfigurationError("translation_table must be one of 4, 11 or 25.")
@@ -142,13 +155,26 @@ def annotate_bakta(
         max_output_bytes=max_output_bytes,
         max_artifact_bytes=max_artifact_bytes,
     )
-    outputs = tuple(annotation / f"{prefix}{suffix}" for suffix in (".gff3", ".tsv", ".json", ".fna"))
+    outputs = tuple(
+        annotation / f"{prefix}{suffix}" for suffix in (".gff3", ".tsv", ".json", ".fna")
+    )
     run(
         program,
         (
-            "--db", str(database_path), "--output", str(annotation), "--prefix", prefix,
-            "--threads", str(threads), "--min-contig-length", str(min_contig_length),
-            "--translation-table", str(translation_table), "--skip-plot", str(genome_path),
+            "--db",
+            str(database_path),
+            "--output",
+            str(annotation),
+            "--prefix",
+            prefix,
+            "--threads",
+            str(threads),
+            "--min-contig-length",
+            str(min_contig_length),
+            "--translation-table",
+            str(translation_table),
+            "--skip-plot",
+            str(genome_path),
         ),
         directory,
         config,
@@ -195,7 +221,11 @@ def predict_checkm2(
     database_path = input_path(database)
     program = _program(program, "program")
     threads = _threads(threads)
-    if not isinstance(extension, str) or not extension or not all(char.isalnum() or char == "." for char in extension):
+    if (
+        not isinstance(extension, str)
+        or not extension
+        or not all(char.isalnum() or char == "." for char in extension)
+    ):
         raise ConfigurationError("extension must contain only letters, digits or periods.")
     directory = workspace(output_directory)
     result_directory = directory / "checkm2"
@@ -209,9 +239,19 @@ def predict_checkm2(
     run(
         program,
         (
-            "predict", "--input", str(bins_path), "--output-directory", str(result_directory),
-            "--database_path", str(database_path), "--extension", extension,
-            "--threads", str(threads), "--lowmem", "--remove_intermediates",
+            "predict",
+            "--input",
+            str(bins_path),
+            "--output-directory",
+            str(result_directory),
+            "--database_path",
+            str(database_path),
+            "--extension",
+            extension,
+            "--threads",
+            str(threads),
+            "--lowmem",
+            "--remove_intermediates",
         ),
         directory,
         config,

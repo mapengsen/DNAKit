@@ -13,32 +13,49 @@ MAX_TEXT_BYTES = 200_000_000
 
 
 # ----------------------------------------------------------------------------- option helpers
-def opt_str(options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None) -> str:
+def opt_str(
+    options: Mapping[str, object], key: str, default: str, allowed: Sequence[str] | None = None
+) -> str:
     value = options.get(key, default)
     if not isinstance(value, str) or not value.strip():
-        raise ConfigurationError(f"Option {key!r} must be a non-empty string.", code="EPIGENOME_OPTION_INVALID")
+        raise ConfigurationError(
+            f"Option {key!r} must be a non-empty string.", code="EPIGENOME_OPTION_INVALID"
+        )
     value = value.strip().lower()
     if allowed is not None and value not in allowed:
         raise ConfigurationError(
-            f"Option {key!r}={value!r} is not supported.", code="EPIGENOME_OPTION_INVALID", hint=f"Use one of: {', '.join(allowed)}."
+            f"Option {key!r}={value!r} is not supported.",
+            code="EPIGENOME_OPTION_INVALID",
+            hint=f"Use one of: {', '.join(allowed)}.",
         )
     return value
 
 
-def opt_int(options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int) -> int:
+def opt_int(
+    options: Mapping[str, object], key: str, default: int, minimum: int, maximum: int
+) -> int:
     value = options.get(key, default)
     if isinstance(value, bool) or not isinstance(value, int) or not minimum <= value <= maximum:
         raise ConfigurationError(
-            f"Option {key!r} must be an integer in [{minimum}, {maximum}].", code="EPIGENOME_OPTION_INVALID"
+            f"Option {key!r} must be an integer in [{minimum}, {maximum}].",
+            code="EPIGENOME_OPTION_INVALID",
         )
     return value
 
 
-def opt_float(options: Mapping[str, object], key: str, default: float, minimum: float, maximum: float) -> float:
+def opt_float(
+    options: Mapping[str, object], key: str, default: float, minimum: float, maximum: float
+) -> float:
     value = options.get(key, default)
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not minimum <= value <= maximum:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or not minimum <= value <= maximum
+    ):
         raise ConfigurationError(
-            f"Option {key!r} must be a number in [{minimum}, {maximum}].", code="EPIGENOME_OPTION_INVALID"
+            f"Option {key!r} must be a number in [{minimum}, {maximum}].",
+            code="EPIGENOME_OPTION_INVALID",
         )
     return float(value)
 
@@ -82,13 +99,19 @@ def _split_lines(text: str) -> list[tuple[int, list[str]]]:
 
 def _int(value: object, what: str, where: object) -> int:
     if isinstance(value, bool):
-        raise InputFormatError(f"{what} must be an integer ({where}).", code="EPIGENOME_RECORD_INVALID")
+        raise InputFormatError(
+            f"{what} must be an integer ({where}).", code="EPIGENOME_RECORD_INVALID"
+        )
     try:
         number = int(str(value)) if not isinstance(value, float) else int(value)
     except ValueError as exc:
-        raise InputFormatError(f"{what} {value!r} is not an integer ({where}).", code="EPIGENOME_RECORD_INVALID") from exc
+        raise InputFormatError(
+            f"{what} {value!r} is not an integer ({where}).", code="EPIGENOME_RECORD_INVALID"
+        ) from exc
     if isinstance(value, float) and value != number:
-        raise InputFormatError(f"{what} {value!r} is not an integer ({where}).", code="EPIGENOME_RECORD_INVALID")
+        raise InputFormatError(
+            f"{what} {value!r} is not an integer ({where}).", code="EPIGENOME_RECORD_INVALID"
+        )
     return number
 
 
@@ -96,7 +119,9 @@ def _float(value: object, what: str, where: object) -> float:
     try:
         number = float(value)  # type: ignore[arg-type]
     except (TypeError, ValueError) as exc:
-        raise InputFormatError(f"{what} {value!r} is not a number ({where}).", code="EPIGENOME_RECORD_INVALID") from exc
+        raise InputFormatError(
+            f"{what} {value!r} is not a number ({where}).", code="EPIGENOME_RECORD_INVALID"
+        ) from exc
     if not math.isfinite(number):
         raise InputFormatError(f"{what} must be finite ({where}).", code="EPIGENOME_RECORD_INVALID")
     return number
@@ -136,11 +161,17 @@ def parse_intervals(value: object, kind: str = "bed") -> list[dict[str, object]]
             extra = dict(row)
             name, strand, score = _get(row, "name", "id"), _get(row, "strand"), _get(row, "score")
             val = _get(row, "value", "signal")
-            record_extra = {k: v for k, v in extra.items() if k not in ("chrom", "chr", "seqid", "contig", "start", "begin", "end", "stop")}
+            record_extra = {
+                k: v
+                for k, v in extra.items()
+                if k not in ("chrom", "chr", "seqid", "contig", "start", "begin", "end", "stop")
+            }
         elif isinstance(row, Sequence) and not isinstance(row, (str, bytes)):
             cells = list(row)
             if len(cells) < (4 if kind == "bedgraph" else 3):
-                raise InputFormatError(f"Too few columns ({where}).", code="EPIGENOME_RECORD_INVALID")
+                raise InputFormatError(
+                    f"Too few columns ({where}).", code="EPIGENOME_RECORD_INVALID"
+                )
             chrom, start, end = cells[0], cells[1], cells[2]
             name = cells[3] if kind == "bed" and len(cells) > 3 else None
             score = cells[4] if kind == "bed" and len(cells) > 4 else None
@@ -148,13 +179,20 @@ def parse_intervals(value: object, kind: str = "bed") -> list[dict[str, object]]
             val = cells[3] if kind == "bedgraph" else None
             record_extra = {}
         else:
-            raise InputFormatError(f"Unsupported record ({where}).", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                f"Unsupported record ({where}).", code="EPIGENOME_RECORD_INVALID"
+            )
         if chrom is None or start is None or end is None:
-            raise InputFormatError(f"Record needs chrom, start and end ({where}).", code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                f"Record needs chrom, start and end ({where}).", code="EPIGENOME_RECORD_INVALID"
+            )
         s, e = _int(start, "start", where), _int(end, "end", where)
         if s < 0 or e <= s:
-            raise InputFormatError(f"Invalid interval {chrom}:{s}-{e} ({where}).", code="EPIGENOME_RECORD_INVALID",
-                                   hint="Intervals are 0-based half-open with end > start >= 0.")
+            raise InputFormatError(
+                f"Invalid interval {chrom}:{s}-{e} ({where}).",
+                code="EPIGENOME_RECORD_INVALID",
+                hint="Intervals are 0-based half-open with end > start >= 0.",
+            )
         record: dict[str, object] = {"chrom": str(chrom), "start": s, "end": e}
         if name is not None:
             record["name"] = str(name)
@@ -162,11 +200,15 @@ def parse_intervals(value: object, kind: str = "bed") -> list[dict[str, object]]
             record["score"] = _float(score, "score", where)
         if strand is not None:
             if str(strand) not in ("+", "-", "."):
-                raise InputFormatError(f"Strand must be +, - or . ({where}).", code="EPIGENOME_RECORD_INVALID")
+                raise InputFormatError(
+                    f"Strand must be +, - or . ({where}).", code="EPIGENOME_RECORD_INVALID"
+                )
             record["strand"] = str(strand)
         if kind == "bedgraph":
             if val is None:
-                raise InputFormatError(f"bedGraph record needs a value ({where}).", code="EPIGENOME_RECORD_INVALID")
+                raise InputFormatError(
+                    f"bedGraph record needs a value ({where}).", code="EPIGENOME_RECORD_INVALID"
+                )
             record["value"] = _float(val, "value", where)
         elif val is not None:
             record["value"] = _float(val, "value", where)
@@ -194,19 +236,35 @@ def parse_methylation(value: object) -> list[dict[str, object]]:
             chrom, start = _get(row, "chrom", "chr", "seqid"), _get(row, "start", "pos", "position")
             m, u = _get(row, *_METH), _get(row, *_UNMETH)
             if m is not None and u is None and _get(row, "coverage", "cov", "depth") is not None:
-                u = _int(_get(row, "coverage", "cov", "depth"), "coverage", where) - _int(m, "methylated", where)
+                u = _int(_get(row, "coverage", "cov", "depth"), "coverage", where) - _int(
+                    m, "methylated", where
+                )
         else:
             cells = list(row)  # type: ignore[arg-type]
             if len(cells) < 6:
-                raise InputFormatError(f"Bismark coverage rows need 6 columns ({where}).", code="EPIGENOME_RECORD_INVALID")
+                raise InputFormatError(
+                    f"Bismark coverage rows need 6 columns ({where}).",
+                    code="EPIGENOME_RECORD_INVALID",
+                )
             chrom, start, m, u = cells[0], cells[1], cells[4], cells[5]
         if chrom is None or start is None or m is None or u is None:
-            raise InputFormatError(f"Methylation record needs chrom, start, methylated and unmethylated ({where}).",
-                                   code="EPIGENOME_RECORD_INVALID")
+            raise InputFormatError(
+                f"Methylation record needs chrom, start, methylated and unmethylated ({where}).",
+                code="EPIGENOME_RECORD_INVALID",
+            )
         mi, ui = _int(m, "methylated", where), _int(u, "unmethylated", where)
         if mi < 0 or ui < 0:
-            raise InputFormatError(f"Counts must be non-negative ({where}).", code="EPIGENOME_RECORD_INVALID")
-        out.append({"chrom": str(chrom), "start": _int(start, "start", where), "methylated": mi, "unmethylated": ui})
+            raise InputFormatError(
+                f"Counts must be non-negative ({where}).", code="EPIGENOME_RECORD_INVALID"
+            )
+        out.append(
+            {
+                "chrom": str(chrom),
+                "start": _int(start, "start", where),
+                "methylated": mi,
+                "unmethylated": ui,
+            }
+        )
         if len(out) > MAX_RECORDS:
             raise ConfigurationError("Too many records.", code="EPIGENOME_INPUT_TOO_LARGE")
     if not out:
@@ -215,7 +273,9 @@ def parse_methylation(value: object) -> list[dict[str, object]]:
 
 
 # ----------------------------------------------------------------------------- intervals
-def merge_intervals(intervals: Sequence[Mapping[str, object]], distance: int = 0) -> list[dict[str, object]]:
+def merge_intervals(
+    intervals: Sequence[Mapping[str, object]], distance: int = 0
+) -> list[dict[str, object]]:
     """bedtools-style merge: intervals on one chromosome whose gap is <= ``distance`` (book-ended included) are joined."""
 
     by_chrom: dict[str, list[tuple[int, int]]] = {}
@@ -231,20 +291,26 @@ def merge_intervals(intervals: Sequence[Mapping[str, object]], distance: int = 0
                 count += 1
             else:
                 if current is not None:
-                    out.append({"chrom": chrom, "start": current[0], "end": current[1], "n_merged": count})
+                    out.append(
+                        {"chrom": chrom, "start": current[0], "end": current[1], "n_merged": count}
+                    )
                 current, count = [s, e], 1
         if current is not None:
             out.append({"chrom": chrom, "start": current[0], "end": current[1], "n_merged": count})
     return out
 
 
-def depth_segments(per_sample: Sequence[Sequence[Mapping[str, object]]], min_depth: int) -> list[dict[str, object]]:
+def depth_segments(
+    per_sample: Sequence[Sequence[Mapping[str, object]]], min_depth: int
+) -> list[dict[str, object]]:
     """Maximal segments where at least ``min_depth`` samples have coverage (each sample counted once per base)."""
 
     events: dict[str, list[tuple[int, int]]] = {}
     for intervals in per_sample:
         for merged in merge_intervals(intervals, 0):  # one vote per sample and base
-            events.setdefault(str(merged["chrom"]), []).extend([(int(merged["start"]), 1), (int(merged["end"]), -1)])  # type: ignore[call-overload]
+            events.setdefault(str(merged["chrom"]), []).extend(
+                [(int(merged["start"]), 1), (int(merged["end"]), -1)]
+            )  # type: ignore[call-overload]
     out: list[dict[str, object]] = []
     for chrom in sorted(events):
         depth = 0
@@ -279,7 +345,9 @@ def overlap_bp(a: tuple[int, int], b: tuple[int, int]) -> int:
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
 
-def group_by_chrom(intervals: Sequence[Mapping[str, object]]) -> dict[str, list[Mapping[str, object]]]:
+def group_by_chrom(
+    intervals: Sequence[Mapping[str, object]],
+) -> dict[str, list[Mapping[str, object]]]:
     out: dict[str, list[Mapping[str, object]]] = {}
     for iv in intervals:
         out.setdefault(str(iv["chrom"]), []).append(iv)
@@ -316,7 +384,9 @@ def fisher_exact(a: int, b: int, c: int, d: int) -> dict[str, float | None]:
         return {"p_value": 1.0, "odds_ratio": None}
     low, high = max(0, k - n2), min(n1, k)
     if high - low > 5_000_000:
-        raise ConfigurationError("Counts are too large for an exact test.", code="EPIGENOME_COUNTS_TOO_LARGE")
+        raise ConfigurationError(
+            "Counts are too large for an exact test.", code="EPIGENOME_COUNTS_TOO_LARGE"
+        )
     denom = _log_choose(n, k)
 
     def log_pmf(x: int) -> float:
@@ -351,7 +421,7 @@ def parse_genes(value: object) -> list[dict[str, object]]:
 
     genes = parse_intervals(value, "bed")
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-        for gene, raw in zip(genes, value):
+        for gene, raw in zip(genes, value, strict=False):
             if isinstance(raw, Mapping) and raw.get("tss") is not None:
                 gene["tss"] = _int(raw["tss"], "tss", gene.get("name", ""))
     for gene in genes:
@@ -375,8 +445,12 @@ def _direction(mid: int, tss: int, strand: object) -> str:
     return "upstream" if (mid < tss) == (strand != "-") else "downstream"
 
 
-def link_regions_to_genes(regions: Sequence[Mapping[str, object]], genes: Sequence[Mapping[str, object]], method: str,
-                          max_distance: int) -> list[dict[str, object]]:
+def link_regions_to_genes(
+    regions: Sequence[Mapping[str, object]],
+    genes: Sequence[Mapping[str, object]],
+    method: str,
+    max_distance: int,
+) -> list[dict[str, object]]:
     """Assign regions to genes by distance from the region midpoint ``(start + end) // 2`` to the gene TSS.
 
     ``nearest``: each region gets its single nearest same-chromosome TSS (ties: lexicographically smallest gene
@@ -389,26 +463,60 @@ def link_regions_to_genes(regions: Sequence[Mapping[str, object]], genes: Sequen
     out: list[dict[str, object]] = []
     for r in regions:
         mid = (int(r["start"]) + int(r["end"])) // 2  # type: ignore[call-overload]
-        candidates = sorted(((abs(tss - mid), name, tss, g) for tss, name, g in by_chrom.get(str(r["chrom"]), [])), key=lambda t: (t[0], t[1]))
-        chosen = candidates[:1] if method == "nearest" else [c for c in candidates if c[0] <= max_distance]
+        candidates = sorted(
+            ((abs(tss - mid), name, tss, g) for tss, name, g in by_chrom.get(str(r["chrom"]), [])),
+            key=lambda t: (t[0], t[1]),
+        )
+        chosen = (
+            candidates[:1]
+            if method == "nearest"
+            else [c for c in candidates if c[0] <= max_distance]
+        )
         links = [c for c in chosen if c[0] <= max_distance]
-        out.append({
-            "region": {"chrom": r["chrom"], "start": r["start"], "end": r["end"], **({"name": r["name"]} if "name" in r else {})},
-            "midpoint": mid,
-            "genes": [{"gene": name, "tss": tss, "distance": dist,
-                       "direction": _direction(mid, tss, g.get("strand")),
-                       "strand": g.get("strand", ".")} for dist, name, tss, g in links],
-        })
+        out.append(
+            {
+                "region": {
+                    "chrom": r["chrom"],
+                    "start": r["start"],
+                    "end": r["end"],
+                    **({"name": r["name"]} if "name" in r else {}),
+                },
+                "midpoint": mid,
+                "genes": [
+                    {
+                        "gene": name,
+                        "tss": tss,
+                        "distance": dist,
+                        "direction": _direction(mid, tss, g.get("strand")),
+                        "strand": g.get("strand", "."),
+                    }
+                    for dist, name, tss, g in links
+                ],
+            }
+        )
     return out
 
 
 # ----------------------------------------------------------------------------- SVG
-def svg_signal_track(records: Sequence[Mapping[str, object]], chrom: str, start: int, end: int, width: int = 800, height: int = 120) -> str:
-    rows = [r for r in records if r["chrom"] == chrom and int(r["end"]) > start and int(r["start"]) < end]  # type: ignore[call-overload]
+def svg_signal_track(
+    records: Sequence[Mapping[str, object]],
+    chrom: str,
+    start: int,
+    end: int,
+    width: int = 800,
+    height: int = 120,
+) -> str:
+    rows = [
+        r
+        for r in records
+        if r["chrom"] == chrom and int(r["end"]) > start and int(r["start"]) < end
+    ]  # type: ignore[call-overload]
     top = max([float(r["value"]) for r in rows] + [0.0]) or 1.0  # type: ignore[arg-type]
     scale = (width - 40) / (end - start)
-    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + 30}">',
-             f'<text x="20" y="12" font-size="10">{chrom}:{start}-{end} (max {top:g})</text>']
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + 30}">',
+        f'<text x="20" y="12" font-size="10">{chrom}:{start}-{end} (max {top:g})</text>',
+    ]
     for r in rows:
         s, e = max(int(r["start"]), start), min(int(r["end"]), end)  # type: ignore[call-overload]
         h = float(r["value"]) / top * height  # type: ignore[arg-type]
@@ -417,5 +525,7 @@ def svg_signal_track(records: Sequence[Mapping[str, object]], chrom: str, start:
             f'x="{20 + (s - start) * scale:.2f}" y="{20 + height - h:.2f}" width="{max((e - s) * scale, 0.5):.2f}" '
             f'height="{h:.2f}" fill="#4e79a7"/>'
         )
-    parts.append(f'<line x1="20" y1="{20 + height}" x2="{width - 20}" y2="{20 + height}" stroke="#333"/></svg>')
+    parts.append(
+        f'<line x1="20" y1="{20 + height}" x2="{width - 20}" y2="{20 + height}" stroke="#333"/></svg>'
+    )
     return "".join(parts)

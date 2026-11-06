@@ -8,10 +8,13 @@ import pytest
 
 pysam = pytest.importorskip("pysam")
 
-from dnakit.bioinformatics import pysam_gap2_functions as gap2  # noqa: E402
-from dnakit.exceptions import ConfigurationError  # noqa: E402
+from dnakit.bioinformatics import pysam_gap2_functions as gap2
+from dnakit.exceptions import ConfigurationError
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 
 
 def test_quality_string_round_trip() -> None:

@@ -454,7 +454,9 @@ def permutation_importance(value: object, options: Mapping[str, object]) -> dict
                     [to_float(v, what="prediction") for v in predicted],
                 )["r2"]
             )
-        return sum(label_text(a) == label_text(b) for a, b in zip(y_raw, predicted, strict=False)) / len(y_raw)
+        return sum(
+            label_text(a) == label_text(b) for a, b in zip(y_raw, predicted, strict=False)
+        ) / len(y_raw)
 
     baseline = score(x)
     rng = random.Random(seed)
@@ -464,7 +466,7 @@ def permutation_importance(value: object, options: Mapping[str, object]) -> dict
         for _ in range(repeats):
             column = [row[j] for row in x]
             rng.shuffle(column)
-            shuffled = [[*row[:j], column[i], *row[j + 1:]] for i, row in enumerate(x)]
+            shuffled = [[*row[:j], column[i], *row[j + 1 :]] for i, row in enumerate(x)]
             drops.append(baseline - score(shuffled))
         mean = math.fsum(drops) / repeats
         std = math.sqrt(math.fsum((d - mean) ** 2 for d in drops) / repeats)

@@ -8,8 +8,8 @@ mapped to fixed flags, no shell, outputs are new explicit paths, results are JSO
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Literal, Sequence
+from collections.abc import Sequence
+from typing import Any, Literal
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.epigenome.deeptools_cli_facades import _existing, _new, _run
@@ -39,9 +39,25 @@ def compute_matrix_scale_regions(
     scores = _many(score_files, "score_files")
     beds = _many(regions, "regions")
     out = _new(output_matrix, "output_matrix")
-    args = ["scale-regions", "-S", *scores, "-R", *beds, "-o", str(out),
-            "-m", str(region_body_length), "-b", str(before_region_length), "-a", str(after_region_length),
-            "--binSize", str(bin_size), "-p", str(number_of_processors)]
+    args = [
+        "scale-regions",
+        "-S",
+        *scores,
+        "-R",
+        *beds,
+        "-o",
+        str(out),
+        "-m",
+        str(region_body_length),
+        "-b",
+        str(before_region_length),
+        "-a",
+        str(after_region_length),
+        "--binSize",
+        str(bin_size),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("computeMatrix", args, [out], deeptools_path)
 
 
@@ -62,9 +78,25 @@ def compute_matrix_reference_point(
     scores = _many(score_files, "score_files")
     beds = _many(regions, "regions")
     out = _new(output_matrix, "output_matrix")
-    args = ["reference-point", "--referencePoint", reference_point, "-S", *scores, "-R", *beds, "-o", str(out),
-            "-b", str(before_region_length), "-a", str(after_region_length), "--binSize", str(bin_size),
-            "-p", str(number_of_processors)]
+    args = [
+        "reference-point",
+        "--referencePoint",
+        reference_point,
+        "-S",
+        *scores,
+        "-R",
+        *beds,
+        "-o",
+        str(out),
+        "-b",
+        str(before_region_length),
+        "-a",
+        str(after_region_length),
+        "--binSize",
+        str(bin_size),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("computeMatrix", args, [out], deeptools_path)
 
 
@@ -82,8 +114,19 @@ def multi_bam_summary(
     """Summarise read counts of several BAM files in genomic bins (deepTools multiBamSummary bins)."""
     paths = _many(bams, "bams")
     out = _new(output, "output")
-    args = ["bins", "-b", *paths, "-o", str(out), "--binSize", str(bin_size), "-n", str(distance_between_bins),
-            "-p", str(number_of_processors)]
+    args = [
+        "bins",
+        "-b",
+        *paths,
+        "-o",
+        str(out),
+        "--binSize",
+        str(bin_size),
+        "-n",
+        str(distance_between_bins),
+        "-p",
+        str(number_of_processors),
+    ]
     if labels is not None:
         if len(labels) != len(paths):
             raise ConfigurationError("labels must have one entry per BAM file.")
@@ -104,7 +147,17 @@ def multi_bigwig_summary(
     """Summarise several bigWig tracks in genomic bins (deepTools multiBigwigSummary bins)."""
     paths = _many(bigwigs, "bigwigs")
     out = _new(output, "output")
-    args = ["bins", "-b", *paths, "-o", str(out), "--binSize", str(bin_size), "-p", str(number_of_processors)]
+    args = [
+        "bins",
+        "-b",
+        *paths,
+        "-o",
+        str(out),
+        "--binSize",
+        str(bin_size),
+        "-p",
+        str(number_of_processors),
+    ]
     if labels is not None:
         if len(labels) != len(paths):
             raise ConfigurationError("labels must have one entry per bigWig file.")
@@ -124,7 +177,16 @@ def bigwig_average(
     """Average several bigWig tracks bin by bin into one bigWig (deepTools bigwigAverage)."""
     paths = _many(bigwigs, "bigwigs")
     out = _new(output, "output")
-    args = ["-b", *paths, "-o", str(out), "--binSize", str(bin_size), "-p", str(number_of_processors)]
+    args = [
+        "-b",
+        *paths,
+        "-o",
+        str(out),
+        "--binSize",
+        str(bin_size),
+        "-p",
+        str(number_of_processors),
+    ]
     return _run("bigwigAverage", args, [out], deeptools_path)
 
 

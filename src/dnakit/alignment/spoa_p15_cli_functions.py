@@ -86,11 +86,22 @@ def spoa_partial_order_alignment(
     target = _cli.new_file(output_path, "output_path")
     mode = _cli.choice(result, tuple(_RESULTS), "result")
     arguments = [
-        "-l", str(_ALGORITHMS[_cli.choice(algorithm, tuple(_ALGORITHMS), "algorithm")]), "-r", _RESULTS[mode],
-        "-m", str(_cli.integer(match, "match")), "-n", str(_cli.integer(mismatch, "mismatch")),
-        "-g", str(_cli.integer(gap_open, "gap_open", maximum=0)), "-e", str(_cli.integer(gap_extend, "gap_extend", maximum=0)),
-        "-q", str(_cli.integer(gap_open_second, "gap_open_second", maximum=0)),
-        "-c", str(_cli.integer(gap_extend_second, "gap_extend_second", maximum=0)),
+        "-l",
+        str(_ALGORITHMS[_cli.choice(algorithm, tuple(_ALGORITHMS), "algorithm")]),
+        "-r",
+        _RESULTS[mode],
+        "-m",
+        str(_cli.integer(match, "match")),
+        "-n",
+        str(_cli.integer(mismatch, "mismatch")),
+        "-g",
+        str(_cli.integer(gap_open, "gap_open", maximum=0)),
+        "-e",
+        str(_cli.integer(gap_extend, "gap_extend", maximum=0)),
+        "-q",
+        str(_cli.integer(gap_open_second, "gap_open_second", maximum=0)),
+        "-c",
+        str(_cli.integer(gap_extend_second, "gap_extend_second", maximum=0)),
     ]
     if _cli.flag(strand_ambiguous, "strand_ambiguous"):
         arguments.append("-s")
@@ -106,13 +117,25 @@ def spoa_partial_order_alignment(
         expected.append(graph_dot)
     arguments.append(str(source))
     record = _cli.invoke(
-        _TOOL, arguments, cwd=target.parent, stdout_to=target, expected=expected, explicit=spoa_path, timeout_seconds=timeout_seconds
+        _TOOL,
+        arguments,
+        cwd=target.parent,
+        stdout_to=target,
+        expected=expected,
+        explicit=spoa_path,
+        timeout_seconds=timeout_seconds,
     )
-    extra: dict[str, Any] = {"output": str(target), "result": mode, "dot_file": str(graph_dot) if graph_dot else None}
+    extra: dict[str, Any] = {
+        "output": str(target),
+        "result": mode,
+        "dot_file": str(graph_dot) if graph_dot else None,
+    }
     if mode in {"msa", "consensus_and_msa", "consensus"}:
         rows = _fasta_records(target)
         if mode != "msa" and rows:
-            extra["consensus"] = rows[-1]["sequence"] if mode == "consensus_and_msa" else rows[0]["sequence"]
+            extra["consensus"] = (
+                rows[-1]["sequence"] if mode == "consensus_and_msa" else rows[0]["sequence"]
+            )
             rows = rows[:-1] if mode == "consensus_and_msa" else []
         extra["alignment"] = rows
         extra["alignment_length"] = len(rows[0]["sequence"]) if rows else None

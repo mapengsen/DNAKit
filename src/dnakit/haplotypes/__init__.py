@@ -8,22 +8,32 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from dnakit._candidate_runtime import candidate_not_implemented, candidate_ok, run_candidate_operation
+from dnakit._candidate_runtime import (
+    candidate_not_implemented,
+    candidate_ok,
+    run_candidate_operation,
+)
 
 from . import _impl_haplotypes as _impl
 
 _MODULE = "haplotypes"
 _TRIO_FORM = "input: {'child': [...], 'father': [...], 'mother': [...]} (+ optional 'sites' labels), one call per site"
-_CALLS = (
-    "A call is 'a/b' or 'a|b' (integer alleles), a pair (a, b), an alt dosage 0/1/2, or None / './.' for missing."
-)
+_CALLS = "A call is 'a/b' or 'a|b' (integer alleles), a pair (a, b), an alt dosage 0/1/2, or None / './.' for missing."
 
 
-def _ok(operation: str, input: object, result: object, options: Mapping[str, object] | None, warnings: tuple[str, ...] = ()) -> object:
+def _ok(
+    operation: str,
+    input: object,
+    result: object,
+    options: Mapping[str, object] | None,
+    warnings: tuple[str, ...] = (),
+) -> object:
     return candidate_ok(_MODULE, operation, input, result, options=options, warnings=warnings)
 
 
-def analyze_trio_inheritance(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def analyze_trio_inheritance(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Check Mendelian consistency of a child's genotypes against both parents and report the transmitted alleles.
 
     input: {'child': [...], 'father': [...], 'mother': [...]} with one genotype call per site (optional
@@ -37,7 +47,9 @@ def analyze_trio_inheritance(input: object, *, options: Mapping[str, object] | N
     return _ok("analyze_trio_inheritance", input, _impl.trio_inheritance(input), options)
 
 
-def calculate_pedigree_likelihood(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def calculate_pedigree_likelihood(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Compute the likelihood of observed biallelic genotypes on a small pedigree (exact enumeration, no genotyping error).
 
     input: {'pedigree': [{'id', 'father', 'mother'}, ...], 'genotypes': {id: [calls per site]}}; give both
@@ -49,7 +61,9 @@ def calculate_pedigree_likelihood(input: object, *, options: Mapping[str, object
     """
 
     settings = _impl.options_dict(options)
-    return _ok("calculate_pedigree_likelihood", input, _impl.pedigree_likelihood(input, settings), options)
+    return _ok(
+        "calculate_pedigree_likelihood", input, _impl.pedigree_likelihood(input, settings), options
+    )
 
 
 def cluster(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -62,7 +76,12 @@ def cluster(input: object, *, options: Mapping[str, object] | None = None) -> ob
 
     settings = _impl.options_dict(options)
     distance = _impl.get_int(settings, "max_distance", 1, low=0, high=10**6)
-    return _ok("cluster", input, _impl.cluster_haplotypes(input, distance or 0, bool(settings.get("ignore_missing", True))), options)
+    return _ok(
+        "cluster",
+        input,
+        _impl.cluster_haplotypes(input, distance or 0, bool(settings.get("ignore_missing", True))),
+        options,
+    )
 
 
 def compare(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -96,10 +115,12 @@ def construct(input: object, *, options: Mapping[str, object] | None = None) -> 
 
 
 def count(input: object, *, options: Mapping[str, object] | None = None) -> object:
-    return run_candidate_operation('haplotypes', 'count', input, options=options)
+    return run_candidate_operation("haplotypes", "count", input, options=options)
 
 
-def detect_compound_heterozygotes(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def detect_compound_heterozygotes(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Find genes carrying heterozygous variants on both parental haplotypes (compound heterozygotes, in trans).
 
     input: {'genes': [gene per site], 'child': [...]} plus either 'father' and 'mother' (trio mode: the
@@ -111,7 +132,9 @@ def detect_compound_heterozygotes(input: object, *, options: Mapping[str, object
     """
 
     settings = _impl.options_dict(options)
-    return _ok("detect_compound_heterozygotes", input, _impl.compound_hets(input, settings), options)
+    return _ok(
+        "detect_compound_heterozygotes", input, _impl.compound_hets(input, settings), options
+    )
 
 
 def detect_denovo_variants(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -141,7 +164,11 @@ def impute(input: object, *, options: Mapping[str, object] | None = None) -> obj
     """Not implemented: genotype imputation needs a phased reference panel and an HMM imputation engine."""
 
     return candidate_not_implemented(
-        _MODULE, "impute", input, options=options, requires="phased reference haplotype panel and an imputation backend (Beagle, IMPUTE5, Minimac4)",
+        _MODULE,
+        "impute",
+        input,
+        options=options,
+        requires="phased reference haplotype panel and an imputation backend (Beagle, IMPUTE5, Minimac4)",
         message="Imputation infers missing genotypes from a reference panel with a statistical model; neither is part of the input.",
     )
 
@@ -235,13 +262,62 @@ def visualize(input: object, *, options: Mapping[str, object] | None = None) -> 
 
     settings = _impl.options_dict(options)
     svg, rows, sites = _impl.haplotype_svg(input)
-    return _ok("visualize", input, {"svg": svg, "haplotype_count": rows, "site_count": sites, "output_path": _impl.write_output(settings, svg)}, options)
+    return _ok(
+        "visualize",
+        input,
+        {
+            "svg": svg,
+            "haplotype_count": rows,
+            "site_count": sites,
+            "output_path": _impl.write_output(settings, svg),
+        },
+        options,
+    )
 
 
-__all__ = ['analyze_trio_inheritance', 'calculate_pedigree_likelihood', 'cluster', 'compare', 'construct', 'count', 'detect_compound_heterozygotes', 'detect_denovo_variants', 'frequency', 'impute', 'infer_parentage', 'phase', 'reconstruct', 'select', 'simulate', 'tag', 'visualize']
+__all__ = [
+    "analyze_trio_inheritance",
+    "calculate_pedigree_likelihood",
+    "cluster",
+    "compare",
+    "construct",
+    "count",
+    "detect_compound_heterozygotes",
+    "detect_denovo_variants",
+    "frequency",
+    "impute",
+    "infer_parentage",
+    "phase",
+    "reconstruct",
+    "select",
+    "simulate",
+    "tag",
+    "visualize",
+]
 
-__candidate_adapter_operations__ = set(['analyze_trio_inheritance', 'calculate_pedigree_likelihood', 'cluster', 'compare', 'construct', 'count', 'detect_compound_heterozygotes', 'detect_denovo_variants', 'frequency', 'impute', 'infer_parentage', 'phase', 'reconstruct', 'select', 'simulate', 'tag', 'visualize'])
+__candidate_adapter_operations__ = set(
+    [
+        "analyze_trio_inheritance",
+        "calculate_pedigree_likelihood",
+        "cluster",
+        "compare",
+        "construct",
+        "count",
+        "detect_compound_heterozygotes",
+        "detect_denovo_variants",
+        "frequency",
+        "impute",
+        "infer_parentage",
+        "phase",
+        "reconstruct",
+        "select",
+        "simulate",
+        "tag",
+        "visualize",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

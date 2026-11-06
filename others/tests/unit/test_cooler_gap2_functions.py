@@ -29,8 +29,8 @@ pd = pytest.importorskip("pandas")
 pytest.importorskip("h5py")
 cooler = pytest.importorskip("cooler")
 
-from dnakit.epigenome import cooler_gap2_functions as gap2  # noqa: E402
-from dnakit.epigenome.cooler_gap2_functions import (  # noqa: E402
+from dnakit.epigenome import cooler_gap2_functions as gap2
+from dnakit.epigenome.cooler_gap2_functions import (
     cooler_attrs,
     cooler_balance,
     cooler_balance_check,
@@ -60,10 +60,11 @@ from dnakit.epigenome.cooler_gap2_functions import (  # noqa: E402
     cooler_tree,
     cooler_zoomify,
 )
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 
 

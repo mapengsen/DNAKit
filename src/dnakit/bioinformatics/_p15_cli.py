@@ -35,7 +35,12 @@ from dnakit.bioinformatics._gap_cli import (  # noqa: F401  (re-exported for the
     program,
     text,
 )
-from dnakit.exceptions import BackendExecutionError, BackendTimeoutError, ConfigurationError, DNAKitError
+from dnakit.exceptions import (
+    BackendExecutionError,
+    BackendTimeoutError,
+    ConfigurationError,
+    DNAKitError,
+)
 
 TIMEOUT_SECONDS = 86_400.0
 MAX_LOG_BYTES = 5_000_000
@@ -144,7 +149,7 @@ def _stream_stdout(
         env.update(environment)
     stdin_handle = stdin_from.open("rb") if stdin_from is not None else None
     with tempfile.TemporaryFile() as errors, target.open("xb") as out:
-        process = subprocess.Popen(  # noqa: S603 - fixed argument vector, no shell
+        process = subprocess.Popen(
             list(command),
             cwd=str(cwd),
             env=env,
@@ -160,8 +165,13 @@ def _stream_stdout(
             while process.poll() is None:
                 if time.monotonic() > deadline:
                     raise BackendTimeoutError(f"{Path(command[0]).name} exceeded its time limit.")
-                if target.stat().st_size > MAX_STDOUT_BYTES or os.fstat(errors.fileno()).st_size > MAX_LOG_BYTES:
-                    raise BackendExecutionError(f"{Path(command[0]).name} exceeded its output size limit.")
+                if (
+                    target.stat().st_size > MAX_STDOUT_BYTES
+                    or os.fstat(errors.fileno()).st_size > MAX_LOG_BYTES
+                ):
+                    raise BackendExecutionError(
+                        f"{Path(command[0]).name} exceeded its output size limit."
+                    )
                 time.sleep(0.01)
         finally:
             if process.poll() is None:
@@ -220,7 +230,9 @@ def invoke(
             cwd=cwd,
             timeout_seconds=timeout,
             max_output_bytes=MAX_LOG_BYTES,
-            monitored_output_paths=[path for path in wanted if path.is_relative_to(cwd) and path != cwd],
+            monitored_output_paths=[
+                path for path in wanted if path.is_relative_to(cwd) and path != cwd
+            ],
             max_monitored_output_bytes=MAX_STDOUT_BYTES,
             environment_overrides=dict(environment) if environment else None,
             verbose=False,
@@ -276,8 +288,10 @@ def convert_number(value: str) -> Any:
 
 
 def open_text(path: Path) -> Any:
-    return gzip.open(path, "rt", encoding="utf-8", errors="replace") if path.suffix == ".gz" else path.open(
-        "r", encoding="utf-8", errors="replace"
+    return (
+        gzip.open(path, "rt", encoding="utf-8", errors="replace")
+        if path.suffix == ".gz"
+        else path.open("r", encoding="utf-8", errors="replace")
     )
 
 
@@ -309,7 +323,9 @@ def read_table(
             rows.append(
                 {
                     (columns[i] if i < len(columns) else f"column_{i + 1}"): (
-                        value if (i < len(columns) and columns[i] in text_columns) else convert_number(value)
+                        value
+                        if (i < len(columns) and columns[i] in text_columns)
+                        else convert_number(value)
                     )
                     for i, value in enumerate(fields)
                 }

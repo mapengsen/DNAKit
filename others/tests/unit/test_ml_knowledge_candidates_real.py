@@ -54,7 +54,15 @@ def test_evaluate_binary_classification_hand_values():
     # AP: 1/3*1 + 1/3*1 + 1/3*(3/4)
     assert m["auprc"] == pytest.approx(1 / 3 + 1 / 3 + 0.25)
     assert m["log_loss"] == pytest.approx(
-        -(math.log(0.9) + math.log(0.4) + math.log(0.8) + math.log(0.7) + math.log(0.4) + math.log(0.8)) / 6
+        -(
+            math.log(0.9)
+            + math.log(0.4)
+            + math.log(0.8)
+            + math.log(0.7)
+            + math.log(0.4)
+            + math.log(0.8)
+        )
+        / 6
     )
 
 
@@ -93,11 +101,17 @@ def test_evaluate_regression_matches_textbook_values():
 
 
 def test_evaluate_correlations_and_constant_target():
-    out = result(ml.evaluate, {"y_true": [1.5, 2.5, 3.5, 9.5], "y_pred": [4.0, 3.0, 2.0, 1.0]}, task="regression")
+    out = result(
+        ml.evaluate,
+        {"y_true": [1.5, 2.5, 3.5, 9.5], "y_pred": [4.0, 3.0, 2.0, 1.0]},
+        task="regression",
+    )
     # Sxy = -12.5, Sxx = 38.75, Syy = 5 -> r = -12.5 / sqrt(38.75 * 5)
     assert out["metrics"]["pearson"] == pytest.approx(-12.5 / math.sqrt(38.75 * 5))
     assert out["metrics"]["spearman"] == pytest.approx(-1.0)
-    constant = result(ml.evaluate, {"y_true": [2.0, 2.0], "y_pred": [1.0, 3.0]}, task="regression")["metrics"]
+    constant = result(ml.evaluate, {"y_true": [2.0, 2.0], "y_pred": [1.0, 3.0]}, task="regression")[
+        "metrics"
+    ]
     assert constant["pearson"] is None and constant["r2"] == 0.0
 
 
@@ -153,7 +167,12 @@ def test_validate_dataset_finds_errors_and_leakage():
         {"id": "a", "sequence": "ACGT", "label": 1, "split": "train"},
         {"id": "b", "sequence": "ACGT", "label": 1, "split": "test"},  # leakage
         {"id": "c", "sequence": "AXGT", "label": 0, "split": "train"},  # bad character
-        {"id": "c", "sequence": "TTTT", "label": "", "split": "train"},  # duplicate id, missing label
+        {
+            "id": "c",
+            "sequence": "TTTT",
+            "label": "",
+            "split": "train",
+        },  # duplicate id, missing label
         {"id": "e", "sequence": "GGGG", "label": 0, "split": "test"},
     ]
     out = result(ml.validate, rows, split_column="split")
@@ -169,6 +188,7 @@ def test_validate_dataset_finds_errors_and_leakage():
 
 
 # ---------------------------------------------------------------- ml_models: calibration, uncertainty
+
 
 def test_isotonic_calibration_hand_values():
     out = result(
@@ -205,7 +225,9 @@ def test_platt_calibration_matches_scikit_learn():
     labels = [0, 0, 0, 1, 0, 1, 1, 1, 1, 1]
     out = result(ml.calibrate, {"y_true": labels, "y_score": scores}, method="platt")
     a, b = cal._sigmoid_calibration(np.array(scores), np.array(labels))
-    assert out["model"]["parameters"]["A"] == pytest.approx(a, abs=1e-3)  # p = 1 / (1 + exp(a * f + b))
+    assert out["model"]["parameters"]["A"] == pytest.approx(
+        a, abs=1e-3
+    )  # p = 1 / (1 + exp(a * f + b))
     assert out["model"]["parameters"]["B"] == pytest.approx(b, abs=1e-3)
     expected = 1 / (1 + np.exp(a * np.array(scores) + b))
     assert out["calibrated"] == pytest.approx(list(expected), abs=1e-3)
@@ -214,24 +236,34 @@ def test_platt_calibration_matches_scikit_learn():
 def test_export_calibration_model_writes_json(tmp_path: Path):
     target = tmp_path / "cal.json"
     out = result(
-        ml.export_calibration_model, {"y_true": [0, 0, 1, 1], "y_score": [0.1, 0.4, 0.6, 0.9]},
-        method="isotonic", output=str(target),
+        ml.export_calibration_model,
+        {"y_true": [0, 0, 1, 1], "y_score": [0.1, 0.4, 0.6, 0.9]},
+        method="isotonic",
+        output=str(target),
     )
     saved = json.loads(target.read_text(encoding="utf-8"))
     assert saved["type"] == "dnakit.calibration" and saved["method"] == "isotonic"
     assert out["output_path"] == str(target)
     assert out["sha256"] == hashlib.sha256(target.read_bytes()).hexdigest()
     with pytest.raises(ConfigurationError, match="ML_OUTPUT_EXISTS"):
-        run(ml.export_calibration_model, {"y_true": [0, 1], "y_score": [0.1, 0.9]}, output=str(target))
+        run(
+            ml.export_calibration_model,
+            {"y_true": [0, 1], "y_score": [0.1, 0.9]},
+            output=str(target),
+        )
 
 
 def test_prediction_uncertainty_classification_and_ensembles():
-    single = result(ml.calculate_prediction_uncertainty, {"probabilities": [[0.5, 0.5], [1.0, 0.0]]})
+    single = result(
+        ml.calculate_prediction_uncertainty, {"probabilities": [[0.5, 0.5], [1.0, 0.0]]}
+    )
     assert single["samples"][0]["entropy"] == pytest.approx(math.log(2))
     assert single["samples"][0]["margin"] == pytest.approx(0.0)
     assert single["samples"][1]["entropy"] == pytest.approx(0.0)
     assert single["samples"][1]["margin"] == pytest.approx(1.0)
-    base2 = result(ml.calculate_prediction_uncertainty, {"probabilities": [[0.5, 0.25, 0.25]]}, log_base=2)
+    base2 = result(
+        ml.calculate_prediction_uncertainty, {"probabilities": [[0.5, 0.25, 0.25]]}, log_base=2
+    )
     assert base2["samples"][0]["entropy"] == pytest.approx(1.5)
     # two members that fully disagree: predictive entropy ln 2, expected entropy 0, mutual information ln 2
     ensemble = result(
@@ -241,7 +273,9 @@ def test_prediction_uncertainty_classification_and_ensembles():
     assert ensemble["predictive_entropy"] == pytest.approx(math.log(2))
     assert ensemble["expected_entropy"] == pytest.approx(0.0)
     assert ensemble["mutual_information"] == pytest.approx(math.log(2))
-    agree = result(ml.calculate_prediction_uncertainty, {"probabilities": [[[0.5, 0.5]], [[0.5, 0.5]]]})["samples"][0]
+    agree = result(
+        ml.calculate_prediction_uncertainty, {"probabilities": [[[0.5, 0.5]], [[0.5, 0.5]]]}
+    )["samples"][0]
     assert agree["mutual_information"] == pytest.approx(0.0, abs=1e-12)
 
 
@@ -257,14 +291,22 @@ def test_prediction_uncertainty_regression_ensemble():
 def test_conformal_uncertainty_model_quantile_rank(tmp_path: Path):
     t = [float(i) for i in range(1, 10)]
     p = [0.0] * 9  # residuals 1..9
-    model = result(ml.export_conformal_uncertainty_model, {"y_true": t, "y_pred": p}, alpha=0.2)["model"]
+    model = result(ml.export_conformal_uncertainty_model, {"y_true": t, "y_pred": p}, alpha=0.2)[
+        "model"
+    ]
     assert model["rank"] == 8 and model["quantile"] == 8.0  # ceil(10 * 0.8) = 8th smallest
-    small = result(ml.export_conformal_uncertainty_model, {"y_true": t, "y_pred": p}, alpha=0.05)["model"]
+    small = result(ml.export_conformal_uncertainty_model, {"y_true": t, "y_pred": p}, alpha=0.05)[
+        "model"
+    ]
     assert small["rank"] is None and small["quantile"] is None
     cls = result(
         ml.export_conformal_uncertainty_model,
-        {"y_true": ["a", "b", "a", "b"], "probabilities": [[0.9, 0.1], [0.2, 0.8], [0.6, 0.4], [0.3, 0.7]]},
-        alpha=0.5, output=str(tmp_path / "u.json"),
+        {
+            "y_true": ["a", "b", "a", "b"],
+            "probabilities": [[0.9, 0.1], [0.2, 0.8], [0.6, 0.4], [0.3, 0.7]],
+        },
+        alpha=0.5,
+        output=str(tmp_path / "u.json"),
     )
     # nonconformity 1 - p(true) = [0.1, 0.2, 0.4, 0.3]; k = ceil(5 * 0.5) = 3 -> 0.3
     assert cls["model"]["quantile"] == pytest.approx(0.3)
@@ -273,21 +315,34 @@ def test_conformal_uncertainty_model_quantile_rank(tmp_path: Path):
 
 # ---------------------------------------------------------------- ml_models: tables and splits
 
+
 def test_leaderboard_uses_competition_ranking_and_direction():
-    rows = [{"model": "a", "score": 0.9}, {"model": "b", "score": 0.8}, {"model": "c", "score": 0.8}, {"model": "d", "score": 0.5}]
+    rows = [
+        {"model": "a", "score": 0.9},
+        {"model": "b", "score": 0.8},
+        {"model": "c", "score": 0.8},
+        {"model": "d", "score": 0.5},
+    ]
     out = result(ml.export_leaderboard, rows, format="json")
     assert [r["rank"] for r in out["ranking"]] == [1, 2, 2, 4]
     assert out["higher_is_better"] is True
-    rmse = result(ml.export_leaderboard, [{"model": "x", "rmse": 3.0}, {"model": "y", "rmse": 1.0}], metric="rmse")
+    rmse = result(
+        ml.export_leaderboard,
+        [{"model": "x", "rmse": 3.0}, {"model": "y", "rmse": 1.0}],
+        metric="rmse",
+    )
     assert [r["model"] for r in rmse["ranking"]] == ["y", "x"]
     assert rmse["content"].splitlines()[0] == "rank\tmodel\trmse"
 
 
 def test_benchmark_ranks_per_dataset_and_summarises():
     rows = [
-        {"model": "A", "dataset": "d1", "value": 0.9}, {"model": "B", "dataset": "d1", "value": 0.8},
-        {"model": "A", "dataset": "d2", "value": 0.7}, {"model": "B", "dataset": "d2", "value": 0.8},
-        {"model": "A", "dataset": "d3", "value": 0.6}, {"model": "B", "dataset": "d3", "value": 0.1},
+        {"model": "A", "dataset": "d1", "value": 0.9},
+        {"model": "B", "dataset": "d1", "value": 0.8},
+        {"model": "A", "dataset": "d2", "value": 0.7},
+        {"model": "B", "dataset": "d2", "value": 0.8},
+        {"model": "A", "dataset": "d3", "value": 0.6},
+        {"model": "B", "dataset": "d3", "value": 0.1},
     ]
     out = result(ml.export_benchmark, rows)
     summary = {r["model"]: r for r in out["summary"]}
@@ -301,16 +356,23 @@ def test_benchmark_ranks_per_dataset_and_summarises():
 
 
 def test_export_dataset_formats(tmp_path: Path):
-    rows = [{"id": "s1", "sequence": "ACGT", "label": 1}, {"id": "s2", "sequence": "GG", "label": 0}]
+    rows = [
+        {"id": "s1", "sequence": "ACGT", "label": 1},
+        {"id": "s2", "sequence": "GG", "label": 0},
+    ]
     csv_text = result(ml.export_dataset, rows)["content"]
     assert csv_text == "id,sequence,label\ns1,ACGT,1\ns2,GG,0\n"
     assert result(ml.export_dataset, rows, format="fasta")["content"] == ">s1\nACGT\n>s2\nGG\n"
-    assert result(ml.export_dataset, rows, format="tsv", columns=["label", "id"])["content"] == "label\tid\n1\ts1\n0\ts2\n"
+    assert (
+        result(ml.export_dataset, rows, format="tsv", columns=["label", "id"])["content"]
+        == "label\tid\n1\ts1\n0\ts2\n"
+    )
     path = tmp_path / "out.jsonl"
     info = result(ml.export_dataset, {"id": ["x", "y"], "sequence": ["A", "C"]}, output=str(path))
     assert info["n_records"] == 2
     assert [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()] == [
-        {"id": "x", "sequence": "A"}, {"id": "y", "sequence": "C"},
+        {"id": "x", "sequence": "A"},
+        {"id": "y", "sequence": "C"},
     ]
 
 
@@ -320,11 +382,18 @@ def _records(n):
 
 @pytest.mark.parametrize(
     ("n", "expected"),
-    [(10, {"train": 8, "validation": 1, "test": 1}), (15, {"train": 12, "validation": 2, "test": 1}), (7, {"train": 5, "validation": 1, "test": 1})],
+    [
+        (10, {"train": 8, "validation": 1, "test": 1}),
+        (15, {"train": 12, "validation": 2, "test": 1}),
+        (7, {"train": 5, "validation": 1, "test": 1}),
+    ],
 )
 def test_splits_use_largest_remainder_counts_and_partition_the_rows(n, expected):
     rows = _records(n)
-    parts = {name: result(getattr(ml, f"export_{name}_split"), rows, seed=3, format="json") for name in ("train", "validation", "test")}
+    parts = {
+        name: result(getattr(ml, f"export_{name}_split"), rows, seed=3, format="json")
+        for name in ("train", "validation", "test")
+    }
     assert parts["train"]["counts"] == expected
     all_indices = sorted(i for p in parts.values() for i in p["row_indices"])
     assert all_indices == list(range(n))  # every row exactly once
@@ -339,10 +408,17 @@ def test_group_split_never_splits_a_group_and_existing_split_column_wins():
     rows = _records(30)
     seen = {}
     for name in ("train", "validation", "test"):
-        for index in result(getattr(ml, f"export_{name}_split"), rows, group_column="group", seed=1)["row_indices"]:
+        for index in result(
+            getattr(ml, f"export_{name}_split"), rows, group_column="group", seed=1
+        )["row_indices"]:
             seen.setdefault(rows[index]["group"], set()).add(name)
     assert all(len(v) == 1 for v in seen.values()) and len(seen) == 10
-    fixed = [{"id": "a", "split": "train"}, {"id": "b", "split": "val"}, {"id": "c", "split": "test"}, {"id": "d", "split": "TRAIN"}]
+    fixed = [
+        {"id": "a", "split": "train"},
+        {"id": "b", "split": "val"},
+        {"id": "c", "split": "test"},
+        {"id": "d", "split": "TRAIN"},
+    ]
     assert result(ml.export_validation_split, fixed)["row_indices"] == [1]
     assert result(ml.export_train_split, fixed)["row_indices"] == [0, 3]
     with pytest.raises(InputFormatError, match="ML_UNKNOWN_SPLIT"):
@@ -353,11 +429,21 @@ def test_group_split_never_splits_a_group_and_existing_split_column_wins():
 
 # ---------------------------------------------------------------- ml_models: sequence operations
 
+
 def test_encode_one_hot_integer_and_kmer():
     onehot = result(ml.encode, "ACGT")
-    assert onehot["encodings"][0]["values"] == [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+    assert onehot["encodings"][0]["values"] == [
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
     assert onehot["feature_names"] == ["A", "C", "G", "T"]
-    assert result(ml.encode, ["ACGT", "TTA"], method="integer")["encodings"][1]["values"] == [3, 3, 0]
+    assert result(ml.encode, ["ACGT", "TTA"], method="integer")["encodings"][1]["values"] == [
+        3,
+        3,
+        0,
+    ]
     kmers = result(ml.encode, "ACGTAC", method="kmer", k=2)
     names = kmers["feature_names"]
     counts = dict(zip(names, kmers["encodings"][0]["values"], strict=True))
@@ -369,11 +455,20 @@ def test_encode_one_hot_integer_and_kmer():
 
 
 def test_export_onehot_and_kmer_matrices(tmp_path: Path):
-    tsv = result(ml.export_onehot_embedding, [{"id": "s1", "sequence": "AC"}], format="tsv")["content"]
-    assert tsv.splitlines() == ["id\tposition\tA\tC\tG\tT", "s1\t0\t1\t0\t0\t0", "s1\t1\t0\t1\t0\t0"]
+    tsv = result(ml.export_onehot_embedding, [{"id": "s1", "sequence": "AC"}], format="tsv")[
+        "content"
+    ]
+    assert tsv.splitlines() == [
+        "id\tposition\tA\tC\tG\tT",
+        "s1\t0\t1\t0\t0\t0",
+        "s1\t1\t0\t1\t0\t0",
+    ]
     path = tmp_path / "oh.json"
     info = result(ml.export_onehot_embedding, ["GT"], output=str(path))
-    assert json.loads(path.read_text(encoding="utf-8"))["sequences"]["seq1"] == [[0, 0, 1, 0], [0, 0, 0, 1]]
+    assert json.loads(path.read_text(encoding="utf-8"))["sequences"]["seq1"] == [
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+    ]
     assert info["total_positions"] == 2
     kmer = result(ml.export_kmer_embedding, ["AAAA", "ACGT"], k=1)["content"].splitlines()
     assert kmer[0] == "id\tA\tC\tG\tT"
@@ -402,11 +497,15 @@ def test_mask_dna_tokens_counts_positions_and_determinism():
     seq = "ACGT" * 5
     out = result(ml.mask_dna_tokens, seq, mask_rate=0.25)["sequences"][0]
     assert len(out["masked_positions"]) == 5 and out["tokens"] == list(seq)
-    for position, (orig, masked) in enumerate(zip(out["tokens"], out["masked_tokens"], strict=True)):
+    for position, (orig, masked) in enumerate(
+        zip(out["tokens"], out["masked_tokens"], strict=True)
+    ):
         assert masked == ("[MASK]" if position in out["masked_positions"] else orig)
     assert out["labels"] == {str(p): seq[p] for p in out["masked_positions"]}
     assert result(ml.mask_dna_tokens, seq, mask_rate=0.25)["sequences"][0] == out
-    kmer = result(ml.mask_dna_tokens, "ACGTACGTAC", token_size=3, mask_rate=0.5, mask_token="N")["sequences"][0]
+    kmer = result(ml.mask_dna_tokens, "ACGTACGTAC", token_size=3, mask_rate=0.5, mask_token="N")[
+        "sequences"
+    ][0]
     assert kmer["tokens"] == ["ACG", "TAC", "GTA", "C"] and len(kmer["masked_positions"]) == 2
     none = result(ml.mask_dna_tokens, "ACGT", mask_rate=0.0)["sequences"][0]
     assert none["masked_positions"] == [] and none["masked_tokens"] == list("ACGT")
@@ -439,27 +538,44 @@ def test_mutagenesis_and_attribution_with_scorer():
 def test_permutation_importance_of_a_known_model():
     x = [[float(i), float((i * 7) % 5)] for i in range(12)]
     y = [row[0] for row in x]
-    out = result(ml.explain, {"X": x, "y": y, "feature_names": ["signal", "noise"]}, model=lambda rows: [r[0] for r in rows], seed=1)
+    out = result(
+        ml.explain,
+        {"X": x, "y": y, "feature_names": ["signal", "noise"]},
+        model=lambda rows: [r[0] for r in rows],
+        seed=1,
+    )
     by_name = {i["feature"]: i for i in out["importances"]}
     assert out["baseline_score"] == pytest.approx(1.0)
     assert by_name["noise"]["importance_mean"] == pytest.approx(0.0, abs=1e-12)  # model ignores x1
     assert by_name["signal"]["importance_mean"] > 0.5
     again = result(ml.explain, {"X": x, "y": y}, model=lambda rows: [r[0] for r in rows], seed=1)
-    assert again["importances"][0]["importance_mean"] == pytest.approx(by_name["signal"]["importance_mean"])
-    acc = result(ml.explain, {"X": [[0, 1], [1, 1], [0, 0], [1, 0]], "y": [0, 1, 0, 1]}, model=lambda r: [row[0] for row in r], task="classification")
+    assert again["importances"][0]["importance_mean"] == pytest.approx(
+        by_name["signal"]["importance_mean"]
+    )
+    acc = result(
+        ml.explain,
+        {"X": [[0, 1], [1, 1], [0, 0], [1, 0]], "y": [0, 1, 0, 1]},
+        model=lambda r: [row[0] for row in r],
+        task="classification",
+    )
     assert acc["baseline_score"] == 1.0 and acc["metric"] == "accuracy"
 
 
 def test_export_interpretability_tsv_and_json():
-    tsv = result(ml.export_interpretability, {"sequence": "ACG", "attributions": [0.5, -1.0, 0.0]})["content"]
+    tsv = result(ml.export_interpretability, {"sequence": "ACG", "attributions": [0.5, -1.0, 0.0]})[
+        "content"
+    ]
     assert tsv == "position\tbase\tattribution\n0\tA\t0.5\n1\tC\t-1\n2\tG\t0\n"
-    computed = result(ml.export_interpretability, "ACG", scorer=lambda s: float(s.count("A")), format="json")
+    computed = result(
+        ml.export_interpretability, "ACG", scorer=lambda s: float(s.count("A")), format="json"
+    )
     assert json.loads(computed["content"])["attributions"] == pytest.approx([1.0, -1 / 3, -1 / 3])
     with pytest.raises(InputFormatError, match="ML_LENGTH_MISMATCH"):
         run(ml.export_interpretability, {"sequence": "AC", "attributions": [1.0]})
 
 
 # ---------------------------------------------------------------- ml_models: delegations
+
 
 @pytest.fixture
 def trained(tmp_path: Path):
@@ -470,14 +586,22 @@ def trained(tmp_path: Path):
     rows = []
     for i in range(40):
         letters, label = ("AC", "a") if i % 2 == 0 else ("GT", "b")
-        rows.append({"id": f"r{i}", "sequence": "".join(rng.choice(letters) for _ in range(30)), "label": label})
+        rows.append(
+            {
+                "id": f"r{i}",
+                "sequence": "".join(rng.choice(letters) for _ in range(30)),
+                "label": label,
+            }
+        )
     data = tmp_path / "data.csv"
     with data.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["id", "sequence", "label"])
         writer.writeheader()
         writer.writerows(rows)
     options = {
-        "task_type": "classification", "model": "logistic_regression", "output_dir": str(tmp_path / "model"),
+        "task_type": "classification",
+        "model": "logistic_regression",
+        "output_dir": str(tmp_path / "model"),
         "mapping": {"sequence_field": "sequence", "label_fields": ["label"], "id_field": "id"},
     }
     return data, options, rows
@@ -488,8 +612,12 @@ def test_train_predict_load_roundtrip_on_separable_sequences(trained):
     trained_out = result(ml.train, str(data), **options)
     assert trained_out["delegate"].endswith("train_custom_property_model")
     assert trained_out["training"]["finetune_method"] == "machine_learning"
-    assert trained_out["training"]["metrics"]["test"]["accuracy"] == 1.0  # A/C-only vs G/T-only is separable
-    predicted = result(ml.predict, str(data), model_dir=options["output_dir"], trust_model=True)["prediction"]
+    assert (
+        trained_out["training"]["metrics"]["test"]["accuracy"] == 1.0
+    )  # A/C-only vs G/T-only is separable
+    predicted = result(ml.predict, str(data), model_dir=options["output_dir"], trust_model=True)[
+        "prediction"
+    ]
     assert [p["label"] for p in predicted["predictions"]] == [r["label"] for r in rows]
     manifest = result(ml.load, options["output_dir"])
     assert manifest["manifest"]["task_type"] == "classification" and manifest["artifact_present"]
@@ -514,7 +642,13 @@ def test_train_validation_errors(trained, tmp_path: Path):
 
 def test_build_describes_untrained_estimator():
     pytest.importorskip("sklearn")
-    out = result(ml.build, None, task_type="classification", model="svm", model_params={"kernel": "linear", "C": 2.0})
+    out = result(
+        ml.build,
+        None,
+        task_type="classification",
+        model="svm",
+        model_params={"kernel": "linear", "C": 2.0},
+    )
     assert out["estimator_class"].endswith("SVC") and out["trained"] is False
     assert out["params"]["kernel"] == "linear" and out["params"]["C"] == 2.0
     reg = result(ml.build, {"task_type": "regression", "model": "ridge"})
@@ -525,7 +659,9 @@ def test_search_filters_the_model_catalogue():
     names = lambda out: {m["name"] for m in out["matches"]}  # noqa: E731
     assert "random_forest" in names(result(ml.search, "random forest"))
     assert "random_forest" in names(result(ml.search, "random_forest"))
-    regression = result(ml.search, "", kind="machine_learning_estimator", task="regression", limit=1000)
+    regression = result(
+        ml.search, "", kind="machine_learning_estimator", task="regression", limit=1000
+    )
     assert "ridge" in names(regression) and "logistic_regression" not in names(regression)
     assert "dnabert2" in names(result(ml.search, "dnabert2", kind="dna_embedding_model"))
     assert result(ml.search, "zzzz-no-such-model")["n_matches"] == 0
@@ -541,7 +677,12 @@ class StubBackend:
 
 
 def test_sequence_embeddings_delegate_to_representation_extraction():
-    out = result(ml.generate_sequence_embeddings, ["AACC", "GGTT"], representation_backend=StubBackend(), model="dnabert2")
+    out = result(
+        ml.generate_sequence_embeddings,
+        ["AACC", "GGTT"],
+        representation_backend=StubBackend(),
+        model="dnabert2",
+    )
     assert out["embeddings"] == [[0.5, 0.0, 1.0], [0.0, 0.5, 1.0]]
     assert out["record_ids"] == ["seq1", "seq2"] and out["dimension"] == 3
     assert out["delegate"].endswith("extract_representations")
@@ -552,11 +693,20 @@ def test_finetune_linear_probe_with_frozen_embeddings(trained, tmp_path: Path):
     data, options, _ = trained
     probe = {k: v for k, v in options.items() if k not in {"model", "output_dir"}}
     out = result(
-        ml.finetune, str(data), representation_backend=StubBackend(), model="dnabert2", output_dir=str(tmp_path / "probe"),
-        epochs=30, workers=0, learning_rate=0.05, **probe,
+        ml.finetune,
+        str(data),
+        representation_backend=StubBackend(),
+        model="dnabert2",
+        output_dir=str(tmp_path / "probe"),
+        epochs=30,
+        workers=0,
+        learning_rate=0.05,
+        **probe,
     )
     assert out["training"]["finetune_method"] == "linear_probe"
-    assert out["training"]["metrics"]["test"]["accuracy"] == 1.0  # fraction of A / G separates the classes
+    assert (
+        out["training"]["metrics"]["test"]["accuracy"] == 1.0
+    )  # fraction of A / G separates the classes
     assert (tmp_path / "probe" / "head.npz").is_file()
 
 
@@ -564,7 +714,9 @@ def test_export_torchscript_roundtrip(tmp_path: Path):
     torch = pytest.importorskip("torch")
     net = torch.nn.Sequential(torch.nn.Linear(3, 2), torch.nn.ReLU())
     target = tmp_path / "net.pt"
-    out = result(ml.export_torchscript_model, net, example_input=[[1.0, 2.0, 3.0]], output=str(target))
+    out = result(
+        ml.export_torchscript_model, net, example_input=[[1.0, 2.0, 3.0]], output=str(target)
+    )
     assert out["roundtrip_max_abs_difference"] == 0.0 and out["input_shape"] == [1, 3]
     reloaded = torch.jit.load(str(target))
     sample = torch.tensor([[0.5, -1.0, 2.0]])
@@ -572,16 +724,35 @@ def test_export_torchscript_roundtrip(tmp_path: Path):
     with pytest.raises(ConfigurationError, match="ML_OUTPUT_EXISTS"):
         run(ml.export_torchscript_model, net, example_input=[[1.0, 2.0, 3.0]], output=str(target))
     with pytest.raises(InputFormatError, match="ML_NOT_A_TORCH_MODULE"):
-        run(ml.export_torchscript_model, "not a model", example_input=[[1.0]], output=str(tmp_path / "x.pt"))
+        run(
+            ml.export_torchscript_model,
+            "not a model",
+            example_input=[[1.0]],
+            output=str(tmp_path / "x.pt"),
+        )
 
 
 # ---------------------------------------------------------------- ml_models: leftovers and invalid input
 
 ML_NOT_IMPLEMENTED = [
-    "pretrain", "serve", "quantize_model", "run_cross_species_transfer", "export_model_onnx", "export_onnx_model",
-    "export_chromatin_model", "export_cnn_model", "export_expression_model", "export_graph_model",
-    "export_long_context_model", "export_pangenome_model", "export_phenotype_model", "export_protein_model",
-    "export_rnn_model", "export_splice_model", "export_transformer_model", "export_variant_effect_model",
+    "pretrain",
+    "serve",
+    "quantize_model",
+    "run_cross_species_transfer",
+    "export_model_onnx",
+    "export_onnx_model",
+    "export_chromatin_model",
+    "export_cnn_model",
+    "export_expression_model",
+    "export_graph_model",
+    "export_long_context_model",
+    "export_pangenome_model",
+    "export_phenotype_model",
+    "export_protein_model",
+    "export_rnn_model",
+    "export_splice_model",
+    "export_transformer_model",
+    "export_variant_effect_model",
 ]
 
 
@@ -595,8 +766,14 @@ def test_ml_models_leftovers_report_not_implemented(name):
 
 @pytest.mark.parametrize(
     ("name", "value"),
-    [("mutagenesis", "ACGT"), ("attribute", "ACGT"), ("explain", {"X": [[1.0]], "y": [1.0]}),
-     ("export_interpretability", "ACGT"), ("generate_sequence_embeddings", ["ACGT"]), ("finetune", "missing.csv")],
+    [
+        ("mutagenesis", "ACGT"),
+        ("attribute", "ACGT"),
+        ("explain", {"X": [[1.0]], "y": [1.0]}),
+        ("export_interpretability", "ACGT"),
+        ("generate_sequence_embeddings", ["ACGT"]),
+        ("finetune", "missing.csv"),
+    ],
 )
 def test_model_dependent_functions_without_a_model_report_not_implemented(name, value):
     assert getattr(ml, name)(value, verbose=False)["status"] == "not_implemented"
@@ -616,9 +793,24 @@ def test_every_ml_function_is_accounted_for():
         (ml.evaluate, {"y_true": [1, 2], "y_pred": [1]}, {}, "ML_LENGTH_MISMATCH"),
         (ml.evaluate, {"y_true": [1, 2]}, {}, "ML_COLUMN_NOT_FOUND"),
         (ml.evaluate, "not a path", {}, "INVALID_ML_INPUT|ML_INPUT"),
-        (ml.evaluate, {"y_true": [0, 1], "y_pred": [0, 1]}, {"metrics": ["nope"]}, "UNKNOWN_ML_METRIC"),
-        (ml.calibrate, {"y_true": [1, 1], "y_score": [0.2, 0.9]}, {}, "ML_AMBIGUOUS_POSITIVE|CALIBRATION_ONE_CLASS"),
-        (ml.calculate_prediction_uncertainty, {"probabilities": [[0.9, 0.3]]}, {}, "INVALID_ML_INPUT"),
+        (
+            ml.evaluate,
+            {"y_true": [0, 1], "y_pred": [0, 1]},
+            {"metrics": ["nope"]},
+            "UNKNOWN_ML_METRIC",
+        ),
+        (
+            ml.calibrate,
+            {"y_true": [1, 1], "y_score": [0.2, 0.9]},
+            {},
+            "ML_AMBIGUOUS_POSITIVE|CALIBRATION_ONE_CLASS",
+        ),
+        (
+            ml.calculate_prediction_uncertainty,
+            {"probabilities": [[0.9, 0.3]]},
+            {},
+            "INVALID_ML_INPUT",
+        ),
         (ml.calculate_prediction_uncertainty, {"x": 1}, {}, "ML_COLUMN_NOT_FOUND"),
         (ml.export_leaderboard, [{"model": "a"}], {}, "ML_COLUMN_NOT_FOUND"),
         (ml.encode, [], {}, "INVALID_ML_INPUT"),
@@ -658,36 +850,59 @@ def edge_set(graph):
 def test_build_merges_duplicates_and_accepts_every_input_form(tmp_path: Path):
     out = result(kg.build_knowledge_graph, TRIPLES + [TRIPLES[0]])
     assert out["n_nodes"] == 4 and out["n_edges"] == 4 and out["duplicate_edges"] == 1
-    assert out["relation_counts"] == {"associated_with": 1, "inhibits": 1, "interacts_with": 1, "regulates": 1}
+    assert out["relation_counts"] == {
+        "associated_with": 1,
+        "inhibits": 1,
+        "interacts_with": 1,
+        "regulates": 1,
+    }
     merged = next(e for e in out["graph"]["edges"] if e["relation"] == "associated_with")
     assert merged["count"] == 2
-    mappings = result(kg.build_knowledge_graph, [
-        {"subject": "a", "predicate": "p", "object": "b", "weight": 0.5},
-        {"head": "b", "relation": "q", "tail": "c"},
-        {"from": "c", "to": "a"},
-    ])
-    assert edge_set(mappings["graph"]) == {("a", "p", "b"), ("b", "q", "c"), ("c", "related_to", "a")}
+    mappings = result(
+        kg.build_knowledge_graph,
+        [
+            {"subject": "a", "predicate": "p", "object": "b", "weight": 0.5},
+            {"head": "b", "relation": "q", "tail": "c"},
+            {"from": "c", "to": "a"},
+        ],
+    )
+    assert edge_set(mappings["graph"]) == {
+        ("a", "p", "b"),
+        ("b", "q", "c"),
+        ("c", "related_to", "a"),
+    }
     assert next(e for e in mappings["graph"]["edges"] if e["relation"] == "p")["weight"] == 0.5
     text = "subject\tpredicate\tobject\nx\tr\ty\ny\tr\tz\n"
     assert result(kg.build_knowledge_graph, text)["n_edges"] == 2
     path = tmp_path / "edges.tsv"
     path.write_text("a\tr\tb\n# comment\nb\tr\tc\n", encoding="utf-8")
     assert result(kg.build_knowledge_graph, str(path))["n_nodes"] == 3
-    graph = result(kg.build_knowledge_graph, {"nodes": [{"id": "g1", "type": "gene"}, "lonely"], "edges": [["g1", "r", "g2"]]})
+    graph = result(
+        kg.build_knowledge_graph,
+        {"nodes": [{"id": "g1", "type": "gene"}, "lonely"], "edges": [["g1", "r", "g2"]]},
+    )
     assert graph["n_nodes"] == 3 and graph["graph"]["nodes"][0] == {"id": "g1", "type": "gene"}
 
 
 def test_undirected_graphs_treat_edge_endpoints_as_unordered():
     out = result(kg.build_knowledge_graph, [["a", "r", "b"], ["b", "r", "a"]], directed=False)
     assert out["n_edges"] == 1 and out["duplicate_edges"] == 1 and out["directed"] is False
-    loops = result(kg.build_knowledge_graph, [["a", "r", "a"], ["a", "r", "b"]], drop_self_loops=True)
+    loops = result(
+        kg.build_knowledge_graph, [["a", "r", "a"], ["a", "r", "b"]], drop_self_loops=True
+    )
     assert loops["n_edges"] == 1 and loops["dropped_self_loops"] == 1
 
 
 def test_create_with_seed_nodes_and_edges():
     empty = result(kg.create, None, name="demo")
     assert empty["n_nodes"] == 0 and empty["graph"]["name"] == "demo"
-    seeded = result(kg.create, None, nodes=["a", {"id": "b", "type": "x"}], edges=[["a", "r", "b"]], directed=False)
+    seeded = result(
+        kg.create,
+        None,
+        nodes=["a", {"id": "b", "type": "x"}],
+        edges=[["a", "r", "b"]],
+        directed=False,
+    )
     assert seeded["n_nodes"] == 2 and seeded["directed"] is False and seeded["n_edges"] == 1
 
 
@@ -696,24 +911,55 @@ def test_add_graph_relationship_does_not_mutate_and_handles_duplicates():
     out = result(kg.add_graph_relationship, original, subject="b", predicate="r", object="c")
     assert out["n_edges"] == 2 and out["added"] == [{"source": "b", "relation": "r", "target": "c"}]
     assert original == [["a", "r", "b"]]
-    again = result(kg.add_graph_relationship, original, relationships=[["a", "r", "b"], ["x", "r", "y"]])
-    assert again["already_present"] == [{"source": "a", "relation": "r", "target": "b"}] and again["n_edges"] == 2
+    again = result(
+        kg.add_graph_relationship, original, relationships=[["a", "r", "b"], ["x", "r", "y"]]
+    )
+    assert (
+        again["already_present"] == [{"source": "a", "relation": "r", "target": "b"}]
+        and again["n_edges"] == 2
+    )
     with pytest.raises(InputFormatError, match="DUPLICATE_EDGE"):
-        run(kg.add_graph_relationship, original, subject="a", predicate="r", object="b", on_duplicate="error")
+        run(
+            kg.add_graph_relationship,
+            original,
+            subject="a",
+            predicate="r",
+            object="b",
+            on_duplicate="error",
+        )
     with pytest.raises(InputFormatError, match="UNKNOWN_NODE"):
-        run(kg.add_graph_relationship, original, subject="a", predicate="r", object="zz", create_missing_nodes=False)
+        run(
+            kg.add_graph_relationship,
+            original,
+            subject="a",
+            predicate="r",
+            object="zz",
+            create_missing_nodes=False,
+        )
     with pytest.raises(ConfigurationError):
         run(kg.add_graph_relationship, original)
 
 
 def test_update_removes_nodes_with_their_edges_and_sets_properties():
     out = result(
-        kg.update, TRIPLES, remove_nodes=["MDM2"], set_node_properties={"TP53": {"type": "gene"}},
-        set_edge_properties=[{"source": "BRCA1", "relation": "interacts_with", "target": "TP53", "properties": {"score": 0.9}}],
+        kg.update,
+        TRIPLES,
+        remove_nodes=["MDM2"],
+        set_node_properties={"TP53": {"type": "gene"}},
+        set_edge_properties=[
+            {
+                "source": "BRCA1",
+                "relation": "interacts_with",
+                "target": "TP53",
+                "properties": {"score": 0.9},
+            }
+        ],
     )
     assert out["nodes_removed"] == 1 and out["edges_removed"] == 2 and out["n_edges"] == 2
     assert {n["id"]: n for n in out["graph"]["nodes"]}["TP53"]["type"] == "gene"
-    assert next(e for e in out["graph"]["edges"] if e["relation"] == "interacts_with")["score"] == 0.9
+    assert (
+        next(e for e in out["graph"]["edges"] if e["relation"] == "interacts_with")["score"] == 0.9
+    )
     removed = result(kg.update, TRIPLES, remove_edges=[["TP53", "regulates", "MDM2"]])
     assert removed["n_edges"] == 3 and removed["n_nodes"] == 4
     with pytest.raises(InputFormatError, match="UNKNOWN_NODE"):
@@ -726,10 +972,21 @@ def test_update_removes_nodes_with_their_edges_and_sets_properties():
 def test_link_pairs_and_shared_property():
     out = result(kg.link, [["a", "r", "b"]], pairs=[["a", "c"], ["a", "b"]], relation="same_as")
     assert out["n_created"] == 2 and ("a", "same_as", "c") in edge_set(out["graph"])
-    graph = {"nodes": [{"id": "n1", "symbol": "TP53"}, {"id": "n2", "symbol": "tp53"}, {"id": "n3", "symbol": " TP53 "}, {"id": "n4", "symbol": "MDM2"}]}
+    graph = {
+        "nodes": [
+            {"id": "n1", "symbol": "TP53"},
+            {"id": "n2", "symbol": "tp53"},
+            {"id": "n3", "symbol": " TP53 "},
+            {"id": "n4", "symbol": "MDM2"},
+        ]
+    }
     shared = result(kg.link, graph, by="symbol")
     assert shared["n_created"] == 3  # C(3, 2) pairs among n1, n2, n3
-    assert {(c["source"], c["target"]) for c in shared["created"]} == {("n1", "n2"), ("n1", "n3"), ("n2", "n3")}
+    assert {(c["source"], c["target"]) for c in shared["created"]} == {
+        ("n1", "n2"),
+        ("n1", "n3"),
+        ("n2", "n3"),
+    }
     with pytest.raises(InputFormatError, match="GRAPH_GROUP_TOO_LARGE"):
         run(kg.link, graph, by="symbol", max_group_size=2)
     with pytest.raises(ConfigurationError):
@@ -743,10 +1000,17 @@ def test_map_renames_and_merges_nodes():
     assert edge_set(out["graph"]) == {("ENSG1", "regulates", "ENSG2"), ("ENSG1", "binds", "DNA")}
     assert next(e for e in out["graph"]["edges"] if e["relation"] == "regulates")["count"] == 2
     dropped = result(kg.map, triples, mapping={"TP53": "X", "MDM2": "Y"}, unmapped="drop")
-    assert edge_set(dropped["graph"]) == {("X", "regulates", "Y")} and dropped["n_nodes_dropped"] == 2
+    assert (
+        edge_set(dropped["graph"]) == {("X", "regulates", "Y")} and dropped["n_nodes_dropped"] == 2
+    )
     with pytest.raises(InputFormatError, match="UNMAPPED_NODE"):
         run(kg.map, triples, mapping={"TP53": "X"}, unmapped="error")
-    renamed = result(kg.map, triples[:1], mapping=[{"from": "TP53", "to": "T"}], relation_mapping={"regulates": "controls"})
+    renamed = result(
+        kg.map,
+        triples[:1],
+        mapping=[{"from": "TP53", "to": "T"}],
+        relation_mapping={"regulates": "controls"},
+    )
     assert edge_set(renamed["graph"]) == {("T", "controls", "MDM2")}
     with pytest.raises(ConfigurationError):
         run(kg.map, triples)
@@ -761,9 +1025,18 @@ def test_aggregate_degree_statistics_hand_values():
     assert out["density"] == pytest.approx(2 / (6 * 5))
     assert out["n_isolated_nodes"] == 3 and out["n_weakly_connected_components"] == 4
     assert out["largest_component_size"] == 3
-    assert out["top_hubs"][0] == {"id": "B", "degree": 2, "in_degree": 1, "out_degree": 1} and len(out["top_hubs"]) == 2
+    assert (
+        out["top_hubs"][0] == {"id": "B", "degree": 2, "in_degree": 1, "out_degree": 1}
+        and len(out["top_hubs"]) == 2
+    )
     assert out["relation_counts"] == {"r": 1, "s": 1}
-    typed = result(kg.aggregate, {"nodes": [{"id": "a", "type": "gene"}, {"id": "b", "type": "gene"}, {"id": "c"}], "edges": []})
+    typed = result(
+        kg.aggregate,
+        {
+            "nodes": [{"id": "a", "type": "gene"}, {"id": "b", "type": "gene"}, {"id": "c"}],
+            "edges": [],
+        },
+    )
     assert typed["node_type_counts"] == {"gene": 2, "unknown": 1} and typed["density"] == 0.0
     undirected = result(kg.aggregate, [["a", "r", "b"]], directed=False)
     assert undirected["density"] == 1.0
@@ -773,22 +1046,53 @@ def test_query_neighbors_depth_direction_and_shortest_path():
     out = result(kg.query_graph_neighbors, CHAIN, node="A", depth=2, direction="out")
     assert [(n["id"], n["distance"]) for n in out["neighbors"]] == [("B", 1), ("C", 2)]
     assert out["neighbors"][1]["path"] == ["A", "B", "C"]
-    assert result(kg.query_graph_neighbors, CHAIN, node="C", direction="in", depth=5)["neighbors"][0]["id"] == "B"
+    assert (
+        result(kg.query_graph_neighbors, CHAIN, node="C", direction="in", depth=5)["neighbors"][0][
+            "id"
+        ]
+        == "B"
+    )
     both = result(kg.query_graph_neighbors, CHAIN, node="B", direction="both")
     assert {n["id"] for n in both["neighbors"]} == {"A", "C"}
     assert result(kg.query_graph_neighbors, CHAIN, node="D", direction="out")["n_neighbors"] == 0
-    path = result(kg.query_graph_neighbors, CHAIN, node="A", direction="out", target="D")["shortest_path"]
+    path = result(kg.query_graph_neighbors, CHAIN, node="A", direction="out", target="D")[
+        "shortest_path"
+    ]
     assert path["found"] and path["length"] == 3 and path["nodes"] == ["A", "B", "C", "D"]
     assert [e["target"] for e in path["edges"]] == ["B", "C", "D"]
-    assert not result(kg.query_graph_neighbors, CHAIN, node="D", direction="out", target="A")["shortest_path"]["found"]
-    assert result(kg.query_graph_neighbors, CHAIN, node="D", direction="both", target="A")["shortest_path"]["length"] == 3
+    assert not result(kg.query_graph_neighbors, CHAIN, node="D", direction="out", target="A")[
+        "shortest_path"
+    ]["found"]
+    assert (
+        result(kg.query_graph_neighbors, CHAIN, node="D", direction="both", target="A")[
+            "shortest_path"
+        ]["length"]
+        == 3
+    )
     shortcut = CHAIN + [["A", "jump", "D"]]
-    assert result(kg.query_graph_neighbors, shortcut, node="A", direction="out", target="D")["shortest_path"]["length"] == 1
-    filtered = result(kg.query_graph_neighbors, shortcut, node="A", direction="out", relations=["next"], depth=3)
-    assert [n["id"] for n in filtered["neighbors"]] == ["B", "C", "D"] and filtered["neighbors"][2]["distance"] == 3
-    sub = result(kg.query_graph_neighbors, CHAIN, node="A", direction="out", depth=1, include_subgraph=True)["subgraph"]
+    assert (
+        result(kg.query_graph_neighbors, shortcut, node="A", direction="out", target="D")[
+            "shortest_path"
+        ]["length"]
+        == 1
+    )
+    filtered = result(
+        kg.query_graph_neighbors, shortcut, node="A", direction="out", relations=["next"], depth=3
+    )
+    assert [n["id"] for n in filtered["neighbors"]] == ["B", "C", "D"] and filtered["neighbors"][2][
+        "distance"
+    ] == 3
+    sub = result(
+        kg.query_graph_neighbors, CHAIN, node="A", direction="out", depth=1, include_subgraph=True
+    )["subgraph"]
     assert edge_set(sub) == {("A", "next", "B")}
-    undirected = result(kg.query_graph_neighbors, [["a", "r", "b"], ["c", "r", "b"]], node="a", depth=2, directed=False)
+    undirected = result(
+        kg.query_graph_neighbors,
+        [["a", "r", "b"], ["c", "r", "b"]],
+        node="a",
+        depth=2,
+        directed=False,
+    )
     assert {n["id"]: n["distance"] for n in undirected["neighbors"]} == {"b": 1, "c": 2}
     with pytest.raises(InputFormatError, match="UNKNOWN_NODE"):
         run(kg.query_graph_neighbors, CHAIN, node="Z")
@@ -797,23 +1101,39 @@ def test_query_neighbors_depth_direction_and_shortest_path():
 
 
 def test_search_nodes_by_text_and_type():
-    graph = {"nodes": [
-        {"id": "BRCA1", "type": "gene", "name": "breast cancer 1"},
-        {"id": "BRCA2", "type": "gene", "name": "breast cancer 2"},
-        {"id": "breast cancer", "type": "disease"},
-    ]}
-    assert [m["id"] for m in result(kg.search, graph, query="brca")["matches"]] == ["BRCA1", "BRCA2"]
-    assert [m["id"] for m in result(kg.search, graph, query="BRCA1", match="exact")["matches"]] == ["BRCA1"]
+    graph = {
+        "nodes": [
+            {"id": "BRCA1", "type": "gene", "name": "breast cancer 1"},
+            {"id": "BRCA2", "type": "gene", "name": "breast cancer 2"},
+            {"id": "breast cancer", "type": "disease"},
+        ]
+    }
+    assert [m["id"] for m in result(kg.search, graph, query="brca")["matches"]] == [
+        "BRCA1",
+        "BRCA2",
+    ]
+    assert [m["id"] for m in result(kg.search, graph, query="BRCA1", match="exact")["matches"]] == [
+        "BRCA1"
+    ]
     assert result(kg.search, graph, query="brca", case_sensitive=True)["n_matches"] == 0
-    assert [m["id"] for m in result(kg.search, graph, query="breast", node_type="disease")["matches"]] == ["breast cancer"]
-    assert [m["id"] for m in result(kg.search, graph, query="breast", fields=["name"])["matches"]] == ["BRCA1", "BRCA2"]
+    assert [
+        m["id"] for m in result(kg.search, graph, query="breast", node_type="disease")["matches"]
+    ] == ["breast cancer"]
+    assert [
+        m["id"] for m in result(kg.search, graph, query="breast", fields=["name"])["matches"]
+    ] == ["BRCA1", "BRCA2"]
     prefix = result(kg.search, graph, query="bre", match="prefix", limit=1)
-    assert prefix["n_matches"] == 3 and prefix["truncated"] and len(prefix["matches"]) == 1  # ids and names
+    assert (
+        prefix["n_matches"] == 3 and prefix["truncated"] and len(prefix["matches"]) == 1
+    )  # ids and names
 
 
 @pytest.mark.parametrize("fmt", ["json", "jsonl", "tsv", "graphml"])
 def test_export_then_read_roundtrip(tmp_path: Path, fmt):
-    graph = {"nodes": [{"id": "g1", "type": "gene"}, {"id": "d<1>&"}], "edges": [{"source": "g1", "relation": "assoc", "target": "d<1>&"}]}
+    graph = {
+        "nodes": [{"id": "g1", "type": "gene"}, {"id": "d<1>&"}],
+        "edges": [{"source": "g1", "relation": "assoc", "target": "d<1>&"}],
+    }
     target = tmp_path / f"graph.{fmt}"
     out = result(kg.export, graph, output=str(target))
     assert out["format"] == fmt and out["output_path"] == str(target) and target.is_file()
@@ -862,7 +1182,13 @@ def test_read_rejects_unsafe_or_unsupported_input(tmp_path: Path):
 def test_validate_reports_each_kind_of_problem():
     graph = {
         "nodes": [{"id": "a"}, {"id": "a"}, {"id": "b"}, {"id": "iso"}],
-        "edges": [["a", "r", "b"], ["a", "r", "b"], ["b", "r", "zzz"], ["b", "bad", "a"], ["a", "r", "a"]],
+        "edges": [
+            ["a", "r", "b"],
+            ["a", "r", "b"],
+            ["b", "r", "zzz"],
+            ["b", "bad", "a"],
+            ["a", "r", "a"],
+        ],
     }
     out = result(kg.validate, graph, allowed_relations=["r"], allow_self_loops=False)
     errors = {e["code"] for e in out["errors"]}
@@ -881,19 +1207,39 @@ def test_version_is_order_independent_and_matches_its_definition():
     a = result(kg.version, TRIPLES)
     b = result(kg.version, list(reversed(TRIPLES)))
     assert a["version_id"] == b["version_id"] and a["short_id"] == a["version_id"][7:19]
-    changed = result(kg.version, TRIPLES + [["x", "r", "y"]], previous_version=a["version_id"], label="v2")
-    assert changed["version_id"] != a["version_id"] and changed["changed_since_previous"] is True and changed["label"] == "v2"
-    assert result(kg.version, TRIPLES, previous_version=a["version_id"])["changed_since_previous"] is False
+    changed = result(
+        kg.version, TRIPLES + [["x", "r", "y"]], previous_version=a["version_id"], label="v2"
+    )
+    assert (
+        changed["version_id"] != a["version_id"]
+        and changed["changed_since_previous"] is True
+        and changed["label"] == "v2"
+    )
+    assert (
+        result(kg.version, TRIPLES, previous_version=a["version_id"])["changed_since_previous"]
+        is False
+    )
     # recompute the documented definition independently for a one-edge graph
     canonical = {"directed": True, "nodes": [["a", {}], ["b", {}]], "edges": [["a", "r", "b", {}]]}
-    expected = "sha256:" + hashlib.sha256(json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    expected = (
+        "sha256:"
+        + hashlib.sha256(
+            json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+    )
     assert result(kg.version, [["a", "r", "b"]])["version_id"] == expected
     assert result(kg.version, TRIPLES, directed=False)["version_id"] != a["version_id"]
 
 
 def test_snapshot_writes_a_reproducible_file(tmp_path: Path):
     target = tmp_path / "snap.json"
-    out = result(kg.snapshot_database_version, TRIPLES, label="release-1", timestamp="2026-01-01T00:00:00Z", output=str(target))
+    out = result(
+        kg.snapshot_database_version,
+        TRIPLES,
+        label="release-1",
+        timestamp="2026-01-01T00:00:00Z",
+        output=str(target),
+    )
     saved = json.loads(target.read_text(encoding="utf-8"))
     assert saved["version_id"] == out["version_id"] == result(kg.version, TRIPLES)["version_id"]
     assert saved["label"] == "release-1" and saved["timestamp"] == "2026-01-01T00:00:00Z"
@@ -907,10 +1253,27 @@ def test_snapshot_writes_a_reproducible_file(tmp_path: Path):
 
 
 def test_compare_versions_added_removed_changed():
-    old = {"nodes": [{"id": "a", "type": "x"}, {"id": "b"}], "edges": [["a", "r", "b"], ["a", "s", "b"]]}
-    new = {"nodes": [{"id": "a", "type": "y"}, {"id": "b"}, {"id": "c"}], "edges": [["a", "r", "b"], ["b", "r", "c"], {"source": "a", "relation": "s", "target": "b", "w": 2}]}
+    old = {
+        "nodes": [{"id": "a", "type": "x"}, {"id": "b"}],
+        "edges": [["a", "r", "b"], ["a", "s", "b"]],
+    }
+    new = {
+        "nodes": [{"id": "a", "type": "y"}, {"id": "b"}, {"id": "c"}],
+        "edges": [
+            ["a", "r", "b"],
+            ["b", "r", "c"],
+            {"source": "a", "relation": "s", "target": "b", "w": 2},
+        ],
+    }
     out = result(kg.compare_database_versions, {"old": old, "new": new})
-    assert out["counts"] == {"nodes_added": 1, "nodes_removed": 0, "nodes_changed": 1, "edges_added": 1, "edges_removed": 0, "edges_changed": 1}
+    assert out["counts"] == {
+        "nodes_added": 1,
+        "nodes_removed": 0,
+        "nodes_changed": 1,
+        "edges_added": 1,
+        "edges_removed": 0,
+        "edges_changed": 1,
+    }
     assert out["added_nodes"] == ["c"] and out["changed_nodes"][0]["new"] == {"type": "y"}
     assert (out["added_edges"][0]["source"], out["added_edges"][0]["target"]) == ("b", "c")
     assert out["changed_edges"][0]["new"] == {"w": 2} and not out["identical"]
@@ -932,13 +1295,28 @@ def test_data_lineage_order_roots_leaves_and_trace():
     assert sorted(out["roots"]) == ["reads.fq", "ref.fa"]
     assert out["leaves"] == ["report.pdf"]
     order = out["topological_order"]
-    assert order.index("reads.fq") < order.index("aligned.bam") < order.index("variants.vcf") < order.index("report.pdf")
+    assert (
+        order.index("reads.fq")
+        < order.index("aligned.bam")
+        < order.index("variants.vcf")
+        < order.index("report.pdf")
+    )
     assert ("variants.vcf", "derived_from", "aligned.bam") in edge_set(out["graph"])
-    assert next(e for e in out["graph"]["edges"] if e["source"] == "aligned.bam" and e["target"] == "reads.fq")["step"] == "bwa"
+    assert (
+        next(
+            e
+            for e in out["graph"]["edges"]
+            if e["source"] == "aligned.bam" and e["target"] == "reads.fq"
+        )["step"]
+        == "bwa"
+    )
     ancestors = {a["id"]: a["distance"] for a in out["upstream_of"]["ancestors"]}
     assert ancestors == {"variants.vcf": 1, "ref.fa": 1, "aligned.bam": 2, "reads.fq": 3}
     with pytest.raises(InputFormatError, match="LINEAGE_CYCLE"):
-        run(kg.build_data_lineage, [{"output": "a", "inputs": ["b"]}, {"output": "b", "inputs": ["a"]}])
+        run(
+            kg.build_data_lineage,
+            [{"output": "a", "inputs": ["b"]}, {"output": "b", "inputs": ["a"]}],
+        )
     with pytest.raises(InputFormatError, match="LINEAGE_CYCLE"):
         run(kg.build_data_lineage, [{"output": "a", "inputs": ["a"]}])
     with pytest.raises(InputFormatError, match="INVALID_LINEAGE"):
@@ -954,11 +1332,18 @@ def test_access_policy_filters_by_clearance():
         ],
         "edges": [
             {"source": "gene", "relation": "in", "target": "cohort", "classification": "internal"},
-            {"source": "cohort", "relation": "has", "target": "patients", "classification": "public"},
+            {
+                "source": "cohort",
+                "relation": "has",
+                "target": "patients",
+                "classification": "public",
+            },
             {"source": "gene", "relation": "x", "target": "cohort", "classification": "secret"},
         ],
     }
-    internal = result(kg.apply_access_policy, graph, clearance="internal", redact_properties=["note"])
+    internal = result(
+        kg.apply_access_policy, graph, clearance="internal", redact_properties=["note"]
+    )
     assert {n["id"] for n in internal["graph"]["nodes"]} == {"gene", "cohort"}
     assert internal["n_nodes_removed"] == 1 and internal["removed_nodes"] == ["patients"]
     assert edge_set(internal["graph"]) == {("gene", "in", "cohort")}
@@ -980,7 +1365,10 @@ def test_knowledge_graph_function_inventory():
     assert len(kg.__all__) == 18
     # pseudonymize_genomic_metadata_fields replaced the misleadingly named earlier de-identification function
     redacted = kg.pseudonymize_genomic_metadata_fields({"name": "Jane", "kept": 1}, verbose=False)
-    assert redacted["status"] == "ok" and redacted["result"]["metadata"] == {"name": "[REDACTED]", "kept": 1}
+    assert redacted["status"] == "ok" and redacted["result"]["metadata"] == {
+        "name": "[REDACTED]",
+        "kept": 1,
+    }
     for name in kg.__all__:
         parameters = list(inspect.signature(getattr(kg, name)).parameters)
         assert parameters[:2] == ["input", "options"]

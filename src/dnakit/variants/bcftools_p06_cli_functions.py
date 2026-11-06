@@ -89,7 +89,9 @@ def bcftools_convert_to_vcf(
     kind = cli.choice(input_format, _CONVERT_FORMATS, "input_format")
     sources = h.existing_files(list(input_files), "input_files")
     if len(sources) != _CONVERT_FILES[kind]:
-        raise ConfigurationError(f"input_format {kind!r} needs exactly {_CONVERT_FILES[kind]} input file(s).")
+        raise ConfigurationError(
+            f"input_format {kind!r} needs exactly {_CONVERT_FILES[kind]} input file(s)."
+        )
     target = cli.new_file(output_path, "output_path")
     arguments = ["convert", _CONVERT_OPTION[kind]]
     if kind != "gvcf":
@@ -158,7 +160,11 @@ def bcftools_index_records(
         for line in lines:
             name, length, count = [*line.split("\t"), "", ""][:3]
             contigs.append(
-                {"contig": name, "length": None if length in {".", ""} else int(length), "records": int(count)}
+                {
+                    "contig": name,
+                    "length": None if length in {".", ""} else int(length),
+                    "records": int(count),
+                }
             )
         total = sum(row["records"] for row in contigs)
         return h.result("bcftools_index_records", done, contigs=contigs, total_records=total)
@@ -207,10 +213,16 @@ def bcftools_norm_variants(
         arguments += ["-f", str(cli.existing_file(reference_fasta, "reference_fasta"))]
     if multiallelics is not None:
         if not isinstance(multiallelics, str) or not _MULTIALLELIC.match(multiallelics):
-            raise ConfigurationError("multiallelics must be -/+ followed by snps, indels, both or any.")
+            raise ConfigurationError(
+                "multiallelics must be -/+ followed by snps, indels, both or any."
+            )
         arguments += ["-m", multiallelics]
     if h.flag(atomize, "atomize"):
-        arguments += ["-a", "--atom-overlaps", cli.choice(atom_overlaps, ("*", "."), "atom_overlaps")]
+        arguments += [
+            "-a",
+            "--atom-overlaps",
+            cli.choice(atom_overlaps, ("*", "."), "atom_overlaps"),
+        ]
     if check_ref is not None:
         if reference_fasta is None:
             raise ConfigurationError("check_ref needs reference_fasta.")
@@ -287,11 +299,16 @@ def bcftools_polysomy(
             arguments += ["-s", cli.text(sample, "sample")]
         arguments += h.selection(regions=regions, targets=targets)
         arguments += [
-            "-b", repr(cli.number(peak_size, "peak_size", minimum=0.0, maximum=1.0)),
-            "-c", repr(cli.number(cn_penalty, "cn_penalty", minimum=0.0, maximum=1.0)),
-            "-f", repr(cli.number(fit_threshold, "fit_threshold", minimum=0.0)),
-            "-m", repr(cli.number(min_fraction, "min_fraction", minimum=0.0, maximum=1.0)),
-            "-p", repr(cli.number(peak_symmetry, "peak_symmetry", minimum=0.0, maximum=1.0)),
+            "-b",
+            repr(cli.number(peak_size, "peak_size", minimum=0.0, maximum=1.0)),
+            "-c",
+            repr(cli.number(cn_penalty, "cn_penalty", minimum=0.0, maximum=1.0)),
+            "-f",
+            repr(cli.number(fit_threshold, "fit_threshold", minimum=0.0)),
+            "-m",
+            repr(cli.number(min_fraction, "min_fraction", minimum=0.0, maximum=1.0)),
+            "-p",
+            repr(cli.number(peak_symmetry, "peak_symmetry", minimum=0.0, maximum=1.0)),
         ]
         if h.flag(include_aa, "include_aa"):
             arguments.append("-i")
@@ -300,12 +317,15 @@ def bcftools_polysomy(
         except BackendExecutionError as error:
             if "unrecognized command" in str(error.context.get("log_tail", "")):
                 raise BackendUnavailableError(
-                    "This bcftools was built without polysomy support (GSL).", hint=h.HINTS["bcftools"]
+                    "This bcftools was built without polysomy support (GSL).",
+                    hint=h.HINTS["bcftools"],
                 ) from error
             raise
         data = folder / "dist.dat"
         if not data.is_file():
-            raise BackendExecutionError("bcftools polysomy wrote no dist.dat.", code="HTSLIB_OUTPUT_MISSING")
+            raise BackendExecutionError(
+                "bcftools polysomy wrote no dist.dat.", code="HTSLIB_OUTPUT_MISSING"
+            )
     except BaseException:
         for leftover in folder.iterdir() if folder.is_dir() else []:
             if leftover.is_file():
@@ -325,8 +345,11 @@ def bcftools_polysomy(
                 }
             )
     return h.result(
-        "bcftools_polysomy", done, outputs={"output_dir": folder, "data": data},
-        files=h.directory_files(folder), copy_numbers=copy_numbers,
+        "bcftools_polysomy",
+        done,
+        outputs={"output_dir": folder, "data": data},
+        files=h.directory_files(folder),
+        copy_numbers=copy_numbers,
     )
 
 

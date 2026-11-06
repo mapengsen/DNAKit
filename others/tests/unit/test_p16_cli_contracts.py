@@ -31,7 +31,9 @@ def test_public_functions_have_keyword_only_verbose(name: str, count: int) -> No
         function = getattr(module, function_name)
         assert function.__doc__, function_name
         parameter = inspect.signature(function).parameters["verbose"]
-        assert parameter.kind is inspect.Parameter.KEYWORD_ONLY and parameter.default is True, function_name
+        assert parameter.kind is inspect.Parameter.KEYWORD_ONLY and parameter.default is True, (
+            function_name
+        )
 
 
 def test_missing_program_raises_with_install_hint(tmp_path: Path, monkeypatch) -> None:
@@ -41,7 +43,9 @@ def test_missing_program_raises_with_install_hint(tmp_path: Path, monkeypatch) -
     alignment.write_text(">a\nACGT\n>b\nACGA\n")
     monkeypatch.setenv("PATH", str(tmp_path))
     with pytest.raises(BackendUnavailableError) as raised:
-        ft.compute_fasttree_distance_matrix(str(alignment), str(tmp_path / "d.phy"), fasttree_path=None, verbose=False)
+        ft.compute_fasttree_distance_matrix(
+            str(alignment), str(tmp_path / "d.phy"), fasttree_path=None, verbose=False
+        )
     assert raised.value.hint and "fasttree" in raised.value.hint.lower()
 
 
@@ -51,7 +55,9 @@ def test_explicit_missing_program_path_raises(tmp_path: Path) -> None:
     reads = tmp_path / "r.fq"
     reads.write_text("@r\nACGT\n+\nIIII\n")
     with pytest.raises(BackendUnavailableError):
-        rq.filter_long_reads_with_reference(str(reads), str(tmp_path / "o.fq"), filtlong_path=str(tmp_path / "nope"), verbose=False)
+        rq.filter_long_reads_with_reference(
+            str(reads), str(tmp_path / "o.fq"), filtlong_path=str(tmp_path / "nope"), verbose=False
+        )
 
 
 def test_outputs_are_never_overwritten(tmp_path: Path) -> None:
@@ -73,14 +79,28 @@ def test_argument_validation(tmp_path: Path) -> None:
     fasta = tmp_path / "x.fa"
     fasta.write_text(">a\nACGT\n")
     with pytest.raises(ConfigurationError, match="rank"):
-        mb.summarize_kaiju_table([str(fasta)], str(fasta), str(fasta), str(tmp_path / "t"), rank="kingdom", verbose=False)
+        mb.summarize_kaiju_table(
+            [str(fasta)], str(fasta), str(fasta), str(tmp_path / "t"), rank="kingdom", verbose=False
+        )
     with pytest.raises(ConfigurationError, match="step"):
         mb.run_genomad(str(fasta), str(tmp_path / "g"), step="bogus", verbose=False)
     with pytest.raises(ConfigurationError, match="database"):
         mb.run_genomad(str(fasta), str(tmp_path / "g"), step="annotate", verbose=False)
     with pytest.raises(ConfigurationError, match="reference"):
-        rq.filter_long_reads_with_reference(str(fasta), str(tmp_path / "o"), trim=True, verbose=False)
+        rq.filter_long_reads_with_reference(
+            str(fasta), str(tmp_path / "o"), trim=True, verbose=False
+        )
     with pytest.raises(ConfigurationError, match="Only one"):
-        mb.summarize_kaiju_table([str(fasta)], str(fasta), str(fasta), str(tmp_path / "t2"), min_percent=1.0, min_reads=2, verbose=False)
+        mb.summarize_kaiju_table(
+            [str(fasta)],
+            str(fasta),
+            str(fasta),
+            str(tmp_path / "t2"),
+            min_percent=1.0,
+            min_reads=2,
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError, match="colon-separated"):
-        pv.compute_mosdepth_quantized_coverage(str(fasta), str(tmp_path / "q"), quantize="a:b", verbose=False)
+        pv.compute_mosdepth_quantized_coverage(
+            str(fasta), str(tmp_path / "q"), quantize="a:b", verbose=False
+        )

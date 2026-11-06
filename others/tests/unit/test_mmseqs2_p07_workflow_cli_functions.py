@@ -1,7 +1,6 @@
 """Tests of ``dnakit.alignment.mmseqs2_p07_workflow_cli_functions``: command lines against a stand-in executable, argument
 validation, and (when MMseqs2 is installed) results against direct MMseqs2 runs on toy data."""
 
-# ruff: noqa: E501
 from __future__ import annotations
 
 import inspect

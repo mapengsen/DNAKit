@@ -30,7 +30,8 @@ MAX_CELLS_AUTO = 5_000
 def _check_size(cm: CountMatrix, limit: int) -> None:
     if cm.n_cells > limit:
         raise InputFormatError(
-            f"{cm.n_cells} cells exceed the {limit}-cell limit of this pairwise-distance operation.", code="INPUT_TOO_LARGE",
+            f"{cm.n_cells} cells exceed the {limit}-cell limit of this pairwise-distance operation.",
+            code="INPUT_TOO_LARGE",
             hint="Subsample cells first.",
         )
 
@@ -52,11 +53,15 @@ def pca_embedding(cm: CountMatrix, options: dict[str, object]):
     """
 
     np = numpy_module()
-    log = log1p_columns(cm, opt_float(options, "target_sum", 1e4, 0.0, math.inf, exclusive_min=True))
+    log = log1p_columns(
+        cm, opt_float(options, "target_sum", 1e4, 0.0, math.inf, exclusive_min=True)
+    )
     x = np.array(log.values, dtype=float).T  # cells x genes
     n_top = opt_int(options, "n_top_genes", None, 1)
     if n_top is not None and n_top < x.shape[1]:
-        keep = np.argsort(-x.var(axis=0, ddof=1) if x.shape[0] > 1 else -x.var(axis=0), kind="stable")[:n_top]
+        keep = np.argsort(
+            -x.var(axis=0, ddof=1) if x.shape[0] > 1 else -x.var(axis=0), kind="stable"
+        )[:n_top]
         x = x[:, np.sort(keep)]
     x = x - x.mean(axis=0)
     if opt_bool(options, "scale", False):
@@ -149,11 +154,17 @@ def _choose_k(points, options: dict[str, object]) -> tuple[int, dict[str, float]
     raw = options.get("n_clusters", "auto")
     if raw == "auto":
         if n > MAX_CELLS_AUTO:
-            raise InputFormatError("n_clusters='auto' supports up to 5000 cells.", code="INPUT_TOO_LARGE", hint="Set n_clusters explicitly.")
+            raise InputFormatError(
+                "n_clusters='auto' supports up to 5000 cells.",
+                code="INPUT_TOO_LARGE",
+                hint="Set n_clusters explicitly.",
+            )
         k_max = opt_int(options, "max_clusters", 10, 2, 100)
         candidates = list(range(2, min(k_max, n - 1) + 1))
         if not candidates:
-            raise InputFormatError("Too few cells to cluster.", code="TOO_FEW_CELLS", hint="Need at least 3 cells.")
+            raise InputFormatError(
+                "Too few cells to cluster.", code="TOO_FEW_CELLS", hint="Need at least 3 cells."
+            )
         scores = {}
         for k in candidates:
             labels, _ = kmeans(points, k)
@@ -163,7 +174,11 @@ def _choose_k(points, options: dict[str, object]) -> tuple[int, dict[str, float]
     k = opt_int({"n_clusters": raw}, "n_clusters", None, 1, 10_000)
     assert k is not None
     if k > n:
-        raise ConfigurationError(f"n_clusters={k} exceeds the {n} cells.", code="INVALID_OPTION", hint="Use fewer clusters.")
+        raise ConfigurationError(
+            f"n_clusters={k} exceeds the {n} cells.",
+            code="INVALID_OPTION",
+            hint="Use fewer clusters.",
+        )
     return k, None
 
 
@@ -174,14 +189,16 @@ def _cluster_result(cm: CountMatrix, points, ratio, options, k, scores, extra_de
     result: dict[str, object] = {
         "definition": extra_def,
         "n_clusters": len(sizes),
-        "labels": dict(zip(cm.cells, names)),
+        "labels": dict(zip(cm.cells, names, strict=False)),
         "cluster_sizes": dict(sorted(sizes.items(), key=lambda kv: int(kv[0]))),
         "inertia": inertia,
         "explained_variance_ratio": None if ratio is None else [float(v) for v in ratio],
         "silhouette_by_k": scores,
     }
     if opt_bool(options, "return_embedding", False):
-        result["embedding"] = {cell: [float(v) for v in row] for cell, row in zip(cm.cells, points)}
+        result["embedding"] = {
+            cell: [float(v) for v in row] for cell, row in zip(cm.cells, points, strict=False)
+        }
     return result, []
 
 
@@ -191,7 +208,12 @@ def op_cluster(value: object, options: dict[str, object]) -> Result:
     points, ratio = pca_embedding(cm, options)
     k, scores = _choose_k(points, options)
     return _cluster_result(
-        cm, points, ratio, options, k, scores,
+        cm,
+        points,
+        ratio,
+        options,
+        k,
+        scores,
         "k-means (deterministic farthest-point start, Lloyd iterations) on the top PCs of ln(1+CP10k) values; k from options or the best mean silhouette",
     )
 
@@ -209,12 +231,21 @@ def op_cluster_spatial(value: object, options: dict[str, object]) -> Result:
     k_spatial = opt_int(options, "n_neighbors", 6, 1, 100)
     alpha = opt_float(options, "alpha", 0.5, 0.0, 1.0)
     if k_spatial >= cm.n_cells:  # type: ignore[operator]
-        raise ConfigurationError("options['n_neighbors'] must be smaller than the number of spots.", code="INVALID_OPTION", hint="Lower n_neighbors.")
+        raise ConfigurationError(
+            "options['n_neighbors'] must be smaller than the number of spots.",
+            code="INVALID_OPTION",
+            hint="Lower n_neighbors.",
+        )
     points, ratio = pca_embedding(cm, options)
     smoothed = spatial_smooth(points, coords, k_spatial, alpha)  # type: ignore[arg-type]
     k, scores = _choose_k(smoothed, options)
     return _cluster_result(
-        cm, smoothed, ratio, options, k, scores,
+        cm,
+        smoothed,
+        ratio,
+        options,
+        k,
+        scores,
         f"spatial-domain heuristic: each spot's PC vector is replaced by (1-alpha)*own + alpha*mean of its {k_spatial} nearest spatial neighbours (alpha={alpha}), then k-means as in cluster()",
     )
 
@@ -241,16 +272,26 @@ def _trajectory(cm: CountMatrix, options: dict[str, object], spatial: bool) -> R
     root_name = str(require_option(options, "root", "name of the root (start) cell"))
     index = cm.cell_index()
     if root_name not in index:
-        raise InputFormatError(f"Root cell {root_name!r} is not in the matrix.", code="UNKNOWN_CELL", hint="Use a column name of the matrix.")
+        raise InputFormatError(
+            f"Root cell {root_name!r} is not in the matrix.",
+            code="UNKNOWN_CELL",
+            hint="Use a column name of the matrix.",
+        )
     n = cm.n_cells
     k = opt_int(options, "n_neighbors", 15 if not spatial else 6, 1, 1000)
     if n < 2:
-        raise InputFormatError("A trajectory needs at least two cells.", code="TOO_FEW_CELLS", hint="Provide more cells.")
+        raise InputFormatError(
+            "A trajectory needs at least two cells.",
+            code="TOO_FEW_CELLS",
+            hint="Provide more cells.",
+        )
     k = min(k, n - 1)  # type: ignore[type-var]
     points, _ratio = pca_embedding(cm, {**options, "n_pcs": options.get("n_pcs", 0)})
     expression = np.array(points, dtype=float)
     if spatial:
-        coords = np.array(parse_coordinates(options.get("coordinates"), cm.cells, options), dtype=float)
+        coords = np.array(
+            parse_coordinates(options.get("coordinates"), cm.cells, options), dtype=float
+        )
         neighbours = knn_indices(coords, k)  # type: ignore[arg-type]
     else:
         neighbours = knn_indices(expression, k)  # type: ignore[arg-type]
@@ -266,14 +307,24 @@ def _trajectory(cm: CountMatrix, options: dict[str, object], spatial: bool) -> R
     top = max(finite)
     warnings = []
     if len(finite) < n:
-        warnings.append(f"{n - len(finite)} cells are not connected to the root in the kNN graph (pseudotime null); raise n_neighbors.")
-    pseudotime = {cell: (d / top if top > 0 else 0.0) if math.isfinite(d) else None for cell, d in zip(cm.cells, distance)}
+        warnings.append(
+            f"{n - len(finite)} cells are not connected to the root in the kNN graph (pseudotime null); raise n_neighbors."
+        )
+    pseudotime = {
+        cell: (d / top if top > 0 else 0.0) if math.isfinite(d) else None
+        for cell, d in zip(cm.cells, distance, strict=False)
+    }
     definition = (
         "shortest-path (geodesic) distance from the root cell in a symmetric kNN graph built on spatial coordinates, with edge weights = Euclidean distance between the cells' expression vectors; divided by the maximum"
-        if spatial else
-        "shortest-path (geodesic) distance from the root cell in a symmetric kNN graph of the cells' expression space (edge weight = Euclidean distance); divided by the maximum"
+        if spatial
+        else "shortest-path (geodesic) distance from the root cell in a symmetric kNN graph of the cells' expression space (edge weight = Euclidean distance); divided by the maximum"
     )
-    return {"definition": definition, "root": root_name, "n_neighbors": k, "pseudotime": pseudotime}, warnings
+    return {
+        "definition": definition,
+        "root": root_name,
+        "n_neighbors": k,
+        "pseudotime": pseudotime,
+    }, warnings
 
 
 def op_trajectory(value: object, options: dict[str, object]) -> Result:
@@ -288,15 +339,30 @@ def op_map_cells(value: object, options: dict[str, object]) -> Result:
     np = numpy_module()
     query = parse_matrix(value, options)
     if options.get("reference") is None:
-        raise ConfigurationError("options['reference'] (annotated reference matrix) is required.", code="MISSING_OPTION", hint="Pass genes x cells counts plus options['reference_labels'].")
-    reference = parse_matrix(options["reference"], {k: v for k, v in options.items() if k in {"delimiter", "max_matrix_elements"}})
-    ref_labels = labels_for(reference.cells, require_option(options, "reference_labels", "label of each reference cell"), "options['reference_labels']")
+        raise ConfigurationError(
+            "options['reference'] (annotated reference matrix) is required.",
+            code="MISSING_OPTION",
+            hint="Pass genes x cells counts plus options['reference_labels'].",
+        )
+    reference = parse_matrix(
+        options["reference"],
+        {k: v for k, v in options.items() if k in {"delimiter", "max_matrix_elements"}},
+    )
+    ref_labels = labels_for(
+        reference.cells,
+        require_option(options, "reference_labels", "label of each reference cell"),
+        "options['reference_labels']",
+    )
     _check_size(query, MAX_PAIRWISE_CELLS)
     _check_size(reference, MAX_PAIRWISE_CELLS)
     ref_index = reference.gene_index()
     shared = [g for g in query.genes if g in ref_index]
     if len(shared) < 2:
-        raise InputFormatError(f"Only {len(shared)} genes are shared between query and reference.", code="TOO_FEW_SHARED_GENES", hint="Use the same gene identifiers.")
+        raise InputFormatError(
+            f"Only {len(shared)} genes are shared between query and reference.",
+            code="TOO_FEW_SHARED_GENES",
+            hint="Use the same gene identifiers.",
+        )
     target = opt_float(options, "target_sum", 1e4, 0.0, math.inf, exclusive_min=True)
     q_log, r_log = log1p_columns(query, target), log1p_columns(reference, target)
     q_idx = query.gene_index()
@@ -311,8 +377,13 @@ def op_map_cells(value: object, options: dict[str, object]) -> Result:
         top = max(votes.values())
         tied = {label for label, n in votes.items() if n == top}
         winner = next(ref_labels[int(j)] for j in order[i] if ref_labels[int(j)] in tied)
-        assignments[cell] = {"label": winner, "confidence": top / k, "nearest_reference_cell": reference.cells[int(order[i][0])]}
+        assignments[cell] = {
+            "label": winner,
+            "confidence": top / k,
+            "nearest_reference_cell": reference.cells[int(order[i][0])],
+        }
     return {
         "definition": f"k-nearest-neighbour label transfer (k={k}): Euclidean distance on ln(1+CP10k) values of the {len(shared)} shared genes; majority vote, ties go to the label of the nearest tied neighbour; confidence = winning votes / k",
-        "n_shared_genes": len(shared), "assignments": assignments,
+        "n_shared_genes": len(shared),
+        "assignments": assignments,
     }, []

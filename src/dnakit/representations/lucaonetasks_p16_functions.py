@@ -32,8 +32,14 @@ def _clean(sequence: str) -> str:
 
 def _records(sequences: Mapping[str, str] | Sequence[str]) -> list[tuple[str, str]]:
     if isinstance(sequences, str):
-        raise ConfigurationError("sequences must be a list of DNA strings or an id-to-sequence mapping.")
-    items = list(sequences.items()) if isinstance(sequences, Mapping) else [(f"sequence_{i + 1}", s) for i, s in enumerate(sequences)]
+        raise ConfigurationError(
+            "sequences must be a list of DNA strings or an id-to-sequence mapping."
+        )
+    items = (
+        list(sequences.items())
+        if isinstance(sequences, Mapping)
+        else [(f"sequence_{i + 1}", s) for i, s in enumerate(sequences)]
+    )
     if not items or len(items) > _MAX_SEQUENCES:
         raise ConfigurationError(f"Provide between 1 and {_MAX_SEQUENCES} sequences.")
     seen: set[str] = set()
@@ -53,9 +59,9 @@ def _disable_flash_attention(model: Any, checkpoint: Path) -> None:
     names = {type(layer).__module__ for layer in model.modules()}
     for module in tuple(sys.modules.values()):
         module_file = getattr(module, "__file__", "") or ""
-        if getattr(module, "__name__", "") in names or checkpoint.name in module_file:
-            if hasattr(module, "flash_attn_qkvpacked_func"):
-                module.__dict__["flash_attn_qkvpacked_func"] = None
+        in_checkpoint = getattr(module, "__name__", "") in names or checkpoint.name in module_file
+        if in_checkpoint and hasattr(module, "flash_attn_qkvpacked_func"):
+            module.__dict__["flash_attn_qkvpacked_func"] = None
 
 
 def embed_dna_with_dnabert(
@@ -93,14 +99,20 @@ def embed_dna_with_dnabert(
         raise ConfigurationError(f"embedding_type must be one of {list(_EMBEDDING_TYPES)}.")
     if truncate_side not in {"right", "left"}:
         raise ConfigurationError("truncate_side must be 'right' or 'left'.")
-    if isinstance(truncation_length, bool) or not isinstance(truncation_length, int) or truncation_length < 1:
+    if (
+        isinstance(truncation_length, bool)
+        or not isinstance(truncation_length, int)
+        or truncation_length < 1
+    ):
         raise ConfigurationError("truncation_length must be a positive integer.")
     if not isinstance(include_special_tokens, bool) or not isinstance(allow_remote_code, bool):
         raise ConfigurationError("include_special_tokens and allow_remote_code must be booleans.")
     if not allow_remote_code:
         raise ConfigurationError(
             "The DNABERT checkpoints load Python code that ships with the checkpoint.",
-            hint="Review the repository zhihan1096/" + _MODELS[key].split("/")[1] + ", then pass allow_remote_code=True.",
+            hint="Review the repository zhihan1096/"
+            + _MODELS[key].split("/")[1]
+            + ", then pass allow_remote_code=True.",
         )
     target = None
     if output_path is not None:
@@ -122,8 +134,12 @@ def embed_dna_with_dnabert(
         local_only = True
         checkpoint = Path(source)
     try:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(source, trust_remote_code=True, local_files_only=local_only)
-        network = transformers.AutoModel.from_pretrained(source, trust_remote_code=True, local_files_only=local_only)
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
+            source, trust_remote_code=True, local_files_only=local_only
+        )
+        network = transformers.AutoModel.from_pretrained(
+            source, trust_remote_code=True, local_files_only=local_only
+        )
     except OSError as exc:
         raise BackendUnavailableError(
             f"The {key} checkpoint {source!r} is not available locally.",
@@ -138,7 +154,11 @@ def embed_dna_with_dnabert(
     arrays: dict[str, Any] = {}
     summaries: list[dict[str, Any]] = []
     for identifier, sequence in records:
-        kept = sequence[-truncation_length:] if truncate_side == "left" else sequence[:truncation_length]
+        kept = (
+            sequence[-truncation_length:]
+            if truncate_side == "left"
+            else sequence[:truncation_length]
+        )
         token_ids = tokenizer(kept, return_tensors="pt")["input_ids"].to(resolved)
         try:
             with torch.no_grad():
@@ -150,7 +170,9 @@ def embed_dna_with_dnabert(
         tokens = int(token_ids.shape[1])
         usable = min(truncation_length, tokens - 2)
         if embedding_type == "matrix":
-            rows = hidden[0, 0 : usable + 2] if include_special_tokens else hidden[0, 1 : usable + 1]
+            rows = (
+                hidden[0, 0 : usable + 2] if include_special_tokens else hidden[0, 1 : usable + 1]
+            )
             value = rows.clone().numpy()
         elif embedding_type == "vector":
             value = hidden[0, 0].clone().numpy()
@@ -158,7 +180,12 @@ def embed_dna_with_dnabert(
             value = hidden[0].mean(dim=0).numpy()
         arrays[identifier] = value.astype(np.float32)
         summaries.append(
-            {"id": identifier, "nucleotides_used": len(kept), "tokens": tokens, "shape": list(value.shape)}
+            {
+                "id": identifier,
+                "nucleotides_used": len(kept),
+                "tokens": tokens,
+                "shape": list(value.shape),
+            }
         )
     if target is not None:
         np.savez_compressed(target, **arrays)
@@ -179,7 +206,9 @@ def embed_dna_with_dnabert(
         "embeddings": inline,
         "outputs": [str(target)] if target is not None else [],
         "provenance": {
-            "tool": "LucaOneTasks src/llm/" + ("dnaberts" if key == "dnabert-s" else "dnabert2") + "/inference_embedding.py",
+            "tool": "LucaOneTasks src/llm/"
+            + ("dnaberts" if key == "dnabert-s" else "dnabert2")
+            + "/inference_embedding.py",
             "transformers": getattr(transformers, "__version__", None),
             "torch": getattr(torch, "__version__", None),
             "citation": "https://doi.org/10.48550/arXiv.2402.08777",

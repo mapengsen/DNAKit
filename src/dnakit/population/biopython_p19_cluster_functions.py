@@ -101,11 +101,17 @@ def _matrix(value: object, name: str, *, minimum_rows: int = 1, minimum_columns:
         if len(row) != width or width == 0:
             raise ConfigurationError(f"{name} rows must all have the same, non-zero length.")
         for item in row:
-            if isinstance(item, bool) or not isinstance(item, (int, float)) or not math.isfinite(item):
+            if (
+                isinstance(item, bool)
+                or not isinstance(item, (int, float))
+                or not math.isfinite(item)
+            ):
                 raise ConfigurationError(f"{name} must hold finite numbers only.")
         rows.append([float(item) for item in row])
     if len(rows) < minimum_rows or (width or 0) < minimum_columns:
-        raise ConfigurationError(f"{name} needs at least {minimum_rows} rows and {minimum_columns} columns.")
+        raise ConfigurationError(
+            f"{name} needs at least {minimum_rows} rows and {minimum_columns} columns."
+        )
     if len(rows) * (width or 0) > _MAX_CELLS:
         raise ConfigurationError(f"{name} may hold at most {_MAX_CELLS} values.")
     return np.array(rows, dtype=float)
@@ -119,7 +125,9 @@ def _mask(value: object, shape: tuple[int, int]) -> Any:
         raise ConfigurationError("mask must be a list of rows of 0/1 integers.")
     array = np.array(value, dtype=int) if value else np.zeros((0, 0), dtype=int)
     if array.shape != shape or ((array != 0) & (array != 1)).any():
-        raise ConfigurationError(f"mask must have the shape of the data {shape} and hold only 0 and 1.")
+        raise ConfigurationError(
+            f"mask must have the shape of the data {shape} and hold only 0 and 1."
+        )
     return array
 
 
@@ -129,7 +137,10 @@ def _weights(value: object, length: int) -> Any:
     np = require("numpy", _EXTRA)
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or len(value) != length:
         raise ConfigurationError(f"weights must be a list of {length} numbers.")
-    if any(isinstance(w, bool) or not isinstance(w, (int, float)) or not math.isfinite(w) or w < 0 for w in value):
+    if any(
+        isinstance(w, bool) or not isinstance(w, (int, float)) or not math.isfinite(w) or w < 0
+        for w in value
+    ):
         raise ConfigurationError("weights must be finite non-negative numbers.")
     return np.array(value, dtype=float)
 
@@ -139,7 +150,12 @@ def _setup(
 ) -> tuple[Any, Any, Any, bool]:
     array = _matrix(data, "data")
     flip = _flag(transpose, "transpose")
-    return array, _mask(mask, array.shape), _weights(weights, array.shape[0] if flip else array.shape[1]), flip
+    return (
+        array,
+        _mask(mask, array.shape),
+        _weights(weights, array.shape[0] if flip else array.shape[1]),
+        flip,
+    )
 
 
 def _call(function: Any, *args: Any, **kwargs: Any) -> Any:
@@ -246,7 +262,7 @@ def split_genepop_by_locus(
         raise ConfigurationError("locus names are not distinct after removing unsafe characters.")
     directory = cli.new_directory(output_dir, "output_dir")
     files = {}
-    for (name, part), stem in zip(parts.items(), stems):
+    for (name, part), stem in zip(parts.items(), stems, strict=False):
         target = directory / f"{stem}.gen"
         target.write_text(str(part), encoding="utf-8")
         files[name] = str(target)
@@ -278,7 +294,9 @@ def remove_genepop_populations(
     count = len(record.populations)
     if isinstance(positions, (str, bytes)) or not isinstance(positions, Sequence) or not positions:
         raise ConfigurationError("positions must be a non-empty list of integers.")
-    chosen = sorted({_integer(item, "positions", minimum=0, maximum=count - 1) for item in positions})
+    chosen = sorted(
+        {_integer(item, "positions", minimum=0, maximum=count - 1) for item in positions}
+    )
     if len(chosen) == count:
         raise ConfigurationError("positions would remove every population.")
     target = cli.new_file(output_path, "output_path")
@@ -315,7 +333,11 @@ def remove_genepop_loci(
     record, source = _read_genepop(genepop_path)
     loci = list(record.loci_list)
     if positions is not None:
-        if isinstance(positions, (str, bytes)) or not isinstance(positions, Sequence) or not positions:
+        if (
+            isinstance(positions, (str, bytes))
+            or not isinstance(positions, Sequence)
+            or not positions
+        ):
             raise ConfigurationError("positions must be a non-empty list of integers.")
         chosen = sorted(
             {_integer(item, "positions", minimum=0, maximum=len(loci) - 1) for item in positions},
@@ -445,7 +467,11 @@ def kmedoids_cluster(
 
 def _tree_nodes(tree: Any) -> list[dict[str, Any]]:
     return [
-        {"left": int(tree[i].left), "right": int(tree[i].right), "distance": float(tree[i].distance)}
+        {
+            "left": int(tree[i].left),
+            "right": int(tree[i].right),
+            "distance": float(tree[i].distance),
+        }
         for i in range(len(tree))
     ]
 
@@ -453,13 +479,21 @@ def _tree_nodes(tree: Any) -> list[dict[str, Any]]:
 def _build_tree(nodes: object) -> Any:
     cluster = _bio("Bio.Cluster")
     if isinstance(nodes, (str, bytes)) or not isinstance(nodes, Sequence) or not nodes:
-        raise ConfigurationError("nodes must be a non-empty list of {left, right, distance} records.")
+        raise ConfigurationError(
+            "nodes must be a non-empty list of {left, right, distance} records."
+        )
     built = []
     for item in nodes:
         if not isinstance(item, Mapping) or not {"left", "right"} <= set(item):
-            raise ConfigurationError("each node needs 'left' and 'right' (and optionally 'distance').")
+            raise ConfigurationError(
+                "each node needs 'left' and 'right' (and optionally 'distance')."
+            )
         distance = item.get("distance", 0.0)
-        if isinstance(distance, bool) or not isinstance(distance, (int, float)) or not math.isfinite(distance):
+        if (
+            isinstance(distance, bool)
+            or not isinstance(distance, (int, float))
+            or not math.isfinite(distance)
+        ):
             raise ConfigurationError("node distance must be a finite number.")
         built.append(
             cluster.Node(
@@ -648,7 +682,10 @@ def cluster_distance(
         if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value:
             raise ConfigurationError(f"{name} must be a non-empty list of item indices.")
         groups.append(
-            np.array([_integer(item, name, minimum=0, maximum=count - 1) for item in value], dtype=np.int32)
+            np.array(
+                [_integer(item, name, minimum=0, maximum=count - 1) for item in value],
+                dtype=np.int32,
+            )
         )
     cluster = _bio("Bio.Cluster")
     value = _call(
@@ -690,10 +727,17 @@ def cluster_centroids(
     array = _matrix(data, "data")
     flip = _flag(transpose, "transpose")
     count = array.shape[1] if flip else array.shape[0]
-    if isinstance(cluster_ids, (str, bytes)) or not isinstance(cluster_ids, Sequence) or len(cluster_ids) != count:
+    if (
+        isinstance(cluster_ids, (str, bytes))
+        or not isinstance(cluster_ids, Sequence)
+        or len(cluster_ids) != count
+    ):
         raise ConfigurationError(f"cluster_ids must hold one cluster number per item ({count}).")
     np = require("numpy", _EXTRA)
-    ids = np.array([_integer(item, "cluster_ids", minimum=0, maximum=count) for item in cluster_ids], dtype=np.int32)
+    ids = np.array(
+        [_integer(item, "cluster_ids", minimum=0, maximum=count) for item in cluster_ids],
+        dtype=np.int32,
+    )
     cluster = _bio("Bio.Cluster")
     centroids, centroid_mask = _call(
         cluster.clustercentroids,
@@ -765,7 +809,9 @@ def cluster_pca(data: Sequence[Sequence[float]], *, verbose: bool = True) -> dic
 
     array = _matrix(data, "data", minimum_rows=2, minimum_columns=2)
     cluster = _bio("Bio.Cluster")
-    means, coordinates, components, eigenvalues = _call(cluster.pca, array)  # Biopython's return order
+    means, coordinates, components, eigenvalues = _call(
+        cluster.pca, array
+    )  # Biopython's return order
     return {
         "status": "completed",
         "operation": "cluster_pca",

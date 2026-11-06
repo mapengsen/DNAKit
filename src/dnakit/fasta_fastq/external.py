@@ -147,7 +147,6 @@ def convert_seqmagick(
     )
 
 
-
 def cluster_vsearch(
     source: str | Path,
     output_directory: str | Path,
@@ -164,7 +163,11 @@ def cluster_vsearch(
 
     source_path = input_path(source)
     _validate_program(program, "program")
-    if isinstance(identity, bool) or not isinstance(identity, (int, float)) or not 0 < identity <= 1:
+    if (
+        isinstance(identity, bool)
+        or not isinstance(identity, (int, float))
+        or not 0 < identity <= 1
+    ):
         raise ConfigurationError("identity must be a number in (0, 1].")
     if isinstance(threads, bool) or not isinstance(threads, int) or not 1 <= threads <= 256:
         raise ConfigurationError("threads must be an integer in [1, 256].")
@@ -212,6 +215,7 @@ def cluster_vsearch(
         },
         verbose=verbose,
     )
+
 
 def _validate_format(value: str, name: str) -> str:
     if (

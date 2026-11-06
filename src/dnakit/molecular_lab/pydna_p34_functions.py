@@ -169,7 +169,9 @@ def _record(value: object, name: str, index: int = 0) -> Any:
                 _letters(value["sequence"], f"{label}.sequence"), circular=True
             )
     else:
-        rec = record_module.Dseqrecord(_dseq({k: v for k, v in value.items() if k != "name"}, label))
+        rec = record_module.Dseqrecord(
+            _dseq({k: v for k, v in value.items() if k != "name"}, label)
+        )
     rec.name = str(value.get("name") or f"fragment{index + 1}")[:40]
     return rec
 
@@ -281,8 +283,12 @@ def pydna_t4_polymerase_polish(
     molecule = _dseq(dna, "dna")
     letters = _nucleotides(nucleotides, "nucleotides")
     new = _guard("T4", lambda: molecule.T4(letters))
-    return _done("t4_polymerase_polish", input=_dseq_dict(molecule), result=_dseq_dict(new),
-                 nucleotides=letters)
+    return _done(
+        "t4_polymerase_polish",
+        input=_dseq_dict(molecule),
+        result=_dseq_dict(new),
+        nucleotides=letters,
+    )
 
 
 def pydna_exonuclease_five_prime(
@@ -300,8 +306,13 @@ def pydna_exonuclease_five_prime(
     count = _integer(bases, "bases", 0, 100_000)
     method = f"nibble_five_prime_{side}"
     new = _guard(method, lambda: getattr(molecule, method)(count))
-    return _done("exonuclease_five_prime", end=side, bases=count, input=_dseq_dict(molecule),
-                 result=_dseq_dict(new))
+    return _done(
+        "exonuclease_five_prime",
+        end=side,
+        bases=count,
+        input=_dseq_dict(molecule),
+        result=_dseq_dict(new),
+    )
 
 
 def pydna_exonuclease_three_prime(
@@ -319,8 +330,13 @@ def pydna_exonuclease_three_prime(
     count = _integer(bases, "bases", 0, 100_000)
     method = f"nibble_three_prime_{side}"
     new = _guard(method, lambda: getattr(molecule, method)(count))
-    return _done("exonuclease_three_prime", end=side, bases=count, input=_dseq_dict(molecule),
-                 result=_dseq_dict(new))
+    return _done(
+        "exonuclease_three_prime",
+        end=side,
+        bases=count,
+        input=_dseq_dict(molecule),
+        result=_dseq_dict(new),
+    )
 
 
 def pydna_terminal_transferase_tail(
@@ -336,11 +352,17 @@ def pydna_terminal_transferase_tail(
     molecule = _dseq(dna, "dna")
     letters = _nucleotides(nucleotides, "nucleotides", "a")
     new = _guard("terminal_transferase", lambda: molecule.terminal_transferase(letters))
-    return _done("terminal_transferase_tail", nucleotides=letters, input=_dseq_dict(molecule),
-                 result=_dseq_dict(new))
+    return _done(
+        "terminal_transferase_tail",
+        nucleotides=letters,
+        input=_dseq_dict(molecule),
+        result=_dseq_dict(new),
+    )
 
 
-def pydna_user_enzyme_treatment(dna: str | dict[str, Any], *, verbose: bool = True) -> dict[str, Any]:
+def pydna_user_enzyme_treatment(
+    dna: str | dict[str, Any], *, verbose: bool = True
+) -> dict[str, Any]:
     """Simulate USER enzyme treatment: each uracil is excised and leaves a gap in its strand.
 
     This is pydna ``Dseq.user``. Write the uracil as ``U`` in the strand; short stretches
@@ -365,8 +387,9 @@ def pydna_cast_to_double_strand(
     side = _choice(end, ("both", "left", "right"), "end")
     method = {"both": "cast_to_ds", "left": "cast_to_ds_left", "right": "cast_to_ds_right"}[side]
     new = _guard(method, lambda: getattr(molecule, method)())
-    return _done("cast_to_double_strand", end=side, input=_dseq_dict(molecule),
-                 result=_dseq_dict(new))
+    return _done(
+        "cast_to_double_strand", end=side, input=_dseq_dict(molecule), result=_dseq_dict(new)
+    )
 
 
 def pydna_melt_short_strands(
@@ -422,14 +445,20 @@ def pydna_shed_strand_segments(
         for index, item in enumerate(value):
             if isinstance(item, (str, bytes)) or not isinstance(item, Sequence) or len(item) != 2:
                 raise ConfigurationError(f"{name}[{index}] must be [start, end].")
-            out.append((_integer(item[0], f"{name}[{index}][0]"), _integer(item[1], f"{name}[{index}][1]")))
+            out.append(
+                (_integer(item[0], f"{name}[{index}][0]"), _integer(item[1], f"{name}[{index}][1]"))
+            )
         return out
 
     watson_pairs = pairs(watson_cutpairs, "watson_cutpairs")
     crick_pairs = pairs(crick_cutpairs, "crick_cutpairs")
     new, strands = _guard("shed_ss_dna", lambda: molecule.shed_ss_dna(watson_pairs, crick_pairs))
-    return _done("shed_strand_segments", input=_dseq_dict(molecule), result=_dseq_dict(new),
-                 shed=[_dseq_dict(item) for item in strands])
+    return _done(
+        "shed_strand_segments",
+        input=_dseq_dict(molecule),
+        result=_dseq_dict(new),
+        shed=[_dseq_dict(item) for item in strands],
+    )
 
 
 # Restriction analysis.
@@ -456,12 +485,17 @@ def pydna_restriction_cutters(
     chosen = _choice(cutter_class, _CUTTER_CLASSES, "cutter_class")
     count = _integer(cuts, "cuts", 0, 10_000)
     restriction = require("Bio.Restriction", "bio-core")
-    batch = restriction.CommOnly if enzymes is None else restriction.RestrictionBatch(
-        _enzymes(enzymes, "enzymes")
+    batch = (
+        restriction.CommOnly
+        if enzymes is None
+        else restriction.RestrictionBatch(_enzymes(enzymes, "enzymes"))
     )
     method = {
-        "none": "no_cutters", "once": "unique_cutters", "twice": "twice_cutters",
-        "n": "n_cutters", "any": "cutters",
+        "none": "no_cutters",
+        "once": "unique_cutters",
+        "twice": "twice_cutters",
+        "n": "n_cutters",
+        "any": "cutters",
     }[chosen]
 
     def run() -> dict[str, Any]:
@@ -473,9 +507,13 @@ def pydna_restriction_cutters(
         return {"enzymes": sorted(counts), "cut_counts": counts}
 
     found = _guard(method, run)
-    return _done("restriction_cutters", cutter_class=chosen,
-                 cuts=count if chosen == "n" else {"none": 0, "once": 1, "twice": 2}.get(chosen),
-                 batch_size=len(batch), **found)
+    return _done(
+        "restriction_cutters",
+        cutter_class=chosen,
+        cuts=count if chosen == "n" else {"none": 0, "once": 1, "twice": 2}.get(chosen),
+        batch_size=len(batch),
+        **found,
+    )
 
 
 def pydna_restriction_ligation_assembly(
@@ -506,17 +544,23 @@ def pydna_restriction_ligation_assembly(
         rows = []
         for product in products:
             partial = assembly.partially_digested_seqs_in_restriction_ligation_assembly(product)
-            rows.append({
-                "sequence": str(product.seq.watson),
-                "length": len(product),
-                "circular": bool(product.circular),
-                "partially_digested_inputs": [str(item.name) for item in partial],
-            })
+            rows.append(
+                {
+                    "sequence": str(product.seq.watson),
+                    "length": len(product),
+                    "circular": bool(product.circular),
+                    "partially_digested_inputs": [str(item.name) for item in partial],
+                }
+            )
         return rows
 
     rows = _guard("restriction_ligation_assembly", run)
-    return _done("restriction_ligation_assembly", enzymes=[str(e) for e in enzyme_list],
-                 product_count=len(rows), products=rows)
+    return _done(
+        "restriction_ligation_assembly",
+        enzymes=[str(e) for e in enzyme_list],
+        product_count=len(rows),
+        products=rows,
+    )
 
 
 # Figures.
@@ -583,7 +627,9 @@ def pydna_assembly_figure(
     target = None
     if kind == "matplotlib":
         if not isinstance(output_path, str) or not output_path.strip():
-            raise ConfigurationError("output_path (a .png path) is required for the matplotlib figure.")
+            raise ConfigurationError(
+                "output_path (a .png path) is required for the matplotlib figure."
+            )
         target = Path(output_path).expanduser().resolve()
         if target.suffix.lower() != ".png":
             raise ConfigurationError("output_path must end with .png.")
@@ -594,7 +640,8 @@ def pydna_assembly_figure(
             assembly = require("pydna.assembly", _EXTRA).Assembly(frags, limit=overlap)
             contigs = sorted(
                 assembly.assemble_circular() if use_circular else assembly.assemble_linear(),
-                key=len, reverse=True,
+                key=len,
+                reverse=True,
             )
         if not contigs:
             raise ValueError("no assembly product was found for these fragments")
@@ -679,7 +726,9 @@ def pydna_build_cloning_strategy(
             raise ValueError("the operation gave no product")
         if chosen != "none":
             if index >= len(products):
-                raise ValueError(f"product_index {index} is out of range for {len(products)} products")
+                raise ValueError(
+                    f"product_index {index} is out of range for {len(products)} products"
+                )
             products = [products[index]]
         for number, product in enumerate(products):
             product.name = f"product{number + 1}"
@@ -744,8 +793,10 @@ def pydna_cloning_history(
         records = models.CloningStrategy.model_validate_json(text).to_dseqrecords()
         rows = []
         for r in records:
-            row: dict[str, Any] = {"name": str(r.name), "has_history": r.source is not None
-                                   and bool(r.history())}
+            row: dict[str, Any] = {
+                "name": str(r.name),
+                "has_history": r.source is not None and bool(r.history()),
+            }
             if mode == "display":
                 row["history"] = r.history()
             elif mode == "validate":
@@ -783,12 +834,12 @@ def pydna_dna_mass_from_amount(
     if moles < 0:
         raise ConfigurationError("amount_mol must not be negative.")
     weight = float(_guard("mw", lambda: molecule.mw()))
-    return _done("dna_mass_from_amount", amount_mol=moles, molecular_weight=weight, mass_g=weight * moles)
+    return _done(
+        "dna_mass_from_amount", amount_mol=moles, molecular_weight=weight, mass_g=weight * moles
+    )
 
 
-def pydna_find_peptide(
-    dna: str, peptide: str, *, verbose: bool = True
-) -> dict[str, Any]:
+def pydna_find_peptide(dna: str, peptide: str, *, verbose: bool = True) -> dict[str, Any]:
     """Find a peptide in the three forward frames of a DNA sequence (pydna ``find_aminoacids``).
 
     Returns the DNA slice (0-based start, end) of the first match, or None. ``find_aa`` is the
@@ -800,8 +851,14 @@ def pydna_find_peptide(
     match = _guard("find_aminoacids", lambda: record.find_aminoacids(letters))
     start = None if match is None else int(match.start)
     end = None if match is None else int(match.stop)
-    return _done("find_peptide", peptide=letters.upper(), found=match is not None, start=start,
-                 end=end, dna=None if match is None else str(record.seq.watson)[start:end])
+    return _done(
+        "find_peptide",
+        peptide=letters.upper(),
+        found=match is not None,
+        start=start,
+        end=end,
+        dna=None if match is None else str(record.seq.watson)[start:end],
+    )
 
 
 def pydna_map_sanger_traces(
@@ -836,9 +893,13 @@ def pydna_map_sanger_traces(
     def run() -> dict[str, Any]:
         files = record.map_trace_files(pattern, limit=minimum)
         mapped = [
-            {"file": str(f.qualifiers["label"][0]),
-             "start": int(f.location.start), "end": int(f.location.end)}
-            for f in record.features if f.type == "trace"
+            {
+                "file": str(f.qualifiers["label"][0]),
+                "start": int(f.location.start),
+                "end": int(f.location.end),
+            }
+            for f in record.features
+            if f.type == "trace"
         ]
         out: dict[str, Any] = {"matching_files": [str(f) for f in files], "mapped": mapped}
         if getattr(record, "matching_reads", None) is not None:
@@ -860,12 +921,19 @@ def pydna_sync_circular_origin(
     ``limit`` bases (``limit`` is lowered for short sequences, as pydna does).
     """
 
-    record = require("pydna.dseqrecord", _EXTRA).Dseqrecord(_letters(sequence, "sequence"), circular=True)
+    record = require("pydna.dseqrecord", _EXTRA).Dseqrecord(
+        _letters(sequence, "sequence"), circular=True
+    )
     ref = _letters(reference, "reference")
     minimum = _integer(limit, "limit", 1, 10_000)
     new = _guard("synced", lambda: record.synced(ref, limit=minimum))
-    return _done("sync_circular_origin", limit=minimum, input=str(record.seq.watson),
-                 result=str(new.seq.watson), circular=bool(new.circular))
+    return _done(
+        "sync_circular_origin",
+        limit=minimum,
+        input=str(record.seq.watson),
+        result=str(new.seq.watson),
+        circular=bool(new.circular),
+    )
 
 
 def pydna_orfs_to_features(
@@ -906,9 +974,14 @@ def pydna_clean_genbank_text(genbank_text: str, *, verbose: bool = True) -> dict
     fixer = require("pydna.genbankfixer", _EXTRA)
     cleaned = _guard("gbtext_clean", lambda: fixer.gbtext_clean(text))
     jseq = cleaned.jseq
-    return _done("clean_genbank_text", genbank_text=cleaned.gbtext, name=jseq.get("name"),
-                 length=len(jseq.get("sequence", "")), topology=jseq.get("topology"),
-                 feature_count=len(jseq.get("features", [])))
+    return _done(
+        "clean_genbank_text",
+        genbank_text=cleaned.gbtext,
+        name=jseq.get("name"),
+        length=len(jseq.get("sequence", "")),
+        topology=jseq.get("topology"),
+        feature_count=len(jseq.get("features", [])),
+    )
 
 
 # Primer screening.
@@ -961,8 +1034,13 @@ def pydna_primer_pairs_by_size(
     seed = _integer(limit, "limit", 4, 100)
     screen = _screen_module()
     rows = _screen(lambda: screen.primer_pairs(record, plist, low, high, seed))
-    return _done("primer_pairs_by_size", short=low, long=high, pair_count=len(rows),
-                 pairs=_amplicon_rows(rows, plist))
+    return _done(
+        "primer_pairs_by_size",
+        short=low,
+        long=high,
+        pair_count=len(rows),
+        pairs=_amplicon_rows(rows, plist),
+    )
 
 
 def pydna_flanking_primer_pairs(
@@ -987,8 +1065,12 @@ def pydna_flanking_primer_pairs(
     seed = _integer(limit, "limit", 4, 100)
     screen = _screen_module()
     rows = _screen(lambda: screen.flanking_primer_pairs(record, plist, (start, end), seed))
-    return _done("flanking_primer_pairs", target=[start, end], pair_count=len(rows),
-                 pairs=_amplicon_rows(rows, plist))
+    return _done(
+        "flanking_primer_pairs",
+        target=[start, end],
+        pair_count=len(rows),
+        pairs=_amplicon_rows(rows, plist),
+    )
 
 
 def pydna_diagnostic_primer_sets(
@@ -1029,16 +1111,22 @@ def pydna_diagnostic_primer_sets(
 
     def convert(item: Any) -> dict[str, Any]:
         record, fp, rp, length = item
-        return {"template": str(record.name), "forward_primer": str(plist[int(fp)].name),
-                "reverse_primer": str(plist[int(rp)].name), "product_size": int(length)}
+        return {
+            "template": str(record.name),
+            "forward_primer": str(plist[int(fp)].name),
+            "reverse_primer": str(plist[int(rp)].name),
+            "product_size": int(length),
+        }
 
     if size == 2:
-        sets = _screen(lambda: screen.diff_primer_pairs(
-            records, plist, low, high, seed, callback=distinct))
+        sets = _screen(
+            lambda: screen.diff_primer_pairs(records, plist, low, high, seed, callback=distinct)
+        )
         rows = [[convert(item) for item in group] for group in sets]
     else:
-        sets = _screen(lambda: screen.diff_primer_triplets(
-            records, plist, seed, low, high, callback=distinct))
+        sets = _screen(
+            lambda: screen.diff_primer_triplets(records, plist, seed, low, high, callback=distinct)
+        )
         rows = [[convert(item) for item in group] for group in sets]
     return _done("diagnostic_primer_sets", primers_per_set=size, set_count=len(rows), sets=rows)
 
@@ -1066,7 +1154,10 @@ def pydna_find_recombinase_sites(
     record = _record(sequence, "sequence")
     first = _letters(site1, "site1", maximum=200)
     second = _letters(site2, "site2", maximum=200)
-    names = (_text(site1_name, "site1_name", maximum=60), _text(site2_name, "site2_name", maximum=60))
+    names = (
+        _text(site1_name, "site1_name", maximum=60),
+        _text(site2_name, "site2_name", maximum=60),
+    )
     module = require("pydna.recombinase", _EXTRA)
 
     def run() -> dict[str, Any]:
@@ -1075,13 +1166,19 @@ def pydna_find_recombinase_sites(
         annotated = recombinase.annotate(record)
         return {
             "sites": {
-                name: [{"start": int(loc.start), "end": int(loc.end), "strand": int(loc.strand)}
-                       for loc in locations]
+                name: [
+                    {"start": int(loc.start), "end": int(loc.end), "strand": int(loc.strand)}
+                    for loc in locations
+                ]
                 for name, locations in found.items()
             },
             "annotated_features": [
-                {"type": str(f.type), "start": int(f.location.start), "end": int(f.location.end),
-                 "strand": int(f.location.strand)}
+                {
+                    "type": str(f.type),
+                    "start": int(f.location.start),
+                    "end": int(f.location.end),
+                    "strand": int(f.location.strand),
+                }
                 for f in annotated.features
             ],
         }
@@ -1197,12 +1294,20 @@ def pydna_seguid_stamp(
     stamp_tool = _text(tool, "tool", maximum=60)
     note = comment if isinstance(comment, str) else ""
     moment = None if timestamp is None else _text(timestamp, "timestamp", maximum=60)
-    stamp = _guard("stamp", lambda: record.stamp(
-        now=(lambda: moment) if moment is not None else _now,
-        tool=stamp_tool, comment=note,
-    ))
-    return _done("seguid_stamp", stamp=str(stamp), comment=record.annotations.get("comment", ""),
-                 circular=bool(record.circular))
+    stamp = _guard(
+        "stamp",
+        lambda: record.stamp(
+            now=(lambda: moment) if moment is not None else _now,
+            tool=stamp_tool,
+            comment=note,
+        ),
+    )
+    return _done(
+        "seguid_stamp",
+        stamp=str(stamp),
+        comment=record.annotations.get("comment", ""),
+        circular=bool(record.circular),
+    )
 
 
 def pydna_iupac_site_to_regex(site: str, *, verbose: bool = True) -> dict[str, Any]:
@@ -1235,8 +1340,8 @@ __all__ = [
     "pydna_find_peptide",
     "pydna_find_recombinase_sites",
     "pydna_flanking_primer_pairs",
-    "pydna_iupac_site_to_regex",
     "pydna_is_open_reading_frame",
+    "pydna_iupac_site_to_regex",
     "pydna_map_sanger_traces",
     "pydna_melt_short_strands",
     "pydna_mung_bean_blunt",

@@ -11,7 +11,7 @@ in that mode. Every call here therefore passes ``catch_stdout=False`` with an ex
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics._common import require
@@ -70,7 +70,9 @@ def _alignment_records(path: Path) -> tuple[int, list[dict[str, Any]]]:
                         "query_name": read.query_name,
                         "flag": int(read.flag),
                         "reference_name": read.reference_name,
-                        "reference_start": None if read.reference_start is None else int(read.reference_start) + 1,
+                        "reference_start": None
+                        if read.reference_start is None
+                        else int(read.reference_start) + 1,
                         "cigar": read.cigarstring,
                         "sequence": read.query_sequence,
                     }

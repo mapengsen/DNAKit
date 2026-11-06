@@ -19,357 +19,409 @@ from dnakit.bioinformatics._gatk_p01_core import Param as _Param
 from dnakit.bioinformatics._gatk_p01_core import Spec as _Spec
 
 _SPECS: dict[str, _Spec] = {
-    'gatk_reblock_gvcf': _Spec(
-        'gatk_reblock_gvcf',
-        {'default': 'ReblockGVCF'},
+    "gatk_reblock_gvcf": _Spec(
+        "gatk_reblock_gvcf",
+        {"default": "ReblockGVCF"},
         (
-            _Param('gvcf_path', 'in', 'variant', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('gvcf_gq_bands', 'strs', 'gvcf-gq-bands'),
-            _Param('drop_low_quals', 'bool', 'drop-low-quals'),
-            _Param('do_qual_score_approximation', 'bool', 'do-qual-score-approximation'),
+            _Param("gvcf_path", "in", "variant", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("gvcf_gq_bands", "strs", "gvcf-gq-bands"),
+            _Param("drop_low_quals", "bool", "drop-low-quals"),
+            _Param("do_qual_score_approximation", "bool", "do-qual-score-approximation"),
         ),
     ),
-    'gatk_calibrate_dragstr_model': _Spec(
-        'gatk_calibrate_dragstr_model',
-        {'default': 'CalibrateDragstrModel'},
+    "gatk_calibrate_dragstr_model": _Spec(
+        "gatk_calibrate_dragstr_model",
+        {"default": "CalibrateDragstrModel"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('str_table_path', 'in', 'str-table-path', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('threads', 'int', 'threads', minimum=1),
-            _Param('min_loci_count', 'int', 'min-loci-count', minimum=1),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("str_table_path", "in", "str-table-path", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("threads", "int", "threads", minimum=1),
+            _Param("min_loci_count", "int", "min-loci-count", minimum=1),
         ),
     ),
-    'gatk_combine_gvcfs': _Spec(
-        'gatk_combine_gvcfs',
-        {'default': 'CombineGVCFs'},
+    "gatk_combine_gvcfs": _Spec(
+        "gatk_combine_gvcfs",
+        {"default": "CombineGVCFs"},
         (
-            _Param('gvcf_paths', 'ins', 'variant', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('convert_to_base_pair_resolution', 'bool', 'convert-to-base-pair-resolution'),
-            _Param('break_bands_at_multiples_of', 'int', 'break-bands-at-multiples-of', minimum=0),
+            _Param("gvcf_paths", "ins", "variant", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("convert_to_base_pair_resolution", "bool", "convert-to-base-pair-resolution"),
+            _Param("break_bands_at_multiples_of", "int", "break-bands-at-multiples-of", minimum=0),
         ),
     ),
-    'gatk_genomicsdb_import': _Spec(
-        'gatk_genomicsdb_import',
-        {'create': 'GenomicsDBImport', 'update': 'GenomicsDBImport'},
+    "gatk_genomicsdb_import": _Spec(
+        "gatk_genomicsdb_import",
+        {"create": "GenomicsDBImport", "update": "GenomicsDBImport"},
         (
-            _Param('workspace_path', 'outd_tool', {'create': 'genomicsdb-workspace-path'}, v=('create',), req=('create',)),
-            _Param('existing_workspace_path', 'in_dir', {'update': 'genomicsdb-update-workspace-path'}, v=('update',), req=('update',)),
-            _Param('gvcf_paths', 'ins', 'variant'),
-            _Param('sample_name_map', 'in', 'sample-name-map'),
-            _Param('intervals', 'strs', 'intervals', v=('create',), req=('create',)),
-            _Param('batch_size', 'int', 'batch-size', minimum=0),
+            _Param(
+                "workspace_path",
+                "outd_tool",
+                {"create": "genomicsdb-workspace-path"},
+                v=("create",),
+                req=("create",),
+            ),
+            _Param(
+                "existing_workspace_path",
+                "in_dir",
+                {"update": "genomicsdb-update-workspace-path"},
+                v=("update",),
+                req=("update",),
+            ),
+            _Param("gvcf_paths", "ins", "variant"),
+            _Param("sample_name_map", "in", "sample-name-map"),
+            _Param("intervals", "strs", "intervals", v=("create",), req=("create",)),
+            _Param("batch_size", "int", "batch-size", minimum=0),
         ),
-        selector='mode',
-        any_of=((None, ('gvcf_paths', 'sample_name_map')),),
+        selector="mode",
+        any_of=((None, ("gvcf_paths", "sample_name_map")),),
     ),
-    'gatk_genotype_gvcfs': _Spec(
-        'gatk_genotype_gvcfs',
-        {'standard': 'GenotypeGVCFs', 'gnarly': 'GnarlyGenotyper'},
+    "gatk_genotype_gvcfs": _Spec(
+        "gatk_genotype_gvcfs",
+        {"standard": "GenotypeGVCFs", "gnarly": "GnarlyGenotyper"},
         (
-            _Param('variant_source', 'src', 'variant', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('dbsnp', 'in', 'dbsnp'),
-            _Param('include_non_variant_sites', 'bool', 'include-non-variant-sites', v=('standard',)),
-            _Param('keep_all_sites', 'bool', 'keep-all-sites', v=('gnarly',)),
+            _Param("variant_source", "src", "variant", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("dbsnp", "in", "dbsnp"),
+            _Param(
+                "include_non_variant_sites", "bool", "include-non-variant-sites", v=("standard",)
+            ),
+            _Param("keep_all_sites", "bool", "keep-all-sites", v=("gnarly",)),
         ),
-        selector='engine',
+        selector="engine",
     ),
-    'gatk_haplotype_based_variant_recaller': _Spec(
-        'gatk_haplotype_based_variant_recaller',
-        {'default': 'HaplotypeBasedVariantRecaller'},
+    "gatk_haplotype_based_variant_recaller": _Spec(
+        "gatk_haplotype_based_variant_recaller",
+        {"default": "HaplotypeBasedVariantRecaller"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('alleles_vcf', 'in', 'alleles-file-vcf', req=True),
-            _Param('haplotypes_bam', 'in', 'haplotypes-file-bam', req=True),
-            _Param('matrix_csv', 'out', 'matrix-file-csv', req=True),
-        ),
-    ),
-    'gatk_learn_read_orientation_model': _Spec(
-        'gatk_learn_read_orientation_model',
-        {'default': 'LearnReadOrientationModel'},
-        (
-            _Param('f1r2_tar_gz_files', 'ins', 'input', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('num_em_iterations', 'int', 'num-em-iterations', minimum=1),
-            _Param('convergence_threshold', 'float', 'convergence-threshold', minimum=0),
-        ),
-    ),
-    'gatk_mutect2': _Spec(
-        'gatk_mutect2',
-        {'default': 'Mutect2'},
-        (
-            _Param('input_paths', 'ins', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('tumor_sample', 'str', 'tumor-sample'),
-            _Param('normal_samples', 'strs', 'normal-sample'),
-            _Param('germline_resource', 'in', 'germline-resource'),
-            _Param('panel_of_normals', 'in', 'panel-of-normals'),
-            _Param('f1r2_tar_gz', 'out', 'f1r2-tar-gz'),
-            _Param('bam_output', 'out', 'bam-output'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("alleles_vcf", "in", "alleles-file-vcf", req=True),
+            _Param("haplotypes_bam", "in", "haplotypes-file-bam", req=True),
+            _Param("matrix_csv", "out", "matrix-file-csv", req=True),
         ),
     ),
-    'gatk_reads_pipeline_spark': _Spec(
-        'gatk_reads_pipeline_spark',
-        {'default': 'ReadsPipelineSpark'},
+    "gatk_learn_read_orientation_model": _Spec(
+        "gatk_learn_read_orientation_model",
+        {"default": "LearnReadOrientationModel"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('known_sites', 'ins', 'known-sites', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('output_bam', 'out', 'output-bam'),
-            _Param('align', 'bool', 'align'),
-            _Param('emit_ref_confidence', 'choice', 'emit-ref-confidence', choices=('NONE', 'BP_RESOLUTION', 'GVCF')),
+            _Param("f1r2_tar_gz_files", "ins", "input", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("num_em_iterations", "int", "num-em-iterations", minimum=1),
+            _Param("convergence_threshold", "float", "convergence-threshold", minimum=0),
         ),
     ),
-    'gatk_collect_sv_evidence': _Spec(
-        'gatk_collect_sv_evidence',
-        {'default': 'CollectSVEvidence'},
+    "gatk_mutect2": _Spec(
+        "gatk_mutect2",
+        {"default": "Mutect2"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('sample_name', 'str', 'sample-name', req=True),
-            _Param('pe_file', 'out', 'pe-file'),
-            _Param('sr_file', 'out', 'sr-file'),
-            _Param('sd_file', 'out', 'sd-file'),
-            _Param('site_depth_locs_vcf', 'in', 'site-depth-locs-vcf'),
-            _Param('depth_evidence_file', 'out', 'depth-evidence-file'),
-        ),
-        any_of=((None, ('pe_file', 'sr_file', 'sd_file', 'depth_evidence_file')),),
-    ),
-    'gatk_condense_depth_evidence': _Spec(
-        'gatk_condense_depth_evidence',
-        {'default': 'CondenseDepthEvidence'},
-        (
-            _Param('depth_evidence', 'in', 'depth-evidence', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('max_interval_size', 'int', 'max-interval-size', minimum=1),
-            _Param('min_interval_size', 'int', 'min-interval-size', minimum=1),
+            _Param("input_paths", "ins", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("tumor_sample", "str", "tumor-sample"),
+            _Param("normal_samples", "strs", "normal-sample"),
+            _Param("germline_resource", "in", "germline-resource"),
+            _Param("panel_of_normals", "in", "panel-of-normals"),
+            _Param("f1r2_tar_gz", "out", "f1r2-tar-gz"),
+            _Param("bam_output", "out", "bam-output"),
         ),
     ),
-    'gatk_convert_counts_to_depth_file': _Spec(
-        'gatk_convert_counts_to_depth_file',
-        {'default': 'ConvertCountsToDepthFile'},
+    "gatk_reads_pipeline_spark": _Spec(
+        "gatk_reads_pipeline_spark",
+        {"default": "ReadsPipelineSpark"},
         (
-            _Param('counts_path', 'in', 'counts-filename', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('sample_name', 'str', 'sample-name'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("known_sites", "ins", "known-sites", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("output_bam", "out", "output-bam"),
+            _Param("align", "bool", "align"),
+            _Param(
+                "emit_ref_confidence",
+                "choice",
+                "emit-ref-confidence",
+                choices=("NONE", "BP_RESOLUTION", "GVCF"),
+            ),
         ),
     ),
-    'gatk_sv_cluster': _Spec(
-        'gatk_sv_cluster',
-        {'cluster': 'SVCluster', 'grouped': 'GroupedSVCluster'},
+    "gatk_collect_sv_evidence": _Spec(
+        "gatk_collect_sv_evidence",
+        {"default": "CollectSVEvidence"},
         (
-            _Param('variant_paths', 'ins', 'variant', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('ploidy_table', 'in', 'ploidy-table', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('clustering_config', 'in', 'clustering-config', v=('grouped',), req=('grouped',)),
-            _Param('stratify_config', 'in', 'stratify-config', v=('grouped',), req=('grouped',)),
-            _Param('algorithm', 'choice', 'algorithm', choices=('SINGLE_LINKAGE', 'MAX_CLIQUE')),
-            _Param('variant_prefix', 'str', 'variant-prefix'),
+            _Param("input_path", "in", "input", req=True),
+            _Param("sample_name", "str", "sample-name", req=True),
+            _Param("pe_file", "out", "pe-file"),
+            _Param("sr_file", "out", "sr-file"),
+            _Param("sd_file", "out", "sd-file"),
+            _Param("site_depth_locs_vcf", "in", "site-depth-locs-vcf"),
+            _Param("depth_evidence_file", "out", "depth-evidence-file"),
         ),
-        selector='mode',
+        any_of=((None, ("pe_file", "sr_file", "sd_file", "depth_evidence_file")),),
     ),
-    'gatk_joint_germline_cnv_segmentation': _Spec(
-        'gatk_joint_germline_cnv_segmentation',
-        {'default': 'JointGermlineCNVSegmentation'},
+    "gatk_condense_depth_evidence": _Spec(
+        "gatk_condense_depth_evidence",
+        {"default": "CondenseDepthEvidence"},
         (
-            _Param('variant_paths', 'ins', 'variant', req=True),
-            _Param('pedigree', 'in', 'pedigree', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('model_call_intervals', 'in', 'model-call-intervals'),
-            _Param('min_sample_set_fraction_overlap', 'float', 'min-sample-set-fraction-overlap', minimum=0),
+            _Param("depth_evidence", "in", "depth-evidence", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("max_interval_size", "int", "max-interval-size", minimum=1),
+            _Param("min_interval_size", "int", "min-interval-size", minimum=1),
         ),
     ),
-    'gatk_print_read_counts': _Spec(
-        'gatk_print_read_counts',
-        {'default': 'PrintReadCounts'},
+    "gatk_convert_counts_to_depth_file": _Spec(
+        "gatk_convert_counts_to_depth_file",
+        {"default": "ConvertCountsToDepthFile"},
         (
-            _Param('counts_path', 'in', 'input-counts', req=True),
-            _Param('output_prefix', 'str', 'output-prefix'),
-            _Param('output_file_list', 'out', 'output-file-list'),
-        ),
-        any_of=((None, ('output_prefix', 'output_file_list')),),
-    ),
-    'gatk_print_sv_evidence': _Spec(
-        'gatk_print_sv_evidence',
-        {'default': 'PrintSVEvidence'},
-        (
-            _Param('evidence_file', 'in', 'evidence-file', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('sample_names', 'strs', 'sample-names'),
+            _Param("counts_path", "in", "counts-filename", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("sample_name", "str", "sample-name"),
         ),
     ),
-    'gatk_sv_annotate': _Spec(
-        'gatk_sv_annotate',
-        {'default': 'SVAnnotate'},
+    "gatk_sv_cluster": _Spec(
+        "gatk_sv_cluster",
+        {"cluster": "SVCluster", "grouped": "GroupedSVCluster"},
         (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('protein_coding_gtf', 'in', 'protein-coding-gtf'),
-            _Param('non_coding_bed', 'in', 'non-coding-bed'),
-            _Param('promoter_window_length', 'int', 'promoter-window-length', minimum=0),
+            _Param("variant_paths", "ins", "variant", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("ploidy_table", "in", "ploidy-table", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param(
+                "clustering_config", "in", "clustering-config", v=("grouped",), req=("grouped",)
+            ),
+            _Param("stratify_config", "in", "stratify-config", v=("grouped",), req=("grouped",)),
+            _Param("algorithm", "choice", "algorithm", choices=("SINGLE_LINKAGE", "MAX_CLIQUE")),
+            _Param("variant_prefix", "str", "variant-prefix"),
+        ),
+        selector="mode",
+    ),
+    "gatk_joint_germline_cnv_segmentation": _Spec(
+        "gatk_joint_germline_cnv_segmentation",
+        {"default": "JointGermlineCNVSegmentation"},
+        (
+            _Param("variant_paths", "ins", "variant", req=True),
+            _Param("pedigree", "in", "pedigree", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("model_call_intervals", "in", "model-call-intervals"),
+            _Param(
+                "min_sample_set_fraction_overlap",
+                "float",
+                "min-sample-set-fraction-overlap",
+                minimum=0,
+            ),
         ),
     ),
-    'gatk_sv_concordance': _Spec(
-        'gatk_sv_concordance',
-        {'default': 'SVConcordance'},
+    "gatk_print_read_counts": _Spec(
+        "gatk_print_read_counts",
+        {"default": "PrintReadCounts"},
         (
-            _Param('evaluation', 'in', 'evaluation', req=True),
-            _Param('truth', 'in', 'truth', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('clustering_config', 'in', 'clustering-config'),
-            _Param('stratify_config', 'in', 'stratify-config'),
+            _Param("counts_path", "in", "input-counts", req=True),
+            _Param("output_prefix", "str", "output-prefix"),
+            _Param("output_file_list", "out", "output-file-list"),
+        ),
+        any_of=((None, ("output_prefix", "output_file_list")),),
+    ),
+    "gatk_print_sv_evidence": _Spec(
+        "gatk_print_sv_evidence",
+        {"default": "PrintSVEvidence"},
+        (
+            _Param("evidence_file", "in", "evidence-file", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("sample_names", "strs", "sample-names"),
         ),
     ),
-    'gatk_sv_stratify': _Spec(
-        'gatk_sv_stratify',
-        {'default': 'SVStratify'},
+    "gatk_sv_annotate": _Spec(
+        "gatk_sv_annotate",
+        {"default": "SVAnnotate"},
         (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('stratify_config', 'in', 'stratify-config', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('track_name', 'strs', 'track-name'),
-            _Param('track_intervals', 'ins', 'track-intervals'),
-            _Param('split_output', 'bool', 'split-output'),
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("protein_coding_gtf", "in", "protein-coding-gtf"),
+            _Param("non_coding_bed", "in", "non-coding-bed"),
+            _Param("promoter_window_length", "int", "promoter-window-length", minimum=0),
         ),
     ),
-    'gatk_site_depth_to_baf': _Spec(
-        'gatk_site_depth_to_baf',
-        {'default': 'SiteDepthtoBAF'},
+    "gatk_sv_concordance": _Spec(
+        "gatk_sv_concordance",
+        {"default": "SVConcordance"},
         (
-            _Param('site_depth_paths', 'ins', 'site-depth', req=True),
-            _Param('baf_sites_vcf', 'in', 'baf-sites-vcf', req=True),
-            _Param('baf_evidence_output', 'out', 'baf-evidence-output', req=True),
-            _Param('sample_names', 'strs', 'sample-names'),
-            _Param('min_het_probability', 'float', 'min-het-probability', minimum=0),
+            _Param("evaluation", "in", "evaluation", req=True),
+            _Param("truth", "in", "truth", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("clustering_config", "in", "clustering-config"),
+            _Param("stratify_config", "in", "stratify-config"),
         ),
     ),
-    'gatk_structural_variation_discovery_pipeline_spark': _Spec(
-        'gatk_structural_variation_discovery_pipeline_spark',
-        {'default': 'StructuralVariationDiscoveryPipelineSpark'},
+    "gatk_sv_stratify": _Spec(
+        "gatk_sv_stratify",
+        {"default": "SVStratify"},
         (
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('aligner_index_image', 'in', 'aligner-index-image', req=True),
-            _Param('kmers_to_ignore', 'in', 'kmers-to-ignore', req=True),
-            _Param('contig_sam_file', 'out', 'contig-sam-file', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("stratify_config", "in", "stratify-config", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("track_name", "strs", "track-name"),
+            _Param("track_intervals", "ins", "track-intervals"),
+            _Param("split_output", "bool", "split-output"),
         ),
     ),
-    'gatk_calculate_genotype_posteriors': _Spec(
-        'gatk_calculate_genotype_posteriors',
-        {'default': 'CalculateGenotypePosteriors'},
+    "gatk_site_depth_to_baf": _Spec(
+        "gatk_site_depth_to_baf",
+        {"default": "SiteDepthtoBAF"},
         (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('pedigree', 'in', 'pedigree'),
-            _Param('supporting_callsets', 'ins', 'supporting-callsets'),
-            _Param('de_novo_prior', 'float', 'de-novo-prior', minimum=0),
+            _Param("site_depth_paths", "ins", "site-depth", req=True),
+            _Param("baf_sites_vcf", "in", "baf-sites-vcf", req=True),
+            _Param("baf_evidence_output", "out", "baf-evidence-output", req=True),
+            _Param("sample_names", "strs", "sample-names"),
+            _Param("min_het_probability", "float", "min-het-probability", minimum=0),
         ),
     ),
-    'gatk_concordance': _Spec(
-        'gatk_concordance',
-        {'default': 'Concordance'},
+    "gatk_structural_variation_discovery_pipeline_spark": _Spec(
+        "gatk_structural_variation_discovery_pipeline_spark",
+        {"default": "StructuralVariationDiscoveryPipelineSpark"},
         (
-            _Param('evaluation', 'in', 'evaluation', req=True),
-            _Param('truth', 'in', 'truth', req=True),
-            _Param('summary_path', 'out', 'summary', req=True),
-            _Param('true_positives_and_false_negatives', 'out', 'true-positives-and-false-negatives'),
-            _Param('true_positives_and_false_positives', 'out', 'true-positives-and-false-positives'),
-        ),
-        tables={'summary_path': 'tsv'},
-    ),
-    'gatk_count_false_positives': _Spec(
-        'gatk_count_false_positives',
-        {'default': 'CountFalsePositives'},
-        (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('intervals', 'strs', 'intervals', req=True),
-            _Param('output_path', 'out', 'output', req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("aligner_index_image", "in", "aligner-index-image", req=True),
+            _Param("kmers_to_ignore", "in", "kmers-to-ignore", req=True),
+            _Param("contig_sam_file", "out", "contig-sam-file", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_evaluate_info_field_concordance': _Spec(
-        'gatk_evaluate_info_field_concordance',
-        {'default': 'EvaluateInfoFieldConcordance'},
+    "gatk_calculate_genotype_posteriors": _Spec(
+        "gatk_calculate_genotype_posteriors",
+        {"default": "CalculateGenotypePosteriors"},
         (
-            _Param('evaluation', 'in', 'evaluation', req=True),
-            _Param('truth', 'in', 'truth', req=True),
-            _Param('eval_info_key', 'str', 'eval-info-key', req=True),
-            _Param('truth_info_key', 'str', 'truth-info-key', req=True),
-            _Param('summary_path', 'out', 'summary', req=True),
-            _Param('epsilon', 'float', 'epsilon', minimum=0),
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("pedigree", "in", "pedigree"),
+            _Param("supporting_callsets", "ins", "supporting-callsets"),
+            _Param("de_novo_prior", "float", "de-novo-prior", minimum=0),
         ),
     ),
-    'gatk_reference_block_concordance': _Spec(
-        'gatk_reference_block_concordance',
-        {'default': 'ReferenceBlockConcordance'},
+    "gatk_concordance": _Spec(
+        "gatk_concordance",
+        {"default": "Concordance"},
         (
-            _Param('evaluation', 'in', 'evaluation', req=True),
-            _Param('truth', 'in', 'truth', req=True),
-            _Param('eval_block_histogram', 'out', 'eval-block-histogram', req=True),
-            _Param('truth_block_histogram', 'out', 'truth-block-histogram', req=True),
-            _Param('confidence_concordance_histogram', 'out', 'confidence-concordance-histogram', req=True),
+            _Param("evaluation", "in", "evaluation", req=True),
+            _Param("truth", "in", "truth", req=True),
+            _Param("summary_path", "out", "summary", req=True),
+            _Param(
+                "true_positives_and_false_negatives", "out", "true-positives-and-false-negatives"
+            ),
+            _Param(
+                "true_positives_and_false_positives", "out", "true-positives-and-false-positives"
+            ),
+        ),
+        tables={"summary_path": "tsv"},
+    ),
+    "gatk_count_false_positives": _Spec(
+        "gatk_count_false_positives",
+        {"default": "CountFalsePositives"},
+        (
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("intervals", "strs", "intervals", req=True),
+            _Param("output_path", "out", "output", req=True),
         ),
     ),
-    'gatk_filter_funcotations': _Spec(
-        'gatk_filter_funcotations',
-        {'default': 'FilterFuncotations'},
+    "gatk_evaluate_info_field_concordance": _Spec(
+        "gatk_evaluate_info_field_concordance",
+        {"default": "EvaluateInfoFieldConcordance"},
         (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('ref_version', 'choice', 'ref-version', req=True, choices=('hg19', 'hg38')),
-            _Param('allele_frequency_data_source', 'choice', 'allele-frequency-data-source', req=True, choices=('gnomad', 'exac')),
+            _Param("evaluation", "in", "evaluation", req=True),
+            _Param("truth", "in", "truth", req=True),
+            _Param("eval_info_key", "str", "eval-info-key", req=True),
+            _Param("truth_info_key", "str", "truth-info-key", req=True),
+            _Param("summary_path", "out", "summary", req=True),
+            _Param("epsilon", "float", "epsilon", minimum=0),
         ),
     ),
-    'gatk_find_mendelian_violations': _Spec(
-        'gatk_find_mendelian_violations',
-        {'default': 'FindMendelianViolations'},
+    "gatk_reference_block_concordance": _Spec(
+        "gatk_reference_block_concordance",
+        {"default": "ReferenceBlockConcordance"},
         (
-            _Param('input_path', 'in', 'INPUT', req=True),
-            _Param('pedigree_path', 'in', 'TRIOS', req=True),
-            _Param('output_path', 'out', 'OUTPUT', req=True),
-            _Param('min_gq', 'int', 'MIN_GQ', minimum=0),
-            _Param('min_dp', 'int', 'MIN_DP', minimum=0),
-            _Param('skip_chroms', 'strs', 'SKIP_CHROMS'),
+            _Param("evaluation", "in", "evaluation", req=True),
+            _Param("truth", "in", "truth", req=True),
+            _Param("eval_block_histogram", "out", "eval-block-histogram", req=True),
+            _Param("truth_block_histogram", "out", "truth-block-histogram", req=True),
+            _Param(
+                "confidence_concordance_histogram",
+                "out",
+                "confidence-concordance-histogram",
+                req=True,
+            ),
         ),
-        tables={'output_path': 'metrics'},
     ),
-    'gatk_funcotate': _Spec(
-        'gatk_funcotate',
-        {'variants': 'Funcotator', 'segments': 'FuncotateSegments'},
+    "gatk_filter_funcotations": _Spec(
+        "gatk_filter_funcotations",
+        {"default": "FilterFuncotations"},
         (
-            _Param('input_path', 'in', {'variants': 'variant', 'segments': 'segments'}, req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('data_sources_path', 'in_dir', 'data-sources-path', req=True),
-            _Param('ref_version', 'str', 'ref-version', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('output_file_format', 'choice', 'output-file-format', req=True, choices=('VCF', 'MAF', 'SEG')),
-            _Param('transcript_selection_mode', 'choice', 'transcript-selection-mode', choices=('BEST_EFFECT', 'CANONICAL', 'ALL')),
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("ref_version", "choice", "ref-version", req=True, choices=("hg19", "hg38")),
+            _Param(
+                "allele_frequency_data_source",
+                "choice",
+                "allele-frequency-data-source",
+                req=True,
+                choices=("gnomad", "exac"),
+            ),
         ),
-        selector='input_kind',
     ),
-    'gatk_validate_basic_somatic_short_mutations': _Spec(
-        'gatk_validate_basic_somatic_short_mutations',
-        {'default': 'ValidateBasicSomaticShortMutations'},
+    "gatk_find_mendelian_violations": _Spec(
+        "gatk_find_mendelian_violations",
+        {"default": "FindMendelianViolations"},
         (
-            _Param('variant_path', 'in', 'variant', req=True),
-            _Param('input_path', 'in', 'input', req=True),
-            _Param('reference_path', 'in', 'reference', req=True),
-            _Param('discovery_sample_name', 'str', 'discovery-sample-name', req=True),
-            _Param('val_case_sample_name', 'str', 'val-case-sample-name', req=True),
-            _Param('val_control_sample_name', 'str', 'val-control-sample-name', req=True),
-            _Param('output_path', 'out', 'output', req=True),
-            _Param('summary_path', 'out', 'summary'),
+            _Param("input_path", "in", "INPUT", req=True),
+            _Param("pedigree_path", "in", "TRIOS", req=True),
+            _Param("output_path", "out", "OUTPUT", req=True),
+            _Param("min_gq", "int", "MIN_GQ", minimum=0),
+            _Param("min_dp", "int", "MIN_DP", minimum=0),
+            _Param("skip_chroms", "strs", "SKIP_CHROMS"),
+        ),
+        tables={"output_path": "metrics"},
+    ),
+    "gatk_funcotate": _Spec(
+        "gatk_funcotate",
+        {"variants": "Funcotator", "segments": "FuncotateSegments"},
+        (
+            _Param("input_path", "in", {"variants": "variant", "segments": "segments"}, req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("data_sources_path", "in_dir", "data-sources-path", req=True),
+            _Param("ref_version", "str", "ref-version", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param(
+                "output_file_format",
+                "choice",
+                "output-file-format",
+                req=True,
+                choices=("VCF", "MAF", "SEG"),
+            ),
+            _Param(
+                "transcript_selection_mode",
+                "choice",
+                "transcript-selection-mode",
+                choices=("BEST_EFFECT", "CANONICAL", "ALL"),
+            ),
+        ),
+        selector="input_kind",
+    ),
+    "gatk_validate_basic_somatic_short_mutations": _Spec(
+        "gatk_validate_basic_somatic_short_mutations",
+        {"default": "ValidateBasicSomaticShortMutations"},
+        (
+            _Param("variant_path", "in", "variant", req=True),
+            _Param("input_path", "in", "input", req=True),
+            _Param("reference_path", "in", "reference", req=True),
+            _Param("discovery_sample_name", "str", "discovery-sample-name", req=True),
+            _Param("val_case_sample_name", "str", "val-case-sample-name", req=True),
+            _Param("val_control_sample_name", "str", "val-control-sample-name", req=True),
+            _Param("output_path", "out", "output", req=True),
+            _Param("summary_path", "out", "summary"),
         ),
     ),
 }
@@ -405,8 +457,15 @@ def gatk_reblock_gvcf(
     Output: The common result fields; `outputs.output_path` is the reblocked GVCF.
     """
     return _core.execute(
-        _SPECS['gatk_reblock_gvcf'],
-        {'gvcf_path': gvcf_path, 'reference_path': reference_path, 'output_path': output_path, 'gvcf_gq_bands': gvcf_gq_bands, 'drop_low_quals': drop_low_quals, 'do_qual_score_approximation': do_qual_score_approximation},
+        _SPECS["gatk_reblock_gvcf"],
+        {
+            "gvcf_path": gvcf_path,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "gvcf_gq_bands": gvcf_gq_bands,
+            "drop_low_quals": drop_low_quals,
+            "do_qual_score_approximation": do_qual_score_approximation,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -445,8 +504,15 @@ def gatk_calibrate_dragstr_model(
     Output: The common result fields; `outputs.output_path` is the parameter file.
     """
     return _core.execute(
-        _SPECS['gatk_calibrate_dragstr_model'],
-        {'input_path': input_path, 'reference_path': reference_path, 'str_table_path': str_table_path, 'output_path': output_path, 'threads': threads, 'min_loci_count': min_loci_count},
+        _SPECS["gatk_calibrate_dragstr_model"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "str_table_path": str_table_path,
+            "output_path": output_path,
+            "threads": threads,
+            "min_loci_count": min_loci_count,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -483,8 +549,14 @@ def gatk_combine_gvcfs(
     Output: The common result fields; `outputs.output_path` is the merged GVCF.
     """
     return _core.execute(
-        _SPECS['gatk_combine_gvcfs'],
-        {'gvcf_paths': gvcf_paths, 'reference_path': reference_path, 'output_path': output_path, 'convert_to_base_pair_resolution': convert_to_base_pair_resolution, 'break_bands_at_multiples_of': break_bands_at_multiples_of},
+        _SPECS["gatk_combine_gvcfs"],
+        {
+            "gvcf_paths": gvcf_paths,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "convert_to_base_pair_resolution": convert_to_base_pair_resolution,
+            "break_bands_at_multiples_of": break_bands_at_multiples_of,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -495,7 +567,7 @@ def gatk_combine_gvcfs(
 
 def gatk_genomicsdb_import(
     *,
-    mode: str = 'create',
+    mode: str = "create",
     workspace_path: str | None = None,
     existing_workspace_path: str | None = None,
     gvcf_paths: Sequence[str] | None = None,
@@ -526,8 +598,15 @@ def gatk_genomicsdb_import(
     Output: The common result fields and `mode`; `outputs.workspace_path` for a new workspace, with `files` listing it.
     """
     return _core.execute(
-        _SPECS['gatk_genomicsdb_import'],
-        {'workspace_path': workspace_path, 'existing_workspace_path': existing_workspace_path, 'gvcf_paths': gvcf_paths, 'sample_name_map': sample_name_map, 'intervals': intervals, 'batch_size': batch_size},
+        _SPECS["gatk_genomicsdb_import"],
+        {
+            "workspace_path": workspace_path,
+            "existing_workspace_path": existing_workspace_path,
+            "gvcf_paths": gvcf_paths,
+            "sample_name_map": sample_name_map,
+            "intervals": intervals,
+            "batch_size": batch_size,
+        },
         mode=mode,
         options=options,
         gatk_path=gatk_path,
@@ -541,7 +620,7 @@ def gatk_genotype_gvcfs(
     reference_path: str,
     output_path: str,
     *,
-    engine: str = 'standard',
+    engine: str = "standard",
     dbsnp: str | None = None,
     include_non_variant_sites: bool | None = None,
     keep_all_sites: bool | None = None,
@@ -569,8 +648,15 @@ def gatk_genotype_gvcfs(
     Output: The common result fields and `mode`; `outputs.output_path` is the VCF.
     """
     return _core.execute(
-        _SPECS['gatk_genotype_gvcfs'],
-        {'variant_source': variant_source, 'reference_path': reference_path, 'output_path': output_path, 'dbsnp': dbsnp, 'include_non_variant_sites': include_non_variant_sites, 'keep_all_sites': keep_all_sites},
+        _SPECS["gatk_genotype_gvcfs"],
+        {
+            "variant_source": variant_source,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "dbsnp": dbsnp,
+            "include_non_variant_sites": include_non_variant_sites,
+            "keep_all_sites": keep_all_sites,
+        },
         mode=engine,
         options=options,
         gatk_path=gatk_path,
@@ -607,8 +693,14 @@ def gatk_haplotype_based_variant_recaller(
     Output: The common result fields; `outputs.matrix_csv` is the matrix.
     """
     return _core.execute(
-        _SPECS['gatk_haplotype_based_variant_recaller'],
-        {'input_path': input_path, 'reference_path': reference_path, 'alleles_vcf': alleles_vcf, 'haplotypes_bam': haplotypes_bam, 'matrix_csv': matrix_csv},
+        _SPECS["gatk_haplotype_based_variant_recaller"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "alleles_vcf": alleles_vcf,
+            "haplotypes_bam": haplotypes_bam,
+            "matrix_csv": matrix_csv,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -643,8 +735,13 @@ def gatk_learn_read_orientation_model(
     Output: The common result fields; `outputs.output_path` is the model archive.
     """
     return _core.execute(
-        _SPECS['gatk_learn_read_orientation_model'],
-        {'f1r2_tar_gz_files': f1r2_tar_gz_files, 'output_path': output_path, 'num_em_iterations': num_em_iterations, 'convergence_threshold': convergence_threshold},
+        _SPECS["gatk_learn_read_orientation_model"],
+        {
+            "f1r2_tar_gz_files": f1r2_tar_gz_files,
+            "output_path": output_path,
+            "num_em_iterations": num_em_iterations,
+            "convergence_threshold": convergence_threshold,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -689,8 +786,18 @@ def gatk_mutect2(
     Output: The common result fields; `outputs.output_path` is the VCF.
     """
     return _core.execute(
-        _SPECS['gatk_mutect2'],
-        {'input_paths': input_paths, 'reference_path': reference_path, 'output_path': output_path, 'tumor_sample': tumor_sample, 'normal_samples': normal_samples, 'germline_resource': germline_resource, 'panel_of_normals': panel_of_normals, 'f1r2_tar_gz': f1r2_tar_gz, 'bam_output': bam_output},
+        _SPECS["gatk_mutect2"],
+        {
+            "input_paths": input_paths,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "tumor_sample": tumor_sample,
+            "normal_samples": normal_samples,
+            "germline_resource": germline_resource,
+            "panel_of_normals": panel_of_normals,
+            "f1r2_tar_gz": f1r2_tar_gz,
+            "bam_output": bam_output,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -731,8 +838,16 @@ def gatk_reads_pipeline_spark(
     Output: The common result fields; `outputs.output_path` is the variant file.
     """
     return _core.execute(
-        _SPECS['gatk_reads_pipeline_spark'],
-        {'input_path': input_path, 'reference_path': reference_path, 'known_sites': known_sites, 'output_path': output_path, 'output_bam': output_bam, 'align': align, 'emit_ref_confidence': emit_ref_confidence},
+        _SPECS["gatk_reads_pipeline_spark"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "known_sites": known_sites,
+            "output_path": output_path,
+            "output_bam": output_bam,
+            "align": align,
+            "emit_ref_confidence": emit_ref_confidence,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -773,8 +888,16 @@ def gatk_collect_sv_evidence(
     Output: The common result fields; `outputs` lists the evidence files.
     """
     return _core.execute(
-        _SPECS['gatk_collect_sv_evidence'],
-        {'input_path': input_path, 'sample_name': sample_name, 'pe_file': pe_file, 'sr_file': sr_file, 'sd_file': sd_file, 'site_depth_locs_vcf': site_depth_locs_vcf, 'depth_evidence_file': depth_evidence_file},
+        _SPECS["gatk_collect_sv_evidence"],
+        {
+            "input_path": input_path,
+            "sample_name": sample_name,
+            "pe_file": pe_file,
+            "sr_file": sr_file,
+            "sd_file": sd_file,
+            "site_depth_locs_vcf": site_depth_locs_vcf,
+            "depth_evidence_file": depth_evidence_file,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -809,8 +932,13 @@ def gatk_condense_depth_evidence(
     Output: The common result fields; `outputs.output_path` is the condensed file.
     """
     return _core.execute(
-        _SPECS['gatk_condense_depth_evidence'],
-        {'depth_evidence': depth_evidence, 'output_path': output_path, 'max_interval_size': max_interval_size, 'min_interval_size': min_interval_size},
+        _SPECS["gatk_condense_depth_evidence"],
+        {
+            "depth_evidence": depth_evidence,
+            "output_path": output_path,
+            "max_interval_size": max_interval_size,
+            "min_interval_size": min_interval_size,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -843,8 +971,8 @@ def gatk_convert_counts_to_depth_file(
     Output: The common result fields; `outputs.output_path` is the depth file.
     """
     return _core.execute(
-        _SPECS['gatk_convert_counts_to_depth_file'],
-        {'counts_path': counts_path, 'output_path': output_path, 'sample_name': sample_name},
+        _SPECS["gatk_convert_counts_to_depth_file"],
+        {"counts_path": counts_path, "output_path": output_path, "sample_name": sample_name},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -859,7 +987,7 @@ def gatk_sv_cluster(
     ploidy_table: str,
     output_path: str,
     *,
-    mode: str = 'cluster',
+    mode: str = "cluster",
     clustering_config: str | None = None,
     stratify_config: str | None = None,
     algorithm: str | None = None,
@@ -890,8 +1018,17 @@ def gatk_sv_cluster(
     Output: The common result fields and `mode`; `outputs.output_path` is the clustered VCF.
     """
     return _core.execute(
-        _SPECS['gatk_sv_cluster'],
-        {'variant_paths': variant_paths, 'reference_path': reference_path, 'ploidy_table': ploidy_table, 'output_path': output_path, 'clustering_config': clustering_config, 'stratify_config': stratify_config, 'algorithm': algorithm, 'variant_prefix': variant_prefix},
+        _SPECS["gatk_sv_cluster"],
+        {
+            "variant_paths": variant_paths,
+            "reference_path": reference_path,
+            "ploidy_table": ploidy_table,
+            "output_path": output_path,
+            "clustering_config": clustering_config,
+            "stratify_config": stratify_config,
+            "algorithm": algorithm,
+            "variant_prefix": variant_prefix,
+        },
         mode=mode,
         options=options,
         gatk_path=gatk_path,
@@ -930,8 +1067,15 @@ def gatk_joint_germline_cnv_segmentation(
     Output: The common result fields; `outputs.output_path` is the combined VCF.
     """
     return _core.execute(
-        _SPECS['gatk_joint_germline_cnv_segmentation'],
-        {'variant_paths': variant_paths, 'pedigree': pedigree, 'reference_path': reference_path, 'output_path': output_path, 'model_call_intervals': model_call_intervals, 'min_sample_set_fraction_overlap': min_sample_set_fraction_overlap},
+        _SPECS["gatk_joint_germline_cnv_segmentation"],
+        {
+            "variant_paths": variant_paths,
+            "pedigree": pedigree,
+            "reference_path": reference_path,
+            "output_path": output_path,
+            "model_call_intervals": model_call_intervals,
+            "min_sample_set_fraction_overlap": min_sample_set_fraction_overlap,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -964,8 +1108,12 @@ def gatk_print_read_counts(
     Output: The common result fields; `outputs.output_file_list` when requested.
     """
     return _core.execute(
-        _SPECS['gatk_print_read_counts'],
-        {'counts_path': counts_path, 'output_prefix': output_prefix, 'output_file_list': output_file_list},
+        _SPECS["gatk_print_read_counts"],
+        {
+            "counts_path": counts_path,
+            "output_prefix": output_prefix,
+            "output_file_list": output_file_list,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -998,8 +1146,8 @@ def gatk_print_sv_evidence(
     Output: The common result fields; `outputs.output_path` is the evidence file.
     """
     return _core.execute(
-        _SPECS['gatk_print_sv_evidence'],
-        {'evidence_file': evidence_file, 'output_path': output_path, 'sample_names': sample_names},
+        _SPECS["gatk_print_sv_evidence"],
+        {"evidence_file": evidence_file, "output_path": output_path, "sample_names": sample_names},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1036,8 +1184,14 @@ def gatk_sv_annotate(
     Output: The common result fields; `outputs.output_path` is the annotated VCF.
     """
     return _core.execute(
-        _SPECS['gatk_sv_annotate'],
-        {'variant_path': variant_path, 'output_path': output_path, 'protein_coding_gtf': protein_coding_gtf, 'non_coding_bed': non_coding_bed, 'promoter_window_length': promoter_window_length},
+        _SPECS["gatk_sv_annotate"],
+        {
+            "variant_path": variant_path,
+            "output_path": output_path,
+            "protein_coding_gtf": protein_coding_gtf,
+            "non_coding_bed": non_coding_bed,
+            "promoter_window_length": promoter_window_length,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1074,8 +1228,14 @@ def gatk_sv_concordance(
     Output: The common result fields; `outputs.output_path` is the annotated VCF.
     """
     return _core.execute(
-        _SPECS['gatk_sv_concordance'],
-        {'evaluation': evaluation, 'truth': truth, 'output_path': output_path, 'clustering_config': clustering_config, 'stratify_config': stratify_config},
+        _SPECS["gatk_sv_concordance"],
+        {
+            "evaluation": evaluation,
+            "truth": truth,
+            "output_path": output_path,
+            "clustering_config": clustering_config,
+            "stratify_config": stratify_config,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1114,8 +1274,15 @@ def gatk_sv_stratify(
     Output: The common result fields; `outputs.output_path` is the stratified VCF.
     """
     return _core.execute(
-        _SPECS['gatk_sv_stratify'],
-        {'variant_path': variant_path, 'stratify_config': stratify_config, 'output_path': output_path, 'track_name': track_name, 'track_intervals': track_intervals, 'split_output': split_output},
+        _SPECS["gatk_sv_stratify"],
+        {
+            "variant_path": variant_path,
+            "stratify_config": stratify_config,
+            "output_path": output_path,
+            "track_name": track_name,
+            "track_intervals": track_intervals,
+            "split_output": split_output,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1152,8 +1319,14 @@ def gatk_site_depth_to_baf(
     Output: The common result fields; `outputs.baf_evidence_output` is the BAF file.
     """
     return _core.execute(
-        _SPECS['gatk_site_depth_to_baf'],
-        {'site_depth_paths': site_depth_paths, 'baf_sites_vcf': baf_sites_vcf, 'baf_evidence_output': baf_evidence_output, 'sample_names': sample_names, 'min_het_probability': min_het_probability},
+        _SPECS["gatk_site_depth_to_baf"],
+        {
+            "site_depth_paths": site_depth_paths,
+            "baf_sites_vcf": baf_sites_vcf,
+            "baf_evidence_output": baf_evidence_output,
+            "sample_names": sample_names,
+            "min_het_probability": min_het_probability,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1192,8 +1365,15 @@ def gatk_structural_variation_discovery_pipeline_spark(
     Output: The common result fields; `outputs.output_path` is the SV VCF.
     """
     return _core.execute(
-        _SPECS['gatk_structural_variation_discovery_pipeline_spark'],
-        {'input_path': input_path, 'reference_path': reference_path, 'aligner_index_image': aligner_index_image, 'kmers_to_ignore': kmers_to_ignore, 'contig_sam_file': contig_sam_file, 'output_path': output_path},
+        _SPECS["gatk_structural_variation_discovery_pipeline_spark"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "aligner_index_image": aligner_index_image,
+            "kmers_to_ignore": kmers_to_ignore,
+            "contig_sam_file": contig_sam_file,
+            "output_path": output_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1230,8 +1410,14 @@ def gatk_calculate_genotype_posteriors(
     Output: The common result fields; `outputs.output_path` is the VCF.
     """
     return _core.execute(
-        _SPECS['gatk_calculate_genotype_posteriors'],
-        {'variant_path': variant_path, 'output_path': output_path, 'pedigree': pedigree, 'supporting_callsets': supporting_callsets, 'de_novo_prior': de_novo_prior},
+        _SPECS["gatk_calculate_genotype_posteriors"],
+        {
+            "variant_path": variant_path,
+            "output_path": output_path,
+            "pedigree": pedigree,
+            "supporting_callsets": supporting_callsets,
+            "de_novo_prior": de_novo_prior,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1268,8 +1454,14 @@ def gatk_concordance(
     Output: The common result fields and `tables.summary_path` (rows per variant type).
     """
     return _core.execute(
-        _SPECS['gatk_concordance'],
-        {'evaluation': evaluation, 'truth': truth, 'summary_path': summary_path, 'true_positives_and_false_negatives': true_positives_and_false_negatives, 'true_positives_and_false_positives': true_positives_and_false_positives},
+        _SPECS["gatk_concordance"],
+        {
+            "evaluation": evaluation,
+            "truth": truth,
+            "summary_path": summary_path,
+            "true_positives_and_false_negatives": true_positives_and_false_negatives,
+            "true_positives_and_false_positives": true_positives_and_false_positives,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1302,8 +1494,8 @@ def gatk_count_false_positives(
     Output: The common result fields; `outputs.output_path` holds the count.
     """
     return _core.execute(
-        _SPECS['gatk_count_false_positives'],
-        {'variant_path': variant_path, 'intervals': intervals, 'output_path': output_path},
+        _SPECS["gatk_count_false_positives"],
+        {"variant_path": variant_path, "intervals": intervals, "output_path": output_path},
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1342,8 +1534,15 @@ def gatk_evaluate_info_field_concordance(
     Output: The common result fields; `outputs.summary_path` is the summary.
     """
     return _core.execute(
-        _SPECS['gatk_evaluate_info_field_concordance'],
-        {'evaluation': evaluation, 'truth': truth, 'eval_info_key': eval_info_key, 'truth_info_key': truth_info_key, 'summary_path': summary_path, 'epsilon': epsilon},
+        _SPECS["gatk_evaluate_info_field_concordance"],
+        {
+            "evaluation": evaluation,
+            "truth": truth,
+            "eval_info_key": eval_info_key,
+            "truth_info_key": truth_info_key,
+            "summary_path": summary_path,
+            "epsilon": epsilon,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1380,8 +1579,14 @@ def gatk_reference_block_concordance(
     Output: The common result fields; `outputs` lists the three histograms.
     """
     return _core.execute(
-        _SPECS['gatk_reference_block_concordance'],
-        {'evaluation': evaluation, 'truth': truth, 'eval_block_histogram': eval_block_histogram, 'truth_block_histogram': truth_block_histogram, 'confidence_concordance_histogram': confidence_concordance_histogram},
+        _SPECS["gatk_reference_block_concordance"],
+        {
+            "evaluation": evaluation,
+            "truth": truth,
+            "eval_block_histogram": eval_block_histogram,
+            "truth_block_histogram": truth_block_histogram,
+            "confidence_concordance_histogram": confidence_concordance_histogram,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1416,8 +1621,13 @@ def gatk_filter_funcotations(
     Output: The common result fields; `outputs.output_path` is the filtered VCF.
     """
     return _core.execute(
-        _SPECS['gatk_filter_funcotations'],
-        {'variant_path': variant_path, 'output_path': output_path, 'ref_version': ref_version, 'allele_frequency_data_source': allele_frequency_data_source},
+        _SPECS["gatk_filter_funcotations"],
+        {
+            "variant_path": variant_path,
+            "output_path": output_path,
+            "ref_version": ref_version,
+            "allele_frequency_data_source": allele_frequency_data_source,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1456,8 +1666,15 @@ def gatk_find_mendelian_violations(
     Output: The common result fields and `tables.output_path` (Picard metrics rows).
     """
     return _core.execute(
-        _SPECS['gatk_find_mendelian_violations'],
-        {'input_path': input_path, 'pedigree_path': pedigree_path, 'output_path': output_path, 'min_gq': min_gq, 'min_dp': min_dp, 'skip_chroms': skip_chroms},
+        _SPECS["gatk_find_mendelian_violations"],
+        {
+            "input_path": input_path,
+            "pedigree_path": pedigree_path,
+            "output_path": output_path,
+            "min_gq": min_gq,
+            "min_dp": min_dp,
+            "skip_chroms": skip_chroms,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1474,7 +1691,7 @@ def gatk_funcotate(
     output_path: str,
     output_file_format: str,
     *,
-    input_kind: str = 'variants',
+    input_kind: str = "variants",
     transcript_selection_mode: str | None = None,
     options: Mapping[str, Any] | None = None,
     gatk_path: str | None = None,
@@ -1501,8 +1718,16 @@ def gatk_funcotate(
     Output: The common result fields and `mode`; `outputs.output_path` is the annotated file.
     """
     return _core.execute(
-        _SPECS['gatk_funcotate'],
-        {'input_path': input_path, 'reference_path': reference_path, 'data_sources_path': data_sources_path, 'ref_version': ref_version, 'output_path': output_path, 'output_file_format': output_file_format, 'transcript_selection_mode': transcript_selection_mode},
+        _SPECS["gatk_funcotate"],
+        {
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "data_sources_path": data_sources_path,
+            "ref_version": ref_version,
+            "output_path": output_path,
+            "output_file_format": output_file_format,
+            "transcript_selection_mode": transcript_selection_mode,
+        },
         mode=input_kind,
         options=options,
         gatk_path=gatk_path,
@@ -1545,8 +1770,17 @@ def gatk_validate_basic_somatic_short_mutations(
     Output: The common result fields; `outputs.output_path` is the validation table.
     """
     return _core.execute(
-        _SPECS['gatk_validate_basic_somatic_short_mutations'],
-        {'variant_path': variant_path, 'input_path': input_path, 'reference_path': reference_path, 'discovery_sample_name': discovery_sample_name, 'val_case_sample_name': val_case_sample_name, 'val_control_sample_name': val_control_sample_name, 'output_path': output_path, 'summary_path': summary_path},
+        _SPECS["gatk_validate_basic_somatic_short_mutations"],
+        {
+            "variant_path": variant_path,
+            "input_path": input_path,
+            "reference_path": reference_path,
+            "discovery_sample_name": discovery_sample_name,
+            "val_case_sample_name": val_case_sample_name,
+            "val_control_sample_name": val_control_sample_name,
+            "output_path": output_path,
+            "summary_path": summary_path,
+        },
         mode=None,
         options=options,
         gatk_path=gatk_path,
@@ -1556,35 +1790,35 @@ def gatk_validate_basic_somatic_short_mutations(
 
 
 __all__ = [
-    "gatk_reblock_gvcf",
+    "gatk_calculate_genotype_posteriors",
     "gatk_calibrate_dragstr_model",
-    "gatk_combine_gvcfs",
-    "gatk_genomicsdb_import",
-    "gatk_genotype_gvcfs",
-    "gatk_haplotype_based_variant_recaller",
-    "gatk_learn_read_orientation_model",
-    "gatk_mutect2",
-    "gatk_reads_pipeline_spark",
     "gatk_collect_sv_evidence",
+    "gatk_combine_gvcfs",
+    "gatk_concordance",
     "gatk_condense_depth_evidence",
     "gatk_convert_counts_to_depth_file",
-    "gatk_sv_cluster",
-    "gatk_joint_germline_cnv_segmentation",
-    "gatk_print_read_counts",
-    "gatk_print_sv_evidence",
-    "gatk_sv_annotate",
-    "gatk_sv_concordance",
-    "gatk_sv_stratify",
-    "gatk_site_depth_to_baf",
-    "gatk_structural_variation_discovery_pipeline_spark",
-    "gatk_calculate_genotype_posteriors",
-    "gatk_concordance",
     "gatk_count_false_positives",
     "gatk_evaluate_info_field_concordance",
-    "gatk_reference_block_concordance",
     "gatk_filter_funcotations",
     "gatk_find_mendelian_violations",
     "gatk_funcotate",
+    "gatk_genomicsdb_import",
+    "gatk_genotype_gvcfs",
+    "gatk_haplotype_based_variant_recaller",
+    "gatk_joint_germline_cnv_segmentation",
+    "gatk_learn_read_orientation_model",
+    "gatk_mutect2",
+    "gatk_print_read_counts",
+    "gatk_print_sv_evidence",
+    "gatk_reads_pipeline_spark",
+    "gatk_reblock_gvcf",
+    "gatk_reference_block_concordance",
+    "gatk_site_depth_to_baf",
+    "gatk_structural_variation_discovery_pipeline_spark",
+    "gatk_sv_annotate",
+    "gatk_sv_cluster",
+    "gatk_sv_concordance",
+    "gatk_sv_stratify",
     "gatk_validate_basic_somatic_short_mutations",
 ]
 

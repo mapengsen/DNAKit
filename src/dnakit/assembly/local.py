@@ -62,12 +62,18 @@ def _lengths(value: object) -> list[int]:
 
 def _target_percentile(options: Mapping[str, object]) -> float:
     value = options.get("percentile", options.get("x", 50))
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 < float(value) <= 100:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not 0 < float(value) <= 100
+    ):
         raise ConfigurationError("options.percentile/options.x must be in the interval (0, 100].")
     return float(value)
 
 
-def _nx(lengths: Sequence[int], percentile: float, denominator: int | None = None) -> tuple[int, int]:
+def _nx(
+    lengths: Sequence[int], percentile: float, denominator: int | None = None
+) -> tuple[int, int]:
     total = int(sum(lengths) if denominator is None else denominator)
     if total <= 0:
         raise ConfigurationError("the N-statistic denominator must be positive.")
@@ -164,7 +170,9 @@ def calculate_ng50(input: object, *, options: Mapping[str, object] | None = None
     )
 
 
-def calculate_stats(input: object, *, options: Mapping[str, object] | None = None) -> dict[str, Any]:
+def calculate_stats(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> dict[str, Any]:
     """Return common assembly length, Nx and Lx statistics."""
 
     settings = dict(options or {})

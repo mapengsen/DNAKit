@@ -27,8 +27,15 @@ def _pyfaidx() -> Any:
     return require("pyfaidx", _EXTRA)
 
 
-def _faidx(module: Any, fasta: Path, index: Path | None, *, gzi: Path | None = None, build: bool,
-           mutable: bool = False) -> Any:
+def _faidx(
+    module: Any,
+    fasta: Path,
+    index: Path | None,
+    *,
+    gzi: Path | None = None,
+    build: bool,
+    mutable: bool = False,
+) -> Any:
     kwargs: dict[str, Any] = {"build_index": build, "rebuild": False, "mutable": mutable}
     if index is not None:
         kwargs["indexname"] = str(index)
@@ -37,15 +44,18 @@ def _faidx(module: Any, fasta: Path, index: Path | None, *, gzi: Path | None = N
     try:
         return module.Faidx(str(fasta), **kwargs)
     except TypeError as exc:
-        raise BackendUnavailableError(f"This pyfaidx version does not accept {sorted(kwargs)}: {exc}",
-                                      hint=_GZI_HINT) from exc
-    except Exception as exc:  # noqa: BLE001 - pyfaidx raises several FastaIndexingError-like classes
+        raise BackendUnavailableError(
+            f"This pyfaidx version does not accept {sorted(kwargs)}: {exc}", hint=_GZI_HINT
+        ) from exc
+    except Exception as exc:
         raise ConfigurationError(f"pyfaidx could not open {fasta}: {exc}") from exc
 
 
 def _need_gzi(faidx: Any, module: Any) -> None:
     if not hasattr(faidx, "build_gzi"):
-        raise BackendUnavailableError(f"pyfaidx {module.__version__} has no BGZF .gzi support.", hint=_GZI_HINT)
+        raise BackendUnavailableError(
+            f"pyfaidx {module.__version__} has no BGZF .gzi support.", hint=_GZI_HINT
+        )
 
 
 def faidx_read_index(
@@ -72,22 +82,46 @@ def faidx_read_index(
     if which == "fai":
         faidx = _faidx(module, source, index, build=False)
         # pyfaidx reads the index when the object is created (build_index=False).
-        rows = [{"name": str(name), "length": int(r.rlen), "offset": int(r.offset),
-                 "line_bases": int(r.lenc), "line_bytes": int(r.lenb)} for name, r in faidx.index.items()]
+        rows = [
+            {
+                "name": str(name),
+                "length": int(r.rlen),
+                "offset": int(r.offset),
+                "line_bases": int(r.lenc),
+                "line_bytes": int(r.lenb),
+            }
+            for name, r in faidx.index.items()
+        ]
         faidx.close()
-        return {"status": "completed", "backend": "pyfaidx", "version": module.__version__, "kind": which,
-                "index_path": str(index), "record_count": len(rows), "records": rows[:limit],
-                "truncated": len(rows) > limit}
+        return {
+            "status": "completed",
+            "backend": "pyfaidx",
+            "version": module.__version__,
+            "kind": which,
+            "index_path": str(index),
+            "record_count": len(rows),
+            "records": rows[:limit],
+            "truncated": len(rows) > limit,
+        }
     with tempfile.TemporaryDirectory() as scratch:
         faidx = _faidx(module, source, Path(scratch) / "tmp.fai", gzi=index, build=True)
         _need_gzi(faidx, module)
         faidx.read_gzi()
-        blocks = [{"compressed_start": int(b.cstart), "uncompressed_start": int(b.ustart)}
-                  for b in faidx.gzi_index[1:]]
+        blocks = [
+            {"compressed_start": int(b.cstart), "uncompressed_start": int(b.ustart)}
+            for b in faidx.gzi_index[1:]
+        ]
         faidx.close()
-    return {"status": "completed", "backend": "pyfaidx", "version": module.__version__, "kind": which,
-            "index_path": str(index), "block_count": len(blocks), "blocks": blocks[:limit],
-            "truncated": len(blocks) > limit}
+    return {
+        "status": "completed",
+        "backend": "pyfaidx",
+        "version": module.__version__,
+        "kind": which,
+        "index_path": str(index),
+        "block_count": len(blocks),
+        "blocks": blocks[:limit],
+        "truncated": len(blocks) > limit,
+    }
 
 
 def faidx_write_index(
@@ -113,8 +147,14 @@ def faidx_write_index(
         faidx.write_fai()
         count = len(faidx.index)
         faidx.close()
-        return {"status": "completed", "backend": "pyfaidx", "version": module.__version__, "kind": which,
-                "outputs": [str(target)], "record_count": count}
+        return {
+            "status": "completed",
+            "backend": "pyfaidx",
+            "version": module.__version__,
+            "kind": which,
+            "outputs": [str(target)],
+            "record_count": count,
+        }
     with tempfile.TemporaryDirectory() as scratch:
         faidx = _faidx(module, source, Path(scratch) / "tmp.fai", gzi=target, build=True)
         _need_gzi(faidx, module)
@@ -125,8 +165,14 @@ def faidx_write_index(
         faidx.write_gzi()
         count = len(faidx.gzi_index) - 1
         faidx.close()
-    return {"status": "completed", "backend": "pyfaidx", "version": module.__version__, "kind": which,
-            "outputs": [str(target)], "block_count": count}
+    return {
+        "status": "completed",
+        "backend": "pyfaidx",
+        "version": module.__version__,
+        "kind": which,
+        "outputs": [str(target)],
+        "block_count": count,
+    }
 
 
 def faidx_overwrite_region(
@@ -162,7 +208,9 @@ def faidx_overwrite_region(
         if name not in faidx.index:
             raise ConfigurationError(f"record {name!r} is not in the FASTA file.")
         if last > faidx.index[name].rlen:
-            raise ConfigurationError(f"end {last} is beyond the record length {faidx.index[name].rlen}.")
+            raise ConfigurationError(
+                f"end {last} is beyond the record length {faidx.index[name].rlen}."
+            )
         previous = faidx.from_file(name, first, last).replace("\n", "").replace("\r", "")
         faidx.to_file(name, first, last, replacement)
         faidx.file.flush()
@@ -171,9 +219,17 @@ def faidx_overwrite_region(
         target.unlink(missing_ok=True)
         Path(str(target) + ".fai").unlink(missing_ok=True)
         raise
-    return {"status": "completed", "backend": "pyfaidx", "version": module.__version__, "record": name,
-            "start": first, "end": last, "previous_sequence": previous, "new_sequence": replacement,
-            "outputs": [str(target)]}
+    return {
+        "status": "completed",
+        "backend": "pyfaidx",
+        "version": module.__version__,
+        "record": name,
+        "start": first,
+        "end": last,
+        "previous_sequence": previous,
+        "new_sequence": replacement,
+        "outputs": [str(target)],
+    }
 
 
 __all__ = ["faidx_overwrite_region", "faidx_read_index", "faidx_write_index"]

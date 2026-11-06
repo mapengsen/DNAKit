@@ -43,7 +43,11 @@ def _number(value: object, name: str, minimum: float, maximum: float) -> float:
 
 
 def _strings(values: Sequence[str], *, alignment: bool = False) -> list[str]:
-    if isinstance(values, (str, bytes)) or not isinstance(values, Sequence) or not 1 <= len(values) <= 100:
+    if (
+        isinstance(values, (str, bytes))
+        or not isinstance(values, Sequence)
+        or not 1 <= len(values) <= 100
+    ):
         raise ConfigurationError("Provide between 1 and 100 nucleotide strings.")
     result = []
     for value in values:
@@ -51,10 +55,14 @@ def _strings(values: Sequence[str], *, alignment: bool = False) -> list[str]:
             raise ConfigurationError("Each nucleotide string must contain 1 to 20000 bases.")
         text = value.upper().replace("U", "T")
         if set(text) - set("ACGTN-" if alignment else "ACGTN"):
-            raise ConfigurationError("Sequences must use A/C/G/T/U/N; only alignments may contain '-'.")
+            raise ConfigurationError(
+                "Sequences must use A/C/G/T/U/N; only alignments may contain '-'."
+            )
         result.append(text)
     if alignment and (len({len(s) for s in result}) != 1 or any(set(s) == {"-"} for s in result)):
-        raise ConfigurationError("Aligned rows must have equal length and contain at least one base.")
+        raise ConfigurationError(
+            "Aligned rows must have equal length and contain at least one base."
+        )
     return result
 
 
@@ -74,8 +82,13 @@ def _plain(result: Any) -> dict[str, Any]:
 
 
 def _run(
-    mode: str, groups: Sequence[Sequence[str]], *, temperature: float,
-    executable_path: str | None, timeout_seconds: float, max_span: int | None = None,
+    mode: str,
+    groups: Sequence[Sequence[str]],
+    *,
+    temperature: float,
+    executable_path: str | None,
+    timeout_seconds: float,
+    max_span: int | None = None,
 ) -> dict[str, Any]:
     aligned = mode in ("alifold", "local_alifold", "aliduplex")
     texts = [_strings(group, alignment=aligned) for group in groups]
@@ -93,7 +106,9 @@ def _run(
         raise ConfigurationError("These wrappers require Biotite >=2,<3.")
     if aligned:
         align = require("biotite.sequence.align", _EXTRA)
-        inputs = [align.Alignment.from_strings(group, sequence.NucleotideSequence) for group in texts]
+        inputs = [
+            align.Alignment.from_strings(group, sequence.NucleotideSequence) for group in texts
+        ]
     elif mode == "multifold":
         inputs = [[sequence.NucleotideSequence(s) for s in texts[0]]]
     else:
@@ -117,87 +132,219 @@ def _run(
     except PackageNotFoundError:
         installed = None
     return {
-        "status": "completed", "backend": program, "temperature": temp,
+        "status": "completed",
+        "backend": program,
+        "temperature": temp,
         "structures": [_plain(item) for item in structures],
-        "inputs": texts, "span_convention": "zero-based, end-exclusive",
-        "provenance": {"package": "biotite", "package_version": installed,
-                       "executable": executable, "version": cli._version_of(executable)},
+        "inputs": texts,
+        "span_convention": "zero-based, end-exclusive",
+        "provenance": {
+            "package": "biotite",
+            "package_version": installed,
+            "executable": executable,
+            "version": cli._version_of(executable),
+        },
     }
 
 
-def fold_rna(sequence: str, *, temperature: float = 37, executable_path: str | None = None,
-             timeout_seconds: float = 300, verbose: bool = True) -> dict[str, Any]:
+def fold_rna(
+    sequence: str,
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAfold minimum-free-energy structure of one nucleotide strand."""
-    return _run("fold", [[sequence]], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "fold",
+        [[sequence]],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def fold_rna_pseudoknots(sequence: str, *, temperature: float = 37, executable_path: str | None = None,
-                        timeout_seconds: float = 300, verbose: bool = True) -> dict[str, Any]:
+def fold_rna_pseudoknots(
+    sequence: str,
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAPKplex secondary structure, including pseudoknots."""
-    return _run("pkplex", [[sequence]], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "pkplex",
+        [[sequence]],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def fold_rna_local(sequence: str, *, max_span: int = 150, temperature: float = 37,
-                   executable_path: str | None = None, timeout_seconds: float = 300,
-                   verbose: bool = True) -> dict[str, Any]:
+def fold_rna_local(
+    sequence: str,
+    *,
+    max_span: int = 150,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNALfold locally stable structures with positions in the original sequence."""
-    return _run("local", [[sequence]], max_span=max_span, temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "local",
+        [[sequence]],
+        max_span=max_span,
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def cofold_rna(sequence1: str, sequence2: str, *, temperature: float = 37,
-               executable_path: str | None = None, timeout_seconds: float = 300,
-               verbose: bool = True) -> dict[str, Any]:
+def cofold_rna(
+    sequence1: str,
+    sequence2: str,
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAcofold minimum-free-energy structure of two strands, including intramolecular pairs."""
-    return _run("cofold", [[sequence1], [sequence2]], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "cofold",
+        [[sequence1], [sequence2]],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def duplex_rna(sequence1: str, sequence2: str, *, temperature: float = 37,
-               executable_path: str | None = None, timeout_seconds: float = 300,
-               verbose: bool = True) -> dict[str, Any]:
+def duplex_rna(
+    sequence1: str,
+    sequence2: str,
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAduplex hybridization restricted to intermolecular base pairs."""
-    return _run("duplex", [[sequence1], [sequence2]], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "duplex",
+        [[sequence1], [sequence2]],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def find_rna_interactions(target: str, query: str, *, temperature: float = 37,
-                         executable_path: str | None = None, timeout_seconds: float = 300,
-                         verbose: bool = True) -> dict[str, Any]:
+def find_rna_interactions(
+    target: str,
+    query: str,
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAplex interaction-site search, returning all reported interactions and spans."""
-    return _run("plex", [[target], [query]], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "plex",
+        [[target], [query]],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def fold_rna_complex(sequences: Sequence[str], *, temperature: float = 37,
-                     executable_path: str | None = None, timeout_seconds: float = 300,
-                     verbose: bool = True) -> dict[str, Any]:
+def fold_rna_complex(
+    sequences: Sequence[str],
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAmultifold minimum-free-energy structure of a multi-strand complex."""
     if len(_strings(sequences)) < 2:
         raise ConfigurationError("A complex requires at least two strands.")
-    return _run("multifold", [sequences], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "multifold",
+        [sequences],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def fold_rna_alignment(alignment: Sequence[str], *, temperature: float = 37,
-                       executable_path: str | None = None, timeout_seconds: float = 300,
-                       verbose: bool = True) -> dict[str, Any]:
+def fold_rna_alignment(
+    alignment: Sequence[str],
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAalifold consensus structure with physical and covariance energies."""
-    return _run("alifold", [alignment], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "alifold",
+        [alignment],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def fold_rna_alignment_local(alignment: Sequence[str], *, max_span: int = 70,
-                             temperature: float = 37, executable_path: str | None = None,
-                             timeout_seconds: float = 300, verbose: bool = True) -> dict[str, Any]:
+def fold_rna_alignment_local(
+    alignment: Sequence[str],
+    *,
+    max_span: int = 70,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNALalifold locally stable consensus structures and alignment-column spans."""
-    return _run("local_alifold", [alignment], max_span=max_span, temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "local_alifold",
+        [alignment],
+        max_span=max_span,
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def duplex_rna_alignments(alignment1: Sequence[str], alignment2: Sequence[str], *,
-                          temperature: float = 37, executable_path: str | None = None,
-                          timeout_seconds: float = 300, verbose: bool = True) -> dict[str, Any]:
+def duplex_rna_alignments(
+    alignment1: Sequence[str],
+    alignment2: Sequence[str],
+    *,
+    temperature: float = 37,
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAaliduplex hybridization structure of two nucleotide alignments."""
-    return _run("aliduplex", [alignment1, alignment2], temperature=temperature, executable_path=executable_path, timeout_seconds=timeout_seconds)
+    return _run(
+        "aliduplex",
+        [alignment1, alignment2],
+        temperature=temperature,
+        executable_path=executable_path,
+        timeout_seconds=timeout_seconds,
+    )
 
 
-def rna_structure_coordinates(dot_bracket: str, *, layout: str = "naview",
-                               executable_path: str | None = None, timeout_seconds: float = 300,
-                               verbose: bool = True) -> dict[str, Any]:
+def rna_structure_coordinates(
+    dot_bracket: str,
+    *,
+    layout: str = "naview",
+    executable_path: str | None = None,
+    timeout_seconds: float = 300,
+    verbose: bool = True,
+) -> dict[str, Any]:
     """RNAplot 2D coordinates for each base of a dot-bracket secondary structure."""
     if not isinstance(dot_bracket, str) or not 1 <= len(dot_bracket) <= 20_000:
         raise ConfigurationError("dot_bracket must contain 1 to 20000 characters.")
@@ -210,7 +357,9 @@ def rna_structure_coordinates(dot_bracket: str, *, layout: str = "naview",
     apps = require("biotite.application.viennarna", _EXTRA)
     # Validate bracket pairing before starting an external process.
     structure.base_pairs_from_dot_bracket(dot_bracket)
-    future = apps.PlotApp(path=executable).run(dot_bracket, layout_type=apps.PlotApp.Layout[way.upper()])
+    future = apps.PlotApp(path=executable).run(
+        dot_bracket, layout_type=apps.PlotApp.Layout[way.upper()]
+    )
     try:
         result = future.result(timeout=timeout)
     except TimeoutError:
@@ -220,17 +369,33 @@ def rna_structure_coordinates(dot_bracket: str, *, layout: str = "naview",
     if getattr(result, "ndim", 2) == 1 and len(dot_bracket) == 1:
         result = result.reshape(1, 2)
     positions = result.tolist()
-    if (len(positions) != len(dot_bracket) or
-            any(not isinstance(row, list) or len(row) != 2 for row in positions)):
+    if len(positions) != len(dot_bracket) or any(
+        not isinstance(row, list) or len(row) != 2 for row in positions
+    ):
         raise ConfigurationError("RNAplot returned an unexpected number of base coordinates.")
     if any(not math.isfinite(value) for row in positions for value in row):
         raise DNAKitError("RNAplot returned non-finite coordinates for this structure/layout.")
-    return {"status": "completed", "backend": "RNAplot", "layout": way,
-            "dot_bracket": dot_bracket, "coordinates": positions,
-            "provenance": {"executable": executable, "version": cli._version_of(executable)}}
+    return {
+        "status": "completed",
+        "backend": "RNAplot",
+        "layout": way,
+        "dot_bracket": dot_bracket,
+        "coordinates": positions,
+        "provenance": {"executable": executable, "version": cli._version_of(executable)},
+    }
 
 
-__all__ = ["fold_rna", "fold_rna_pseudoknots", "fold_rna_local", "cofold_rna", "duplex_rna",
-           "find_rna_interactions", "fold_rna_complex", "fold_rna_alignment",
-           "fold_rna_alignment_local", "duplex_rna_alignments", "rna_structure_coordinates"]
+__all__ = [
+    "cofold_rna",
+    "duplex_rna",
+    "duplex_rna_alignments",
+    "find_rna_interactions",
+    "fold_rna",
+    "fold_rna_alignment",
+    "fold_rna_alignment_local",
+    "fold_rna_complex",
+    "fold_rna_local",
+    "fold_rna_pseudoknots",
+    "rna_structure_coordinates",
+]
 _register_public_verbose(globals(), tuple(__all__))

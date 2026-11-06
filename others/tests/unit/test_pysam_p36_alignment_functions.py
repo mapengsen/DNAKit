@@ -42,9 +42,22 @@ def bam(tmp_path_factory):
         make("p1", 99, 100, "50M", REF[100:150], mate=250),
         make("p1", 147, 250, "50M", REF[250:300], mate=100),
         make("s1", 0, 400, "20M100N20M", REF[400:420] + REF[520:540]),
-        make("m1", 0, 600, "40M", "".join(mismatch), tags=[("MD", "10" + REF[610] + "29", "Z"), ("NM", 1, "i")]),
-        make("mod", 0, 700, "40M", "ACGTCGACGT" * 4,
-             tags=[("MM", "C+m,0,1;", "Z"), ("ML", array.array("B", [200, 100]))]),
+        make(
+            "m1",
+            0,
+            600,
+            "40M",
+            "".join(mismatch),
+            tags=[("MD", "10" + REF[610] + "29", "Z"), ("NM", 1, "i")],
+        ),
+        make(
+            "mod",
+            0,
+            700,
+            "40M",
+            "ACGTCGACGT" * 4,
+            tags=[("MM", "C+m,0,1;", "Z"), ("ML", array.array("B", [200, 100]))],
+        ),
         make("ins", 0, 800, "10M2I5D10M3S"),
     ]
     reads.sort(key=lambda r: r.reference_start)
@@ -83,19 +96,25 @@ def test_count_base_coverage_equals_pysam_and_validates(bam):
 def test_spliced_junctions_fast_and_slow_agree(bam):
     fast = m.count_spliced_junctions(bam, verbose=False)
     slow = m.count_spliced_junctions(bam, "chr1", method="slow", verbose=False)
-    assert fast["junctions"] == slow["junctions"] == [
-        {"intron_start": 420, "intron_end": 520, "supporting_reads": 1}
-    ]
+    assert (
+        fast["junctions"]
+        == slow["junctions"]
+        == [{"intron_start": 420, "intron_end": 520, "supporting_reads": 1}]
+    )
     assert m.count_spliced_junctions(bam, "chr1", 0, 300, verbose=False)["junction_count"] == 0
 
 
 def test_pileup_columns_report_aligned_reads(bam):
-    result = m.pileup_columns(bam, "chr1", 120, 125, truncate=True, include_read_names=True, verbose=False)
+    result = m.pileup_columns(
+        bam, "chr1", 120, 125, truncate=True, include_read_names=True, verbose=False
+    )
     assert [c["reference_pos"] for c in result["columns"]] == [120, 121, 122, 123, 124]
     assert all(c["query_names"] == ["p1"] and c["num_aligned"] == 1 for c in result["columns"])
     capped = m.pileup_columns(bam, "chr1", 100, 150, truncate=True, max_columns=10, verbose=False)
     assert capped["truncated"] and capped["column_count"] == 10
-    strict = m.pileup_columns(bam, "chr1", 100, 110, truncate=True, min_base_quality=60, verbose=False)
+    strict = m.pileup_columns(
+        bam, "chr1", 100, 110, truncate=True, min_base_quality=60, verbose=False
+    )
     assert all(c["num_aligned"] == 0 for c in strict["columns"])
     assert all(c["nsegments"] == 1 for c in strict["columns"])
 
@@ -112,13 +131,17 @@ def test_header_conversions_round_trip(bam, tmp_path):
     out = tmp_path / "h.sam"
     written = m.write_sam_header(out, header_dict=info["header"], verbose=False)
     assert out.read_text() == info["header_text"] == written["header_text"]
-    refs = m.write_sam_header(tmp_path / "r.sam", reference_names=["a", "b"], reference_lengths=[10, 20], verbose=False)
+    refs = m.write_sam_header(
+        tmp_path / "r.sam", reference_names=["a", "b"], reference_lengths=[10, 20], verbose=False
+    )
     assert refs["header"]["SQ"] == [{"SN": "a", "LN": 10}, {"SN": "b", "LN": 20}]
     assert refs["header_text"] == "@SQ\tSN:a\tLN:10\n@SQ\tSN:b\tLN:20\n"
     with pytest.raises(ConfigurationError):
         m.write_sam_header(out, header_dict=info["header"], verbose=False)  # exists
     with pytest.raises(ConfigurationError):
-        m.write_sam_header(tmp_path / "x.sam", reference_names=["a"], reference_lengths=[1, 2], verbose=False)
+        m.write_sam_header(
+            tmp_path / "x.sam", reference_names=["a"], reference_lengths=[1, 2], verbose=False
+        )
     with pytest.raises(ConfigurationError):
         m.write_sam_header(tmp_path / "y.sam", verbose=False)
 
@@ -130,7 +153,9 @@ def test_alignment_records_round_trip_through_dicts(bam, tmp_path):
     result = m.write_alignments_from_dicts(dumped["records"], dumped["header"], out, verbose=False)
     assert result["count"] == 6
     with pysam.AlignmentFile(str(bam)) as a, pysam.AlignmentFile(str(out)) as b:
-        assert [r.to_dict() for r in a.fetch(until_eof=True)] == [r.to_dict() for r in b.fetch(until_eof=True)]
+        assert [r.to_dict() for r in a.fetch(until_eof=True)] == [
+            r.to_dict() for r in b.fetch(until_eof=True)
+        ]
     with pytest.raises(ConfigurationError):
         m.write_alignments_from_dicts([], dumped["header"], tmp_path / "bad.txt", verbose=False)
 
@@ -143,12 +168,17 @@ def test_per_read_geometry_matches_pysam(bam):
     stats = m.read_cigar_stats(bam, "chr1", verbose=False)["records"]
     positions = m.read_reference_positions(bam, "chr1", verbose=False)["records"]
     lengths = m.infer_read_lengths(bam, "chr1", verbose=False)["records"]
-    for read, p, b, s, pos, ln in zip(reads, pairs, blocks, stats, positions, lengths):
+    for read, p, b, s, pos, ln in zip(
+        reads, pairs, blocks, stats, positions, lengths, strict=False
+    ):
         assert p["pairs"] == [list(x) for x in read.get_aligned_pairs(matches_only=True)]
         assert b["blocks"] == [list(x) for x in read.get_blocks()]
         assert s["bases"]["M"] == read.get_cigar_stats()[0][0]
         assert pos["positions"] == read.get_reference_positions()
-        assert ln["query_length"] == read.infer_query_length() and ln["read_length"] == read.infer_read_length()
+        assert (
+            ln["query_length"] == read.infer_query_length()
+            and ln["read_length"] == read.infer_read_length()
+        )
     spliced = next(r for r in blocks if r["query_name"] == "s1")
     assert spliced["blocks"] == [[400, 420], [520, 540]]
     indel = next(r for r in stats if r["query_name"] == "ins")

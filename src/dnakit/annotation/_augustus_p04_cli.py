@@ -59,7 +59,9 @@ def bin_dir(value: object) -> str | None:
         return None
     path = Path(str(value)).expanduser()
     if not path.is_dir():
-        raise BackendUnavailableError(f"augustus_bin_dir is not a folder: {path}", hint=INSTALL_HINT)
+        raise BackendUnavailableError(
+            f"augustus_bin_dir is not a folder: {path}", hint=INSTALL_HINT
+        )
     return str(path.resolve())
 
 
@@ -220,7 +222,9 @@ def run(
             os.close(descriptor)
             kept = Path(copy_name)
             shutil.copyfile(target, kept)
-    return Completed(tool, int(process.returncode), log, exe, program_version, (tool, *arguments), kept)
+    return Completed(
+        tool, int(process.returncode), log, exe, program_version, (tool, *arguments), kept
+    )
 
 
 def captured_text(completed: Completed) -> str:
@@ -300,7 +304,9 @@ def name_token(value: object, name: str) -> str:
     """A species or file-name token: letters, digits, '_', '.', '+', '-'; never a flag."""
     text = cli.text(value, name)
     if NAME.fullmatch(text) is None:
-        raise ConfigurationError(f"{name} may contain only letters, digits, '_', '.', '+' and '-': {text!r}")
+        raise ConfigurationError(
+            f"{name} may contain only letters, digits, '_', '.', '+' and '-': {text!r}"
+        )
     return text
 
 
@@ -308,7 +314,9 @@ def optional_file(value: object, name: str) -> Path | None:
     return None if value is None else cli.existing_file(str(value), name)
 
 
-def optional_int(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int | None:
+def optional_int(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int | None:
     return None if value is None else cli.integer(value, name, minimum=minimum, maximum=maximum)
 
 
@@ -332,7 +340,9 @@ def switch(flag_name: str, on: bool) -> list[str]:
     return [flag_name] if on else []
 
 
-def boolean_word(flag_name: str, value: bool | None, words: tuple[str, str] = ("true", "false")) -> list[str]:
+def boolean_word(
+    flag_name: str, value: bool | None, words: tuple[str, str] = ("true", "false")
+) -> list[str]:
     """``--flag=true``/``--flag=false`` (AUGUSTUS style) for an optional bool."""
     if value is None:
         return []
@@ -356,15 +366,30 @@ def simple(
     """Run one filter-style program whose single output is ``output`` (standard output or a file it writes)."""
     if to_stdout:
         completed = run(
-            tool, arguments, directory=directory, cwd=output.parent, stdin=stdin, stdout=output,
-            accept=accept, config_path=config_path,
+            tool,
+            arguments,
+            directory=directory,
+            cwd=output.parent,
+            stdin=stdin,
+            stdout=output,
+            accept=accept,
+            config_path=config_path,
         )
     else:
         completed = run(
-            tool, arguments, directory=directory, cwd=output.parent, stdin=stdin, capture=True,
-            expected=[output], accept=accept, config_path=config_path,
+            tool,
+            arguments,
+            directory=directory,
+            cwd=output.parent,
+            stdin=stdin,
+            capture=True,
+            expected=[output],
+            accept=accept,
+            config_path=config_path,
         )
         captured_text(completed)
-    summary: dict[str, Any] = {"records": fasta_count(output)} if kind == "fasta" else line_summary(output)
+    summary: dict[str, Any] = (
+        {"records": fasta_count(output)} if kind == "fasta" else line_summary(output)
+    )
     summary.update(extra)
     return result(operation, completed, outputs={"output": output}, **summary)

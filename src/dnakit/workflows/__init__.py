@@ -55,7 +55,7 @@ __all__ = [
     "write_wes_report",
 ]
 
-# Optional-backend exports (see docs/api/features) 
+# Optional-backend exports (see docs/api/features)
 from .backends import (
     check_wdl_inputs,
     list_galaxy_histories,
@@ -68,6 +68,17 @@ from .backends import (
     read_snakefile,
 )
 
-__all__ = [*__all__, "check_wdl_inputs", "list_galaxy_histories", "list_galaxy_tools", "list_galaxy_workflows", "list_nfcore_processes", "parse_wdl_document", "plan_snakemake_jobs", "read_cwl_workflow", "read_snakefile"]
+__all__ = [
+    *__all__,
+    "check_wdl_inputs",
+    "list_galaxy_histories",
+    "list_galaxy_tools",
+    "list_galaxy_workflows",
+    "list_nfcore_processes",
+    "parse_wdl_document",
+    "plan_snakemake_jobs",
+    "read_cwl_workflow",
+    "read_snakefile",
+]
 
 _register_public_verbose(globals())

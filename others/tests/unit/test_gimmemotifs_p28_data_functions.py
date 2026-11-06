@@ -8,12 +8,12 @@ pytest.importorskip("gimmemotifs")
 pytest.importorskip("genomepy")
 np = pytest.importorskip("numpy")
 
-from gimmemotifs.fasta import Fasta  # noqa: E402
-from gimmemotifs.motif import read_motifs  # noqa: E402
-from gimmemotifs.scanner import Scanner  # noqa: E402
+from gimmemotifs.fasta import Fasta
+from gimmemotifs.motif import read_motifs
+from gimmemotifs.scanner import Scanner
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.regulation import gimmemotifs_p28_data_functions as module  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.regulation import gimmemotifs_p28_data_functions as module
 
 PFM_FILE = (
     ">acgt\n10 0 0 0\n0 10 0 0\n0 0 10 0\n0 0 0 10\n"

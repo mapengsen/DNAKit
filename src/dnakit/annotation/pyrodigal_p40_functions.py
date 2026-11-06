@@ -20,8 +20,13 @@ from dnakit.exceptions import ConfigurationError
 
 _EXTRA = "bio-pyrodigal"
 _OUTPUTS = ("nucleotides", "translations", "genbank", "gff", "scores")
-_OUTPUT_SUFFIX = {"nucleotides": "genes.fna", "translations": "proteins.faa", "genbank": "genes.gbk",
-                  "gff": "genes.gff", "scores": "scores.tsv"}
+_OUTPUT_SUFFIX = {
+    "nucleotides": "genes.fna",
+    "translations": "proteins.faa",
+    "genbank": "genes.gbk",
+    "gff": "genes.gff",
+    "scores": "scores.tsv",
+}
 
 
 def _lib() -> Any:
@@ -32,8 +37,15 @@ def _records(fasta: str | Path) -> list[tuple[str, str]]:
     return [(rid, seq.upper()) for rid, _d, seq in _h.read_fasta(_h.existing(fasta, "fasta"))]
 
 
-def _training(lib: Any, records: Sequence[tuple[str, str]], training_file: str | Path | None, *,
-              translation_table: int, force_nonsd: bool, start_weight: float | None) -> Any:
+def _training(
+    lib: Any,
+    records: Sequence[tuple[str, str]],
+    training_file: str | Path | None,
+    *,
+    translation_table: int,
+    force_nonsd: bool,
+    start_weight: float | None,
+) -> Any:
     if training_file is not None:
         with open(_h.existing(training_file, "training_file"), "rb") as handle:
             return lib.TrainingInfo.load(handle)
@@ -77,10 +89,22 @@ def pyrodigal_train_gene_finder(
     lib = _lib()
     table = _h.integer(translation_table, "translation_table", minimum=1, maximum=33)
     records = _records(fasta)
-    info = _training(lib, records, None, translation_table=table, force_nonsd=bool(force_nonsd),
-                     start_weight=start_weight)
-    result: dict[str, Any] = {"status": "completed", "backend": "pyrodigal", "version": lib.__version__,
-                              "record_count": len(records), "training": _info_summary(info), "outputs": []}
+    info = _training(
+        lib,
+        records,
+        None,
+        translation_table=table,
+        force_nonsd=bool(force_nonsd),
+        start_weight=start_weight,
+    )
+    result: dict[str, Any] = {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "record_count": len(records),
+        "training": _info_summary(info),
+        "outputs": [],
+    }
     if training_output is not None:
         target = _h.new_file(training_output, "training_output")
         with open(target, "wb") as handle:
@@ -126,9 +150,18 @@ def pyrodigal_gc_frame_plot(
             if len(segments) < limit:
                 segments.append({"start": start, "end": index + 1, "frame": int(frame)})
             start = index + 1
-    return {"status": "completed", "backend": "pyrodigal", "version": lib.__version__, "record": chosen[0],
-            "window_size": window, "length": len(plot), "frame_counts": counts, "unknown_frame_count": unknown_count,
-            "segments": segments, "segments_truncated": total_segments > len(segments)}
+    return {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "record": chosen[0],
+        "window_size": window,
+        "length": len(plot),
+        "frame_counts": counts,
+        "unknown_frame_count": unknown_count,
+        "segments": segments,
+        "segments_truncated": total_segments > len(segments),
+    }
 
 
 def _pick(records: Sequence[tuple[str, str]], record: str | None) -> tuple[str, str]:
@@ -167,16 +200,35 @@ def pyrodigal_shine_dalgarno(
         raise ConfigurationError("strand must be 1 or -1.")
     begin = _h.integer(start, "start", minimum=0, maximum=len(chosen[1]) - 1)
     pos = begin - strand if position is None else _h.integer(position, "position", minimum=0)
-    info = _training(lib, records, training_file, translation_table=translation_table, force_nonsd=False,
-                     start_weight=None)
+    info = _training(
+        lib,
+        records,
+        training_file,
+        translation_table=translation_table,
+        force_nonsd=False,
+        start_weight=None,
+    )
     try:
-        index = int(lib.Sequence(chosen[1]).shine_dalgarno(pos, begin, info, strand=strand, exact=bool(exact)))
+        index = int(
+            lib.Sequence(chosen[1]).shine_dalgarno(
+                pos, begin, info, strand=strand, exact=bool(exact)
+            )
+        )
     except ValueError as exc:
         raise ConfigurationError(f"pyrodigal rejected the positions: {exc}") from exc
     weights = [float(x) for x in info.rbs_weights]
-    return {"status": "completed", "backend": "pyrodigal", "version": lib.__version__, "record": chosen[0],
-            "start": begin, "position": pos, "strand": strand, "exact": bool(exact),
-            "motif_index": index, "motif_weight": weights[index] if index < len(weights) else None}
+    return {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "record": chosen[0],
+        "start": begin,
+        "position": pos,
+        "strand": strand,
+        "exact": bool(exact),
+        "motif_index": index,
+        "motif_weight": weights[index] if index < len(weights) else None,
+    }
 
 
 def pyrodigal_codon_probability(
@@ -197,8 +249,15 @@ def pyrodigal_codon_probability(
     chosen = _pick(_records(fasta), record)
     seq = lib.Sequence(chosen[1])
     value = seq.start_probability() if which == "start" else seq.stop_probability()
-    return {"status": "completed", "backend": "pyrodigal", "version": lib.__version__, "record": chosen[0],
-            "kind": which, "gc": float(seq.gc), "probability": float(value)}
+    return {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "record": chosen[0],
+        "kind": which,
+        "gc": float(seq.gc),
+        "probability": float(value),
+    }
 
 
 def pyrodigal_candidate_nodes(
@@ -227,22 +286,45 @@ def pyrodigal_candidate_nodes(
     nodes = lib.Nodes()
     count = nodes.extract(sequence, closed=bool(closed), translation_table=table)
     if score:
-        info = _training(lib, records, training_file, translation_table=table, force_nonsd=False,
-                         start_weight=None)
+        info = _training(
+            lib,
+            records,
+            training_file,
+            translation_table=table,
+            force_nonsd=False,
+            start_weight=None,
+        )
         nodes.score(sequence, info, closed=bool(closed))
     nodes.sort()
     rows = []
     for index in range(min(int(nodes.length), limit)):
         node = nodes[index]
-        row: dict[str, Any] = {"index": int(node.index), "type": str(node.type), "strand": int(node.strand),
-                               "edge": bool(node.edge)}
+        row: dict[str, Any] = {
+            "index": int(node.index),
+            "type": str(node.type),
+            "strand": int(node.strand),
+            "edge": bool(node.edge),
+        }
         if score:
-            row.update({"coding_score": float(node.cscore), "rbs_score": float(node.rscore),
-                        "start_score": float(node.sscore), "total_score": float(node.score)})
+            row.update(
+                {
+                    "coding_score": float(node.cscore),
+                    "rbs_score": float(node.rscore),
+                    "start_score": float(node.sscore),
+                    "total_score": float(node.score),
+                }
+            )
         rows.append(row)
-    return {"status": "completed", "backend": "pyrodigal", "version": lib.__version__, "record": chosen[0],
-            "scored": bool(score), "node_count": int(count), "nodes": rows,
-            "truncated": int(nodes.length) > limit}
+    return {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "record": chosen[0],
+        "scored": bool(score),
+        "node_count": int(count),
+        "nodes": rows,
+        "truncated": int(nodes.length) > limit,
+    }
 
 
 def pyrodigal_find_genes(
@@ -283,8 +365,14 @@ def pyrodigal_find_genes(
     if which == "meta":
         finder = lib.GeneFinder(meta=True, **kwargs)
     else:
-        info = _training(lib, records, training_file, translation_table=table, force_nonsd=False,
-                         start_weight=None)
+        info = _training(
+            lib,
+            records,
+            training_file,
+            translation_table=table,
+            force_nonsd=False,
+            start_weight=None,
+        )
         finder = lib.GeneFinder(info, **kwargs)
     directory = _h.new_dir(output_dir, "output_dir") if wanted else None
     handles = {name: io.StringIO() for name in wanted}
@@ -295,13 +383,24 @@ def pyrodigal_find_genes(
         total += len(genes)
         for gene in genes:
             if len(genes_out) < limit:
-                genes_out.append({
-                    "record": rid, "begin": int(gene.begin), "end": int(gene.end), "strand": int(gene.strand),
-                    "start_type": str(gene.start_type), "partial_begin": bool(gene.partial_begin),
-                    "partial_end": bool(gene.partial_end), "rbs_motif": gene.rbs_motif,
-                    "rbs_spacer": gene.rbs_spacer, "gc_content": float(gene.gc_cont),
-                    "score": float(gene.score), "coding_score": float(gene.cscore),
-                    "confidence": float(gene.confidence()), "length": int(gene.end - gene.begin + 1)})
+                genes_out.append(
+                    {
+                        "record": rid,
+                        "begin": int(gene.begin),
+                        "end": int(gene.end),
+                        "strand": int(gene.strand),
+                        "start_type": str(gene.start_type),
+                        "partial_begin": bool(gene.partial_begin),
+                        "partial_end": bool(gene.partial_end),
+                        "rbs_motif": gene.rbs_motif,
+                        "rbs_spacer": gene.rbs_spacer,
+                        "gc_content": float(gene.gc_cont),
+                        "score": float(gene.score),
+                        "coding_score": float(gene.cscore),
+                        "confidence": float(gene.confidence()),
+                        "length": int(gene.end - gene.begin + 1),
+                    }
+                )
         if "nucleotides" in handles:
             genes.write_genes(handles["nucleotides"], sequence_id=rid)
         if "translations" in handles:
@@ -317,9 +416,17 @@ def pyrodigal_find_genes(
         target = directory / _OUTPUT_SUFFIX[name]  # type: ignore[operator]
         target.write_text(buffer.getvalue(), encoding="utf-8")
         files.append(str(target))
-    return {"status": "completed", "backend": "pyrodigal", "version": lib.__version__, "mode": which,
-            "record_count": len(records), "gene_count": total, "genes": genes_out,
-            "truncated": total > len(genes_out), "outputs": files}
+    return {
+        "status": "completed",
+        "backend": "pyrodigal",
+        "version": lib.__version__,
+        "mode": which,
+        "record_count": len(records),
+        "gene_count": total,
+        "genes": genes_out,
+        "truncated": total > len(genes_out),
+        "outputs": files,
+    }
 
 
 __all__ = [

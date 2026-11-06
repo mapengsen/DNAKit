@@ -699,7 +699,9 @@ def mmseqs_unpackdb(
     source = core.input_database(database, "database")
     target = Path(output_dir).expanduser().resolve()
     core.reject_with(target.exists(), f"output_dir must not exist yet: {target}")
-    core.reject_with(not target.parent.is_dir(), f"The folder for output_dir does not exist: {target.parent}")
+    core.reject_with(
+        not target.parent.is_dir(), f"The folder for output_dir does not exist: {target.parent}"
+    )
     options: list[str] = []
     options += core.opt_choice("--unpack-name-mode", unpack_name_mode, (0, 1), "unpack_name_mode")
     options += core.opt_text("--unpack-suffix", unpack_suffix, "unpack_suffix", r"[A-Za-z0-9._-]+")

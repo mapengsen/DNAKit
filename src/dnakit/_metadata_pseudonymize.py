@@ -34,21 +34,73 @@ MAX_REPORTED_PATHS = 10_000
 # Normalised form (lower case, only [a-z0-9]) of the key names treated as sensitive by default.
 DEFAULT_SENSITIVE_KEYS = frozenset(
     {
-        "name", "firstname", "lastname", "fullname", "givenname", "familyname", "surname", "middlename",
-        "patient", "patientid", "patientname", "mrn", "medicalrecordnumber", "ssn", "socialsecuritynumber",
-        "email", "emailaddress", "phone", "phonenumber", "telephone", "mobile", "mobilephone", "fax",
-        "address", "homeaddress", "streetaddress", "street", "city", "zip", "zipcode", "postalcode", "postcode",
-        "dob", "dateofbirth", "birthdate", "birthday", "nationalid", "passport", "passportnumber",
-        "insurance", "insuranceid", "insurancenumber", "accountnumber", "ipaddress", "deviceid",
-        "photo", "photograph", "biometric", "biometrics", "licensenumber", "driverlicense",
+        "name",
+        "firstname",
+        "lastname",
+        "fullname",
+        "givenname",
+        "familyname",
+        "surname",
+        "middlename",
+        "patient",
+        "patientid",
+        "patientname",
+        "mrn",
+        "medicalrecordnumber",
+        "ssn",
+        "socialsecuritynumber",
+        "email",
+        "emailaddress",
+        "phone",
+        "phonenumber",
+        "telephone",
+        "mobile",
+        "mobilephone",
+        "fax",
+        "address",
+        "homeaddress",
+        "streetaddress",
+        "street",
+        "city",
+        "zip",
+        "zipcode",
+        "postalcode",
+        "postcode",
+        "dob",
+        "dateofbirth",
+        "birthdate",
+        "birthday",
+        "nationalid",
+        "passport",
+        "passportnumber",
+        "insurance",
+        "insuranceid",
+        "insurancenumber",
+        "accountnumber",
+        "ipaddress",
+        "deviceid",
+        "photo",
+        "photograph",
+        "biometric",
+        "biometrics",
+        "licensenumber",
+        "driverlicense",
     }
 )
 
 _PATTERNS = (
     ("email", re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}")),
     ("ssn", re.compile(r"(?<![\w-])\d{3}[- ]\d{2}[- ]\d{4}(?![\w-])")),
-    ("phone", re.compile(r"(?<![\w+])\+\d{1,3}[\s.\-]?\(?\d{1,4}\)?(?:[\s.\-]?\d{2,4}){2,4}(?!\w)")),
-    ("phone", re.compile(r"(?<![\w+])(?:\+?1[\s.\-]?)?(?:\(\d{3}\)\s?|\d{3}[\s.\-]?)\d{3}[\s.\-]?\d{4}(?!\w)")),
+    (
+        "phone",
+        re.compile(r"(?<![\w+])\+\d{1,3}[\s.\-]?\(?\d{1,4}\)?(?:[\s.\-]?\d{2,4}){2,4}(?!\w)"),
+    ),
+    (
+        "phone",
+        re.compile(
+            r"(?<![\w+])(?:\+?1[\s.\-]?)?(?:\(\d{3}\)\s?|\d{3}[\s.\-]?)\d{3}[\s.\-]?\d{4}(?!\w)"
+        ),
+    ),
 )
 _IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
@@ -73,7 +125,8 @@ def _opts(options: object) -> dict[str, object]:
         return {}
     if not isinstance(options, Mapping):
         raise ConfigurationError(
-            "options must be a mapping or None.", code="INVALID_PSEUDONYMIZE_OPTIONS",
+            "options must be a mapping or None.",
+            code="INVALID_PSEUDONYMIZE_OPTIONS",
             hint="Pass options={'mode': 'redact'} or leave options out.",
         )
     return dict(options)
@@ -84,15 +137,19 @@ def _key_set(options: Mapping[str, object], name: str) -> frozenset[str]:
     if value is None:
         return frozenset()
     items = [value] if isinstance(value, str) else value
-    if not isinstance(items, (list, tuple, set, frozenset)) or not all(isinstance(item, str) for item in items):
+    if not isinstance(items, (list, tuple, set, frozenset)) or not all(
+        isinstance(item, str) for item in items
+    ):
         raise ConfigurationError(
-            f"options['{name}'] must be a string or a list of strings.", code="INVALID_PSEUDONYMIZE_KEYS",
+            f"options['{name}'] must be a string or a list of strings.",
+            code="INVALID_PSEUDONYMIZE_KEYS",
             hint=f"Example: options={{'{name}': ['sample_owner', 'clinic']}}.",
         )
     normalized = {normalize_key(item) for item in items}
     if "" in normalized:
         raise ConfigurationError(
-            f"options['{name}'] contains a key without letters or digits.", code="INVALID_PSEUDONYMIZE_KEYS",
+            f"options['{name}'] contains a key without letters or digits.",
+            code="INVALID_PSEUDONYMIZE_KEYS",
             hint="Give key names such as 'clinic' or 'Sample_Owner'.",
         )
     return frozenset(normalized)
@@ -103,7 +160,8 @@ class _Settings:
         mode = options.get("mode", "redact")
         if not isinstance(mode, str) or mode not in MODES:
             raise ConfigurationError(
-                "options['mode'] must be one of 'redact', 'drop' or 'hash'.", code="INVALID_PSEUDONYMIZE_MODE",
+                "options['mode'] must be one of 'redact', 'drop' or 'hash'.",
+                code="INVALID_PSEUDONYMIZE_MODE",
                 hint="'redact' replaces the value by \"[REDACTED]\"; 'hash' needs options['salt'].",
             )
         self.mode = mode
@@ -119,16 +177,22 @@ class _Settings:
                 )
             self.salt = salt.encode("utf-8")
             digest = options.get("digest_chars", DEFAULT_DIGEST_CHARS)
-            if isinstance(digest, bool) or not isinstance(digest, int) or not MIN_DIGEST_CHARS <= digest <= MAX_DIGEST_CHARS:
+            if (
+                isinstance(digest, bool)
+                or not isinstance(digest, int)
+                or not MIN_DIGEST_CHARS <= digest <= MAX_DIGEST_CHARS
+            ):
                 raise ConfigurationError(
                     f"options['digest_chars'] must be an integer from {MIN_DIGEST_CHARS} to {MAX_DIGEST_CHARS}.",
-                    code="INVALID_DIGEST_CHARS", hint=f"The default is {DEFAULT_DIGEST_CHARS}.",
+                    code="INVALID_DIGEST_CHARS",
+                    hint=f"The default is {DEFAULT_DIGEST_CHARS}.",
                 )
             self.digest_chars = digest
         scan = options.get("scan_text", True)
         if not isinstance(scan, bool):
             raise ConfigurationError(
-                "options['scan_text'] must be true or false.", code="INVALID_PSEUDONYMIZE_OPTIONS",
+                "options['scan_text'] must be true or false.",
+                code="INVALID_PSEUDONYMIZE_OPTIONS",
                 hint="Use scan_text=False only if string values are already known to be free of e-mail/phone/SSN.",
             )
         self.scan_text = scan
@@ -153,7 +217,9 @@ def _load(value: object) -> tuple[object, int]:
     if isinstance(value, (list, tuple)) and all(isinstance(item, Mapping) for item in value):
         return value, len(value)
     raise InputFormatError(
-        "Metadata must be a mapping, a list of mappings, or JSON text of those.", code="INVALID_METADATA_INPUT", hint=hint
+        "Metadata must be a mapping, a list of mappings, or JSON text of those.",
+        code="INVALID_METADATA_INPUT",
+        hint=hint,
     )
 
 
@@ -180,7 +246,9 @@ class _Run:
         if isinstance(value, str):
             message = value
         else:
-            message = json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), default=str)
+            message = json.dumps(
+                value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), default=str
+            )
         digest = hmac.new(self.s.salt or b"", message.encode("utf-8"), hashlib.sha256).hexdigest()
         return digest[: self.s.digest_chars]
 
@@ -195,14 +263,19 @@ class _Run:
     def walk(self, value: object, path: str, depth: int) -> object:
         if depth > MAX_DEPTH:
             raise InputFormatError(
-                f"Metadata is nested deeper than {MAX_DEPTH} levels (or contains a cycle).", code="METADATA_TOO_DEEP",
+                f"Metadata is nested deeper than {MAX_DEPTH} levels (or contains a cycle).",
+                code="METADATA_TOO_DEEP",
                 hint="Flatten the metadata or remove self-references.",
             )
         if isinstance(value, Mapping):
             out: dict[object, object] = {}
             for key, item in value.items():
                 self.n_keys += 1
-                child = path + (f".{key}" if _IDENTIFIER.fullmatch(str(key)) else "['" + str(key).replace("\\", "\\\\").replace("'", "\\'") + "']")
+                child = path + (
+                    f".{key}"
+                    if _IDENTIFIER.fullmatch(str(key))
+                    else "['" + str(key).replace("\\", "\\\\").replace("'", "\\'") + "']"
+                )
                 if normalize_key(key) in self.s.sensitive:
                     self.n_key_matches += 1
                     self.note(child)
@@ -213,7 +286,9 @@ class _Run:
                     out[key] = self.walk(item, child, depth + 1)
             return out
         if isinstance(value, (list, tuple)):
-            return [self.walk(item, f"{path}[{index}]", depth + 1) for index, item in enumerate(value)]
+            return [
+                self.walk(item, f"{path}[{index}]", depth + 1) for index, item in enumerate(value)
+            ]
         if isinstance(value, str):
             return self.scan(value, path) if self.s.scan_text else value
         if isinstance(value, (_dt.datetime, _dt.date)):
@@ -222,7 +297,8 @@ class _Run:
         if value is None or isinstance(value, (bool, int, float)):
             return value
         raise InputFormatError(
-            f"Unsupported metadata value of type {type(value).__name__} at {path}.", code="UNSUPPORTED_METADATA_VALUE",
+            f"Unsupported metadata value of type {type(value).__name__} at {path}.",
+            code="UNSUPPORTED_METADATA_VALUE",
             hint="Use JSON types only: dict, list, str, int, float, bool, None.",
         )
 
@@ -237,7 +313,9 @@ def pseudonymize_metadata(input: object, options: object = None) -> dict[str, ob
     n_text = sum(run.pattern_counts.values())
     warnings = list(WARNINGS)
     if not settings.scan_text:
-        warnings.append("scan_text is disabled: string values were not scanned for e-mail, phone or SSN-like patterns.")
+        warnings.append(
+            "scan_text is disabled: string values were not scanned for e-mail, phone or SSN-like patterns."
+        )
     if settings.mode == "hash":
         warnings.append(
             "mode 'hash' gives equal tokens for equal values, so records stay linkable and low-entropy values "
@@ -257,7 +335,9 @@ def pseudonymize_metadata(input: object, options: object = None) -> dict[str, ob
     }
 
 
-def pseudonymize_envelope(module: str, operation: str, input: object, options: object = None) -> object:
+def pseudonymize_envelope(
+    module: str, operation: str, input: object, options: object = None
+) -> object:
     """Run the shared implementation and wrap it in the standard candidate envelope.
 
     The envelope's ``input_summary`` only has ``record_count`` and ``n_keys`` (no text length, no hash of the
@@ -267,6 +347,12 @@ def pseudonymize_envelope(module: str, operation: str, input: object, options: o
     result = pseudonymize_metadata(input, options)
     summary = result.pop("_summary")
     return candidate_ok(
-        module, operation, input, result, options=_opts(options), warnings=result["warnings"],
-        implementation="native", input_summary=summary,
+        module,
+        operation,
+        input,
+        result,
+        options=_opts(options),
+        warnings=result["warnings"],
+        implementation="native",
+        input_summary=summary,
     )

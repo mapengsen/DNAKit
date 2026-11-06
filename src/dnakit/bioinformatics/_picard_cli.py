@@ -319,9 +319,8 @@ def read_metrics(path: Path) -> dict[str, Any]:
             current = "metrics" if "METRICS CLASS" in line else "histogram"
             label = line.split("\t", 1)[1] if "\t" in line else ""
             rows = []
-        elif current is not None and not line.startswith("#"):
-            if line.strip():
-                rows.append(line.split("\t"))
+        elif current is not None and not line.startswith("#") and line.strip():
+            rows.append(line.split("\t"))
     if current is not None:
         sections[current] = (label, rows)
 

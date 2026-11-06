@@ -13,7 +13,7 @@ from dnakit.exceptions import ConfigurationError
 pytest.importorskip("gtars")
 refget = pytest.importorskip("gtars.refget")
 
-from dnakit.annotation import gtars_p24_refget_functions as m  # noqa: E402
+from dnakit.annotation import gtars_p24_refget_functions as m
 
 
 def _fasta(path, seed, names=("chrA", "chrB"), length=300):

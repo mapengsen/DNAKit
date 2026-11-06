@@ -53,7 +53,9 @@ def _locate(name: str, repeatmasker_dir: str | Path | None, *, util: bool = Fals
         base = Path(repeatmasker_dir).expanduser().resolve()
         candidate = base / "util" / name if util else base / name
         if not candidate.is_file():
-            raise BackendUnavailableError(f"{name} was not found in the RepeatMasker folder {base}.", hint=_HINT)
+            raise BackendUnavailableError(
+                f"{name} was not found in the RepeatMasker folder {base}.", hint=_HINT
+            )
         return str(candidate)
     return _cli.program(name, explicit=None, hint=_HINT)
 
@@ -75,7 +77,10 @@ def _launcher(script: str) -> list[str]:
             elif Path(interpreter).is_file():
                 return [script]
         if "perl" in first:
-            return [_cli.program("perl", explicit=None, hint="Install Perl and put it on PATH."), script]
+            return [
+                _cli.program("perl", explicit=None, hint="Install Perl and put it on PATH."),
+                script,
+            ]
     return [script]
 
 
@@ -92,7 +97,12 @@ def _probe_version(command: Sequence[str]) -> str | None:
     """Run ``<command> -v`` and read the version number from its output."""
     try:
         completed = subprocess.run(
-            [*command, "-v"], capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL, check=False
+            [*command, "-v"],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            stdin=subprocess.DEVNULL,
+            check=False,
         )
     except (OSError, subprocess.SubprocessError):
         return None
@@ -116,10 +126,19 @@ def _run(
     launch = _launcher(script)
     command = [*launch[1:], *arguments] if len(launch) > 1 else list(arguments)
     executable = launch[0]
-    _p.run_checked(operation, executable, command, directory, stdout_name=stdout_name, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        operation,
+        executable,
+        command,
+        directory,
+        stdout_name=stdout_name,
+        timeout_seconds=timeout_seconds,
+    )
     skip = set(before or ()) | {_p.LOG_NAME}
     outputs = {
-        path.name: path for path in sorted(directory.iterdir()) if path.is_file() and path.name not in skip
+        path.name: path
+        for path in sorted(directory.iterdir())
+        if path.is_file() and path.name not in skip
     }
     if stdout_name is not None and stdout_name not in skip:
         outputs[stdout_name] = directory / stdout_name
@@ -142,7 +161,9 @@ def _stage(source: str | Path, directory: Path, name: str, *, new_name: str | No
     path = Path(_p.file_path(source, name))
     target = directory / (new_name or path.name)
     if target.exists():
-        raise ConfigurationError(f"Two inputs would both be copied to {target.name}; rename one of them.")
+        raise ConfigurationError(
+            f"Two inputs would both be copied to {target.name}; rename one of them."
+        )
     shutil.copy2(path, target)
     return target
 
@@ -291,7 +312,9 @@ def mask_repeats(
         arguments.append(style_flag)
     _p.switch(arguments, "-lcambig", lowercase_ambiguous, "lowercase_ambiguous")
     _p.switch(arguments, "-a", alignments, "alignments")
-    _p.switch(arguments, "-inv", alignments_in_repeat_orientation, "alignments_in_repeat_orientation")
+    _p.switch(
+        arguments, "-inv", alignments_in_repeat_orientation, "alignments_in_repeat_orientation"
+    )
     _p.switch(arguments, "-poly", polymorphic_simple_repeats, "polymorphic_simple_repeats")
     _p.switch(arguments, "-ace", ace_output, "ace_output")
     _p.switch(arguments, "-gff", gff_output, "gff_output")
@@ -459,7 +482,11 @@ def date_repeats(
     DNA unmasked. FamDB must be configured in the RepeatMasker installation.
     """
     annotation = Path(_p.file_path(repeat_annotation, "repeat_annotation"))
-    others = [_cli.text(item, "comparison_species") for item in comparison_species] if not isinstance(comparison_species, str) else []
+    others = (
+        [_cli.text(item, "comparison_species") for item in comparison_species]
+        if not isinstance(comparison_species, str)
+        else []
+    )
     if not others:
         raise ConfigurationError("comparison_species must be a non-empty list of species names.")
     arguments = ["-query", _cli.text(query_species, "query_species")]
@@ -467,7 +494,9 @@ def date_repeats(
         arguments.extend(("-comp", item))
     if mask_species is not None:
         if sequence_file is None:
-            raise ConfigurationError("mask_species needs sequence_file (the FASTA of the annotated sequence).")
+            raise ConfigurationError(
+                "mask_species needs sequence_file (the FASTA of the annotated sequence)."
+            )
         arguments.extend(("-mask", _cli.text(mask_species, "mask_species")))
     elif sequence_file is not None:
         raise ConfigurationError("sequence_file is only used together with mask_species.")
@@ -479,7 +508,9 @@ def date_repeats(
     staged = _stage(annotation, directory, "repeat_annotation")
     if sequence_file is not None:
         # DateRepeats looks for the sequence file next to the annotation, named like it without ".out".
-        _stage(sequence_file, directory, "sequence_file", new_name=re.sub(r"\.out$", "", staged.name))
+        _stage(
+            sequence_file, directory, "sequence_file", new_name=re.sub(r"\.out$", "", staged.name)
+        )
     before = _listing(directory)
     return _run(
         "date_repeats",
@@ -528,7 +559,9 @@ def annotate_segmental_duplications(
     _p.switch(arguments, "-align", alignments, "alignments")
     _p.switch(arguments, "-gff", gff_output, "gff_output")
     if search_engine is not None:
-        arguments.extend(("-engine", _cli.choice(search_engine, ("abblast", "wublast", "ncbi"), "search_engine")))
+        arguments.extend(
+            ("-engine", _cli.choice(search_engine, ("abblast", "wublast", "ncbi"), "search_engine"))
+        )
     _p.opt_int(arguments, "-pa", parallel, "parallel", minimum=1, maximum=1024)
     _p.switch(arguments, "-dupout", seeds_only, "seeds_only")
     script = _locate("DupMasker", repeatmasker_dir)
@@ -577,12 +610,18 @@ def mask_repeat_proteins(
     source = Path(_p.file_path(fasta, "fasta"))
     arguments: list[str] = []
     if search_engine is not None:
-        arguments.extend(("-engine", _cli.choice(search_engine, ("ncbi", "abblast", "wublast"), "search_engine")))
+        arguments.extend(
+            ("-engine", _cli.choice(search_engine, ("ncbi", "abblast", "wublast"), "search_engine"))
+        )
     _p.opt_num(arguments, "-pvalue", p_value, "p_value", minimum=0.0)
     _p.opt_int(arguments, "-minscore", min_score, "min_score", minimum=0)
     _p.opt_int(arguments, "-wordsize", word_size, "word_size", minimum=1)
-    _p.opt_int(arguments, "-queryStatLen", query_statistics_length, "query_statistics_length", minimum=1)
-    _p.opt_int(arguments, "-maxAADist", max_amino_acid_distance, "max_amino_acid_distance", minimum=1)
+    _p.opt_int(
+        arguments, "-queryStatLen", query_statistics_length, "query_statistics_length", minimum=1
+    )
+    _p.opt_int(
+        arguments, "-maxAADist", max_amino_acid_distance, "max_amino_acid_distance", minimum=1
+    )
     if not _p.flag(mask_low_complexity, "mask_low_complexity"):
         arguments.append("-noLowSimple")
     script = _locate("RepeatProteinMask", repeatmasker_dir)
@@ -631,7 +670,10 @@ def mask_tandem_repeats(
         timeout_seconds=timeout_seconds,
         before=before,
     )
-    match = re.search(r"seqCount = (\d+), totaSeqLen = (\d+), GC Level = ([\d.]+), bp masked = (\d+)", result["log_tail"])
+    match = re.search(
+        r"seqCount = (\d+), totaSeqLen = (\d+), GC Level = ([\d.]+), bp masked = (\d+)",
+        result["log_tail"],
+    )
     if match:
         result["summary"] = {
             "sequences": int(match.group(1)),
@@ -674,7 +716,11 @@ def convert_repeats_to_gff3(
         timeout_seconds=timeout_seconds,
         stdout_name=name,
     )
-    result["features"] = sum(1 for line in Path(result["outputs"][name]).read_text().splitlines() if line and line[0] != "#")
+    result["features"] = sum(
+        1
+        for line in Path(result["outputs"][name]).read_text().splitlines()
+        if line and line[0] != "#"
+    )
     return result
 
 
@@ -708,16 +754,32 @@ def convert_repeats_to_bed(
     arguments: list[str] = []
     _p.opt_text(arguments, "-p", output_prefix, "output_prefix")
     if split_by is not None:
-        arguments.extend(("-sp", _cli.choice(split_by, ("name", "family", "class", "subclass"), "split_by")))
+        arguments.extend(
+            ("-sp", _cli.choice(split_by, ("name", "family", "class", "subclass"), "split_by"))
+        )
     if sort_by is not None:
-        arguments.extend(("-s", _cli.choice(sort_by, ("size", "name", "family", "class", "subclass", "diverge"), "sort_by")))
+        arguments.extend(
+            (
+                "-s",
+                _cli.choice(
+                    sort_by, ("size", "name", "family", "class", "subclass", "diverge"), "sort_by"
+                ),
+            )
+        )
     _p.opt_int(arguments, "-m", min_length, "min_length", minimum=0)
     _p.opt_int(arguments, "-n", min_hits, "min_hits", minimum=1)
     _p.opt_num(arguments, "-dmax", max_divergence, "max_divergence", minimum=0.0)
     _p.opt_num(arguments, "-dmin", min_divergence, "min_divergence", minimum=0.0)
     if overlap_resolution is not None:
         arguments.extend(
-            ("-o", _cli.choice(overlap_resolution, ("higher_score", "longer_element", "lower_divergence"), "overlap_resolution"))
+            (
+                "-o",
+                _cli.choice(
+                    overlap_resolution,
+                    ("higher_score", "longer_element", "lower_divergence"),
+                    "overlap_resolution",
+                ),
+            )
         )
     script = _locate("RM2Bed.py", repeatmasker_dir, util=True)
     directory = _cli.new_directory(output_directory, "output_directory")
@@ -770,7 +832,11 @@ def export_repeats_ucsc_tables(
         timeout_seconds=timeout_seconds,
         before=before,
     )
-    result["tables"] = {key: _p.count_lines(Path(path)) for key, path in result["outputs"].items() if key.endswith(".tsv")}
+    result["tables"] = {
+        key: _p.count_lines(Path(path))
+        for key, path in result["outputs"].items()
+        if key.endswith(".tsv")
+    }
     return result
 
 
@@ -910,7 +976,11 @@ def _count_masked(path: Path, *, lowercase: bool) -> int:
             if line.startswith(">"):
                 continue
             body = line.strip()
-            total += sum(1 for character in body if character.islower()) if lowercase else body.upper().count("N")
+            total += (
+                sum(1 for character in body if character.islower())
+                if lowercase
+                else body.upper().count("N")
+            )
     return total
 
 
@@ -945,7 +1015,9 @@ def summarize_repeat_annotation(
     _p.opt_num(arguments, "-maxDiv", max_divergence, "max_divergence", minimum=0.0, maximum=1.0)
     _p.opt_text(arguments, "-species", species, "species")
     _p.opt_file(arguments, "-genome", genome, "genome")
-    _p.switch(arguments, "-useAbsoluteGenomeSize", use_absolute_genome_size, "use_absolute_genome_size")
+    _p.switch(
+        arguments, "-useAbsoluteGenomeSize", use_absolute_genome_size, "use_absolute_genome_size"
+    )
     _p.opt_dir(arguments, "-libdir", library_dir, "library_dir")
     script = _locate("buildSummary.pl", repeatmasker_dir, util=True)
     directory = _cli.new_directory(output_directory, "output_directory")
@@ -958,7 +1030,9 @@ def summarize_repeat_annotation(
         timeout_seconds=timeout_seconds,
         stdout_name=name,
     )
-    result["report"] = Path(result["outputs"][name]).read_text(encoding="utf-8", errors="replace")[:4000]
+    result["report"] = Path(result["outputs"][name]).read_text(encoding="utf-8", errors="replace")[
+        :4000
+    ]
     return result
 
 
@@ -1004,7 +1078,9 @@ def recalculate_repeat_divergence(
     )
     families: list[dict[str, Any]] = []
     in_table = False
-    for line in Path(result["outputs"][summary]).read_text(encoding="utf-8", errors="replace").splitlines():
+    for line in (
+        Path(result["outputs"][summary]).read_text(encoding="utf-8", errors="replace").splitlines()
+    ):
         if line.startswith("Class\tRepeat"):
             in_table = True
             continue
@@ -1079,7 +1155,9 @@ def plot_repeat_landscape(
     for match in re.finditer(r"^\s*\[\s*'([^']*)',([^\]]*)\],?\s*$", page, re.MULTILINE):
         values = [float(item) for item in match.group(2).split(",") if item.strip()]
         if len(values) == len(classes):
-            rows.append({"divergence": _p.number(match.group(1)), **dict(zip(classes, values, strict=True))})
+            rows.append(
+                {"divergence": _p.number(match.group(1)), **dict(zip(classes, values, strict=True))}
+            )
     result["classes"] = classes
     result["landscape"] = rows
     return result

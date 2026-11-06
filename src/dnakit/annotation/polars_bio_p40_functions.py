@@ -85,7 +85,8 @@ def read_bigwig_intervals(
         "interval_count": len(records),
         "intervals": records,
         "provenance": _provenance(
-            "0-based half-open coordinates (BED)" if zero_based else "1-based closed coordinates"),
+            "0-based half-open coordinates (BED)" if zero_based else "1-based closed coordinates"
+        ),
     }
 
 

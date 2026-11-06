@@ -49,7 +49,6 @@ def trim_trimmomatic(
         max_artifact_bytes=max_artifact_bytes,
     )
 
-
     directory = workspace(output_directory)
     arguments: list[str] = []
     outputs: list[Path]

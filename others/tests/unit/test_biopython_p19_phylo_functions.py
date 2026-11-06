@@ -12,8 +12,8 @@ import pytest
 
 pytest.importorskip("Bio")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.phylogeny import biopython_p19_phylo_functions as m  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.phylogeny import biopython_p19_phylo_functions as m
 
 GAPPED = {"A": "--ACGT--A", "B": "?ACGTTTAA", "C": "-ACG--TTA"}
 ALN = {"a": "ACGTACGTAC", "b": "ACGTACGTTC", "c": "ACGAACGTTC", "d": "TCGAACGATC"}
@@ -24,7 +24,9 @@ def _codon_alignment() -> dict[str, str]:
     rnd = random.Random(5)
     stops = {"TAA", "TAG", "TGA"}
     base = "".join(rnd.choice("ACGT") for _ in range(600))
-    base = "".join(base[i : i + 3] if base[i : i + 3] not in stops else "GCT" for i in range(0, 600, 3))
+    base = "".join(
+        base[i : i + 3] if base[i : i + 3] not in stops else "GCT" for i in range(0, 600, 3)
+    )
 
     def mutate(text: str, count: int) -> str:
         letters = list(text)
@@ -32,7 +34,8 @@ def _codon_alignment() -> dict[str, str]:
             letters[rnd.randrange(len(letters))] = rnd.choice("ACGT")
         mutated = "".join(letters)
         return "".join(
-            mutated[i : i + 3] if mutated[i : i + 3] not in stops else "GCT" for i in range(0, len(mutated), 3)
+            mutated[i : i + 3] if mutated[i : i + 3] not in stops else "GCT"
+            for i in range(0, len(mutated), 3)
         )
 
     return {"a": base, "b": mutate(base, 25), "c": mutate(base, 45), "d": mutate(base, 70)}
@@ -60,13 +63,17 @@ def test_terminal_gaps_to_missing_matches_biopython() -> None:
     reference.terminal_gap_to_missing()
     assert result["alignment"] == {k: str(v) for k, v in reference.matrix.items()}
     assert result["alignment"]["A"] == "??ACGT--A"
-    assert m.nexus_terminal_gaps_to_missing({"x": "-----"}, verbose=False)["alignment"]["x"] == "?????"
+    assert (
+        m.nexus_terminal_gaps_to_missing({"x": "-----"}, verbose=False)["alignment"]["x"] == "?????"
+    )
     with pytest.raises(ConfigurationError):
         m.nexus_terminal_gaps_to_missing({"A": "AC", "B": "ACG"}, verbose=False)
 
 
 def test_combine_matrices_fills_missing_taxa() -> None:
-    result = m.nexus_combine_matrices({"g1": GAPPED, "g2": {"A": "ACGTAA", "D": "TTTTGG"}}, verbose=False)
+    result = m.nexus_combine_matrices(
+        {"g1": GAPPED, "g2": {"A": "ACGTAA", "D": "TTTTGG"}}, verbose=False
+    )
     assert result["taxa"] == ["A", "B", "C", "D"]
     assert result["character_count"] == 15
     assert result["alignment"]["D"] == "?" * 9 + "TTTTGG"
@@ -82,7 +89,8 @@ def test_write_partition_files(tmp_path) -> None:
         GAPPED, {"p1": [0, 1, 2], "p2": [3, 4, 5, 6, 7, 8]}, out, exclude=[1], verbose=False
     )
     assert set(result["files"]) == {"p1", "p2"}
-    text = open(result["files"]["p1"]).read()
+    with open(result["files"]["p1"]) as handle:
+        text = handle.read()
     assert "nchar=2" in text and "begin data;" in text
     assert result["partition_sizes"] == {"p1": 2, "p2": 6}
     with pytest.raises(ConfigurationError):
@@ -125,7 +133,9 @@ def test_distance_matrix_identity_and_blastn() -> None:
         assert result["ids"] == list(ALN)
         assert result["matrix"][3][1] == pytest.approx(reference["d", "b"])
         assert result["matrix"][1][3] == result["matrix"][3][1]
-    assert m.biopython_alignment_distance_matrix(ALN, verbose=False)["matrix"][0][1] == pytest.approx(0.1)
+    assert m.biopython_alignment_distance_matrix(ALN, verbose=False)["matrix"][0][
+        1
+    ] == pytest.approx(0.1)
     with pytest.raises(ConfigurationError):
         m.biopython_alignment_distance_matrix(ALN, model="blosum62", verbose=False)
 
@@ -140,7 +150,9 @@ def test_parsimony_tree_search() -> None:
     with pytest.raises(ConfigurationError):
         m.parsimony_tree_search(ALN, starting_tree="((a:1,b:1):1,(c:1,z:1):1);", verbose=False)
     with pytest.raises(ConfigurationError):
-        m.parsimony_tree_search(ALN, starting_tree="((a,b),(c,d));", verbose=False)  # no branch lengths
+        m.parsimony_tree_search(
+            ALN, starting_tree="((a,b),(c,d));", verbose=False
+        )  # no branch lengths
 
 
 def test_strict_consensus_matches_biopython_and_ignores_tip_order() -> None:
@@ -150,9 +162,13 @@ def test_strict_consensus_matches_biopython_and_ignores_tip_order() -> None:
     trees = ["(((A,B),C),(D,E));", "(((A,B),C),(D,E));", "((A,B),(C,(D,E)));"]
     result = m.strict_consensus_tree(trees, verbose=False)
     reference = Consensus.strict_consensus([Phylo.read(io.StringIO(t), "newick") for t in trees])
-    ref_sets = {frozenset(t.name for t in c.get_terminals()) for c in reference.find_clades(terminal=False)}
+    ref_sets = {
+        frozenset(t.name for t in c.get_terminals()) for c in reference.find_clades(terminal=False)
+    }
     mine = Phylo.read(io.StringIO(result["newick"]), "newick")
-    assert {frozenset(t.name for t in c.get_terminals()) for c in mine.find_clades(terminal=False)} == ref_sets
+    assert {
+        frozenset(t.name for t in c.get_terminals()) for c in mine.find_clades(terminal=False)
+    } == ref_sets
     # different tip order: (C,D) vs (C,E) must not agree
     clash = m.strict_consensus_tree(["((A,B),(C,D),E);", "((A,B),(C,E),D);"], verbose=False)
     assert clash["shared_clade_count"] == 1
@@ -205,18 +221,30 @@ def test_bifurcation_descendant_and_find() -> None:
 
 
 def test_identical_and_compatible() -> None:
-    assert m.trees_are_identical("((A,B),(C,D));", "((D,C),(B,A));", verbose=False)["identical"] is True
-    assert m.trees_are_identical("((A,B),(C,D));", "((A,C),(B,D));", verbose=False)["identical"] is False
-    ok = m.trees_are_compatible("((A,B)90:1,(C,D)90:1,E);", "((A,B)95:1,(C,D)80:1,E);", threshold=50, verbose=False)
+    assert (
+        m.trees_are_identical("((A,B),(C,D));", "((D,C),(B,A));", verbose=False)["identical"]
+        is True
+    )
+    assert (
+        m.trees_are_identical("((A,B),(C,D));", "((A,C),(B,D));", verbose=False)["identical"]
+        is False
+    )
+    ok = m.trees_are_compatible(
+        "((A,B)90:1,(C,D)90:1,E);", "((A,B)95:1,(C,D)80:1,E);", threshold=50, verbose=False
+    )
     assert ok["compatible"] is True
-    clash = m.trees_are_compatible("((A,B)90:1,(C,D)90:1,E);", "((A,C)90:1,(B,D)90:1,E);", threshold=50, verbose=False)
+    clash = m.trees_are_compatible(
+        "((A,B)90:1,(C,D)90:1,E);", "((A,C)90:1,(B,D)90:1,E);", threshold=50, verbose=False
+    )
     assert clash["compatible"] is False and clash["conflict_count"] >= 1
     with pytest.raises(ConfigurationError):
         m.trees_are_compatible("((A,B)90:1,C);", "((A,B)90:1,D);", threshold=50, verbose=False)
 
 
 def test_convert_support() -> None:
-    result = m.convert_tree_support("((A:1,B:2)90:1,(C:1,D:1)80:2,E:3);", replicates=100, verbose=False)
+    result = m.convert_tree_support(
+        "((A:1,B:2)90:1,(C:1,D:1)80:2,E:3);", replicates=100, verbose=False
+    )
     supports = [n["support"] for n in result["nodes"] if n["support"] is not None]
     assert supports == [0.9, 0.8]
     moved = m.convert_tree_support(
@@ -244,7 +272,9 @@ def test_codon_dn_ds_matches_biopython(method) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         dn, ds = analysis.calculate_dn_ds_matrix(
-            Alignment(records, np.array([[0, length]] * len(aln))), method=method, codon_table=CodonTable.generic_by_id[1]
+            Alignment(records, np.array([[0, length]] * len(aln))),
+            method=method,
+            codon_table=CodonTable.generic_by_id[1],
         )
     assert result["dn"][2][1] == pytest.approx(float(dn.matrix[2][1]))
     assert result["ds"][2][0] == pytest.approx(float(ds.matrix[2][0]))
@@ -261,7 +291,9 @@ def test_codon_dn_ds_edge_cases() -> None:
 
 
 def test_codon_dn_ds_trees() -> None:
-    result = m.codon_dn_ds_trees(_codon_alignment(), dn_ds_method="NG86", tree_method="NJ", verbose=False)
+    result = m.codon_dn_ds_trees(
+        _codon_alignment(), dn_ds_method="NG86", tree_method="NJ", verbose=False
+    )
     for key in ("dn_tree_newick", "ds_tree_newick"):
         for name in "abcd":
             assert name in result[key]
@@ -304,7 +336,9 @@ def _paml_inputs(tmp_path):
 @pytest.mark.skipif(shutil.which("yn00") is None, reason="PAML is not installed")
 def test_run_paml_yn00_end_to_end(tmp_path) -> None:
     phy, _ = _paml_inputs(tmp_path)
-    result = m.run_paml("yn00", phy, tmp_path / "w", options={"icode": 0, "verbose": 0}, verbose=False)
+    result = m.run_paml(
+        "yn00", phy, tmp_path / "w", options={"icode": 0, "verbose": 0}, verbose=False
+    )
     assert result["status"] == "completed"
     assert set(result["results"]) == {"a", "b", "c", "d"}
     assert 0 < result["results"]["a"]["b"]["YN00"]["dN"] < 1
@@ -317,17 +351,27 @@ def test_run_paml_yn00_end_to_end(tmp_path) -> None:
 def test_run_paml_codeml_end_to_end(tmp_path) -> None:
     phy, tree = _paml_inputs(tmp_path)
     options = {"runmode": 0, "seqtype": 1, "CodonFreq": 2, "model": 0, "NSsites": [0], "verbose": 0}
-    result = m.run_paml("codeml", phy, tmp_path / "w", tree_path=tree, options=options, verbose=False)
+    result = m.run_paml(
+        "codeml", phy, tmp_path / "w", tree_path=tree, options=options, verbose=False
+    )
     assert result["status"] == "completed"
     site = result["results"]["NSsites"]["0"]
     assert site["lnL"] < 0 and site["parameters"]["omega"] > 0
-    assert m.read_paml_results("codeml", result["results_file"], verbose=False)["results"] == result["results"]
+    assert (
+        m.read_paml_results("codeml", result["results_file"], verbose=False)["results"]
+        == result["results"]
+    )
 
 
 @pytest.mark.skipif(shutil.which("baseml") is None, reason="PAML is not installed")
 def test_run_paml_baseml_end_to_end(tmp_path) -> None:
     phy, tree = _paml_inputs(tmp_path)
-    result = m.run_paml("baseml", phy, tmp_path / "w", tree_path=tree, options={"model": 4}, verbose=False)
+    result = m.run_paml(
+        "baseml", phy, tmp_path / "w", tree_path=tree, options={"model": 4}, verbose=False
+    )
     assert result["status"] == "completed"
     assert result["results"]["parameters"]["kappa"] > 0
-    assert m.read_paml_results("baseml", result["results_file"], verbose=False)["results"] == result["results"]
+    assert (
+        m.read_paml_results("baseml", result["results_file"], verbose=False)["results"]
+        == result["results"]
+    )

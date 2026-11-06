@@ -37,9 +37,7 @@ def call_freebayes(
     """Call small variants from one or more indexed BAM/CRAM files with FreeBayes."""
 
     reference_path = input_path(reference)
-    alignment_values = (
-        (alignments,) if isinstance(alignments, (str, Path)) else tuple(alignments)
-    )
+    alignment_values = (alignments,) if isinstance(alignments, (str, Path)) else tuple(alignments)
     if not alignment_values:
         raise ConfigurationError("alignments must contain at least one BAM or CRAM path.")
     alignment_paths = tuple(input_path(path) for path in alignment_values)
@@ -158,7 +156,9 @@ def query_gemini_database(
     _validate_program(program, "program")
     _validate_bool(header, "header")
     if result_format is not None:
-        result_format = _validate_choice(result_format, "result_format", {"default", "sampledetail"})
+        result_format = _validate_choice(
+            result_format, "result_format", {"default", "sampledetail"}
+        )
     config = ExecutionConfig(
         threads=1,
         timeout_seconds=timeout_seconds,
@@ -236,11 +236,14 @@ def annotate_vcf_ensembl_vep(
         max_artifact_bytes=max_artifact_bytes,
     )
     directory = workspace(output_directory)
-    output = directory / {
-        "vcf": "annotated.vcf",
-        "tab": "annotated.tsv",
-        "json": "annotated.json",
-    }[output_format]
+    output = (
+        directory
+        / {
+            "vcf": "annotated.vcf",
+            "tab": "annotated.tsv",
+            "json": "annotated.json",
+        }[output_format]
+    )
     arguments = [
         "--input_file",
         str(source_path),
@@ -815,9 +818,7 @@ def _validate_fraction(value: float | None, name: str) -> None:
         raise ConfigurationError(f"{name} must be between 0 and 1.")
 
 
-def _validate_number(
-    value: float | None, name: str, *, minimum: float, maximum: float
-) -> None:
+def _validate_number(value: float | None, name: str, *, minimum: float, maximum: float) -> None:
     if value is None:
         return
     if isinstance(value, bool) or not isinstance(value, (int, float)):

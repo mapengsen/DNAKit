@@ -23,8 +23,10 @@ SHARED_BAM = Path(
 def _write_bam(path: Path, *, index: bool) -> None:
     """Two references; four mapped reads (3 on chr1, 1 on chr2) and two unplaced unmapped reads."""
 
-    header = {"HD": {"VN": "1.6", "SO": "coordinate"}, "SQ": [
-        {"SN": "chr1", "LN": 1000}, {"SN": "chr2", "LN": 1000}]}
+    header = {
+        "HD": {"VN": "1.6", "SO": "coordinate"},
+        "SQ": [{"SN": "chr1", "LN": 1000}, {"SN": "chr2", "LN": 1000}],
+    }
     unsorted = path.with_suffix(".unsorted.bam")
     with pysam.AlignmentFile(str(unsorted), "wb", header=header) as out:
         for name, tid, pos in [("r1", 0, 10), ("r2", 0, 100), ("r3", 0, 300), ("r4", 1, 50)]:

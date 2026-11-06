@@ -49,7 +49,13 @@ def _journal_citation_status(record: dict[str, Any]) -> str:
     """Classify the source type; a DOI alone does not prove peer review."""
 
     explicit = record.get("publication_type")
-    if explicit in {"journal_article", "preprint", "software_archive", "project_only", "source_check_required"}:
+    if explicit in {
+        "journal_article",
+        "preprint",
+        "software_archive",
+        "project_only",
+        "source_check_required",
+    }:
         return explicit
     doi = str(record.get("doi") or "").casefold()
     if "preprint" in doi or "peerj.preprints" in doi:
@@ -120,7 +126,10 @@ def publication_readiness(
     journal_citation_status = _journal_citation_status(record)
     if version is not None and (not isinstance(version, str) or not version.strip()):
         raise ConfigurationError("version must be a non-empty string or None.")
-    for field, value in (("backend_version", backend_version), ("database_version", database_version)):
+    for field, value in (
+        ("backend_version", backend_version),
+        ("database_version", database_version),
+    ):
         if value is not None and (not isinstance(value, str) or not value.strip()):
             raise ConfigurationError(f"{field} must be a non-empty string or None.")
     if accessed is not None and (not isinstance(accessed, str) or not accessed.strip()):
@@ -130,14 +139,21 @@ def publication_readiness(
             date.fromisoformat(accessed)
         except ValueError as exc:
             raise ConfigurationError("accessed must use YYYY-MM-DD ISO date format.") from exc
-    if accessed is None and record["citation_status"] in {"project_citation", "paper_citation_requires_source_check"}:
+    if accessed is None and record["citation_status"] in {
+        "project_citation",
+        "paper_citation_requires_source_check",
+    }:
         accessed = date.today().isoformat()
     checks = {
-        "citation_evidence": record.get("citation_status") in {"verified_doi", "project_citation", "preprint_or_project"},
+        "citation_evidence": record.get("citation_status")
+        in {"verified_doi", "project_citation", "preprint_or_project"},
         "license_evidence": record.get("license_status") == "verified",
         "version_recorded": bool(version),
-        "backend_version_recorded": bool(backend_version) or record.get("kind") not in {"pip_or_cli", "software_or_service", "cli"},
-        "database_version_recorded": bool(database_version) or record.get("reuse_route") not in {"optional_pip_adapter", "external_cli_adapter", "optional_pip_or_external_cli"},
+        "backend_version_recorded": bool(backend_version)
+        or record.get("kind") not in {"pip_or_cli", "software_or_service", "cli"},
+        "database_version_recorded": bool(database_version)
+        or record.get("reuse_route")
+        not in {"optional_pip_adapter", "external_cli_adapter", "optional_pip_or_external_cli"},
         "access_date_recorded": bool(accessed),
     }
     if record.get("license_status") == "restricted":
@@ -154,7 +170,8 @@ def publication_readiness(
         "name": record["name"],
         "status": status,
         "journal_citation_status": journal_citation_status,
-        "ready_for_journal": journal_citation_status == "journal_article" and checks["citation_evidence"],
+        "ready_for_journal": journal_citation_status == "journal_article"
+        and checks["citation_evidence"],
         "article_citation": record["article_citation"],
         "reuse_route": record["reuse_route"],
         "checks": checks,

@@ -30,14 +30,20 @@ def test_alpha_matches_skbio_for_every_metric():
         elif metric == "phydiv":
             assert result["value"] == 10.0
         elif metric == "michaelis_menten_fit":
-            assert math.isfinite(result["value"]) and result["value"] >= 5  # random subsampling, unseeded
+            assert (
+                math.isfinite(result["value"]) and result["value"] >= 5
+            )  # random subsampling, unseeded
         else:
             assert result["value"] == pytest.approx(float(getattr(alpha, metric)(vector)))
 
 
 def test_alpha_options_and_edge_cases():
-    assert m.calculate_alpha_diversity([5, 5], metric="shannon", base=2, verbose=False)["value"] == pytest.approx(1.0)
-    assert m.calculate_alpha_diversity([1, 3], metric="simpson", finite=True, verbose=False)["value"] == pytest.approx(0.5)
+    assert m.calculate_alpha_diversity([5, 5], metric="shannon", base=2, verbose=False)[
+        "value"
+    ] == pytest.approx(1.0)
+    assert m.calculate_alpha_diversity([1, 3], metric="simpson", finite=True, verbose=False)[
+        "value"
+    ] == pytest.approx(0.5)
     assert m.calculate_alpha_diversity([0, 0, 0], metric="sobs", verbose=False)["value"] == 0
     with pytest.raises(ConfigurationError):
         m.calculate_alpha_diversity([1, 2], metric="nope", verbose=False)
@@ -53,9 +59,13 @@ def test_unifrac_matches_skbio():
 
     tree = TreeNode.read([TREE])
     un = m.calculate_unifrac_distance(COUNTS, TAXA, TREE, verbose=False)["distance_matrix"]
-    wt = m.calculate_unifrac_distance(COUNTS, TAXA, TREE, weighted=True, normalized=True, verbose=False)["distance_matrix"]
+    wt = m.calculate_unifrac_distance(
+        COUNTS, TAXA, TREE, weighted=True, normalized=True, verbose=False
+    )["distance_matrix"]
     assert un[0][1] == pytest.approx(unweighted_unifrac(COUNTS[0], COUNTS[1], TAXA, tree))
-    assert wt[0][2] == pytest.approx(weighted_unifrac(COUNTS[0], COUNTS[2], TAXA, tree, normalized=True))
+    assert wt[0][2] == pytest.approx(
+        weighted_unifrac(COUNTS[0], COUNTS[2], TAXA, tree, normalized=True)
+    )
     assert un[1][1] == 0.0
     with pytest.raises(ConfigurationError):
         m.calculate_unifrac_distance(COUNTS, TAXA[:3], TREE, verbose=False)
@@ -65,12 +75,18 @@ def test_rarefy_and_isubsample():
     a = m.rarefy_count_vector([5, 3, 0, 2], 4, seed=1, verbose=False)
     b = m.rarefy_count_vector([5, 3, 0, 2], 4, seed=1, verbose=False)
     assert a["counts"] == b["counts"] and sum(a["counts"]) == 4 and a["counts"][2] == 0
-    assert sum(m.rarefy_count_vector([1, 1], 10, replace=True, seed=2, verbose=False)["counts"]) == 10
+    assert (
+        sum(m.rarefy_count_vector([1, 1], 10, replace=True, seed=2, verbose=False)["counts"]) == 10
+    )
     with pytest.raises(ConfigurationError):
         m.rarefy_count_vector([1, 1], 10, verbose=False)
-    chosen = m.subsample_items_per_bin(list("abcdefgh"), 2, bins=list("xxxyyyzz"), seed=1, verbose=False)["selected"]
+    chosen = m.subsample_items_per_bin(
+        list("abcdefgh"), 2, bins=list("xxxyyyzz"), seed=1, verbose=False
+    )["selected"]
     assert sorted(b for b, _ in chosen) == ["x", "x", "y", "y", "z", "z"]
-    dropped = m.subsample_items_per_bin(list("abc"), 2, minimum=2, bins=["x", "y", "y"], seed=1, verbose=False)["selected"]
+    dropped = m.subsample_items_per_bin(
+        list("abc"), 2, minimum=2, bins=["x", "y", "y"], seed=1, verbose=False
+    )["selected"]
     assert {b for b, _ in dropped} == {"y"}
     with pytest.raises(ConfigurationError):
         m.subsample_items_per_bin(["a"], 1, minimum=2, verbose=False)
@@ -98,8 +114,13 @@ def _gradient_inputs():
 def test_gradient_anova_algorithms(algorithm):
     coords, meta = _gradient_inputs()
     result = m.calculate_gradient_anova(
-        coords, [0.5, 0.3, 0.2], meta, algorithm=algorithm, sort_category="t",
-        trajectory_categories=["g"], verbose=False,
+        coords,
+        [0.5, 0.3, 0.2],
+        meta,
+        algorithm=algorithm,
+        sort_category="t",
+        trajectory_categories=["g"],
+        verbose=False,
     )
     groups = result["categories"][0]["groups"]
     assert set(groups) == {"A", "B"}
@@ -122,7 +143,10 @@ TABLE = [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [2, 2, 2, 2, 2], [9, 1, 1, 1, 1]]
 def test_table_augmentation_shapes_and_seed():
     mix = m.mixup_table(TABLE, 3, labels=[0, 1, 0, 1], seed=1, verbose=False)
     assert len(mix["matrix"]) == 3 and len(mix["labels"][0]) == 2
-    assert mix["matrix"] == m.mixup_table(TABLE, 3, labels=[0, 1, 0, 1], seed=1, verbose=False)["matrix"]
+    assert (
+        mix["matrix"]
+        == m.mixup_table(TABLE, 3, labels=[0, 1, 0, 1], seed=1, verbose=False)["matrix"]
+    )
     assert len(m.mixup_table(TABLE, 3, append=True, seed=1, verbose=False)["matrix"]) == 7
     ait = m.aitchison_mixup_table(TABLE, 2, seed=1, verbose=False)
     assert all(sum(row) == pytest.approx(1.0) for row in ait["matrix"])
@@ -152,17 +176,26 @@ def test_sample_metadata():
 def test_interval_metadata():
     first = {"upper_bound": 3, "intervals": [{"bounds": [[0, 2]], "metadata": {"gene": "sagA"}}]}
     second = {"upper_bound": 4, "intervals": [{"bounds": [[1, 4]], "metadata": {"gene": "sagB"}}]}
-    hit = m.query_interval_metadata(first, bounds=[[1, 3]], attributes={"gene": "sagA"}, verbose=False)
+    hit = m.query_interval_metadata(
+        first, bounds=[[1, 3]], attributes={"gene": "sagA"}, verbose=False
+    )
     assert hit["n_matches"] == 1
-    assert m.query_interval_metadata(first, attributes={"gene": "recA"}, verbose=False)["n_matches"] == 0
+    assert (
+        m.query_interval_metadata(first, attributes={"gene": "recA"}, verbose=False)["n_matches"]
+        == 0
+    )
     joined = m.concat_interval_metadata([first, second], verbose=False)
     assert joined["upper_bound"] == 7 and joined["intervals"][1]["bounds"] == [[4, 7]]
     with pytest.raises(ConfigurationError):
-        m.query_interval_metadata({"upper_bound": 3, "intervals": [{"bounds": [[0, 9]]}]}, verbose=False)
+        m.query_interval_metadata(
+            {"upper_bound": 3, "intervals": [{"bounds": [[0, 9]]}]}, verbose=False
+        )
 
 
 def test_embedding_ordination():
-    result = m.ordinate_embedding_vectors({"a": [1, 2, 3], "b": [2, 1, 0], "c": [0, 5, 1], "d": [3, 3, 3]}, verbose=False)
+    result = m.ordinate_embedding_vectors(
+        {"a": [1, 2, 3], "b": [2, 1, 0], "c": [0, 5, 1], "d": [3, 3, 3]}, verbose=False
+    )
     assert result["ids"] == ["a", "b", "c", "d"] and len(result["coordinates"]) == 4
     assert sum(result["proportion_explained"]) == pytest.approx(1.0)
     with pytest.raises(ConfigurationError):

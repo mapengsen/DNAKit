@@ -6,7 +6,6 @@ compressed, as dnaio's ``open`` supports). Outputs are written to new paths; not
 
 from __future__ import annotations
 
-import io
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -38,7 +37,9 @@ def _make(module: Any, item: Mapping[str, Any], index: int) -> Any:
     qualities = item.get("qualities")
     if qualities is not None and len(qualities) != len(item["sequence"]):
         raise ConfigurationError(f"record {index}: qualities and sequence differ in length.")
-    return module.SequenceRecord(str(item["name"]), str(item["sequence"]), None if qualities is None else str(qualities))
+    return module.SequenceRecord(
+        str(item["name"]), str(item["sequence"]), None if qualities is None else str(qualities)
+    )
 
 
 def dnaio_read_parallel_files(
@@ -68,10 +69,22 @@ def dnaio_read_parallel_files(
                 count += 1
                 if len(rows) < limit:
                     rows.append([_entry(record) for record in group])
-    except (module.FileFormatError, module.FastaFormatError, module.FastqFormatError, ValueError) as exc:
+    except (
+        module.FileFormatError,
+        module.FastaFormatError,
+        module.FastqFormatError,
+        ValueError,
+    ) as exc:
         raise ConfigurationError(f"dnaio could not read the files in parallel: {exc}") from exc
-    return {"status": "completed", "backend": "dnaio", "version": module.__version__, "file_count": len(paths),
-            "record_group_count": count, "groups": rows, "truncated": count > limit}
+    return {
+        "status": "completed",
+        "backend": "dnaio",
+        "version": module.__version__,
+        "file_count": len(paths),
+        "record_group_count": count,
+        "groups": rows,
+        "truncated": count > limit,
+    }
 
 
 def dnaio_write_reads(
@@ -102,7 +115,9 @@ def dnaio_write_reads(
     if mode == "separate" and len(paths) != len(reads):
         raise ConfigurationError("layout='separate' needs one output path per mate.")
     if mode == "interleaved" and (len(paths) != 1 or len(reads) != 2):
-        raise ConfigurationError("layout='interleaved' needs one output path and exactly two mates.")
+        raise ConfigurationError(
+            "layout='interleaved' needs one output path and exactly two mates."
+        )
     if len(paths) != len({str(p) for p in paths}):
         raise ConfigurationError("outputs must be distinct.")
     groups = [[_make(module, item, i) for i, item in enumerate(mate)] for mate in reads]
@@ -113,15 +128,21 @@ def dnaio_write_reads(
         kwargs["interleaved"] = True
     try:
         with module.open(*paths, **kwargs) as writer:
-            for tuple_ in zip(*groups):
+            for tuple_ in zip(*groups, strict=False):
                 writer.write(*tuple_)
-    except Exception as exc:  # noqa: BLE001 - dnaio raises several format errors
+    except Exception as exc:
         for path in paths:
             path.unlink(missing_ok=True)
         raise ConfigurationError(f"dnaio could not write the reads: {exc}") from exc
-    return {"status": "completed", "backend": "dnaio", "version": module.__version__, "layout": mode,
-            "mate_count": len(groups), "record_count_per_mate": len(groups[0]),
-            "outputs": [str(p) for p in paths]}
+    return {
+        "status": "completed",
+        "backend": "dnaio",
+        "version": module.__version__,
+        "layout": mode,
+        "mate_count": len(groups),
+        "record_count_per_mate": len(groups[0]),
+        "outputs": [str(p) for p in paths],
+    }
 
 
 def dnaio_split_into_chunks(
@@ -174,10 +195,18 @@ def dnaio_split_into_chunks(
                 for number, (first, second) in enumerate(iterator):
                     total += 1
                     if len(chunks) < chunk_limit:
-                        chunks.append({"chunk": number, "bytes": len(first),
-                                       "records": count(first),
-                                       **({} if second is None else {"mate_bytes": len(second),
-                                                                     "mate_records": count(second)})})
+                        chunks.append(
+                            {
+                                "chunk": number,
+                                "bytes": len(first),
+                                "records": count(first),
+                                **(
+                                    {}
+                                    if second is None
+                                    else {"mate_bytes": len(second), "mate_records": count(second)}
+                                ),
+                            }
+                        )
                     if folder is not None:
                         names = [(first, left)] + ([] if second is None else [(second, right)])
                         for k, (data, origin) in enumerate(names, 1):
@@ -193,9 +222,16 @@ def dnaio_split_into_chunks(
                     two_cm.close()
     except (module.UnknownFileFormat, module.FileFormatError, ValueError) as exc:
         raise ConfigurationError(f"dnaio could not split the file: {exc}") from exc
-    return {"status": "completed", "backend": "dnaio", "version": module.__version__,
-            "paired": right is not None, "chunk_count": total, "chunks": chunks,
-            "truncated": total > len(chunks), "outputs": files}
+    return {
+        "status": "completed",
+        "backend": "dnaio",
+        "version": module.__version__,
+        "paired": right is not None,
+        "chunk_count": total,
+        "chunks": chunks,
+        "truncated": total > len(chunks),
+        "outputs": files,
+    }
 
 
 def dnaio_reverse_complement_reads(
@@ -230,8 +266,14 @@ def dnaio_reverse_complement_reads(
     except (module.FileFormatError, ValueError) as exc:
         target.unlink(missing_ok=True)
         raise ConfigurationError(f"dnaio could not process the file: {exc}") from exc
-    return {"status": "completed", "backend": "dnaio", "version": module.__version__, "file_format": fmt,
-            "record_count": count, "outputs": [str(target)]}
+    return {
+        "status": "completed",
+        "backend": "dnaio",
+        "version": module.__version__,
+        "file_format": fmt,
+        "record_count": count,
+        "outputs": [str(target)],
+    }
 
 
 __all__ = [

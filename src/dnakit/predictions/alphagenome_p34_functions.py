@@ -199,8 +199,14 @@ def _pairs(value: object, name: str, *, frame: bool = False) -> list[tuple[int, 
     rows: list[tuple[int, ...]] = []
     width = (2, 3) if frame else (2,)
     for index, item in enumerate(value):
-        if isinstance(item, (str, bytes)) or not isinstance(item, Sequence) or len(item) not in width:
-            raise ConfigurationError(f"{name}[{index}] must be {'[start, end(, frame)]' if frame else '[start, end]'}.")
+        if (
+            isinstance(item, (str, bytes))
+            or not isinstance(item, Sequence)
+            or len(item) not in width
+        ):
+            raise ConfigurationError(
+                f"{name}[{index}] must be {'[start, end(, frame)]' if frame else '[start, end]'}."
+            )
         rows.append(tuple(_integer(x, f"{name}[{index}]") for x in item))
     return rows
 
@@ -234,7 +240,9 @@ def alphagenome_adjust_interval(
         new = _guard("Interval.pad", lambda: item.pad(first, second, use_strand=flag))
     else:
         new = _guard("Interval.boundary_shift", lambda: item.boundary_shift(first, second, flag))
-    return _done("adjust_interval", method=mode, input=_interval_dict(item), result=_interval_dict(new))
+    return _done(
+        "adjust_interval", method=mode, input=_interval_dict(item), result=_interval_dict(new)
+    )
 
 
 def alphagenome_interval_center(
@@ -246,8 +254,11 @@ def alphagenome_interval_center(
     """
 
     item = _interval(interval, "interval")
-    return _done("interval_center", input=_interval_dict(item),
-                 center=int(item.center(_flag(use_strand, "use_strand"))))
+    return _done(
+        "interval_center",
+        input=_interval_dict(item),
+        center=int(item.center(_flag(use_strand, "use_strand"))),
+    )
 
 
 def alphagenome_interval_within_reference(
@@ -257,8 +268,12 @@ def alphagenome_interval_within_reference(
 
     item = _interval(interval, "interval")
     length = _integer(reference_length, "reference_length", 1)
-    return _done("interval_within_reference", input=_interval_dict(item),
-                 reference_length=length, within_reference=bool(item.within_reference(length)))
+    return _done(
+        "interval_within_reference",
+        input=_interval_dict(item),
+        reference_length=length,
+        within_reference=bool(item.within_reference(length)),
+    )
 
 
 def alphagenome_interval_strand(
@@ -272,8 +287,12 @@ def alphagenome_interval_strand(
 
     item = _interval(interval, "interval")
     chosen = _choice(mode, ("swap", "drop"), "mode")
-    new = _guard("strand change", lambda: item.swap_strand() if chosen == "swap" else item.as_unstranded())
-    return _done("interval_strand", mode=chosen, input=_interval_dict(item), result=_interval_dict(new))
+    new = _guard(
+        "strand change", lambda: item.swap_strand() if chosen == "swap" else item.as_unstranded()
+    )
+    return _done(
+        "interval_strand", mode=chosen, input=_interval_dict(item), result=_interval_dict(new)
+    )
 
 
 def alphagenome_interval_relation(
@@ -292,8 +311,13 @@ def alphagenome_interval_relation(
     first, second = _interval(interval, "interval"), _interval(other, "other")
     chosen = _choice(relation, ("overlaps", "contains"), "relation")
     answer = first.overlaps(second) if chosen == "overlaps" else first.contains(second)
-    return _done("interval_relation", relation=chosen, interval=_interval_dict(first),
-                 other=_interval_dict(second), result=bool(answer))
+    return _done(
+        "interval_relation",
+        relation=chosen,
+        interval=_interval_dict(first),
+        other=_interval_dict(second),
+        result=bool(answer),
+    )
 
 
 def alphagenome_interval_coverage(
@@ -326,8 +350,15 @@ def alphagenome_interval_coverage(
     else:
         method = item.binary_mask if as_mask else item.coverage
         track = _guard("coverage", lambda: method(others, bin_size=size))
-    return _done("interval_coverage", interval=_interval_dict(item), bin_size=size,
-                 stranded=by_strand, mask=as_mask, shape=list(track.shape), values=_plain(track))
+    return _done(
+        "interval_coverage",
+        interval=_interval_dict(item),
+        bin_size=size,
+        stranded=by_strand,
+        mask=as_mask,
+        shape=list(track.shape),
+        values=_plain(track),
+    )
 
 
 def alphagenome_overlap_ranges(
@@ -360,8 +391,13 @@ def alphagenome_variant_overlap(
     var, item = _variant(variant, "variant"), _interval(interval, "interval")
     chosen = _choice(allele, ("reference", "alternate"), "allele")
     answer = var.reference_overlaps(item) if chosen == "reference" else var.alternate_overlaps(item)
-    return _done("variant_overlap", allele=chosen, variant=_variant_dict(var),
-                 interval=_interval_dict(item), overlaps=bool(answer))
+    return _done(
+        "variant_overlap",
+        allele=chosen,
+        variant=_variant_dict(var),
+        interval=_interval_dict(item),
+        overlaps=bool(answer),
+    )
 
 
 def alphagenome_split_variant(
@@ -376,8 +412,13 @@ def alphagenome_split_variant(
     var = _variant(variant, "variant")
     point = _integer(anchor, "anchor", 0)
     upstream, downstream = _guard("Variant.split", lambda: var.split(point))
-    return _done("split_variant", anchor=point, variant=_variant_dict(var),
-                 upstream=_variant_dict(upstream), downstream=_variant_dict(downstream))
+    return _done(
+        "split_variant",
+        anchor=point,
+        variant=_variant_dict(var),
+        upstream=_variant_dict(upstream),
+        downstream=_variant_dict(downstream),
+    )
 
 
 def alphagenome_junction_regions(
@@ -408,8 +449,14 @@ def alphagenome_junction_regions(
         return [_interval_dict(method(pad))], junc
 
     regions, junc = _guard("Junction regions", run)
-    return _done("junction_regions", region=chosen, junction=_interval_dict(junc),
-                 acceptor=int(junc.acceptor), donor=int(junc.donor), regions=regions)
+    return _done(
+        "junction_regions",
+        region=chosen,
+        junction=_interval_dict(junc),
+        acceptor=int(junc.acceptor),
+        donor=int(junc.donor),
+        regions=regions,
+    )
 
 
 # Transcripts.
@@ -420,8 +467,17 @@ def _transcript(value: object, name: str) -> Any:
     transcript_module = require("alphagenome.data.transcript", _EXTRA)
     if not isinstance(value, Mapping):
         raise ConfigurationError(f"{name} must be an object.")
-    unknown = set(value) - {"chromosome", "strand", "exons", "cds", "start_codon", "stop_codon",
-                            "transcript_id", "gene_id", "protein_id"}
+    unknown = set(value) - {
+        "chromosome",
+        "strand",
+        "exons",
+        "cds",
+        "start_codon",
+        "stop_codon",
+        "transcript_id",
+        "gene_id",
+        "protein_id",
+    }
     if unknown:
         raise ConfigurationError(f"{name} has unsupported keys: {sorted(unknown)}.")
     chromosome = _text(value.get("chromosome"), f"{name}.chromosome", 256)
@@ -441,15 +497,18 @@ def _transcript(value: object, name: str) -> Any:
     exons = build("exons", False)
     if not exons:
         raise ConfigurationError(f"{name}.exons must hold at least one exon.")
-    return _guard("transcript building", lambda: transcript_module.Transcript(
-        exons=exons,
-        cds=build("cds", True),
-        start_codon=build("start_codon", False),
-        stop_codon=build("stop_codon", True),
-        transcript_id=value.get("transcript_id"),
-        gene_id=value.get("gene_id"),
-        protein_id=value.get("protein_id"),
-    ))
+    return _guard(
+        "transcript building",
+        lambda: transcript_module.Transcript(
+            exons=exons,
+            cds=build("cds", True),
+            start_codon=build("start_codon", False),
+            stop_codon=build("stop_codon", True),
+            transcript_id=value.get("transcript_id"),
+            gene_id=value.get("gene_id"),
+            protein_id=value.get("protein_id"),
+        ),
+    )
 
 
 def _transcript_dict(transcript: Any) -> dict[str, Any]:
@@ -489,7 +548,9 @@ def alphagenome_transcript_cds_offset(
     item = _transcript(transcript, "transcript")
     point = _integer(position, "position", 0)
     offset = _guard("offset_in_cds", lambda: item.offset_in_cds(point))
-    return _done("transcript_cds_offset", position=point, offset=None if offset is None else int(offset))
+    return _done(
+        "transcript_cds_offset", position=point, offset=None if offset is None else int(offset)
+    )
 
 
 def alphagenome_fix_transcript_truncation(
@@ -505,7 +566,9 @@ def alphagenome_fix_transcript_truncation(
     item = _transcript(transcript, "transcript")
     transcript_module = require("alphagenome.data.transcript", _EXTRA)
     fixed = _guard("fix_truncation", lambda: transcript_module.Transcript.fix_truncation(item))
-    return _done("fix_transcript_truncation", input=_transcript_dict(item), result=_transcript_dict(fixed))
+    return _done(
+        "fix_transcript_truncation", input=_transcript_dict(item), result=_transcript_dict(fixed)
+    )
 
 
 def alphagenome_transcripts_from_gtf(
@@ -526,7 +589,11 @@ def alphagenome_transcripts_from_gtf(
     pandas = require("pandas", _EXTRA)
     transcript_module = require("alphagenome.data.transcript", _EXTRA)
     path = input_path(gtf_path)
-    if isinstance(transcript_ids, (str, bytes)) or not isinstance(transcript_ids, Sequence) or not transcript_ids:
+    if (
+        isinstance(transcript_ids, (str, bytes))
+        or not isinstance(transcript_ids, Sequence)
+        or not transcript_ids
+    ):
         raise ConfigurationError("transcript_ids must be a non-empty list.")
     wanted = {_text(item, "transcript_ids[]", 256) for item in transcript_ids}
     repair = _flag(fix_truncation, "fix_truncation")
@@ -546,11 +613,22 @@ def alphagenome_transcripts_from_gtf(
                 continue
             try:
                 row = {
-                    "Chromosome": fields[0], "Start": int(fields[3]) - 1, "End": int(fields[4]),
-                    "Strand": fields[6], "Feature": fields[2],
+                    "Chromosome": fields[0],
+                    "Start": int(fields[3]) - 1,
+                    "End": int(fields[4]),
+                    "Strand": fields[6],
+                    "Feature": fields[2],
                     "Frame": int(fields[7]) if fields[7] != "." else 0,
-                    **{key: attributes.get(key) for key in (
-                        "gene_id", "transcript_id", "protein_id", "gene_type", "transcript_type")},
+                    **{
+                        key: attributes.get(key)
+                        for key in (
+                            "gene_id",
+                            "transcript_id",
+                            "protein_id",
+                            "gene_type",
+                            "transcript_type",
+                        )
+                    },
                 }
             except ValueError as exc:
                 raise ConfigurationError(f"GTF line {number} has invalid coordinates.") from exc
@@ -562,11 +640,20 @@ def alphagenome_transcripts_from_gtf(
             missing.append(name)
             continue
         frame = pandas.DataFrame(rows[name])
-        transcript = _guard("from_gtf_df", lambda frame=frame: transcript_module.Transcript.from_gtf_df(
-            frame, fix_truncation=repair))
+        transcript = _guard(
+            "from_gtf_df",
+            lambda frame=frame: transcript_module.Transcript.from_gtf_df(
+                frame, fix_truncation=repair
+            ),
+        )
         built.append(_transcript_dict(transcript))
-    return _done("transcripts_from_gtf", fix_truncation=repair, transcript_count=len(built),
-                 missing=missing, transcripts=built)
+    return _done(
+        "transcripts_from_gtf",
+        fix_truncation=repair,
+        transcript_count=len(built),
+        missing=missing,
+        transcripts=built,
+    )
 
 
 # Track data.
@@ -594,11 +681,21 @@ def _track_data(value: object, name: str) -> Any:
     if len(strands) != len(names):
         raise ConfigurationError(f"{name}.strands must have one entry per name.")
     resolution = _integer(value.get("resolution", 1), f"{name}.resolution", 1)
-    interval = None if value.get("interval") is None else _interval(value["interval"], f"{name}.interval")
-    metadata = pandas.DataFrame({"name": [str(x) for x in names],
-                                 "strand": [_choice(s, _STRANDS, f"{name}.strands[]") for s in strands]})
-    return _guard("TrackData", lambda: module.TrackData(
-        values=values, metadata=metadata, resolution=resolution, interval=interval))
+    interval = (
+        None if value.get("interval") is None else _interval(value["interval"], f"{name}.interval")
+    )
+    metadata = pandas.DataFrame(
+        {
+            "name": [str(x) for x in names],
+            "strand": [_choice(s, _STRANDS, f"{name}.strands[]") for s in strands],
+        }
+    )
+    return _guard(
+        "TrackData",
+        lambda: module.TrackData(
+            values=values, metadata=metadata, resolution=resolution, interval=interval
+        ),
+    )
 
 
 def _track_dict(track: Any) -> dict[str, Any]:
@@ -633,7 +730,10 @@ def alphagenome_slice_track_data(
         if start is not None or end is not None:
             raise ConfigurationError("give either interval or start and end, not both.")
         region = _interval(interval, "interval")
-        new = _guard("slice_by_interval", lambda: data.slice_by_interval(region, _flag(match_resolution, "match_resolution")))
+        new = _guard(
+            "slice_by_interval",
+            lambda: data.slice_by_interval(region, _flag(match_resolution, "match_resolution")),
+        )
     else:
         if start is None or end is None:
             raise ConfigurationError("give interval, or both start and end.")
@@ -649,8 +749,12 @@ def alphagenome_track_bin_index(
 
     data = _track_data(track, "track")
     position = _integer(relative_position, "relative_position", 0)
-    return _done("track_bin_index", resolution=int(data.resolution), relative_position=position,
-                 bin_index=int(data.bin_index(position)))
+    return _done(
+        "track_bin_index",
+        resolution=int(data.resolution),
+        relative_position=position,
+        bin_index=int(data.bin_index(position)),
+    )
 
 
 def alphagenome_resize_track_data(
@@ -688,11 +792,20 @@ def alphagenome_change_track_resolution(
     rule = _choice(aggregation, ("sum", "max"), "aggregation")
     module = require(_TRACK, _EXTRA)
     kind = module.AggregationType.SUM if rule == "sum" else module.AggregationType.MAX
-    direction = "same" if target == data.resolution else ("downsample" if target > data.resolution else "upsample")
+    direction = (
+        "same"
+        if target == data.resolution
+        else ("downsample" if target > data.resolution else "upsample")
+    )
     method = data.downsample if direction == "downsample" else data.upsample
     new = _guard(direction, lambda: method(target, kind))
-    return _done("change_track_resolution", direction=direction, aggregation=rule,
-                 input=_track_dict(data), result=_track_dict(new))
+    return _done(
+        "change_track_resolution",
+        direction=direction,
+        aggregation=rule,
+        input=_track_dict(data),
+        result=_track_dict(new),
+    )
 
 
 def alphagenome_reverse_complement_track_data(
@@ -734,16 +847,27 @@ def _junction_data(value: object, name: str) -> Any:
     if isinstance(names, (str, bytes)) or not isinstance(names, Sequence):
         raise ConfigurationError(f"{name}.names must be a list of track names.")
     if values.ndim != 2 or values.shape != (len(junctions), len(names)):
-        raise ConfigurationError(f"{name}.values must have one row per junction and one column per name.")
+        raise ConfigurationError(
+            f"{name}.values must have one row per junction and one column per name."
+        )
     array = np.empty(len(junctions), dtype=object)
     for index, item in enumerate(junctions):
         array[index] = _guard(
-            "Junction", lambda item=item: genome.Junction(item.chromosome, item.start, item.end, item.strand)
+            "Junction",
+            lambda item=item: genome.Junction(item.chromosome, item.start, item.end, item.strand),
         )
-    interval = None if value.get("interval") is None else _interval(value["interval"], f"{name}.interval")
-    return _guard("JunctionData", lambda: module.JunctionData(
-        junctions=array, values=values,
-        metadata=pandas.DataFrame({"name": [str(x) for x in names]}), interval=interval))
+    interval = (
+        None if value.get("interval") is None else _interval(value["interval"], f"{name}.interval")
+    )
+    return _guard(
+        "JunctionData",
+        lambda: module.JunctionData(
+            junctions=array,
+            values=values,
+            metadata=pandas.DataFrame({"name": [str(x) for x in names]}),
+            interval=interval,
+        ),
+    )
 
 
 def _junction_dict(data: Any) -> dict[str, Any]:
@@ -776,8 +900,13 @@ def alphagenome_junctions_in_interval(
     data = _junction_data(junction_data, "junction_data")
     region = _interval(interval, "interval")
     new = _guard("intersect_with_interval", lambda: data.intersect_with_interval(region))
-    return _done("junctions_in_interval", interval=_interval_dict(region),
-                 input_count=len(data), result_count=len(new), result=_junction_dict(new))
+    return _done(
+        "junctions_in_interval",
+        interval=_interval_dict(region),
+        input_count=len(data),
+        result_count=len(new),
+        result=_junction_dict(new),
+    )
 
 
 # FASTA and metadata.
@@ -795,15 +924,24 @@ def alphagenome_extract_fasta_interval(
     fasta = require("alphagenome.io.fasta", _EXTRA)
     path = input_path(fasta_path)
     region = _interval(interval, "interval")
-    sequence = _guard("FastaExtractor.extract", lambda: fasta.FastaExtractor(str(path)).extract(region))
-    return _done("extract_fasta_interval", interval=_interval_dict(region), sequence=sequence,
-                 length=len(sequence))
+    sequence = _guard(
+        "FastaExtractor.extract", lambda: fasta.FastaExtractor(str(path)).extract(region)
+    )
+    return _done(
+        "extract_fasta_interval",
+        interval=_interval_dict(region),
+        sequence=sequence,
+        length=len(sequence),
+    )
 
 
 def _metadata_rows(frame: Any, limit: int) -> dict[str, Any]:
     records = frame.reset_index().head(limit).to_dict("records")
-    return {"row_count": int(len(frame)), "columns": [str(c) for c in frame.columns],
-            "rows": [_plain(r) for r in records]}
+    return {
+        "row_count": len(frame),
+        "columns": [str(c) for c in frame.columns],
+        "rows": [_plain(r) for r in records],
+    }
 
 
 def alphagenome_output_metadata(
@@ -865,12 +1003,20 @@ def alphagenome_scorer_metadata(
     def run() -> dict[str, Any]:
         client = atlas.create(key, timeout=wait, address=address)
         return {
-            name: {"is_signed": bool(item.is_signed), "track_metadata": _metadata_rows(item.track_metadata, limit)}
+            name: {
+                "is_signed": bool(item.is_signed),
+                "track_metadata": _metadata_rows(item.track_metadata, limit),
+            }
             for name, item in client.scorer_metadata().items()
         }
 
     scorers = _guard("AtlasClient.scorer_metadata", run)
-    return _done("scorer_metadata", source="AlphaGenome Atlas service", scorer_count=len(scorers), scorers=scorers)
+    return _done(
+        "scorer_metadata",
+        source="AlphaGenome Atlas service",
+        scorer_count=len(scorers),
+        scorers=scorers,
+    )
 
 
 # Plots.
@@ -921,12 +1067,23 @@ def alphagenome_plot_contact_map_difference(
     if not low < 0 < high:
         raise ConfigurationError("vmin must be below 0 and vmax above 0.")
     if data.interval is None or data.values.ndim != 3:
-        raise ConfigurationError("contact_maps needs an interval and 3-D values (bins x bins x tracks).")
+        raise ConfigurationError(
+            "contact_maps needs an interval and 3-D values (bins x bins x tracks)."
+        )
     components = require("alphagenome.visualization.plot_components", _EXTRA)
-    _save(target, lambda: components.plot(
-        [components.ContactMapsDiff(data, vmin=low, vmax=high)], interval=data.interval))
-    return _done("plot_contact_map_difference", image_path=str(target), vmin=low, vmax=high,
-                 data=_track_dict(data))
+    _save(
+        target,
+        lambda: components.plot(
+            [components.ContactMapsDiff(data, vmin=low, vmax=high)], interval=data.interval
+        ),
+    )
+    return _done(
+        "plot_contact_map_difference",
+        image_path=str(target),
+        vmin=low,
+        vmax=high,
+        data=_track_dict(data),
+    )
 
 
 def alphagenome_plot_overlaid_tracks(
@@ -955,10 +1112,20 @@ def alphagenome_plot_overlaid_tracks(
         raise ConfigurationError("every track set needs an interval.")
     share, opacity = _flag(shared_y_scale, "shared_y_scale"), _number(alpha, "alpha")
     components = require("alphagenome.visualization.plot_components", _EXTRA)
-    _save(target, lambda: components.plot(
-        [components.OverlaidTracks(mapping, shared_y_scale=share, alpha=opacity)], interval=window))
-    return _done("plot_overlaid_tracks", image_path=str(target), labels=list(mapping),
-                 interval=_interval_dict(window), data={k: _track_dict(v) for k, v in mapping.items()})
+    _save(
+        target,
+        lambda: components.plot(
+            [components.OverlaidTracks(mapping, shared_y_scale=share, alpha=opacity)],
+            interval=window,
+        ),
+    )
+    return _done(
+        "plot_overlaid_tracks",
+        image_path=str(target),
+        labels=list(mapping),
+        interval=_interval_dict(window),
+        data={k: _track_dict(v) for k, v in mapping.items()},
+    )
 
 
 def alphagenome_plot_annotations(
@@ -1003,8 +1170,13 @@ def alphagenome_plot_annotations(
         return components.plot(body, interval=window, annotations=notes)
 
     _save(target, draw)
-    return _done("plot_annotations", image_path=str(target), interval=_interval_dict(window),
-                 intervals=[_interval_dict(x) for x in spans], variants=[_variant_dict(v) for v in snvs])
+    return _done(
+        "plot_annotations",
+        image_path=str(target),
+        interval=_interval_dict(window),
+        intervals=[_interval_dict(x) for x in spans],
+        variants=[_variant_dict(v) for v in snvs],
+    )
 
 
 __all__ = [

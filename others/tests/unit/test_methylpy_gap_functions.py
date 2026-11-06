@@ -16,16 +16,23 @@ import pytest
 
 pytest.importorskip("methylpy")
 
-from dnakit.epigenome import methylpy_gap_functions as facade  # noqa: E402
-from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError  # noqa: E402
+from dnakit.epigenome import methylpy_gap_functions as facade
+from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
 _LOCAL_CUTADAPT = Path(sys.executable).parent / "cutadapt"
-_CUTADAPT = shutil.which("cutadapt") or (str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None)
-needs_cutadapt = pytest.mark.skipif(_CUTADAPT is None, reason="cutadapt executable is not installed")
-needs_bgzip_tabix = pytest.mark.skipif(
-    shutil.which("bgzip") is None or shutil.which("tabix") is None, reason="bgzip/tabix (htslib) is not installed"
+_CUTADAPT = shutil.which("cutadapt") or (
+    str(_LOCAL_CUTADAPT) if _LOCAL_CUTADAPT.is_file() else None
 )
-needs_samtools = pytest.mark.skipif(shutil.which("samtools") is None, reason="samtools is not installed")
+needs_cutadapt = pytest.mark.skipif(
+    _CUTADAPT is None, reason="cutadapt executable is not installed"
+)
+needs_bgzip_tabix = pytest.mark.skipif(
+    shutil.which("bgzip") is None or shutil.which("tabix") is None,
+    reason="bgzip/tabix (htslib) is not installed",
+)
+needs_samtools = pytest.mark.skipif(
+    shutil.which("samtools") is None, reason="samtools is not installed"
+)
 
 
 def _gsl_installed() -> bool:
@@ -66,7 +73,9 @@ def test_public_functions_take_keyword_only_verbose() -> None:
         assert verbose.default is True
 
 
-def test_missing_program_raises_before_running_upstream(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_missing_program_raises_before_running_upstream(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import methylpy.call_mc_se as upstream
 
     called: list[dict] = []
@@ -75,8 +84,14 @@ def test_missing_program_raises_before_running_upstream(tmp_path: Path, monkeypa
     reads = _touch(tmp_path, "reads.fq")
     with pytest.raises(BackendUnavailableError) as info:
         facade.methylpy_se_run_mapping(
-            "lib1", reads, "s1", refs[0], refs[1], refs[2],
-            path_to_samtools=str(tmp_path / "missing"), path_to_aligner=str(tmp_path),
+            "lib1",
+            reads,
+            "s1",
+            refs[0],
+            refs[1],
+            refs[2],
+            path_to_samtools=str(tmp_path / "missing"),
+            path_to_aligner=str(tmp_path),
             path_to_cutadapt=str(tmp_path),
         )
     assert "samtools" in str(info.value)
@@ -84,7 +99,9 @@ def test_missing_program_raises_before_running_upstream(tmp_path: Path, monkeypa
     assert called == []
 
 
-def test_only_arguments_set_by_the_caller_are_forwarded(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_only_arguments_set_by_the_caller_are_forwarded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import methylpy.call_mc_se as upstream
 
     calls: list[dict] = []
@@ -93,8 +110,16 @@ def test_only_arguments_set_by_the_caller_are_forwarded(tmp_path: Path, monkeypa
     refs = _touch(tmp_path, "fwd.fa", "rev.fa", "ref.fa")
     reads = _touch(tmp_path, "reads.fq")
     result = facade.methylpy_se_run_mapping(
-        "lib1", reads, "s1", refs[0], refs[1], refs[2],
-        path_to_samtools=tools, path_to_aligner=tools, path_to_cutadapt=tools, min_mapq=20,
+        "lib1",
+        reads,
+        "s1",
+        refs[0],
+        refs[1],
+        refs[2],
+        path_to_samtools=tools,
+        path_to_aligner=tools,
+        path_to_cutadapt=tools,
+        min_mapq=20,
     )
     assert result["status"] == "completed"
     assert result["backend"] == "methylpy"
@@ -108,7 +133,9 @@ def test_only_arguments_set_by_the_caller_are_forwarded(tmp_path: Path, monkeypa
     assert "aligner" not in kwargs
 
 
-def test_pipeline_checks_cutadapt_only_when_trimming(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_pipeline_checks_cutadapt_only_when_trimming(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import methylpy.call_mc_se as upstream
 
     calls: list[dict] = []
@@ -118,17 +145,32 @@ def test_pipeline_checks_cutadapt_only_when_trimming(tmp_path: Path, monkeypatch
     reads = _touch(tmp_path, "reads.fq")
     with pytest.raises(BackendUnavailableError):
         facade.methylpy_se_run_methylation_pipeline(
-            reads, "s1", refs[0], refs[1], refs[2], path_to_samtools=tools, path_to_aligner=tools,
+            reads,
+            "s1",
+            refs[0],
+            refs[1],
+            refs[2],
+            path_to_samtools=tools,
+            path_to_aligner=tools,
             path_to_cutadapt=str(tmp_path / "no_cutadapt"),
         )
     result = facade.methylpy_se_run_methylation_pipeline(
-        reads, "s1", refs[0], refs[1], refs[2], path_to_samtools=tools, path_to_aligner=tools, trim_reads=False,
+        reads,
+        "s1",
+        refs[0],
+        refs[1],
+        refs[2],
+        path_to_samtools=tools,
+        path_to_aligner=tools,
+        trim_reads=False,
     )
     assert result["status"] == "completed"
     assert "trim_reads" in calls[0]["kwargs"]
 
 
-def test_paired_end_mapping_forwards_both_read_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_paired_end_mapping_forwards_both_read_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import methylpy.call_mc_pe as upstream
 
     calls: list[dict] = []
@@ -138,7 +180,15 @@ def test_paired_end_mapping_forwards_both_read_files(tmp_path: Path, monkeypatch
     r1 = _touch(tmp_path, "r1.fq")
     r2 = _touch(tmp_path, "r2.fq")
     facade.methylpy_pe_run_mapping(
-        "lib1", r1, r2, "s1", refs[0], refs[1], refs[2], path_to_samtools=tools, path_to_aligner=tools,
+        "lib1",
+        r1,
+        r2,
+        "s1",
+        refs[0],
+        refs[1],
+        refs[2],
+        path_to_samtools=tools,
+        path_to_aligner=tools,
         path_to_cutadapt=tools,
     )
     kwargs = calls[0]["kwargs"]
@@ -149,20 +199,29 @@ def test_paired_end_mapping_forwards_both_read_files(tmp_path: Path, monkeypatch
 def test_remove_clonal_needs_picard_jar(tmp_path: Path) -> None:
     bam = _touch(tmp_path, "in.bam")[0]
     with pytest.raises(ConfigurationError):
-        facade.methylpy_remove_clonal_bam(bam, str(tmp_path / "out.bam"), "picard", path_to_picard=None)
+        facade.methylpy_remove_clonal_bam(
+            bam, str(tmp_path / "out.bam"), "picard", path_to_picard=None
+        )
     with pytest.raises(BackendUnavailableError) as info:
-        facade.methylpy_remove_clonal_bam(bam, str(tmp_path / "out.bam"), "picard", path_to_picard=str(tmp_path))
+        facade.methylpy_remove_clonal_bam(
+            bam, str(tmp_path / "out.bam"), "picard", path_to_picard=str(tmp_path)
+        )
     assert "picard.jar" in str(info.value)
 
 
 def test_bgzip_and_convert_report_missing_htslib_or_samtools(tmp_path: Path) -> None:
     allc = _touch(tmp_path, "allc.tsv")[0]
     with pytest.raises(BackendUnavailableError):
-        facade.methylpy_bgzip_allc_file(allc, path_to_bgzip=str(tmp_path / "x"), path_to_tabix=str(tmp_path / "y"))
+        facade.methylpy_bgzip_allc_file(
+            allc, path_to_bgzip=str(tmp_path / "x"), path_to_tabix=str(tmp_path / "y")
+        )
     refs = _touch(tmp_path, "ref.fa")[0]
     with pytest.raises(BackendUnavailableError):
         facade.methylpy_convert_allc_to_bigwig(
-            allc, str(tmp_path / "out.bw"), refs, path_to_samtools=str(tmp_path / "x"),
+            allc,
+            str(tmp_path / "out.bw"),
+            refs,
+            path_to_samtools=str(tmp_path / "x"),
             path_to_wigToBigWig=str(tmp_path / "y"),
         )
 
@@ -171,10 +230,14 @@ def test_inputs_are_checked_before_running(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         facade.methylpy_dmrfind([str(tmp_path / "missing.allc")], str(tmp_path / "dmr"))
     with pytest.raises(ConfigurationError):
-        facade.methylpy_se_find_multi_mappers(str(tmp_path / "missing.sam"), str(tmp_path / "out.sam"))
+        facade.methylpy_se_find_multi_mappers(
+            str(tmp_path / "missing.sam"), str(tmp_path / "out.sam")
+        )
 
 
-@pytest.mark.skipif(_gsl_installed(), reason="GSL is installed; the missing-library error path does not apply")
+@pytest.mark.skipif(
+    _gsl_installed(), reason="GSL is installed; the missing-library error path does not apply"
+)
 def test_bundled_rms_binary_reports_missing_gsl(tmp_path: Path) -> None:
     files = _touch(tmp_path, "a.allc", "b.allc")
     with pytest.raises(BackendExecutionError) as info:
@@ -185,10 +248,13 @@ def test_bundled_rms_binary_reports_missing_gsl(tmp_path: Path) -> None:
 @needs_cutadapt
 def test_quality_trim_se_uses_cutadapt_without_shell(tmp_path: Path) -> None:
     source = tmp_path / "reads.fq"
-    source.write_text("@r1\nACGTACGTAGATCGGAAGAGCACACGTCTG\n+\n" + "I" * 30 + "\n", encoding="utf-8")
+    source.write_text(
+        "@r1\nACGTACGTAGATCGGAAGAGCACACGTCTG\n+\n" + "I" * 30 + "\n", encoding="utf-8"
+    )
     output = tmp_path / "trimmed.fq"
-    result = facade.methylpy_quality_trim_se([str(source)], [str(output)], min_read_len=5,
-                                             path_to_cutadapt=str(Path(_CUTADAPT).parent))
+    result = facade.methylpy_quality_trim_se(
+        [str(source)], [str(output)], min_read_len=5, path_to_cutadapt=str(Path(_CUTADAPT).parent)
+    )
     assert result["status"] == "completed"
     assert output.read_text(encoding="utf-8").splitlines()[1] == "ACGTACGT"
 
@@ -198,8 +264,12 @@ def test_quality_trim_se_checks_inputs_and_output_count(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError):
         facade.methylpy_quality_trim_se([source], [], path_to_cutadapt=str(tmp_path))
     with pytest.raises(ConfigurationError):
-        facade.methylpy_quality_trim_se([source], [str(tmp_path / "o.fq")], adapter_seq="ACGTXYZ!",
-                                        path_to_cutadapt=str(tmp_path))
+        facade.methylpy_quality_trim_se(
+            [source],
+            [str(tmp_path / "o.fq")],
+            adapter_seq="ACGTXYZ!",
+            path_to_cutadapt=str(tmp_path),
+        )
 
 
 @needs_cutadapt
@@ -210,8 +280,14 @@ def test_quality_trim_pe_runs_upstream_with_cutadapt(tmp_path: Path) -> None:
     r2.write_text("@p\nGGGGCCCCAAAATTTTGGGG\n+\n" + "I" * 20 + "\n", encoding="utf-8")
     out1 = tmp_path / "o1.fq"
     out2 = tmp_path / "o2.fq"
-    result = facade.methylpy_quality_trim_pe(str(r1), str(out1), str(r2), str(out2),
-                                             path_to_cutadapt=str(Path(_CUTADAPT).parent), min_read_len=5)
+    result = facade.methylpy_quality_trim_pe(
+        str(r1),
+        str(out1),
+        str(r2),
+        str(out2),
+        path_to_cutadapt=str(Path(_CUTADAPT).parent),
+        min_read_len=5,
+    )
     assert result["status"] == "completed", result
     assert out1.is_file() and out2.is_file()
 

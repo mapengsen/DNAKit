@@ -93,11 +93,31 @@ _DATA_TYPES = ("dna", "rna", "standard")
 _RECODE_UNCERTAIN = ("missing", "gap")
 _PHYLIP_INPUT_OPTIONS: Mapping[str, Mapping[str, bool]] = {
     "phylip-strict": {"strict": True, "multispace_delimiter": False, "interleaved": False},
-    "phylip-relaxed-singlespace": {"strict": False, "multispace_delimiter": False, "interleaved": False},
-    "phylip-relaxed-multispace": {"strict": False, "multispace_delimiter": True, "interleaved": False},
-    "phylip-strict-interleaved": {"strict": True, "multispace_delimiter": False, "interleaved": True},
-    "phylip-relaxed-singlespace-interleaved": {"strict": False, "multispace_delimiter": False, "interleaved": True},
-    "phylip-relaxed-multispace-interleaved": {"strict": False, "multispace_delimiter": True, "interleaved": True},
+    "phylip-relaxed-singlespace": {
+        "strict": False,
+        "multispace_delimiter": False,
+        "interleaved": False,
+    },
+    "phylip-relaxed-multispace": {
+        "strict": False,
+        "multispace_delimiter": True,
+        "interleaved": False,
+    },
+    "phylip-strict-interleaved": {
+        "strict": True,
+        "multispace_delimiter": False,
+        "interleaved": True,
+    },
+    "phylip-relaxed-singlespace-interleaved": {
+        "strict": False,
+        "multispace_delimiter": False,
+        "interleaved": True,
+    },
+    "phylip-relaxed-multispace-interleaved": {
+        "strict": False,
+        "multispace_delimiter": True,
+        "interleaved": True,
+    },
 }
 
 
@@ -110,7 +130,9 @@ def _read_plan(input_format: str, data_type: str | None) -> tuple[str, dict[str,
         options.update(_PHYLIP_INPUT_OPTIONS[input_format])
     if schema in ("fasta", "phylip"):
         if data_type is None:
-            raise ConfigurationError("data_type (dna, rna or standard) is required when reading FASTA or PHYLIP input.")
+            raise ConfigurationError(
+                "data_type (dna, rna or standard) is required when reading FASTA or PHYLIP input."
+            )
         options["data_type"] = data_type
     return schema, options
 
@@ -166,11 +188,23 @@ def convert_format(
     source_path = _gap_cli.existing_file(source, "source")
     output_path = _gap_cli.new_file(output, "output")
     input_name = _gap_cli.choice(input_format, _INPUT_FORMATS, "input_format")
-    checked_data_type = None if data_type is None else _gap_cli.choice(data_type, _DATA_TYPES, "data_type")
+    checked_data_type = (
+        None if data_type is None else _gap_cli.choice(data_type, _DATA_TYPES, "data_type")
+    )
     read_schema, read_options = _read_plan(input_name, checked_data_type)
-    target = read_schema if output_format is None else _gap_cli.choice(output_format, _OUTPUT_FORMATS, "output_format")
-    write_schema, write_options = _write_plan(target, _flag(unquoted_underscores, "unquoted_underscores"))
-    mode = None if recode_uncertain is None else _gap_cli.choice(recode_uncertain, _RECODE_UNCERTAIN, "recode_uncertain")
+    target = (
+        read_schema
+        if output_format is None
+        else _gap_cli.choice(output_format, _OUTPUT_FORMATS, "output_format")
+    )
+    write_schema, write_options = _write_plan(
+        target, _flag(unquoted_underscores, "unquoted_underscores")
+    )
+    mode = (
+        None
+        if recode_uncertain is None
+        else _gap_cli.choice(recode_uncertain, _RECODE_UNCERTAIN, "recode_uncertain")
+    )
     with source_path.open() as handle:
         dataset = dendropy.DataSet.get(file=handle, schema=read_schema, **read_options)
     if mode is not None:
@@ -351,9 +385,13 @@ def run_dendropy_format(
     source_path = _gap_cli.existing_file(source, "source")
     output_path = _gap_cli.new_file(output, "output")
     input_name = _gap_cli.choice(input_format, _INPUT_FORMATS, "input_format")
-    checked_data_type = None if data_type is None else _gap_cli.choice(data_type, _DATA_TYPES, "data_type")
+    checked_data_type = (
+        None if data_type is None else _gap_cli.choice(data_type, _DATA_TYPES, "data_type")
+    )
     if checked_data_type is None and (input_name == "fasta" or input_name.startswith("phylip")):
-        raise ConfigurationError("data_type (dna, rna or standard) is required when reading FASTA or PHYLIP input.")
+        raise ConfigurationError(
+            "data_type (dna, rna or standard) is required when reading FASTA or PHYLIP input."
+        )
     arguments = ["--from", input_name]
     if output_format is not None:
         arguments += ["--to", _gap_cli.choice(output_format, _OUTPUT_FORMATS, "output_format")]
@@ -387,7 +425,15 @@ def run_dendropy_format(
 _SUMTREES_INPUT_FORMATS = ("nexus/newick", "nexus", "newick", "phylip", "nexml")
 _SUMTREES_OUTPUT_FORMATS = ("nexus", "newick", "phylip", "nexml")
 _SUMTREES_TARGETS = ("consensus", "mcct", "msct")
-_SUMTREES_EDGES = ("mean-length", "median-length", "mean-age", "median-age", "support", "keep", "clear")
+_SUMTREES_EDGES = (
+    "mean-length",
+    "median-length",
+    "mean-age",
+    "median-age",
+    "support",
+    "keep",
+    "clear",
+)
 _SUMTREES_LABELS = ("support", "keep", "clear")
 
 
@@ -424,7 +470,10 @@ def summarize_tree_samples(
     output_path = _gap_cli.new_file(output, "output")
     arguments = ["--quiet"]
     if input_format is not None:
-        arguments += ["--input-format", _gap_cli.choice(input_format, _SUMTREES_INPUT_FORMATS, "input_format")]
+        arguments += [
+            "--input-format",
+            _gap_cli.choice(input_format, _SUMTREES_INPUT_FORMATS, "input_format"),
+        ]
     arguments += ["--burnin", str(_gap_cli.integer(burnin, "burnin", minimum=0))]
     if rooted is True:
         arguments.append("--force-rooted")
@@ -433,9 +482,14 @@ def summarize_tree_samples(
     if _flag(weighted_trees, "weighted_trees"):
         arguments.append("--weighted-trees")
     if target_tree is not None and summary_target is not None:
-        raise ConfigurationError("Give either summary_target or target_tree, not both (sumtrees crashes on that combination).")
+        raise ConfigurationError(
+            "Give either summary_target or target_tree, not both (sumtrees crashes on that combination)."
+        )
     if target_tree is not None:
-        arguments += ["--target-tree-filepath", str(_gap_cli.existing_file(target_tree, "target_tree"))]
+        arguments += [
+            "--target-tree-filepath",
+            str(_gap_cli.existing_file(target_tree, "target_tree")),
+        ]
     else:
         target = _gap_cli.choice(summary_target or "consensus", _SUMTREES_TARGETS, "summary_target")
         arguments += ["--summary-target", target]
@@ -449,7 +503,10 @@ def summarize_tree_samples(
         arguments.append("--percentages")
     arguments += ["--decimals", str(_gap_cli.integer(decimals, "decimals", minimum=0))]
     if output_format is not None:
-        arguments += ["--output-tree-format", _gap_cli.choice(output_format, _SUMTREES_OUTPUT_FORMATS, "output_format")]
+        arguments += [
+            "--output-tree-format",
+            _gap_cli.choice(output_format, _SUMTREES_OUTPUT_FORMATS, "output_format"),
+        ]
     arguments += ["--output", str(output_path)]
     arguments += [str(path) for path in sources]
     return _gap_cli.run(
@@ -486,7 +543,12 @@ def transfer_tree_labels(
     sources = _existing_files(tree_files, "tree_files")
     target = _gap_cli.existing_file(target_tree, "target_tree")
     output_path = _gap_cli.new_file(output, "output")
-    arguments = ["--quiet", "--target", str(target), f"--separator={_free_text(separator, 'separator')}"]
+    arguments = [
+        "--quiet",
+        "--target",
+        str(target),
+        f"--separator={_free_text(separator, 'separator')}",
+    ]
     if _flag(preserve_target_labels, "preserve_target_labels"):
         arguments.append("--preserve-target-labels")
     if rooted is True:
@@ -496,7 +558,9 @@ def transfer_tree_labels(
     if not _flag(include_taxa_block, "include_taxa_block"):
         arguments.append("--no-taxa-block")
     if additional_comments is not None:
-        arguments.append(f"--additional-comments={_free_text(additional_comments, 'additional_comments')}")
+        arguments.append(
+            f"--additional-comments={_free_text(additional_comments, 'additional_comments')}"
+        )
     if _flag(to_newick, "to_newick"):
         arguments.append("--to-newick")
     arguments += ["--output", str(output_path)]
@@ -517,12 +581,18 @@ def transfer_tree_labels(
 
 
 def _entrez_identifiers(ids: object) -> list[str]:
-    if isinstance(ids, (str, bytes)) or not isinstance(ids, Sequence) or not 0 < len(ids) <= _ENTREZ_MAX_IDS:
+    if (
+        isinstance(ids, (str, bytes))
+        or not isinstance(ids, Sequence)
+        or not 0 < len(ids) <= _ENTREZ_MAX_IDS
+    ):
         raise ConfigurationError(f"ids must be a list of 1 to {_ENTREZ_MAX_IDS} Entrez UIDs.")
     identifiers: list[str] = []
     for value in ids:
         if isinstance(value, bool) or not isinstance(value, (str, int)):
-            raise ConfigurationError("Each Entrez identifier must be an integer or a string of digits.")
+            raise ConfigurationError(
+                "Each Entrez identifier must be an integer or a string of digits."
+            )
         digits = str(value).strip()
         if not re.fullmatch(r"[0-9]+", digits):
             raise ConfigurationError(
@@ -618,9 +688,13 @@ def align_with_muscle(
     executable = _gap_cli.program("muscle", explicit=muscle_path, hint=_MUSCLE_HINT)
     sequences = dendropy.DnaCharacterMatrix.get(path=str(source), schema="fasta")
     try:
-        aligned = _muscle.muscle_align(sequences, muscle_args=arguments or None, muscle_path=executable)
+        aligned = _muscle.muscle_align(
+            sequences, muscle_args=arguments or None, muscle_path=executable
+        )
     except Exception as exc:  # dendropy raises a bare Exception that carries MUSCLE's stderr
-        raise BackendExecutionError(f"MUSCLE failed: {exc}", context={"backend_id": "muscle"}) from exc
+        raise BackendExecutionError(
+            f"MUSCLE failed: {exc}", context={"backend_id": "muscle"}
+        ) from exc
     with output_path.open("x") as handle:
         aligned.write_to_stream(handle, schema="fasta")
     return {
@@ -642,7 +716,9 @@ def _program_arguments(values: Sequence[str] | None, name: str) -> list[str]:
     arguments: list[str] = []
     for value in values:
         if not isinstance(value, str) or not value or "\x00" in value:
-            raise ConfigurationError(f"Each item of {name} must be a non-empty string without NUL characters.")
+            raise ConfigurationError(
+                f"Each item of {name} must be a non-empty string without NUL characters."
+            )
         arguments.append(value)
     return arguments
 
@@ -670,13 +746,17 @@ def _paup_call(operation: str, call: Any) -> Any:
         return call()
     except DNAKitError:
         raise
-    except Exception as exc:  # dendropy reports PAUP* failures as ExternalServiceError or bare exceptions
+    except (
+        Exception
+    ) as exc:  # dendropy reports PAUP* failures as ExternalServiceError or bare exceptions
         raise BackendExecutionError(
             f"PAUP* {operation} failed: {exc}", context={"backend_id": "paup"}
         ) from exc
 
 
-def _paup_result(operation: str, executable: str, outputs: Sequence[Path], **extra: Any) -> dict[str, Any]:
+def _paup_result(
+    operation: str, executable: str, outputs: Sequence[Path], **extra: Any
+) -> dict[str, Any]:
     result: dict[str, Any] = {
         "status": "completed",
         "backend": "PAUP*",
@@ -701,7 +781,9 @@ def _tree_schema(path: Path) -> str:
 
 
 def _read_trees(dendropy: Any, path: Path, namespace: Any) -> Any:
-    return dendropy.TreeList.get(path=str(path), schema=_tree_schema(path), taxon_namespace=namespace)
+    return dendropy.TreeList.get(
+        path=str(path), schema=_tree_schema(path), taxon_namespace=namespace
+    )
 
 
 def _write_tree(tree: Any, output: Path) -> None:
@@ -750,12 +832,20 @@ def paup_estimate_tree(
     tree = _paup_call(
         "estimate_tree",
         lambda: _paup.estimate_tree(
-            matrix, tree_est_criterion=criterion_name, num_subst=types, paup_path=executable, **options
+            matrix,
+            tree_est_criterion=criterion_name,
+            num_subst=types,
+            paup_path=executable,
+            **options,
         ),
     )
     _write_tree(tree, output_path)
     return _paup_result(
-        "estimate_tree", executable, [output_path], criterion=criterion_name, substitution_types=types,
+        "estimate_tree",
+        executable,
+        [output_path],
+        criterion=criterion_name,
+        substitution_types=types,
         taxon_count=len(matrix),
     )
 
@@ -787,11 +877,16 @@ def paup_estimate_ultrametric_tree(
         topology = _read_trees(dendropy, topology_path, matrix.taxon_namespace)[0]
     tree = _paup_call(
         "estimate_ultrametric_tree",
-        lambda: _paup.estimate_ultrametric_tree(matrix, topology_tree=topology, paup_path=executable),
+        lambda: _paup.estimate_ultrametric_tree(
+            matrix, topology_tree=topology, paup_path=executable
+        ),
     )
     _write_tree(tree, output_path)
     return _paup_result(
-        "estimate_ultrametric_tree", executable, [output_path], taxon_count=len(matrix),
+        "estimate_ultrametric_tree",
+        executable,
+        [output_path],
+        taxon_count=len(matrix),
         topology_given=topology is not None,
     )
 
@@ -845,7 +940,11 @@ def paup_estimate_model(
     )
     _write_tree(tree, output_path)
     return _paup_result(
-        "estimate_model", executable, [output_path], substitution_types=types, estimates=dict(estimates),
+        "estimate_model",
+        executable,
+        [output_path],
+        substitution_types=types,
+        estimates=dict(estimates),
     )
 
 
@@ -872,17 +971,24 @@ def paup_pscore_trees(
     tokens = [] if pset_options is None else list(pset_options)
     for token in tokens:
         if not isinstance(token, str) or not _PAUP_TOKEN.fullmatch(token):
-            raise ConfigurationError(f"pset_options must be plain PAUP* tokens such as gapmode=missing; got {token!r}.")
+            raise ConfigurationError(
+                f"pset_options must be plain PAUP* tokens such as gapmode=missing; got {token!r}."
+            )
     executable = _paup_executable(paup_path)
     matrix = _read_alignment(dendropy, source)
     trees = _read_trees(dendropy, tree_path, matrix.taxon_namespace)
     scores = _paup_call(
         "pscore",
         lambda: _paup.pscore_trees(
-            trees, matrix, pset_option_list=tokens or None, paup_path=executable,
+            trees,
+            matrix,
+            pset_option_list=tokens or None,
+            paup_path=executable,
         ),
     )
-    return _paup_result("pscore", executable, [], scores=[int(value) for value in scores], tree_count=len(trees))
+    return _paup_result(
+        "pscore", executable, [], scores=[int(value) for value in scores], tree_count=len(trees)
+    )
 
 
 def paup_prune_taxa(
@@ -920,7 +1026,10 @@ def paup_prune_taxa(
     with output_path.open("x") as handle:
         pruned.write_to_stream(handle, schema="nexus")
     return _paup_result(
-        "prune_taxa_from_trees", executable, [output_path], removed=[str(t.label) for t in selected],
+        "prune_taxa_from_trees",
+        executable,
+        [output_path],
+        removed=[str(t.label) for t in selected],
         tree_count=len(pruned),
     )
 

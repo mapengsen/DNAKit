@@ -10,7 +10,9 @@ from dnakit.exceptions import ConfigurationError
 from dnakit.microbiome import khmer_p27_read_parser_functions as m
 
 
-@pytest.mark.parametrize("text", [">one\nACGT\n", ">one\nacgtn\n>two\nN\n", "@one\nACGT\n+\nIIII\n"])
+@pytest.mark.parametrize(
+    "text", [">one\nACGT\n", ">one\nacgtn\n>two\nN\n", "@one\nACGT\n+\nIIII\n"]
+)
 def test_read_records_match_direct_parser(tmp_path, text):
     path = tmp_path / "reads.fa"
     path.write_text(text)
@@ -28,7 +30,9 @@ def test_pairs_match_direct_parser(tmp_path, length):
     path.write_text(f">r/1\n{'A' * length}\n>r/2\n{'T' * length}\n")
     expected = list(khmer.ReadParser(str(path)).iter_read_pairs())
     actual = m.khmer_parse_read_pairs(path, verbose=False)
-    assert [[r["name"] for r in pair] for pair in actual["records"]] == [[r.name for r in pair] for pair in expected]
+    assert [[r["name"] for r in pair] for pair in actual["records"]] == [
+        [r.name for r in pair] for pair in expected
+    ]
     assert actual["base_count"] == 2 * length
 
 

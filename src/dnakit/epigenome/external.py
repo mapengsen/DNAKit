@@ -29,7 +29,11 @@ def extract_methylation_methyldackel(
     alignment_path = input_path(alignment)
     if not isinstance(include_chg, bool) or not isinstance(include_chh, bool):
         raise ConfigurationError("include_chg and include_chh must be booleans.")
-    if not isinstance(program, str) or not program.strip() or any(char in program for char in "\x00\r\n"):
+    if (
+        not isinstance(program, str)
+        or not program.strip()
+        or any(char in program for char in "\x00\r\n")
+    ):
         raise ConfigurationError("program must be a non-empty executable name without newlines.")
     directory = workspace(output_directory)
     prefix = directory / "methylation"

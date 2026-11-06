@@ -10,7 +10,7 @@ Input handling is bounded: files and gzip streams are read up to ``max_bytes``, 
 unless an explicit ``output`` / ``output_dir`` option is given, and no network access happens.
 """
 
-# ruff: noqa: E501, RUF012
+# ruff: noqa: RUF012
 
 from __future__ import annotations
 

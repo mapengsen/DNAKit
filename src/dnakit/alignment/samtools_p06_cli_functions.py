@@ -32,7 +32,9 @@ def _flag_spec(value: str | None, name: str) -> list[str]:
     if value is None:
         return []
     if not isinstance(value, str) or not _FLAG_SPEC.match(value):
-        raise ConfigurationError(f"{name} must be a number (decimal or 0x hex) or comma-joined flag names.")
+        raise ConfigurationError(
+            f"{name} must be a number (decimal or 0x hex) or comma-joined flag names."
+        )
     return [value]
 
 
@@ -168,11 +170,16 @@ def samtools_coverage_histogram(
     if region is not None:
         arguments += ["-r", cli.text(region, "region")]
     arguments += [
-        "-l", str(cli.integer(min_read_length, "min_read_length", minimum=0)),
-        "-q", str(cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)),
-        "-Q", str(cli.integer(min_base_quality, "min_base_quality", minimum=0)),
-        "-d", str(cli.integer(max_depth, "max_depth", minimum=0)),
-        "--min-depth", str(cli.integer(min_depth, "min_depth", minimum=0)),
+        "-l",
+        str(cli.integer(min_read_length, "min_read_length", minimum=0)),
+        "-q",
+        str(cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)),
+        "-Q",
+        str(cli.integer(min_base_quality, "min_base_quality", minimum=0)),
+        "-d",
+        str(cli.integer(max_depth, "max_depth", minimum=0)),
+        "--min-depth",
+        str(cli.integer(min_depth, "min_depth", minimum=0)),
     ]
     for option, value in (("--rf", required_flags), ("--ff", excluded_flags)):
         for item in _flag_spec(value, option):
@@ -191,7 +198,9 @@ def samtools_coverage_histogram(
             tail = re.split(r"[│|]", line)[-1]
             for key, value in _HIST_STAT.findall(tail):
                 contigs[-1]["statistics"][key.strip()] = h.number(value.rstrip("x%"))
-    return h.result("samtools_coverage_histogram", done, outputs={"output": target}, contigs=contigs)
+    return h.result(
+        "samtools_coverage_histogram", done, outputs={"output": target}, contigs=contigs
+    )
 
 
 def samtools_checksum(

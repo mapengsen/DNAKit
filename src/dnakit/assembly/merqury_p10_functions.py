@@ -334,9 +334,12 @@ def merqury_kmer_multiplicity_track(
     # asm_multiplicity.sh tests for the FASTA (not the index) before indexing, so the index is made here
     import subprocess
 
-    subprocess.run(  # noqa: S603 - fixed argument vector, no shell
+    subprocess.run(
         [_check_programs(home, ["samtools"])["samtools"], "faidx", fasta_name],
-        cwd=directory, check=False, capture_output=True, timeout=600,
+        cwd=directory,
+        check=False,
+        capture_output=True,
+        timeout=600,
     )
     if kind == "assembly":
         script, wig, big = (
@@ -712,7 +715,11 @@ def merqury_combine_kmer_dbs(
     target = directory / result_name
     rendered = _run(script, arguments, home=home, cwd=directory, expected=[target], needs=needs)
     return _finish(
-        "merqury_combine_kmer_dbs", rendered, home, combine_operation=kind, database=str(target.resolve())
+        "merqury_combine_kmer_dbs",
+        rendered,
+        home,
+        combine_operation=kind,
+        database=str(target.resolve()),
     )
 
 
@@ -810,7 +817,9 @@ def merqury_hapmers(
     )
 
     def parse(_: str) -> dict[str, Any]:
-        databases = sorted(str(path) for path in directory.glob("*.meryl") if path.name not in names)
+        databases = sorted(
+            str(path) for path in directory.glob("*.meryl") if path.name not in names
+        )
         cutoffs: dict[str, int] = {}
         cut = directory / "cutoffs.txt"
         if cut.is_file():
@@ -1155,7 +1164,9 @@ def merqury_phase_blocks(
         rendered["status"] = "completed" if done else "failed"
         rendered["return_code"] = step["return_code"]
         if done and step["return_code"] != 0:
-            rendered["plot_warning"] = "the trailing blob plot of switch_error.sh failed; see log_tail"
+            rendered["plot_warning"] = (
+                "the trailing blob plot of switch_error.sh failed; see log_tail"
+            )
         rendered["log_tail"] = (rendered["log_tail"] + step["log_tail"])[-_cli.LOG_TAIL_CHARS :]
         text += step["_text"]
     rendered["_text"] = text
@@ -1437,9 +1448,17 @@ def merqury_plot_block_n(
         arguments.append("-p")
     suffix = "pdf" if pdf else "png"
     statistic = "NG" if genome_size else "N"
-    plots = [directory / f"{prefix}.{kind}.{statistic}.{suffix}" for kind in ("block", "continuity")]
+    plots = [
+        directory / f"{prefix}.{kind}.{statistic}.{suffix}" for kind in ("block", "continuity")
+    ]
     rendered = _run(
-        "plot/plot_block_N.R", arguments, home=home, cwd=directory, expected=plots, needs=[], interpreter="Rscript",
+        "plot/plot_block_N.R",
+        arguments,
+        home=home,
+        cwd=directory,
+        expected=plots,
+        needs=[],
+        interpreter="Rscript",
     )
     return _finish("merqury_plot_block_n", rendered, home, plots=[str(path) for path in plots])
 

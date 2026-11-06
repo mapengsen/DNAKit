@@ -86,7 +86,15 @@ from .pygenomeviz_gap_functions import (
     plot_genome_features,
 )
 
-__all__ = [*__all__, "compare_genomes_mmseqs", "compare_genomes_mummer", "compare_genomes_progressive_mauve", "load_example_dataset", "load_example_gff", "plot_genome_features"]
+__all__ = [
+    *__all__,
+    "compare_genomes_mmseqs",
+    "compare_genomes_mummer",
+    "compare_genomes_progressive_mauve",
+    "load_example_dataset",
+    "load_example_gff",
+    "plot_genome_features",
+]
 
 # Public integration of the reviewed P00–P45 operation packs.
 from .biopython_p19_graphics_functions import (

@@ -44,7 +44,17 @@ from dnakit.molecular_lab.varcode_gap_functions import (
 
 _MAX_VARIANTS = 100000
 _SAMPLE_KINDS = ("germline", "somatic", "mixed")
-_MANIFEST_COLUMNS = {"path", "kind", "assembly", "sample", "role", "label", "donor_id", "tumor_id", "normal_sample"}
+_MANIFEST_COLUMNS = {
+    "path",
+    "kind",
+    "assembly",
+    "sample",
+    "role",
+    "label",
+    "donor_id",
+    "tumor_id",
+    "normal_sample",
+}
 _SAMPLE_TSV_FIELDS = [
     "sample_a",
     "sample_b",
@@ -95,12 +105,18 @@ def _variant_records(values: object) -> list[Mapping[str, Any]]:
     if values is None:
         return []
     if isinstance(values, (str, bytes)) or not isinstance(values, Sequence):
-        raise ConfigurationError("variants must be a list of mappings with contig, start, ref and alt.")
+        raise ConfigurationError(
+            "variants must be a list of mappings with contig, start, ref and alt."
+        )
     records: list[Mapping[str, Any]] = []
     for item in values:
         if not isinstance(item, Mapping) or not {"contig", "start", "ref", "alt"} <= set(item):
             raise ConfigurationError("Each variant needs contig, start, ref and alt fields.")
-        if isinstance(item["start"], bool) or not isinstance(item["start"], int) or item["start"] < 1:
+        if (
+            isinstance(item["start"], bool)
+            or not isinstance(item["start"], int)
+            or item["start"] < 1
+        ):
             raise ConfigurationError("variant start must be a 1-based integer position.")
         records.append(item)
     return records
@@ -117,7 +133,9 @@ def _new_output(path: object, name: str) -> Path:
     return resolved
 
 
-def _reference(gtf: object, genome_fasta: object, cache_dir: object, genome: object) -> tuple[Any, str | None]:
+def _reference(
+    gtf: object, genome_fasta: object, cache_dir: object, genome: object
+) -> tuple[Any, str | None]:
     """Return the genome object for varcode and a reference label for the result."""
     if gtf is not None or genome_fasta is not None:
         if gtf is None or genome_fasta is None:
@@ -156,7 +174,9 @@ def _load_collections(
             collections.append(require("varcode.maf", _VARCODE_EXTRA).load_maf(str(path)))
         if records:
             if genome is None:
-                raise ConfigurationError("Explicit variants need gtf and genome_fasta, or a genome name.")
+                raise ConfigurationError(
+                    "Explicit variants need gtf and genome_fasta, or a genome name."
+                )
             collections.append(
                 varcode.VariantCollection(
                     [
@@ -175,11 +195,15 @@ def _load_collections(
                 )
             )
         for path in json_paths:
-            collections.append(varcode.VariantCollection.from_json(path.read_text(encoding="utf-8")))
+            collections.append(
+                varcode.VariantCollection.from_json(path.read_text(encoding="utf-8"))
+            )
     except ValueError as exc:
         raise ConfigurationError(f"varcode could not load the variants: {exc}") from exc
     if not collections:
-        raise ConfigurationError("No variants were given: pass vcf_paths, maf_paths, json_paths or variants.")
+        raise ConfigurationError(
+            "No variants were given: pass vcf_paths, maf_paths, json_paths or variants."
+        )
     return varcode.VariantCollection.union(*collections)
 
 
@@ -230,7 +254,12 @@ def varcode_load_variant_sources(
         "coordinates": "1-based inclusive",
         "reference": label,
         "count": len(rows),
-        "sources": {"vcf": len(vcf), "maf": len(maf), "json": len(json_files), "variant": len(records)},
+        "sources": {
+            "vcf": len(vcf),
+            "maf": len(maf),
+            "json": len(json_files),
+            "variant": len(records),
+        },
         "variants": rows,
     }
 
@@ -326,16 +355,26 @@ def _config(overrides: Mapping[str, Any] | None, sample_identity: Any) -> Any:
         raise ConfigurationError(f"Invalid config: {exc}") from exc
 
 
-def _manifest_samples(path: Path, assembly: str | None, settings: Any, sample_identity: Any) -> list[Any]:
+def _manifest_samples(
+    path: Path, assembly: str | None, settings: Any, sample_identity: Any
+) -> list[Any]:
     groups: dict[tuple[Path, str, str | None], list[Any]] = {}
     with path.open(newline="", encoding="utf-8") as source:
         reader = csv.DictReader(source, delimiter="\t" if path.suffix.lower() == ".tsv" else ",")
         if not reader.fieldnames or not {"path", "sample"} <= set(reader.fieldnames):
             raise ConfigurationError("Manifest requires path and sample columns.")
-        if len(set(reader.fieldnames)) != len(reader.fieldnames) or set(reader.fieldnames) - _MANIFEST_COLUMNS:
+        if (
+            len(set(reader.fieldnames)) != len(reader.fieldnames)
+            or set(reader.fieldnames) - _MANIFEST_COLUMNS
+        ):
             raise ConfigurationError("Duplicate or unknown manifest columns.")
         for number, row in enumerate(reader, 2):
-            if None in row or any(value is None for value in row.values()) or not row["path"] or not row["sample"]:
+            if (
+                None in row
+                or any(value is None for value in row.values())
+                or not row["path"]
+                or not row["sample"]
+            ):
                 raise ConfigurationError(f"Malformed manifest row {number}.")
             source_path = (path.parent / Path(row["path"]).expanduser()).resolve()
             key = (source_path, row.get("kind") or "germline", row.get("assembly") or assembly)
@@ -404,7 +443,9 @@ def varcode_check_sample_identity_files(
     }
     manifest = None if manifest_path is None else _file(manifest_path, "manifest_path")
     outputs = [Path(p).expanduser().resolve() for p in (json_output, tsv_output) if p is not None]
-    given_inputs = {path for paths in groups.values() for path in paths} | ({manifest} if manifest else set())
+    given_inputs = {path for paths in groups.values() for path in paths} | (
+        {manifest} if manifest else set()
+    )
     if given_inputs & set(outputs) or len(set(outputs)) != len(outputs):
         raise ConfigurationError("Output paths must differ from the inputs and from one another.")
     json_target = _new_output(json_output, "json_output") if json_output is not None else None
@@ -414,19 +455,25 @@ def varcode_check_sample_identity_files(
         for kind in _SAMPLE_KINDS:
             for path in groups[kind]:
                 samples.extend(
-                    sample_identity.load_vcf_samples(path, kind=kind, assembly=assembly, config=settings)
+                    sample_identity.load_vcf_samples(
+                        path, kind=kind, assembly=assembly, config=settings
+                    )
                 )
         if manifest is not None:
             samples.extend(_manifest_samples(manifest, assembly, settings, sample_identity))
         if not samples:
-            raise ConfigurationError("No samples: pass germline, somatic or mixed VCF files, or a manifest.")
+            raise ConfigurationError(
+                "No samples: pass germline, somatic or mixed VCF files, or a manifest."
+            )
         report = sample_identity.check_sample_identity(samples, config=settings)
     except ValueError as exc:
         raise ConfigurationError(f"Sample identity check failed: {exc}") from exc
     if {Path(sample.path).resolve() for sample in samples} & set(outputs):
         raise ConfigurationError("Output paths must differ from the inputs and from one another.")
     if json_target is not None:
-        json_target.write_text(json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+        json_target.write_text(
+            json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8"
+        )
     if tsv_target is not None:
         _write_sample_tsv(tsv_target, report)
     return {
@@ -451,7 +498,9 @@ def _write_rows(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
         writer.writeheader()
         writer.writerows(
             {
-                key: json.dumps(value, sort_keys=True) if isinstance(value, (dict, tuple, list)) else value
+                key: json.dumps(value, sort_keys=True)
+                if isinstance(value, (dict, tuple, list))
+                else value
                 for key, value in row.items()
             }
             for row in rows
@@ -493,7 +542,9 @@ def varcode_compare_sv_calls_directory(
         "call_count": len(result["members"]),
         "group_count": len(result["groups"]),
     }
-    (target / "comparison.json").write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf-8")
+    (target / "comparison.json").write_text(
+        json.dumps(result, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return {
         "operation": "compare_sv_calls_directory",
         "status": "completed",

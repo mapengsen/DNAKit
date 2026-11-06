@@ -41,7 +41,10 @@ def _opts(options: Mapping[str, object] | None) -> dict[str, object]:
 
 def _token(value: object, what: str) -> str:
     if isinstance(value, bool) or not isinstance(value, (str, int, float, os.PathLike)):
-        raise InputFormatError(f"{what} must be a string, number or path, got {type(value).__name__}.", code="INVALID_COMMAND")
+        raise InputFormatError(
+            f"{what} must be a string, number or path, got {type(value).__name__}.",
+            code="INVALID_COMMAND",
+        )
     text = os.fspath(value) if isinstance(value, os.PathLike) else str(value)
     if "\x00" in text:
         raise InputFormatError(f"{what} contains a NUL byte.", code="INVALID_COMMAND")
@@ -74,12 +77,26 @@ def _subcommand_tokens(settings: Mapping[str, object]) -> list[str]:
     sub = settings.get("subcommand")
     if sub is None:
         return []
-    items = [sub] if isinstance(sub, (str, os.PathLike)) else list(sub) if isinstance(sub, Sequence) and not isinstance(sub, bytes) else None  # type: ignore[call-overload]
+    items = (
+        [sub]
+        if isinstance(sub, (str, os.PathLike))
+        else list(sub)
+        if isinstance(sub, Sequence) and not isinstance(sub, bytes)
+        else None
+    )  # type: ignore[call-overload]
     if items is None or not items:
-        raise ConfigurationError("options.subcommand must be a non-empty string or list of strings.", code="INVALID_OPTION", hint="For example 'view' or ['index', 'build'].")
+        raise ConfigurationError(
+            "options.subcommand must be a non-empty string or list of strings.",
+            code="INVALID_OPTION",
+            hint="For example 'view' or ['index', 'build'].",
+        )
     tokens = [_token(item, "subcommand") for item in items]
     if any(not token.strip() for token in tokens):
-        raise ConfigurationError("options.subcommand must not contain empty strings.", code="INVALID_OPTION", hint="For example 'view' or ['index', 'build'].")
+        raise ConfigurationError(
+            "options.subcommand must not contain empty strings.",
+            code="INVALID_OPTION",
+            hint="For example 'view' or ['index', 'build'].",
+        )
     return tokens
 
 
@@ -94,7 +111,9 @@ def _argv(command: object, settings: Mapping[str, object]) -> list[str]:
     subcommand = _subcommand_tokens(settings)
     if isinstance(command, Mapping):
         if "program" not in command:
-            raise InputFormatError("A command mapping needs a 'program' key.", code="INVALID_COMMAND")
+            raise InputFormatError(
+                "A command mapping needs a 'program' key.", code="INVALID_COMMAND"
+            )
         argv = [_token(command["program"], "program"), *subcommand]
         argv += _flag_tokens(command.get("flags", {}))
         argv += [_token(item, "argument") for item in command.get("args", [])]
@@ -102,13 +121,18 @@ def _argv(command: object, settings: Mapping[str, object]) -> list[str]:
         try:
             argv = shlex.split(command)
         except ValueError as exc:
-            raise InputFormatError(f"Cannot split the command line: {exc}", code="INVALID_COMMAND") from exc
+            raise InputFormatError(
+                f"Cannot split the command line: {exc}", code="INVALID_COMMAND"
+            ) from exc
     elif isinstance(command, Sequence) and not isinstance(command, bytes):
         argv = [_token(item, "argument") for item in command]
     elif isinstance(command, os.PathLike):
         argv = [_token(command, "program")]
     else:
-        raise InputFormatError("input must be a program name, argv list, command line or mapping.", code="INVALID_COMMAND")
+        raise InputFormatError(
+            "input must be a program name, argv list, command line or mapping.",
+            code="INVALID_COMMAND",
+        )
     if subcommand and not isinstance(command, Mapping) and argv:
         argv[1:1] = subcommand
     if extra_flags:
@@ -131,7 +155,9 @@ def _text_of(value: object) -> str:
             return _text_of(Path(str(value["path"])))
         if isinstance(value.get("result"), Mapping):
             return _text_of(value["result"])
-        raise InputFormatError("The mapping needs a 'stdout', 'text' or 'path' key.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "The mapping needs a 'stdout', 'text' or 'path' key.", code="INVALID_INPUT"
+        )
     if isinstance(value, os.PathLike):
         path = Path(value)
         if not path.is_file():
@@ -172,7 +198,10 @@ def _parse_records(text: str, settings: Mapping[str, object]) -> tuple[str, list
         else:
             fmt = "lines"
     if fmt not in {"tsv", "csv", "json", "jsonl", "fasta", "lines"}:
-        raise ConfigurationError("options.format must be auto, tsv, csv, json, jsonl, fasta or lines.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.format must be auto, tsv, csv, json, jsonl, fasta or lines.",
+            code="INVALID_OPTION",
+        )
     if fmt == "lines":
         return fmt, [line for line in text.splitlines() if line.strip()]
     if fmt == "json":
@@ -185,7 +214,9 @@ def _parse_records(text: str, settings: Mapping[str, object]) -> tuple[str, list
         try:
             return fmt, [json.loads(line) for line in text.splitlines() if line.strip()]
         except ValueError as exc:
-            raise InputFormatError(f"Invalid JSON Lines output: {exc}", code="INVALID_OUTPUT") from exc
+            raise InputFormatError(
+                f"Invalid JSON Lines output: {exc}", code="INVALID_OUTPUT"
+            ) from exc
     if fmt == "fasta":
         records: list[object] = []
         current: dict[str, object] | None = None
@@ -202,7 +233,9 @@ def _parse_records(text: str, settings: Mapping[str, object]) -> tuple[str, list
                 identifier, _, description = header.partition(" ")
                 current, chunks = {"id": identifier, "description": description.strip()}, []
             elif current is None:
-                raise InputFormatError("FASTA output has sequence before the first header.", code="INVALID_OUTPUT")
+                raise InputFormatError(
+                    "FASTA output has sequence before the first header.", code="INVALID_OUTPUT"
+                )
             else:
                 chunks.append(line)
         if current is not None:
@@ -211,7 +244,11 @@ def _parse_records(text: str, settings: Mapping[str, object]) -> tuple[str, list
         return fmt, records
     delimiter = str(settings.get("delimiter", "\t" if fmt == "tsv" else ","))
     prefix = settings.get("comment_prefix", "#")
-    lines = [line for line in text.splitlines() if line.strip() and not (prefix and line.startswith(str(prefix)))]
+    lines = [
+        line
+        for line in text.splitlines()
+        if line.strip() and not (prefix and line.startswith(str(prefix)))
+    ]
     rows = list(csv.reader(lines, delimiter=delimiter))
     convert = settings.get("convert_types", True) is not False
     columns = settings.get("columns")
@@ -226,8 +263,15 @@ def _parse_records(text: str, settings: Mapping[str, object]) -> tuple[str, list
     for index, row in enumerate(body, start=1):
         keys = names or [f"column_{i}" for i in range(1, len(row) + 1)]
         if names and len(row) != len(names):
-            raise InputFormatError(f"Row {index} has {len(row)} fields, expected {len(names)}.", code="INVALID_OUTPUT")
-        records.append({key: (_convert(cell) if convert else cell) for key, cell in zip(keys, row)})
+            raise InputFormatError(
+                f"Row {index} has {len(row)} fields, expected {len(names)}.", code="INVALID_OUTPUT"
+            )
+        records.append(
+            {
+                key: (_convert(cell) if convert else cell)
+                for key, cell in zip(keys, row, strict=False)
+            }
+        )
     return fmt, records
 
 
@@ -248,7 +292,13 @@ def build_command(input: object, *, options: Mapping[str, object] | None = None)
 
     settings = _opts(options)
     argv = _argv(input, settings)
-    return candidate_ok(_MODULE, "build_command", input, {"argv": argv, "program": argv[0], "command_line": shlex.join(argv)}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "build_command",
+        input,
+        {"argv": argv, "program": argv[0], "command_line": shlex.join(argv)},
+        options=options,
+    )
 
 
 def check(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -261,21 +311,38 @@ def check(input: object, *, options: Mapping[str, object] | None = None) -> obje
     """
 
     settings = _opts(options)
-    programs = [input] if isinstance(input, (str, os.PathLike)) else list(input) if isinstance(input, Sequence) else None  # type: ignore[call-overload]
+    programs = (
+        [input]
+        if isinstance(input, (str, os.PathLike))
+        else list(input)
+        if isinstance(input, Sequence)
+        else None
+    )  # type: ignore[call-overload]
     if not programs:
-        raise InputFormatError("input must be a program name or a list of program names.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be a program name or a list of program names.", code="INVALID_INPUT"
+        )
     version_args = settings.get("version_args")
     timeout = float(settings.get("timeout", 10))
     rows = []
     for program in programs:
         name = _token(program, "program")
         path = shutil.which(name)
-        row: dict[str, object] = {"program": name, "available": path is not None, "path": path, "version": None}
+        row: dict[str, object] = {
+            "program": name,
+            "available": path is not None,
+            "path": path,
+            "version": None,
+        }
         if path is not None and version_args is not None:
             try:
                 completed = subprocess.run(
                     [path, *[_token(item, "version argument") for item in version_args]],  # type: ignore[union-attr]
-                    capture_output=True, text=True, timeout=timeout, check=False, stdin=subprocess.DEVNULL,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    check=False,
+                    stdin=subprocess.DEVNULL,
                 )
                 lines = (completed.stdout + completed.stderr).strip().splitlines()
                 row["version"] = lines[0] if lines else ""
@@ -283,7 +350,13 @@ def check(input: object, *, options: Mapping[str, object] | None = None) -> obje
                 row["version"] = None
                 row["version_error"] = f"timed out after {timeout} s"
         rows.append(row)
-    return candidate_ok(_MODULE, "check", input, {"all_available": all(r["available"] for r in rows), "programs": rows}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "check",
+        input,
+        {"all_available": all(r["available"] for r in rows), "programs": rows},
+        options=options,
+    )
 
 
 def convert_input(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -299,11 +372,15 @@ def convert_input(input: object, *, options: Mapping[str, object] | None = None)
     settings = _opts(options)
     target = str(settings.get("target_format", "fasta"))
     if target not in {"fasta", "fastq", "tsv"}:
-        raise ConfigurationError("options.target_format must be fasta, fastq or tsv.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.target_format must be fasta, fastq or tsv.", code="INVALID_OPTION"
+        )
     width = int(settings.get("line_width", 80))
     quality = str(settings.get("quality", "I"))
     if width < 0 or len(quality) != 1:
-        raise ConfigurationError("line_width must be >= 0 and quality a single character.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "line_width must be >= 0 and quality a single character.", code="INVALID_OPTION"
+        )
     records: list[tuple[str, str]] = []
 
     def add(identifier: object, sequence: object) -> None:
@@ -311,9 +388,16 @@ def convert_input(input: object, *, options: Mapping[str, object] | None = None)
             normalized = normalize_dna_sequence(str(sequence))
         except ValueError as exc:
             raise InputFormatError(str(exc), code="INVALID_SEQUENCE") from exc
-        records.append((str(identifier) if identifier not in (None, "") else f"seq{len(records) + 1}", normalized))
+        records.append(
+            (
+                str(identifier) if identifier not in (None, "") else f"seq{len(records) + 1}",
+                normalized,
+            )
+        )
 
-    if isinstance(input, (str, os.PathLike)) and (isinstance(input, os.PathLike) or str(input).lstrip().startswith(">")):
+    if isinstance(input, (str, os.PathLike)) and (
+        isinstance(input, os.PathLike) or str(input).lstrip().startswith(">")
+    ):
         _, parsed = _parse_records(_text_of(input), {"format": "fasta"})
         for record in parsed:
             add(record["id"], record["sequence"])  # type: ignore[index]
@@ -328,19 +412,31 @@ def convert_input(input: object, *, options: Mapping[str, object] | None = None)
             else:
                 add(None, item)
     else:
-        raise InputFormatError("input must be FASTA text, a sequence or a list of records.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be FASTA text, a sequence or a list of records.", code="INVALID_INPUT"
+        )
     if not records:
         raise InputFormatError("No sequence records were found.", code="INVALID_INPUT")
     lines: list[str] = []
     for identifier, sequence in records:
         if target == "fasta":
             lines.append(f">{identifier}")
-            lines.extend([sequence[i:i + width] for i in range(0, len(sequence), width)] if width else [sequence])
+            lines.extend(
+                [sequence[i : i + width] for i in range(0, len(sequence), width)]
+                if width
+                else [sequence]
+            )
         elif target == "fastq":
             lines.extend((f"@{identifier}", sequence, "+", quality * len(sequence)))
         else:
             lines.append(f"{identifier}\t{sequence}")
-    return candidate_ok(_MODULE, "convert_input", input, {"format": target, "text": "\n".join(lines) + "\n", "record_count": len(records)}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "convert_input",
+        input,
+        {"format": target, "text": "\n".join(lines) + "\n", "record_count": len(records)},
+        options=options,
+    )
 
 
 def convert_output(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -356,7 +452,9 @@ def convert_output(input: object, *, options: Mapping[str, object] | None = None
     settings = _opts(options)
     target = str(settings.get("target_format", "json"))
     if target not in {"json", "jsonl", "tsv", "csv"}:
-        raise ConfigurationError("options.target_format must be json, jsonl, tsv or csv.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.target_format must be json, jsonl, tsv or csv.", code="INVALID_OPTION"
+        )
     _, records = _parse_records(_text_of(input), settings)
     if target == "json":
         text = json.dumps(records, indent=2, ensure_ascii=False) + "\n"
@@ -364,7 +462,9 @@ def convert_output(input: object, *, options: Mapping[str, object] | None = None
         text = "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in records)
     else:
         if any(not isinstance(record, Mapping) for record in records):
-            raise InputFormatError("Tabular targets need dictionary records.", code="INVALID_OUTPUT")
+            raise InputFormatError(
+                "Tabular targets need dictionary records.", code="INVALID_OUTPUT"
+            )
         columns = list(dict.fromkeys(key for record in records for key in record))  # type: ignore[union-attr]
         buffer = io.StringIO()
         writer = csv.writer(buffer, delimiter="\t" if target == "tsv" else ",", lineterminator="\n")
@@ -372,11 +472,22 @@ def convert_output(input: object, *, options: Mapping[str, object] | None = None
         for record in records:
             writer.writerow(["" if record.get(key) is None else record[key] for key in columns])  # type: ignore[union-attr]
         text = buffer.getvalue()
-    return candidate_ok(_MODULE, "convert_output", input, {"format": target, "text": text, "record_count": len(records)}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "convert_output",
+        input,
+        {"format": target, "text": text, "record_count": len(records)},
+        options=options,
+    )
 
 
 _LEVELS = (
-    ("error", re.compile(r"\b(?:fatal|critical|error|exception|traceback|segmentation fault)\b", re.IGNORECASE)),
+    (
+        "error",
+        re.compile(
+            r"\b(?:fatal|critical|error|exception|traceback|segmentation fault)\b", re.IGNORECASE
+        ),
+    ),
     ("warning", re.compile(r"\b(?:warn|warning)\b", re.IGNORECASE)),
     ("info", re.compile(r"\binfo\b", re.IGNORECASE)),
     ("debug", re.compile(r"\bdebug\b", re.IGNORECASE)),
@@ -393,9 +504,15 @@ def make_report(input: object, *, options: Mapping[str, object] | None = None) -
     """
 
     settings = _opts(options)
-    run = input["result"] if isinstance(input, Mapping) and isinstance(input.get("result"), Mapping) else input
+    run = (
+        input["result"]
+        if isinstance(input, Mapping) and isinstance(input.get("result"), Mapping)
+        else input
+    )
     if not isinstance(run, Mapping) or "argv" not in run or "returncode" not in run:
-        raise InputFormatError("input must be a run result with 'argv' and 'returncode'.", code="INVALID_INPUT")
+        raise InputFormatError(
+            "input must be a run result with 'argv' and 'returncode'.", code="INVALID_INPUT"
+        )
     output_format = str(settings.get("format", "markdown"))
     if output_format not in {"markdown", "json"}:
         raise ConfigurationError("options.format must be markdown or json.", code="INVALID_OPTION")
@@ -403,18 +520,41 @@ def make_report(input: object, *, options: Mapping[str, object] | None = None) -
     stdout, stderr = str(run.get("stdout", "")), str(run.get("stderr", ""))
     log = _log_summary(stderr + "\n" + stdout if stderr else stdout)
     summary = {
-        "command": shlex.join([str(item) for item in run["argv"]]), "returncode": run["returncode"],
-        "success": run["returncode"] == 0, "duration_s": run.get("duration_s"), "log": log,
-        "stdout_head": stdout.splitlines()[:max_lines], "stderr_head": stderr.splitlines()[:max_lines],
+        "command": shlex.join([str(item) for item in run["argv"]]),
+        "returncode": run["returncode"],
+        "success": run["returncode"] == 0,
+        "duration_s": run.get("duration_s"),
+        "log": log,
+        "stdout_head": stdout.splitlines()[:max_lines],
+        "stderr_head": stderr.splitlines()[:max_lines],
     }
     if output_format == "json":
-        return candidate_ok(_MODULE, "make_report", input, {"format": "json", "report": summary}, options=options)
-    lines = [f"# {settings.get('title', 'External program run')}", "", f"- command: `{summary['command']}`", f"- return code: {summary['returncode']}",
-             f"- success: {'yes' if summary['success'] else 'no'}", f"- duration: {summary['duration_s']} s",
-             f"- log: {log['levels']['error']} error, {log['levels']['warning']} warning line(s)", "", "## stdout (head)", ""]
+        return candidate_ok(
+            _MODULE, "make_report", input, {"format": "json", "report": summary}, options=options
+        )
+    lines = [
+        f"# {settings.get('title', 'External program run')}",
+        "",
+        f"- command: `{summary['command']}`",
+        f"- return code: {summary['returncode']}",
+        f"- success: {'yes' if summary['success'] else 'no'}",
+        f"- duration: {summary['duration_s']} s",
+        f"- log: {log['levels']['error']} error, {log['levels']['warning']} warning line(s)",
+        "",
+        "## stdout (head)",
+        "",
+    ]
     lines += ["    " + line for line in summary["stdout_head"]] or ["(empty)"]
-    lines += ["", "## stderr (head)", ""] + (["    " + line for line in summary["stderr_head"]] or ["(empty)"])
-    return candidate_ok(_MODULE, "make_report", input, {"format": "markdown", "report": "\n".join(lines) + "\n"}, options=options)
+    lines += ["", "## stderr (head)", ""] + (
+        ["    " + line for line in summary["stderr_head"]] or ["(empty)"]
+    )
+    return candidate_ok(
+        _MODULE,
+        "make_report",
+        input,
+        {"format": "markdown", "report": "\n".join(lines) + "\n"},
+        options=options,
+    )
 
 
 def _log_summary(text: str, *, sample: int = 100) -> dict[str, object]:
@@ -431,7 +571,13 @@ def _log_summary(text: str, *, sample: int = 100) -> dict[str, object]:
                 if name in samples and len(samples[name]) < sample:
                     samples[name].append({"line": number, "text": line.strip()[:500]})
                 break
-    return {"line_count": count, "levels": levels, "errors": samples["error"], "warnings": samples["warning"], "has_errors": levels["error"] > 0}
+    return {
+        "line_count": count,
+        "levels": levels,
+        "errors": samples["error"],
+        "warnings": samples["warning"],
+        "has_errors": levels["error"] > 0,
+    }
 
 
 def parse_log(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -465,7 +611,13 @@ def parse_output(input: object, *, options: Mapping[str, object] | None = None) 
 
     settings = _opts(options)
     fmt, records = _parse_records(_text_of(input), settings)
-    return candidate_ok(_MODULE, "parse_output", input, {"format": fmt, "records": records, "record_count": len(records)}, options=options)
+    return candidate_ok(
+        _MODULE,
+        "parse_output",
+        input,
+        {"format": fmt, "records": records, "record_count": len(records)},
+        options=options,
+    )
 
 
 def run(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -485,14 +637,22 @@ def run(input: object, *, options: Mapping[str, object] | None = None) -> object
     argv = _argv(input, settings)
     timeout = float(settings.get("timeout", 60))
     if not 0 < timeout <= 3600:
-        raise ConfigurationError("options.timeout must be in (0, 3600] seconds.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.timeout must be in (0, 3600] seconds.", code="INVALID_OPTION"
+        )
     cap = int(settings.get("max_output_bytes", 1_000_000))
     if cap < 1:
-        raise ConfigurationError("options.max_output_bytes must be positive.", code="INVALID_OPTION")
+        raise ConfigurationError(
+            "options.max_output_bytes must be positive.", code="INVALID_OPTION"
+        )
     program = shutil.which(argv[0])
     if program is None:
         return candidate_not_implemented(
-            _MODULE, "run", input, options=options, requires=f"the external program {argv[0]!r} on PATH",
+            _MODULE,
+            "run",
+            input,
+            options=options,
+            requires=f"the external program {argv[0]!r} on PATH",
             message=f"The external program {argv[0]!r} was not found on PATH, so it was not run.",
         )
     cwd = settings.get("cwd")
@@ -503,29 +663,53 @@ def run(input: object, *, options: Mapping[str, object] | None = None) -> object
         extra = settings["env"]
         if not isinstance(extra, Mapping):
             raise ConfigurationError("options.env must be a mapping.", code="INVALID_OPTION")
-        environment = {**os.environ, **{_token(k, "env name"): _token(v, "env value") for k, v in extra.items()}}
+        environment = {
+            **os.environ,
+            **{_token(k, "env name"): _token(v, "env value") for k, v in extra.items()},
+        }
     stdin_text = settings.get("stdin")
     started = time.monotonic()
     try:
         completed = subprocess.run(
-            [program, *argv[1:]], capture_output=True, timeout=timeout, check=False, cwd=cwd, env=environment,
+            [program, *argv[1:]],
+            capture_output=True,
+            timeout=timeout,
+            check=False,
+            cwd=cwd,
+            env=environment,
             input=None if stdin_text is None else str(stdin_text).encode("utf-8"),
             stdin=subprocess.DEVNULL if stdin_text is None else None,
         )
     except subprocess.TimeoutExpired as exc:
-        raise BackendTimeoutError(f"{argv[0]} did not finish within {timeout} s and was killed.", code="EXTERNAL_PROGRAM_TIMEOUT") from exc
+        raise BackendTimeoutError(
+            f"{argv[0]} did not finish within {timeout} s and was killed.",
+            code="EXTERNAL_PROGRAM_TIMEOUT",
+        ) from exc
     except OSError as exc:
-        raise ConfigurationError(f"{argv[0]} could not be started: {exc}", code="EXTERNAL_PROGRAM_FAILED_TO_START") from exc
+        raise ConfigurationError(
+            f"{argv[0]} could not be started: {exc}", code="EXTERNAL_PROGRAM_FAILED_TO_START"
+        ) from exc
     duration = round(time.monotonic() - started, 6)
     truncated = len(completed.stdout) > cap or len(completed.stderr) > cap
     result = {
-        "argv": [program, *argv[1:]], "returncode": completed.returncode, "success": completed.returncode == 0,
+        "argv": [program, *argv[1:]],
+        "returncode": completed.returncode,
+        "success": completed.returncode == 0,
         "stdout": completed.stdout[:cap].decode("utf-8", errors="replace"),
         "stderr": completed.stderr[:cap].decode("utf-8", errors="replace"),
-        "duration_s": duration, "truncated": truncated,
+        "duration_s": duration,
+        "truncated": truncated,
     }
     warnings = [f"output truncated to {cap} bytes per stream"] if truncated else []
-    return candidate_ok(_MODULE, "run", input, result, options=options, warnings=warnings, implementation="subprocess")
+    return candidate_ok(
+        _MODULE,
+        "run",
+        input,
+        result,
+        options=options,
+        warnings=warnings,
+        implementation="subprocess",
+    )
 
 
 def validate_output(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -541,10 +725,18 @@ def validate_output(input: object, *, options: Mapping[str, object] | None = Non
 
     settings = _opts(options)
     text = _text_of(input)
-    checks: list[dict[str, object]] = [{"name": "not_empty", "passed": bool(text.strip()), "detail": f"{len(text)} characters"}]
+    checks: list[dict[str, object]] = [
+        {"name": "not_empty", "passed": bool(text.strip()), "detail": f"{len(text)} characters"}
+    ]
     if isinstance(input, Mapping) and "returncode" in input:
         expected = int(settings.get("expected_returncode", 0))
-        checks.append({"name": "returncode", "passed": input["returncode"] == expected, "detail": f"got {input['returncode']}, expected {expected}"})
+        checks.append(
+            {
+                "name": "returncode",
+                "passed": input["returncode"] == expected,
+                "detail": f"got {input['returncode']}, expected {expected}",
+            }
+        )
     records: list[object] | None = None
     if "format" in settings:
         try:
@@ -554,20 +746,67 @@ def validate_output(input: object, *, options: Mapping[str, object] | None = Non
             checks.append({"name": "parses", "passed": False, "detail": exc.message})
     if "min_records" in settings:
         count = None if records is None else len(records)
-        checks.append({"name": "min_records", "passed": count is not None and count >= int(settings["min_records"]), "detail": f"{count} records, need {settings['min_records']}"})  # type: ignore[call-overload]
+        checks.append(
+            {
+                "name": "min_records",
+                "passed": count is not None and count >= int(settings["min_records"]),
+                "detail": f"{count} records, need {settings['min_records']}",
+            }
+        )  # type: ignore[call-overload]
     if "required_columns" in settings:
-        keys = set().union(*(r.keys() for r in records if isinstance(r, Mapping))) if records else set()
+        keys = (
+            set().union(*(r.keys() for r in records if isinstance(r, Mapping)))
+            if records
+            else set()
+        )
         missing = [str(c) for c in settings["required_columns"] if c not in keys]  # type: ignore[union-attr]
-        checks.append({"name": "required_columns", "passed": records is not None and not missing, "detail": f"missing: {missing}"})
+        checks.append(
+            {
+                "name": "required_columns",
+                "passed": records is not None and not missing,
+                "detail": f"missing: {missing}",
+            }
+        )
     for needle in settings.get("must_contain", []):  # type: ignore[union-attr]
-        checks.append({"name": "must_contain", "passed": str(needle) in text, "detail": f"{needle!r}"})
-    return candidate_ok(_MODULE, "validate_output", input, {"valid": all(c["passed"] for c in checks), "checks": checks}, options=options)
+        checks.append(
+            {"name": "must_contain", "passed": str(needle) in text, "detail": f"{needle!r}"}
+        )
+    return candidate_ok(
+        _MODULE,
+        "validate_output",
+        input,
+        {"valid": all(c["passed"] for c in checks), "checks": checks},
+        options=options,
+    )
 
 
-__all__ = ['build_command', 'check', 'convert_input', 'convert_output', 'make_report', 'parse_log', 'parse_output', 'run', 'validate_output']
+__all__ = [
+    "build_command",
+    "check",
+    "convert_input",
+    "convert_output",
+    "make_report",
+    "parse_log",
+    "parse_output",
+    "run",
+    "validate_output",
+]
 
-__candidate_adapter_operations__ = set(['build_command', 'check', 'convert_input', 'convert_output', 'make_report', 'parse_log', 'parse_output', 'run', 'validate_output'])
+__candidate_adapter_operations__ = set(
+    [
+        "build_command",
+        "check",
+        "convert_input",
+        "convert_output",
+        "make_report",
+        "parse_log",
+        "parse_output",
+        "run",
+        "validate_output",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 _register_public_verbose(globals())

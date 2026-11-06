@@ -5,7 +5,7 @@ Trees are parsed into :class:`Node` objects by an iterative scanner (no recursio
 brackets are discarded; underscores in unquoted labels are kept as they are.
 """
 
-# ruff: noqa: E501, RUF012, B905
+# ruff: noqa: RUF012, B905
 
 from __future__ import annotations
 

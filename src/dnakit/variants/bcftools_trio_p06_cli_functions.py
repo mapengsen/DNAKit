@@ -82,10 +82,18 @@ def bcftools_parental_origin(
     if len(names) != 3:
         raise ConfigurationError("trio must be [proband, father, mother].")
     options = [
-        "-p", ",".join(names),
-        "-t", cli.choice(cnv_type, _CNV_TYPES, "cnv_type"),
-        "-r", cli.text(region, "region"),
-        "-b", repr(cli.number(min_binomial_probability, "min_binomial_probability", minimum=0.0, maximum=1.0)),
+        "-p",
+        ",".join(names),
+        "-t",
+        cli.choice(cnv_type, _CNV_TYPES, "cnv_type"),
+        "-r",
+        cli.text(region, "region"),
+        "-b",
+        repr(
+            cli.number(
+                min_binomial_probability, "min_binomial_probability", minimum=0.0, maximum=1.0
+            )
+        ),
     ]
     if h.flag(greedy, "greedy"):
         options.append("-g")
@@ -98,8 +106,14 @@ def bcftools_parental_origin(
     if exclude is not None:
         options += ["-e", cli.text(exclude, "exclude")]
     run = h.run_text_plugin(
-        "bcftools_parental_origin", "parental-origin", vcf_path, output_path, options=options,
-        separator=False, header="none", bcftools_path=bcftools_path,
+        "bcftools_parental_origin",
+        "parental-origin",
+        vcf_path,
+        output_path,
+        options=options,
+        separator=False,
+        header="none",
+        bcftools_path=bcftools_path,
     )
     for row in run["report"]["rows"]:
         if len(row) >= 4 and row[0] in _CNV_TYPES:
@@ -143,14 +157,32 @@ def bcftools_trio_stats(
             cli.choice(item, ("mendel-errors", "transmitted"), "debug")
         options += ["-d", ",".join(items)]
     run = h.run_text_plugin(
-        "bcftools_trio_stats", "trio-stats", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        header="none", bcftools_path=bcftools_path,
+        "bcftools_trio_stats",
+        "trio-stats",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        header="none",
+        bcftools_path=bcftools_path,
     )
     run["trio_columns"] = [
-        "filter", "child", "father", "mother", "valid_gts", "non_ref_gts", "dnm_or_mendel_errors",
-        "novel_singletons", "untransmitted_singletons", "transmitted_singletons", "ts", "tv",
-        "ts_tv", "homozygous_dnm", "recurrent_dnm",
+        "filter",
+        "child",
+        "father",
+        "mother",
+        "valid_gts",
+        "non_ref_gts",
+        "dnm_or_mendel_errors",
+        "novel_singletons",
+        "untransmitted_singletons",
+        "transmitted_singletons",
+        "ts",
+        "tv",
+        "ts_tv",
+        "homozygous_dnm",
+        "recurrent_dnm",
     ]
     run["trios"] = [
         dict(zip(run["trio_columns"], row, strict=False))
@@ -176,11 +208,24 @@ def bcftools_trio_switch_rate(
     switch percentage) and ``POP`` rows per population; they are parsed into ``trios``.
     """
     run = h.run_text_plugin(
-        "bcftools_trio_switch_rate", "trio-switch-rate", vcf_path, output_path,
+        "bcftools_trio_switch_rate",
+        "trio-switch-rate",
+        vcf_path,
+        output_path,
         options=["-p", str(cli.existing_file(ped_path, "ped_path"))],
-        general=h.selection(regions=regions), header="none", bcftools_path=bcftools_path,
+        general=h.selection(regions=regions),
+        header="none",
+        bcftools_path=bcftools_path,
     )
-    names = ["father", "mother", "child", "tested", "mendelian_errors", "switches", "switch_percent"]
+    names = [
+        "father",
+        "mother",
+        "child",
+        "tested",
+        "mendelian_errors",
+        "switches",
+        "switch_percent",
+    ]
     run["trios"] = [
         dict(zip(names, row[1:], strict=False))
         for row in run["report"]["rows"]
@@ -227,16 +272,30 @@ def bcftools_mendelian_consistency(
     general = h.selection(regions=regions, include=include, exclude=exclude)
     if mode == "c":
         return h.run_text_plugin(
-            "bcftools_mendelian_consistency", "mendelian2", vcf_path, output_path,
-            options=[*options, "-m", "c"], general=general, separator=False, header="none",
-            bcftools_path=bcftools_path, mode=mode,
+            "bcftools_mendelian_consistency",
+            "mendelian2",
+            vcf_path,
+            output_path,
+            options=[*options, "-m", "c"],
+            general=general,
+            separator=False,
+            header="none",
+            bcftools_path=bcftools_path,
+            mode=mode,
         )
     if not set(mode) <= _MENDELIAN_MODES:
         raise ConfigurationError("mode must be 'c' or a string of the letters a d e E g m M S.")
     return h.run_vcf_plugin(
-        "bcftools_mendelian_consistency", "mendelian2", vcf_path, output_path,
-        options=[*options, "-m", mode], general=general, separator=False, output_type=output_type,
-        bcftools_path=bcftools_path, mode=mode,
+        "bcftools_mendelian_consistency",
+        "mendelian2",
+        vcf_path,
+        output_path,
+        options=[*options, "-m", mode],
+        general=general,
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
+        mode=mode,
     )
 
 
@@ -293,7 +352,10 @@ def bcftools_trio_denovo(
     if not isinstance(dnm_tag, str) or not _DNM_TAG.match(dnm_tag):
         raise ConfigurationError("dnm_tag must look like DNM or DNM:log (log, flag, phred, prob).")
     options += ["--dnm-tag", dnm_tag, "-X", cli.text(chrx_regions, "chrx_regions")]
-    options += ["--mrate", repr(cli.number(mutation_rate, "mutation_rate", minimum=0.0, maximum=1.0))]
+    options += [
+        "--mrate",
+        repr(cli.number(mutation_rate, "mutation_rate", minimum=0.0, maximum=1.0)),
+    ]
     if min_score is not None:
         options += ["-m", repr(cli.number(min_score, "min_score"))]
     if h.flag(strictly_novel, "strictly_novel"):
@@ -307,7 +369,9 @@ def bcftools_trio_denovo(
         if value is None:
             return
         if kind not in models:
-            raise ConfigurationError(f"{name} applies to the model(s) {', '.join(models)}, not {kind}.")
+            raise ConfigurationError(
+                f"{name} applies to the model(s) {', '.join(models)}, not {kind}."
+            )
         options.extend([flag_name, repr(cli.number(value, name))])
 
     only(noise_prior, "noise_prior", "--np", ("dmm", "alm"))
@@ -321,9 +385,16 @@ def bcftools_trio_denovo(
             raise ConfigurationError("use_child_ad applies to the dmm model.")
         options.append("--with-cAD")
     return h.run_vcf_plugin(
-        "bcftools_trio_denovo", "trio-dnm3", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        output_type=output_type, bcftools_path=bcftools_path, model=kind,
+        "bcftools_trio_denovo",
+        "trio-dnm3",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
+        model=kind,
     )
 
 

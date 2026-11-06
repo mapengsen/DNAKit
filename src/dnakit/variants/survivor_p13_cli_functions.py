@@ -160,13 +160,24 @@ def survivor_simulate_sv_genome(
         "INV_del": inversion_deletion,
         "INV_dup": inversion_duplication,
     }
-    checked = {key: _triplet(value, name) for (key, name, _), value in zip(_SIM_TYPES, supplied.values(), strict=True)}
-    chosen = _cli.existing_file(parameter_file, "parameter_file") if parameter_file is not None else None
+    checked = {
+        key: _triplet(value, name)
+        for (key, name, _), value in zip(_SIM_TYPES, supplied.values(), strict=True)
+    }
+    chosen = (
+        _cli.existing_file(parameter_file, "parameter_file") if parameter_file is not None else None
+    )
     _check(survivor_path)
     if chosen is None:
         parameters.write_text(_sim_parameter_text(checked), encoding="utf-8")
         chosen = parameters
-    args = [str(reference), str(chosen), repr(rate), "0" if mode == "simulated_reads" else "1", str(prefix)]
+    args = [
+        str(reference),
+        str(chosen),
+        repr(rate),
+        "0" if mode == "simulated_reads" else "1",
+        str(prefix),
+    ]
     result = _run(
         "simSV",
         args,
@@ -183,10 +194,16 @@ def survivor_simulate_sv_genome(
 
 
 def _samtools_text(
-    alignments: Path, reference: Path | None, samtools_path: str | None, work: Path, timeout_seconds: float
+    alignments: Path,
+    reference: Path | None,
+    samtools_path: str | None,
+    work: Path,
+    timeout_seconds: float,
 ) -> Path:
     """Write the alignment records (no header) as SAM text; BAM/CRAM and MD-tag creation need samtools."""
-    hint = "Install samtools (for example `conda install -c bioconda samtools`) or pass samtools_path."
+    hint = (
+        "Install samtools (for example `conda install -c bioconda samtools`) or pass samtools_path."
+    )
     target = work / "alignments.sam"
     suffix = alignments.suffix.lower()
     if suffix in (".bam", ".cram") or reference is not None:
@@ -205,7 +222,9 @@ def _samtools_text(
                 timeout_seconds=timeout_seconds,
             )
             if result["status"] != "completed":
-                raise ConfigurationError(f"samtools could not read the alignments: {result['log_tail'][-500:]}")
+                raise ConfigurationError(
+                    f"samtools could not read the alignments: {result['log_tail'][-500:]}"
+                )
             _strip_header(raw, target)
         return target
     _strip_header(alignments, target)
@@ -213,7 +232,10 @@ def _samtools_text(
 
 
 def _strip_header(source: Path, target: Path) -> None:
-    with source.open(encoding="utf-8", errors="replace") as reader, target.open("w", encoding="utf-8") as writer:
+    with (
+        source.open(encoding="utf-8", errors="replace") as reader,
+        target.open("w", encoding="utf-8") as writer,
+    ):
         for line in reader:
             if not line.startswith("@"):
                 writer.write(line)
@@ -239,12 +261,16 @@ def survivor_scan_read_error_profile(
     and is written to ``output_path``. BAM/CRAM input and ``reference_path`` need samtools.
     """
     alignments = _cli.existing_file(alignments_path, "alignments_path")
-    reference = _cli.existing_file(reference_path, "reference_path") if reference_path is not None else None
+    reference = (
+        _cli.existing_file(reference_path, "reference_path") if reference_path is not None else None
+    )
     minimum = _cli.integer(min_read_length, "min_read_length", minimum=1)
     _check(survivor_path)
     out = _cli.new_file(output_path, "output_path")
     with tempfile.TemporaryDirectory(dir=out.parent) as scratch:
-        records = _samtools_text(alignments, reference, samtools_path, Path(scratch), timeout_seconds)
+        records = _samtools_text(
+            alignments, reference, samtools_path, Path(scratch), timeout_seconds
+        )
         result = _p13.run_to_file(
             _PROGRAM,
             ["scanreads", str(minimum), str(out)],
@@ -380,7 +406,11 @@ def survivor_filter_sv_vcf(
     in ``records_in`` and ``records_out``.
     """
     vcf = _cli.existing_file(vcf_path, "vcf_path")
-    regions = str(_cli.existing_file(ignore_regions_bed, "ignore_regions_bed")) if ignore_regions_bed else "NA"
+    regions = (
+        str(_cli.existing_file(ignore_regions_bed, "ignore_regions_bed"))
+        if ignore_regions_bed
+        else "NA"
+    )
     low = _size(min_size, "min_size")
     high = _size(max_size, "max_size")
     if low >= 0 and high >= 0 and low > high:
@@ -445,12 +475,20 @@ def _stats_totals(text: str) -> dict[str, int]:
         if line.startswith("Tot\t") and index + 1 < len(lines):
             names = line.split("\t")
             values = lines[index + 1].split("\t")
-            return {name: int(value) for name, value in zip(names, values, strict=False) if value.strip().isdigit()}
+            return {
+                name: int(value)
+                for name, value in zip(names, values, strict=False)
+                if value.strip().isdigit()
+            }
     return {}
 
 
 def _length_table(path: Path) -> list[dict[str, Any]]:
-    lines = [line for line in path.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()]
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()
+        if line.strip()
+    ]
     if not lines:
         return []
     names = lines[0].split("\t")
@@ -482,7 +520,11 @@ def survivor_annotate_sv_with_mummer(
     are annotated. ``changed_records`` counts the records that differ from the input VCF.
     """
     vcf = _cli.existing_file(vcf_path, "vcf_path")
-    if isinstance(show_diff_paths, str) or not isinstance(show_diff_paths, Sequence) or not show_diff_paths:
+    if (
+        isinstance(show_diff_paths, str)
+        or not isinstance(show_diff_paths, Sequence)
+        or not show_diff_paths
+    ):
         raise ConfigurationError("show_diff_paths must be a non-empty list of files.")
     diffs = [_cli.existing_file(path, "show_diff_paths") for path in show_diff_paths]
     distance = _cli.integer(max_distance, "max_distance", minimum=0)
@@ -501,7 +543,11 @@ def survivor_annotate_sv_with_mummer(
     result["list_file"] = str(listing)
     if out.is_file():
         before = set(vcf.read_text(encoding="utf-8", errors="replace").splitlines())
-        after = [line for line in out.read_text(encoding="utf-8", errors="replace").splitlines() if not line.startswith("#")]
+        after = [
+            line
+            for line in out.read_text(encoding="utf-8", errors="replace").splitlines()
+            if not line.startswith("#")
+        ]
         result["changed_records"] = sum(1 for line in after if line not in before)
     return result
 
@@ -738,7 +784,11 @@ def survivor_parental_phasing(
         timeout_seconds=timeout_seconds,
     )
     result["rows"] = (
-        [line.split("\t") for line in out.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()]
+        [
+            line.split("\t")
+            for line in out.read_text(encoding="utf-8", errors="replace").splitlines()
+            if line.strip()
+        ]
         if out.is_file()
         else []
     )

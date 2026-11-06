@@ -12,6 +12,7 @@ from dnakit._candidate_runtime import candidate_not_implemented, candidate_ok
 from dnakit.design_crispr import _impl_local as _impl
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
+
 def assemble_dna_fragments(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Assemble DNA fragments in the given order by exact terminal overlaps (in-silico Gibson/overlap joining).
 
@@ -28,20 +29,40 @@ def assemble_dna_fragments(input: object, *, options: Mapping[str, object] | Non
 
     items = _impl.parse_sequences(input, "fragments", max_items=1_000)
     if len(items) < 2:
-        raise InputFormatError("Assembly needs at least two fragments.", code="CRISPR_INPUT_INVALID")
-    ids = [name if name not in {n for n, _ in items[:i]} else f"{name}_{i}" for i, (name, _) in enumerate(items)]
-    fragments = [AssemblyFragment(fid, DNASequence(seq)) for fid, (_, seq) in zip(ids, items)]
+        raise InputFormatError(
+            "Assembly needs at least two fragments.", code="CRISPR_INPUT_INVALID"
+        )
+    ids = [
+        name if name not in {n for n, _ in items[:i]} else f"{name}_{i}"
+        for i, (name, _) in enumerate(items)
+    ]
+    fragments = [
+        AssemblyFragment(fid, DNASequence(seq)) for fid, (_, seq) in zip(ids, items, strict=False)
+    ]
     result = simulate_assembly(
-        fragments, method="gibson", min_overlap=_impl.opt_int(opts, "min_overlap", 15, 1, 100_000),
-        max_overlap=_impl.opt_int(opts, "max_overlap", 200, 1, 100_000), circularize=_impl.opt_bool(opts, "circularize", False),
+        fragments,
+        method="gibson",
+        min_overlap=_impl.opt_int(opts, "min_overlap", 15, 1, 100_000),
+        max_overlap=_impl.opt_int(opts, "max_overlap", 200, 1, 100_000),
+        circularize=_impl.opt_bool(opts, "circularize", False),
         verbose=False,
     )
     payload = {
-        "product": result.product.symbols, "length": len(result.product.symbols), "circular": result.circularized,
-        "junctions": [{"left": s.left_fragment_id, "right": s.right_fragment_id, "overlap": s.junction_sequence,
-                       "overlap_length": len(s.junction_sequence)} for s in result.steps],
+        "product": result.product.symbols,
+        "length": len(result.product.symbols),
+        "circular": result.circularized,
+        "junctions": [
+            {
+                "left": s.left_fragment_id,
+                "right": s.right_fragment_id,
+                "overlap": s.junction_sequence,
+                "overlap_length": len(s.junction_sequence),
+            }
+            for s in result.steps
+        ],
     }
     return candidate_ok("design_crispr", "assemble_dna_fragments", input, payload, options=opts)
+
 
 def calculate_primer_tm(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Melting temperature (Tm) of one or more primers by the Wallace rule or the nearest-neighbour model.
@@ -67,13 +88,26 @@ def calculate_primer_tm(input: object, *, options: Mapping[str, object] | None =
     for name, seq in _impl.parse_primers(input, rna):
         tm, used = _impl.primer_tm(seq, method, conditions)
         if used == "wallace" and len(seq) > 14:
-            warnings.append(f"Primer {name!r}: the Wallace rule overestimates Tm for oligos longer than about 14 bases.")
-        rows.append({"id": name, "sequence": seq, "length": len(seq), "gc_fraction": _impl.gc_fraction(seq),
-                     "tm_celsius": tm, "method": used})
+            warnings.append(
+                f"Primer {name!r}: the Wallace rule overestimates Tm for oligos longer than about 14 bases."
+            )
+        rows.append(
+            {
+                "id": name,
+                "sequence": seq,
+                "length": len(seq),
+                "gc_fraction": _impl.gc_fraction(seq),
+                "tm_celsius": tm,
+                "method": used,
+            }
+        )
     result: dict[str, object] = {"primers": rows}
     if any(r["method"] == "nearest_neighbor" for r in rows):
         result["conditions"] = conditions
-    return candidate_ok("design_crispr", "calculate_primer_tm", input, result, options=opts, warnings=warnings)
+    return candidate_ok(
+        "design_crispr", "calculate_primer_tm", input, result, options=opts, warnings=warnings
+    )
+
 
 def check_primer_dimer(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Screen primers for self- and cross-dimers by the longest perfectly complementary ungapped stretch.
@@ -94,7 +128,9 @@ def check_primer_dimer(input: object, *, options: Mapping[str, object] | None = 
     elif isinstance(input, Sequence):
         raw = [(f"primer{i + 1}", str(v)) for i, v in enumerate(input)]
     else:
-        raise InputFormatError("Provide a primer string, a list or {'forward','reverse'}.", code="CRISPR_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide a primer string, a list or {'forward','reverse'}.", code="CRISPR_INPUT_INVALID"
+        )
     if not raw or len(raw) > 100:
         raise InputFormatError("Provide between 1 and 100 primers.", code="CRISPR_INPUT_INVALID")
     primers = [(n, _impl.clean_dna(s, f"primer {n!r}", max_length=200)) for n, s in raw]
@@ -106,14 +142,27 @@ def check_primer_dimer(input: object, *, options: Mapping[str, object] | None = 
             rc_b = _impl.revcomp(b)
             length, start_a, _ = _impl.longest_common_substring(a, rc_b)
             run_a, run_b = _impl.three_prime_run(a, b), _impl.three_prime_run(b, a)
-            pairs.append({
-                "a": name_a, "b": name_b, "self": name_a == name_b, "longest_complementary_run": length,
-                "run_start_in_a": start_a if length else None, "three_prime_run_a": run_a, "three_prime_run_b": run_b,
-                "three_prime_dimer": max(run_a, run_b) > max_3, "long_complementary_run": length > max_run,
-            })
-    return candidate_ok("design_crispr", "check_primer_dimer", input, {"pairs": pairs}, options=opts)
+            pairs.append(
+                {
+                    "a": name_a,
+                    "b": name_b,
+                    "self": name_a == name_b,
+                    "longest_complementary_run": length,
+                    "run_start_in_a": start_a if length else None,
+                    "three_prime_run_a": run_a,
+                    "three_prime_run_b": run_b,
+                    "three_prime_dimer": max(run_a, run_b) > max_3,
+                    "long_complementary_run": length > max_run,
+                }
+            )
+    return candidate_ok(
+        "design_crispr", "check_primer_dimer", input, {"pairs": pairs}, options=opts
+    )
 
-def check_primer_secondary_structure(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def check_primer_secondary_structure(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Screen a primer for hairpins: maximal perfect Watson-Crick stems with a loop of >= ``min_loop`` bases.
 
     ``input``: one primer string, a list of primers or a mapping ``{name: primer}``. ``options``: ``min_stem``
@@ -130,7 +179,9 @@ def check_primer_secondary_structure(input: object, *, options: Mapping[str, obj
     elif isinstance(input, Sequence):
         raw = [(f"primer{i + 1}", str(v)) for i, v in enumerate(input)]
     else:
-        raise InputFormatError("Provide a primer string, a list or a mapping.", code="CRISPR_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide a primer string, a list or a mapping.", code="CRISPR_INPUT_INVALID"
+        )
     if not raw or len(raw) > 1_000:
         raise InputFormatError("Provide between 1 and 1000 primers.", code="CRISPR_INPUT_INVALID")
     min_stem = _impl.opt_int(opts, "min_stem", 4, 2, 50)
@@ -139,14 +190,23 @@ def check_primer_secondary_structure(input: object, *, options: Mapping[str, obj
     for name, text in raw:
         seq = _impl.clean_dna(text, f"primer {name!r}", max_length=200)
         hairpins = _impl.find_hairpins(seq, min_stem, min_loop)
-        out.append({
-            "primer": name, "sequence": seq, "hairpins": hairpins,
-            "longest_stem": hairpins[0]["stem_length"] if hairpins else 0,
-            "three_prime_hairpin": any(h["involves_3prime_end"] for h in hairpins),
-        })
-    return candidate_ok("design_crispr", "check_primer_secondary_structure", input, {"primers": out}, options=opts)
+        out.append(
+            {
+                "primer": name,
+                "sequence": seq,
+                "hairpins": hairpins,
+                "longest_stem": hairpins[0]["stem_length"] if hairpins else 0,
+                "three_prime_hairpin": any(h["involves_3prime_end"] for h in hairpins),
+            }
+        )
+    return candidate_ok(
+        "design_crispr", "check_primer_secondary_structure", input, {"primers": out}, options=opts
+    )
 
-def check_primer_specificity(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def check_primer_specificity(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Count where a primer binds (ungapped, mismatches allowed) on each template sequence, both strands.
 
     ``input``: one primer string, a list of primers or ``{name: primer}``. ``options``: ``templates`` (required:
@@ -166,13 +226,18 @@ def check_primer_specificity(input: object, *, options: Mapping[str, object] | N
     elif isinstance(input, Sequence):
         raw = [(f"primer{i + 1}", str(v)) for i, v in enumerate(input)]
     else:
-        raise InputFormatError("Provide a primer string, a list or a mapping.", code="CRISPR_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide a primer string, a list or a mapping.", code="CRISPR_INPUT_INVALID"
+        )
     if "templates" not in opts:
         raise ConfigurationError(
-            "check_primer_specificity needs options['templates'].", code="CRISPR_OPTION_INVALID",
+            "check_primer_specificity needs options['templates'].",
+            code="CRISPR_OPTION_INVALID",
             hint="Pass {'templates': {'chr1': 'ACGT...'}}.",
         )
-    templates = _impl.parse_sequences(opts["templates"], "templates", max_items=1_000, allow_iupac=False)
+    templates = _impl.parse_sequences(
+        opts["templates"], "templates", max_items=1_000, allow_iupac=False
+    )
     if sum(len(s) for _, s in templates) > 20_000_000:
         raise ConfigurationError("Templates exceed 20 Mb.", code="CRISPR_SEQUENCE_TOO_LONG")
     max_mm = _impl.opt_int(opts, "max_mismatches", 0, 0, 10)
@@ -183,13 +248,37 @@ def check_primer_specificity(input: object, *, options: Mapping[str, object] | N
         hits: list[dict[str, object]] = []
         for tid, template in templates:
             result = match_primer(
-                DNASequence(seq), DNASequence(template), primer_name=name, max_mismatches=min(max_mm, len(seq)),
-                strict_three_prime_bases=min(strict, len(seq)), max_hits=10_000, verbose=False,
+                DNASequence(seq),
+                DNASequence(template),
+                primer_name=name,
+                max_mismatches=min(max_mm, len(seq)),
+                strict_three_prime_bases=min(strict, len(seq)),
+                max_hits=10_000,
+                verbose=False,
             )
-            hits.extend({"template": tid, "strand": h.strand.value, "start": h.start, "end": h.end,
-                         "mismatch_positions": list(h.mismatch_positions_5to3)} for h in result.hits)
-        out.append({"primer": name, "sequence": seq, "total_hits": len(hits), "specific": len(hits) == 1, "hits": hits})
-    return candidate_ok("design_crispr", "check_primer_specificity", input, {"primers": out}, options=opts)
+            hits.extend(
+                {
+                    "template": tid,
+                    "strand": h.strand.value,
+                    "start": h.start,
+                    "end": h.end,
+                    "mismatch_positions": list(h.mismatch_positions_5to3),
+                }
+                for h in result.hits
+            )
+        out.append(
+            {
+                "primer": name,
+                "sequence": seq,
+                "total_hits": len(hits),
+                "specific": len(hits) == 1,
+                "hits": hits,
+            }
+        )
+    return candidate_ok(
+        "design_crispr", "check_primer_specificity", input, {"primers": out}, options=opts
+    )
+
 
 def design(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Design CRISPR guide RNAs for a target sequence, or an HDR donor template around a cut site.
@@ -217,26 +306,42 @@ def design(input: object, *, options: Mapping[str, object] | None = None) -> obj
     if which == "donor_template":
         cut = _impl.opt_int(opts, "cut_site", -1, 0, len(sequence)) if "cut_site" in opts else None
         if cut is None:
-            raise ConfigurationError("The donor template needs options['cut_site'].", code="CRISPR_OPTION_INVALID")
+            raise ConfigurationError(
+                "The donor template needs options['cut_site'].", code="CRISPR_OPTION_INVALID"
+            )
         insert = _impl.clean_dna(opts["insert"], "insert") if opts.get("insert") else ""
         deleted = _impl.opt_int(opts, "delete_length", 0, 0, len(sequence))
-        left, right = _impl.opt_int(opts, "left_arm", 60, 1, 5_000), _impl.opt_int(opts, "right_arm", 60, 1, 5_000)
+        left, right = (
+            _impl.opt_int(opts, "left_arm", 60, 1, 5_000),
+            _impl.opt_int(opts, "right_arm", 60, 1, 5_000),
+        )
         edit_end = cut + deleted
         if cut - left < 0 or edit_end + right > len(sequence):
             raise ConfigurationError(
-                "Homology arms extend beyond the target sequence.", code="CRISPR_ARM_OUT_OF_RANGE",
+                "Homology arms extend beyond the target sequence.",
+                code="CRISPR_ARM_OUT_OF_RANGE",
                 hint="Shorten left_arm/right_arm or provide a longer target.",
             )
         donor = sequence[cut - left : cut] + insert + sequence[edit_end : edit_end + right]
         result = {
-            "target": name, "donor": donor, "donor_length": len(donor),
+            "target": name,
+            "donor": donor,
+            "donor_length": len(donor),
             "left_arm": {"start": cut - left, "end": cut, "sequence": sequence[cut - left : cut]},
-            "right_arm": {"start": edit_end, "end": edit_end + right, "sequence": sequence[edit_end : edit_end + right]},
-            "insert": insert, "deleted": sequence[cut:edit_end],
+            "right_arm": {
+                "start": edit_end,
+                "end": edit_end + right,
+                "sequence": sequence[edit_end : edit_end + right],
+            },
+            "insert": insert,
+            "deleted": sequence[cut:edit_end],
             "edited_sequence": sequence[:cut] + insert + sequence[edit_end:],
         }
         return candidate_ok("design_crispr", "design", input, result, options=opts)
-    min_gc, max_gc = _impl.opt_float(opts, "min_gc", 0.4, 0, 1), _impl.opt_float(opts, "max_gc", 0.7, 0, 1)
+    min_gc, max_gc = (
+        _impl.opt_float(opts, "min_gc", 0.4, 0, 1),
+        _impl.opt_float(opts, "max_gc", 0.7, 0, 1),
+    )
     max_hp = _impl.opt_int(opts, "max_homopolymer", 4, 1, 100)
     poly_t = _impl.opt_bool(opts, "avoid_poly_t", True)
     motifs = _impl.resolve_motifs(opts)
@@ -244,12 +349,23 @@ def design(input: object, *, options: Mapping[str, object] | None = None) -> obj
     candidates = _impl.enumerate_guides(sequence, opts)
     kept = []
     for guide in candidates:
-        checks = _impl.guide_checks(str(guide["sequence"]), min_gc=min_gc, max_gc=max_gc, max_homopolymer=max_hp,
-                                    avoid_poly_t=poly_t, motifs=motifs)
+        checks = _impl.guide_checks(
+            str(guide["sequence"]),
+            min_gc=min_gc,
+            max_gc=max_gc,
+            max_homopolymer=max_hp,
+            avoid_poly_t=poly_t,
+            motifs=motifs,
+        )
         if checks["failed"]:
             continue
-        guide.update({"gc": checks["gc"], "longest_homopolymer": checks["longest_homopolymer"],
-                      "proxy_score": _impl.proxy_score(str(guide["sequence"]))})
+        guide.update(
+            {
+                "gc": checks["gc"],
+                "longest_homopolymer": checks["longest_homopolymer"],
+                "proxy_score": _impl.proxy_score(str(guide["sequence"])),
+            }
+        )
         kept.append(guide)
     kept.sort(key=lambda g: (-g["proxy_score"], g["start"], g["strand"]))  # type: ignore[operator]
     kept = kept[:limit]
@@ -257,11 +373,18 @@ def design(input: object, *, options: Mapping[str, object] | None = None) -> obj
         guide["id"] = f"{name}_g{i}"
     warnings = ["proxy_score is a rule-based heuristic, not a trained on-target efficiency model."]
     if "references" in opts:
-        refs = _impl.parse_sequences(opts["references"], "references", max_items=1_000, allow_iupac=True)
+        refs = _impl.parse_sequences(
+            opts["references"], "references", max_items=1_000, allow_iupac=True
+        )
         _impl.add_offtargets(kept, refs, opts)
-    result = {"target": name, "nuclease": _impl.resolve_nuclease(opts)[0], "candidates_scanned": len(candidates),
-              "guides": kept}
+    result = {
+        "target": name,
+        "nuclease": _impl.resolve_nuclease(opts)[0],
+        "candidates_scanned": len(candidates),
+        "guides": kept,
+    }
     return candidate_ok("design_crispr", "design", input, result, options=opts, warnings=warnings)
+
 
 def encode_data_into_dna(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Encode bytes as a DNA string with a fixed 2-bits-per-base code (A=00, C=01, G=10, T=11, 4 bases per byte).
@@ -281,10 +404,16 @@ def encode_data_into_dna(input: object, *, options: Mapping[str, object] | None 
     elif isinstance(input, Path) or (source == "path" and isinstance(input, str)):
         path = Path(input)
         if not path.is_file():
-            raise InputFormatError(f"{str(input)[:200]!r} is not an existing file.", code="CRISPR_INPUT_INVALID",
-                                   hint="Pass an existing file path, or text with options['source'] = 'text'.")
+            raise InputFormatError(
+                f"{str(input)[:200]!r} is not an existing file.",
+                code="CRISPR_INPUT_INVALID",
+                hint="Pass an existing file path, or text with options['source'] = 'text'.",
+            )
         if path.stat().st_size > _impl.MAX_STORAGE_BYTES:
-            raise ConfigurationError(f"File is larger than {_impl.MAX_STORAGE_BYTES} bytes.", code="CRISPR_INPUT_TOO_LARGE")
+            raise ConfigurationError(
+                f"File is larger than {_impl.MAX_STORAGE_BYTES} bytes.",
+                code="CRISPR_INPUT_TOO_LARGE",
+            )
         data = path.read_bytes()
     elif isinstance(input, str):
         data = input.encode("utf-8", errors="surrogatepass")
@@ -292,12 +421,22 @@ def encode_data_into_dna(input: object, *, options: Mapping[str, object] | None 
         try:
             data = json.dumps(input, ensure_ascii=False, sort_keys=True).encode("utf-8")
         except (TypeError, ValueError) as exc:
-            raise InputFormatError("Mapping/list input must be JSON-serialisable.", code="CRISPR_INPUT_INVALID") from exc
+            raise InputFormatError(
+                "Mapping/list input must be JSON-serialisable.", code="CRISPR_INPUT_INVALID"
+            ) from exc
     else:
-        raise InputFormatError("Provide bytes, a file path, text or a JSON-serialisable mapping/list.", code="CRISPR_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide bytes, a file path, text or a JSON-serialisable mapping/list.",
+            code="CRISPR_INPUT_INVALID",
+        )
     if len(data) > _impl.MAX_STORAGE_BYTES:
-        raise ConfigurationError(f"Input is larger than {_impl.MAX_STORAGE_BYTES} bytes.", code="CRISPR_INPUT_TOO_LARGE")
-    return candidate_ok("design_crispr", "encode_data_into_dna", input, _impl.bytes_to_dna(data), options=opts)
+        raise ConfigurationError(
+            f"Input is larger than {_impl.MAX_STORAGE_BYTES} bytes.", code="CRISPR_INPUT_TOO_LARGE"
+        )
+    return candidate_ok(
+        "design_crispr", "encode_data_into_dna", input, _impl.bytes_to_dna(data), options=opts
+    )
+
 
 def evaluate_primer_pair(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Evaluate a forward/reverse primer pair: Tm of each primer, delta Tm, GC, 3' GC clamp and complementarity flags.
@@ -321,18 +460,28 @@ def evaluate_primer_pair(input: object, *, options: Mapping[str, object] | None 
     conditions = _impl.tm_conditions(opts)
     limits = {
         "max_delta_tm": _impl.opt_float(opts, "max_delta_tm", 5.0, 0.0, 1000.0),
-        "min_length": _impl.opt_int(opts, "min_length", 18, 1, 200), "max_length": _impl.opt_int(opts, "max_length", 30, 1, 200),
-        "min_gc": _impl.opt_float(opts, "min_gc", 0.40, 0.0, 1.0), "max_gc": _impl.opt_float(opts, "max_gc", 0.60, 0.0, 1.0),
-        "min_gc_clamp": _impl.opt_int(opts, "min_gc_clamp", 1, 0, 5), "max_gc_clamp": _impl.opt_int(opts, "max_gc_clamp", 3, 0, 5),
+        "min_length": _impl.opt_int(opts, "min_length", 18, 1, 200),
+        "max_length": _impl.opt_int(opts, "max_length", 30, 1, 200),
+        "min_gc": _impl.opt_float(opts, "min_gc", 0.40, 0.0, 1.0),
+        "max_gc": _impl.opt_float(opts, "max_gc", 0.60, 0.0, 1.0),
+        "min_gc_clamp": _impl.opt_int(opts, "min_gc_clamp", 1, 0, 5),
+        "max_gc_clamp": _impl.opt_int(opts, "max_gc_clamp", 3, 0, 5),
         "max_self_complementary": _impl.opt_int(opts, "max_self_complementary", 4, 0, 200),
         "max_cross_complementary": _impl.opt_int(opts, "max_cross_complementary", 4, 0, 200),
     }
     if isinstance(input, Mapping) and set(input) == {"forward", "reverse"}:
         raw = [("forward", input["forward"]), ("reverse", input["reverse"])]
-    elif isinstance(input, Sequence) and not isinstance(input, (str, bytes, bytearray)) and len(input) == 2:
+    elif (
+        isinstance(input, Sequence)
+        and not isinstance(input, (str, bytes, bytearray))
+        and len(input) == 2
+    ):
         raw = [("forward", input[0]), ("reverse", input[1])]
     else:
-        raise InputFormatError("Provide {'forward': ..., 'reverse': ...} or a list of two primers.", code="CRISPR_INPUT_INVALID")
+        raise InputFormatError(
+            "Provide {'forward': ..., 'reverse': ...} or a list of two primers.",
+            code="CRISPR_INPUT_INVALID",
+        )
     primers: dict[str, dict[str, object]] = {}
     flags: list[dict[str, object]] = []
 
@@ -343,20 +492,41 @@ def evaluate_primer_pair(input: object, *, options: Mapping[str, object] | None 
         seq = _impl.clean_primer(text, f"{role} primer", rna)
         tm, used = _impl.primer_tm(seq, method, conditions)
         entry: dict[str, object] = {
-            "sequence": seq, "length": len(seq), "gc_fraction": _impl.gc_fraction(seq), "tm_celsius": tm, "method": used,
-            "gc_clamp": _impl.gc_clamp(seq), "longest_self_complementary": _impl.self_complementary_run(seq),
+            "sequence": seq,
+            "length": len(seq),
+            "gc_fraction": _impl.gc_fraction(seq),
+            "tm_celsius": tm,
+            "method": used,
+            "gc_clamp": _impl.gc_clamp(seq),
+            "longest_self_complementary": _impl.self_complementary_run(seq),
         }
         primers[role] = entry
         if not limits["min_length"] <= len(seq) <= limits["max_length"]:
-            flag("length_out_of_range", role, len(seq), [limits["min_length"], limits["max_length"]])
+            flag(
+                "length_out_of_range", role, len(seq), [limits["min_length"], limits["max_length"]]
+            )
         if not limits["min_gc"] <= entry["gc_fraction"] <= limits["max_gc"]:  # type: ignore[operator]
-            flag("gc_out_of_range", role, entry["gc_fraction"], [limits["min_gc"], limits["max_gc"]])
+            flag(
+                "gc_out_of_range", role, entry["gc_fraction"], [limits["min_gc"], limits["max_gc"]]
+            )
         if not limits["min_gc_clamp"] <= entry["gc_clamp"] <= limits["max_gc_clamp"]:  # type: ignore[operator]
-            flag("gc_clamp_out_of_range", role, entry["gc_clamp"], [limits["min_gc_clamp"], limits["max_gc_clamp"]])
+            flag(
+                "gc_clamp_out_of_range",
+                role,
+                entry["gc_clamp"],
+                [limits["min_gc_clamp"], limits["max_gc_clamp"]],
+            )
         if entry["longest_self_complementary"] > limits["max_self_complementary"]:  # type: ignore[operator]
-            flag("self_complementarity", role, entry["longest_self_complementary"], limits["max_self_complementary"])
+            flag(
+                "self_complementarity",
+                role,
+                entry["longest_self_complementary"],
+                limits["max_self_complementary"],
+            )
     fwd, rev = str(primers["forward"]["sequence"]), str(primers["reverse"]["sequence"])
-    delta = round(abs(float(primers["forward"]["tm_celsius"]) - float(primers["reverse"]["tm_celsius"])), 2)  # type: ignore[arg-type]
+    delta = round(
+        abs(float(primers["forward"]["tm_celsius"]) - float(primers["reverse"]["tm_celsius"])), 2
+    )  # type: ignore[arg-type]
     cross = _impl.longest_common_substring(fwd, _impl.revcomp(rev))[0]
     if delta > limits["max_delta_tm"]:
         flag("tm_mismatch", None, delta, limits["max_delta_tm"])
@@ -364,12 +534,24 @@ def evaluate_primer_pair(input: object, *, options: Mapping[str, object] | None 
         flag("cross_complementarity", None, cross, limits["max_cross_complementary"])
     warnings = []
     if primers["forward"]["method"] != primers["reverse"]["method"]:
-        warnings.append("The two Tm values come from different methods; delta_tm_celsius is not meaningful. Set options['method'].")
-    result = {"forward": primers["forward"], "reverse": primers["reverse"], "delta_tm_celsius": delta,
-              "longest_cross_complementary": cross, "thresholds": limits, "flags": flags, "pass": not flags}
+        warnings.append(
+            "The two Tm values come from different methods; delta_tm_celsius is not meaningful. Set options['method']."
+        )
+    result = {
+        "forward": primers["forward"],
+        "reverse": primers["reverse"],
+        "delta_tm_celsius": delta,
+        "longest_cross_complementary": cross,
+        "thresholds": limits,
+        "flags": flags,
+        "pass": not flags,
+    }
     if any(p["method"] == "nearest_neighbor" for p in primers.values()):
         result["conditions"] = conditions
-    return candidate_ok("design_crispr", "evaluate_primer_pair", input, result, options=opts, warnings=warnings)
+    return candidate_ok(
+        "design_crispr", "evaluate_primer_pair", input, result, options=opts, warnings=warnings
+    )
+
 
 def export(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Serialise guide RNAs as TSV, CSV, FASTA or JSON text, optionally writing a file.
@@ -397,12 +579,21 @@ def export(input: object, *, options: Mapping[str, object] | None = None) -> obj
     if opts.get("output") is not None:
         path = Path(str(opts["output"]))
         if path.exists() and not _impl.opt_bool(opts, "overwrite", False):
-            raise ConfigurationError(f"Output file {path} already exists.", code="CRISPR_OUTPUT_EXISTS",
-                                     hint="Set options['overwrite']=True.")
+            raise ConfigurationError(
+                f"Output file {path} already exists.",
+                code="CRISPR_OUTPUT_EXISTS",
+                hint="Set options['overwrite']=True.",
+            )
         path.write_text(text, encoding="utf-8")
         written = str(path)
-    return candidate_ok("design_crispr", "export", input, {"format": fmt, "count": len(guides), "text": text,
-                                                           "output_path": written}, options=opts)
+    return candidate_ok(
+        "design_crispr",
+        "export",
+        input,
+        {"format": fmt, "count": len(guides), "text": text, "output_path": written},
+        options=opts,
+    )
+
 
 def filter(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Filter guide RNAs by GC content, homopolymer runs, poly-T, length and excluded motifs, reporting why each was dropped.
@@ -415,7 +606,10 @@ def filter(input: object, *, options: Mapping[str, object] | None = None) -> obj
     """
     opts = dict(options or {})
     guides = _impl.parse_guides(input)
-    min_gc, max_gc = _impl.opt_float(opts, "min_gc", 0.4, 0, 1), _impl.opt_float(opts, "max_gc", 0.7, 0, 1)
+    min_gc, max_gc = (
+        _impl.opt_float(opts, "min_gc", 0.4, 0, 1),
+        _impl.opt_float(opts, "max_gc", 0.7, 0, 1),
+    )
     if min_gc > max_gc:
         raise ConfigurationError("min_gc cannot exceed max_gc.", code="CRISPR_OPTION_INVALID")
     max_hp = _impl.opt_int(opts, "max_homopolymer", 4, 1, 100)
@@ -424,15 +618,37 @@ def filter(input: object, *, options: Mapping[str, object] | None = None) -> obj
     length = _impl.opt_int(opts, "length", 0, 0, 100) if "length" in opts else None
     kept, rejected = [], []
     for guide in guides:
-        checks = _impl.guide_checks(str(guide["sequence"]), min_gc=min_gc, max_gc=max_gc, max_homopolymer=max_hp,
-                                    avoid_poly_t=poly_t, motifs=motifs)
+        checks = _impl.guide_checks(
+            str(guide["sequence"]),
+            min_gc=min_gc,
+            max_gc=max_gc,
+            max_homopolymer=max_hp,
+            avoid_poly_t=poly_t,
+            motifs=motifs,
+        )
         failed = list(checks["failed"])  # type: ignore[call-overload]
         if length and len(str(guide["sequence"])) != length:
             failed.append("length")
-        row = {**guide, "gc": checks["gc"], "longest_homopolymer": checks["longest_homopolymer"], "failed": failed}
+        row = {
+            **guide,
+            "gc": checks["gc"],
+            "longest_homopolymer": checks["longest_homopolymer"],
+            "failed": failed,
+        }
         (rejected if failed else kept).append(row)
-    return candidate_ok("design_crispr", "filter", input, {"kept": kept, "rejected": rejected, "kept_count": len(kept),
-                                                           "rejected_count": len(rejected)}, options=opts)
+    return candidate_ok(
+        "design_crispr",
+        "filter",
+        input,
+        {
+            "kept": kept,
+            "rejected": rejected,
+            "kept_count": len(kept),
+            "rejected_count": len(rejected),
+        },
+        options=opts,
+    )
+
 
 def plot(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Draw guide RNA positions along a target as an SVG map (forward-strand guides above the line, reverse below).
@@ -443,12 +659,25 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     ``data-start``, ``data-end`` and ``data-strand`` attributes. Result: ``{"svg": ...}``.
     """
     opts = dict(options or {})
-    if not isinstance(input, Mapping) or "guides" not in input or not isinstance(input["guides"], Sequence):
-        raise InputFormatError("plot expects {'length' or 'sequence', 'guides': [...]}.", code="CRISPR_INPUT_INVALID")
+    if (
+        not isinstance(input, Mapping)
+        or "guides" not in input
+        or not isinstance(input["guides"], Sequence)
+    ):
+        raise InputFormatError(
+            "plot expects {'length' or 'sequence', 'guides': [...]}.", code="CRISPR_INPUT_INVALID"
+        )
     guides = list(input["guides"])  # type: ignore[arg-type]
     for g in guides:
-        if not isinstance(g, Mapping) or not {"start", "end"} <= set(g) or g["end"] <= g["start"] or g["start"] < 0:  # type: ignore[operator]
-            raise InputFormatError("Every guide needs 0 <= start < end.", code="CRISPR_INPUT_INVALID")
+        if (
+            not isinstance(g, Mapping)
+            or not {"start", "end"} <= set(g)
+            or g["end"] <= g["start"]
+            or g["start"] < 0
+        ):  # type: ignore[operator]
+            raise InputFormatError(
+                "Every guide needs 0 <= start < end.", code="CRISPR_INPUT_INVALID"
+            )
     length = input.get("length") or len(str(input.get("sequence", "")))
     if not isinstance(length, int) or length <= 0:
         length = max((int(g["end"]) for g in guides), default=1)
@@ -457,15 +686,24 @@ def plot(input: object, *, options: Mapping[str, object] | None = None) -> objec
     if opts.get("output") is not None:
         Path(str(opts["output"])).write_text(svg, encoding="utf-8")
         written = str(opts["output"])
-    return candidate_ok("design_crispr", "plot", input, {"svg": svg, "output_path": written}, options=opts)
+    return candidate_ok(
+        "design_crispr", "plot", input, {"svg": svg, "output_path": written}, options=opts
+    )
 
-def predict_editing_outcomes(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def predict_editing_outcomes(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Predict CRISPR repair outcomes (not implemented: needs a trained outcome model such as inDelphi or FORECasT)."""
     return candidate_not_implemented(
-        "design_crispr", "predict_editing_outcomes", input, options=options,
+        "design_crispr",
+        "predict_editing_outcomes",
+        input,
+        options=options,
         requires="a trained repair-outcome model (inDelphi, FORECasT, Lindel) and its weights",
         message="Indel/repair outcome prediction needs trained model weights that are not bundled.",
     )
+
 
 def rank(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Rank guide RNAs by a numeric field; the default ``proxy_score`` is a rule-based heuristic (see ``score``).
@@ -483,17 +721,36 @@ def rank(input: object, *, options: Mapping[str, object] | None = None) -> objec
         if by == "proxy_score" and "proxy_score" not in g:
             g["proxy_score"] = _impl.proxy_score(str(g["sequence"]))
         value = g.get(by)
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
-            raise InputFormatError(f"Guide {g['id']!r} has no numeric field {by!r}.", code="CRISPR_INPUT_INVALID")
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+        ):
+            raise InputFormatError(
+                f"Guide {g['id']!r} has no numeric field {by!r}.", code="CRISPR_INPUT_INVALID"
+            )
     ranked = sorted(guides, key=lambda g: g[by] if ascending else -g[by])  # type: ignore[operator]
     if "top_n" in opts:
         ranked = ranked[: _impl.opt_int(opts, "top_n", 1, 1, len(ranked))]
     ranked = [{**g, "rank": i} for i, g in enumerate(ranked, 1)]
-    warnings = ["proxy_score is a rule-based heuristic, not a trained on-target efficiency model."] if by == "proxy_score" else []
-    return candidate_ok("design_crispr", "rank", input, {"by": by, "ascending": ascending, "ranked": ranked},
-                        options=opts, warnings=warnings)
+    warnings = (
+        ["proxy_score is a rule-based heuristic, not a trained on-target efficiency model."]
+        if by == "proxy_score"
+        else []
+    )
+    return candidate_ok(
+        "design_crispr",
+        "rank",
+        input,
+        {"by": by, "ascending": ascending, "ranked": ranked},
+        options=opts,
+        warnings=warnings,
+    )
 
-def remove_restriction_sites(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def remove_restriction_sites(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Remove restriction-enzyme recognition sites from a DNA sequence by minimal base substitutions.
 
     ``input``: DNA string, FASTA text/path or ``{"sequence": ...}``. ``options``: ``enzymes`` (built-in names such as
@@ -508,9 +765,13 @@ def remove_restriction_sites(input: object, *, options: Mapping[str, object] | N
     from dnakit.core import DNASequence
     from dnakit.molbio.optimization import RuleOptimizationConfig, optimize_sequence_rules
 
-    motifs = _impl.resolve_motifs({"exclude_motifs": opts.get("sites", ()), "avoid_enzymes": opts.get("enzymes", ())})
+    motifs = _impl.resolve_motifs(
+        {"exclude_motifs": opts.get("sites", ()), "avoid_enzymes": opts.get("enzymes", ())}
+    )
     if not motifs:
-        raise ConfigurationError("Provide options['enzymes'] and/or options['sites'].", code="CRISPR_OPTION_INVALID")
+        raise ConfigurationError(
+            "Provide options['enzymes'] and/or options['sites'].", code="CRISPR_OPTION_INVALID"
+        )
     name, sequence = _impl.parse_sequences(input, "sequence", max_items=1)[0]
 
     def count(seq: str) -> int:
@@ -518,20 +779,31 @@ def remove_restriction_sites(input: object, *, options: Mapping[str, object] | N
 
     before = count(sequence)
     config = RuleOptimizationConfig(
-        forbidden_motifs=tuple(motifs.values()), forbidden_motifs_both_strands=True,
-        preserve_translation=_impl.opt_bool(opts, "preserve_translation", False), seed=_impl.opt_int(opts, "seed", 0, 0, 2**31),
+        forbidden_motifs=tuple(motifs.values()),
+        forbidden_motifs_both_strands=True,
+        preserve_translation=_impl.opt_bool(opts, "preserve_translation", False),
+        seed=_impl.opt_int(opts, "seed", 0, 0, 2**31),
     )
     outcome = optimize_sequence_rules(DNASequence(sequence), config, verbose=False)
     edited = outcome.optimized.symbols
     after = count(edited)
     result = {
-        "sequence_id": name, "sequence": edited, "sites_before": before, "sites_after": after, "removed_all": after == 0,
-        "changes": [{"position": c.position, "before": c.before, "after": c.after}
-                    for c in sorted(outcome.changes, key=lambda c: c.position)],
+        "sequence_id": name,
+        "sequence": edited,
+        "sites_before": before,
+        "sites_after": after,
+        "removed_all": after == 0,
+        "changes": [
+            {"position": c.position, "before": c.before, "after": c.after}
+            for c in sorted(outcome.changes, key=lambda c: c.position)
+        ],
     }
     return candidate_ok("design_crispr", "remove_restriction_sites", input, result, options=opts)
 
-def run_crispr_screen_design(input: object, *, options: Mapping[str, object] | None = None) -> object:
+
+def run_crispr_screen_design(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Design a pooled CRISPR guide library: the best filtered guides per target sequence.
 
     ``input``: targets as ``{target_id: DNA sequence}``, a list of sequences or FASTA text/path (e.g. exons).
@@ -547,21 +819,36 @@ def run_crispr_screen_design(input: object, *, options: Mapping[str, object] | N
     targets = _impl.parse_sequences(input, "targets", max_items=10_000)
     per = _impl.opt_int(opts, "guides_per_target", 4, 1, 1_000)
     spacing = _impl.opt_int(opts, "min_cut_spacing", 0, 0, 100_000)
-    min_gc, max_gc = _impl.opt_float(opts, "min_gc", 0.4, 0, 1), _impl.opt_float(opts, "max_gc", 0.7, 0, 1)
+    min_gc, max_gc = (
+        _impl.opt_float(opts, "min_gc", 0.4, 0, 1),
+        _impl.opt_float(opts, "max_gc", 0.7, 0, 1),
+    )
     max_hp = _impl.opt_int(opts, "max_homopolymer", 4, 1, 100)
     poly_t = _impl.opt_bool(opts, "avoid_poly_t", True)
     motifs = _impl.resolve_motifs(opts)
-    refs = _impl.parse_sequences(opts["references"], "references", max_items=1_000, allow_iupac=True) if "references" in opts else None
+    refs = (
+        _impl.parse_sequences(opts["references"], "references", max_items=1_000, allow_iupac=True)
+        if "references" in opts
+        else None
+    )
     max_sites = _impl.opt_int(opts, "max_off_target_sites", -1, -1, 1_000_000)
     library: list[dict[str, object]] = []
     short = []
     for tid, sequence in targets:
         pool = []
         for guide in _impl.enumerate_guides(sequence, opts):
-            checks = _impl.guide_checks(str(guide["sequence"]), min_gc=min_gc, max_gc=max_gc, max_homopolymer=max_hp,
-                                        avoid_poly_t=poly_t, motifs=motifs)
+            checks = _impl.guide_checks(
+                str(guide["sequence"]),
+                min_gc=min_gc,
+                max_gc=max_gc,
+                max_homopolymer=max_hp,
+                avoid_poly_t=poly_t,
+                motifs=motifs,
+            )
             if not checks["failed"]:
-                guide.update({"gc": checks["gc"], "proxy_score": _impl.proxy_score(str(guide["sequence"]))})
+                guide.update(
+                    {"gc": checks["gc"], "proxy_score": _impl.proxy_score(str(guide["sequence"]))}
+                )
                 pool.append(guide)
         pool.sort(key=lambda g: (-g["proxy_score"], g["start"], g["strand"]))  # type: ignore[operator]
         chosen: list[dict[str, object]] = []
@@ -569,7 +856,11 @@ def run_crispr_screen_design(input: object, *, options: Mapping[str, object] | N
             if len(chosen) >= per:
                 break
             cut = guide["cut_site"] if guide["cut_site"] is not None else guide["start"]
-            if any(abs(int(cut) - int(c["cut_site"] if c["cut_site"] is not None else c["start"])) < spacing for c in chosen):  # type: ignore[call-overload]
+            if any(
+                abs(int(cut) - int(c["cut_site"] if c["cut_site"] is not None else c["start"]))
+                < spacing
+                for c in chosen
+            ):  # type: ignore[call-overload]
                 continue
             if refs is not None and max_sites >= 0:
                 _impl.add_offtargets([guide], refs, opts)
@@ -582,10 +873,24 @@ def run_crispr_screen_design(input: object, *, options: Mapping[str, object] | N
             library.append({"target": tid, "guide_id": f"{tid}_g{i}", **guide})
         if len(chosen) < per:
             short.append({"target": tid, "requested": per, "designed": len(chosen)})
-    result = {"guides_per_target": per, "target_count": len(targets), "guide_count": len(library), "library": library,
-              "targets_short": short}
-    return candidate_ok("design_crispr", "run_crispr_screen_design", input, result, options=opts,
-                        warnings=["proxy_score is a rule-based heuristic, not a trained on-target efficiency model."])
+    result = {
+        "guides_per_target": per,
+        "target_count": len(targets),
+        "guide_count": len(library),
+        "library": library,
+        "targets_short": short,
+    }
+    return candidate_ok(
+        "design_crispr",
+        "run_crispr_screen_design",
+        input,
+        result,
+        options=opts,
+        warnings=[
+            "proxy_score is a rule-based heuristic, not a trained on-target efficiency model."
+        ],
+    )
+
 
 def scan_grna_offtargets(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Find off-target sites of guide RNAs in supplied sequences by exact ungapped Hamming search on both strands.
@@ -601,16 +906,27 @@ def scan_grna_offtargets(input: object, *, options: Mapping[str, object] | None 
     opts = dict(options or {})
     guides = _impl.parse_guides(input, max_items=1_000)
     if "references" not in opts:
-        raise ConfigurationError("scan_grna_offtargets needs options['references'].", code="CRISPR_OPTION_INVALID",
-                                 hint="Pass {'references': {'chr1': 'ACGT...'}}.")
-    refs = _impl.parse_sequences(opts["references"], "references", max_items=10_000, allow_iupac=True)
+        raise ConfigurationError(
+            "scan_grna_offtargets needs options['references'].",
+            code="CRISPR_OPTION_INVALID",
+            hint="Pass {'references': {'chr1': 'ACGT...'}}.",
+        )
+    refs = _impl.parse_sequences(
+        opts["references"], "references", max_items=10_000, allow_iupac=True
+    )
     max_mm = _impl.opt_int(opts, "max_mismatches", 3, 0, 6)
-    pam = "NGG" if "pam" not in opts else opts["pam"]
+    pam = opts.get("pam", "NGG")
     pam = None if pam is None else _impl.clean_dna(str(pam), "pam", allow_iupac=True, max_length=20)
     side = _impl.opt_str(opts, "pam_side", "3prime", ("3prime", "5prime"))
     out = _impl.scan_offtargets(guides, refs, max_mm, pam, side)
-    return candidate_ok("design_crispr", "scan_grna_offtargets", input, {"max_mismatches": max_mm, "pam": pam,
-                                                                          "guides": out}, options=opts)
+    return candidate_ok(
+        "design_crispr",
+        "scan_grna_offtargets",
+        input,
+        {"max_mismatches": max_mm, "pam": pam, "guides": out},
+        options=opts,
+    )
+
 
 def score(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Score guide RNAs with a rule-based HEURISTIC on-target proxy in [0, 100] (not a trained efficiency model).
@@ -628,11 +944,29 @@ def score(input: object, *, options: Mapping[str, object] | None = None) -> obje
     for g in guides:
         seq = str(g["sequence"])
         if not 10 <= len(seq) <= 40:
-            raise InputFormatError(f"Guide {g['id']!r} has length {len(seq)}; expected 10-40.", code="CRISPR_SEQUENCE_INVALID")
-        rows.append({"id": g["id"], "sequence": seq, "proxy_score": _impl.proxy_score(seq), "gc": _impl.gc_fraction(seq),
-                     "longest_homopolymer": _impl.longest_run(seq), "poly_t": "TTTT" in seq})
-    return candidate_ok("design_crispr", "score", input, {"method": "heuristic_rule_proxy", "scores": rows}, options=opts,
-                        warnings=["Heuristic rule-based proxy, not a trained on-target efficiency model."])
+            raise InputFormatError(
+                f"Guide {g['id']!r} has length {len(seq)}; expected 10-40.",
+                code="CRISPR_SEQUENCE_INVALID",
+            )
+        rows.append(
+            {
+                "id": g["id"],
+                "sequence": seq,
+                "proxy_score": _impl.proxy_score(seq),
+                "gc": _impl.gc_fraction(seq),
+                "longest_homopolymer": _impl.longest_run(seq),
+                "poly_t": "TTTT" in seq,
+            }
+        )
+    return candidate_ok(
+        "design_crispr",
+        "score",
+        input,
+        {"method": "heuristic_rule_proxy", "scores": rows},
+        options=opts,
+        warnings=["Heuristic rule-based proxy, not a trained on-target efficiency model."],
+    )
+
 
 def simulate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Simulate homology-directed repair in silico: swap the region between a donor's homology arms into the target.
@@ -652,24 +986,41 @@ def simulate(input: object, *, options: Mapping[str, object] | None = None) -> o
     left_len = _impl.opt_int(opts, "left_arm", 0, 1, len(donor)) if "left_arm" in opts else 0
     right_len = _impl.opt_int(opts, "right_arm", 0, 1, len(donor)) if "right_arm" in opts else 0
     if not left_len or not right_len or left_len + right_len > len(donor):
-        raise ConfigurationError("simulate needs left_arm and right_arm lengths that fit in the donor.",
-                                 code="CRISPR_OPTION_INVALID")
-    left, right, payload = donor[:left_len], donor[len(donor) - right_len :], donor[left_len : len(donor) - right_len]
+        raise ConfigurationError(
+            "simulate needs left_arm and right_arm lengths that fit in the donor.",
+            code="CRISPR_OPTION_INVALID",
+        )
+    left, right, payload = (
+        donor[:left_len],
+        donor[len(donor) - right_len :],
+        donor[left_len : len(donor) - right_len],
+    )
     if target.count(left) != 1 or target.count(right) != 1:
         raise InputFormatError(
-            "Each homology arm must occur exactly once in the target.", code="CRISPR_ARM_NOT_UNIQUE",
-            context={"left_arm_matches": target.count(left), "right_arm_matches": target.count(right)},
+            "Each homology arm must occur exactly once in the target.",
+            code="CRISPR_ARM_NOT_UNIQUE",
+            context={
+                "left_arm_matches": target.count(left),
+                "right_arm_matches": target.count(right),
+            },
         )
     left_end = target.index(left) + left_len
     right_start = target.index(right)
     if right_start < left_end:
-        raise InputFormatError("The right arm lies before the end of the left arm.", code="CRISPR_ARM_ORDER")
+        raise InputFormatError(
+            "The right arm lies before the end of the left arm.", code="CRISPR_ARM_ORDER"
+        )
     edited = target[:left_end] + payload + target[right_start:]
     result = {
-        "target": name, "edited_sequence": edited, "region": {"start": left_end, "end": right_start},
-        "deleted": target[left_end:right_start], "inserted": payload, "length_change": len(edited) - len(target),
+        "target": name,
+        "edited_sequence": edited,
+        "region": {"start": left_end, "end": right_start},
+        "deleted": target[left_end:right_start],
+        "inserted": payload,
+        "length_change": len(edited) - len(target),
     }
     return candidate_ok("design_crispr", "simulate", input, result, options=opts)
+
 
 def validate(input: object, *, options: Mapping[str, object] | None = None) -> object:
     """Validate guide RNAs: alphabet, length, PAM adjacency in a target (optional) and design-rule warnings.
@@ -681,10 +1032,16 @@ def validate(input: object, *, options: Mapping[str, object] | None = None) -> o
     in the target); ``warnings`` (GC outside 40-70 %, homopolymer run > 4, ``TTTT``) do not.
     """
     opts = dict(options or {})
-    records = [{"id": g["id"], "raw": g["sequence"]} for g in _impl.parse_guides(input, strict=False)]
+    records = [
+        {"id": g["id"], "raw": g["sequence"]} for g in _impl.parse_guides(input, strict=False)
+    ]
     name, pam, side, default_len = _impl.resolve_nuclease(opts)
     length = _impl.opt_int(opts, "length", default_len, 10, 40)
-    target = _impl.parse_sequences(opts["target"], "target", max_items=1)[0][1] if "target" in opts else None
+    target = (
+        _impl.parse_sequences(opts["target"], "target", max_items=1)[0][1]
+        if "target" in opts
+        else None
+    )
     pam_re = re.compile("".join(_impl._IUPAC[c] for c in pam))
     rows = []
     for rec in records:
@@ -706,25 +1063,98 @@ def validate(input: object, *, options: Mapping[str, object] | None = None) -> o
                 for strand, seq in (("forward", target), ("reverse", _impl.revcomp(target))):
                     start = seq.find(text)
                     while start != -1:
-                        pam_text = seq[start + length : start + length + len(pam)] if side == "3prime" else seq[max(0, start - len(pam)) : start]
+                        pam_text = (
+                            seq[start + length : start + length + len(pam)]
+                            if side == "3prime"
+                            else seq[max(0, start - len(pam)) : start]
+                        )
                         if len(pam_text) == len(pam) and pam_re.fullmatch(pam_text):
                             pos = start if strand == "forward" else len(target) - start - length
-                            sites.append({"strand": strand, "start": pos, "end": pos + length, "pam": pam_text})
+                            sites.append(
+                                {
+                                    "strand": strand,
+                                    "start": pos,
+                                    "end": pos + length,
+                                    "pam": pam_text,
+                                }
+                            )
                         start = seq.find(text, start + 1)
                 if not sites:
                     errors.append("no_pam_adjacent_site_in_target")
-        rows.append({"id": rec["id"], "sequence": text, "valid": not errors, "errors": errors, "warnings": warnings,
-                     "target_sites": sites})
-    return candidate_ok("design_crispr", "validate", input,
-                        {"nuclease": name, "pam": pam, "expected_length": length, "guides": rows,
-                         "all_valid": all(r["valid"] for r in rows)}, options=opts)
+        rows.append(
+            {
+                "id": rec["id"],
+                "sequence": text,
+                "valid": not errors,
+                "errors": errors,
+                "warnings": warnings,
+                "target_sites": sites,
+            }
+        )
+    return candidate_ok(
+        "design_crispr",
+        "validate",
+        input,
+        {
+            "nuclease": name,
+            "pam": pam,
+            "expected_length": length,
+            "guides": rows,
+            "all_valid": all(r["valid"] for r in rows),
+        },
+        options=opts,
+    )
 
-__all__ = ['assemble_dna_fragments', 'calculate_primer_tm', 'check_primer_dimer', 'check_primer_secondary_structure', 'check_primer_specificity', 'design', 'encode_data_into_dna', 'evaluate_primer_pair', 'export', 'filter', 'plot', 'predict_editing_outcomes', 'rank', 'remove_restriction_sites', 'run_crispr_screen_design', 'scan_grna_offtargets', 'score', 'simulate', 'validate']
 
-__candidate_adapter_operations__ = set(['assemble_dna_fragments', 'calculate_primer_tm', 'check_primer_dimer', 'check_primer_secondary_structure', 'check_primer_specificity', 'design', 'encode_data_into_dna', 'evaluate_primer_pair', 'export', 'filter', 'plot', 'predict_editing_outcomes', 'rank', 'remove_restriction_sites', 'run_crispr_screen_design', 'scan_grna_offtargets', 'score', 'simulate', 'validate'])
+__all__ = [
+    "assemble_dna_fragments",
+    "calculate_primer_tm",
+    "check_primer_dimer",
+    "check_primer_secondary_structure",
+    "check_primer_specificity",
+    "design",
+    "encode_data_into_dna",
+    "evaluate_primer_pair",
+    "export",
+    "filter",
+    "plot",
+    "predict_editing_outcomes",
+    "rank",
+    "remove_restriction_sites",
+    "run_crispr_screen_design",
+    "scan_grna_offtargets",
+    "score",
+    "simulate",
+    "validate",
+]
+
+__candidate_adapter_operations__ = set(
+    [
+        "assemble_dna_fragments",
+        "calculate_primer_tm",
+        "check_primer_dimer",
+        "check_primer_secondary_structure",
+        "check_primer_specificity",
+        "design",
+        "encode_data_into_dna",
+        "evaluate_primer_pair",
+        "export",
+        "filter",
+        "plot",
+        "predict_editing_outcomes",
+        "rank",
+        "remove_restriction_sites",
+        "run_crispr_screen_design",
+        "scan_grna_offtargets",
+        "score",
+        "simulate",
+        "validate",
+    ]
+)
 
 
 from dnakit._verbosity import register_public as _register_public_verbose
+
 # Public integration of the reviewed P00–P45 operation packs.
 from .crispresso_p13_cli_functions import (
     crispresso_aggregate,

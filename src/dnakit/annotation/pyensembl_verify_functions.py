@@ -77,19 +77,28 @@ def pyensembl_install_local_annotation(
     reference = _text(reference_name, "reference_name")
     annotation = _text(annotation_name, "annotation_name")
     gtf = _local_file(gtf_path, "gtf_path")
-    if annotation_version is not None:
-        if isinstance(annotation_version, bool) or not isinstance(annotation_version, int) or annotation_version < 1:
-            raise ConfigurationError("annotation_version must be a positive integer.")
+    if annotation_version is not None and (
+        isinstance(annotation_version, bool)
+        or not isinstance(annotation_version, int)
+        or annotation_version < 1
+    ):
+        raise ConfigurationError("annotation_version must be a positive integer.")
     transcripts = _files(list(transcript_fasta_paths), "transcript_fasta_paths")
     proteins = _files(list(protein_fasta_paths), "protein_fasta_paths")
-    genome_fasta = None if genome_fasta_path is None else str(_local_file(genome_fasta_path, "genome_fasta_path"))
+    genome_fasta = (
+        None
+        if genome_fasta_path is None
+        else str(_local_file(genome_fasta_path, "genome_fasta_path"))
+    )
     if not isinstance(overwrite, bool):
         raise ConfigurationError("overwrite must be true or false.")
     cache_dir = None
     if cache_directory_path is not None:
         cache_dir = Path(cache_directory_path).expanduser().resolve()
         if not cache_dir.is_dir():
-            raise ConfigurationError(f"cache_directory_path must be an existing folder: {cache_dir}")
+            raise ConfigurationError(
+                f"cache_directory_path must be an existing folder: {cache_dir}"
+            )
     try:
         genome = pyensembl.Genome(
             reference_name=reference,
@@ -126,7 +135,6 @@ def pyensembl_install_local_annotation(
     }
 
 
-
 def pyensembl_install_ensembl_release(
     release: int | str,
     species: str = "human",
@@ -160,7 +168,9 @@ def pyensembl_install_ensembl_release(
         cache_location = str(ensembl.download_cache.cache_directory_path)
         gtf_url = str(ensembl.gtf_url)
     except (ValueError, TypeError, OSError) as exc:
-        raise ConfigurationError(f"pyensembl could not install Ensembl release {release}: {exc}") from exc
+        raise ConfigurationError(
+            f"pyensembl could not install Ensembl release {release}: {exc}"
+        ) from exc
     return {
         "status": "installed" if installed else "not_installed",
         "operation": "pyensembl_install_ensembl_release",
@@ -176,6 +186,7 @@ def pyensembl_install_ensembl_release(
         },
     }
 
-__all__ = ["pyensembl_install_local_annotation", "pyensembl_install_ensembl_release"]
+
+__all__ = ["pyensembl_install_ensembl_release", "pyensembl_install_local_annotation"]
 
 _register_public_verbose(globals())

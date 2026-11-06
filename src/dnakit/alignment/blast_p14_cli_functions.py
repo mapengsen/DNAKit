@@ -30,7 +30,17 @@ _NUCLEOTIDE_TASKS = ("blastn", "blastn-short", "dc-megablast", "megablast", "rmb
 _STRANDS = ("both", "plus", "minus")
 _OUTFMT = re.compile(r"^\d{1,2}(?: [A-Za-z_]+)*$")
 _STANDARD_COLUMNS = (
-    "qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue",
+    "qseqid",
+    "sseqid",
+    "pident",
+    "length",
+    "mismatch",
+    "gapopen",
+    "qstart",
+    "qend",
+    "sstart",
+    "send",
+    "evalue",
     "bitscore",
 )
 _RANGE = re.compile(r"^\d+-(?:\d+)?$")
@@ -43,7 +53,9 @@ def _executable(name: str, blast_path: str | None) -> str | None:
         return None
     folder = Path(blast_path).expanduser()
     if not folder.is_dir():
-        raise ConfigurationError(f"blast_path must be a folder that contains the BLAST+ programs: {folder}")
+        raise ConfigurationError(
+            f"blast_path must be a folder that contains the BLAST+ programs: {folder}"
+        )
     return str(folder / name)
 
 
@@ -51,15 +63,25 @@ def _outfmt(value: int | str | None) -> list[str]:
     if value is None:
         return []
     text = str(value)
-    if isinstance(value, bool) or not _OUTFMT.fullmatch(text) or not 0 <= int(text.split()[0]) <= 18:
-        raise ConfigurationError("outfmt must be an integer 0-18 or a string such as '6 qseqid sseqid pident'.")
+    if (
+        isinstance(value, bool)
+        or not _OUTFMT.fullmatch(text)
+        or not 0 <= int(text.split()[0]) <= 18
+    ):
+        raise ConfigurationError(
+            "outfmt must be an integer 0-18 or a string such as '6 qseqid sseqid pident'."
+        )
     return ["-outfmt", text]
 
 
 def _database(value: str | Path, name: str, *, suffixes: Sequence[str]) -> str:
     prefix = Path(value).expanduser().resolve()
-    if not any(next(prefix.parent.glob(f"{prefix.name}.{suffix}"), None) is not None for suffix in suffixes):
-        raise ConfigurationError(f"{name} is not a BLAST database (no {prefix.name}.{'/'.join(suffixes)} files): {prefix}")
+    if not any(
+        next(prefix.parent.glob(f"{prefix.name}.{suffix}"), None) is not None for suffix in suffixes
+    ):
+        raise ConfigurationError(
+            f"{name} is not a BLAST database (no {prefix.name}.{'/'.join(suffixes)} files): {prefix}"
+        )
     return str(prefix)
 
 
@@ -77,17 +99,27 @@ def _common_search_options(
     if word_size is not None:
         arguments += ["-word_size", str(_gap_cli.integer(word_size, "word_size", minimum=2))]
     if max_target_seqs is not None:
-        arguments += ["-max_target_seqs", str(_gap_cli.integer(max_target_seqs, "max_target_seqs", minimum=1))]
+        arguments += [
+            "-max_target_seqs",
+            str(_gap_cli.integer(max_target_seqs, "max_target_seqs", minimum=1)),
+        ]
     if max_hsps is not None:
         arguments += ["-max_hsps", str(_gap_cli.integer(max_hsps, "max_hsps", minimum=1))]
     if num_threads is not None:
-        arguments += ["-num_threads", str(_gap_cli.integer(num_threads, "num_threads", minimum=1, maximum=256))]
+        arguments += [
+            "-num_threads",
+            str(_gap_cli.integer(num_threads, "num_threads", minimum=1, maximum=256)),
+        ]
     return arguments + _outfmt(outfmt)
 
 
 def _tabular_rows(result: dict[str, Any], output: Path, outfmt: int | str | None) -> None:
     """Add parsed rows for tabular output (outfmt 6, 7 or 10) when the run succeeded."""
-    if outfmt is None or str(outfmt).split()[0] not in {"6", "7", "10"} or result["status"] != "completed":
+    if (
+        outfmt is None
+        or str(outfmt).split()[0] not in {"6", "7", "10"}
+        or result["status"] != "completed"
+    ):
         return
     parts = str(outfmt).split()
     columns = list(_STANDARD_COLUMNS) if len(parts) == 1 or parts[1] == "std" else parts[1:]
@@ -165,16 +197,26 @@ def blastn_search(
     output_path = _gap_cli.new_file(output, "output")
     if (database is None) == (subject is None):
         raise ConfigurationError("Give exactly one of database and subject.")
-    arguments = ["-query", str(query_path), "-task", _gap_cli.choice(task, _NUCLEOTIDE_TASKS, "task")]
+    arguments = [
+        "-query",
+        str(query_path),
+        "-task",
+        _gap_cli.choice(task, _NUCLEOTIDE_TASKS, "task"),
+    ]
     if database is not None:
         arguments += ["-db", _database(database, "database", suffixes=("nin", "ndb", "nal"))]
     else:
         assert subject is not None
         arguments += ["-subject", str(_gap_cli.existing_file(subject, "subject"))]
     arguments += ["-out", str(output_path)]
-    arguments += _common_search_options(evalue, max_target_seqs, num_threads, outfmt, word_size, max_hsps)
+    arguments += _common_search_options(
+        evalue, max_target_seqs, num_threads, outfmt, word_size, max_hsps
+    )
     if perc_identity is not None:
-        arguments += ["-perc_identity", str(_gap_cli.number(perc_identity, "perc_identity", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "-perc_identity",
+            str(_gap_cli.number(perc_identity, "perc_identity", minimum=0.0, maximum=100.0)),
+        ]
     if strand is not None:
         arguments += ["-strand", _gap_cli.choice(strand, _STRANDS, "strand")]
     if dust is not None:
@@ -187,12 +229,19 @@ def blastn_search(
     if reward is not None:
         arguments += ["-reward", str(_gap_cli.integer(reward, "reward", minimum=1))]
     if template_type is not None:
-        arguments += ["-template_type", _gap_cli.choice(template_type, ("coding", "coding_and_optimal", "optimal"), "template_type")]
+        arguments += [
+            "-template_type",
+            _gap_cli.choice(
+                template_type, ("coding", "coding_and_optimal", "optimal"), "template_type"
+            ),
+        ]
     if template_length is not None:
         if template_length not in (16, 18, 21):
             raise ConfigurationError("template_length must be 16, 18 or 21.")
         arguments += ["-template_length", str(template_length)]
-    result = _run("blastn", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    result = _run(
+        "blastn", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path
+    )
     result["task"] = task
     _tabular_rows(result, output_path, outfmt)
     return result
@@ -221,16 +270,28 @@ def rpstblastn_search(
     query_path = _gap_cli.existing_file(query, "query")
     output_path = _gap_cli.new_file(output, "output")
     arguments = [
-        "-query", str(query_path),
-        "-db", _database(database, "database", suffixes=("rps", "pin", "pal")),
-        "-out", str(output_path),
+        "-query",
+        str(query_path),
+        "-db",
+        _database(database, "database", suffixes=("rps", "pin", "pal")),
+        "-out",
+        str(output_path),
     ]
     arguments += _common_search_options(evalue, max_target_seqs, num_threads, outfmt, None, None)
     if query_gencode is not None:
-        arguments += ["-query_gencode", str(_gap_cli.integer(query_gencode, "query_gencode", minimum=1, maximum=33))]
+        arguments += [
+            "-query_gencode",
+            str(_gap_cli.integer(query_gencode, "query_gencode", minimum=1, maximum=33)),
+        ]
     if strand is not None:
         arguments += ["-strand", _gap_cli.choice(strand, _STRANDS, "strand")]
-    result = _run("rpstblastn", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    result = _run(
+        "rpstblastn",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
     _tabular_rows(result, output_path, outfmt)
     return result
 
@@ -259,11 +320,18 @@ def blastdbcmd_fetch_sequences(
     ``%f``, FASTA; for example ``'%a %l'`` lists accession and length). ``database_type`` is 'nucl' or 'prot'.
     Writes a new file.
     """
-    db = _database(database, "database", suffixes=("nin", "nsq", "ndb", "pin", "psq", "pdb", "nal", "pal"))
+    db = _database(
+        database, "database", suffixes=("nin", "nsq", "ndb", "pin", "psq", "pdb", "nal", "pal")
+    )
     output_path = _gap_cli.new_file(output, "output")
     if (entries is None) == (entry_batch is None):
         raise ConfigurationError("Give exactly one of entries and entry_batch.")
-    arguments = ["-db", db, "-dbtype", _gap_cli.choice(database_type, ("nucl", "prot"), "database_type")]
+    arguments = [
+        "-db",
+        db,
+        "-dbtype",
+        _gap_cli.choice(database_type, ("nucl", "prot"), "database_type"),
+    ]
     if entries is not None:
         if isinstance(entries, str) or not entries:
             raise ConfigurationError("entries must be a non-empty list of identifiers.")
@@ -280,7 +348,9 @@ def blastdbcmd_fetch_sequences(
     else:
         assert entry_batch is not None
         if sequence_range is not None or strand is not None:
-            raise ConfigurationError("sequence_range and strand cannot be combined with entry_batch; put them in the file.")
+            raise ConfigurationError(
+                "sequence_range and strand cannot be combined with entry_batch; put them in the file."
+            )
         arguments += ["-entry_batch", str(_gap_cli.existing_file(entry_batch, "entry_batch"))]
     if outfmt is not None:
         arguments += ["-outfmt", _p14_cli.line_text(outfmt, "outfmt")]
@@ -291,7 +361,13 @@ def blastdbcmd_fetch_sequences(
     if _p14_cli.flag(long_seqids, "long_seqids"):
         arguments.append("-long_seqids")
     arguments += ["-out", str(output_path)]
-    return _run("blastdbcmd", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    return _run(
+        "blastdbcmd",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 def makembindex_build_index(
@@ -321,7 +397,9 @@ def makembindex_build_index(
     fmt = _gap_cli.choice(input_format, ("blastdb", "fasta"), "input_format")
     if fmt == "blastdb":
         if output_prefix is not None:
-            raise ConfigurationError("output_prefix is ignored by makembindex for blastdb input; leave it None.")
+            raise ConfigurationError(
+                "output_prefix is ignored by makembindex for blastdb input; leave it None."
+            )
         source = _database(input_path, "input_path", suffixes=("nin", "ndb", "nal"))
         stem = Path(source)
         arguments = ["-input", source, "-iformat", "blastdb"]
@@ -334,7 +412,16 @@ def makembindex_build_index(
             raise ConfigurationError(f"The folder for output_prefix does not exist: {stem.parent}")
         if any(stem.parent.glob(f"{stem.name}*")):
             raise ConfigurationError(f"output_prefix must not exist yet: {stem}")
-        arguments = ["-input", source, "-iformat", "fasta", "-output", str(stem), "-old_style_index", "true"]
+        arguments = [
+            "-input",
+            source,
+            "-iformat",
+            "fasta",
+            "-output",
+            str(stem),
+            "-old_style_index",
+            "true",
+        ]
     if any(stem.parent.glob(f"{stem.name}.*.idx")) and fmt == "blastdb":
         raise ConfigurationError(f"An index for this database already exists: {stem}.NN.idx")
     if legacy is not None:
@@ -342,12 +429,17 @@ def makembindex_build_index(
     if _p14_cli.flag(idmap, "idmap"):
         arguments += ["-idmap", "true"]
     for name, value, low, high in (
-        ("nmer", nmer, 8, 15), ("ws_hint", ws_hint, 1, None), ("volsize", volsize, 1, None), ("stride", stride, 1, None)
+        ("nmer", nmer, 8, 15),
+        ("ws_hint", ws_hint, 1, None),
+        ("volsize", volsize, 1, None),
+        ("stride", stride, 1, None),
     ):
         if value is not None:
             arguments += [f"-{name}", str(_gap_cli.integer(value, name, minimum=low, maximum=high))]
     result = _run("makembindex", arguments, cwd=stem.parent, expected=[], blast_path=blast_path)
-    produced = sorted(str(path) for path in stem.parent.glob(f"{stem.name}.*.idx") if path.is_file())
+    produced = sorted(
+        str(path) for path in stem.parent.glob(f"{stem.name}.*.idx") if path.is_file()
+    )
     result["outputs"] = produced
     if result["status"] == "completed" and not produced:
         result["status"] = "failed"
@@ -387,28 +479,57 @@ def windowmasker_mask_sequences(
     counts = _gap_cli.existing_file(unit_counts, "unit_counts")
     output_path = _gap_cli.new_file(output, "output")
     arguments = [
-        "-ustat", str(counts), "-in", str(source),
-        "-infmt", _gap_cli.choice(input_format, ("fasta", "blastdb", "seqids"), "input_format"),
-        "-outfmt", _gap_cli.choice(
+        "-ustat",
+        str(counts),
+        "-in",
+        str(source),
+        "-infmt",
+        _gap_cli.choice(input_format, ("fasta", "blastdb", "seqids"), "input_format"),
+        "-outfmt",
+        _gap_cli.choice(
             output_format,
-            ("interval", "fasta", "maskinfo_asn1_bin", "maskinfo_asn1_text", "maskinfo_xml", "seqloc_asn1_bin", "seqloc_asn1_text", "seqloc_xml"),
+            (
+                "interval",
+                "fasta",
+                "maskinfo_asn1_bin",
+                "maskinfo_asn1_text",
+                "maskinfo_xml",
+                "seqloc_asn1_bin",
+                "seqloc_asn1_text",
+                "seqloc_xml",
+            ),
             "output_format",
         ),
-        "-out", str(output_path),
+        "-out",
+        str(output_path),
     ]
     for name, value in (
-        ("window", window), ("t_thres", t_thres), ("t_extend", t_extend), ("t_low", t_low), ("t_high", t_high),
-        ("set_t_low", set_t_low), ("set_t_high", set_t_high),
+        ("window", window),
+        ("t_thres", t_thres),
+        ("t_extend", t_extend),
+        ("t_low", t_low),
+        ("t_high", t_high),
+        ("set_t_low", set_t_low),
+        ("set_t_high", set_t_high),
     ):
         if value is not None:
-            arguments += [f"-{name}", str(_gap_cli.integer(value, name, minimum=1 if name != "t_extend" else 0))]
+            arguments += [
+                f"-{name}",
+                str(_gap_cli.integer(value, name, minimum=1 if name != "t_extend" else 0)),
+            ]
     if _p14_cli.flag(dust, "dust"):
         arguments += ["-dust", "true"]
     if dust_level is not None:
         arguments += ["-dust_level", str(_gap_cli.integer(dust_level, "dust_level", minimum=0))]
     if _p14_cli.flag(parse_seqids, "parse_seqids"):
         arguments.append("-parse_seqids")
-    return _run("windowmasker", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    return _run(
+        "windowmasker",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 def windowmasker_count_units(
@@ -438,12 +559,21 @@ def windowmasker_count_units(
     source = _gap_cli.existing_file(input_path, "input_path")
     output_path = _gap_cli.new_file(output, "output")
     arguments = [
-        "-mk_counts", "-in", str(source), "-out", str(output_path),
-        "-infmt", _gap_cli.choice(input_format, ("fasta", "blastdb", "seqids"), "input_format"),
-        "-sformat", _gap_cli.choice(counts_format, ("ascii", "binary", "oascii", "obinary"), "counts_format"),
+        "-mk_counts",
+        "-in",
+        str(source),
+        "-out",
+        str(output_path),
+        "-infmt",
+        _gap_cli.choice(input_format, ("fasta", "blastdb", "seqids"), "input_format"),
+        "-sformat",
+        _gap_cli.choice(counts_format, ("ascii", "binary", "oascii", "obinary"), "counts_format"),
     ]
     if unit_length is not None:
-        arguments += ["-unit", str(_gap_cli.integer(unit_length, "unit_length", minimum=1, maximum=16))]
+        arguments += [
+            "-unit",
+            str(_gap_cli.integer(unit_length, "unit_length", minimum=1, maximum=16)),
+        ]
     if genome_size is not None:
         arguments += ["-genome_size", str(_gap_cli.integer(genome_size, "genome_size", minimum=1))]
     if _p14_cli.flag(input_is_list, "input_is_list"):
@@ -456,7 +586,13 @@ def windowmasker_count_units(
         arguments += ["-smem", str(_gap_cli.integer(counts_size_mb, "counts_size_mb", minimum=1))]
     if metadata is not None:
         arguments += ["-meta", _p14_cli.line_text(metadata, "metadata")]
-    return _run("windowmasker", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    return _run(
+        "windowmasker",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 def windowmasker_convert_counts(
@@ -476,14 +612,25 @@ def windowmasker_convert_counts(
     source = _gap_cli.existing_file(input_path, "input_path")
     output_path = _gap_cli.new_file(output, "output")
     arguments = [
-        "-convert", "-in", str(source), "-out", str(output_path),
-        "-sformat", _gap_cli.choice(counts_format, ("ascii", "binary", "oascii", "obinary"), "counts_format"),
+        "-convert",
+        "-in",
+        str(source),
+        "-out",
+        str(output_path),
+        "-sformat",
+        _gap_cli.choice(counts_format, ("ascii", "binary", "oascii", "obinary"), "counts_format"),
     ]
     if counts_size_mb is not None:
         arguments += ["-smem", str(_gap_cli.integer(counts_size_mb, "counts_size_mb", minimum=1))]
     if metadata is not None:
         arguments += ["-meta", _p14_cli.line_text(metadata, "metadata")]
-    return _run("windowmasker", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    return _run(
+        "windowmasker",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 def convert2blastmask_from_fasta(
@@ -507,14 +654,30 @@ def convert2blastmask_from_fasta(
     source = _gap_cli.existing_file(input_path, "input_path")
     output_path = _gap_cli.new_file(output, "output")
     arguments = [
-        "-in", str(source), "-out", str(output_path),
-        "-outfmt", _gap_cli.choice(output_format, ("interval", "maskinfo_asn1_bin", "maskinfo_asn1_text", "maskinfo_xml"), "output_format"),
-        "-masking_algorithm", _gap_cli.text(masking_algorithm, "masking_algorithm"),
-        "-masking_options", _p14_cli.line_text(masking_options, "masking_options"),
+        "-in",
+        str(source),
+        "-out",
+        str(output_path),
+        "-outfmt",
+        _gap_cli.choice(
+            output_format,
+            ("interval", "maskinfo_asn1_bin", "maskinfo_asn1_text", "maskinfo_xml"),
+            "output_format",
+        ),
+        "-masking_algorithm",
+        _gap_cli.text(masking_algorithm, "masking_algorithm"),
+        "-masking_options",
+        _p14_cli.line_text(masking_options, "masking_options"),
     ]
     if _p14_cli.flag(parse_seqids, "parse_seqids"):
         arguments.append("-parse_seqids")
-    return _run("convert2blastmask", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    return _run(
+        "convert2blastmask",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 def blast_vdb_search(
@@ -559,12 +722,17 @@ def blast_vdb_search(
     if genetic_code is not None:
         if chosen != "tblastn_vdb":
             raise ConfigurationError("genetic_code applies to tblastn_vdb only.")
-        arguments += ["-db_gencode", str(_gap_cli.integer(genetic_code, "genetic_code", minimum=1, maximum=33))]
+        arguments += [
+            "-db_gencode",
+            str(_gap_cli.integer(genetic_code, "genetic_code", minimum=1, maximum=33)),
+        ]
     if sra_mode is not None:
         arguments += ["-sra_mode", _gap_cli.text(sra_mode, "sra_mode")]
     if _p14_cli.flag(include_filtered_reads, "include_filtered_reads"):
         arguments.append("-include_filtered_reads")
-    result = _run(chosen, arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+    result = _run(
+        chosen, arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path
+    )
     _tabular_rows(result, output_path, outfmt)
     return result
 
@@ -592,7 +760,9 @@ def blast_vdb_cmd_fetch_reads(
     ``'paths'`` / ``'paths_all'`` print the local top-level or all paths of the run files. ``accessions`` are SRA run
     accessions such as ``['SRR000001']``. Writes a new file.
     """
-    chosen = _gap_cli.choice(view, ("sequences", "info", "references", "paths", "paths_all"), "view")
+    chosen = _gap_cli.choice(
+        view, ("sequences", "info", "references", "paths", "paths_all"), "view"
+    )
     output_path = _gap_cli.new_file(output, "output")
     if isinstance(accessions, str) or not accessions:
         raise ConfigurationError("accessions must be a non-empty list of SRA run accessions.")
@@ -602,7 +772,9 @@ def blast_vdb_cmd_fetch_reads(
     arguments = ["-db", " ".join(names), "-out", str(output_path)]
     if chosen == "sequences":
         if (entries is None) == (entry_batch is None):
-            raise ConfigurationError("Give exactly one of entries and entry_batch with view='sequences'.")
+            raise ConfigurationError(
+                "Give exactly one of entries and entry_batch with view='sequences'."
+            )
         if entries is not None:
             if isinstance(entries, str) or not entries:
                 raise ConfigurationError("entries must be a non-empty list of identifiers.")
@@ -616,14 +788,35 @@ def blast_vdb_cmd_fetch_reads(
         if outfmt is not None:
             arguments += ["-outfmt", _p14_cli.line_text(outfmt, "outfmt")]
         if line_length is not None:
-            arguments += ["-line_length", str(_gap_cli.integer(line_length, "line_length", minimum=1))]
+            arguments += [
+                "-line_length",
+                str(_gap_cli.integer(line_length, "line_length", minimum=1)),
+            ]
         if _p14_cli.flag(include_filtered_reads, "include_filtered_reads"):
             arguments.append("-include_filtered_reads")
     else:
-        if entries is not None or entry_batch is not None or outfmt is not None or line_length is not None or include_filtered_reads:
-            raise ConfigurationError("entries, entry_batch, outfmt, line_length and include_filtered_reads apply to view='sequences' only.")
-        arguments.append({"info": "-info", "references": "-ref", "paths": "-paths", "paths_all": "-paths_all"}[chosen])
-    return _run("blast_vdb_cmd", arguments, cwd=output_path.parent, expected=[output_path], blast_path=blast_path)
+        if (
+            entries is not None
+            or entry_batch is not None
+            or outfmt is not None
+            or line_length is not None
+            or include_filtered_reads
+        ):
+            raise ConfigurationError(
+                "entries, entry_batch, outfmt, line_length and include_filtered_reads apply to view='sequences' only."
+            )
+        arguments.append(
+            {"info": "-info", "references": "-ref", "paths": "-paths", "paths_all": "-paths_all"}[
+                chosen
+            ]
+        )
+    return _run(
+        "blast_vdb_cmd",
+        arguments,
+        cwd=output_path.parent,
+        expected=[output_path],
+        blast_path=blast_path,
+    )
 
 
 __all__ = [

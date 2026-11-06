@@ -95,11 +95,15 @@ def _download(call: Callable[[], Any], *, dataset: str) -> Any:
     try:
         return call()
     except KeyError as exc:
-        raise ConfigurationError(f"snapatac2 does not know the dataset or file {dataset!r}: {exc}") from exc
+        raise ConfigurationError(
+            f"snapatac2 does not know the dataset or file {dataset!r}: {exc}"
+        ) from exc
     except TypeError as exc:
         raise ConfigurationError(f"snapatac2 rejected the request for {dataset!r}: {exc}") from exc
     except (OSError, ValueError, RuntimeError) as exc:
-        raise DownloadError(f"snapatac2 could not fetch {dataset!r}: {exc}", hint=_CACHE_HINT) from exc
+        raise DownloadError(
+            f"snapatac2 could not fetch {dataset!r}: {exc}", hint=_CACHE_HINT
+        ) from exc
 
 
 def _result(
@@ -130,7 +134,9 @@ def _motif_summary(motifs: Sequence[Any]) -> dict[str, Any]:
     return {"motif_count": len(rows), "motifs": rows}
 
 
-def _network_arrays(node_types: Sequence[str], edges: Sequence[Mapping[str, Any]]) -> tuple[list[str], list[dict[str, Any]]]:
+def _network_arrays(
+    node_types: Sequence[str], edges: Sequence[Mapping[str, Any]]
+) -> tuple[list[str], list[dict[str, Any]]]:
     """Validate a network given as node types and edges that refer to nodes by index."""
     if not node_types:
         raise ConfigurationError("node_types must contain at least one node.")
@@ -142,11 +148,15 @@ def _network_arrays(node_types: Sequence[str], edges: Sequence[Mapping[str, Any]
         source, target = edge.get("source"), edge.get("target")
         for label, node in (("source", source), ("target", target)):
             if isinstance(node, bool) or not isinstance(node, int) or not 0 <= node < len(types):
-                raise ConfigurationError(f"edges[{position}].{label} must be a node index below {len(types)}.")
+                raise ConfigurationError(
+                    f"edges[{position}].{label} must be a node index below {len(types)}."
+                )
         row: dict[str, Any] = {"source": source, "target": target}
         for key in ("distance", "cor_score", "regr_score"):
             value = edge.get(key)
-            if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, (int, float))
+            ):
                 raise ConfigurationError(f"edges[{position}].{key} must be a number or absent.")
             row[key] = None if value is None else float(value)
         rows.append(row)
@@ -168,7 +178,9 @@ def _rustworkx_graph(types: Sequence[str], rows: Sequence[Mapping[str, Any]], rx
     return graph
 
 
-def load_snapatac2_dataset(dataset: str, *, file: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def load_snapatac2_dataset(
+    dataset: str, *, file: str | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Fetch one file of a snapatac2 registry dataset into the local cache (snapatac2.datasets.load)."""
     name = _text(dataset, "dataset")
     if file is not None:
@@ -184,7 +196,9 @@ def load_snapatac2_dataset(dataset: str, *, file: str | None = None, verbose: bo
     return _result(name, {"file": file}, paths, data)
 
 
-def fetch_snapatac2_pbmc500(*, data_type: str = "fragment", downsample: bool = False, verbose: bool = True) -> dict[str, Any]:
+def fetch_snapatac2_pbmc500(
+    *, data_type: str = "fragment", downsample: bool = False, verbose: bool = True
+) -> dict[str, Any]:
     """Download the 10x 500-cell PBMC scATAC-seq example as fragment, BAM or FASTQ files (snapatac2.datasets.pbmc500)."""
     kind = _choice(data_type, "data_type", ("fragment", "bam", "fastq"))
     if not isinstance(downsample, bool):
@@ -192,7 +206,9 @@ def fetch_snapatac2_pbmc500(*, data_type: str = "fragment", downsample: bool = F
     if downsample and kind != "fragment":
         raise ConfigurationError("downsample is only available with data_type='fragment'.")
     datasets = require("snapatac2.datasets", _EXTRA)
-    result = _download(lambda: datasets.pbmc500(type=kind, downsample=downsample), dataset="atac_pbmc_500")
+    result = _download(
+        lambda: datasets.pbmc500(type=kind, downsample=downsample), dataset="atac_pbmc_500"
+    )
     return _result("atac_pbmc_500", {"data_type": kind, "downsample": downsample}, _paths(result))
 
 
@@ -214,7 +230,9 @@ def fetch_snapatac2_pbmc10k_multiome(
     mode = _choice(modality, "modality", ("RNA", "ATAC"))
     kind = _choice(data_type, "data_type", ("fragment", "h5ad"))
     datasets = require("snapatac2.datasets", _EXTRA)
-    result = _download(lambda: datasets.pbmc10k_multiome(modality=mode, type=kind), dataset="pbmc_10k_multiome")
+    result = _download(
+        lambda: datasets.pbmc10k_multiome(modality=mode, type=kind), dataset="pbmc_10k_multiome"
+    )
     return _result("pbmc_10k_multiome", {"modality": mode, "data_type": kind}, _paths(result))
 
 
@@ -223,7 +241,9 @@ def fetch_snapatac2_colon_transverse(*, verbose: bool = True) -> dict[str, Any]:
     datasets = require("snapatac2.datasets", _EXTRA)
     samples = _download(lambda: datasets.colon(), dataset="colon_transverse")
     rows = [{"sample": str(name), "fragment_file": str(path)} for name, path in samples]
-    return _result("colon_transverse", {}, [row["fragment_file"] for row in rows], {"samples": rows})
+    return _result(
+        "colon_transverse", {}, [row["fragment_file"] for row in rows], {"samples": rows}
+    )
 
 
 def fetch_snapatac2_hea_ccre(*, verbose: bool = True) -> dict[str, Any]:
@@ -251,12 +271,16 @@ def fetch_snapatac2_meuleman_2020_motifs(*, verbose: bool = True) -> dict[str, A
     return _result("Meuleman_2020", {}, [], data)
 
 
-def fetch_snapatac2_genome_files(genome: str, *, kind: str = "both", verbose: bool = True) -> dict[str, Any]:
+def fetch_snapatac2_genome_files(
+    genome: str, *, kind: str = "both", verbose: bool = True
+) -> dict[str, Any]:
     """Download the FASTA and/or gene annotation of a genome preset through snapatac2.genome.load."""
     name = _text(genome, "genome")
     canonical = _GENOME_ALIASES.get(name, name)
     if canonical not in _GENOMES:
-        raise ConfigurationError(f"genome must be one of: {', '.join(sorted(_GENOMES) + sorted(_GENOME_ALIASES))}.")
+        raise ConfigurationError(
+            f"genome must be one of: {', '.join(sorted(_GENOMES) + sorted(_GENOME_ALIASES))}."
+        )
     choice = _choice(kind, "kind", ("fasta", "annotation", "both"))
     dataset, fasta_name, annotation_name = _GENOMES[canonical]
     genome_module = require("snapatac2.genome", _EXTRA)
@@ -264,21 +288,41 @@ def fetch_snapatac2_genome_files(genome: str, *, kind: str = "both", verbose: bo
     paths: dict[str, str] = {}
     if choice in ("fasta", "both"):
         fasta = _download(
-            lambda: genome_module.load(dataset, file=fasta_name, processor=pooch.Decompress(method="gzip")),
+            lambda: genome_module.load(
+                dataset, file=fasta_name, processor=pooch.Decompress(method="gzip")
+            ),
             dataset=dataset,
         )
         paths["fasta"] = str(fasta)
     if choice in ("annotation", "both"):
-        annotation = _download(lambda: genome_module.load(dataset, file=annotation_name), dataset=dataset)
+        annotation = _download(
+            lambda: genome_module.load(dataset, file=annotation_name), dataset=dataset
+        )
         paths["annotation"] = str(annotation)
-    return _result(dataset, {"genome": canonical, "requested_name": name, "kind": choice}, list(paths.values()), paths)
+    return _result(
+        dataset,
+        {"genome": canonical, "requested_name": name, "kind": choice},
+        list(paths.values()),
+        paths,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Plots: upstream figures are drawn with Matplotlib (Plotly's PNG export needs Chrome, which is not installed).
 # ---------------------------------------------------------------------------
 
-_COLORS = ("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
+_COLORS = (
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
+)
 _LINKAGES = ("single", "complete", "average", "weighted", "centroid", "median", "ward")
 
 
@@ -312,7 +356,9 @@ def _decode(value: Any, np: Any) -> Any:
             array = np.frombuffer(base64.b64decode(value["bdata"]), dtype=np.dtype(value["dtype"]))
             shape = value.get("shape")
             if shape:
-                array = array.reshape(tuple(int(part) for part in str(shape).split(",") if part.strip()))
+                array = array.reshape(
+                    tuple(int(part) for part in str(shape).split(",") if part.strip())
+                )
             return array
         return {str(key): _decode(item, np) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
@@ -325,7 +371,10 @@ def _spec_from_figure(figure: Any) -> dict[str, Any]:
     np = _numpy()
     raw = figure.to_plotly_json()
     layout = {key: value for key, value in raw.get("layout", {}).items() if key != "template"}
-    return {"data": [_decode(trace, np) for trace in raw.get("data", [])], "layout": _decode(layout, np)}
+    return {
+        "data": [_decode(trace, np) for trace in raw.get("data", [])],
+        "layout": _decode(layout, np),
+    }
 
 
 def _title(value: Any) -> str | None:
@@ -346,7 +395,9 @@ def _domain(layout: Mapping[str, Any], ref: str) -> tuple[float, float]:
 def _array(np: Any, values: Any, name: str) -> Any:
     array = np.asarray(values)
     if array.dtype.kind not in "biuf":
-        raise ConfigurationError(f"The figure has non-numeric {name} values, which this renderer does not draw.")
+        raise ConfigurationError(
+            f"The figure has non-numeric {name} values, which this renderer does not draw."
+        )
     return array.astype(float)
 
 
@@ -356,7 +407,9 @@ def _coordinates(np: Any, values: Any, count: int) -> tuple[Any, list[str] | Non
         return np.arange(count, dtype=float), None
     array = np.asarray(values)
     if array.shape[0] != count:
-        raise ConfigurationError("A figure coordinate does not match the number of matrix rows or columns.")
+        raise ConfigurationError(
+            "A figure coordinate does not match the number of matrix rows or columns."
+        )
     if array.dtype.kind in "biuf":
         return array.astype(float), None
     return np.arange(count, dtype=float), [str(item) for item in array]
@@ -389,7 +442,11 @@ def _colormap(scale: Any) -> Any:
             if name in maps:
                 return maps[name]
     if isinstance(scale, (list, tuple)) and scale:
-        palette = [_css_color(str(pair[1])) for pair in scale if isinstance(pair, (list, tuple)) and len(pair) == 2]
+        palette = [
+            _css_color(str(pair[1]))
+            for pair in scale
+            if isinstance(pair, (list, tuple)) and len(pair) == 2
+        ]
         if palette:
             return colors.LinearSegmentedColormap.from_list("plotly_scale", palette)
     return maps["viridis"]
@@ -412,7 +469,9 @@ def _trace_color(trace: Mapping[str, Any], index: int) -> Any:
     return _COLORS[index % len(_COLORS)]
 
 
-def _draw_scatter(ax: Any, trace: Mapping[str, Any], index: int, layout: Mapping[str, Any], np: Any) -> tuple[Any, list[str] | None]:
+def _draw_scatter(
+    ax: Any, trace: Mapping[str, Any], index: int, layout: Mapping[str, Any], np: Any
+) -> tuple[Any, list[str] | None]:
     y = _array(np, trace.get("y"), "y")
     x, x_labels = _coordinates(np, trace.get("x"), y.size)
     mode = str(trace.get("mode") or "lines")
@@ -427,16 +486,28 @@ def _draw_scatter(ax: Any, trace: Mapping[str, Any], index: int, layout: Mapping
     color = marker.get("color")
     if isinstance(color, np.ndarray) and color.dtype.kind in "biuf":
         scale = (layout.get("coloraxis") or {}).get("colorscale", "viridis")
-        mappable = ax.scatter(x, y, s=size**2, c=color.astype(float), cmap=_colormap(scale), alpha=opacity, linewidths=0)
+        mappable = ax.scatter(
+            x,
+            y,
+            s=size**2,
+            c=color.astype(float),
+            cmap=_colormap(scale),
+            alpha=opacity,
+            linewidths=0,
+        )
         return mappable, x_labels
-    ax.scatter(x, y, s=size**2, color=_trace_color(trace, index), alpha=opacity, label=label, linewidths=0)
+    ax.scatter(
+        x, y, s=size**2, color=_trace_color(trace, index), alpha=opacity, label=label, linewidths=0
+    )
     return None, x_labels
 
 
 def _draw_bar(ax: Any, trace: Mapping[str, Any], index: int, np: Any) -> list[str] | None:
     height = _array(np, trace.get("y"), "y")
     positions, labels = _coordinates(np, trace.get("x"), height.size)
-    ax.bar(positions, height, width=0.8, color=_trace_color(trace, index), label=_legend_label(trace))
+    ax.bar(
+        positions, height, width=0.8, color=_trace_color(trace, index), label=_legend_label(trace)
+    )
     return labels
 
 
@@ -460,14 +531,18 @@ def _draw_violins(ax: Any, traces: Sequence[tuple[int, Mapping[str, Any]]], np: 
         labels.append(name)
     if datasets:
         parts = ax.violinplot(datasets, positions=positions, showmedians=True, widths=0.8)
-        for body, color in zip(parts["bodies"], colors):
+        for body, color in zip(parts["bodies"], colors, strict=False):
             body.set_facecolor(color)
             body.set_alpha(0.6)
     ax.set_xticks(list(range(len(traces))))
-    ax.set_xticklabels(labels + [""] * (len(traces) - len(labels)), rotation=45, ha="right", fontsize=6)
+    ax.set_xticklabels(
+        labels + [""] * (len(traces) - len(labels)), rotation=45, ha="right", fontsize=6
+    )
 
 
-def _draw_field(ax: Any, trace: Mapping[str, Any], kind: str, layout: Mapping[str, Any], np: Any) -> tuple[Any, Any, Any]:
+def _draw_field(
+    ax: Any, trace: Mapping[str, Any], kind: str, layout: Mapping[str, Any], np: Any
+) -> tuple[Any, Any, Any]:
     z = np.asarray(trace.get("z"), dtype=float)
     if z.ndim != 2:
         raise ConfigurationError("A heatmap or contour trace needs a two-dimensional z matrix.")
@@ -490,7 +565,9 @@ def _draw_shapes(ax: Any, layout: Mapping[str, Any], ref_x: str, np: Any) -> Non
             ax.axvline(float(shape["x0"]), color="0.4", linestyle="--", linewidth=0.8)
 
 
-def _style_axes(ax: Any, layout: Mapping[str, Any], ref_x: str, ref_y: str, labels: tuple[Any, Any], field: bool) -> None:
+def _style_axes(
+    ax: Any, layout: Mapping[str, Any], ref_x: str, ref_y: str, labels: tuple[Any, Any], field: bool
+) -> None:
     x_axis = layout.get(_axis_key(ref_x)) or {}
     y_axis = layout.get(_axis_key(ref_y)) or {}
     if x_axis.get("type") == "log":
@@ -510,11 +587,18 @@ def _style_axes(ax: Any, layout: Mapping[str, Any], ref_x: str, ref_y: str, labe
         ax.tick_params(axis="x", labelbottom=False)
     if y_axis.get("showticklabels") is False:
         ax.tick_params(axis="y", labelleft=False, labelright=False)
-    for axis, axis_layout, categories in ((ax.xaxis, x_axis, x_labels), (ax.yaxis, y_axis, y_labels)):
+    for axis, axis_layout, categories in (
+        (ax.xaxis, x_axis, x_labels),
+        (ax.yaxis, y_axis, y_labels),
+    ):
         if axis_layout.get("visible") is False:
             axis.set_ticks([])
             continue
-        if field and axis_layout.get("tickvals") is not None and axis_layout.get("ticktext") is not None:
+        if (
+            field
+            and axis_layout.get("tickvals") is not None
+            and axis_layout.get("ticktext") is not None
+        ):
             values = [float(item) for item in axis_layout["tickvals"]]
             text = [str(item) for item in axis_layout["ticktext"]]
         elif categories is not None:
@@ -527,14 +611,23 @@ def _style_axes(ax: Any, layout: Mapping[str, Any], ref_x: str, ref_y: str, labe
         rotation = 45 if len(text) > 6 else 0
         if axis is ax.xaxis:
             ax.set_xticks(values)
-            ax.set_xticklabels(text, rotation=rotation, ha="right" if rotation else "center", fontsize=7)
+            ax.set_xticklabels(
+                text, rotation=rotation, ha="right" if rotation else "center", fontsize=7
+            )
         else:
             ax.set_yticks(values)
             ax.set_yticklabels(text, fontsize=7)
 
 
-def _draw_group(figure: Any, ax: Any, members: Sequence[tuple[int, Mapping[str, Any]]], layout: Mapping[str, Any],
-                ref_x: str, ref_y: str, np: Any) -> list[tuple[Any, str | None]]:
+def _draw_group(
+    figure: Any,
+    ax: Any,
+    members: Sequence[tuple[int, Mapping[str, Any]]],
+    layout: Mapping[str, Any],
+    ref_x: str,
+    ref_y: str,
+    np: Any,
+) -> list[tuple[Any, str | None]]:
     labels: tuple[Any, Any] = (None, None)
     colorbars: list[tuple[Any, str | None]] = []
     violins: list[tuple[int, Mapping[str, Any]]] = []
@@ -546,7 +639,9 @@ def _draw_group(figure: Any, ax: Any, members: Sequence[tuple[int, Mapping[str, 
             if x_labels is not None:
                 labels = (x_labels, labels[1])
             if mappable is not None:
-                scale_title = _title(((layout.get("coloraxis") or {}).get("colorbar") or {}).get("title"))
+                scale_title = _title(
+                    ((layout.get("coloraxis") or {}).get("colorbar") or {}).get("title")
+                )
                 colorbars.append((mappable, scale_title))
         elif kind == "bar":
             labels = (_draw_bar(ax, trace, index, np), labels[1])
@@ -570,12 +665,16 @@ def _draw_group(figure: Any, ax: Any, members: Sequence[tuple[int, Mapping[str, 
     return colorbars
 
 
-def _draw_3d(figure: Any, traces: Sequence[Mapping[str, Any]], layout: Mapping[str, Any], np: Any) -> None:
+def _draw_3d(
+    figure: Any, traces: Sequence[Mapping[str, Any]], layout: Mapping[str, Any], np: Any
+) -> None:
     ax = figure.add_subplot(111, projection="3d")
     scene = layout.get("scene") or {}
     for index, trace in enumerate(traces):
         if trace.get("type") != "scatter3d":
-            raise ConfigurationError("A figure with scatter3d traces can only contain scatter3d traces.")
+            raise ConfigurationError(
+                "A figure with scatter3d traces can only contain scatter3d traces."
+            )
         marker = trace.get("marker") or {}
         size = float(marker.get("size") or 6)
         ax.scatter(
@@ -587,7 +686,11 @@ def _draw_3d(figure: Any, traces: Sequence[Mapping[str, Any]], layout: Mapping[s
             alpha=float(marker.get("opacity") if marker.get("opacity") is not None else 1.0),
             label=_legend_label(trace),
         )
-    for name, setter in (("xaxis", ax.set_xlabel), ("yaxis", ax.set_ylabel), ("zaxis", ax.set_zlabel)):
+    for name, setter in (
+        ("xaxis", ax.set_xlabel),
+        ("yaxis", ax.set_ylabel),
+        ("zaxis", ax.set_zlabel),
+    ):
         title = _title((scene.get(name) or {}).get("title"))
         if title:
             setter(title, fontsize=8)
@@ -613,7 +716,9 @@ def _draw_figure(spec: Mapping[str, Any], target: Path) -> None:
         _draw_3d(figure, traces, layout, np)
     else:
         # A colour bar takes a narrow column on the right; the plot area stops before it.
-        has_colorbar = "coloraxis" in layout or any(trace.get("type") in ("heatmap", "contour") for trace in traces)
+        has_colorbar = "coloraxis" in layout or any(
+            trace.get("type") in ("heatmap", "contour") for trace in traces
+        )
         left, right = 0.10, (0.80 if has_colorbar else 0.95)
         groups: dict[tuple[str, str], list[tuple[int, Mapping[str, Any]]]] = {}
         for index, trace in enumerate(traces):
@@ -623,8 +728,14 @@ def _draw_figure(spec: Mapping[str, Any], target: Path) -> None:
         for (ref_x, ref_y), members in groups.items():
             x0, x1 = _domain(layout, ref_x)
             y0, y1 = _domain(layout, ref_y)
-            ax = figure.add_axes([left + (right - left) * x0, 0.12 + 0.72 * y0,
-                                  (right - left) * (x1 - x0), 0.72 * (y1 - y0)])
+            ax = figure.add_axes(
+                [
+                    left + (right - left) * x0,
+                    0.12 + 0.72 * y0,
+                    (right - left) * (x1 - x0),
+                    0.72 * (y1 - y0),
+                ]
+            )
             colorbars.extend(_draw_group(figure, ax, members, layout, ref_x, ref_y, np))
         if colorbars:
             colorbar_axis = figure.add_axes([0.925, 0.12, 0.018, 0.72]) if has_colorbar else None
@@ -657,7 +768,10 @@ def _figure_data(spec: Mapping[str, Any]) -> dict[str, Any]:
     layout = spec.get("layout") or {}
     traces: list[dict[str, Any]] = []
     for trace in spec.get("data") or []:
-        entry: dict[str, Any] = {"type": str(trace.get("type", "scatter")), "name": _plain(trace.get("name"))}
+        entry: dict[str, Any] = {
+            "type": str(trace.get("type", "scatter")),
+            "name": _plain(trace.get("name")),
+        }
         for key in ("x", "y", "z"):
             if trace.get(key) is not None:
                 entry[key] = _bounded(np, trace[key])
@@ -672,8 +786,13 @@ def _figure_data(spec: Mapping[str, Any]) -> dict[str, Any]:
     return data
 
 
-def _plot_result(operation: str, spec: Mapping[str, Any], target: Path, parameters: Mapping[str, Any],
-                 extra: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def _plot_result(
+    operation: str,
+    spec: Mapping[str, Any],
+    target: Path,
+    parameters: Mapping[str, Any],
+    extra: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     _draw_figure(spec, target)
     data = _figure_data(spec)
     if extra:
@@ -695,7 +814,9 @@ def _values(values: Any, name: str, *, minimum: int = 1, positive: bool = False)
     except (TypeError, ValueError) as exc:
         raise ConfigurationError(f"{name} must be a sequence of numbers.") from exc
     if array.ndim != 1 or array.size < minimum:
-        raise ConfigurationError(f"{name} must be a one-dimensional sequence with at least {minimum} values.")
+        raise ConfigurationError(
+            f"{name} must be a one-dimensional sequence with at least {minimum} values."
+        )
     if not np.all(np.isfinite(array)):
         raise ConfigurationError(f"{name} must not contain NaN or infinite values.")
     if positive and np.any(array <= 0):
@@ -734,7 +855,9 @@ def _matrix(values: Any, name: str) -> Any:
     return array
 
 
-def _network_graph(node_types: Sequence[str], edges: Sequence[Mapping[str, Any]]) -> tuple[Any, list[dict[str, Any]]]:
+def _network_graph(
+    node_types: Sequence[str], edges: Sequence[Mapping[str, Any]]
+) -> tuple[Any, list[dict[str, Any]]]:
     types, rows = _network_arrays(node_types, edges)
     rx = require("rustworkx", _EXTRA)
     return _rustworkx_graph(types, rows, rx), rows
@@ -757,13 +880,17 @@ def render_snapatac2_figure_png(
     go = require("plotly.graph_objects", _EXTRA)
     plotting = require("snapatac2.plotting", _EXTRA)
     try:
-        plotly_figure = go.Figure({"data": list(figure["data"]), "layout": dict(figure.get("layout") or {})})
+        plotly_figure = go.Figure(
+            {"data": list(figure["data"]), "layout": dict(figure.get("layout") or {})}
+        )
     except (ValueError, TypeError) as exc:
         raise ConfigurationError(f"figure is not a valid Plotly figure: {exc}") from exc
-    rendered = plotting.render_plot(plotly_figure, width=width_px, height=height_px, interactive=True,
-                                    show=False, out_file=None)
-    return _plot_result("render_plot", _spec_from_figure(rendered), target,
-                        {"width": width_px, "height": height_px})
+    rendered = plotting.render_plot(
+        plotly_figure, width=width_px, height=height_px, interactive=True, show=False, out_file=None
+    )
+    return _plot_result(
+        "render_plot", _spec_from_figure(rendered), target, {"width": width_px, "height": height_px}
+    )
 
 
 def plot_snapatac2_heatmap_png(
@@ -811,8 +938,14 @@ def plot_snapatac2_heatmap_png(
         "heatmap",
         _spec_from_figure(figure),
         target,
-        {"rows": rows, "columns": columns, "cluster_rows": cluster_rows, "cluster_columns": cluster_columns,
-         "colorscale": scale, "linkage": method},
+        {
+            "rows": rows,
+            "columns": columns,
+            "cluster_rows": cluster_rows,
+            "cluster_columns": cluster_columns,
+            "colorscale": scale,
+            "linkage": method,
+        },
     )
 
 
@@ -835,8 +968,12 @@ def plot_snapatac2_kde2d_png(
         raise ConfigurationError("x and y must have the same length.")
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.kde2d(xs, ys, log_x=log_x, log_y=log_y)
-    return _plot_result("kde2d", _spec_from_figure(figure), target,
-                        {"points": int(xs.size), "log_x": log_x, "log_y": log_y})
+    return _plot_result(
+        "kde2d",
+        _spec_from_figure(figure),
+        target,
+        {"points": int(xs.size), "log_x": log_x, "log_y": log_y},
+    )
 
 
 def plot_snapatac2_scatter_png(
@@ -860,16 +997,31 @@ def plot_snapatac2_scatter_png(
         raise ConfigurationError("x and y must have the same length.")
     colors = None if color is None else _labels(color, int(xs.size), "color")
     if marker_size <= 0 or not 0 <= marker_opacity <= 1:
-        raise ConfigurationError("marker_size must be positive and marker_opacity must be between 0 and 1.")
+        raise ConfigurationError(
+            "marker_size must be positive and marker_opacity must be between 0 and 1."
+        )
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.scatter(
-        xs.tolist(), ys.tolist(), color=colors, x_label=_text(x_label, "x_label"),
-        y_label=_text(y_label, "y_label"), color_label=_text(color_label, "color_label"),
-        marker_size=float(marker_size), marker_opacity=float(marker_opacity), show=False,
+        xs.tolist(),
+        ys.tolist(),
+        color=colors,
+        x_label=_text(x_label, "x_label"),
+        y_label=_text(y_label, "y_label"),
+        color_label=_text(color_label, "color_label"),
+        marker_size=float(marker_size),
+        marker_opacity=float(marker_opacity),
+        show=False,
     )
-    return _plot_result("scatter", _spec_from_figure(figure), target,
-                        {"points": int(xs.size), "marker_size": float(marker_size),
-                         "marker_opacity": float(marker_opacity)})
+    return _plot_result(
+        "scatter",
+        _spec_from_figure(figure),
+        target,
+        {
+            "points": int(xs.size),
+            "marker_size": float(marker_size),
+            "marker_opacity": float(marker_opacity),
+        },
+    )
 
 
 def plot_snapatac2_scatter3d_png(
@@ -896,17 +1048,33 @@ def plot_snapatac2_scatter3d_png(
         raise ConfigurationError("x, y and z must have the same length.")
     colors = None if color is None else _labels(color, int(xs.size), "color")
     if marker_size <= 0 or not 0 <= marker_opacity <= 1:
-        raise ConfigurationError("marker_size must be positive and marker_opacity must be between 0 and 1.")
+        raise ConfigurationError(
+            "marker_size must be positive and marker_opacity must be between 0 and 1."
+        )
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.scatter3d(
-        xs.tolist(), ys.tolist(), zs.tolist(), color=colors, x_label=_text(x_label, "x_label"),
-        y_label=_text(y_label, "y_label"), z_label=_text(z_label, "z_label"),
-        color_label=_text(color_label, "color_label"), marker_size=float(marker_size),
-        marker_opacity=float(marker_opacity), show=False,
+        xs.tolist(),
+        ys.tolist(),
+        zs.tolist(),
+        color=colors,
+        x_label=_text(x_label, "x_label"),
+        y_label=_text(y_label, "y_label"),
+        z_label=_text(z_label, "z_label"),
+        color_label=_text(color_label, "color_label"),
+        marker_size=float(marker_size),
+        marker_opacity=float(marker_opacity),
+        show=False,
     )
-    return _plot_result("scatter3d", _spec_from_figure(figure), target,
-                        {"points": int(xs.size), "marker_size": float(marker_size),
-                         "marker_opacity": float(marker_opacity)})
+    return _plot_result(
+        "scatter3d",
+        _spec_from_figure(figure),
+        target,
+        {
+            "points": int(xs.size),
+            "marker_size": float(marker_size),
+            "marker_opacity": float(marker_opacity),
+        },
+    )
 
 
 def plot_snapatac2_network_scores_png(
@@ -930,9 +1098,15 @@ def plot_snapatac2_network_scores_png(
     if all(row[score] is None for row in rows):
         raise ConfigurationError(f"No edge has a {score} value.")
     plotting = require("snapatac2.plotting", _EXTRA)
-    figure = plotting.network_scores(graph, score_name=score, width=width_px, height=height_px, show=False)
-    return _plot_result("network_scores", _spec_from_figure(figure), target,
-                        {"score_name": score, "edges": len(rows)})
+    figure = plotting.network_scores(
+        graph, score_name=score, width=width_px, height=height_px, show=False
+    )
+    return _plot_result(
+        "network_scores",
+        _spec_from_figure(figure),
+        target,
+        {"score_name": score, "edges": len(rows)},
+    )
 
 
 def plot_snapatac2_network_edge_stat_png(
@@ -949,7 +1123,9 @@ def plot_snapatac2_network_edge_stat_png(
         raise ConfigurationError("No edge has a cor_score value.")
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.network_edge_stat(graph, show=False)
-    return _plot_result("network_edge_stat", _spec_from_figure(figure), target, {"edges": len(rows)})
+    return _plot_result(
+        "network_edge_stat", _spec_from_figure(figure), target, {"edges": len(rows)}
+    )
 
 
 def plot_snapatac2_valid_cells_png(
@@ -966,9 +1142,12 @@ def plot_snapatac2_valid_cells_png(
     width_px = _positive_int(width, "width")
     height_px = _positive_int(height, "height")
     plotting = require("snapatac2.plotting", _EXTRA)
-    figure = plotting.valid_cells([float(item) for item in values], width=width_px, height=height_px, show=False)
-    return _plot_result("valid_cells", _spec_from_figure(figure), target,
-                        {"barcodes": int(values.size)})
+    figure = plotting.valid_cells(
+        [float(item) for item in values], width=width_px, height=height_px, show=False
+    )
+    return _plot_result(
+        "valid_cells", _spec_from_figure(figure), target, {"barcodes": int(values.size)}
+    )
 
 
 def plot_snapatac2_tsse_png(
@@ -999,11 +1178,17 @@ def plot_snapatac2_tsse_png(
     )
     adata = anndata.AnnData(obs=obs)
     plotting = require("snapatac2.plotting", _EXTRA)
-    figure = plotting.tsse(adata, min_fragment=min_fragment, width=width_px, height=height_px, show=False)
+    figure = plotting.tsse(
+        adata, min_fragment=min_fragment, width=width_px, height=height_px, show=False
+    )
     selected = int((fragments >= min_fragment).sum())
-    return _plot_result("tsse", _spec_from_figure(figure), target,
-                        {"cells": int(fragments.size), "min_fragment": min_fragment},
-                        {"cells_plotted": selected})
+    return _plot_result(
+        "tsse",
+        _spec_from_figure(figure),
+        target,
+        {"cells": int(fragments.size), "min_fragment": min_fragment},
+        {"cells_plotted": selected},
+    )
 
 
 def plot_snapatac2_frag_size_distr_png(
@@ -1021,8 +1206,12 @@ def plot_snapatac2_frag_size_distr_png(
     size = _positive_int(max_recorded_size, "max_recorded_size")
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.frag_size_distr(counts, max_recorded_size=size, show=False)
-    return _plot_result("frag_size_distr", _spec_from_figure(figure), target,
-                        {"max_recorded_size": size, "sizes": int(counts.size)})
+    return _plot_result(
+        "frag_size_distr",
+        _spec_from_figure(figure),
+        target,
+        {"max_recorded_size": size, "sizes": int(counts.size)},
+    )
 
 
 def plot_snapatac2_spectral_eigenvalues_png(
@@ -1044,9 +1233,13 @@ def plot_snapatac2_spectral_eigenvalues_png(
     plotting = require("snapatac2.plotting", _EXTRA)
     figure = plotting.spectral_eigenvalues(adata, width=width_px, height=height_px, show=False)
     elbow = adata.uns.get("num_eigen")
-    return _plot_result("spectral_eigenvalues", _spec_from_figure(figure), target,
-                        {"eigenvalues": int(values.size)},
-                        {"num_eigen": None if elbow is None else int(elbow)})
+    return _plot_result(
+        "spectral_eigenvalues",
+        _spec_from_figure(figure),
+        target,
+        {"eigenvalues": int(values.size)},
+        {"num_eigen": None if elbow is None else int(elbow)},
+    )
 
 
 def plot_snapatac2_regions_png(
@@ -1081,7 +1274,9 @@ def plot_snapatac2_regions_png(
         chosen = _names(members, len(members), f"peaks[{group!r}]") or []
         unknown = [item for item in chosen if item not in set(names or [])]
         if not chosen or unknown:
-            raise ConfigurationError(f"peaks[{group!r}] must list peaks from peak_names (unknown: {unknown[:3]}).")
+            raise ConfigurationError(
+                f"peaks[{group!r}] must list peaks from peak_names (unknown: {unknown[:3]})."
+            )
         selection[str(group)] = chosen
     width_px = _positive_int(width, "width")
     height_px = _positive_int(height, "height")
@@ -1093,10 +1288,16 @@ def plot_snapatac2_regions_png(
         var=pandas.DataFrame(index=names),
     )
     plotting = require("snapatac2.plotting", _EXTRA)
-    figure = plotting.regions(adata, groupby=label, peaks=selection, width=width_px, height=height_px, show=False)
-    return _plot_result("regions", _spec_from_figure(figure), target,
-                        {"cells": cells, "peaks": regions, "groupby": label},
-                        {"selected_peaks": sum(len(items) for items in selection.values())})
+    figure = plotting.regions(
+        adata, groupby=label, peaks=selection, width=width_px, height=height_px, show=False
+    )
+    return _plot_result(
+        "regions",
+        _spec_from_figure(figure),
+        target,
+        {"cells": cells, "peaks": regions, "groupby": label},
+        {"selected_peaks": sum(len(items) for items in selection.values())},
+    )
 
 
 def plot_snapatac2_umap_png(
@@ -1117,7 +1318,9 @@ def plot_snapatac2_umap_png(
         raise ConfigurationError("marker_size must be positive.")
     if not 0 <= marker_opacity <= 1:
         raise ConfigurationError("marker_opacity must be between 0 and 1.")
-    labels = None if color is None else _numpy().asarray(_labels(color, coordinates.shape[0], "color"))
+    labels = (
+        None if color is None else _numpy().asarray(_labels(color, coordinates.shape[0], "color"))
+    )
     if labels is None and coordinates.shape[1] == 3:
         # snapatac2 2.10 fails for a 3D embedding without colours (scatter3d names a missing 'color' column),
         # so every point is put in one group; the legend then reads 'all cells'.
@@ -1130,8 +1333,12 @@ def plot_snapatac2_umap_png(
         marker_opacity=float(marker_opacity),
         show=False,
     )
-    return _plot_result("umap", _spec_from_figure(figure), target,
-                        {"points": int(coordinates.shape[0]), "dimensions": int(coordinates.shape[1])})
+    return _plot_result(
+        "umap",
+        _spec_from_figure(figure),
+        target,
+        {"points": int(coordinates.shape[0]), "dimensions": int(coordinates.shape[1])},
+    )
 
 
 def plot_snapatac2_motif_enrichment_png(
@@ -1154,7 +1361,9 @@ def plot_snapatac2_motif_enrichment_png(
     reference_ids: list[str] | None = None
     for group, columns in enrichment.items():
         if not isinstance(columns, Mapping) or any(name not in columns for name in required):
-            raise ConfigurationError(f"enrichment[{group!r}] must be a table with the columns {', '.join(required)}.")
+            raise ConfigurationError(
+                f"enrichment[{group!r}] must be a table with the columns {', '.join(required)}."
+            )
         if len({len(list(columns[name])) for name in required}) != 1:
             raise ConfigurationError(f"enrichment[{group!r}] columns must have the same length.")
         ids = [str(item) for item in columns["id"]]
@@ -1162,15 +1371,23 @@ def plot_snapatac2_motif_enrichment_png(
             reference_ids = ids
         elif ids != reference_ids:
             raise ConfigurationError("Every group must list the same motif ids in the same order.")
-        tables[str(group)] = polars.DataFrame({str(name): list(values) for name, values in columns.items()})
+        tables[str(group)] = polars.DataFrame(
+            {str(name): list(values) for name, values in columns.items()}
+        )
     plotting = require("snapatac2.plotting", _EXTRA)
-    figure = plotting.motif_enrichment(tables, min_log_fc=float(min_log_fc), max_fdr=float(max_fdr), show=False)
+    figure = plotting.motif_enrichment(
+        tables, min_log_fc=float(min_log_fc), max_fdr=float(max_fdr), show=False
+    )
     return _plot_result(
         "motif_enrichment",
         _spec_from_figure(figure),
         target,
-        {"groups": len(tables), "motifs": len(reference_ids or []), "min_log_fc": float(min_log_fc),
-         "max_fdr": float(max_fdr)},
+        {
+            "groups": len(tables),
+            "motifs": len(reference_ids or []),
+            "min_log_fc": float(min_log_fc),
+            "max_fdr": float(max_fdr),
+        },
     )
 
 
@@ -1190,7 +1407,9 @@ def plot_snapatac2_coverage_png(
     text = _text(region, "region")
     match = re.fullmatch(r"([^:\s]+):(\d+)-(\d+)", text)
     if match is None or int(match.group(2)) >= int(match.group(3)):
-        raise ConfigurationError("region must be formatted as chrom:start-end with start below end.")
+        raise ConfigurationError(
+            "region must be formatted as chrom:start-end with start below end."
+        )
     start, end = int(match.group(2)), int(match.group(3))
     label = _text(groupby, "groupby")
     snapatac2 = require("snapatac2", _EXTRA)
@@ -1219,7 +1438,9 @@ def plot_snapatac2_coverage_png(
     figure = figure_module.Figure(figsize=(6.0, 1.2 * len(tracks)), dpi=100, layout="constrained")
     canvas_module.FigureCanvasAgg(figure)
     axes = figure.subplots(len(tracks), 1, sharex=True, squeeze=False).ravel()
-    for index, (axis, (name, signal)) in enumerate(zip(axes, zip([name for name, _ in tracks], signals))):
+    for index, (axis, (name, signal)) in enumerate(
+        zip(axes, zip([name for name, _ in tracks], signals, strict=False), strict=False)
+    ):
         axis.fill_between(range(signal.size), 0, signal, color=colormap(index % 10))
         axis.set_title(str(name), fontsize=7)
         axis.spines[["top", "right"]].set_visible(False)
@@ -1236,7 +1457,7 @@ def plot_snapatac2_coverage_png(
         "positions": positions,
         "tracks": [
             {"group": str(name), "max": float(signal.max()), "signal": _bounded(np, signal)}
-            for (name, _), signal in zip(tracks, signals)
+            for (name, _), signal in zip(tracks, signals, strict=False)
         ],
     }
     return {
@@ -1250,30 +1471,30 @@ def plot_snapatac2_coverage_png(
 
 
 __all__ = [
-    "load_snapatac2_dataset",
-    "fetch_snapatac2_pbmc500",
+    "fetch_snapatac2_cis_bp_motifs",
+    "fetch_snapatac2_colon_transverse",
+    "fetch_snapatac2_genome_files",
+    "fetch_snapatac2_hea_ccre",
+    "fetch_snapatac2_meuleman_2020_motifs",
     "fetch_snapatac2_pbmc5k",
     "fetch_snapatac2_pbmc10k_multiome",
-    "fetch_snapatac2_colon_transverse",
-    "fetch_snapatac2_hea_ccre",
-    "fetch_snapatac2_cis_bp_motifs",
-    "fetch_snapatac2_meuleman_2020_motifs",
-    "fetch_snapatac2_genome_files",
-    "render_snapatac2_figure_png",
+    "fetch_snapatac2_pbmc500",
+    "load_snapatac2_dataset",
+    "plot_snapatac2_coverage_png",
+    "plot_snapatac2_frag_size_distr_png",
     "plot_snapatac2_heatmap_png",
     "plot_snapatac2_kde2d_png",
-    "plot_snapatac2_scatter_png",
-    "plot_snapatac2_scatter3d_png",
-    "plot_snapatac2_network_scores_png",
-    "plot_snapatac2_network_edge_stat_png",
-    "plot_snapatac2_valid_cells_png",
-    "plot_snapatac2_tsse_png",
-    "plot_snapatac2_frag_size_distr_png",
-    "plot_snapatac2_spectral_eigenvalues_png",
-    "plot_snapatac2_regions_png",
-    "plot_snapatac2_umap_png",
     "plot_snapatac2_motif_enrichment_png",
-    "plot_snapatac2_coverage_png",
+    "plot_snapatac2_network_edge_stat_png",
+    "plot_snapatac2_network_scores_png",
+    "plot_snapatac2_regions_png",
+    "plot_snapatac2_scatter3d_png",
+    "plot_snapatac2_scatter_png",
+    "plot_snapatac2_spectral_eigenvalues_png",
+    "plot_snapatac2_tsse_png",
+    "plot_snapatac2_umap_png",
+    "plot_snapatac2_valid_cells_png",
+    "render_snapatac2_figure_png",
 ]
 
 _register_public_verbose(globals())

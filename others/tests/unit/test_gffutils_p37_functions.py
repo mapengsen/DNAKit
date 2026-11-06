@@ -36,7 +36,9 @@ def test_fetch_and_list_match_gffutils(gff):
     assert fetched["gff_line"] == str(db["tA1"])
     assert fetched["feature"]["start"] == 101
     assert g.list_gffutils_features(gff, featuretype="gene", verbose=False)["count"] == 2
-    assert g.list_gffutils_features(gff, verbose=False)["count"] == sum(1 for _ in db.all_features())
+    assert g.list_gffutils_features(gff, verbose=False)["count"] == sum(
+        1 for _ in db.all_features()
+    )
     assert g.list_gffutils_features(gff, seqid="chrX", verbose=False)["count"] == 0
     with pytest.raises(ConfigurationError):
         g.fetch_gffutils_feature(gff, "missing", verbose=False)
@@ -46,12 +48,14 @@ def test_parent_children_groups_and_parents(gff):
     groups = g.group_gffutils_parent_children(gff, verbose=False)["groups"]
     assert [group["parent"]["id"] for group in groups] == ["geneA", "geneB"]
     db = gffutils.create_db(str(gff), ":memory:", verbose=False)
-    direct = list(db.iter_by_parent_childs(featuretype="gene"))[0]
+    direct = next(iter(db.iter_by_parent_childs(featuretype="gene")))
     # The first element is the parent; only the remaining five records are children.
     assert [child["id"] for child in groups[0]["children"]] == [child.id for child in direct[1:]]
     parents = g.fetch_gffutils_parents(gff, "eA1", verbose=False)["parents"]
     assert {p["id"] for p in parents} == {"tA1", "geneA"}
-    assert [p["id"] for p in g.fetch_gffutils_parents(gff, "eA1", level=1, verbose=False)["parents"]] == ["tA1"]
+    assert [
+        p["id"] for p in g.fetch_gffutils_parents(gff, "eA1", level=1, verbose=False)["parents"]
+    ] == ["tA1"]
 
 
 def test_interfeatures_introns_splice_sites_and_children_bp(gff):
@@ -62,7 +66,10 @@ def test_interfeatures_introns_splice_sites_and_children_bp(gff):
     sites = g.create_gffutils_splice_sites(gff, verbose=False)
     assert sites["count"] == 6
     assert g.gffutils_children_bp(gff, "geneA", verbose=False)["base_pairs"] == 500
-    assert g.gffutils_children_bp(gff, "geneA", child_featuretype="CDS", verbose=False)["base_pairs"] == 50
+    assert (
+        g.gffutils_children_bp(gff, "geneA", child_featuretype="CDS", verbose=False)["base_pairs"]
+        == 50
+    )
 
 
 def test_derived_features_are_written_only_to_new_files(gff, tmp_path):
@@ -76,10 +83,17 @@ def test_derived_features_are_written_only_to_new_files(gff, tmp_path):
 def test_database_edits_write_new_databases(gff, tmp_path):
     deleted = g.delete_gffutils_features(gff, tmp_path / "d.db", featuretype="exon", verbose=False)
     assert (deleted["features_before"], deleted["features_after"], deleted["deleted"]) == (10, 5, 5)
-    assert g.delete_gffutils_features(gff, tmp_path / "d2.db", feature_ids=["cA1"], verbose=False)["features_after"] == 9
+    assert (
+        g.delete_gffutils_features(gff, tmp_path / "d2.db", feature_ids=["cA1"], verbose=False)[
+            "features_after"
+        ]
+        == 9
+    )
     with pytest.raises(ConfigurationError):
         g.delete_gffutils_features(gff, tmp_path / "d3.db", verbose=False)
-    updated = g.update_gffutils_features(gff, ["chr1\tx\tgene\t5\t50\t.\t+\t.\tID=geneC"], tmp_path / "u.db", verbose=False)
+    updated = g.update_gffutils_features(
+        gff, ["chr1\tx\tgene\t5\t50\t.\t+\t.\tID=geneC"], tmp_path / "u.db", verbose=False
+    )
     assert (updated["features_before"], updated["features_after"]) == (10, 11)
     assert gffutils.FeatureDB(str(tmp_path / "u.db"))["geneC"].end == 50
     related = g.add_gffutils_relation(gff, "geneB", "tA1", 1, tmp_path / "r.db", verbose=False)
@@ -105,15 +119,23 @@ def test_write_gff_and_canonical_order(gff, tmp_path):
     assert plain["records_written"] == 10
     only = g.write_gffutils_gff(gff, tmp_path / "genes.gff3", featuretype="gene", verbose=False)
     assert only["records_written"] == 2
-    canonical = g.write_gffutils_gff(gff, tmp_path / "canon.gff3", canonical_gene_order=True, verbose=False)
-    lines = [x.split("\t")[2] for x in (tmp_path / "canon.gff3").read_text().splitlines() if x and not x.startswith("#")]
+    canonical = g.write_gffutils_gff(
+        gff, tmp_path / "canon.gff3", canonical_gene_order=True, verbose=False
+    )
+    lines = [
+        x.split("\t")[2]
+        for x in (tmp_path / "canon.gff3").read_text().splitlines()
+        if x and not x.startswith("#")
+    ]
     assert lines[:2] == ["gene", "mRNA"] and canonical["records_written"] == 10
 
 
 def test_remove_duplicates_merges_repeated_ids(tmp_path):
     source = tmp_path / "dup.gff3"
     line = "chr1\tx\tgene\t1\t100\t.\t+\t.\tID=g1;Name=a\n"
-    source.write_text("##gff-version 3\n" + line + line + "chr1\tx\tgene\t200\t300\t.\t+\t.\tID=g2\n")
+    source.write_text(
+        "##gff-version 3\n" + line + line + "chr1\tx\tgene\t200\t300\t.\t+\t.\tID=g2\n"
+    )
     result = g.remove_gffutils_duplicates(source, tmp_path / "out.gff3", verbose=False)
     assert (result["records_before"], result["records_after"], result["removed"]) == (3, 2, 1)
 
@@ -121,6 +143,8 @@ def test_remove_duplicates_merges_repeated_ids(tmp_path):
 def test_plot_gene_model_saves_image(gff, tmp_path):
     pytest.importorskip("pybedtools")
     pytest.importorskip("matplotlib")
-    result = g.plot_gffutils_gene_model(gff, "geneA", tmp_path / "gene.png", utrs=["UTR"], verbose=False)
+    result = g.plot_gffutils_gene_model(
+        gff, "geneA", tmp_path / "gene.png", utrs=["UTR"], verbose=False
+    )
     assert (tmp_path / "gene.png").stat().st_size > 1000
     assert result["transcripts"][0]["cds_count"] == 1

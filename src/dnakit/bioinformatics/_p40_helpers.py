@@ -49,7 +49,9 @@ def new_dir(value: str | Path, name: str) -> Path:
     return path
 
 
-def integer(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int:
+def integer(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{name} must be an integer.")
     if minimum is not None and value < minimum:
@@ -89,7 +91,9 @@ def read_fasta(path: Path, *, max_bases: int = 500_000_000) -> list[tuple[str, s
     def flush() -> None:
         if header is not None:
             parts = header.split(None, 1)
-            records.append((parts[0] if parts else "", parts[1] if len(parts) > 1 else "", "".join(chunks)))
+            records.append(
+                (parts[0] if parts else "", parts[1] if len(parts) > 1 else "", "".join(chunks))
+            )
 
     with open_text(path) as handle:
         for line in handle:
@@ -99,7 +103,9 @@ def read_fasta(path: Path, *, max_bases: int = 500_000_000) -> list[tuple[str, s
                 header, chunks = line[1:], []
             elif line.strip():
                 if header is None:
-                    raise ConfigurationError(f"{path} is not FASTA: sequence before the first '>' line.")
+                    raise ConfigurationError(
+                        f"{path} is not FASTA: sequence before the first '>' line."
+                    )
                 chunks.append(line.strip())
                 total += len(line)
                 if total > max_bases:

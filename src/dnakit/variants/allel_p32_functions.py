@@ -58,7 +58,9 @@ def _int_option(value: object, name: str, *, minimum: int = 0, maximum: int = _M
     return value
 
 
-def _int_array(value: object, name: str, *, ndim: int, minimum: int = -1, maximum: int = _MAX_ALLELE) -> Any:
+def _int_array(
+    value: object, name: str, *, ndim: int, minimum: int = -1, maximum: int = _MAX_ALLELE
+) -> Any:
     np = _numpy()
     try:
         array = np.asarray(value)
@@ -82,7 +84,9 @@ def _haplotypes(value: object, name: str = "haplotypes") -> Any:
 
 
 def _allele_counts(value: object, name: str = "allele_counts") -> Any:
-    return _allel().AlleleCountsArray(_int_array(value, name, ndim=2, minimum=0, maximum=_MAX_COUNT))
+    return _allel().AlleleCountsArray(
+        _int_array(value, name, ndim=2, minimum=0, maximum=_MAX_COUNT)
+    )
 
 
 def _positions(value: object, name: str) -> Any:
@@ -97,9 +101,15 @@ def _plain(value: Any) -> Any:
     np = _numpy()
     if isinstance(value, np.ndarray):
         if value.dtype.kind == "f" and not np.isfinite(value).all():
-            return np.where(np.isfinite(value), value, None).tolist()  # NaN and infinity become null
+            return np.where(
+                np.isfinite(value), value, None
+            ).tolist()  # NaN and infinity become null
         if value.dtype.kind in "SU":
-            return np.char.decode(value.astype("S"), "ascii").tolist() if value.dtype.kind == "S" else value.tolist()
+            return (
+                np.char.decode(value.astype("S"), "ascii").tolist()
+                if value.dtype.kind == "S"
+                else value.tolist()
+            )
         return value.tolist()
     if isinstance(value, np.generic):
         return value.item()
@@ -153,8 +163,12 @@ def write_sites_vcf(
         ids.append(str(record.get("id") or "."))
         qual.append(float(record["qual"]) if record.get("qual") is not None else None)
         names = record.get("filters") or []
-        if isinstance(names, str) or not all(isinstance(item, str) and item.isidentifier() for item in names):
-            raise ConfigurationError("filters must be a list of filter names (letters, digits, underscore).")
+        if isinstance(names, str) or not all(
+            isinstance(item, str) and item.isidentifier() for item in names
+        ):
+            raise ConfigurationError(
+                "filters must be a list of filter names (letters, digits, underscore)."
+            )
         failed.append(list(names))
         alts.append(alt_list)
     width = max(len(item) for item in alts)
@@ -169,7 +183,9 @@ def write_sites_vcf(
         "variants/FILTER_PASS": np.array([not item for item in failed], dtype=bool),
     }
     for name in sorted({item for names in failed for item in names}):
-        callset[f"variants/FILTER_{name}"] = np.array([name in names for names in failed], dtype=bool)
+        callset[f"variants/FILTER_{name}"] = np.array(
+            [name in names for names in failed], dtype=bool
+        )
     allel.write_vcf(str(target), callset, fill={"ALT": b""})
     return _result("write_sites_vcf", output_vcf=str(target), variant_count=len(chrom))
 
@@ -190,7 +206,11 @@ def haploidify_genotypes(
     array = _genotypes(genotypes)
     if seed is not None:
         np.random.seed(_int_option(seed, "seed", maximum=2**32 - 1))
-    return _result("haploidify_genotypes", seed=seed, haplotypes=_plain(_numpy().asarray(array.haploidify_samples().values)))
+    return _result(
+        "haploidify_genotypes",
+        seed=seed,
+        haplotypes=_plain(_numpy().asarray(array.haploidify_samples().values)),
+    )
 
 
 def fill_masked_genotypes(
@@ -301,7 +321,9 @@ def count_genotype_calls(
     elif chosen == "call":
         if call is None or len(call) != array.shape[2]:
             raise ConfigurationError("call must be a genotype with one allele per ploidy.")
-        counts = array.count_call(tuple(_int_option(item, "call allele", minimum=-1) for item in call), axis=axis)
+        counts = array.count_call(
+            tuple(_int_option(item, "call allele", minimum=-1) for item in call), axis=axis
+        )
     else:
         counts = getattr(array, f"count_{chosen}")(axis=axis)
     return _result("count_genotype_calls", kind=chosen, axis=axis, counts=_plain(counts))
@@ -428,7 +450,9 @@ def summarize_alleles_per_variant(
 
     array = _allele_counts(allele_counts)
     chosen = _choice(kind, "kind", ("allelism", "max_allele"))
-    return _result("summarize_alleles_per_variant", kind=chosen, values=_plain(getattr(array, chosen)()))
+    return _result(
+        "summarize_alleles_per_variant", kind=chosen, values=_plain(getattr(array, chosen)())
+    )
 
 
 _SITE_KINDS = (
@@ -462,7 +486,9 @@ def locate_allele_count_sites(
         mask = getattr(array, f"is_{chosen}")(_int_option(allele, "allele"))
     else:
         mask = getattr(array, f"is_{chosen}")()
-    return _result("locate_allele_count_sites", kind=chosen, mask=_plain(mask), count=int(mask.sum()))
+    return _result(
+        "locate_allele_count_sites", kind=chosen, mask=_plain(mask), count=int(mask.sum())
+    )
 
 
 def count_allele_count_sites(
@@ -530,7 +556,9 @@ def locate_sorted_positions(
         raise ConfigurationError("positions must be unique.")
     try:
         if isinstance(keys, int) and not isinstance(keys, bool):
-            return _result("locate_sorted_positions", mode="key", located=int(index.locate_key(keys)))
+            return _result(
+                "locate_sorted_positions", mode="key", located=int(index.locate_key(keys))
+            )
         key_array = _int_array(keys, "keys", ndim=1, minimum=1, maximum=_MAX_POSITION)
         mask = index.locate_keys(key_array, strict=bool(strict))
     except KeyError as exc:
@@ -563,7 +591,9 @@ def intersect_sorted_positions(
 def _range_bounds(ranges: object) -> tuple[Any, Any]:
     pairs = _int_array(ranges, "ranges", ndim=2, minimum=1, maximum=_MAX_POSITION)
     if pairs.shape[1] != 2 or (pairs[:, 1] < pairs[:, 0]).any():
-        raise ConfigurationError("ranges must be [start, stop] pairs (1-based, inclusive) with stop >= start.")
+        raise ConfigurationError(
+            "ranges must be [start, stop] pairs (1-based, inclusive) with stop >= start."
+        )
     return pairs[:, 0], pairs[:, 1]
 
 
@@ -656,12 +686,21 @@ def principal_coordinates_analysis(
         matrix = np.asarray(distance_matrix, dtype=float)
     except (TypeError, ValueError) as exc:
         raise ConfigurationError("distance_matrix must be numeric.") from exc
-    if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1] or matrix.shape[0] < 3 or matrix.size > 4_000_000:
+    if (
+        matrix.ndim != 2
+        or matrix.shape[0] != matrix.shape[1]
+        or matrix.shape[0] < 3
+        or matrix.size > 4_000_000
+    ):
         raise ConfigurationError("distance_matrix must be a square matrix with at least 3 rows.")
     if not np.isfinite(matrix).all() or not np.allclose(matrix, matrix.T):
         raise ConfigurationError("distance_matrix must be finite and symmetric.")
     coords, explained = allel.pcoa(matrix)
-    return _result("principal_coordinates_analysis", coordinates=_plain(coords), explained_ratio=_plain(explained))
+    return _result(
+        "principal_coordinates_analysis",
+        coordinates=_plain(coords),
+        explained_ratio=_plain(explained),
+    )
 
 
 def _states(x: object, states: object, pos: object) -> tuple[Any, Any, Any]:
@@ -737,7 +776,12 @@ def scale_genotype_dosages(
         matrix = np.asarray(dosages, dtype=float)
     except (TypeError, ValueError) as exc:
         raise ConfigurationError("dosages must be numeric.") from exc
-    if matrix.ndim != 2 or matrix.size == 0 or matrix.size > _MAX_ITEMS or not np.isfinite(matrix).all():
+    if (
+        matrix.ndim != 2
+        or matrix.size == 0
+        or matrix.size > _MAX_ITEMS
+        or not np.isfinite(matrix).all()
+    ):
         raise ConfigurationError("dosages must be a finite, non-empty 2-D array.")
     scaler = allel.CenterScaler() if chosen == "center" else allel.PattersonScaler(ploidy=ploid)
     scaled = scaler.fit(matrix).transform(matrix)

@@ -30,7 +30,7 @@ _HEX = re.compile(r"#[0-9A-Fa-f]{6}")
 _MAX_TRACKS = 20
 _MAX_FEATURES = 20_000
 _MAX_LENGTH = 10**10
-_PNG_HINT = 'Install the ReportLab Cairo backend: python -m pip install rlPyCairo (or choose pdf, svg or eps).'
+_PNG_HINT = "Install the ReportLab Cairo backend: python -m pip install rlPyCairo (or choose pdf, svg or eps)."
 
 
 def _provenance(**notes: str) -> dict[str, Any]:
@@ -129,7 +129,11 @@ def genome_diagram_crosslinks(
     """
 
     fmt = _format(image_format)
-    if isinstance(tracks, (str, bytes)) or not isinstance(tracks, Sequence) or not 2 <= len(tracks) <= _MAX_TRACKS:
+    if (
+        isinstance(tracks, (str, bytes))
+        or not isinstance(tracks, Sequence)
+        or not 2 <= len(tracks) <= _MAX_TRACKS
+    ):
         raise ConfigurationError(f"tracks must hold 2 to {_MAX_TRACKS} tracks.")
     if isinstance(links, (str, bytes)) or not isinstance(links, Sequence) or not links:
         raise ConfigurationError("links must be a non-empty list of link records.")
@@ -144,15 +148,24 @@ def genome_diagram_crosslinks(
         unknown = set(track) - {"name", "length", "features"}
         if unknown:
             raise ConfigurationError(f"tracks[{index}]: unknown keys {sorted(unknown)}.")
-        length = _integer(track.get("length"), f"tracks[{index}].length", minimum=1, maximum=_MAX_LENGTH)
+        length = _integer(
+            track.get("length"), f"tracks[{index}].length", minimum=1, maximum=_MAX_LENGTH
+        )
         features = track.get("features", [])
-        if isinstance(features, (str, bytes)) or not isinstance(features, Sequence) or len(features) > _MAX_FEATURES:
+        if (
+            isinstance(features, (str, bytes))
+            or not isinstance(features, Sequence)
+            or len(features) > _MAX_FEATURES
+        ):
             raise ConfigurationError(f"tracks[{index}].features must be a list.")
         parsed.append(
             {
                 "name": _label(track.get("name"), f"tracks[{index}].name"),
                 "length": length,
-                "features": [_feature(item, length, f"tracks[{index}].features[{n}]") for n, item in enumerate(features)],
+                "features": [
+                    _feature(item, length, f"tracks[{index}].features[{n}]")
+                    for n, item in enumerate(features)
+                ],
             }
         )
     if len({item["name"] for item in parsed}) != len(parsed):
@@ -170,24 +183,57 @@ def genome_diagram_crosslinks(
     for index, link in enumerate(links):
         if not isinstance(link, Mapping):
             raise ConfigurationError("each link must be a mapping.")
-        unknown = set(link) - {"track_a", "start_a", "end_a", "track_b", "start_b", "end_b", "color", "flip"}
+        unknown = set(link) - {
+            "track_a",
+            "start_a",
+            "end_a",
+            "track_b",
+            "start_b",
+            "end_b",
+            "color",
+            "flip",
+        }
         if unknown:
             raise ConfigurationError(f"links[{index}]: unknown keys {sorted(unknown)}.")
-        a, b = locate(link.get("track_a"), f"links[{index}].track_a"), locate(link.get("track_b"), f"links[{index}].track_b")
+        a, b = (
+            locate(link.get("track_a"), f"links[{index}].track_a"),
+            locate(link.get("track_b"), f"links[{index}].track_b"),
+        )
         if a == b:
             raise ConfigurationError(f"links[{index}]: a link must join two different tracks.")
         flip = link.get("flip", False)
         if not isinstance(flip, bool):
             raise ConfigurationError(f"links[{index}].flip must be True or False.")
-        start_a = _integer(link.get("start_a"), f"links[{index}].start_a", minimum=0, maximum=parsed[a]["length"])
-        end_a = _integer(link.get("end_a"), f"links[{index}].end_a", minimum=start_a + 1, maximum=parsed[a]["length"])
-        start_b = _integer(link.get("start_b"), f"links[{index}].start_b", minimum=0, maximum=parsed[b]["length"])
-        end_b = _integer(link.get("end_b"), f"links[{index}].end_b", minimum=start_b + 1, maximum=parsed[b]["length"])
+        start_a = _integer(
+            link.get("start_a"), f"links[{index}].start_a", minimum=0, maximum=parsed[a]["length"]
+        )
+        end_a = _integer(
+            link.get("end_a"),
+            f"links[{index}].end_a",
+            minimum=start_a + 1,
+            maximum=parsed[a]["length"],
+        )
+        start_b = _integer(
+            link.get("start_b"), f"links[{index}].start_b", minimum=0, maximum=parsed[b]["length"]
+        )
+        end_b = _integer(
+            link.get("end_b"),
+            f"links[{index}].end_b",
+            minimum=start_b + 1,
+            maximum=parsed[b]["length"],
+        )
         parsed_links.append(
             {
-                "track_a": parsed[a]["name"], "start_a": start_a, "end_a": end_a,
-                "track_b": parsed[b]["name"], "start_b": start_b, "end_b": end_b,
-                "color": link.get("color"), "flip": flip, "_a": a, "_b": b,
+                "track_a": parsed[a]["name"],
+                "start_a": start_a,
+                "end_a": end_a,
+                "track_b": parsed[b]["name"],
+                "start_b": start_b,
+                "end_b": end_b,
+                "color": link.get("color"),
+                "flip": flip,
+                "_a": a,
+                "_b": b,
             }
         )
     diagram_title = _label(title, "title") if title is not None else None
@@ -203,14 +249,21 @@ def genome_diagram_crosslinks(
         for index, item in enumerate(parsed):
             # odd track levels leave a gap between bands for the cross-link ribbons
             track = diagram.new_track(
-                2 * (len(parsed) - index) - 1, name=item["name"], greytrack=True, greytrack_labels=1,
-                start=0, end=item["length"], height=1.0,
+                2 * (len(parsed) - index) - 1,
+                name=item["name"],
+                greytrack=True,
+                greytrack_labels=1,
+                start=0,
+                end=item["length"],
+                height=1.0,
             )
             feature_set = track.new_set()
             for feature in item["features"]:
                 feature_set.add_feature(
                     seqfeature.SeqFeature(
-                        seqfeature.FeatureLocation(feature["start"], feature["end"], strand=feature["strand"] or None)
+                        seqfeature.FeatureLocation(
+                            feature["start"], feature["end"], strand=feature["strand"] or None
+                        )
                     ),
                     color=_color(feature["color"], "feature color", "steelblue"),
                     label=feature["label"] is not None,
@@ -245,7 +298,10 @@ def genome_diagram_crosslinks(
         "image_format": fmt,
         "bytes": target.stat().st_size,
         "tracks": [{key: item[key] for key in ("name", "length", "features")} for item in parsed],
-        "links": [{key: value for key, value in link.items() if not key.startswith("_")} for link in parsed_links],
+        "links": [
+            {key: value for key, value in link.items() if not key.startswith("_")}
+            for link in parsed_links
+        ],
         "provenance": _provenance(parser="Bio.Graphics.GenomeDiagram (Diagram, CrossLink)"),
     }
 
@@ -272,7 +328,11 @@ def chromosome_ideogram(
     """
 
     fmt = _format(image_format)
-    if isinstance(chromosomes, (str, bytes)) or not isinstance(chromosomes, Sequence) or not 1 <= len(chromosomes) <= 60:
+    if (
+        isinstance(chromosomes, (str, bytes))
+        or not isinstance(chromosomes, Sequence)
+        or not 1 <= len(chromosomes) <= 60
+    ):
         raise ConfigurationError("chromosomes must hold 1 to 60 chromosomes.")
     for value, name in ((page_width_cm, "page_width_cm"), (page_height_cm, "page_height_cm")):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not 5 <= value <= 200:
@@ -286,16 +346,23 @@ def chromosome_ideogram(
         unknown = set(chromosome) - {"name", "length", "features"}
         if unknown:
             raise ConfigurationError(f"chromosomes[{index}]: unknown keys {sorted(unknown)}.")
-        length = _integer(chromosome.get("length"), f"chromosomes[{index}].length", minimum=1, maximum=_MAX_LENGTH)
+        length = _integer(
+            chromosome.get("length"), f"chromosomes[{index}].length", minimum=1, maximum=_MAX_LENGTH
+        )
         features = chromosome.get("features", [])
-        if isinstance(features, (str, bytes)) or not isinstance(features, Sequence) or len(features) > _MAX_FEATURES:
+        if (
+            isinstance(features, (str, bytes))
+            or not isinstance(features, Sequence)
+            or len(features) > _MAX_FEATURES
+        ):
             raise ConfigurationError(f"chromosomes[{index}].features must be a list.")
         parsed.append(
             {
                 "name": _label(chromosome.get("name"), f"chromosomes[{index}].name"),
                 "length": length,
                 "features": [
-                    _feature(item, length, f"chromosomes[{index}].features[{n}]") for n, item in enumerate(features)
+                    _feature(item, length, f"chromosomes[{index}].features[{n}]")
+                    for n, item in enumerate(features)
                 ],
             }
         )
@@ -351,7 +418,9 @@ def chromosome_ideogram(
         "bytes": target.stat().st_size,
         "telomere_length": cap,
         "chromosomes": parsed,
-        "provenance": _provenance(parser="Bio.Graphics.BasicChromosome (Organism, Chromosome, segments)"),
+        "provenance": _provenance(
+            parser="Bio.Graphics.BasicChromosome (Organism, Chromosome, segments)"
+        ),
     }
 
 

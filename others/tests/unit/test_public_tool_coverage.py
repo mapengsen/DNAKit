@@ -15,6 +15,7 @@ from dnakit.integrations import (
     third_party_route,
     unified_capability_summary,
 )
+from dnakit.integrations.third_party import _SKILL_CATALOG
 
 
 def test_coverage_preserves_declared_and_recoverable_counts() -> None:
@@ -33,10 +34,13 @@ def test_integration_inventory_separates_surface_counts() -> None:
     inventory = integration_inventory(verbose=False)
     assert inventory["python_functions"] >= inventory["agent_compatible_python_functions"]
     assert inventory["mcp_server_recipes"] > 0
-    assert inventory["registered_skills"] > 0
+    # The Skills catalog is registry/catalog.json in the source tree; an installed wheel has none.
+    assert (inventory["registered_skills"] > 0) == _SKILL_CATALOG.is_file()
     assert inventory["python_functions"] >= 5795
     assert inventory["tool_surface_total"] == (
-        inventory["python_functions"] + inventory["mcp_server_recipes"] + inventory["registered_skills"]
+        inventory["python_functions"]
+        + inventory["mcp_server_recipes"]
+        + inventory["registered_skills"]
     )
     assert inventory["survey_unique_projects"] == 320
     assert inventory["survey_records_by_kind"]["mcp"] == 103
@@ -93,8 +97,16 @@ def test_existing_pip_dependencies_are_recorded_as_bounded_adapters() -> None:
         ),
         ("Minimap2", "dnakit.alignment.map_long_reads", "10.1093/bioinformatics/bty191"),
         ("BEDTools", "dnakit.alignment.intersect_bed", "10.1093/bioinformatics/btq033"),
-        ("DIAMOND", "dnakit.alignment.search_diamond_blastp / dnakit.alignment.search_diamond_blastx", "10.1038/s41592-021-01101-x"),
-        ("MMseqs2", "dnakit.alignment.search_mmseqs_protein / dnakit.alignment.cluster_mmseqs_protein", "10.1038/nbt.3988"),
+        (
+            "DIAMOND",
+            "dnakit.alignment.search_diamond_blastp / dnakit.alignment.search_diamond_blastx",
+            "10.1038/s41592-021-01101-x",
+        ),
+        (
+            "MMseqs2",
+            "dnakit.alignment.search_mmseqs_protein / dnakit.alignment.cluster_mmseqs_protein",
+            "10.1038/nbt.3988",
+        ),
         ("Kraken2", "dnakit.microbiome.classify_kraken2", "10.1186/s13059-019-1891-0"),
         ("Prokka", "dnakit.annotation.annotate_prokka", "10.1093/bioinformatics/btu153"),
         ("Bakta", "dnakit.annotation.annotate_bakta", "10.1099/mgen.0.000685"),

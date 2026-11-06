@@ -19,7 +19,9 @@ _ONE_BASED = "1-based-closed"
 _COORDINATE_SYSTEMS = {_ZERO_BASED, _ONE_BASED}
 
 
-def _envelope(operation: str, result: Mapping[str, Any], *, coordinate_system: str | None = None) -> dict[str, Any]:
+def _envelope(
+    operation: str, result: Mapping[str, Any], *, coordinate_system: str | None = None
+) -> dict[str, Any]:
     provenance: dict[str, Any] = {
         "implementation": "dnakit.native_annotation_intervals",
         "backend": "local_dependency_free",
@@ -44,14 +46,18 @@ def _coordinate_system(options: Mapping[str, object], *, default: str = _ONE_BAS
     return str(value)
 
 
-def _records(value: object, *, key_names: tuple[str, ...] = ("records", "features", "genes", "items")) -> list[dict[str, Any]]:
+def _records(
+    value: object, *, key_names: tuple[str, ...] = ("records", "features", "genes", "items")
+) -> list[dict[str, Any]]:
     if isinstance(value, Mapping):
         for key in key_names:
             if key in value:
                 value = value[key]
                 break
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
-        raise ConfigurationError("input must be a sequence of annotation mappings or a mapping containing records.")
+        raise ConfigurationError(
+            "input must be a sequence of annotation mappings or a mapping containing records."
+        )
     records: list[dict[str, Any]] = []
     for index, record in enumerate(value):
         if not isinstance(record, Mapping):
@@ -100,7 +106,13 @@ def _contig_lengths(input: object, options: Mapping[str, object]) -> dict[str, i
         raise ConfigurationError("contig_lengths must be a mapping or sequence of mappings.")
     result: dict[str, int] = {}
     for chrom, length in pairs:
-        if not isinstance(chrom, str) or not chrom.strip() or isinstance(length, bool) or not isinstance(length, int) or length < 1:
+        if (
+            not isinstance(chrom, str)
+            or not chrom.strip()
+            or isinstance(length, bool)
+            or not isinstance(length, int)
+            or length < 1
+        ):
             raise ConfigurationError("contig lengths require a name and a positive integer length.")
         result[chrom.strip()] = length
     if not result:
@@ -108,12 +120,16 @@ def _contig_lengths(input: object, options: Mapping[str, object]) -> dict[str, i
     return result
 
 
-def convert_annotation_coordinates(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> dict[str, Any]:
+def convert_annotation_coordinates(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Convert explicit intervals between 0-based half-open and 1-based closed coordinates."""
 
     settings = dict(options or {})
     source = _coordinate_system(settings, default=_ONE_BASED)
-    target = settings.get("target_coordinate_system", _ZERO_BASED if source == _ONE_BASED else _ONE_BASED)
+    target = settings.get(
+        "target_coordinate_system", _ZERO_BASED if source == _ONE_BASED else _ONE_BASED
+    )
     if target not in _COORDINATE_SYSTEMS:
         raise ConfigurationError(
             "options.target_coordinate_system must be '0-based-half-open' or '1-based-closed'."
@@ -135,12 +151,19 @@ def convert_annotation_coordinates(input: object, *, options: Mapping[str, objec
         converted.append(row)
     return _envelope(
         "convert_annotation_coordinates",
-        {"records": converted, "record_count": len(converted), "source_coordinate_system": source, "target_coordinate_system": target},
+        {
+            "records": converted,
+            "record_count": len(converted),
+            "source_coordinate_system": source,
+            "target_coordinate_system": target,
+        },
         coordinate_system=target,
     )
 
 
-def make_intergenic_regions(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> dict[str, Any]:
+def make_intergenic_regions(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Create gaps between explicit gene intervals and contig boundaries."""
 
     settings = dict(options or {})
@@ -157,7 +180,9 @@ def make_intergenic_regions(input: object, *, options: Mapping[str, object] | No
             raise ConfigurationError(f"gene interval uses unknown contig {chrom!r}.")
         length = contigs[chrom]
         if end > length:
-            raise ConfigurationError(f"gene interval {chrom}:{start}-{end} exceeds contig length {length}.")
+            raise ConfigurationError(
+                f"gene interval {chrom}:{start}-{end} exceeds contig length {length}."
+            )
         grouped[chrom].append((start, end))
     result: list[dict[str, Any]] = []
     for chrom, length in contigs.items():
@@ -178,11 +203,29 @@ def make_intergenic_regions(input: object, *, options: Mapping[str, object] | No
         index = 1
         for start, end in merged:
             if cursor < start:
-                result.append({"id": f"intergenic_{chrom}_{index}", "chrom": chrom, "start": cursor, "end": start - 1 if coordinate_system == _ONE_BASED else start, "feature_type": "intergenic", "coordinate_system": coordinate_system})
+                result.append(
+                    {
+                        "id": f"intergenic_{chrom}_{index}",
+                        "chrom": chrom,
+                        "start": cursor,
+                        "end": start - 1 if coordinate_system == _ONE_BASED else start,
+                        "feature_type": "intergenic",
+                        "coordinate_system": coordinate_system,
+                    }
+                )
                 index += 1
             cursor = max(cursor, end + 1 if coordinate_system == _ONE_BASED else end)
         if cursor <= length - (0 if coordinate_system == _ZERO_BASED else 1):
-            result.append({"id": f"intergenic_{chrom}_{index}", "chrom": chrom, "start": cursor, "end": length, "feature_type": "intergenic", "coordinate_system": coordinate_system})
+            result.append(
+                {
+                    "id": f"intergenic_{chrom}_{index}",
+                    "chrom": chrom,
+                    "start": cursor,
+                    "end": length,
+                    "feature_type": "intergenic",
+                    "coordinate_system": coordinate_system,
+                }
+            )
     return _envelope(
         "make_intergenic_regions",
         {
@@ -203,7 +246,9 @@ def _length_option(settings: Mapping[str, object], name: str, default: int) -> i
     return value
 
 
-def make_promoter_regions(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> dict[str, Any]:
+def make_promoter_regions(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Generate strand-aware promoter windows around explicit gene intervals."""
 
     settings = dict(options or {})
@@ -212,48 +257,62 @@ def make_promoter_regions(input: object, *, options: Mapping[str, object] | None
     downstream = _length_option(settings, "downstream", 100)
     records = _records(input, key_names=("genes", "records", "features", "items"))
     contig_lengths = None
-    if "contig_lengths" in settings or isinstance(input, Mapping) and ("contig_lengths" in input or "contigs" in input):
+    if "contig_lengths" in settings or (
+        isinstance(input, Mapping) and ("contig_lengths" in input or "contigs" in input)
+    ):
         contig_lengths = _contig_lengths(input, settings)
     promoters: list[dict[str, Any]] = []
     for index, gene in enumerate(records, 1):
         chrom, start, end = _coordinate(gene, coordinate_system)
         strand = _strand(gene)
         if strand == "-":
-            raw_start = end - downstream + 1 if coordinate_system == _ONE_BASED else end - downstream
+            raw_start = (
+                end - downstream + 1 if coordinate_system == _ONE_BASED else end - downstream
+            )
             raw_end = end + upstream
         else:
-            raw_start = start - upstream if coordinate_system == _ZERO_BASED else start - upstream
-            raw_end = start + downstream if coordinate_system == _ZERO_BASED else start + downstream - 1
-        if coordinate_system == _ONE_BASED:
-            raw_start = max(1, raw_start)
-        else:
-            raw_start = max(0, raw_start)
+            raw_start = start - upstream
+            raw_end = (
+                start + downstream if coordinate_system == _ZERO_BASED else start + downstream - 1
+            )
+        raw_start = max(1, raw_start) if coordinate_system == _ONE_BASED else max(0, raw_start)
         if contig_lengths is not None:
             if chrom not in contig_lengths:
                 raise ConfigurationError(f"gene interval uses unknown contig {chrom!r}.")
             raw_end = min(contig_lengths[chrom], raw_end)
         if raw_end < raw_start:
-            raise ConfigurationError(f"promoter window is empty for gene {gene.get('id', index)!r}.")
-        promoters.append({
-            "id": f"promoter_{gene.get('id', index)}",
-            "gene_id": gene.get("id", gene.get("gene_id", index)),
-            "chrom": chrom,
-            "start": raw_start,
-            "end": raw_end,
-            "strand": strand,
-            "feature_type": "promoter",
-            "coordinate_system": coordinate_system,
-            "upstream": upstream,
-            "downstream": downstream,
-        })
+            raise ConfigurationError(
+                f"promoter window is empty for gene {gene.get('id', index)!r}."
+            )
+        promoters.append(
+            {
+                "id": f"promoter_{gene.get('id', index)}",
+                "gene_id": gene.get("id", gene.get("gene_id", index)),
+                "chrom": chrom,
+                "start": raw_start,
+                "end": raw_end,
+                "strand": strand,
+                "feature_type": "promoter",
+                "coordinate_system": coordinate_system,
+                "upstream": upstream,
+                "downstream": downstream,
+            }
+        )
     return _envelope(
         "make_promoter_regions",
-        {"promoters": promoters, "promoter_count": len(promoters), "upstream": upstream, "downstream": downstream},
+        {
+            "promoters": promoters,
+            "promoter_count": len(promoters),
+            "upstream": upstream,
+            "downstream": downstream,
+        },
         coordinate_system=coordinate_system,
     )
 
 
-def merge_gene_models(input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True) -> dict[str, Any]:
+def merge_gene_models(
+    input: object, *, options: Mapping[str, object] | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Merge explicit exon/segment intervals by gene identity."""
 
     settings = dict(options or {})
@@ -282,20 +341,27 @@ def merge_gene_models(input: object, *, options: Mapping[str, object] | None = N
                 merged[-1][1] = max(merged[-1][1], end)
             else:
                 merged.append([start, end])
-        models.append({
-            "gene_id": gene_id,
-            "gene_name": names[(chrom, gene_id, strand)],
-            "chrom": chrom,
-            "strand": strand,
-            "start": min(interval[0] for interval in merged),
-            "end": max(interval[1] for interval in merged),
-            "segments": [{"start": start, "end": end} for start, end in merged],
-            "segment_count": len(merged),
-            "coordinate_system": coordinate_system,
-        })
+        models.append(
+            {
+                "gene_id": gene_id,
+                "gene_name": names[(chrom, gene_id, strand)],
+                "chrom": chrom,
+                "strand": strand,
+                "start": min(interval[0] for interval in merged),
+                "end": max(interval[1] for interval in merged),
+                "segments": [{"start": start, "end": end} for start, end in merged],
+                "segment_count": len(merged),
+                "coordinate_system": coordinate_system,
+            }
+        )
     return _envelope(
         "merge_gene_models",
-        {"models": models, "model_count": len(models), "input_segment_count": len(records), "merge_adjacent": merge_adjacent},
+        {
+            "models": models,
+            "model_count": len(models),
+            "input_segment_count": len(records),
+            "merge_adjacent": merge_adjacent,
+        },
         coordinate_system=coordinate_system,
     )
 

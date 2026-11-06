@@ -39,10 +39,16 @@ def pyfastx_count_sequences(
 ) -> dict[str, Any]:
     """Count the FASTA sequences that are at least ``min_length`` bp long (pyfastx Fasta.count)."""
 
-    module, fa, source = _fasta(fasta)
+    module, fa, _source = _fasta(fasta)
     cutoff = _h.integer(min_length, "min_length", minimum=0)
-    return {"status": "completed", "backend": "pyfastx", "version": module.__version__, "min_length": cutoff,
-            "sequence_count": int(fa.count(cutoff)), "total_sequence_count": len(fa)}
+    return {
+        "status": "completed",
+        "backend": "pyfastx",
+        "version": module.__version__,
+        "min_length": cutoff,
+        "sequence_count": int(fa.count(cutoff)),
+        "total_sequence_count": len(fa),
+    }
 
 
 def pyfastx_list_sequence_names(
@@ -62,10 +68,18 @@ def pyfastx_list_sequence_names(
     limit = _h.integer(max_names, "max_names", minimum=1, maximum=_h.MAX_ROWS * 10)
     keys = fa.keys()
     if sort_by is not None:
-        keys = keys.sort(_h.choice(sort_by, ("id", "name", "length"), "sort_by"), reverse=bool(reverse))
+        keys = keys.sort(
+            _h.choice(sort_by, ("id", "name", "length"), "sort_by"), reverse=bool(reverse)
+        )
     names = [str(name) for name in keys]
-    return {"status": "completed", "backend": "pyfastx", "version": module.__version__,
-            "name_count": len(names), "names": names[:limit], "truncated": len(names) > limit}
+    return {
+        "status": "completed",
+        "backend": "pyfastx",
+        "version": module.__version__,
+        "name_count": len(names),
+        "names": names[:limit],
+        "truncated": len(names) > limit,
+    }
 
 
 def pyfastx_nl_statistic(
@@ -82,8 +96,15 @@ def pyfastx_nl_statistic(
     module, fa, _source = _fasta(fasta)
     q = _h.integer(quantile, "quantile", minimum=1, maximum=99)
     n_length, l_count = fa.nl(q)
-    return {"status": "completed", "backend": "pyfastx", "version": module.__version__, "quantile": q,
-            "n_length": int(n_length), "l_count": int(l_count), "sequence_count": len(fa)}
+    return {
+        "status": "completed",
+        "backend": "pyfastx",
+        "version": module.__version__,
+        "quantile": q,
+        "n_length": int(n_length),
+        "l_count": int(l_count),
+        "sequence_count": len(fa),
+    }
 
 
 def pyfastx_split_fastq(
@@ -134,7 +155,7 @@ def pyfastx_split_fastq(
             if written == 0:
                 number += 1
                 target = folder / f"{base}.{str(number).zfill(digits)}{suffix}"
-                handle = gzip.open(target, "wt") if fq.is_gzip else open(target, "w")
+                handle = gzip.open(target, "wt") if fq.is_gzip else open(target, "w")  # noqa: SIM115 - closed explicitly below
                 outputs.append(str(target))
             handle.write(read.raw)
             written += 1
@@ -149,8 +170,15 @@ def pyfastx_split_fastq(
     finally:
         if handle is not None and not handle.closed:
             handle.close()
-    return {"status": "completed", "backend": "pyfastx", "version": module.__version__, "read_count": total,
-            "file_count": len(outputs), "reads_per_file": counts, "outputs": outputs}
+    return {
+        "status": "completed",
+        "backend": "pyfastx",
+        "version": module.__version__,
+        "read_count": total,
+        "file_count": len(outputs),
+        "reads_per_file": counts,
+        "outputs": outputs,
+    }
 
 
 def pyfastx_extract_records(
@@ -189,8 +217,14 @@ def pyfastx_extract_records(
     with open(target, "w") as out:
         for name in wanted:
             out.write(fx[name].raw)
-    return {"status": "completed", "backend": "pyfastx", "version": module.__version__,
-            "format": "fastq" if is_fastq else "fasta", "record_count": len(wanted), "outputs": [str(target)]}
+    return {
+        "status": "completed",
+        "backend": "pyfastx",
+        "version": module.__version__,
+        "format": "fastq" if is_fastq else "fasta",
+        "record_count": len(wanted),
+        "outputs": [str(target)],
+    }
 
 
 __all__ = [

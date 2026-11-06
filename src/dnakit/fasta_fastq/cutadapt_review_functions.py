@@ -36,7 +36,9 @@ def _integer(value: object, name: str, *, minimum: int | None = None, nonzero: b
     return value
 
 
-def _execute(source: Path, target: Path, args: list[str], cutadapt_path: str | None) -> dict[str, Any]:
+def _execute(
+    source: Path, target: Path, args: list[str], cutadapt_path: str | None
+) -> dict[str, Any]:
     """Run cutadapt once with a fixed argument list and return the JSON-serialisable run record."""
     program = _program(cutadapt_path)
     full = ["--report", "minimal", *args, "-o", str(target), str(source)]
@@ -136,7 +138,11 @@ def cutadapt_adapter_action(
     if action not in _ACTIONS:
         raise ConfigurationError(f"action must be one of {_ACTIONS}.")
     count = _integer(times, "times", minimum=1)
-    if isinstance(error_rate, bool) or not isinstance(error_rate, (int, float)) or not 0 <= error_rate <= 1:
+    if (
+        isinstance(error_rate, bool)
+        or not isinstance(error_rate, (int, float))
+        or not 0 <= error_rate <= 1
+    ):
         raise ConfigurationError("error_rate must be a number between 0 and 1.")
     args: list[str] = ["-e", str(float(error_rate)), "--action", action, "-n", str(count)]
     if reverse_complement:

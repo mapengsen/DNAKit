@@ -55,7 +55,9 @@ def text(value: object, name: str) -> str:
     return value
 
 
-def integer(value: object, name: str, *, minimum: int | None = None, maximum: int | None = None) -> int:
+def integer(
+    value: object, name: str, *, minimum: int | None = None, maximum: int | None = None
+) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{name} must be an integer.")
     if minimum is not None and value < minimum:
@@ -65,7 +67,9 @@ def integer(value: object, name: str, *, minimum: int | None = None, maximum: in
     return value
 
 
-def number(value: object, name: str, *, minimum: float | None = None, maximum: float | None = None) -> float:
+def number(
+    value: object, name: str, *, minimum: float | None = None, maximum: float | None = None
+) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigurationError(f"{name} must be a number.")
     if minimum is not None and value < minimum:
@@ -143,12 +147,16 @@ def _scalar(value: object, name: str) -> str:
         if not value or "\x00" in value:
             raise ConfigurationError(f"option {name!r} has an empty or NUL-containing value.")
         if value.startswith("-") and not re.fullmatch(r"-\d+(?:\.\d+)?(?:[eE][-+]?\d+)?", value):
-            raise ConfigurationError(f"option {name!r}: values must not look like command-line flags.")
+            raise ConfigurationError(
+                f"option {name!r}: values must not look like command-line flags."
+            )
         return value
     raise ConfigurationError(f"option {name!r} must be a string, number, bool or a list of them.")
 
 
-def option_arguments(tool: str, options: Mapping[str, Any] | None, *, reserved: Sequence[str] = ()) -> list[str]:
+def option_arguments(
+    tool: str, options: Mapping[str, Any] | None, *, reserved: Sequence[str] = ()
+) -> list[str]:
     """Turn ``{"max-records-in-ram": 5000}`` into ``["--max-records-in-ram", "5000"]`` for the listed options only.
 
     A list value repeats the option; ``True`` / ``False`` become ``true`` / ``false``. Options that the calling
@@ -207,7 +215,9 @@ def resolve_gatk(gatk_path: str | None) -> str:
     found = shutil.which(PROGRAM)
     if found is None:
         raise BackendUnavailableError(
-            "External executable 'gatk' was not found on PATH.", hint=INSTALL_HINT, code="GATK_UNAVAILABLE"
+            "External executable 'gatk' was not found on PATH.",
+            hint=INSTALL_HINT,
+            code="GATK_UNAVAILABLE",
         )
     return str(Path(found).absolute())
 
@@ -288,7 +298,11 @@ def run_tool(
             f"gatk {tool} exited with code {result.return_code}."
             + (f" {problems[0][:300]}" if problems else ""),
             code="GATK_EXECUTION_FAILED",
-            context={"operation": operation, "log_tail": tail(result.output), "errors": problems[:5]},
+            context={
+                "operation": operation,
+                "log_tail": tail(result.output),
+                "errors": problems[:5],
+            },
         )
     missing = [str(path) for path in expected if not path.exists()]
     if missing:
@@ -316,7 +330,9 @@ def run_tool(
     }
 
 
-def finish(result: dict[str, Any], *, outputs: Mapping[str, Path | None], **extra: object) -> dict[str, Any]:
+def finish(
+    result: dict[str, Any], *, outputs: Mapping[str, Path | None], **extra: object
+) -> dict[str, Any]:
     """Drop the private log, add the output paths (``None`` outputs are omitted) and extra fields."""
     result.pop("_log", None)
     result["outputs"] = {name: str(path) for name, path in outputs.items() if path is not None}
@@ -459,10 +475,7 @@ def execute(
     verbose: bool,
 ) -> dict[str, Any]:
     """Validate the arguments of one public function, run its GATK tool and collect the results."""
-    if spec.selector is None:
-        variant = "default"
-    else:
-        variant = choice(mode, tuple(spec.tools), spec.selector)
+    variant = "default" if spec.selector is None else choice(mode, tuple(spec.tools), spec.selector)
     tool = spec.tools[variant]
     arguments: list[str] = []
     reserved: list[str] = []
@@ -512,7 +525,15 @@ def execute(
                 raise ConfigurationError(f"{param.name} must be a non-empty list of strings.")
             pieces = [text(item, param.name) for item in value]
         elif kind == "int":
-            pieces = [str(integer(value, param.name, minimum=None if param.minimum is None else int(param.minimum)))]
+            pieces = [
+                str(
+                    integer(
+                        value,
+                        param.name,
+                        minimum=None if param.minimum is None else int(param.minimum),
+                    )
+                )
+            ]
         elif kind == "float":
             pieces = [str(number(value, param.name, minimum=param.minimum))]
         elif kind == "bool":
@@ -526,9 +547,8 @@ def execute(
             for piece in pieces:
                 arguments += [f"--{flag}", piece]
     for scope, names in spec.any_of:
-        if scope is None or variant in scope:
-            if all(values.get(name) is None for name in names):
-                raise ConfigurationError(f"at least one of {', '.join(names)} is required.")
+        if (scope is None or variant in scope) and all(values.get(name) is None for name in names):
+            raise ConfigurationError(f"at least one of {', '.join(names)} is required.")
     derived_paths: dict[str, list[Path]] = {}
     for key, source_name, suffixes, all_created in spec.derived:
         source_value = values.get(source_name)
@@ -604,7 +624,11 @@ def read_text(path: Path, limit: int = 1_000_000) -> str:
 
 def tsv_rows(path: Path, *, comment: str = "#") -> list[dict[str, str]]:
     """Rows of a GATK/Picard metrics-style table: ``#`` lines skipped, first remaining line is the header."""
-    lines = [line for line in read_text(path).splitlines() if line.strip() and not line.startswith(comment)]
+    lines = [
+        line
+        for line in read_text(path).splitlines()
+        if line.strip() and not line.startswith(comment)
+    ]
     if not lines:
         return []
     names = lines[0].split("\t")

@@ -15,8 +15,8 @@ import pytest
 np = pytest.importorskip("numpy")
 allel = pytest.importorskip("allel")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.variants import allel_p32_functions as ap  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.variants import allel_p32_functions as ap
 
 # variants x samples x ploidy: hom-ref, het, hom-alt / het-12, missing, hom-2
 G = [[[0, 0], [0, 1], [1, 1]], [[1, 2], [-1, -1], [2, 2]]]
@@ -61,8 +61,14 @@ def test_locate_genotype_calls_matches_definitions(kind: str, expected: list) ->
 
 
 def test_locate_genotype_calls_specific_allele_and_call() -> None:
-    assert _run("locate_genotype_calls", G, kind="hom", allele=2)["mask"] == [[False] * 3, [False, False, True]]
-    assert _run("locate_genotype_calls", G, kind="call", call=[0, 1])["mask"] == [[False, True, False], [False] * 3]
+    assert _run("locate_genotype_calls", G, kind="hom", allele=2)["mask"] == [
+        [False] * 3,
+        [False, False, True],
+    ]
+    assert _run("locate_genotype_calls", G, kind="call", call=[0, 1])["mask"] == [
+        [False, True, False],
+        [False] * 3,
+    ]
     with pytest.raises(ConfigurationError):
         _run("locate_genotype_calls", G, kind="call")
     with pytest.raises(ConfigurationError):
@@ -76,11 +82,20 @@ def test_locate_genotype_calls_rejects_bad_arrays() -> None:
 
 
 def test_locate_haplotype_calls() -> None:
-    assert _run("locate_haplotype_calls", H, kind="ref")["mask"] == [[True, False, False, False], [False, True, True, False]]
-    assert _run("locate_haplotype_calls", H, kind="alt")["mask"] == [[False, True, True, False], [True, False, False, True]]
+    assert _run("locate_haplotype_calls", H, kind="ref")["mask"] == [
+        [True, False, False, False],
+        [False, True, True, False],
+    ]
+    assert _run("locate_haplotype_calls", H, kind="alt")["mask"] == [
+        [False, True, True, False],
+        [True, False, False, True],
+    ]
     assert _run("locate_haplotype_calls", H, kind="missing")["count"] == 1
     assert _run("locate_haplotype_calls", H, kind="called")["count"] == 7
-    assert _run("locate_haplotype_calls", H, kind="call", allele=2)["mask"] == [[False] * 4, [True, False, False, True]]
+    assert _run("locate_haplotype_calls", H, kind="call", allele=2)["mask"] == [
+        [False] * 4,
+        [True, False, False, True],
+    ]
     with pytest.raises(ConfigurationError):
         _run("locate_haplotype_calls", H, kind="call")
 
@@ -88,7 +103,11 @@ def test_locate_haplotype_calls() -> None:
 def test_count_genotype_calls_axes_match_allel() -> None:
     g = allel.GenotypeArray(G)
     assert _run("count_genotype_calls", G, kind="hom")["counts"] == int(g.count_hom())
-    assert _run("count_genotype_calls", G, kind="hom", axis=1)["counts"] == g.count_hom(axis=1).tolist() == [2, 1]
+    assert (
+        _run("count_genotype_calls", G, kind="hom", axis=1)["counts"]
+        == g.count_hom(axis=1).tolist()
+        == [2, 1]
+    )
     assert _run("count_genotype_calls", G, kind="hom", axis=0)["counts"] == [1, 0, 2]
     assert _run("count_genotype_calls", G, kind="het")["counts"] == 2
     assert _run("count_genotype_calls", G, kind="call", call=[2, 2])["counts"] == 1
@@ -116,7 +135,10 @@ def test_genotype_allele_counts_per_call_and_gt_strings() -> None:
     assert counts["max_allele"] == 2
     assert counts["counts"][0][1] == [1, 1, 0] and counts["counts"][1][1] == [0, 0, 0]
     assert _run("genotype_allele_counts_per_call", G, max_allele=3)["counts"][0][0] == [2, 0, 0, 0]
-    assert _run("genotypes_to_gt_strings", G)["gt"] == [["0/0", "0/1", "1/1"], ["1/2", "./.", "2/2"]]
+    assert _run("genotypes_to_gt_strings", G)["gt"] == [
+        ["0/0", "0/1", "1/1"],
+        ["1/2", "./.", "2/2"],
+    ]
 
 
 def test_remap_alleles_for_each_array_kind() -> None:
@@ -131,7 +153,9 @@ def test_remap_alleles_for_each_array_kind() -> None:
 
 
 def test_fill_masked_genotypes() -> None:
-    result = _run("fill_masked_genotypes", G, [[True, False, False], [False, False, True]], fill_value=-1)
+    result = _run(
+        "fill_masked_genotypes", G, [[True, False, False], [False, False, True]], fill_value=-1
+    )
     assert result["genotypes"][0][0] == [-1, -1] and result["genotypes"][1][2] == [-1, -1]
     assert result["genotypes"][0][1] == [0, 1]
     with pytest.raises(ConfigurationError):
@@ -141,8 +165,8 @@ def test_fill_masked_genotypes() -> None:
 def test_haploidify_is_reproducible_and_picks_existing_alleles() -> None:
     first = _run("haploidify_genotypes", G, seed=7)["haplotypes"]
     assert first == _run("haploidify_genotypes", G, seed=7)["haplotypes"]
-    for row, calls in zip(first, G):
-        for allele, call in zip(row, calls):
+    for row, calls in zip(first, G, strict=False):
+        for allele, call in zip(row, calls, strict=False):
             assert allele in call
 
 
@@ -159,17 +183,40 @@ def test_allele_count_site_masks_and_counts() -> None:
     }
     # a site is a variant when a non-reference allele is observed; sites 0 and 2 (all reference / no calls) are not
     arr = allel.AlleleCountsArray(AC)
-    for kind, mask in expected.items():
+    for kind, _mask in expected.items():
         got = _run("locate_allele_count_sites", AC, kind=kind)
         method = getattr(arr, f"is_{kind}")
         direct = method(1) if kind in ("singleton", "doubleton") else method()
         assert got["mask"] == direct.tolist(), kind
         assert got["count"] == int(direct.sum())
     assert _run("locate_allele_count_sites", AC, kind="variant")["mask"] == expected["variant"]
-    assert _run("locate_allele_count_sites", AC, kind="doubleton", allele=2)["mask"] == [False, False, False, False, False]
-    assert _run("locate_allele_count_sites", AC, kind="singleton", allele=2)["mask"] == [False, False, False, False, False]
-    for kind in ("variant", "non_variant", "segregating", "non_segregating", "singleton", "doubleton"):
-        direct = getattr(arr, f"count_{kind}")(1) if kind in ("singleton", "doubleton") else getattr(arr, f"count_{kind}")()
+    assert _run("locate_allele_count_sites", AC, kind="doubleton", allele=2)["mask"] == [
+        False,
+        False,
+        False,
+        False,
+        False,
+    ]
+    assert _run("locate_allele_count_sites", AC, kind="singleton", allele=2)["mask"] == [
+        False,
+        False,
+        False,
+        False,
+        False,
+    ]
+    for kind in (
+        "variant",
+        "non_variant",
+        "segregating",
+        "non_segregating",
+        "singleton",
+        "doubleton",
+    ):
+        direct = (
+            getattr(arr, f"count_{kind}")(1)
+            if kind in ("singleton", "doubleton")
+            else getattr(arr, f"count_{kind}")()
+        )
         assert _run("count_allele_count_sites", AC, kind=kind)["count"] == int(direct)
     with pytest.raises(ConfigurationError):
         _run("count_allele_count_sites", AC, kind="biallelic")
@@ -177,7 +224,13 @@ def test_allele_count_site_masks_and_counts() -> None:
 
 def test_summarize_alleles_per_variant() -> None:
     assert _run("summarize_alleles_per_variant", AC, kind="allelism")["values"] == [1, 2, 0, 1, 3]
-    assert _run("summarize_alleles_per_variant", AC, kind="max_allele")["values"] == [0, 1, -1, 1, 2]
+    assert _run("summarize_alleles_per_variant", AC, kind="max_allele")["values"] == [
+        0,
+        1,
+        -1,
+        1,
+        2,
+    ]
 
 
 def test_feature_coverage_mask() -> None:
@@ -212,7 +265,13 @@ def test_intersect_sorted_positions() -> None:
 
 def test_select_positions_and_overlap_with_ranges() -> None:
     selected = _run("select_positions_in_ranges", [1, 3, 5, 7, 9], [[2, 5], [8, 20]])
-    assert selected["positions"] == [3, 5, 9] and selected["mask"] == [False, True, True, False, True]
+    assert selected["positions"] == [3, 5, 9] and selected["mask"] == [
+        False,
+        True,
+        True,
+        False,
+        True,
+    ]
     single = _run("select_positions_in_ranges", [1, 3, 5, 7, 9], [[3, 3]])
     assert single["positions"] == [3]
     with pytest.raises(ConfigurationError):
@@ -228,7 +287,9 @@ def test_create_allele_index_mapping_matches_allel() -> None:
     ref, alt, alleles = ["A", "C"], [["G", "T"], ["A", ""]], [["A", "G"], ["A", "C"]]
     got = _run("create_allele_index_mapping", ref, alt, alleles)["mapping"]
     assert got == [[0, 1, -1], [1, 0, -1]]
-    assert got == allel.create_allele_mapping(np.array(ref), np.array(alt), np.array(alleles)).tolist()
+    assert (
+        got == allel.create_allele_mapping(np.array(ref), np.array(alt), np.array(alleles)).tolist()
+    )
     with pytest.raises(ConfigurationError):
         _run("create_allele_index_mapping", ref, alt, [["A", "G"]])
 
@@ -237,7 +298,9 @@ def test_principal_coordinates_analysis_matches_allel_and_checks_input() -> None
     d = np.array([[0, 1, 2, 3], [1, 0, 1.5, 2], [2, 1.5, 0, 1], [3, 2, 1, 0]], dtype=float)
     result = _run("principal_coordinates_analysis", d.tolist())
     coords, explained = allel.pcoa(d)
-    assert np.allclose(result["coordinates"], coords) and np.allclose(result["explained_ratio"], explained)
+    assert np.allclose(result["coordinates"], coords) and np.allclose(
+        result["explained_ratio"], explained
+    )
     assert abs(sum(result["explained_ratio"]) - 1.0) < 1e-9
     with pytest.raises(ConfigurationError):
         _run("principal_coordinates_analysis", [[0, 1], [1, 0]])
@@ -276,8 +339,17 @@ def test_scale_genotype_dosages_center_and_patterson() -> None:
 
 def test_fold_site_frequency_spectrum() -> None:
     assert _run("fold_site_frequency_spectrum", [0, 5, 3, 2, 1, 0], 5)["folded"] == [0, 6, 5]
-    assert _run("fold_site_frequency_spectrum", [0, 4, 3, 2, 1, 5, 0, 0], 7)["folded"] == [0, 4, 8, 3]
-    assert _run("fold_site_frequency_spectrum", [0, 5, 3], 5)["folded"] == [0, 5, 3]  # zero-padded to n + 1
+    assert _run("fold_site_frequency_spectrum", [0, 4, 3, 2, 1, 5, 0, 0], 7)["folded"] == [
+        0,
+        4,
+        8,
+        3,
+    ]
+    assert _run("fold_site_frequency_spectrum", [0, 5, 3], 5)["folded"] == [
+        0,
+        5,
+        3,
+    ]  # zero-padded to n + 1
     with pytest.raises(ConfigurationError):
         _run("fold_site_frequency_spectrum", [0, 5, 3, 1], 2)
 
@@ -290,24 +362,39 @@ def test_write_sites_vcf_is_readable_and_refuses_overwrite(tmp_path) -> None:
     ]
     result = _run("write_sites_vcf", str(target), records)
     assert result["variant_count"] == 2
-    rows = [line.split("\t") for line in target.read_text().splitlines() if not line.startswith("#")]
+    rows = [
+        line.split("\t") for line in target.read_text().splitlines() if not line.startswith("#")
+    ]
     assert rows[0][:8] == ["1", "5", ".", "A", "G,T", "30", "PASS", "."]
     assert rows[1][:8] == ["1", "9", "rs1", "C", "T", ".", "LowQual", "."]
-    parsed = allel.read_vcf(str(target), fields=["variants/POS", "variants/ALT", "variants/FILTER_LowQual"])
+    parsed = allel.read_vcf(
+        str(target), fields=["variants/POS", "variants/ALT", "variants/FILTER_LowQual"]
+    )
     assert parsed["variants/POS"].tolist() == [5, 9]
-    assert parsed["variants/ALT"][0].tolist() == ["G", "T", ""] and parsed["variants/ALT"][1].tolist()[0] == "T"
+    assert (
+        parsed["variants/ALT"][0].tolist() == ["G", "T", ""]
+        and parsed["variants/ALT"][1].tolist()[0] == "T"
+    )
     assert parsed["variants/FILTER_LowQual"].tolist() == [False, True]
     with pytest.raises(ConfigurationError):
         _run("write_sites_vcf", str(target), records)
     with pytest.raises(ConfigurationError):
-        _run("write_sites_vcf", str(tmp_path / "x.vcf"), [{"chrom": "1", "pos": 0, "ref": "A", "alt": "G"}])
+        _run(
+            "write_sites_vcf",
+            str(tmp_path / "x.vcf"),
+            [{"chrom": "1", "pos": 0, "ref": "A", "alt": "G"}],
+        )
 
 
 def test_large_genomic_coordinates_and_counts_are_accepted() -> None:
     positions = [1_000_000, 2_500_000, 99_000_000]
     assert _run("locate_sorted_positions", positions, 2_500_000)["located"] == 1
-    assert _run("select_positions_in_ranges", positions, [[1_000_001, 100_000_000]])["positions"] == [2_500_000, 99_000_000]
-    assert _run("tabulate_state_blocks", [0, 0, 1], [0, 1], pos=positions)["blocks"][0]["support"] == 2
+    assert _run("select_positions_in_ranges", positions, [[1_000_001, 100_000_000]])[
+        "positions"
+    ] == [2_500_000, 99_000_000]
+    assert (
+        _run("tabulate_state_blocks", [0, 0, 1], [0, 1], pos=positions)["blocks"][0]["support"] == 2
+    )
     assert _run("feature_coverage_mask", [[5_000, 9_000]], 12_000)["covered"] == 4_001
     assert _run("summarize_alleles_per_variant", [[250_000, 3]], kind="allelism")["values"] == [2]
     assert _run("fold_site_frequency_spectrum", [0, 5_000, 3_000], 2)["folded"] == [5_000]

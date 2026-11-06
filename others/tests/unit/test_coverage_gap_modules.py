@@ -46,7 +46,9 @@ def test_public_functions_take_keyword_only_verbose_and_are_typed(module_name: s
         signature = inspect.signature(function)
         verbose = signature.parameters.get("verbose")
         assert verbose is not None, f"{module_name}.{name} lacks a verbose parameter"
-        assert verbose.kind is inspect.Parameter.KEYWORD_ONLY, f"{module_name}.{name}: verbose must be keyword-only"
+        assert verbose.kind is inspect.Parameter.KEYWORD_ONLY, (
+            f"{module_name}.{name}: verbose must be keyword-only"
+        )
         assert function.__doc__, f"{module_name}.{name} has no docstring"
         for parameter in signature.parameters.values():
             if parameter.name in ("self", "cls"):

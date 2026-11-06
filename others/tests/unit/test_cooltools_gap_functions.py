@@ -23,6 +23,7 @@ import pytest
 from dnakit.epigenome import cooltools_gap_functions as cg
 from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, ConfigurationError
 
+
 @pytest.fixture(autouse=True)
 def _close_figures_left_by_other_tests():
     """Other tests in the same process may leave figures open; these tests check that the function closes its own."""
@@ -190,7 +191,7 @@ def test_checksum_mismatch_is_reported_as_backend_error(
 ) -> None:
     monkeypatch.setattr(cooltools_io, "download_file", Recorder(effect=_write_payload))
     table = _listing(tmp_path / "table.tsv", demo_checksum="0" * 32)
-    with pytest.raises(BackendExecutionError, match="differs from original test|failed"):
+    with pytest.raises(BackendExecutionError, match=r"differs from original test|failed"):
         cg.download_cooltools_example_data(
             "demo", data_dir=str(tmp_path / "data"), info_url=str(table)
         )

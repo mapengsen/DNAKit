@@ -32,7 +32,9 @@ from dnakit.exceptions import BackendExecutionError, BackendUnavailableError, Co
 
 _PACKAGE = "pysam"
 _EXTRA = "bio-reads"
-_INSTALL_HINT = 'python -m pip install "dnakit[bio-reads]" (pysam 0.22 to 0.24 bundles samtools and bcftools)'
+_INSTALL_HINT = (
+    'python -m pip install "dnakit[bio-reads]" (pysam 0.22 to 0.24 bundles samtools and bcftools)'
+)
 _TIMEOUT_SECONDS = 1800.0
 _MAX_OUTPUT_BYTES = 5_000_000
 _MAX_ARTIFACT_BYTES = 2_000_000_000
@@ -46,8 +48,18 @@ _OFFSETS = (0, 33, 64)
 # The only subcommands the child interpreter may call. Each public function passes one of these names.
 _SUBCOMMANDS = {
     "samtools": frozenset(
-        {"consensus", "flagstat", "stats", "ampliconstats", "cram_size", "depad", "phase",
-         "targetcut", "reference", "rmdup"}
+        {
+            "consensus",
+            "flagstat",
+            "stats",
+            "ampliconstats",
+            "cram_size",
+            "depad",
+            "phase",
+            "targetcut",
+            "reference",
+            "rmdup",
+        }
     ),
     "bcftools": frozenset({"mpileup", "call", "norm", "stats"}),
 }
@@ -228,7 +240,12 @@ def _region(value: object) -> str:
 
 
 def _provenance(program: str) -> dict[str, str]:
-    return {"package": _PACKAGE, "version": _pysam_version(), "tool": program, "bundled_with": "pysam"}
+    return {
+        "package": _PACKAGE,
+        "version": _pysam_version(),
+        "tool": program,
+        "bundled_with": "pysam",
+    }
 
 
 def _result(operation: str, subcommand: str, log: str, **fields: Any) -> dict[str, Any]:
@@ -290,7 +307,14 @@ def _flagstat_categories(text: str) -> list[dict[str, Any]]:
     return categories
 
 
-_CRAM_BLOCK_KEYS = ("content_id", "uncompressed_size", "compressed_size", "ratio", "method", "data_series")
+_CRAM_BLOCK_KEYS = (
+    "content_id",
+    "uncompressed_size",
+    "compressed_size",
+    "ratio",
+    "method",
+    "data_series",
+)
 
 
 def _cram_blocks(text: str) -> list[dict[str, Any]]:
@@ -301,7 +325,7 @@ def _cram_blocks(text: str) -> list[dict[str, Any]]:
             continue
         values = fields[1:]
         row: dict[str, Any] = {}
-        for key, value in zip(_CRAM_BLOCK_KEYS, values):
+        for key, value in zip(_CRAM_BLOCK_KEYS, values, strict=False):
             row[key] = _number(value) if key.endswith("size") else value
         blocks.append(row)
     return blocks
@@ -388,9 +412,7 @@ def samtools_stats(source: str | Path, *, verbose: bool = True) -> dict[str, Any
     path = _input(source)
     data, log = _run_pysam("samtools", "stats", (str(path),), verbose=verbose)
     sections = _tab_sections(data.decode("utf-8", "replace"))
-    summary = {
-        str(row[0]).rstrip(":"): row[1] for row in sections.get("SN", []) if len(row) >= 2
-    }
+    summary = {str(row[0]).rstrip(":"): row[1] for row in sections.get("SN", []) if len(row) >= 2}
     return _result("samtools_stats", "samtools stats", log, summary=summary, sections=sections)
 
 
@@ -404,13 +426,9 @@ def samtools_ampliconstats(
     """
     bed = _input(primers_bed, "primers_bed")
     path = _input(source)
-    data, log = _run_pysam(
-        "samtools", "ampliconstats", (str(bed), str(path)), verbose=verbose
-    )
+    data, log = _run_pysam("samtools", "ampliconstats", (str(bed), str(path)), verbose=verbose)
     sections = _tab_sections(data.decode("utf-8", "replace"))
-    return _result(
-        "samtools_ampliconstats", "samtools ampliconstats", log, sections=sections
-    )
+    return _result("samtools_ampliconstats", "samtools ampliconstats", log, sections=sections)
 
 
 def samtools_cram_size(source: str | Path, *, verbose: bool = True) -> dict[str, Any]:
@@ -442,12 +460,8 @@ def samtools_depad(
     options = ["-T", str(ref)]
     if fmt == "sam":
         options.append("-s")
-    _, log = _run_pysam_to_file(
-        "samtools", "depad", (*options, str(path)), output, verbose=verbose
-    )
-    return _result(
-        "samtools_depad", "samtools depad", log, output=str(output), output_format=fmt
-    )
+    _, log = _run_pysam_to_file("samtools", "depad", (*options, str(path)), output, verbose=verbose)
+    return _result("samtools_depad", "samtools depad", log, output=str(output), output_format=fmt)
 
 
 def samtools_phase_report(
@@ -471,10 +485,14 @@ def samtools_phase_report(
     path = _input(source)
     output = _output(output_path)
     arguments = [
-        "-k", str(_integer(block_length, "block_length", minimum=1, maximum=10_000)),
-        "-q", str(_integer(min_het_phred, "min_het_phred", minimum=0, maximum=1_000)),
-        "-Q", str(_integer(min_base_quality, "min_base_quality", minimum=0, maximum=93)),
-        "-D", str(_integer(max_depth, "max_depth", minimum=1, maximum=1_000_000)),
+        "-k",
+        str(_integer(block_length, "block_length", minimum=1, maximum=10_000)),
+        "-q",
+        str(_integer(min_het_phred, "min_het_phred", minimum=0, maximum=1_000)),
+        "-Q",
+        str(_integer(min_base_quality, "min_base_quality", minimum=0, maximum=93)),
+        "-D",
+        str(_integer(max_depth, "max_depth", minimum=1, maximum=1_000_000)),
     ]
     if not fix_chimeras:
         arguments.append("-F")
@@ -516,9 +534,15 @@ def samtools_targetcut(
     if reference is not None:
         arguments += ["-f", str(_input(reference, "reference"))]
     if min_base_quality is not None:
-        arguments += ["-Q", str(_integer(min_base_quality, "min_base_quality", minimum=0, maximum=93))]
+        arguments += [
+            "-Q",
+            str(_integer(min_base_quality, "min_base_quality", minimum=0, maximum=93)),
+        ]
     if insertion_penalty is not None:
-        arguments += ["-i", str(_integer(insertion_penalty, "insertion_penalty", minimum=0, maximum=1_000))]
+        arguments += [
+            "-i",
+            str(_integer(insertion_penalty, "insertion_penalty", minimum=0, maximum=1_000)),
+        ]
     for flag, value, name in (
         ("-0", error_rate_0, "error_rate_0"),
         ("-1", error_rate_1, "error_rate_1"),
@@ -550,7 +574,7 @@ def samtools_embedded_reference(
     if region is not None:
         arguments += ["-r", _region(region)]
     arguments.append(str(path))
-    size, log = _run_pysam_to_file("samtools", "reference", arguments, output, verbose=verbose)
+    _size, log = _run_pysam_to_file("samtools", "reference", arguments, output, verbose=verbose)
     return _result(
         "samtools_embedded_reference",
         "samtools reference -e",
@@ -779,21 +803,21 @@ def encode_phred_qualities(
 
 
 __all__ = (
-    "samtools_consensus",
-    "samtools_flagstat",
-    "samtools_stats",
-    "samtools_ampliconstats",
-    "samtools_cram_size",
-    "samtools_depad",
-    "samtools_phase_report",
-    "samtools_targetcut",
-    "samtools_embedded_reference",
-    "samtools_rmdup",
-    "bcftools_normalize_vcf",
     "bcftools_call_consensus",
+    "bcftools_normalize_vcf",
     "bcftools_stats",
     "decode_phred_quality_string",
     "encode_phred_qualities",
+    "samtools_ampliconstats",
+    "samtools_consensus",
+    "samtools_cram_size",
+    "samtools_depad",
+    "samtools_embedded_reference",
+    "samtools_flagstat",
+    "samtools_phase_report",
+    "samtools_rmdup",
+    "samtools_stats",
+    "samtools_targetcut",
 )
 
 _register_public_verbose(globals(), tuple(__all__))

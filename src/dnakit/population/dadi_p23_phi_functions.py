@@ -60,7 +60,9 @@ def _load_phi(np: Any, value: object, points: int, dims: tuple[int, ...] | None 
         try:
             array = np.load(source, allow_pickle=False)
         except (OSError, ValueError) as exc:
-            raise ConfigurationError(f"phi file {source.name} is not a readable .npy: {exc}") from exc
+            raise ConfigurationError(
+                f"phi file {source.name} is not a readable .npy: {exc}"
+            ) from exc
     elif isinstance(value, Sequence) and not isinstance(value, bytes):
         try:
             array = np.array(value, dtype=float)
@@ -173,25 +175,46 @@ def phi_one_population(
     if chosen == "dominance":
         theta_value = None if theta is None else _number(theta, "theta", positive=True)
         phi = _call(
-            manip.phi_1D, xx, nu=values["nu"], theta0=values["theta0"], gamma=values["gamma"],
-            h=_number(h, "h"), theta=theta_value, beta=beta_value,
+            manip.phi_1D,
+            xx,
+            nu=values["nu"],
+            theta0=values["theta0"],
+            gamma=values["gamma"],
+            h=_number(h, "h"),
+            theta=theta_value,
+            beta=beta_value,
         )
     elif chosen == "genic":
         theta_value = None if theta is None else _number(theta, "theta", positive=True)
         phi = _call(
-            manip.phi_1D_genic, xx, nu=values["nu"], theta0=values["theta0"],
-            gamma=values["gamma"], theta=theta_value, beta=beta_value,
+            manip.phi_1D_genic,
+            xx,
+            nu=values["nu"],
+            theta0=values["theta0"],
+            gamma=values["gamma"],
+            theta=theta_value,
+            beta=beta_value,
         )
     elif chosen == "neutral":
         theta_value = None if theta is None else _number(theta, "theta", positive=True)
         phi = _call(
-            manip.phi_1D_snm, xx, nu=values["nu"], theta0=values["theta0"], theta=theta_value,
+            manip.phi_1D_snm,
+            xx,
+            nu=values["nu"],
+            theta0=values["theta0"],
+            theta=theta_value,
             beta=beta_value,
         )
     else:
         phi = _call(
-            manip.phi_1D_X, xx, nu=values["nu"], theta0=values["theta0"], gamma=values["gamma"],
-            h=_number(h, "h"), beta=beta_value, alpha=_number(alpha, "alpha", positive=True),
+            manip.phi_1D_X,
+            xx,
+            nu=values["nu"],
+            theta0=values["theta0"],
+            gamma=values["gamma"],
+            h=_number(h, "h"),
+            beta=beta_value,
+            alpha=_number(alpha, "alpha", positive=True),
         )
     return _phi_result(np, "phi_one_population", phi, points, output_path, {"model": chosen})
 
@@ -257,7 +280,11 @@ def phi_create_admixed_population(
     }[count]
     result = _call(function, density, *f, *grids)
     return _phi_result(
-        np, "phi_create_admixed_population", result, points, output_path,
+        np,
+        "phi_create_admixed_population",
+        result,
+        points,
+        output_path,
         {"proportions": f},
     )
 
@@ -292,14 +319,21 @@ def phi_admix_into_population(
     if count == 2:
         function = manip.phi_2D_admix_1_into_2 if target == 2 else manip.phi_2D_admix_2_into_1
     elif count == 3:
-        names = {3: "phi_3D_admix_1_and_2_into_3", 2: "phi_3D_admix_1_and_3_into_2",
-                 1: "phi_3D_admix_2_and_3_into_1"}
+        names = {
+            3: "phi_3D_admix_1_and_2_into_3",
+            2: "phi_3D_admix_1_and_3_into_2",
+            1: "phi_3D_admix_2_and_3_into_1",
+        }
         function = getattr(manip, names[target])
     else:
         function = getattr(manip, f"phi_{count}D_admix_into_{target}")
     result = _call(function, density, *f, *grids)
     return _phi_result(
-        np, "phi_admix_into_population", result, points, output_path,
+        np,
+        "phi_admix_into_population",
+        result,
+        points,
+        output_path,
         {"target_population": target, "proportions": f},
     )
 
@@ -345,7 +379,11 @@ def phi_select_populations(
             raise ConfigurationError(f"reorder needs a permutation of 1..{count}.")
         result = _call(manip.reorder_pops, density, chosen)
     return _phi_result(
-        np, "phi_select_populations", result, points, output_path,
+        np,
+        "phi_select_populations",
+        result,
+        points,
+        output_path,
         {"select": operation, "populations": chosen},
     )
 
@@ -405,7 +443,11 @@ def spectrum_from_phi(
     points = _grid_points(grid_points)
     density = _load_phi(np, phi, points)
     count = density.ndim
-    if isinstance(sample_sizes, (str, bytes)) or not isinstance(sample_sizes, Sequence) or len(sample_sizes) != count:
+    if (
+        isinstance(sample_sizes, (str, bytes))
+        or not isinstance(sample_sizes, Sequence)
+        or len(sample_sizes) != count
+    ):
         raise ConfigurationError(f"sample_sizes must list {count} integers, one per population.")
     ns = [_integer(item, "sample size", minimum=2, maximum=_MAX_SAMPLE) for item in sample_sizes]
     xxs = [_grid(dadi, points)] * count
@@ -460,9 +502,7 @@ def scramble_spectrum_pop_ids(
         raise ConfigurationError("spectrum needs at least two populations.")
     with _seeded(np, seed_value):
         scrambled = _call(fs.scramble_pop_ids, mask_corners=mask_corners)
-    return _spectrum_result(
-        np, "scramble_spectrum_pop_ids", scrambled, {"seed": seed_value}
-    )
+    return _spectrum_result(np, "scramble_spectrum_pop_ids", scrambled, {"seed": seed_value})
 
 
 def spectrum_from_snp_data(
@@ -498,27 +538,40 @@ def spectrum_from_snp_data(
     missing = [name for name in names if name not in available]
     if missing or len(set(names)) != len(names):
         raise ConfigurationError(f"pop_ids {names} must be distinct and in the file {available}.")
-    if isinstance(projections, (str, bytes)) or not isinstance(projections, Sequence) or len(projections) != len(names):
+    if (
+        isinstance(projections, (str, bytes))
+        or not isinstance(projections, Sequence)
+        or len(projections) != len(names)
+    ):
         raise ConfigurationError("projections must list one integer per population.")
     proj = [_integer(item, "projection", minimum=2, maximum=_MAX_SAMPLE) for item in projections]
     if not all(isinstance(flag, bool) for flag in (polarized, mask_corners, force_positive)):
-        raise ConfigurationError("polarized, mask_corners and force_positive must be true or false.")
+        raise ConfigurationError(
+            "polarized, mask_corners and force_positive must be true or false."
+        )
     if misidentification_path is None:
         fs = _call(
-            dadi.Spectrum.from_data_dict, data, names, proj,
-            mask_corners=mask_corners, polarized=polarized,
+            dadi.Spectrum.from_data_dict,
+            data,
+            names,
+            proj,
+            mask_corners=mask_corners,
+            polarized=polarized,
         )
         mode = "from_data_dict"
     else:
         fux = input_path(misidentification_path)
         fs = _call(
-            dadi.Spectrum.from_data_dict_corrected, data, names, proj, str(fux),
-            force_pos=force_positive, mask_corners=mask_corners,
+            dadi.Spectrum.from_data_dict_corrected,
+            data,
+            names,
+            proj,
+            str(fux),
+            force_pos=force_positive,
+            mask_corners=mask_corners,
         )
         mode = "from_data_dict_corrected"
-    return _spectrum_result(
-        np, "spectrum_from_snp_data", fs, {"mode": mode, "source": str(source)}
-    )
+    return _spectrum_result(np, "spectrum_from_snp_data", fs, {"mode": mode, "source": str(source)})
 
 
 __all__ = [

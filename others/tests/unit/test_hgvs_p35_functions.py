@@ -53,7 +53,9 @@ def build_data() -> dict:
     for start, end in plus_exons:
         genome[start:end] = list(tx[position : position + end - start])
         position += end - start
-    minus_tx = utr5[:10] + "ATG" + "".join(rng.choice(codons) for _ in range(40)) + "TGA" + utr3[:20]
+    minus_tx = (
+        utr5[:10] + "ATG" + "".join(rng.choice(codons) for _ in range(40)) + "TGA" + utr3[:20]
+    )
     first = 80
     e1 = (1000 - first, 1000)
     e2 = (e1[0] - 30 - (len(minus_tx) - first), e1[0] - 30)
@@ -81,14 +83,35 @@ def build_data() -> dict:
         return rows
 
     return {
-        "sequences": {CHROM: genome_text, "NM_999999.1": tx, "NM_999999.2": tx2, "NM_999998.1": minus_tx},
+        "sequences": {
+            CHROM: genome_text,
+            "NM_999999.1": tx,
+            "NM_999999.2": tx2,
+            "NM_999998.1": minus_tx,
+        },
         "transcripts": {
-            "NM_999999.1": {"hgnc": "TOYA", "cds_start_i": 20, "cds_end_i": 200, "pro_ac": "NP_999999.1"},
-            "NM_999999.2": {"hgnc": "TOYA", "cds_start_i": 30, "cds_end_i": 210, "pro_ac": "NP_999999.2"},
+            "NM_999999.1": {
+                "hgnc": "TOYA",
+                "cds_start_i": 20,
+                "cds_end_i": 200,
+                "pro_ac": "NP_999999.1",
+            },
+            "NM_999999.2": {
+                "hgnc": "TOYA",
+                "cds_start_i": 30,
+                "cds_end_i": 210,
+                "pro_ac": "NP_999999.2",
+            },
             "NM_999998.1": {"hgnc": "TOYB", "cds_start_i": 10, "cds_end_i": 136},
         },
         "alignments": [
-            {"tx_ac": "NM_999999.1", "alt_ac": CHROM, "alt_aln_method": "splign", "alt_strand": 1, "exons": exons(plus_exons)},
+            {
+                "tx_ac": "NM_999999.1",
+                "alt_ac": CHROM,
+                "alt_aln_method": "splign",
+                "alt_strand": 1,
+                "exons": exons(plus_exons),
+            },
             {
                 "tx_ac": "NM_999999.2",
                 "alt_ac": CHROM,
@@ -102,7 +125,14 @@ def build_data() -> dict:
                 "alt_aln_method": "splign",
                 "alt_strand": -1,
                 "exons": [
-                    {"ord": 0, "tx_start_i": 0, "tx_end_i": first, "alt_start_i": e1[0], "alt_end_i": e1[1], "cigar": f"{first}="},
+                    {
+                        "ord": 0,
+                        "tx_start_i": 0,
+                        "tx_end_i": first,
+                        "alt_start_i": e1[0],
+                        "alt_end_i": e1[1],
+                        "cigar": f"{first}=",
+                    },
                     {
                         "ord": 1,
                         "tx_start_i": first,
@@ -156,8 +186,14 @@ def test_parse_posedit_and_position() -> None:
     bare = h.parse_hgvs_position("26+2_57-3", variant_type="c", verbose=False)
     # Coding coordinates are measured from CDS_START, as the upstream parser reports.
     from hgvs.parser import Parser
+
     direct = Parser().parse_c_interval("26+2_57-3")
-    assert bare["start"] == {"text": "26+2", "base": 26, "offset": 2, "datum": direct.start.datum.name}
+    assert bare["start"] == {
+        "text": "26+2",
+        "base": 26,
+        "offset": 2,
+        "datum": direct.start.datum.name,
+    }
     assert bare["end"]["offset"] == -3
     prefixed = h.parse_hgvs_position("NM_000001.1:c.26+2_57-3", verbose=False)
     assert prefixed["accession"] == "NM_000001.1" and prefixed["type"] == "c"
@@ -197,7 +233,10 @@ def test_validate_position_and_variant() -> None:
 def test_fill_reference_and_length_change() -> None:
     tx = DATA["sequences"]["NM_999999.1"]
     filled = h.fill_hgvs_reference("NM_999999.1:c.5_7del", **KW)
-    assert filled["output"]["hgvs"] == f"NM_999999.1:c.5_7del{tx[24:27]}" and filled["reference"] == tx[24:27]
+    assert (
+        filled["output"]["hgvs"] == f"NM_999999.1:c.5_7del{tx[24:27]}"
+        and filled["reference"] == tx[24:27]
+    )
     unchanged = h.fill_hgvs_reference("NM_999999.1:c.5A>T", **KW)
     assert unchanged["output"]["hgvs"] == "NM_999999.1:c.5A>T"
     changes = {
@@ -211,8 +250,11 @@ def test_fill_reference_and_length_change() -> None:
         assert h.hgvs_length_change(text, verbose=False)["length_change"] == expected, text
     # Explicit deleted bases are optional: HGVS can infer the length from the interval.
     from hgvs.parser import Parser
+
     direct = Parser().parse_hgvs_variant("NM_1.1:c.5_7del")
-    assert h.hgvs_length_change("NM_1.1:c.5_7del", verbose=False)["length_change"] == direct.posedit.length_change(on_error_raise=True)
+    assert h.hgvs_length_change("NM_1.1:c.5_7del", verbose=False)[
+        "length_change"
+    ] == direct.posedit.length_change(on_error_raise=True)
     with pytest.raises(ConfigurationError, match="not a valid HGVS variant"):
         h.hgvs_length_change("garbage", verbose=False)
 
@@ -226,10 +268,18 @@ def test_map_variant_plus_strand_round_trip() -> None:
     assert to_c["output"]["hgvs"] == "NM_999999.1:c.-1C>G" or to_c["output"]["type"] == "c"
     coding = to_c["output"]["hgvs"]
     assert to_c["mapper_method"] == "g_to_c" and to_c["mapper"] == "VariantMapper"
-    assert h.map_hgvs_variant(coding, to_type="g", genomic_accession=CHROM, **KW)["output"]["hgvs"] == genomic
-    non_coding = h.map_hgvs_variant(genomic, to_type="n", transcript_accession="NM_999999.1", **KW)["output"]["hgvs"]
+    assert (
+        h.map_hgvs_variant(coding, to_type="g", genomic_accession=CHROM, **KW)["output"]["hgvs"]
+        == genomic
+    )
+    non_coding = h.map_hgvs_variant(genomic, to_type="n", transcript_accession="NM_999999.1", **KW)[
+        "output"
+    ]["hgvs"]
     assert non_coding == "NM_999999.1:n.20C>G"
-    assert h.map_hgvs_variant(non_coding, to_type="g", genomic_accession=CHROM, **KW)["output"]["hgvs"] == genomic
+    assert (
+        h.map_hgvs_variant(non_coding, to_type="g", genomic_accession=CHROM, **KW)["output"]["hgvs"]
+        == genomic
+    )
     assert h.map_hgvs_variant(non_coding, to_type="c", **KW)["output"]["hgvs"] == coding
     assert h.map_hgvs_variant(coding, to_type="n", **KW)["output"]["hgvs"] == non_coding
     automatic = h.map_hgvs_variant(genomic, to_type="t", transcript_accession="NM_999999.1", **KW)
@@ -240,14 +290,21 @@ def test_map_variant_plus_strand_round_trip() -> None:
 
 def test_map_variant_with_assembly_mapper_and_minus_strand() -> None:
     genomic = snv(950)
-    via_assembly = h.map_hgvs_variant(genomic, to_type="c", transcript_accession="NM_999998.1", assembly_name="GRCh38", **KW)
+    via_assembly = h.map_hgvs_variant(
+        genomic, to_type="c", transcript_accession="NM_999998.1", assembly_name="GRCh38", **KW
+    )
     assert via_assembly["mapper"] == "AssemblyMapper"
     explicit = h.map_hgvs_variant(genomic, to_type="c", transcript_accession="NM_999998.1", **KW)
     assert via_assembly["output"]["hgvs"] == explicit["output"]["hgvs"]
     coding = explicit["output"]["hgvs"]
     ref = GENOME[949]
-    assert coding.endswith(f"{COMPLEMENT[ref]}>{COMPLEMENT[COMPLEMENT[ref]]}")  # the minus strand flips the bases
-    assert h.map_hgvs_variant(coding, to_type="g", assembly_name="GRCh38", **KW)["output"]["hgvs"] == genomic
+    assert coding.endswith(
+        f"{COMPLEMENT[ref]}>{COMPLEMENT[COMPLEMENT[ref]]}"
+    )  # the minus strand flips the bases
+    assert (
+        h.map_hgvs_variant(coding, to_type="g", assembly_name="GRCh38", **KW)["output"]["hgvs"]
+        == genomic
+    )
 
 
 def test_map_variant_argument_errors() -> None:
@@ -258,36 +315,68 @@ def test_map_variant_argument_errors() -> None:
     with pytest.raises(ConfigurationError, match="cannot map"):
         h.map_hgvs_variant(snv(120), to_type="g", transcript_accession="NM_999999.1", **KW)
     with pytest.raises(ConfigurationError, match="reference"):
-        h.map_hgvs_variant(f"{CHROM}:g.120A>G", to_type="c", transcript_accession="NM_999999.1", **KW)
+        h.map_hgvs_variant(
+            f"{CHROM}:g.120A>G", to_type="c", transcript_accession="NM_999999.1", **KW
+        )
     unchecked = h.map_hgvs_variant(
-        f"{CHROM}:g.120A>G", to_type="c", transcript_accession="NM_999999.1", prevalidation_level="NONE", replace_reference=False, **KW
+        f"{CHROM}:g.120A>G",
+        to_type="c",
+        transcript_accession="NM_999999.1",
+        prevalidation_level="NONE",
+        replace_reference=False,
+        **KW,
     )
     assert unchecked["output"]["posedit"].startswith("-1")
-    with pytest.raises(ConfigurationError, match="No transcript definition|NM_000000"):
+    with pytest.raises(ConfigurationError, match=r"No transcript definition|NM_000000"):
         h.map_hgvs_variant(snv(120), to_type="c", transcript_accession="NM_000000.1", **KW)
 
 
 def test_map_interval() -> None:
     to_genome = h.map_hgvs_interval(
-        "1_10", from_type="c", to_type="g", transcript_accession="NM_999999.1", genomic_accession=CHROM, **KW
+        "1_10",
+        from_type="c",
+        to_type="g",
+        transcript_accession="NM_999999.1",
+        genomic_accession=CHROM,
+        **KW,
     )
     assert to_genome["output"] == "121_130"
     back = h.map_hgvs_interval(
-        "121_130", from_type="g", to_type="c", transcript_accession="NM_999999.1", genomic_accession=CHROM, **KW
+        "121_130",
+        from_type="g",
+        to_type="c",
+        transcript_accession="NM_999999.1",
+        genomic_accession=CHROM,
+        **KW,
     )
     assert back["output"] == "1_10"
-    non_coding = h.map_hgvs_interval("1_10", from_type="c", to_type="n", transcript_accession="NM_999999.1", **KW)
+    non_coding = h.map_hgvs_interval(
+        "1_10", from_type="c", to_type="n", transcript_accession="NM_999999.1", **KW
+    )
     assert non_coding["output"] == "21_30" and non_coding["start"] == "21"
     across_exons = h.map_hgvs_interval(
-        "70_130", from_type="c", to_type="g", transcript_accession="NM_999999.1", genomic_accession=CHROM, **KW
+        "70_130",
+        from_type="c",
+        to_type="g",
+        transcript_accession="NM_999999.1",
+        genomic_accession=CHROM,
+        **KW,
     )
-    assert across_exons["output"] == "190_350"  # c.70 -> transcript index 89 in exon 1, c.130 -> index 149 in exon 2
+    assert (
+        across_exons["output"] == "190_350"
+    )  # c.70 -> transcript index 89 in exon 1, c.130 -> index 149 in exon 2
     with pytest.raises(ConfigurationError, match="differ"):
-        h.map_hgvs_interval("1_10", from_type="c", to_type="c", transcript_accession="NM_999999.1", **KW)
+        h.map_hgvs_interval(
+            "1_10", from_type="c", to_type="c", transcript_accession="NM_999999.1", **KW
+        )
     with pytest.raises(ConfigurationError, match="genomic_accession"):
-        h.map_hgvs_interval("1_10", from_type="c", to_type="g", transcript_accession="NM_999999.1", **KW)
-    with pytest.raises(ConfigurationError, match="out of bounds|bounds"):
-        h.map_hgvs_interval("1_1000", from_type="c", to_type="n", transcript_accession="NM_999999.1", **KW)
+        h.map_hgvs_interval(
+            "1_10", from_type="c", to_type="g", transcript_accession="NM_999999.1", **KW
+        )
+    with pytest.raises(ConfigurationError, match=r"out of bounds|bounds"):
+        h.map_hgvs_interval(
+            "1_1000", from_type="c", to_type="n", transcript_accession="NM_999999.1", **KW
+        )
 
 
 def test_predict_protein_consequence() -> None:
@@ -296,8 +385,12 @@ def test_predict_protein_consequence() -> None:
     alt = COMPLEMENT[codon[0]]
     result = h.predict_hgvs_protein_consequence(f"NM_999999.1:c.4{codon[0]}>{alt}", **KW)
     assert result["output"]["accession"] == "NP_999999.1" and result["output"]["type"] == "p"
-    assert result["output"]["posedit"].startswith("(") and "Ser" not in "" and result["output"]["posedit"].count("2") == 1
-    assembly = h.predict_hgvs_protein_consequence(f"NM_999999.1:c.4{codon[0]}>{alt}", assembly_name="GRCh38", **KW)
+    assert (
+        result["output"]["posedit"].startswith("(") and result["output"]["posedit"].count("2") == 1
+    )
+    assembly = h.predict_hgvs_protein_consequence(
+        f"NM_999999.1:c.4{codon[0]}>{alt}", assembly_name="GRCh38", **KW
+    )
     assert assembly["output"]["hgvs"] == result["output"]["hgvs"]
     start_loss = h.predict_hgvs_protein_consequence("NM_999999.1:c.1A>G", **KW)
     assert start_loss["output"]["posedit"] == "Met1?"
@@ -308,16 +401,25 @@ def test_predict_protein_consequence() -> None:
 
 def test_project_variant_between_transcripts() -> None:
     forward = h.project_hgvs_variant(
-        "NM_999999.1:c.5A>T".replace("A>T", f"{DATA['sequences']['NM_999999.1'][24]}>{COMPLEMENT[DATA['sequences']['NM_999999.1'][24]]}"),
+        "NM_999999.1:c.5A>T".replace(
+            "A>T",
+            f"{DATA['sequences']['NM_999999.1'][24]}>{COMPLEMENT[DATA['sequences']['NM_999999.1'][24]]}",
+        ),
         source_accession="NM_999999.1",
         destination_accession="NM_999999.2",
         genomic_accession=CHROM,
         **KW,
     )
     assert forward["kind"] == "variant" and forward["output"]["accession"] == "NM_999999.2"
-    assert forward["output"]["posedit"].startswith("5")  # same CDS-relative position on the longer transcript
+    assert forward["output"]["posedit"].startswith(
+        "5"
+    )  # same CDS-relative position on the longer transcript
     interval = h.project_hgvs_variant(
-        "-5_10", source_accession="NM_999999.1", destination_accession="NM_999999.2", genomic_accession=CHROM, **KW
+        "-5_10",
+        source_accession="NM_999999.1",
+        destination_accession="NM_999999.2",
+        genomic_accession=CHROM,
+        **KW,
     )
     assert interval["kind"] == "interval" and interval["output"] == "-5_10"
     backward = h.project_hgvs_variant(
@@ -331,13 +433,20 @@ def test_project_variant_between_transcripts() -> None:
     assert backward["output"]["accession"] == "NM_999999.1"
     with pytest.raises(ConfigurationError, match="direction"):
         h.project_hgvs_variant(
-            "-5_10", source_accession="NM_999999.1", destination_accession="NM_999999.2", genomic_accession=CHROM, direction="up", **KW
+            "-5_10",
+            source_accession="NM_999999.1",
+            destination_accession="NM_999999.2",
+            genomic_accession=CHROM,
+            direction="up",
+            **KW,
         )
 
 
 def test_relevant_transcripts_and_vcf_allele() -> None:
     relevant = h.list_hgvs_relevant_transcripts(snv(120), **KW)
-    assert relevant["transcripts"] == ["NM_999999.1", "NM_999999.2"] or sorted(relevant["transcripts"]) == [
+    assert relevant["transcripts"] == ["NM_999999.1", "NM_999999.2"] or sorted(
+        relevant["transcripts"]
+    ) == [
         "NM_999999.1",
         "NM_999999.2",
     ]
@@ -346,12 +455,21 @@ def test_relevant_transcripts_and_vcf_allele() -> None:
         h.list_hgvs_relevant_transcripts("NM_999999.1:c.5A>T", **KW)
 
     allele = h.hgvs_to_vcf_allele(snv(120), **KW)
-    assert (allele["chrom"], allele["pos"], allele["ref"], allele["edit_type"]) == ("1", 120, GENOME[119], "sub")
+    assert (allele["chrom"], allele["pos"], allele["ref"], allele["edit_type"]) == (
+        "1",
+        120,
+        GENOME[119],
+        "sub",
+    )
     deletion = h.hgvs_to_vcf_allele(f"{CHROM}:g.120_122del", **KW)
-    assert deletion["edit_type"] == "del" and deletion["ref"] == GENOME[117:122] or deletion["ref"].startswith(GENOME[117])
+    assert (deletion["edit_type"] == "del" and deletion["ref"] == GENOME[117:122]) or deletion[
+        "ref"
+    ].startswith(GENOME[117])
     assert deletion["alt"] == deletion["ref"][0] and len(deletion["ref"]) == 4
     duplication = h.hgvs_to_vcf_allele(f"{CHROM}:g.120_122dup", **KW)
-    assert duplication["edit_type"] == "dup" and len(duplication["alt"]) == len(duplication["ref"]) + 3
+    assert (
+        duplication["edit_type"] == "dup" and len(duplication["alt"]) == len(duplication["ref"]) + 3
+    )
     with pytest.raises(ConfigurationError, match="g\\. variant"):
         h.hgvs_to_vcf_allele("NM_999999.1:c.5A>T", **KW)
 
@@ -374,19 +492,46 @@ def test_transcript_database_queries() -> None:
     assert query("gene_info", gene="NOPE", **KW)["rows"] == []
     for_gene = query("tx_for_gene", gene="TOYA", **KW)["rows"]
     assert [row["tx_ac"] for row in for_gene] == ["NM_999999.1", "NM_999999.2"]
-    exons = query("tx_exons", transcript_accession="NM_999998.1", genomic_accession=CHROM, alt_aln_method="splign", **KW)
-    assert [row["alt_start_i"] for row in exons["rows"]] == sorted(row["alt_start_i"] for row in exons["rows"])
+    exons = query(
+        "tx_exons",
+        transcript_accession="NM_999998.1",
+        genomic_accession=CHROM,
+        alt_aln_method="splign",
+        **KW,
+    )
+    assert [row["alt_start_i"] for row in exons["rows"]] == sorted(
+        row["alt_start_i"] for row in exons["rows"]
+    )
     assert exons["rows"][0]["alt_strand"] == -1 and exons["row_count"] == 2
     identity = query("tx_identity_info", transcript_accession="NM_999999.1", **KW)["rows"][0]
-    assert identity["lengths"] == [100, 100, 60] and (identity["cds_start_i"], identity["cds_end_i"]) == (20, 200)
-    info = query("tx_info", transcript_accession="NM_999999.1", genomic_accession=CHROM, alt_aln_method="splign", **KW)["rows"][0]
+    assert identity["lengths"] == [100, 100, 60] and (
+        identity["cds_start_i"],
+        identity["cds_end_i"],
+    ) == (20, 200)
+    info = query(
+        "tx_info",
+        transcript_accession="NM_999999.1",
+        genomic_accession=CHROM,
+        alt_aln_method="splign",
+        **KW,
+    )["rows"][0]
     assert info["hgnc"] == "TOYA" and info["alt_ac"] == CHROM
     options = query("tx_mapping_options", transcript_accession="NM_999999.1", **KW)["rows"]
     assert options == [{"tx_ac": "NM_999999.1", "alt_ac": CHROM, "alt_aln_method": "splign"}]
     similar = query("similar_transcripts", transcript_accession="NM_999999.1", **KW)["rows"]
-    assert similar == [
-        {"tx_ac1": "NM_999999.1", "tx_ac2": "NM_999999.2", "cds_eq": True, "es_fp_eq": False, "cds_es_fp_eq": False}
-    ] or similar[0]["cds_eq"] is True
+    assert (
+        similar
+        == [
+            {
+                "tx_ac1": "NM_999999.1",
+                "tx_ac2": "NM_999999.2",
+                "cds_eq": True,
+                "es_fp_eq": False,
+                "cds_es_fp_eq": False,
+            }
+        ]
+        or similar[0]["cds_eq"] is True
+    )
     assert similar[0]["es_fp_eq"] is False  # exon 1 starts at a different genomic position
     assert query("protein_accession", transcript_accession="NM_999999.1", **KW)["rows"] == [
         {"tx_ac": "NM_999999.1", "pro_ac": "NP_999999.1"}
@@ -399,7 +544,13 @@ def test_transcript_database_queries() -> None:
     with pytest.raises(ConfigurationError, match="query"):
         query("everything", **KW)
     with pytest.raises(ConfigurationError, match="No tx_exons"):
-        query("tx_exons", transcript_accession="NM_999998.1", genomic_accession="NC_X", alt_aln_method="splign", **KW)
+        query(
+            "tx_exons",
+            transcript_accession="NM_999998.1",
+            genomic_accession="NC_X",
+            alt_aln_method="splign",
+            **KW,
+        )
 
 
 def test_local_data_is_validated() -> None:
@@ -408,7 +559,9 @@ def test_local_data_is_validated() -> None:
     with pytest.raises(ConfigurationError, match="alt_strand"):
         h.fetch_hgvs_reference_sequence(CHROM, data_source="local", local_data=bad, verbose=False)
     with pytest.raises(ConfigurationError, match="unknown keys"):
-        h.fetch_hgvs_reference_sequence(CHROM, data_source="local", local_data={"x": 1}, verbose=False)
+        h.fetch_hgvs_reference_sequence(
+            CHROM, data_source="local", local_data={"x": 1}, verbose=False
+        )
     with pytest.raises(ConfigurationError, match="needs local_data"):
         h.fetch_hgvs_reference_sequence(CHROM, verbose=False)
     with pytest.raises(ConfigurationError, match="data_source"):

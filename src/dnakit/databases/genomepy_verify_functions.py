@@ -270,7 +270,9 @@ def genomepy_gencode_add_grch37(
         raise ConfigurationError("ftp_link must be a non-empty string.")
     grch = [key for key in out if key.startswith("GRCh") and key[4:].isdigit()]
     if not grch:
-        raise ConfigurationError("the GENCODE catalogue has no GRCh assembly to take the release from.")
+        raise ConfigurationError(
+            "the GENCODE catalogue has no GRCh assembly to take the release from."
+        )
     latest = f"GRCh{max(int(key[4:]) for key in grch)}"
     annotations = out[latest].get("annotations") or []
     if not annotations:

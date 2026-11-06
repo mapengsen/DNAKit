@@ -384,9 +384,9 @@ def test_starch_archive_family(tmp_path: Path) -> None:
     assert (tmp_path / "chr2.bed").read_text() == "chr2\t10\t60\tr4\n"
 
     def summary(name: str, **kw: str) -> object:
-        return bo.unstarch_summary(
-            str(tmp_path / "a.starch"), statistic=name, verbose=False, **kw
-        )["value"]
+        return bo.unstarch_summary(str(tmp_path / "a.starch"), statistic=name, verbose=False, **kw)[
+            "value"
+        ]
 
     assert summary("elements") == 4 and summary("elements", chromosome="chr1") == 3
     assert summary("bases") == 100 + 100 + 100 + 50 and summary("bases-uniq") == 350

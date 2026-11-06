@@ -31,12 +31,21 @@ _TOOL = _cli.Tool(
     version_pattern=r"Version:?\s*v?(\d+\.\d+\.\d+)",
 )
 _PYTHON_TOOL = _cli.Tool(
-    name="delly2bnd", executable="python", hint="A Python interpreter with cyvcf2 is required to run delly2bnd.py.", tested_version="2.7.0",
-    citation="https://github.com/dellytools/delly", version_arguments=("--version",),
+    name="delly2bnd",
+    executable="python",
+    hint="A Python interpreter with cyvcf2 is required to run delly2bnd.py.",
+    tested_version="2.7.0",
+    citation="https://github.com/dellytools/delly",
+    version_arguments=("--version",),
 )
 _R_TOOL = _cli.Tool(
-    name="delly-rd-plot", executable="Rscript", hint="Install R with the packages DNAcopy, ggplot2, scales and gtable (for example `conda install -c bioconda -c conda-forge r-base r-ggplot2 bioconductor-dnacopy`) and put Rscript on PATH.",
-    tested_version="2.7.0", citation="https://github.com/dellytools/delly", version_arguments=("--version",), version_pattern=r"(\d+\.\d+\.\d+)",
+    name="delly-rd-plot",
+    executable="Rscript",
+    hint="Install R with the packages DNAcopy, ggplot2, scales and gtable (for example `conda install -c bioconda -c conda-forge r-base r-ggplot2 bioconductor-dnacopy`) and put Rscript on PATH.",
+    tested_version="2.7.0",
+    citation="https://github.com/dellytools/delly",
+    version_arguments=("--version",),
+    version_pattern=r"(\d+\.\d+\.\d+)",
 )
 _SV_TYPES = ("DEL", "INS", "DUP", "INV", "BND", "ALL")
 
@@ -52,10 +61,17 @@ def _variants(path: Path, limit: int = 1000) -> list[dict[str, Any]]:
         for record in handle:
             if len(rows) >= limit:
                 break
-            rows.append({
-                "chrom": record.chrom, "start": record.pos, "end": record.stop, "id": record.id,
-                "type": record.info.get("SVTYPE"), "filter": list(record.filter.keys()), "quality": record.qual,
-            })
+            rows.append(
+                {
+                    "chrom": record.chrom,
+                    "start": record.pos,
+                    "end": record.stop,
+                    "id": record.id,
+                    "type": record.info.get("SVTYPE"),
+                    "filter": list(record.filter.keys()),
+                    "quality": record.qual,
+                }
+            )
     return rows
 
 
@@ -102,8 +118,22 @@ def delly_genotype_sv_sites(
         arguments += ["-y", _cli.choice(technology, ("ont", "pb"), "technology")]
     if exclude_regions is not None:
         arguments += ["-x", str(_cli.existing_file(exclude_regions, "exclude_regions"))]
-    record = _cli.invoke(_TOOL, [*arguments, *bams], cwd=target.parent, expected=[target], explicit=delly_path, timeout_seconds=timeout_seconds)
-    return _cli.finish(record, "genotype_sv_sites", output=str(target), mode=chosen, variant_count=_count(target), variants=_variants(target))
+    record = _cli.invoke(
+        _TOOL,
+        [*arguments, *bams],
+        cwd=target.parent,
+        expected=[target],
+        explicit=delly_path,
+        timeout_seconds=timeout_seconds,
+    )
+    return _cli.finish(
+        record,
+        "genotype_sv_sites",
+        output=str(target),
+        mode=chosen,
+        variant_count=_count(target),
+        variants=_variants(target),
+    )
 
 
 def delly_assembly_sv(
@@ -131,12 +161,35 @@ def delly_assembly_sv(
     target = _cli.new_file(output_bcf, "output_bcf")
     chosen = _cli.choice(mode, ("squashed", "diploid"), "mode")
     arguments = [
-        "asm", "-g", str(genome), "-y", chosen, "-t", _cli.choice(svtype, _SV_TYPES, "svtype"),
-        "-q", str(_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)), "-c", str(_cli.integer(min_clip, "min_clip", minimum=1)),
-        "-o", str(target),
+        "asm",
+        "-g",
+        str(genome),
+        "-y",
+        chosen,
+        "-t",
+        _cli.choice(svtype, _SV_TYPES, "svtype"),
+        "-q",
+        str(_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)),
+        "-c",
+        str(_cli.integer(min_clip, "min_clip", minimum=1)),
+        "-o",
+        str(target),
     ]
-    record = _cli.invoke(_TOOL, [*arguments, *bams], cwd=target.parent, expected=[target], explicit=delly_path, timeout_seconds=timeout_seconds)
-    return _cli.finish(record, "assembly_based_sv_discovery", output=str(target), variant_count=_count(target), variants=_variants(target))
+    record = _cli.invoke(
+        _TOOL,
+        [*arguments, *bams],
+        cwd=target.parent,
+        expected=[target],
+        explicit=delly_path,
+        timeout_seconds=timeout_seconds,
+    )
+    return _cli.finish(
+        record,
+        "assembly_based_sv_discovery",
+        output=str(target),
+        variant_count=_count(target),
+        variants=_variants(target),
+    )
 
 
 def delly_copy_number_variants(
@@ -168,23 +221,47 @@ def delly_copy_number_variants(
     genome = _cli.existing_file(reference, "reference")
     target = _cli.new_file(output_bcf, "output_bcf")
     arguments = [
-        "cnv", "-g", str(genome), "-o", str(target), "-z", str(_cli.integer(min_cnv_size, "min_cnv_size", minimum=1)),
-        "-q", str(_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)), "-y", str(_cli.integer(ploidy, "ploidy", minimum=1)),
-        "-w", str(_cli.integer(window, "window", minimum=0)),
+        "cnv",
+        "-g",
+        str(genome),
+        "-o",
+        str(target),
+        "-z",
+        str(_cli.integer(min_cnv_size, "min_cnv_size", minimum=1)),
+        "-q",
+        str(_cli.integer(min_mapping_quality, "min_mapping_quality", minimum=0)),
+        "-y",
+        str(_cli.integer(ploidy, "ploidy", minimum=1)),
+        "-w",
+        str(_cli.integer(window, "window", minimum=0)),
     ]
     expected = [target]
     if genotype_sites is not None:
         arguments += ["-v", str(_cli.existing_file(genotype_sites, "genotype_sites"))]
     if exclude_regions is not None:
         arguments += ["-x", str(_cli.existing_file(exclude_regions, "exclude_regions"))]
-    for flag, value, name in (("-c", coverage_file, "coverage_file"), ("-u", segmentation_file, "segmentation_file")):
+    for flag, value, name in (
+        ("-c", coverage_file, "coverage_file"),
+        ("-u", segmentation_file, "segmentation_file"),
+    ):
         if value is not None:
             path = _cli.new_file(value, name)
             arguments += [flag, str(path)]
             expected.append(path)
-    record = _cli.invoke(_TOOL, [*arguments, str(bam)], cwd=target.parent, expected=expected, explicit=delly_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _TOOL,
+        [*arguments, str(bam)],
+        cwd=target.parent,
+        expected=expected,
+        explicit=delly_path,
+        timeout_seconds=timeout_seconds,
+    )
     return _cli.finish(
-        record, "copy_number_variants", output=str(target), regenotyped=genotype_sites is not None, variant_count=_count(target),
+        record,
+        "copy_number_variants",
+        output=str(target),
+        regenotyped=genotype_sites is not None,
+        variant_count=_count(target),
         variants=_variants(target),
     )
 
@@ -213,16 +290,37 @@ def delly_merge_call_sets(
     files = _bams(bcf_files, "bcf_files")
     target = _cli.new_file(output_bcf, "output_bcf")
     arguments = [
-        "merge", "-o", str(target), "-y", str(_cli.integer(min_quality, "min_quality", minimum=0)),
-        "-m", str(_cli.integer(min_size, "min_size", minimum=0)), "-n", str(_cli.integer(max_size, "max_size", minimum=1)),
+        "merge",
+        "-o",
+        str(target),
+        "-y",
+        str(_cli.integer(min_quality, "min_quality", minimum=0)),
+        "-m",
+        str(_cli.integer(min_size, "min_size", minimum=0)),
+        "-n",
+        str(_cli.integer(max_size, "max_size", minimum=1)),
     ]
     if reference is not None:
         arguments += ["-g", str(_cli.existing_file(reference, "reference"))]
     for enabled, option in ((cnv_mode, "-e"), (long_reads, "-l"), (pass_only, "-p")):
         if _cli.flag(enabled, option):
             arguments.append(option)
-    record = _cli.invoke(_TOOL, [*arguments, *files], cwd=target.parent, expected=[target], explicit=delly_path, timeout_seconds=timeout_seconds)
-    return _cli.finish(record, "merge_call_sets", output=str(target), cnv_mode=cnv_mode, variant_count=_count(target), variants=_variants(target))
+    record = _cli.invoke(
+        _TOOL,
+        [*arguments, *files],
+        cwd=target.parent,
+        expected=[target],
+        explicit=delly_path,
+        timeout_seconds=timeout_seconds,
+    )
+    return _cli.finish(
+        record,
+        "merge_call_sets",
+        output=str(target),
+        cnv_mode=cnv_mode,
+        variant_count=_count(target),
+        variants=_variants(target),
+    )
 
 
 def delly_filter_call_set(
@@ -257,25 +355,60 @@ def delly_filter_call_set(
     target = _cli.new_file(output_bcf, "output_bcf")
     chosen = _cli.choice(filter_mode, ("somatic", "germline"), "filter_mode")
     arguments = [
-        "filter", "-f", chosen, "-o", str(target), "-m", str(_cli.integer(min_size, "min_size", minimum=0)),
-        "-n", str(_cli.integer(max_size, "max_size", minimum=1)), "-y", str(_cli.integer(min_quality, "min_quality", minimum=0)),
-        "-a", format(_cli.number(min_alt_fraction, "min_alt_fraction", minimum=0.0, maximum=1.0), ".12g"),
-        "-r", format(_cli.number(min_genotyped_fraction, "min_genotyped_fraction", minimum=0.0, maximum=1.0), ".12g"),
+        "filter",
+        "-f",
+        chosen,
+        "-o",
+        str(target),
+        "-m",
+        str(_cli.integer(min_size, "min_size", minimum=0)),
+        "-n",
+        str(_cli.integer(max_size, "max_size", minimum=1)),
+        "-y",
+        str(_cli.integer(min_quality, "min_quality", minimum=0)),
+        "-a",
+        format(_cli.number(min_alt_fraction, "min_alt_fraction", minimum=0.0, maximum=1.0), ".12g"),
+        "-r",
+        format(
+            _cli.number(min_genotyped_fraction, "min_genotyped_fraction", minimum=0.0, maximum=1.0),
+            ".12g",
+        ),
     ]
     if chosen == "somatic":
         if samples_file is None:
             raise ConfigurationError("filter_mode='somatic' needs samples_file.")
         arguments += [
-            "-s", str(_cli.existing_file(samples_file, "samples_file")), "-v", str(_cli.integer(min_coverage, "min_coverage", minimum=0)),
-            "-c", format(_cli.number(max_control_support, "max_control_support", minimum=0.0, maximum=1.0), ".12g"),
+            "-s",
+            str(_cli.existing_file(samples_file, "samples_file")),
+            "-v",
+            str(_cli.integer(min_coverage, "min_coverage", minimum=0)),
+            "-c",
+            format(
+                _cli.number(max_control_support, "max_control_support", minimum=0.0, maximum=1.0),
+                ".12g",
+            ),
         ]
     elif long_reads:
         arguments.append("-l")
     for enabled, option in ((pass_only, "-p"), (tag_only, "-t")):
         if _cli.flag(enabled, option):
             arguments.append(option)
-    record = _cli.invoke(_TOOL, [*arguments, str(source)], cwd=target.parent, expected=[target], explicit=delly_path, timeout_seconds=timeout_seconds)
-    return _cli.finish(record, "filter_call_set", output=str(target), filter_mode=chosen, variant_count=_count(target), variants=_variants(target))
+    record = _cli.invoke(
+        _TOOL,
+        [*arguments, str(source)],
+        cwd=target.parent,
+        expected=[target],
+        explicit=delly_path,
+        timeout_seconds=timeout_seconds,
+    )
+    return _cli.finish(
+        record,
+        "filter_call_set",
+        output=str(target),
+        filter_mode=chosen,
+        variant_count=_count(target),
+        variants=_variants(target),
+    )
 
 
 def delly_translocations_to_breakends(
@@ -301,18 +434,32 @@ def delly_translocations_to_breakends(
     target = _cli.new_file(output_vcf, "output_vcf")
     interpreter = python_path or sys.executable
     environment = None
-    if python_path is None:  # the resolved interpreter path may lose the virtual environment; keep its packages visible
-        environment = {"PYTHONPATH": os.pathsep.join(filter(None, [sysconfig.get_paths()["purelib"], os.environ.get("PYTHONPATH", "")]))}
+    if (
+        python_path is None
+    ):  # the resolved interpreter path may lose the virtual environment; keep its packages visible
+        environment = {
+            "PYTHONPATH": os.pathsep.join(
+                filter(None, [sysconfig.get_paths()["purelib"], os.environ.get("PYTHONPATH", "")])
+            )
+        }
     record = _cli.invoke(
-        _PYTHON_TOOL, [str(script), "-v", str(source), "-r", str(genome), "-o", str(target)], cwd=target.parent, expected=[target],
-        explicit=interpreter, executable_name=Path(interpreter).name, timeout_seconds=timeout_seconds, environment=environment,
+        _PYTHON_TOOL,
+        [str(script), "-v", str(source), "-r", str(genome), "-o", str(target)],
+        cwd=target.parent,
+        expected=[target],
+        explicit=interpreter,
+        executable_name=Path(interpreter).name,
+        timeout_seconds=timeout_seconds,
+        environment=environment,
     )
     breakends = 0
     with target.open(encoding="utf-8", errors="replace") as handle:
         for line in handle:
             if not line.startswith("#"):
                 breakends += 1
-    return _cli.finish(record, "translocations_to_breakends", output=str(target), breakend_record_count=breakends)
+    return _cli.finish(
+        record, "translocations_to_breakends", output=str(target), breakend_record_count=breakends
+    )
 
 
 def delly_plot_read_depth(
@@ -339,10 +486,22 @@ def delly_plot_read_depth(
     arguments = [str(script), str(coverage)]
     if segmentation_file is not None:
         arguments.append(str(_cli.existing_file(segmentation_file, "segmentation_file")))
-    record = _cli.invoke(_R_TOOL, arguments, cwd=out, expected=[out / "plot.wholegenome.png"], explicit=rscript_path, timeout_seconds=timeout_seconds)
+    record = _cli.invoke(
+        _R_TOOL,
+        arguments,
+        cwd=out,
+        expected=[out / "plot.wholegenome.png"],
+        explicit=rscript_path,
+        timeout_seconds=timeout_seconds,
+    )
     return _cli.finish(
-        record, "plot_read_depth_profile", output_directory=str(out), images=sorted(str(p) for p in out.glob("plot.*.png")),
-        segmentation=str(out / "segmentation.tsv") if (out / "segmentation.tsv").is_file() else None,
+        record,
+        "plot_read_depth_profile",
+        output_directory=str(out),
+        images=sorted(str(p) for p in out.glob("plot.*.png")),
+        segmentation=str(out / "segmentation.tsv")
+        if (out / "segmentation.tsv").is_file()
+        else None,
     )
 
 

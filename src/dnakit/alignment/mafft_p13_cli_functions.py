@@ -65,11 +65,18 @@ def _common_options(
 ) -> list[str]:
     args = ["--quiet", "--thread", str(_cli.integer(threads, "threads", minimum=-1, maximum=256))]
     if sequence_type is not None:
-        args.append({"nucleotide": "--nuc", "amino": "--amino"}[_cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")])
+        args.append(
+            {"nucleotide": "--nuc", "amino": "--amino"}[
+                _cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")
+            ]
+        )
     if gap_open_penalty is not None:
         args += ["--op", f"{_cli.number(gap_open_penalty, 'gap_open_penalty', minimum=0.0):g}"]
     if gap_extension_offset is not None:
-        args += ["--ep", f"{_cli.number(gap_extension_offset, 'gap_extension_offset', minimum=0.0):g}"]
+        args += [
+            "--ep",
+            f"{_cli.number(gap_extension_offset, 'gap_extension_offset', minimum=0.0):g}",
+        ]
     if max_iterations is not None:
         args += ["--maxiterate", str(_cli.integer(max_iterations, "max_iterations", minimum=0))]
     if retree is not None:
@@ -177,7 +184,15 @@ def mafft_align(
     sequences = _cli.existing_file(sequences_path, "sequences_path")
     name = f"mafft-{_cli.choice(strategy, _STRATEGIES, 'strategy')}"
     args = _common_options(
-        threads, sequence_type, gap_open_penalty, gap_extension_offset, max_iterations, retree, reorder, adjust_direction, output_format
+        threads,
+        sequence_type,
+        gap_open_penalty,
+        gap_extension_offset,
+        max_iterations,
+        retree,
+        reorder,
+        adjust_direction,
+        output_format,
     )
     args.append(str(sequences))
     _require_existing(mafft_path, name)
@@ -221,8 +236,15 @@ def mafft_add_sequences(
     flag = _cli.choice(mode, _ADD_MODES, "mode")
     args = ["--quiet", "--thread", str(_cli.integer(threads, "threads", minimum=-1, maximum=256))]
     if sequence_type is not None:
-        args.append({"nucleotide": "--nuc", "amino": "--amino"}[_cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")])
-    for on, switch, label in ((keep_length, "--keeplength", "keep_length"), (six_mer_pair, "--6merpair", "six_mer_pair")):
+        args.append(
+            {"nucleotide": "--nuc", "amino": "--amino"}[
+                _cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")
+            ]
+        )
+    for on, switch, label in (
+        (keep_length, "--keeplength", "keep_length"),
+        (six_mer_pair, "--6merpair", "six_mer_pair"),
+    ):
         if not isinstance(on, bool):
             raise ConfigurationError(f"{label} must be True or False.")
         if on:
@@ -253,12 +275,20 @@ def mafft_seed_alignment(
     sequences and the sequences of ``sequences_path``.
     """
     sequences = _cli.existing_file(sequences_path, "sequences_path")
-    if isinstance(seed_alignment_paths, str) or not isinstance(seed_alignment_paths, Sequence) or not seed_alignment_paths:
+    if (
+        isinstance(seed_alignment_paths, str)
+        or not isinstance(seed_alignment_paths, Sequence)
+        or not seed_alignment_paths
+    ):
         raise ConfigurationError("seed_alignment_paths must be a non-empty list of files.")
     seeds = [_cli.existing_file(path, "seed_alignment_paths") for path in seed_alignment_paths]
     args = ["--quiet", "--thread", str(_cli.integer(threads, "threads", minimum=-1, maximum=256))]
     if sequence_type is not None:
-        args.append({"nucleotide": "--nuc", "amino": "--amino"}[_cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")])
+        args.append(
+            {"nucleotide": "--nuc", "amino": "--amino"}[
+                _cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")
+            ]
+        )
     for seed in seeds:
         args += ["--seed", str(seed)]
     args.append(str(sequences))
@@ -286,7 +316,12 @@ def mafft_profile_alignment(
     _require_existing(mafft_path, "mafft-profile")
     out = _cli.new_file(output_path, "output_path")
     return _stream(
-        "mafft-profile", [str(first), str(second)], out, mafft_path, timeout_seconds, "mafft-profile"
+        "mafft-profile",
+        [str(first), str(second)],
+        out,
+        mafft_path,
+        timeout_seconds,
+        "mafft-profile",
     )
 
 
@@ -320,7 +355,11 @@ def mafft_partition_tree_align(
     method = _cli.choice(tree_method, _PARTITION_TREES, "tree_method")
     args = ["--quiet", "--thread", str(_cli.integer(threads, "threads", minimum=-1, maximum=256))]
     if sequence_type is not None:
-        args.append({"nucleotide": "--nuc", "amino": "--amino"}[_cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")])
+        args.append(
+            {"nucleotide": "--nuc", "amino": "--amino"}[
+                _cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")
+            ]
+        )
     args += [f"--{method}", "--retree", str(_cli.integer(retree, "retree", minimum=1))]
     if partition_size is not None:
         args += ["--partsize", str(_cli.integer(partition_size, "partition_size", minimum=2))]
@@ -360,15 +399,32 @@ def mafft_sparsecore_align(
     random_seed = _cli.integer(seed, "seed", minimum=0)
     candidates = str(core_candidates)
     if not candidates or candidates.startswith("-") or any(char.isspace() for char in candidates):
-        raise ConfigurationError("core_candidates must be an integer count or a percentage such as '50%'.")
+        raise ConfigurationError(
+            "core_candidates must be an integer count or a percentage such as '50%'."
+        )
     mafft = _program("mafft", mafft_path)
     script = _program("mafft-sparsecore.rb", mafft_path)
     if shutil.which("ruby") is None:
         raise BackendUnavailableError(
-            "ruby was not found on PATH; mafft-sparsecore.rb is a Ruby script.", hint="Install ruby (apt install ruby)."
+            "ruby was not found on PATH; mafft-sparsecore.rb is a Ruby script.",
+            hint="Install ruby (apt install ruby).",
         )
-    args = ["-i", str(sequences), "-m", mafft, "-p", str(size), "-n", candidates, "-s", str(random_seed)]
-    for flag, value, label in (("-C", core_options, "core_options"), ("-A", add_options, "add_options")):
+    args = [
+        "-i",
+        str(sequences),
+        "-m",
+        mafft,
+        "-p",
+        str(size),
+        "-n",
+        candidates,
+        "-s",
+        str(random_seed),
+    ]
+    for flag, value, label in (
+        ("-C", core_options, "core_options"),
+        ("-A", add_options, "add_options"),
+    ):
         if value is not None:
             args += [flag, _cli.text(value, label)]
     if not isinstance(keep_input_order, bool) or not isinstance(mark_core, bool):
@@ -419,7 +475,11 @@ def mafft_pairwise_distances(
     limit = _cli.integer(max_rows_returned, "max_rows_returned", minimum=1)
     args: list[str] = []
     if sequence_type is not None:
-        args.append({"nucleotide": "-D", "amino": "-P"}[_cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")])
+        args.append(
+            {"nucleotide": "-D", "amino": "-P"}[
+                _cli.choice(sequence_type, ("nucleotide", "amino"), "sequence_type")
+            ]
+        )
     args.append(str(sequences))
     _require_existing(mafft_path, "mafft-distance")
     out = _cli.new_file(output_path, "output_path")
@@ -440,7 +500,12 @@ def mafft_pairwise_distances(
     if out.is_file():
         for line in out.read_text(encoding="utf-8", errors="replace").splitlines():
             parts = line.split()
-            if len(parts) == 3 and "-" in parts[0] and parts[1].startswith("d=") and parts[2].startswith("l="):
+            if (
+                len(parts) == 3
+                and "-" in parts[0]
+                and parts[1].startswith("d=")
+                and parts[2].startswith("l=")
+            ):
                 total += 1
                 if total <= limit:
                     first, second = parts[0].split("-", 1)

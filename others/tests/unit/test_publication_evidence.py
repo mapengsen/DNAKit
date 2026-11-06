@@ -1,17 +1,20 @@
 """Tests for manuscript citation evidence records."""
 
+from dnakit.exceptions import ConfigurationError
 from dnakit.integrations import (
     build_software_citation,
     describe_publication_record,
     publication_readiness,
     publication_registry_summary,
 )
-from dnakit.exceptions import ConfigurationError
 
 
 def test_registry_contains_recoverable_software_dois() -> None:
     assert publication_registry_summary(verbose=False)["records"] == 19
-    assert describe_publication_record("pyfaidx", verbose=False)["doi"] == "10.7287/peerj.preprints.970v1"
+    assert (
+        describe_publication_record("pyfaidx", verbose=False)["doi"]
+        == "10.7287/peerj.preprints.970v1"
+    )
     assert describe_publication_record("dnaio", verbose=False)["doi"] == "10.5281/zenodo.10548864"
 
 

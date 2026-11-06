@@ -51,10 +51,16 @@ def test_all_in_scope_catalog_candidates_are_formal_dnakit_exports() -> None:
     root = Path(__file__).parents[3]
     if not (root / "new_vision/DNAKit_unified_function_catalog.csv").exists():
         pytest.skip("new_vision/ is a local audit directory and is not part of the repository")
-    catalog = list(csv.DictReader((root / "new_vision/DNAKit_unified_function_catalog.csv").open(encoding="utf-8")))
+    catalog = list(
+        csv.DictReader(
+            (root / "new_vision/DNAKit_unified_function_catalog.csv").open(encoding="utf-8")
+        )
+    )
     comparison = {
         row["capability_id"]: row
-        for row in csv.DictReader((root / "new_vision/DNAKit_unified_comparison.csv").open(encoding="utf-8"))
+        for row in csv.DictReader(
+            (root / "new_vision/DNAKit_unified_comparison.csv").open(encoding="utf-8")
+        )
     }
     missing: list[str] = []
     for row in catalog:

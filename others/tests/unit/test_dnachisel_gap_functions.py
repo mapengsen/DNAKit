@@ -24,7 +24,6 @@ import pytest
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.molecular_lab import dnachisel_gap_functions as module
 
-
 requires_pkg = pytest.mark.skipif(
     importlib.util.find_spec("dnachisel") is None,
     reason="dnachisel is not installed",
@@ -95,11 +94,13 @@ def test_breach_plot_refuses_existing_output_and_non_png(tmp_path):
     existing = tmp_path / "exists.png"
     existing.write_bytes(b"x")
     with pytest.raises(ConfigurationError, match="already exists"):
-        module.plot_constraint_breaches_png(SEQUENCE, output_path=str(existing),
-                                            constraints=GC_CONSTRAINTS, verbose=False)
+        module.plot_constraint_breaches_png(
+            SEQUENCE, output_path=str(existing), constraints=GC_CONSTRAINTS, verbose=False
+        )
     with pytest.raises(ConfigurationError, match=r"\.png"):
-        module.plot_constraint_breaches_png(SEQUENCE, output_path=str(tmp_path / "b.pdf"),
-                                            constraints=GC_CONSTRAINTS, verbose=False)
+        module.plot_constraint_breaches_png(
+            SEQUENCE, output_path=str(tmp_path / "b.pdf"), constraints=GC_CONSTRAINTS, verbose=False
+        )
     assert existing.read_bytes() == b"x"
 
 
@@ -125,8 +126,10 @@ def test_breach_pdf_has_one_page_per_sequence(tmp_path):
 def test_breach_pdf_rejects_bad_specs_before_writing(tmp_path):
     with pytest.raises(ConfigurationError, match="Unsupported DnaChisel specification"):
         module.write_constraint_breaches_pdf(
-            {"s": SEQUENCE}, output_path=str(tmp_path / "x.pdf"),
-            constraints=[{"name": "NotASpec"}], verbose=False,
+            {"s": SEQUENCE},
+            output_path=str(tmp_path / "x.pdf"),
+            constraints=[{"name": "NotASpec"}],
+            verbose=False,
         )
     assert not (tmp_path / "x.pdf").exists()
 
@@ -165,7 +168,9 @@ def test_no_solution_report_reports_satisfiable_constraints_without_writing(tmp_
 @requires_pkg
 def test_no_solution_report_needs_a_constraint_and_a_new_directory(tmp_path):
     with pytest.raises(ConfigurationError, match="at least one constraint"):
-        module.write_dnachisel_no_solution_report(SEQUENCE, output_dir=str(tmp_path / "a"), verbose=False)
+        module.write_dnachisel_no_solution_report(
+            SEQUENCE, output_dir=str(tmp_path / "a"), verbose=False
+        )
     (tmp_path / "taken").mkdir()
     with pytest.raises(ConfigurationError, match="already exists"):
         module.write_dnachisel_no_solution_report(
@@ -203,7 +208,9 @@ def test_optimization_report_needs_constraints_or_objectives(tmp_path, monkeypat
     monkeypatch.setitem(sys.modules, "pdf_reports", types.ModuleType("pdf_reports"))
     monkeypatch.setitem(sys.modules, "sequenticon", types.ModuleType("sequenticon"))
     with pytest.raises(ConfigurationError, match="constraint or objective"):
-        module.write_dnachisel_optimization_report(SEQUENCE, output_dir=str(tmp_path / "r"), verbose=False)
+        module.write_dnachisel_optimization_report(
+            SEQUENCE, output_dir=str(tmp_path / "r"), verbose=False
+        )
     assert not (tmp_path / "r").exists()
 
 
@@ -217,7 +224,10 @@ def test_changes_plot_guard_without_geneblocks(tmp_path, monkeypatch):
     monkeypatch.setitem(sys.modules, "geneblocks", None)
     with pytest.raises(BackendUnavailableError) as info:
         module.plot_optimization_changes_png(
-            SEQUENCE, output_path=str(tmp_path / "changes.png"), constraints=GC_CONSTRAINTS, verbose=False
+            SEQUENCE,
+            output_path=str(tmp_path / "changes.png"),
+            constraints=GC_CONSTRAINTS,
+            verbose=False,
         )
     assert "bio-geneblocks" in (info.value.hint or "")
     assert not (tmp_path / "changes.png").exists()
@@ -230,7 +240,10 @@ def test_changes_plot_guard_without_geneblocks(tmp_path, monkeypatch):
 @requires_pkg
 def test_changes_plot_happy_path(tmp_path):
     result = module.plot_optimization_changes_png(
-        SEQUENCE, output_path=str(tmp_path / "changes.png"), constraints=GC_CONSTRAINTS, verbose=False
+        SEQUENCE,
+        output_path=str(tmp_path / "changes.png"),
+        constraints=GC_CONSTRAINTS,
+        verbose=False,
     )
     assert _is_png(tmp_path / "changes.png")
     assert result["all_constraints_pass"] is True
@@ -243,16 +256,20 @@ def test_changes_plot_happy_path(tmp_path):
 
 def test_blast_argument_checks_run_before_the_binary_lookup(tmp_path):
     with pytest.raises(ConfigurationError, match="exactly one"):
-        module.blast_sequence_hits(SEQUENCE, blast_db="db", subject_fasta=str(tmp_path / "s.fa"),
-                                   verbose=False)
+        module.blast_sequence_hits(
+            SEQUENCE, blast_db="db", subject_fasta=str(tmp_path / "s.fa"), verbose=False
+        )
     with pytest.raises(ConfigurationError, match="task"):
         module.blast_sequence_hits(SEQUENCE, blast_db="db", task="tblastx", verbose=False)
     with pytest.raises(ConfigurationError, match="dust"):
         module.blast_sequence_hits(SEQUENCE, blast_db="db", dust="maybe", verbose=False)
     with pytest.raises(ConfigurationError, match="existing FASTA"):
-        module.blast_sequence_hits(SEQUENCE, subject_fasta=str(tmp_path / "missing.fa"), verbose=False)
+        module.blast_sequence_hits(
+            SEQUENCE, subject_fasta=str(tmp_path / "missing.fa"), verbose=False
+        )
 
 
+@requires_pkg
 def test_blast_missing_binary_raises_backend_error(tmp_path, monkeypatch):
     monkeypatch.setenv("PATH", str(tmp_path))
     with pytest.raises(BackendUnavailableError) as info:
@@ -261,8 +278,9 @@ def test_blast_missing_binary_raises_backend_error(tmp_path, monkeypatch):
     assert "BLAST+" in (info.value.hint or "")
     explicit = tmp_path / "no-such-blastn"
     with pytest.raises(BackendUnavailableError, match="missing or not executable"):
-        module.blast_sequence_hits(SEQUENCE, blast_db=str(tmp_path / "db"),
-                                   blastn_path=str(explicit), verbose=False)
+        module.blast_sequence_hits(
+            SEQUENCE, blast_db=str(tmp_path / "db"), blastn_path=str(explicit), verbose=False
+        )
 
 
 @pytest.mark.skipif(
@@ -317,20 +335,27 @@ def test_bowtie_index_with_stand_in_builder(tmp_path):
 
 def test_bowtie_match_argument_checks(tmp_path):
     with pytest.raises(ConfigurationError, match="No Bowtie index"):
-        module.find_bowtie_matches(SEQUENCE, index_prefix=str(tmp_path / "none"), match_length=10,
-                                   verbose=False)
+        module.find_bowtie_matches(
+            SEQUENCE, index_prefix=str(tmp_path / "none"), match_length=10, verbose=False
+        )
     (tmp_path / "idx.1.ebwt").write_bytes(b"x")
-    with pytest.raises(ConfigurationError, match="max_mismatches|between"):
-        module.find_bowtie_matches(SEQUENCE, index_prefix=str(tmp_path / "idx"), match_length=10,
-                                   max_mismatches=4, verbose=False)
+    with pytest.raises(ConfigurationError, match=r"max_mismatches|between"):
+        module.find_bowtie_matches(
+            SEQUENCE,
+            index_prefix=str(tmp_path / "idx"),
+            match_length=10,
+            max_mismatches=4,
+            verbose=False,
+        )
 
 
 def test_bowtie_match_missing_binary_raises_backend_error(tmp_path, monkeypatch):
     (tmp_path / "idx.1.ebwt").write_bytes(b"x")
     monkeypatch.setenv("PATH", str(tmp_path))
     with pytest.raises(BackendUnavailableError, match="bowtie"):
-        module.find_bowtie_matches(SEQUENCE, index_prefix=str(tmp_path / "idx"), match_length=10,
-                                   verbose=False)
+        module.find_bowtie_matches(
+            SEQUENCE, index_prefix=str(tmp_path / "idx"), match_length=10, verbose=False
+        )
 
 
 def test_bowtie_matches_with_stand_in_aligner(tmp_path):
@@ -342,8 +367,12 @@ def test_bowtie_matches_with_stand_in_aligner(tmp_path):
         "printf '0\\t\\n2\\t1:A>C\\n'\n",
     )
     result = module.find_bowtie_matches(
-        "ACGTACGT", index_prefix=str(tmp_path / "idx"), match_length=4,
-        max_mismatches=1, bowtie_path=aligner, verbose=False,
+        "ACGTACGT",
+        index_prefix=str(tmp_path / "idx"),
+        match_length=4,
+        max_mismatches=1,
+        bowtie_path=aligner,
+        verbose=False,
     )
     assert result["version"] == "1.3.1"
     assert result["kmer_length"] == 4

@@ -48,13 +48,38 @@ def test_missing_program(tmp_path: Path) -> None:
     fasta = tmp_path / "g.fa"
     fasta.write_text(">c\nACGT\n")
     with pytest.raises(BackendUnavailableError):
-        bu.busco_assess_completeness(str(fasta), "bacteria_odb10", str(tmp_path / "o"), busco_path=str(tmp_path / "missing"), verbose=False)
+        bu.busco_assess_completeness(
+            str(fasta),
+            "bacteria_odb10",
+            str(tmp_path / "o"),
+            busco_path=str(tmp_path / "missing"),
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        bu.busco_assess_completeness(str(fasta), "bacteria_odb10", str(tmp_path / "o2"), gene_predictor="sapling", verbose=False)
+        bu.busco_assess_completeness(
+            str(fasta),
+            "bacteria_odb10",
+            str(tmp_path / "o2"),
+            gene_predictor="sapling",
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        bu.busco_assess_completeness(str(fasta), "bacteria_odb10", str(tmp_path / "o3"), mode="transcriptome", gene_predictor="augustus", verbose=False)
+        bu.busco_assess_completeness(
+            str(fasta),
+            "bacteria_odb10",
+            str(tmp_path / "o3"),
+            mode="transcriptome",
+            gene_predictor="augustus",
+            verbose=False,
+        )
     with pytest.raises(ConfigurationError):
-        bu.busco_assess_completeness(str(fasta), "bacteria_odb10", str(tmp_path / "o4"), augustus_species="human", verbose=False)
+        bu.busco_assess_completeness(
+            str(fasta),
+            "bacteria_odb10",
+            str(tmp_path / "o4"),
+            augustus_species="human",
+            verbose=False,
+        )
 
 
 def test_arguments_and_parsing(tmp_path: Path) -> None:
@@ -65,12 +90,30 @@ def test_arguments_and_parsing(tmp_path: Path) -> None:
     fasta = tmp_path / "g.fa"
     fasta.write_text(">c\nACGT\n")
     result = bu.busco_assess_completeness(
-        str(fasta), "eukaryota_odb10", str(tmp_path / "out"), gene_predictor="miniprot", scaffold_composition=True, offline=True, cpus=2,
-        busco_path=str(stub), verbose=False,
+        str(fasta),
+        "eukaryota_odb10",
+        str(tmp_path / "out"),
+        gene_predictor="miniprot",
+        scaffold_composition=True,
+        offline=True,
+        cpus=2,
+        busco_path=str(stub),
+        verbose=False,
     )
     args = json.loads((stub.parent / "args.json").read_text())
-    assert "--miniprot" in args and "--scaffold_composition" in args and "--offline" in args and args[args.index("-l") + 1] == "eukaryota_odb10"
+    assert (
+        "--miniprot" in args
+        and "--scaffold_composition" in args
+        and "--offline" in args
+        and args[args.index("-l") + 1] == "eukaryota_odb10"
+    )
     assert result["scores_percent"]["complete"] == 98.4 and result["marker_count"] == 124
-    assert result["assembly_statistics"]["total_length"] == 4641652 and result["assembly_statistics"]["percent_gaps"] == 0.0
+    assert (
+        result["assembly_statistics"]["total_length"] == 4641652
+        and result["assembly_statistics"]["percent_gaps"] == 0.0
+    )
     assert result["counts"]["complete_buscos_c"] == 122
-    assert result["full_table"][0]["Busco id"] == "b1" and result["scaffold_composition"][0]["Scaffold"] == "chr"
+    assert (
+        result["full_table"][0]["Busco id"] == "b1"
+        and result["scaffold_composition"][0]["Scaffold"] == "chr"
+    )

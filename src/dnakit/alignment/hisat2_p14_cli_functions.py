@@ -46,7 +46,9 @@ def _executable(name: str, hisat2_path: str | None) -> str | None:
         return None
     folder = Path(hisat2_path).expanduser()
     if not folder.is_dir():
-        raise ConfigurationError(f"hisat2_path must be a folder that contains the HISAT2 programs: {folder}")
+        raise ConfigurationError(
+            f"hisat2_path must be a folder that contains the HISAT2 programs: {folder}"
+        )
     return str(folder / name)
 
 
@@ -73,7 +75,9 @@ def _run(
 def _index(prefix: str) -> str:
     path = Path(prefix).expanduser().resolve()
     if next(path.parent.glob(f"{path.name}.1.ht2*"), None) is None:
-        raise ConfigurationError(f"No HISAT2 index with this prefix (no {path.name}.1.ht2 or .ht2l file): {path}")
+        raise ConfigurationError(
+            f"No HISAT2 index with this prefix (no {path.name}.1.ht2 or .ht2l file): {path}"
+        )
     return str(path)
 
 
@@ -93,7 +97,11 @@ def _new_base(value: str, name: str) -> Path:
     base = Path(value).expanduser().resolve()
     if not base.parent.is_dir():
         raise ConfigurationError(f"The folder for {name} does not exist: {base.parent}")
-    if base.exists() or any(base.parent.glob(f"{base.name}.*")) or any(base.parent.glob(f"{base.name}_*")):
+    if (
+        base.exists()
+        or any(base.parent.glob(f"{base.name}.*"))
+        or any(base.parent.glob(f"{base.name}_*"))
+    ):
         raise ConfigurationError(f"{name} must not exist yet: {base}")
     return base
 
@@ -159,9 +167,18 @@ def hisat2_align_reads(
         raise ConfigurationError("reads_1 and reads_2 must be given together.")
     if unpaired_reads is None and reads_1 is None:
         raise ConfigurationError("Give unpaired_reads, or reads_1 and reads_2.")
-    arguments = ["-x", index, _INPUT_FORMATS[_gap_cli.choice(read_format, tuple(_INPUT_FORMATS), "read_format")]]
+    arguments = [
+        "-x",
+        index,
+        _INPUT_FORMATS[_gap_cli.choice(read_format, tuple(_INPUT_FORMATS), "read_format")],
+    ]
     if reads_1 is not None:
-        arguments += ["-1", str(_file_list(reads_1, "reads_1")), "-2", str(_file_list(reads_2, "reads_2"))]
+        arguments += [
+            "-1",
+            str(_file_list(reads_1, "reads_1")),
+            "-2",
+            str(_file_list(reads_2, "reads_2")),
+        ]
     if unpaired_reads is not None:
         arguments += ["-U", str(_file_list(unpaired_reads, "unpaired_reads"))]
     arguments += ["-S", str(output_path)]
@@ -173,9 +190,15 @@ def hisat2_align_reads(
         arguments.append("--no-spliced-alignment")
     expected = [output_path]
     if known_splice_sites is not None:
-        arguments += ["--known-splicesite-infile", str(_gap_cli.existing_file(known_splice_sites, "known_splice_sites"))]
+        arguments += [
+            "--known-splicesite-infile",
+            str(_gap_cli.existing_file(known_splice_sites, "known_splice_sites")),
+        ]
     if novel_splice_sites_in is not None:
-        arguments += ["--novel-splicesite-infile", str(_gap_cli.existing_file(novel_splice_sites_in, "novel_splice_sites_in"))]
+        arguments += [
+            "--novel-splicesite-infile",
+            str(_gap_cli.existing_file(novel_splice_sites_in, "novel_splice_sites_in")),
+        ]
     if novel_splice_sites_out is not None:
         novel = _gap_cli.new_file(novel_splice_sites_out, "novel_splice_sites_out")
         arguments += ["--novel-splicesite-outfile", str(novel)]
@@ -197,9 +220,23 @@ def hisat2_align_reads(
         ("seed", seed, "--seed"),
     ):
         if value is not None:
-            arguments += [flag_name, str(_gap_cli.integer(value, name, minimum=0 if name not in {"max_alignments", "min_intron_length", "max_intron_length"} else 1))]
+            arguments += [
+                flag_name,
+                str(
+                    _gap_cli.integer(
+                        value,
+                        name,
+                        minimum=0
+                        if name not in {"max_alignments", "min_intron_length", "max_intron_length"}
+                        else 1,
+                    )
+                ),
+            ]
     if rna_strandness is not None:
-        arguments += ["--rna-strandness", _gap_cli.choice(rna_strandness, _STRANDNESS, "rna_strandness")]
+        arguments += [
+            "--rna-strandness",
+            _gap_cli.choice(rna_strandness, _STRANDNESS, "rna_strandness"),
+        ]
     for value, flag_name, argument_name in (
         (downstream_transcriptome_assembly, "--dta", "downstream_transcriptome_assembly"),
         (dta_cufflinks, "--dta-cufflinks", "dta_cufflinks"),
@@ -213,7 +250,9 @@ def hisat2_align_reads(
             arguments.append(flag_name)
     if read_group_id is not None:
         arguments += ["--rg-id", _gap_cli.text(read_group_id, "read_group_id")]
-    return _run("hisat2", arguments, cwd=output_path.parent, expected=expected, hisat2_path=hisat2_path)
+    return _run(
+        "hisat2", arguments, cwd=output_path.parent, expected=expected, hisat2_path=hisat2_path
+    )
 
 
 def hisat2_inspect_index(
@@ -244,7 +283,12 @@ def hisat2_inspect_index(
         stdout_file=output_path,
     )
     result["view"] = chosen
-    if result["status"] == "completed" and chosen in {"snps", "splice_sites", "splice_sites_all", "exons"}:
+    if result["status"] == "completed" and chosen in {
+        "snps",
+        "splice_sites",
+        "splice_sites_all",
+        "exons",
+    }:
         rows = _p14_cli.tsv_rows(output_path)
         result["rows"] = rows
         result["row_count"] = len(rows)
@@ -288,7 +332,14 @@ def hisat2_build_repeat_index(
         ("repeat_edit_distance", repeat_edit_distance, "--repeat-edit"),
     ):
         if value is not None:
-            arguments += [flag_name, str(_gap_cli.integer(value, name, minimum=0 if name == "repeat_edit_distance" else 1))]
+            arguments += [
+                flag_name,
+                str(
+                    _gap_cli.integer(
+                        value, name, minimum=0 if name == "repeat_edit_distance" else 1
+                    )
+                ),
+            ]
     if _p14_cli.flag(forward_only, "forward_only"):
         arguments.append("--forward-only")
     arguments += [str(source), str(base)]
@@ -316,8 +367,12 @@ def hisat2_extract_splice_sites(
     source = _gap_cli.existing_file(annotation_gtf, "annotation_gtf")
     output_path = _gap_cli.new_file(output, "output")
     result = _run(
-        "hisat2_extract_splice_sites.py", [str(source)], cwd=output_path.parent, expected=[],
-        hisat2_path=hisat2_path, stdout_file=output_path,
+        "hisat2_extract_splice_sites.py",
+        [str(source)],
+        cwd=output_path.parent,
+        expected=[],
+        hisat2_path=hisat2_path,
+        stdout_file=output_path,
     )
     return _with_rows(result, output_path)
 
@@ -337,8 +392,12 @@ def hisat2_extract_exons(
     source = _gap_cli.existing_file(annotation_gtf, "annotation_gtf")
     output_path = _gap_cli.new_file(output, "output")
     result = _run(
-        "hisat2_extract_exons.py", [str(source)], cwd=output_path.parent, expected=[],
-        hisat2_path=hisat2_path, stdout_file=output_path,
+        "hisat2_extract_exons.py",
+        [str(source)],
+        cwd=output_path.parent,
+        expected=[],
+        hisat2_path=hisat2_path,
+        stdout_file=output_path,
     )
     return _with_rows(result, output_path)
 
@@ -377,7 +436,13 @@ def hisat2_extract_snps_haplotypes_ucsc(
         arguments += ["--intra-gap", str(_gap_cli.integer(intra_gap, "intra_gap", minimum=0))]
     arguments += [str(genome), str(table), str(base)]
     return _glob_result(
-        _run("hisat2_extract_snps_haplotypes_UCSC.py", arguments, cwd=base.parent, expected=[], hisat2_path=hisat2_path),
+        _run(
+            "hisat2_extract_snps_haplotypes_UCSC.py",
+            arguments,
+            cwd=base.parent,
+            expected=[],
+            hisat2_path=hisat2_path,
+        ),
         base,
     )
 
@@ -410,7 +475,10 @@ def hisat2_extract_snps_haplotypes_vcf(
     base = _new_base(output_base, "output_base")
     arguments: list[str] = []
     if reference_type is not None:
-        arguments += ["--reference-type", _gap_cli.choice(reference_type, _REFERENCE_TYPES, "reference_type")]
+        arguments += [
+            "--reference-type",
+            _gap_cli.choice(reference_type, _REFERENCE_TYPES, "reference_type"),
+        ]
     if inter_gap is not None:
         arguments += ["--inter-gap", str(_gap_cli.integer(inter_gap, "inter_gap", minimum=0))]
     if intra_gap is not None:
@@ -422,12 +490,21 @@ def hisat2_extract_snps_haplotypes_vcf(
     if genotype_gene_list is not None:
         if isinstance(genotype_gene_list, str) or not genotype_gene_list:
             raise ConfigurationError("genotype_gene_list must be a non-empty list of gene names.")
-        arguments += ["--genotype-gene-list", ",".join(_gap_cli.text(item, "genotype_gene_list") for item in genotype_gene_list)]
+        arguments += [
+            "--genotype-gene-list",
+            ",".join(_gap_cli.text(item, "genotype_gene_list") for item in genotype_gene_list),
+        ]
     if _p14_cli.flag(extra_files, "extra_files"):
         arguments.append("--extra-files")
     arguments += [str(genome), str(vcfs), str(base)]
     return _glob_result(
-        _run("hisat2_extract_snps_haplotypes_VCF.py", arguments, cwd=base.parent, expected=[], hisat2_path=hisat2_path),
+        _run(
+            "hisat2_extract_snps_haplotypes_VCF.py",
+            arguments,
+            cwd=base.parent,
+            expected=[],
+            hisat2_path=hisat2_path,
+        ),
         base,
     )
 
@@ -463,7 +540,11 @@ def hisat2_read_statistics(
     with tempfile.TemporaryDirectory(prefix="dnakit_hisat2_") as folder:
         work = Path(folder)
         result = _run(
-            "hisat2_read_statistics.py", arguments, cwd=work, expected=[], hisat2_path=hisat2_path,
+            "hisat2_read_statistics.py",
+            arguments,
+            cwd=work,
+            expected=[],
+            hisat2_path=hisat2_path,
             stdout_file=work / "stats.txt",
         )
         text = (work / "stats.txt").read_text(encoding="utf-8").strip()
@@ -535,23 +616,54 @@ def hisat2_simulate_reads(
         ("random_seed", random_seed, "--random-seed"),
     ):
         if value is not None:
-            arguments += [flag_name, str(_gap_cli.integer(value, name, minimum=0 if name in {"max_mismatch", "random_seed"} else 1))]
+            arguments += [
+                flag_name,
+                str(
+                    _gap_cli.integer(
+                        value, name, minimum=0 if name in {"max_mismatch", "random_seed"} else 1
+                    )
+                ),
+            ]
     if expression_profile is not None:
-        arguments += ["--expr-profile", _gap_cli.choice(expression_profile, ("flux", "constant"), "expression_profile")]
+        arguments += [
+            "--expr-profile",
+            _gap_cli.choice(expression_profile, ("flux", "constant"), "expression_profile"),
+        ]
     if repeat_info is not None:
         arguments += ["--repeat-info", str(_gap_cli.existing_file(repeat_info, "repeat_info"))]
     if error_rate is not None:
-        arguments += ["--error-rate", str(_gap_cli.number(error_rate, "error_rate", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "--error-rate",
+            str(_gap_cli.number(error_rate, "error_rate", minimum=0.0, maximum=100.0)),
+        ]
     if snp_probability is not None:
-        arguments += ["--snp-prob", str(_gap_cli.number(snp_probability, "snp_probability", minimum=0.0, maximum=1.0))]
+        arguments += [
+            "--snp-prob",
+            str(_gap_cli.number(snp_probability, "snp_probability", minimum=0.0, maximum=1.0)),
+        ]
     arguments += [str(genome), str(annotation), str(snps), str(base)]
     if python_path is None:
-        result = _run("hisat2_simulate_reads.py", arguments, cwd=base.parent, expected=[], hisat2_path=hisat2_path)
+        result = _run(
+            "hisat2_simulate_reads.py",
+            arguments,
+            cwd=base.parent,
+            expected=[],
+            hisat2_path=hisat2_path,
+        )
     else:
-        script = _gap_cli.program("hisat2_simulate_reads.py", explicit=_executable("hisat2_simulate_reads.py", hisat2_path), hint=_HINT)
+        script = _gap_cli.program(
+            "hisat2_simulate_reads.py",
+            explicit=_executable("hisat2_simulate_reads.py", hisat2_path),
+            hint=_HINT,
+        )
         result = _p14_cli.run(
-            "python3", [script, *arguments], cwd=base.parent, expected=[], explicit=python_path,
-            hint="Pass python_path as an existing Python interpreter.", program_name="hisat2_simulate_reads.py",
+            "python3",
+            [script, *arguments],
+            cwd=base.parent,
+            expected=[],
+            explicit=python_path,
+            hint="Pass python_path as an existing Python interpreter.",
+            program_name="hisat2_simulate_reads.py",
         )
     result = _glob_result(result, base)
     result["read_type"] = "dna" if dna else "rna"

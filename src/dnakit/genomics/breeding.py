@@ -196,13 +196,22 @@ def _with_eigen(np: Any, result: dict[str, Any], count: int) -> dict[str, Any]:
 
 
 def _gcta_relationship(
-    np: Any, data: Any, means: Any, keep: Any, absent: Any, monomorphic: Any, progress: Any, task: Any
+    np: Any,
+    data: Any,
+    means: Any,
+    keep: Any,
+    absent: Any,
+    monomorphic: Any,
+    progress: Any,
+    task: Any,
 ) -> dict[str, Any]:
     """SNPRelate snpgdsGRM(method='GCTA'): standardized markers, pairwise valid-marker counts."""
     selected = data[:, keep]
     observed = ~np.isnan(selected)
     frequencies = means[keep] / 2
-    scaled = np.where(observed, (selected - means[keep]) / np.sqrt(frequencies * (1 - frequencies)), 0.0)
+    scaled = np.where(
+        observed, (selected - means[keep]) / np.sqrt(frequencies * (1 - frequencies)), 0.0
+    )
     missing = (~observed).astype(float)
     per_sample = missing.sum(axis=1)
     invalid = per_sample[:, None] + per_sample[None, :] - missing @ missing.T

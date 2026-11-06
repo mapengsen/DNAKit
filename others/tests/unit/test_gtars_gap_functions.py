@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import inspect
 import random
-from pathlib import Path
 
 import pytest
 
@@ -18,7 +17,7 @@ pytest.importorskip("gtars")
 reftx = pytest.importorskip("gtars.reftx")
 refget = pytest.importorskip("gtars.refget")
 
-from dnakit.annotation import gtars_gap_functions as facades  # noqa: E402
+from dnakit.annotation import gtars_gap_functions as facades
 
 CONTIG = "NC_TEST.1"
 
@@ -51,7 +50,11 @@ def stores(tmp_path_factory):
     store_dir = root / "refget_store"
     store = refget.RefgetStore.on_disk(str(store_dir))
     store.add_sequence_collection_from_fasta(str(fasta))
-    return {"transcript_store": str(transcript_store), "refget_store": str(store_dir), "digest": digest}
+    return {
+        "transcript_store": str(transcript_store),
+        "refget_store": str(store_dir),
+        "digest": digest,
+    }
 
 
 def test_public_functions_are_keyword_only_verbose():
@@ -63,7 +66,11 @@ def test_public_functions_are_keyword_only_verbose():
 
 def test_deletion_gets_a_vrs_allele_identifier(stores):
     result = facades.hgvs_to_vrs_allele_id(
-        "NM_TEST.1:c.10del", stores["transcript_store"], stores["refget_store"], stores["digest"], verbose=False
+        "NM_TEST.1:c.10del",
+        stores["transcript_store"],
+        stores["refget_store"],
+        stores["digest"],
+        verbose=False,
     )
     assert result["vrs_allele_id"].startswith("ga4gh:VA.")
     assert result["backend"] == "gtars"
@@ -72,9 +79,15 @@ def test_deletion_gets_a_vrs_allele_identifier(stores):
 
 def test_identifier_is_deterministic_and_distinguishes_variants(stores):
     args = (stores["transcript_store"], stores["refget_store"], stores["digest"])
-    first = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.20_21insT", *args, verbose=False)["vrs_allele_id"]
-    again = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.20_21insT", *args, verbose=False)["vrs_allele_id"]
-    other = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.10del", *args, verbose=False)["vrs_allele_id"]
+    first = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.20_21insT", *args, verbose=False)[
+        "vrs_allele_id"
+    ]
+    again = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.20_21insT", *args, verbose=False)[
+        "vrs_allele_id"
+    ]
+    other = facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.10del", *args, verbose=False)[
+        "vrs_allele_id"
+    ]
     assert first == again
     assert first != other
 
@@ -82,20 +95,40 @@ def test_identifier_is_deterministic_and_distinguishes_variants(stores):
 def test_reference_mismatch_is_a_configuration_error(stores):
     with pytest.raises(ConfigurationError):
         facades.hgvs_to_vrs_allele_id(
-            "NM_TEST.1:c.5A>G", stores["transcript_store"], stores["refget_store"], stores["digest"], verbose=False
+            "NM_TEST.1:c.5A>G",
+            stores["transcript_store"],
+            stores["refget_store"],
+            stores["digest"],
+            verbose=False,
         )
 
 
 def test_inputs_are_checked(stores, tmp_path):
     with pytest.raises(ConfigurationError):
         facades.hgvs_to_vrs_allele_id(
-            "NM_TEST.1:c.10del", str(tmp_path / "none.reftx"), stores["refget_store"], stores["digest"], verbose=False
+            "NM_TEST.1:c.10del",
+            str(tmp_path / "none.reftx"),
+            stores["refget_store"],
+            stores["digest"],
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
         facades.hgvs_to_vrs_allele_id(
-            "NM_TEST.1:c.10del", stores["transcript_store"], str(tmp_path / "none"), stores["digest"], verbose=False
+            "NM_TEST.1:c.10del",
+            stores["transcript_store"],
+            str(tmp_path / "none"),
+            stores["digest"],
+            verbose=False,
         )
     with pytest.raises(ConfigurationError):
-        facades.hgvs_to_vrs_allele_id("", stores["transcript_store"], stores["refget_store"], stores["digest"], verbose=False)
+        facades.hgvs_to_vrs_allele_id(
+            "", stores["transcript_store"], stores["refget_store"], stores["digest"], verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        facades.hgvs_to_vrs_allele_id("NM_TEST.1:c.10del", stores["transcript_store"], stores["refget_store"], " ", verbose=False)
+        facades.hgvs_to_vrs_allele_id(
+            "NM_TEST.1:c.10del",
+            stores["transcript_store"],
+            stores["refget_store"],
+            " ",
+            verbose=False,
+        )

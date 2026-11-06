@@ -13,14 +13,34 @@ from typing import Any
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _p16_cli as cli
-from dnakit.exceptions import ConfigurationError
 
-_FLYE = cli.Tool("flye", "flye", "Install Flye (conda install -c bioconda flye) and put it on PATH or pass flye_path.",
-                 "2.9.5", "https://doi.org/10.1038/s41587-019-0072-8", ("--version",), None)
-_LIFTOFF = cli.Tool("liftoff", "liftoff", "Install Liftoff (conda install -c bioconda liftoff; needs minimap2) and put it on PATH or pass liftoff_path.",
-                    "1.6.3", "https://doi.org/10.1093/bioinformatics/btaa1016", ("--version",), None)
-_MINIPROT = cli.Tool("miniprot", "miniprot", "Install miniprot (conda install -c bioconda miniprot) and put it on PATH or pass miniprot_path.",
-                     "0.18", "https://doi.org/10.1093/bioinformatics/btad014", ("--version",), None)
+_FLYE = cli.Tool(
+    "flye",
+    "flye",
+    "Install Flye (conda install -c bioconda flye) and put it on PATH or pass flye_path.",
+    "2.9.5",
+    "https://doi.org/10.1038/s41587-019-0072-8",
+    ("--version",),
+    None,
+)
+_LIFTOFF = cli.Tool(
+    "liftoff",
+    "liftoff",
+    "Install Liftoff (conda install -c bioconda liftoff; needs minimap2) and put it on PATH or pass liftoff_path.",
+    "1.6.3",
+    "https://doi.org/10.1093/bioinformatics/btaa1016",
+    ("--version",),
+    None,
+)
+_MINIPROT = cli.Tool(
+    "miniprot",
+    "miniprot",
+    "Install miniprot (conda install -c bioconda miniprot) and put it on PATH or pass miniprot_path.",
+    "0.18",
+    "https://doi.org/10.1093/bioinformatics/btad014",
+    ("--version",),
+    None,
+)
 _READ_TYPES = ("pacbio-raw", "pacbio-corr", "pacbio-hifi", "nano-raw", "nano-corr", "nano-hq")
 
 
@@ -48,8 +68,16 @@ def assemble_long_reads_flye(
     """
     source = cli.existing_file(reads, "reads")
     out_dir = cli.new_directory(output_directory, "output_directory")
-    arguments = [f"--{cli.choice(read_type, _READ_TYPES, 'read_type')}", str(source), "--out-dir", str(out_dir),
-                 "--threads", str(cli.threads_value(threads)), "--iterations", str(cli.integer(iterations, "iterations", minimum=0))]
+    arguments = [
+        f"--{cli.choice(read_type, _READ_TYPES, 'read_type')}",
+        str(source),
+        "--out-dir",
+        str(out_dir),
+        "--threads",
+        str(cli.threads_value(threads)),
+        "--iterations",
+        str(cli.integer(iterations, "iterations", minimum=0)),
+    ]
     if genome_size is not None:
         arguments += ["--genome-size", cli.text(genome_size, "genome_size")]
     if cli.flag(metagenome, "metagenome"):
@@ -59,9 +87,19 @@ def assemble_long_reads_flye(
     if min_overlap is not None:
         arguments += ["--min-overlap", str(cli.integer(min_overlap, "min_overlap", minimum=1))]
     assembly, info = out_dir / "assembly.fasta", out_dir / "assembly_info.txt"
-    record = cli.invoke(_FLYE, arguments, cwd=out_dir, expected=[assembly, info], explicit=flye_path)
-    contigs = cli.read_table(info, comment="#", limit=1000, text_columns=frozenset({"seq_name", "circ.", "graph_path"}))
-    return cli.finish(record, "assemble_long_reads_flye", metagenome=metagenome, scaffold=scaffold, contigs=contigs)
+    record = cli.invoke(
+        _FLYE, arguments, cwd=out_dir, expected=[assembly, info], explicit=flye_path
+    )
+    contigs = cli.read_table(
+        info, comment="#", limit=1000, text_columns=frozenset({"seq_name", "circ.", "graph_path"})
+    )
+    return cli.finish(
+        record,
+        "assemble_long_reads_flye",
+        metagenome=metagenome,
+        scaffold=scaffold,
+        contigs=contigs,
+    )
 
 
 def polish_assembly_flye(
@@ -83,8 +121,18 @@ def polish_assembly_flye(
     source = cli.existing_file(reads, "reads")
     out_dir = cli.new_directory(output_directory, "output_directory")
     rounds = cli.integer(iterations, "iterations", minimum=1)
-    arguments = ["--polish-target", str(contigs), f"--{cli.choice(read_type, _READ_TYPES, 'read_type')}", str(source),
-                 "--out-dir", str(out_dir), "--iterations", str(rounds), "--threads", str(cli.threads_value(threads))]
+    arguments = [
+        "--polish-target",
+        str(contigs),
+        f"--{cli.choice(read_type, _READ_TYPES, 'read_type')}",
+        str(source),
+        "--out-dir",
+        str(out_dir),
+        "--iterations",
+        str(rounds),
+        "--threads",
+        str(cli.threads_value(threads)),
+    ]
     polished = out_dir / f"polished_{rounds}.fasta"
     record = cli.invoke(_FLYE, arguments, cwd=out_dir, expected=[polished], explicit=flye_path)
     return cli.finish(record, "polish_assembly_flye", polished=str(polished))
@@ -119,21 +167,54 @@ def lift_over_annotation_liftoff(
     reference = cli.existing_file(reference_fasta, "reference_fasta")
     annotation = cli.existing_file(reference_annotation, "reference_annotation")
     out = cli.new_file(output_gff, "output_gff")
-    unmapped = cli.new_file(unmapped_path, "unmapped_path") if unmapped_path else out.with_name(out.name + ".unmapped.txt")
-    arguments = ["-g", str(annotation), "-o", str(out), "-u", str(unmapped), "-a", str(cli.number(min_coverage, "min_coverage", minimum=0.0, maximum=1.0)),
-                 "-s", str(cli.number(min_identity, "min_identity", minimum=0.0, maximum=1.0)), "-p", str(cli.threads_value(threads)),
-                 "-dir", str(out.with_name(out.name + ".intermediate"))]
+    unmapped = (
+        cli.new_file(unmapped_path, "unmapped_path")
+        if unmapped_path
+        else out.with_name(out.name + ".unmapped.txt")
+    )
+    arguments = [
+        "-g",
+        str(annotation),
+        "-o",
+        str(out),
+        "-u",
+        str(unmapped),
+        "-a",
+        str(cli.number(min_coverage, "min_coverage", minimum=0.0, maximum=1.0)),
+        "-s",
+        str(cli.number(min_identity, "min_identity", minimum=0.0, maximum=1.0)),
+        "-p",
+        str(cli.threads_value(threads)),
+        "-dir",
+        str(out.with_name(out.name + ".intermediate")),
+    ]
     if cli.flag(extra_copies, "extra_copies"):
-        arguments += ["-copies", "-sc", str(cli.number(copy_identity, "copy_identity", minimum=0.0, maximum=1.0))]
+        arguments += [
+            "-copies",
+            "-sc",
+            str(cli.number(copy_identity, "copy_identity", minimum=0.0, maximum=1.0)),
+        ]
     if cli.flag(polish, "polish"):
         arguments.append("-polish")
     if feature_types is not None:
         arguments += ["-f", str(cli.existing_file(feature_types, "feature_types"))]
     arguments += [str(target), str(reference)]
-    record = cli.invoke(_LIFTOFF, arguments, cwd=out.parent, expected=[out, unmapped], explicit=liftoff_path)
-    genes = sum(1 for line in cli.open_text(out) if not line.startswith("#") and line.split("\t")[2:3] == ["gene"])
-    return cli.finish(record, "lift_over_annotation_liftoff", lifted_genes=genes,
-                      unmapped_features=cli.count_lines(unmapped), extra_copies=extra_copies, polish=polish)
+    record = cli.invoke(
+        _LIFTOFF, arguments, cwd=out.parent, expected=[out, unmapped], explicit=liftoff_path
+    )
+    genes = sum(
+        1
+        for line in cli.open_text(out)
+        if not line.startswith("#") and line.split("\t")[2:3] == ["gene"]
+    )
+    return cli.finish(
+        record,
+        "lift_over_annotation_liftoff",
+        lifted_genes=genes,
+        unmapped_features=cli.count_lines(unmapped),
+        extra_copies=extra_copies,
+        polish=polish,
+    )
 
 
 def build_miniprot_index(
@@ -149,9 +230,20 @@ def build_miniprot_index(
     """Build a reusable miniprot genome index (``miniprot -d FILE ref.fna``)."""
     ref = cli.existing_file(genome, "genome")
     index = cli.new_file(index_path, "index_path")
-    arguments = ["-t", str(cli.threads_value(threads)), "-k", str(cli.integer(kmer, "kmer", minimum=1, maximum=10)),
-                 "-T", str(cli.integer(translation_table, "translation_table", minimum=1, maximum=33)), "-d", str(index), str(ref)]
-    record = cli.invoke(_MINIPROT, arguments, cwd=index.parent, expected=[index], explicit=miniprot_path)
+    arguments = [
+        "-t",
+        str(cli.threads_value(threads)),
+        "-k",
+        str(cli.integer(kmer, "kmer", minimum=1, maximum=10)),
+        "-T",
+        str(cli.integer(translation_table, "translation_table", minimum=1, maximum=33)),
+        "-d",
+        str(index),
+        str(ref),
+    ]
+    record = cli.invoke(
+        _MINIPROT, arguments, cwd=index.parent, expected=[index], explicit=miniprot_path
+    )
     return cli.finish(record, "build_miniprot_index", index=str(index))
 
 
@@ -199,12 +291,22 @@ def align_proteins_to_genome_miniprot(
     if splice_model is not None:
         arguments += ["-j", str(cli.integer(splice_model, "splice_model", minimum=0, maximum=2))]
     if ref.suffix != ".mpi":
-        arguments += ["-T", str(cli.integer(translation_table, "translation_table", minimum=1, maximum=33))]
+        arguments += [
+            "-T",
+            str(cli.integer(translation_table, "translation_table", minimum=1, maximum=33)),
+        ]
     arguments += [str(ref), str(prot)]
-    record = cli.invoke(_MINIPROT, arguments, cwd=target.parent, stdout_to=target, explicit=miniprot_path)
+    record = cli.invoke(
+        _MINIPROT, arguments, cwd=target.parent, stdout_to=target, explicit=miniprot_path
+    )
     lines = [line for line in cli.open_text(target) if line.strip() and not line.startswith("##")]
-    return cli.finish(record, "align_proteins_to_genome_miniprot", output_format=kind, lines=len(lines),
-                      head=[line.rstrip("\n") for line in lines[:20]])
+    return cli.finish(
+        record,
+        "align_proteins_to_genome_miniprot",
+        output_format=kind,
+        lines=len(lines),
+        head=[line.rstrip("\n") for line in lines[:20]],
+    )
 
 
 __all__ = [

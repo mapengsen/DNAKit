@@ -9,6 +9,7 @@ import json
 import struct
 import threading
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -707,7 +708,7 @@ def test_nexus_read_validate_summarize_index() -> None:
     assert result["taxa"] == ["A", "B", "C d"] and result["datatype"] == "dna"
     sequences = [r for r in result["records"] if r["kind"] == "sequence"]
     assert [r["sequence"] for r in sequences] == ["ACGTACGT", "ACGTACGA", "ACG-ACGT"]
-    tree = [r for r in result["records"] if r["kind"] == "tree"][0]
+    tree = next(r for r in result["records"] if r["kind"] == "tree")
     assert (
         tree["name"] == "t1"
         and tree["rooted"] is True
@@ -1174,12 +1175,12 @@ class RangeHandler(http.server.BaseHTTPRequestHandler):
     cut_at = 0
     etag = ETAG
     body = PAYLOAD
-    requests: list[dict[str, str | None]] = []
+    requests: ClassVar[list[dict[str, str | None]]] = []
 
     def log_message(self, *args: object) -> None:  # silence
         pass
 
-    def do_GET(self) -> None:  # noqa: N802
+    def do_GET(self) -> None:
         cls = type(self)
         if self.path == "/redirect":
             self.send_response(302)

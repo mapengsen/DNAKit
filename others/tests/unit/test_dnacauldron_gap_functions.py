@@ -21,6 +21,7 @@ pytest.importorskip("dnacauldron")
 from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 from dnakit.molecular_lab import dnacauldron_gap_functions as gap
 
+
 @pytest.fixture(autouse=True)
 def _close_figures_left_by_other_tests():
     """Other tests in the same process may leave figures open; these tests check that the function closes its own."""

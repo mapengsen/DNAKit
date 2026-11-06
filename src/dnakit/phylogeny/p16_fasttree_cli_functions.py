@@ -13,8 +13,15 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.bioinformatics import _p16_cli as cli
 from dnakit.exceptions import ConfigurationError
 
-_TOOL = cli.Tool("fasttree", "FastTree", "Install FastTree (conda install -c bioconda fasttree) and put it on PATH or pass fasttree_path.",
-                 "2.2.0", "https://doi.org/10.1371/journal.pone.0009490", ("-expert",), r"FastTree (?:Version )?(\d+(?:\.\d+)+)")
+_TOOL = cli.Tool(
+    "fasttree",
+    "FastTree",
+    "Install FastTree (conda install -c bioconda fasttree) and put it on PATH or pass fasttree_path.",
+    "2.2.0",
+    "https://doi.org/10.1371/journal.pone.0009490",
+    ("-expert",),
+    r"FastTree (?:Version )?(\d+(?:\.\d+)+)",
+)
 _ENV_NOTE = "FastTree prints its progress on standard error; the tail is returned in log_tail."
 
 
@@ -44,7 +51,9 @@ def compute_fasttree_distance_matrix(
     if pseudocounts is not None:
         arguments += ["-pseudo", str(cli.number(pseudocounts, "pseudocounts", minimum=0.0))]
     arguments += ["-makematrix", str(source)]
-    record = cli.invoke(_TOOL, arguments, cwd=target.parent, stdout_to=target, explicit=fasttree_path)
+    record = cli.invoke(
+        _TOOL, arguments, cwd=target.parent, stdout_to=target, explicit=fasttree_path
+    )
     lines = [ln.split() for ln in target.read_text(encoding="utf-8").splitlines() if ln.strip()]
     count = int(lines[0][0])
     labels = [row[0] for row in lines[1 : count + 1]]
@@ -91,7 +100,12 @@ def infer_fasttree_tree(
         arguments.append("-gamma")
     if starting_tree is not None:
         arguments += ["-intree", str(cli.existing_file(starting_tree, "starting_tree"))]
-    modes = {None: [], "mllen": ["-mllen"], "mllen_fixed_topology": ["-mllen", "-nome"], "noml": ["-noml"]}
+    modes = {
+        None: [],
+        "mllen": ["-mllen"],
+        "mllen_fixed_topology": ["-mllen", "-nome"],
+        "noml": ["-noml"],
+    }
     if refine not in modes:
         raise ConfigurationError(f"refine must be one of {[m for m in modes if m]} or None.")
     if refine == "mllen_fixed_topology" and starting_tree is None:
@@ -100,22 +114,35 @@ def infer_fasttree_tree(
     if constraints is not None:
         arguments += ["-constraints", str(cli.existing_file(constraints, "constraints"))]
         if constraint_weight is not None:
-            arguments += ["-constraintWeight", str(cli.number(constraint_weight, "constraint_weight", minimum=0.0))]
+            arguments += [
+                "-constraintWeight",
+                str(cli.number(constraint_weight, "constraint_weight", minimum=0.0)),
+            ]
     elif constraint_weight is not None:
         raise ConfigurationError("constraint_weight needs constraints.")
     if bootstrap_replicates is not None and no_support:
         raise ConfigurationError("bootstrap_replicates and no_support are mutually exclusive.")
     if bootstrap_replicates is not None:
-        arguments += ["-boot", str(cli.integer(bootstrap_replicates, "bootstrap_replicates", minimum=1))]
+        arguments += [
+            "-boot",
+            str(cli.integer(bootstrap_replicates, "bootstrap_replicates", minimum=1)),
+        ]
     if cli.flag(no_support, "no_support"):
         arguments.append("-nosupport")
     if seed is not None:
         arguments += ["-seed", str(cli.integer(seed, "seed", minimum=0))]
     arguments += ["-quiet", "-out", str(target), str(source)]
-    record = cli.invoke(_TOOL, arguments, cwd=target.parent, expected=[target], explicit=fasttree_path)
+    record = cli.invoke(
+        _TOOL, arguments, cwd=target.parent, expected=[target], explicit=fasttree_path
+    )
     newick = target.read_text(encoding="utf-8").strip()
-    return cli.finish(record, "infer_fasttree_tree", refine=refine, newick=newick[:100_000],
-                      tips=newick.count(",") + 1 if newick else 0)
+    return cli.finish(
+        record,
+        "infer_fasttree_tree",
+        refine=refine,
+        newick=newick[:100_000],
+        tips=newick.count(",") + 1 if newick else 0,
+    )
 
 
 __all__ = ["compute_fasttree_distance_matrix", "infer_fasttree_tree"]

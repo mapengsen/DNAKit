@@ -15,10 +15,13 @@ import pytest
 pytest.importorskip("varcode")
 pytest.importorskip("pyensembl")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.molecular_lab import varcode_verify_functions as vv  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.molecular_lab import varcode_verify_functions as vv
 
-DATA = Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+DATA = (
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+)
 GENOME = DATA / "genome.fa"
 VCF = DATA / "variants.vcf"
 STOPS = {"TAA", "TAG", "TGA"}
@@ -55,7 +58,9 @@ def _orf(sequence: str) -> tuple[int, int]:
 
 def _gtf_row(feature: str, start: int, end: int, attributes: str) -> str:
     score_or_frame = "0" if feature == "CDS" else "."
-    return "\t".join(["chr1", "test", feature, str(start), str(end), ".", "+", score_or_frame, attributes])
+    return "\t".join(
+        ["chr1", "test", feature, str(start), str(end), ".", "+", score_or_frame, attributes]
+    )
 
 
 @pytest.fixture(scope="module")
@@ -150,10 +155,18 @@ def test_explicit_records_and_json_are_unioned(reference: dict[str, Any], tmp_pa
     from varcode import Variant, VariantCollection
 
     start, _ = reference["span"]
-    ref = reference["chr1"][start]  # 1-based position start+1 is the first base after the 0-based index
+    ref = reference["chr1"][
+        start
+    ]  # 1-based position start+1 is the first base after the 0-based index
     alt = "C" if ref != "C" else "G"
     genome = _local_genome(reference)
-    collection = VariantCollection([Variant("chr1", start=start + 10, ref=reference["chr1"][start + 9], alt="A", genome=genome)])
+    collection = VariantCollection(
+        [
+            Variant(
+                "chr1", start=start + 10, ref=reference["chr1"][start + 9], alt="A", genome=genome
+            )
+        ]
+    )
     js = tmp_path / "variants.json"
     js.write_text(collection.to_json(), encoding="utf-8")
     records = [
@@ -173,18 +186,38 @@ def test_explicit_records_and_json_are_unioned(reference: dict[str, Any], tmp_pa
     # Same union as varcode's own VariantCollection.union over the same inputs (the CLI behaviour).
     explicit = VariantCollection(
         [
-            Variant("chr1", start=start + 10, ref=records[0]["ref"], alt="A", genome=genome, convert_ucsc_contig_names=False),
-            Variant("chr1", start=start + 20, ref=records[1]["ref"], alt=alt, genome=genome, convert_ucsc_contig_names=False),
+            Variant(
+                "chr1",
+                start=start + 10,
+                ref=records[0]["ref"],
+                alt="A",
+                genome=genome,
+                convert_ucsc_contig_names=False,
+            ),
+            Variant(
+                "chr1",
+                start=start + 20,
+                ref=records[1]["ref"],
+                alt=alt,
+                genome=genome,
+                convert_ucsc_contig_names=False,
+            ),
         ]
     )
-    expected = _quiet(VariantCollection.union, VariantCollection.from_json(js.read_text(encoding="utf-8")), explicit)
+    expected = _quiet(
+        VariantCollection.union,
+        VariantCollection.from_json(js.read_text(encoding="utf-8")),
+        explicit,
+    )
     assert result["count"] == len(expected) >= 2
     assert {v["start"] for v in result["variants"]} >= {start + 10, start + 20}
 
 
 def test_explicit_record_without_reference_is_configuration_error() -> None:
     with pytest.raises(ConfigurationError, match="Explicit variants need"):
-        vv.varcode_load_variant_sources(variants=[{"contig": "chr1", "start": 5, "ref": "A", "alt": "C"}], verbose=False)
+        vv.varcode_load_variant_sources(
+            variants=[{"contig": "chr1", "start": 5, "ref": "A", "alt": "C"}], verbose=False
+        )
 
 
 def test_invalid_variant_record_is_configuration_error() -> None:
@@ -217,7 +250,10 @@ def test_effects_table_matches_upstream_effects(reference: dict[str, Any], tmp_p
     assert result["variant_count"] == 1
     assert result["effect_count"] == len(rows) == len(upstream) >= 1
     assert sorted(result["class_counts"].items()) == sorted(
-        {name: sum(type(e).__name__ == name for e in upstream) for name in {type(e).__name__ for e in upstream}}.items()
+        {
+            name: sum(type(e).__name__ == name for e in upstream)
+            for name in {type(e).__name__ for e in upstream}
+        }.items()
     )
     assert set(rows[0]) == set(vv._EFFECT_FIELDS)
     assert rows[0]["transcript_id"] == "T1"
@@ -244,7 +280,16 @@ def test_sample_identity_files_match_upstream_cli(tmp_path: Path) -> None:
     upstream_tsv = tmp_path / "upstream.tsv"
     code = _quiet(
         sample_checks.main,
-        ["--germline", str(VCF), "--assembly", "GRCh38", "--json", str(upstream_json), "--tsv", str(upstream_tsv)],
+        [
+            "--germline",
+            str(VCF),
+            "--assembly",
+            "GRCh38",
+            "--json",
+            str(upstream_json),
+            "--tsv",
+            str(upstream_tsv),
+        ],
     )
     assert code in (None, 0)
     ours_json = tmp_path / "ours.json"
@@ -257,7 +302,9 @@ def test_sample_identity_files_match_upstream_cli(tmp_path: Path) -> None:
         tsv_output=str(ours_tsv),
         verbose=False,
     )
-    assert json.loads(ours_json.read_text(encoding="utf-8")) == json.loads(upstream_json.read_text(encoding="utf-8"))
+    assert json.loads(ours_json.read_text(encoding="utf-8")) == json.loads(
+        upstream_json.read_text(encoding="utf-8")
+    )
     assert ours_tsv.read_text(encoding="utf-8") == upstream_tsv.read_text(encoding="utf-8")
     assert result["sample_count"] == 24
     assert result["pair_count"] == len(result["report"]["pairs"]) > 0
@@ -295,9 +342,18 @@ def test_sv_comparison_matches_upstream_cli(tmp_path: Path) -> None:
         writer.writerow(header)
         writer.writerows(calls)
     upstream_dir = tmp_path / "upstream"
-    _quiet(upstream_main, ["--calls", str(source), "--output", str(upstream_dir), "--max-distance", "100"])
+    _quiet(
+        upstream_main,
+        ["--calls", str(source), "--output", str(upstream_dir), "--max-distance", "100"],
+    )
     ours_dir = tmp_path / "ours"
-    result = _quiet(vv.varcode_compare_sv_calls_directory, str(source), str(ours_dir), max_distance=100, verbose=False)
+    result = _quiet(
+        vv.varcode_compare_sv_calls_directory,
+        str(source),
+        str(ours_dir),
+        max_distance=100,
+        verbose=False,
+    )
     for name in ("groups.csv", "members.csv"):
         assert _read_rows(ours_dir / name) == _read_rows(upstream_dir / name)
     ours = json.loads((ours_dir / "comparison.json").read_text(encoding="utf-8"))
@@ -325,4 +381,6 @@ def test_sv_negative_distance_is_configuration_error(tmp_path: Path) -> None:
     source = tmp_path / "calls.csv"
     source.write_text("call_id,caller,sample,build,chrom,pos,ref,alt\n", encoding="utf-8")
     with pytest.raises(ConfigurationError, match="max_distance"):
-        vv.varcode_compare_sv_calls_directory(str(source), str(tmp_path / "out"), max_distance=-1, verbose=False)
+        vv.varcode_compare_sv_calls_directory(
+            str(source), str(tmp_path / "out"), max_distance=-1, verbose=False
+        )

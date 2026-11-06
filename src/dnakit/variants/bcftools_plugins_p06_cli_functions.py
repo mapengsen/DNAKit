@@ -42,7 +42,9 @@ _ANNOTATIONS = ("PASSOC", "FASSOC", "NASSOC", "NOVELAL", "NOVELGT", "BCSQ")
 _CSQ_TAG = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*$")
 
 
-def _number_text(value: object, name: str, *, minimum: float | None = None, maximum: float | None = None) -> str:
+def _number_text(
+    value: object, name: str, *, minimum: float | None = None, maximum: float | None = None
+) -> str:
     return repr(cli.number(value, name, minimum=minimum, maximum=maximum))
 
 
@@ -86,16 +88,21 @@ def bcftools_ad_bias(
     the threshold.
     """
     if isinstance(sample_pairs, (str, bytes)) or not sample_pairs:
-        raise ConfigurationError("sample_pairs must be a non-empty list of [sample, control] pairs.")
+        raise ConfigurationError(
+            "sample_pairs must be a non-empty list of [sample, control] pairs."
+        )
     lines = []
     for pair in sample_pairs:
         if isinstance(pair, (str, bytes)) or len(pair) != 2:
             raise ConfigurationError("each sample pair must have exactly two sample names.")
         lines.append("\t".join(cli.text(name, "sample name") for name in pair))
     options = [
-        "-t", _number_text(threshold, "threshold", minimum=0.0, maximum=1.0),
-        "-a", str(cli.integer(min_alt_depth, "min_alt_depth", minimum=0)),
-        "-d", str(cli.integer(min_depth, "min_depth", minimum=0)),
+        "-t",
+        _number_text(threshold, "threshold", minimum=0.0, maximum=1.0),
+        "-a",
+        str(cli.integer(min_alt_depth, "min_alt_depth", minimum=0)),
+        "-d",
+        str(cli.integer(min_depth, "min_depth", minimum=0)),
     ]
     if variant_type is not None:
         options += ["-v", cli.choice(variant_type, _VARIANT_TYPES, "variant_type")]
@@ -108,12 +115,22 @@ def bcftools_ad_bias(
         options += ["-s", str(pairs_file)]
         if clean_vcf:
             return h.run_vcf_plugin(
-                "bcftools_ad_bias", "ad-bias", vcf_path, output_path,
-                options=[*options, "-c"], general=general, bcftools_path=bcftools_path,
+                "bcftools_ad_bias",
+                "ad-bias",
+                vcf_path,
+                output_path,
+                options=[*options, "-c"],
+                general=general,
+                bcftools_path=bcftools_path,
             )
         return h.run_text_plugin(
-            "bcftools_ad_bias", "ad-bias", vcf_path, output_path,
-            options=options, general=general, bcftools_path=bcftools_path,
+            "bcftools_ad_bias",
+            "ad-bias",
+            vcf_path,
+            output_path,
+            options=options,
+            general=general,
+            bcftools_path=bcftools_path,
         )
 
 
@@ -151,9 +168,14 @@ def bcftools_af_distribution(
     if h.flag(per_sample, "per_sample"):
         options.append("-s")
     return h.run_text_plugin(
-        "bcftools_af_distribution", "af-dist", vcf_path, output_path, options=options,
+        "bcftools_af_distribution",
+        "af-dist",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
-        header="none", bcftools_path=bcftools_path,
+        header="none",
+        bcftools_path=bcftools_path,
     )
 
 
@@ -173,9 +195,14 @@ def bcftools_allele_length_counts(
     NUCLEOTIDES``; it is saved to ``output_path`` and parsed into ``report``.
     """
     return h.run_text_plugin(
-        "bcftools_allele_length_counts", "allele-length", vcf_path, output_path,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        header="first", bcftools_path=bcftools_path,
+        "bcftools_allele_length_counts",
+        "allele-length",
+        vcf_path,
+        output_path,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        header="first",
+        bcftools_path=bcftools_path,
     )
 
 
@@ -196,8 +223,13 @@ def bcftools_check_ploidy(
     """
     options = ["-m"] if h.flag(use_missing, "use_missing") else []
     return h.run_text_plugin(
-        "bcftools_check_ploidy", "check-ploidy", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions), bcftools_path=bcftools_path,
+        "bcftools_check_ploidy",
+        "check-ploidy",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions),
+        bcftools_path=bcftools_path,
     )
 
 
@@ -223,8 +255,14 @@ def bcftools_check_sparsity(
     if regions_file is not None:
         options += ["-R", str(cli.existing_file(regions_file, "regions_file"))]
     return h.run_text_plugin(
-        "bcftools_check_sparsity", "check-sparsity", vcf_path, output_path,
-        options=options, separator=False, header="none", bcftools_path=bcftools_path,
+        "bcftools_check_sparsity",
+        "check-sparsity",
+        vcf_path,
+        output_path,
+        options=options,
+        separator=False,
+        header="none",
+        bcftools_path=bcftools_path,
     )
 
 
@@ -247,7 +285,11 @@ def bcftools_genotype_dosage(
     """
     options = ["-t", ",".join(h.text_list(list(tags), "tags"))]
     return h.run_text_plugin(
-        "bcftools_genotype_dosage", "dosage", vcf_path, output_path, options=options,
+        "bcftools_genotype_dosage",
+        "dosage",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
         bcftools_path=bcftools_path,
     )
@@ -282,8 +324,13 @@ def bcftools_genotype_intersections(
         if h.flag(enabled, name)
     ]
     return h.run_text_plugin(
-        "bcftools_genotype_intersections", "GTisec", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), header="none",
+        "bcftools_genotype_intersections",
+        "GTisec",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        header="none",
         bcftools_path=bcftools_path,
     )
 
@@ -312,17 +359,25 @@ def bcftools_indel_stats(
     (``SN*``, ``FRM``, ``VAF`` and similar rows) is saved to ``output_path``.
     """
     options = [
-        "-c", cli.text(csq_tag, "csq_tag"),
-        "--max-len", str(cli.integer(max_length, "max_length", minimum=1)),
+        "-c",
+        cli.text(csq_tag, "csq_tag"),
+        "--max-len",
+        str(cli.integer(max_length, "max_length", minimum=1)),
     ]
     if ped_path is not None:
         options += ["-p", str(cli.existing_file(ped_path, "ped_path"))]
     if h.flag(alt_to_ref_dnm, "alt_to_ref_dnm"):
         options.append("--alt2ref-DNM")
     return h.run_text_plugin(
-        "bcftools_indel_stats", "indel-stats", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        header="none", bcftools_path=bcftools_path,
+        "bcftools_indel_stats",
+        "indel-stats",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        header="none",
+        bcftools_path=bcftools_path,
     )
 
 
@@ -347,9 +402,14 @@ def bcftools_vcf_to_table(
     if hide is not None:
         options += ["--hide", ",".join(h.text_list(list(hide), "hide"))]
     run = h.run_text_plugin(
-        "bcftools_vcf_to_table", "vcf2table", vcf_path, output_path, options=options,
+        "bcftools_vcf_to_table",
+        "vcf2table",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
-        header="none", bcftools_path=bcftools_path,
+        header="none",
+        bcftools_path=bcftools_path,
     )
     text = h.read_text(Path(run["outputs"]["report"]))
     run["report"] = {"variants": sum(1 for line in text.splitlines() if line.startswith("<<<"))}
@@ -390,11 +450,16 @@ def bcftools_variant_read_frequency_score(
             raise ConfigurationError("alignment_list, reference_fasta and sites_file are required.")
         arguments = [
             "+vrfs",
-            "-a", str(cli.existing_file(alignment_list, "alignment_list")),
-            "-f", str(cli.existing_file(reference_fasta, "reference_fasta")),
-            "-s", str(cli.existing_file(sites_file, "sites_file")),
-            "-d", str(cli.integer(min_depth, "min_depth", minimum=0)),
-            "-n", str(cli.integer(vaf_bins, "vaf_bins", minimum=2)),
+            "-a",
+            str(cli.existing_file(alignment_list, "alignment_list")),
+            "-f",
+            str(cli.existing_file(reference_fasta, "reference_fasta")),
+            "-s",
+            str(cli.existing_file(sites_file, "sites_file")),
+            "-d",
+            str(cli.integer(min_depth, "min_depth", minimum=0)),
+            "-n",
+            str(cli.integer(vaf_bins, "vaf_bins", minimum=2)),
         ]
         if batch is not None:
             if not isinstance(batch, str) or not re.match(r"^\d+/\d+$", batch):
@@ -402,7 +467,9 @@ def bcftools_variant_read_frequency_score(
             arguments += ["-b", batch]
     done = h.invoke("bcftools", bcftools_path, arguments, plugin=True, stdout_path=target)
     return h.result(
-        "bcftools_variant_read_frequency_score", done, outputs={"report": target},
+        "bcftools_variant_read_frequency_score",
+        done,
+        outputs={"report": target},
         report=h.tab_table(h.read_text(target), header="none"),
     )
 
@@ -427,9 +494,14 @@ def bcftools_add_variantkey(
     (``bcftools +add-variantkey``).
     """
     return h.run_vcf_plugin(
-        "bcftools_add_variantkey", "add-variantkey", vcf_path, output_path,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_add_variantkey",
+        "add-variantkey",
+        vcf_path,
+        output_path,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -450,8 +522,11 @@ def bcftools_variantkey_tables(
     folder = cli.new_directory(output_dir, "output_dir")
     try:
         done = h.invoke(
-            "bcftools", bcftools_path, h.plugin_command("variantkey-hex", [source], separator=False),
-            plugin=True, cwd=folder,
+            "bcftools",
+            bcftools_path,
+            h.plugin_command("variantkey-hex", [source], separator=False),
+            plugin=True,
+            cwd=folder,
         )
     except BaseException:
         for leftover in folder.iterdir():
@@ -460,11 +535,16 @@ def bcftools_variantkey_tables(
         raise
     counters = {
         key.strip(): int(value)
-        for key, value in re.findall(r"^(.+?):\s+(\d+)\s*$", done.stdout + "\n" + done.stderr, re.MULTILINE)
+        for key, value in re.findall(
+            r"^(.+?):\s+(\d+)\s*$", done.stdout + "\n" + done.stderr, re.MULTILINE
+        )
     }
     return h.result(
-        "bcftools_variantkey_tables", done, outputs={"output_dir": folder},
-        files=h.directory_files(folder), counters=counters,
+        "bcftools_variantkey_tables",
+        done,
+        outputs={"output_dir": folder},
+        files=h.directory_files(folder),
+        counters=counters,
     )
 
 
@@ -495,8 +575,10 @@ def bcftools_contrast_groups(
     count). ``force_samples`` continues when listed samples are missing from the VCF.
     """
     options = [
-        "-0", ",".join(h.text_list(list(control_samples), "control_samples")),
-        "-1", ",".join(h.text_list(list(case_samples), "case_samples")),
+        "-0",
+        ",".join(h.text_list(list(control_samples), "control_samples")),
+        "-1",
+        ",".join(h.text_list(list(case_samples), "case_samples")),
     ]
     if annotations is not None:
         items = h.text_list(list(annotations), "annotations")
@@ -508,9 +590,15 @@ def bcftools_contrast_groups(
     if h.flag(force_samples, "force_samples"):
         options.append("--force-samples")
     return h.run_vcf_plugin(
-        "bcftools_contrast_groups", "contrast", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_contrast_groups",
+        "contrast",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -536,8 +624,10 @@ def bcftools_fill_from_fasta(
     ``replace_non_acgtn`` replaces other characters with N (``-N``).
     """
     options = [
-        "-c", cli.text(column, "column"),
-        "-f", str(cli.existing_file(fasta_path, "fasta_path")),
+        "-c",
+        cli.text(column, "column"),
+        "-f",
+        str(cli.existing_file(fasta_path, "fasta_path")),
     ]
     if header_lines_path is not None:
         options += ["-h", str(cli.existing_file(header_lines_path, "header_lines_path"))]
@@ -550,8 +640,13 @@ def bcftools_fill_from_fasta(
     if h.flag(replace_non_acgtn, "replace_non_acgtn"):
         options.append("-N")
     return h.run_vcf_plugin(
-        "bcftools_fill_from_fasta", "fill-from-fasta", vcf_path, output_path, options=options,
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_fill_from_fasta",
+        "fill-from-fasta",
+        vcf_path,
+        output_path,
+        options=options,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -586,9 +681,14 @@ def bcftools_fill_tags(
     if h.flag(drop_missing, "drop_missing"):
         options.append("-d")
     return h.run_vcf_plugin(
-        "bcftools_fill_tags", "fill-tags", vcf_path, output_path, options=options,
+        "bcftools_fill_tags",
+        "fill-tags",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
-        output_type=output_type, bcftools_path=bcftools_path,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -606,9 +706,14 @@ def bcftools_exclusive_genotype_sites(
     (``bcftools +GTsubset``).
     """
     return h.run_vcf_plugin(
-        "bcftools_exclusive_genotype_sites", "GTsubset", vcf_path, output_path,
+        "bcftools_exclusive_genotype_sites",
+        "GTsubset",
+        vcf_path,
+        output_path,
         options=["-s", ",".join(h.text_list(list(samples), "samples"))],
-        general=h.selection(regions=regions), output_type=output_type, bcftools_path=bcftools_path,
+        general=h.selection(regions=regions),
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -629,9 +734,15 @@ def bcftools_isec_genotypes(
     """
     other = cli.existing_file(other_vcf_path, "other_vcf_path")
     return h.run_vcf_plugin(
-        "bcftools_isec_genotypes", "isecGT", vcf_path, output_path,
-        general=h.selection(regions=regions), separator=False, extra_inputs=[other],
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_isec_genotypes",
+        "isecGT",
+        vcf_path,
+        output_path,
+        general=h.selection(regions=regions),
+        separator=False,
+        extra_inputs=[other],
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -693,9 +804,15 @@ def bcftools_prune_sites(
     if h.flag(randomize_missing, "randomize_missing"):
         options.append("--randomize-missing")
     return h.run_vcf_plugin(
-        "bcftools_prune_sites", "prune", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions, include=include, exclude=exclude), separator=False,
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_prune_sites",
+        "prune",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions, include=include, exclude=exclude),
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -732,18 +849,29 @@ def bcftools_remove_overlaps(
         source = cli.existing_file(vcf_path, "vcf_path")
         target = cli.new_file(output_path, "output_path")
         arguments = h.plugin_command(
-            "remove-overlaps", [source],
+            "remove-overlaps",
+            [source],
             general=[*h.selection(regions=regions), "-O", output_type, "-o", str(target)],
-            options=options, separator=False,
+            options=options,
+            separator=False,
         )
         done = h.invoke("bcftools", bcftools_path, arguments, plugin=True, created=[target])
         return h.result(
-            "bcftools_remove_overlaps", done, outputs={"output": target}, output_type=output_type,
+            "bcftools_remove_overlaps",
+            done,
+            outputs={"output": target},
+            output_type=output_type,
             messages=[line for line in done.stderr_tail.splitlines() if line.strip()][-4:],
         )
     return h.run_vcf_plugin(
-        "bcftools_remove_overlaps", "remove-overlaps", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions), separator=False, output_type=output_type,
+        "bcftools_remove_overlaps",
+        "remove-overlaps",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions),
+        separator=False,
+        output_type=output_type,
         bcftools_path=bcftools_path,
     )
 
@@ -771,7 +899,9 @@ def bcftools_scatter_vcf(
     """
     chosen = [value is not None for value in (sites_per_chunk, regions_to_scatter, scatter_file)]
     if sum(chosen) != 1:
-        raise ConfigurationError("Give exactly one of sites_per_chunk, regions_to_scatter, scatter_file.")
+        raise ConfigurationError(
+            "Give exactly one of sites_per_chunk, regions_to_scatter, scatter_file."
+        )
     source = cli.existing_file(vcf_path, "vcf_path")
     options: list[str] = []
     if sites_per_chunk is not None:
@@ -788,7 +918,11 @@ def bcftools_scatter_vcf(
     folder = cli.new_directory(output_dir, "output_dir")
     try:
         arguments = h.plugin_command(
-            "scatter", [source], general=["-O", kind, "-o", str(folder)], options=options, separator=False
+            "scatter",
+            [source],
+            general=["-O", kind, "-o", str(folder)],
+            options=options,
+            separator=False,
         )
         done = h.invoke("bcftools", bcftools_path, arguments, plugin=True, created=[])
     except BaseException:
@@ -797,7 +931,10 @@ def bcftools_scatter_vcf(
         folder.rmdir()
         raise
     return h.result(
-        "bcftools_scatter_vcf", done, outputs={"output_dir": folder}, output_type=kind,
+        "bcftools_scatter_vcf",
+        done,
+        outputs={"output_dir": folder},
+        output_type=kind,
         files=h.directory_files(folder),
     )
 
@@ -836,10 +973,16 @@ def bcftools_set_genotypes(
             "target_genotypes must be one of ./., ./x, ., a, q, b[:AD<p], r:FLOAT."
         )
     if not isinstance(new_genotype, str) or not _SET_NEW.match(new_genotype):
-        raise ConfigurationError("new_genotype must be ., 0, c:GT, i, m, M, X, p or u (with an optional p).")
+        raise ConfigurationError(
+            "new_genotype must be ., 0, c:GT, i, m, M, X, p or u (with an optional p)."
+        )
     options = [
-        "-t", target_genotypes, "-n", new_genotype,
-        "-s", str(cli.integer(random_seed, "random_seed", minimum=0)),
+        "-t",
+        target_genotypes,
+        "-n",
+        new_genotype,
+        "-s",
+        str(cli.integer(random_seed, "random_seed", minimum=0)),
     ]
     if genotype_include is not None and genotype_exclude is not None:
         raise ConfigurationError("genotype_include and genotype_exclude are mutually exclusive.")
@@ -850,9 +993,14 @@ def bcftools_set_genotypes(
     if target_genotypes == "q" and genotype_include is None and genotype_exclude is None:
         raise ConfigurationError("target_genotypes 'q' needs genotype_include or genotype_exclude.")
     return h.run_vcf_plugin(
-        "bcftools_set_genotypes", "setGT", vcf_path, output_path, options=options,
+        "bcftools_set_genotypes",
+        "setGT",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
-        output_type=output_type, bcftools_path=bcftools_path,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -892,9 +1040,17 @@ def bcftools_split_vcf_by_sample(
     folder = cli.new_directory(output_dir, "output_dir")
     try:
         arguments = h.plugin_command(
-            "split", [source],
-            general=[*h.selection(regions=regions, include=include, exclude=exclude), "-O", kind, "-o", str(folder)],
-            options=options, separator=False,
+            "split",
+            [source],
+            general=[
+                *h.selection(regions=regions, include=include, exclude=exclude),
+                "-O",
+                kind,
+                "-o",
+                str(folder),
+            ],
+            options=options,
+            separator=False,
         )
         done = h.invoke("bcftools", bcftools_path, arguments, plugin=True)
     except BaseException:
@@ -903,7 +1059,10 @@ def bcftools_split_vcf_by_sample(
         folder.rmdir()
         raise
     return h.result(
-        "bcftools_split_vcf_by_sample", done, outputs={"output_dir": folder}, output_type=kind,
+        "bcftools_split_vcf_by_sample",
+        done,
+        outputs={"output_dir": folder},
+        output_type=kind,
         files=h.directory_files(folder),
     )
 
@@ -975,10 +1134,20 @@ def bcftools_split_vep(
     general = h.selection(regions=regions, include=include, exclude=exclude)
     if text_format is not None or list_fields:
         if text_format is not None:
-            options += ["-f", cli.text(text_format.replace("\\t", "\t").replace("\\n", "\n"), "text_format")]
+            options += [
+                "-f",
+                cli.text(text_format.replace("\\t", "\t").replace("\\n", "\n"), "text_format"),
+            ]
         run = h.run_text_plugin(
-            "bcftools_split_vep", "split-vep", vcf_path, output_path, options=options,
-            general=general, separator=False, header="none", bcftools_path=bcftools_path,
+            "bcftools_split_vep",
+            "split-vep",
+            vcf_path,
+            output_path,
+            options=options,
+            general=general,
+            separator=False,
+            header="none",
+            bcftools_path=bcftools_path,
         )
         if list_fields:
             fields = [
@@ -989,8 +1158,15 @@ def bcftools_split_vep(
             run["fields"] = fields
         return run
     return h.run_vcf_plugin(
-        "bcftools_split_vep", "split-vep", vcf_path, output_path, options=options, general=general,
-        separator=False, output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_split_vep",
+        "split-vep",
+        vcf_path,
+        output_path,
+        options=options,
+        general=general,
+        separator=False,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -1026,15 +1202,22 @@ def bcftools_convert_format_tags(
     if h.flag(replace_source, "replace_source"):
         options.append("-r")
     options += [
-        "-t", _number_text(gp_threshold, "gp_threshold", minimum=0.0, maximum=1.0),
-        "-s", str(cli.integer(skip_nalt, "skip_nalt", minimum=0)),
+        "-t",
+        _number_text(gp_threshold, "gp_threshold", minimum=0.0, maximum=1.0),
+        "-s",
+        str(cli.integer(skip_nalt, "skip_nalt", minimum=0)),
     ]
     if defaults is not None:
         options += ["-d", cli.text(defaults, "defaults")]
     return h.run_vcf_plugin(
-        "bcftools_convert_format_tags", "tag2tag", vcf_path, output_path, options=options,
+        "bcftools_convert_format_tags",
+        "tag2tag",
+        vcf_path,
+        output_path,
+        options=options,
         general=h.selection(regions=regions, include=include, exclude=exclude),
-        output_type=output_type, bcftools_path=bcftools_path,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
 
 
@@ -1055,12 +1238,20 @@ def bcftools_variant_distance(
     previous and to the next variant); ``tag_name`` is the INFO tag written (``-n``, default ``DIST``).
     """
     options = [
-        "-d", cli.choice(direction, _DIRECTIONS, "direction"),
-        "-n", cli.text(tag_name, "tag_name"),
+        "-d",
+        cli.choice(direction, _DIRECTIONS, "direction"),
+        "-n",
+        cli.text(tag_name, "tag_name"),
     ]
     return h.run_vcf_plugin(
-        "bcftools_variant_distance", "variant-distance", vcf_path, output_path, options=options,
-        general=h.selection(regions=regions), separator=False, output_type=output_type,
+        "bcftools_variant_distance",
+        "variant-distance",
+        vcf_path,
+        output_path,
+        options=options,
+        general=h.selection(regions=regions),
+        separator=False,
+        output_type=output_type,
         bcftools_path=bcftools_path,
     )
 
@@ -1106,18 +1297,31 @@ def bcftools_fixref(
         target = cli.new_file(output_path, "output_path")
         arguments = h.plugin_command("fixref", [source], general=general, options=options)
         done = h.invoke("bcftools", bcftools_path, arguments, plugin=True)
-        with target.open("x", encoding="utf-8") as handle:  # the statistics are printed on standard error
+        with target.open(
+            "x", encoding="utf-8"
+        ) as handle:  # the statistics are printed on standard error
             handle.write(done.stderr)
         table = h.tab_table(done.stderr, header="none")
         sections: dict[str, list[list[object]]] = {}
         for row in table["rows"]:
             sections.setdefault(str(row[0]), []).append(row[1:])
         return h.result(
-            "bcftools_fixref", done, outputs={"report": target}, report=table, sections=sections, mode=kind
+            "bcftools_fixref",
+            done,
+            outputs={"report": target},
+            report=table,
+            sections=sections,
+            mode=kind,
         )
     run = h.run_vcf_plugin(
-        "bcftools_fixref", "fixref", vcf_path, output_path, options=options, general=general,
-        output_type=output_type, bcftools_path=bcftools_path,
+        "bcftools_fixref",
+        "fixref",
+        vcf_path,
+        output_path,
+        options=options,
+        general=general,
+        output_type=output_type,
+        bcftools_path=bcftools_path,
     )
     run["mode"] = kind
     return run
@@ -1168,7 +1372,9 @@ def bcftools_color_chromosomes(
         done = h.invoke("bcftools", bcftools_path, arguments, plugin=True, cwd=folder)
         data = folder / f"{stem}.dat"
         if not data.is_file():
-            raise ConfigurationError("bcftools +color-chrs wrote no output (are the genotypes phased?).")
+            raise ConfigurationError(
+                "bcftools +color-chrs wrote no output (are the genotypes phased?)."
+            )
     except BaseException:
         for leftover in folder.iterdir():
             leftover.unlink()
@@ -1176,7 +1382,9 @@ def bcftools_color_chromosomes(
         raise
     table = h.tab_table(h.read_text(data), header="none")
     return h.result(
-        "bcftools_color_chromosomes", done, outputs={"data": data},
+        "bcftools_color_chromosomes",
+        done,
+        outputs={"data": data},
         segments=[row[1:] for row in table["rows"] if row and row[0] == "SG"],
         switches=[row[1:] for row in table["rows"] if row and row[0] == "SW"],
         files=h.directory_files(folder),

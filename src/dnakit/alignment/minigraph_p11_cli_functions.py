@@ -42,14 +42,23 @@ _PRESETS = ("lr", "asm", "sr", "ggs")
 # ---------------------------------------------------------------------------
 
 
-def _pair(arguments: list[str], option: str, value: int | Sequence[int] | None, name: str, *, minimum: int = 0) -> None:
+def _pair(
+    arguments: list[str],
+    option: str,
+    value: int | Sequence[int] | None,
+    name: str,
+    *,
+    minimum: int = 0,
+) -> None:
     """An option taking ``INT`` or ``INT,INT``."""
     if value is None:
         return
     values = [value] if isinstance(value, int) and not isinstance(value, bool) else list(value)
     if not 1 <= len(values) <= 2:
         raise ConfigurationError(f"{name} must be an integer or a pair of integers.")
-    arguments.extend((option, ",".join(str(_cli.integer(item, name, minimum=minimum)) for item in values)))
+    arguments.extend(
+        (option, ",".join(str(_cli.integer(item, name, minimum=minimum)) for item in values))
+    )
 
 
 def _mapping_arguments(
@@ -131,11 +140,18 @@ def _script(
     output = directory / output_name
     arguments = build_arguments(directory)
     command = [script, subcommand, *arguments]
-    _p.run_checked(operation, k8, command, directory, stdout_name=output_name, timeout_seconds=timeout_seconds)
+    _p.run_checked(
+        operation, k8, command, directory, stdout_name=output_name, timeout_seconds=timeout_seconds
+    )
     version = None
     if with_version:
         probe = directory / ".version"
-        if _p.stream(k8, [script, "version"], directory, stdout_name=".version", log_name=".version.log") == 0:
+        if (
+            _p.stream(
+                k8, [script, "version"], directory, stdout_name=".version", log_name=".version.log"
+            )
+            == 0
+        ):
             version = probe.read_text(encoding="utf-8").strip() or None
         probe.unlink(missing_ok=True)
         (directory / ".version.log").unlink(missing_ok=True)
@@ -157,7 +173,17 @@ def _k8_version(k8: str, directory: Path) -> str | None:
     """The k8 shell version (``k8 -v`` prints ``k8: 1.2-r137`` after the V8 line)."""
     probe = directory / ".k8_version"
     try:
-        if _p.stream(k8, ["-v"], directory, stdout_name=".k8_version", log_name=".k8_version.log", timeout_seconds=60.0) == 0:
+        if (
+            _p.stream(
+                k8,
+                ["-v"],
+                directory,
+                stdout_name=".k8_version",
+                log_name=".k8_version.log",
+                timeout_seconds=60.0,
+            )
+            == 0
+        ):
             for line in probe.read_text(encoding="utf-8").splitlines():
                 if line.startswith("k8:"):
                     return line.split(":", 1)[1].strip()
@@ -220,22 +246,37 @@ def map_sequences_to_graph(
     query_files = _p.file_paths(queries, "queries")
     name = _output_name(output_name)
     arguments = _mapping_arguments(
-        preset=preset, base_alignment=base_alignment, kmer_size=kmer_size, window_size=window_size, threads=threads
+        preset=preset,
+        base_alignment=base_alignment,
+        kmer_size=kmer_size,
+        window_size=window_size,
+        threads=threads,
     )
-    _p.opt_num(arguments, "-f", repetitive_fraction, "repetitive_fraction", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        arguments, "-f", repetitive_fraction, "repetitive_fraction", minimum=0.0, maximum=1.0
+    )
     _pair(arguments, "-U", occurrence_range, "occurrence_range", minimum=1)
     _p.opt_num(arguments, "-j", divergence, "divergence", minimum=0.0, maximum=1.0)
     _p.opt_int(arguments, "-g", chain_gap, "chain_gap", minimum=1)
     _pair(arguments, "-r", bandwidth, "bandwidth", minimum=1)
     _pair(arguments, "-n", min_minimizers, "min_minimizers", minimum=1)
     _pair(arguments, "-m", min_chain_score, "min_chain_score", minimum=1)
-    _p.opt_num(arguments, "-p", min_secondary_ratio, "min_secondary_ratio", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        arguments, "-p", min_secondary_ratio, "min_secondary_ratio", minimum=0.0, maximum=1.0
+    )
     _p.opt_int(arguments, "-N", max_secondary, "max_secondary", minimum=0)
     _p.switch(arguments, "-D", skip_self_diagonal, "skip_self_diagonal")
     _p.switch(arguments, "-S", linear_chains, "linear_chains")
     _p.switch(arguments, "--vc", vertex_coordinates, "vertex_coordinates")
     result = _run_minigraph(
-        "map_sequences_to_graph", arguments, graph_file, query_files, output_directory, name, minigraph_path, timeout_seconds
+        "map_sequences_to_graph",
+        arguments,
+        graph_file,
+        query_files,
+        output_directory,
+        name,
+        minigraph_path,
+        timeout_seconds,
     )
     rows, total = _p.table(Path(result["outputs"]["output"]), limit=10_000_000)
     result["records"] = total
@@ -271,13 +312,24 @@ def graph_segment_coverage(
     read_files = _p.file_paths(reads, "reads")
     name = _output_name(output_name)
     arguments = _mapping_arguments(
-        preset=preset, base_alignment=base_alignment, kmer_size=kmer_size, window_size=window_size, threads=threads
+        preset=preset,
+        base_alignment=base_alignment,
+        kmer_size=kmer_size,
+        window_size=window_size,
+        threads=threads,
     )
     arguments.append("--cov")
     _p.opt_int(arguments, "--min-cov-blen", min_aligned_length, "min_aligned_length", minimum=0)
     _p.opt_int(arguments, "--min-cov-mapq", min_mapq, "min_mapq", minimum=0)
     result = _run_minigraph(
-        "graph_segment_coverage", arguments, graph_file, read_files, output_directory, name, minigraph_path, timeout_seconds
+        "graph_segment_coverage",
+        arguments,
+        graph_file,
+        read_files,
+        output_directory,
+        name,
+        minigraph_path,
+        timeout_seconds,
     )
     depths: dict[str, float] = {}
     segments = 0
@@ -398,7 +450,14 @@ def call_graph_bubbles(
     )
     arguments.append("--call")
     result = _run_minigraph(
-        "call_graph_bubbles", arguments, graph_file, [assembly_file], output_directory, name, minigraph_path, timeout_seconds
+        "call_graph_bubbles",
+        arguments,
+        graph_file,
+        [assembly_file],
+        output_directory,
+        name,
+        minigraph_path,
+        timeout_seconds,
     )
     rows, total = _data_rows(result)
     result["bubbles"] = total
@@ -469,7 +528,9 @@ def blacklist_insert_alignments(
     """
     source = _p.file_path(paf, "paf")
     name = _output_name(output_name)
-    divergence = format(_cli.number(min_divergence, "min_divergence", minimum=0.0, maximum=1.0), ".12g")
+    divergence = format(
+        _cli.number(min_divergence, "min_divergence", minimum=0.0, maximum=1.0), ".12g"
+    )
     only_identical = _p.flag(identical_only, "identical_only")
 
     def arguments(directory: Path) -> list[str]:
@@ -535,7 +596,9 @@ def annotate_inserted_sequences(
     _p.opt_file(arguments, "-b", bubbles, "bubbles")
     _p.opt_file(arguments, "-s", segdup, "segdup")
     _p.opt_int(arguments, "-l", min_feature_length, "min_feature_length", minimum=0)
-    _p.opt_num(arguments, "-S", min_segdup_fraction, "min_segdup_fraction", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        arguments, "-S", min_segdup_fraction, "min_segdup_fraction", minimum=0.0, maximum=1.0
+    )
     _p.switch(arguments, "-m", annotate_mobile, "annotate_mobile")
     result = _script(
         "annotate_inserted_sequences",
@@ -582,7 +645,10 @@ def summarize_insert_annotation(
         timeout_seconds=timeout_seconds,
     )
     rows, total = _data_rows(result)
-    result["classes"] = [{"key": row[0], "label": row[1], "counts": [_p.number(item) for item in row[2:]]} for row in rows]
+    result["classes"] = [
+        {"key": row[0], "label": row[1], "counts": [_p.number(item) for item in row[2:]]}
+        for row in rows
+    ]
     result["class_count"] = total
     return result
 
@@ -695,15 +761,20 @@ def merge_bubble_calls(
     names = None if samples is None else [_cli.text(item, "samples") for item in samples]
     if names is not None and len(names) != len(files):
         raise ConfigurationError("samples must have one name per call file.")
-    annotation_file = None if annotation is None else str(_cli.existing_file(annotation, "annotation"))
+    annotation_file = (
+        None if annotation is None else str(_cli.existing_file(annotation, "annotation"))
+    )
     columns = [Path(item).read_text(encoding="utf-8").splitlines() for item in files]
     if len({len(column) for column in columns}) != 1:
-        raise ConfigurationError("All call files must have the same number of rows (same graph and bubbles).")
+        raise ConfigurationError(
+            "All call files must have the same number of rows (same graph and bubbles)."
+        )
 
     def arguments(directory: Path) -> list[str]:
         pasted = directory / "pasted.bed"
         pasted.write_text(
-            "".join("\t".join(parts) + "\n" for parts in zip(*columns, strict=True)), encoding="utf-8"
+            "".join("\t".join(parts) + "\n" for parts in zip(*columns, strict=True)),
+            encoding="utf-8",
         )
         values: list[str] = []
         if annotation_file is not None:
@@ -797,7 +868,9 @@ def count_gene_copies(
     name = _output_name(output_name)
     options: list[str] = []
     _p.opt_num(options, "-c", min_coverage, "min_coverage", minimum=0.0, maximum=1.0)
-    _p.opt_num(options, "-r", min_relative_coverage, "min_relative_coverage", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        options, "-r", min_relative_coverage, "min_relative_coverage", minimum=0.0, maximum=1.0
+    )
     result = _script(
         "count_gene_copies",
         "mgutils.js",
@@ -1001,13 +1074,20 @@ def merge_sv_evidence(
     _p.opt_int(options, "-c", min_read_count, "min_read_count", minimum=1)
     _p.opt_int(options, "-s", min_read_count_per_strand, "min_read_count_per_strand", minimum=0)
     _p.opt_int(options, "-w", window_size, "window_size", minimum=1)
-    _p.opt_num(options, "-d", max_length_difference, "max_length_difference", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        options, "-d", max_length_difference, "max_length_difference", minimum=0.0, maximum=1.0
+    )
     _p.opt_int(options, "-e", min_centromere_distance, "min_centromere_distance", minimum=0)
     _p.opt_int(options, "-r", min_retrotransposon_length, "min_retrotransposon_length", minimum=0)
     _p.opt_int(options, "-R", min_retrotransposon_reads, "min_retrotransposon_reads", minimum=0)
     _p.opt_int(options, "-A", max_alleles, "max_alleles", minimum=1)
     _p.opt_int(options, "-C", max_reads_compared, "max_reads_compared", minimum=1)
-    lines = [line for item in files for line in Path(item).read_text(encoding="utf-8").splitlines() if line.strip()]
+    lines = [
+        line
+        for item in files
+        for line in Path(item).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
 
     def sort_key(line: str) -> tuple[str, int]:
         fields = line.split("\t")
@@ -1079,7 +1159,9 @@ def evaluate_sv_calls(
     _p.opt_int(options, "-w", window_size, "window_size", minimum=0)
     _p.opt_num(options, "-r", read_length_ratio, "read_length_ratio", minimum=0.0, maximum=1.0)
     _p.opt_num(options, "-m", min_length_ratio, "min_length_ratio", minimum=0.0, maximum=1.0)
-    _p.opt_num(options, "-v", min_allele_frequency, "min_allele_frequency", minimum=0.0, maximum=1.0)
+    _p.opt_num(
+        options, "-v", min_allele_frequency, "min_allele_frequency", minimum=0.0, maximum=1.0
+    )
     _p.switch(options, "-F", ignore_filter, "ignore_filter")
     _p.switch(options, "-G", check_genotype, "check_genotype")
     _p.switch(options, "-e", print_errors, "print_errors")

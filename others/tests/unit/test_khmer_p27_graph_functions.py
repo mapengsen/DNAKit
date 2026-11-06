@@ -13,8 +13,8 @@ import pytest
 
 khmer = pytest.importorskip("khmer")
 
-from dnakit.exceptions import ConfigurationError  # noqa: E402
-from dnakit.microbiome import khmer_p27_graph_functions as m  # noqa: E402
+from dnakit.exceptions import ConfigurationError
+from dnakit.microbiome import khmer_p27_graph_functions as m
 
 V = {"verbose": False}
 K = 15

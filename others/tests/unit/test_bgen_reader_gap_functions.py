@@ -14,7 +14,7 @@ from dnakit.exceptions import ConfigurationError
 
 pytest.importorskip("bgen_reader")
 
-from dnakit.variants import bgen_reader_gap_functions as facades  # noqa: E402
+from dnakit.variants import bgen_reader_gap_functions as facades
 
 
 def test_public_functions_are_keyword_only_verbose():
@@ -30,7 +30,9 @@ def test_unknown_example_name_is_refused_before_any_download():
     assert "example.bgen" in str(info.value)
 
 
-@pytest.mark.skipif(os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="network test; set DNAKIT_LIVE_TESTS=1")
+@pytest.mark.skipif(
+    os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="network test; set DNAKIT_LIVE_TESTS=1"
+)
 def test_live_fetch_example_bgen():
     pytest.importorskip("requests")
     result = facades.fetch_bgen_example("example.bgen", verbose=False)

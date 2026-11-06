@@ -25,7 +25,7 @@ from __future__ import annotations
 import re
 import shutil
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from io import StringIO
 from itertools import accumulate
 from pathlib import Path
@@ -155,7 +155,9 @@ def back_transcribe_keep_case(sequence: str, *, verbose: bool = True) -> str:
     return _sequence(sequence, "sequence").replace("U", "T").replace("u", "t")
 
 
-def search_nucleotide_iupac(sequence: str, subsequence: str, *, verbose: bool = True) -> list[str | int]:
+def search_nucleotide_iupac(
+    sequence: str, subsequence: str, *, verbose: bool = True
+) -> list[str | int]:
     """Find every (overlapping) occurrence of a DNA pattern that may contain IUPAC codes.
 
     Reproduces ``Bio.SeqUtils.nt_search``: the result list starts with the regular-expression pattern
@@ -221,7 +223,9 @@ def translate_nucleotide_bio(
     )
 
 
-def six_frame_translation_report(sequence: str, *, genetic_code: int = 1, verbose: bool = True) -> str:
+def six_frame_translation_report(
+    sequence: str, *, genetic_code: int = 1, verbose: bool = True
+) -> str:
     """Return the six-frame translation as the text report of ``Bio.SeqUtils.six_frame_translations``.
 
     The report has a header with the A, T, G and C counts, the length and the GC content, then one
@@ -323,7 +327,9 @@ def melting_temperature_biopython(
     )
 
 
-def gc_fraction_biopython(sequence: str, *, ambiguous: str = "remove", verbose: bool = True) -> float:
+def gc_fraction_biopython(
+    sequence: str, *, ambiguous: str = "remove", verbose: bool = True
+) -> float:
     """Return the G+C fraction (0 to 1) as ``Bio.SeqUtils.gc_fraction`` does.
 
     ``ambiguous`` is ``"remove"`` (ambiguous symbols are not counted in the denominator), ``"ignore"``
@@ -456,7 +462,9 @@ def read_single_sequence_record(
         with input_path(path).open(encoding="utf-8") as handle:
             record = seq_io.read(handle, format)
     except ValueError as exc:
-        raise ConfigurationError(f"{Path(path).name} does not hold exactly one record: {exc}") from exc
+        raise ConfigurationError(
+            f"{Path(path).name} does not hold exactly one record: {exc}"
+        ) from exc
     return _record_summary(record)
 
 
@@ -523,7 +531,9 @@ def read_single_search_result(
         with input_path(path).open("rb") as handle:
             query = searchio.read(handle, format)
     except ValueError as exc:
-        raise ConfigurationError(f"{Path(path).name} does not hold exactly one query: {exc}") from exc
+        raise ConfigurationError(
+            f"{Path(path).name} does not hold exactly one query: {exc}"
+        ) from exc
     return _query_summary(query)
 
 
@@ -546,7 +556,9 @@ def search_results_by_id(
     return {key: _query_summary(query) for key, query in mapping.items()}
 
 
-def read_single_motif(path: str | Path, format: str = "jaspar", *, verbose: bool = True) -> dict[str, Any]:
+def read_single_motif(
+    path: str | Path, format: str = "jaspar", *, verbose: bool = True
+) -> dict[str, Any]:
     """Read a motif file that holds exactly one motif, as ``Bio.motifs.read`` does.
 
     Returns the motif name, length, consensus and the per-position base counts. Biopython raises
@@ -559,7 +571,9 @@ def read_single_motif(path: str | Path, format: str = "jaspar", *, verbose: bool
         with input_path(path).open(encoding="utf-8") as handle:
             motif = motifs.read(handle, format)
     except ValueError as exc:
-        raise ConfigurationError(f"{Path(path).name} does not hold exactly one motif: {exc}") from exc
+        raise ConfigurationError(
+            f"{Path(path).name} does not hold exactly one motif: {exc}"
+        ) from exc
     counts = {letter: [int(value) for value in motif.counts[letter]] for letter in "ACGT"}
     return {
         "name": motif.name,
@@ -714,7 +728,9 @@ def run_naccess_accessibility(
         raise ConfigurationError("probe_size must be in (0, 10] angstrom.")
     if z_slice is not None and not 0 < float(z_slice) <= 10:
         raise ConfigurationError("z_slice must be in (0, 10] angstrom.")
-    directory = Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="naccess_"))
+    directory = (
+        Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="naccess_"))
+    )
     directory.mkdir(parents=True, exist_ok=True)
     model = directory / "model.pdb"
     model.write_bytes(source.read_bytes())
@@ -801,7 +817,9 @@ def run_psea_secondary_structure(
     )
     structure = _parse_psea_secondary_structure(sea_path)
     if not structure:
-        raise BackendExecutionError("psea produced no secondary-structure block.", context={"log": log})
+        raise BackendExecutionError(
+            "psea produced no secondary-structure block.", context={"log": log}
+        )
     return {
         "status": "completed",
         "operation": "run_psea_secondary_structure",
@@ -816,8 +834,8 @@ def run_psea_secondary_structure(
 
 __all__ = [
     "back_transcribe_keep_case",
-    "complement_keep_case",
     "codon_dn_ds_biopython",
+    "complement_keep_case",
     "complement_rna_keep_case",
     "draw_ascii_tree",
     "draw_tree_figure",

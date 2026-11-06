@@ -9,7 +9,6 @@ fail on plotly 6 (``titlefont``). Plots are written into tmp_path. Socket connec
 from __future__ import annotations
 
 import importlib.util
-import json
 import socket
 
 import pytest
@@ -25,7 +24,12 @@ PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 MATRICES = {
     "positive": [[0.5, 0.1, 0.2, 0.9], [0.3, 0.8, 0.1, 0.2], [0.6, 0.2, 0.7, 0.05]],
-    "mixed": [[0.5, -0.2, 0.1, 0.0], [-0.3, 0.8, -0.1, 0.2], [0.1, 0.1, 0.9, -0.4], [-0.6, -0.5, 0.3, 0.3]],
+    "mixed": [
+        [0.5, -0.2, 0.1, 0.0],
+        [-0.3, 0.8, -0.1, 0.2],
+        [0.1, 0.1, 0.9, -0.4],
+        [-0.6, -0.5, 0.3, 0.3],
+    ],
     "all_negative": [[-0.5, -0.2, -0.1, -0.9], [-0.3, -0.8, -0.1, -0.2]],
 }
 
@@ -40,10 +44,13 @@ def _no_network(monkeypatch):
 
 
 @requires_selene
-@pytest.mark.parametrize("name,order", [("positive", "value"), ("mixed", "value"), ("mixed", "alpha"), ("all_negative", "value")])
+@pytest.mark.parametrize(
+    "name,order",
+    [("positive", "value"), ("mixed", "value"), ("mixed", "alpha"), ("all_negative", "value")],
+)
 def test_logo_bars_and_glyphs_match_selene(tmp_path, name, order):
-    import numpy as np
     import matplotlib
+    import numpy as np
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -53,10 +60,14 @@ def test_logo_bars_and_glyphs_match_selene(tmp_path, name, order):
     matrix = MATRICES[name]
     upstream_ax = vis.sequence_logo(np.array(matrix, dtype=float), order=order)
     try:
-        ours = module.plot_sequence_logo_scores(matrix, str(tmp_path / "logo.png"), order=order, verbose=False)
+        ours = module.plot_sequence_logo_scores(
+            matrix, str(tmp_path / "logo.png"), order=order, verbose=False
+        )
         assert (tmp_path / "logo.png").read_bytes()[:8] == PNG_SIGNATURE
         length = len(matrix)
-        bars = [patch for patch in upstream_ax.patches if isinstance(patch, Rectangle)][: 4 * length]
+        bars = [patch for patch in upstream_ax.patches if isinstance(patch, Rectangle)][
+            : 4 * length
+        ]
         heights = np.array([bar.get_height() for bar in bars]).reshape(4, length)
         assert np.allclose(heights, np.array(ours["scores"]))
         glyphs = [patch for patch in upstream_ax.patches if not isinstance(patch, Rectangle)]
@@ -64,7 +75,10 @@ def test_logo_bars_and_glyphs_match_selene(tmp_path, name, order):
         for index, patch in enumerate(glyphs):
             base = ours["bases"][index // length][index % length]
             expected = vis._SVG_PATHS[base][0]
-            assert np.array_equal(np.asarray(patch.get_path().vertices), np.asarray(expected)), (index, base)
+            assert np.array_equal(np.asarray(patch.get_path().vertices), np.asarray(expected)), (
+                index,
+                base,
+            )
     finally:
         plt.close("all")
 
@@ -72,7 +86,9 @@ def test_logo_bars_and_glyphs_match_selene(tmp_path, name, order):
 @requires_selene
 def test_logo_rejects_wrong_column_count(tmp_path):
     with pytest.raises(ConfigurationError, match="columns"):
-        module.plot_sequence_logo_scores([[0.1, 0.2, 0.3]], str(tmp_path / "bad.png"), verbose=False)
+        module.plot_sequence_logo_scores(
+            [[0.1, 0.2, 0.3]], str(tmp_path / "bad.png"), verbose=False
+        )
 
 
 @requires_selene
@@ -93,14 +109,23 @@ def test_scatter_orders_by_chromosome_and_takes_feature_maximum(tmp_path):
     target = tmp_path / "scatter.html"
     result = module.plot_variant_diffs_scatter(SCORES, LABELS, FEATURES, str(target), verbose=False)
     assert target.is_file()
-    assert [(v["chrom"], v["pos"]) for v in result["variants"]] == [("chr1", 5), ("chr1", 20), ("chr2", 500)]
+    assert [(v["chrom"], v["pos"]) for v in result["variants"]] == [
+        ("chr1", 5),
+        ("chr1", 20),
+        ("chr2", 500),
+    ]
     assert [v["max_abs_diff"] for v in result["variants"]] == [0.6, 0.9, 0.5]
 
 
 @requires_selene
 def test_scatter_feature_filter_keeps_each_variant_with_its_own_scores(tmp_path):
     result = module.plot_variant_diffs_scatter(
-        SCORES, LABELS, FEATURES, str(tmp_path / "filtered.html"), feature_indices=[1, 2], verbose=False
+        SCORES,
+        LABELS,
+        FEATURES,
+        str(tmp_path / "filtered.html"),
+        feature_indices=[1, 2],
+        verbose=False,
     )
     assert result["features"] == ["f2", "f3"]
     expected = {("chr1", 5): 0.6, ("chr1", 20): 0.3, ("chr2", 500): 0.5}
@@ -110,7 +135,13 @@ def test_scatter_feature_filter_keeps_each_variant_with_its_own_scores(tmp_path)
 @requires_selene
 def test_scatter_percentile_and_threshold(tmp_path):
     result = module.plot_variant_diffs_scatter(
-        SCORES, LABELS, FEATURES, str(tmp_path / "pct.html"), nth_percentile=40, threshold_line=0.4, verbose=False
+        SCORES,
+        LABELS,
+        FEATURES,
+        str(tmp_path / "pct.html"),
+        nth_percentile=40,
+        threshold_line=0.4,
+        verbose=False,
     )
     # maxima in label order are 0.6, 0.9, 0.5; the 40th percentile is 0.58, so variants at 5 and 20 remain
     assert [v["pos"] for v in result["variants"]] == [5, 20]
@@ -124,4 +155,6 @@ def test_upstream_scatter_fails_on_plotly_titlefont(tmp_path):
     from selene_sdk.interpret import vis
 
     with pytest.raises(ValueError, match="titlefont"):
-        vis.variant_diffs_scatter_plot(np.array(SCORES), LABELS, FEATURES, str(tmp_path / "up.html"))
+        vis.variant_diffs_scatter_plot(
+            np.array(SCORES), LABELS, FEATURES, str(tmp_path / "up.html")
+        )

@@ -66,18 +66,28 @@ def read_sequences(value: object) -> list[tuple[str, str]]:
             else:
                 entries.append((f"seq{index}", item))
     else:
-        raise InputFormatError("Provide FASTA text, a sequence, or a list/mapping of sequences.", code="INVALID_SEQUENCE_INPUT")
+        raise InputFormatError(
+            "Provide FASTA text, a sequence, or a list/mapping of sequences.",
+            code="INVALID_SEQUENCE_INPUT",
+        )
     if not entries or len(entries) > MAX_SEQUENCES:
-        raise InputFormatError(f"Provide between 1 and {MAX_SEQUENCES} sequences.", code="INVALID_SEQUENCE_INPUT")
+        raise InputFormatError(
+            f"Provide between 1 and {MAX_SEQUENCES} sequences.", code="INVALID_SEQUENCE_INPUT"
+        )
     result: list[tuple[str, str]] = []
     total = 0
     for identifier, sequence in entries:
         if not isinstance(sequence, str):
-            raise InputFormatError(f"Sequence {identifier!r} must be text.", code="INVALID_SEQUENCE")
+            raise InputFormatError(
+                f"Sequence {identifier!r} must be text.", code="INVALID_SEQUENCE"
+            )
         cleaned = "".join(sequence.split()).upper().replace("U", "T")
         invalid = sorted({c for c in cleaned if not ("A" <= c <= "Z" or c in "-*.")})
         if invalid:
-            raise InputFormatError(f"Sequence {identifier!r} has invalid symbols {invalid[:5]}.", code="INVALID_SEQUENCE")
+            raise InputFormatError(
+                f"Sequence {identifier!r} has invalid symbols {invalid[:5]}.",
+                code="INVALID_SEQUENCE",
+            )
         total += len(cleaned)
         if total > MAX_TOTAL_BASES:
             raise InputFormatError("The sequences are too large.", code="INPUT_TOO_LARGE")
@@ -107,7 +117,9 @@ def n_statistic(lengths: Sequence[int], fraction: float = 0.5) -> int:
 def median(values: Sequence[float]) -> float:
     ordered = sorted(values)
     middle = len(ordered) // 2
-    return float(ordered[middle]) if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+    return (
+        float(ordered[middle]) if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+    )
 
 
 def summarize(records: Sequence[tuple[str, str]]) -> dict[str, object]:
@@ -117,8 +129,15 @@ def summarize(records: Sequence[tuple[str, str]]) -> dict[str, object]:
         counts.update(sequence)
     acgt = sum(counts[base] for base in "ACGT")
     return {
-        "sequence_count": len(records), "total_bases": sum(lengths),
-        "length": {"min": min(lengths), "max": max(lengths), "mean": sum(lengths) / len(lengths), "median": median(lengths), "n50": n_statistic(lengths)},
+        "sequence_count": len(records),
+        "total_bases": sum(lengths),
+        "length": {
+            "min": min(lengths),
+            "max": max(lengths),
+            "mean": sum(lengths) / len(lengths),
+            "median": median(lengths),
+            "n50": n_statistic(lengths),
+        },
         "gc_percent": 100.0 * (counts["G"] + counts["C"]) / acgt if acgt else None,
         "base_counts": dict(sorted(counts.items())),
         "non_acgt_bases": sum(counts.values()) - acgt,

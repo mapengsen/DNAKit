@@ -1,7 +1,5 @@
 """Binds the public ``<operation>_<format>`` functions to the format engines."""
 
-# ruff: noqa: E501
-
 from __future__ import annotations
 
 import os

@@ -1033,9 +1033,13 @@ _NO_SE_WARNING = (
 
 def _h2_range_warnings(value: float, label: str) -> list[str]:
     if value < 0:
-        return [f"{label} = {value:.4g} is negative: sampling noise (small sample or weak signal); the estimate is kept unclamped and is not a valid heritability"]
+        return [
+            f"{label} = {value:.4g} is negative: sampling noise (small sample or weak signal); the estimate is kept unclamped and is not a valid heritability"
+        ]
     if value > 1:
-        return [f"{label} = {value:.4g} exceeds 1: sampling noise or model misfit; the estimate is kept unclamped and is not a valid heritability"]
+        return [
+            f"{label} = {value:.4g} exceeds 1: sampling noise or model misfit; the estimate is kept unclamped and is not a valid heritability"
+        ]
     return []
 
 
@@ -1096,8 +1100,10 @@ def estimate_snp_heritability(
 
 def _rg_warnings(rg: float | None) -> list[str]:
     if rg is not None and abs(rg) > 1:
-        return [f"rg = {rg:.4g} is outside [-1, 1]: the ratio estimator is not bounded and small samples or noisy covariance can push it past 1; "
-                "the value is reported unclamped and carries large uncertainty"]
+        return [
+            f"rg = {rg:.4g} is outside [-1, 1]: the ratio estimator is not bounded and small samples or noisy covariance can push it past 1; "
+            "the value is reported unclamped and carries large uncertainty"
+        ]
     return []
 
 
@@ -1122,7 +1128,11 @@ def estimate_genetic_correlation(
         _, c12 = _he_pairs(grm["matrix"], z1, z2)
         h1, h2, cov = _he_slope(a, c11), _he_slope(a, c22), _he_slope(a, c12)
         rg = cov / math.sqrt(h1 * h2) if h1 > 0 and h2 > 0 else None
-        he_warnings = _rg_warnings(rg) + _h2_range_warnings(h1, "h2_trait1") + _h2_range_warnings(h2, "h2_trait2")
+        he_warnings = (
+            _rg_warnings(rg)
+            + _h2_range_warnings(h1, "h2_trait1")
+            + _h2_range_warnings(h2, "h2_trait2")
+        )
         return {
             "method": "haseman_elston_cross_product",
             "rg": rg,
@@ -1134,7 +1144,9 @@ def estimate_genetic_correlation(
                 "rg = slope(0.5*(y1_i*y2_j+y1_j*y2_i) ~ GRM_ij) / sqrt(h2_1*h2_2), phenotypes "
                 "scaled to unit variance"
             ),
-        }, ([] if rg is not None else ["a heritability estimate is not positive; rg is undefined"]) + he_warnings
+        }, (
+            [] if rg is not None else ["a heritability estimate is not positive; rg is undefined"]
+        ) + he_warnings
     if "trait1" not in source or "trait2" not in source:
         raise InputFormatError(
             "provide genotypes with phenotype_1/phenotype_2, or trait1 and trait2 summary "

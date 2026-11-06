@@ -13,14 +13,15 @@ import socket
 
 import pytest
 
-from dnakit.exceptions import ConfigurationError
 from dnakit.annotation import pyensembl_verify_functions as module
+from dnakit.exceptions import ConfigurationError
 
 requires_pyensembl = pytest.mark.skipif(
     importlib.util.find_spec("pyensembl") is None, reason="pyensembl is not installed"
 )
 live_only = pytest.mark.skipif(
-    os.environ.get("DNAKIT_LIVE_TESTS") != "1", reason="set DNAKIT_LIVE_TESTS=1 for the Ensembl download"
+    os.environ.get("DNAKIT_LIVE_TESTS") != "1",
+    reason="set DNAKIT_LIVE_TESTS=1 for the Ensembl download",
 )
 
 GTF = """chr1\ttest\tgene\t100\t900\t.\t+\t.\tgene_id "G1"; gene_name "GENE1"; gene_biotype "protein_coding";

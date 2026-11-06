@@ -15,24 +15,50 @@ from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.exceptions import ConfigurationError, InputFormatError
 
 from . import _impl_assembly as _impl
-from .external import assemble_flye, assemble_hifiasm, assemble_megahit, assemble_shasta, assemble_unicycler, evaluate_merqury, run_busco
+from .external import (
+    assemble_flye,
+    assemble_hifiasm,
+    assemble_megahit,
+    assemble_shasta,
+    assemble_unicycler,
+    evaluate_merqury,
+    run_busco,
+)
 from .local import (
     calculate_l50 as _calculate_l50_native,
+)
+from .local import (
     calculate_n50 as _calculate_n50_native,
+)
+from .local import (
     calculate_ng50 as _calculate_ng50_native,
+)
+from .local import (
     calculate_nx as _calculate_nx_native,
+)
+from .local import (
     calculate_stats as _calculate_stats_native,
 )
 
 _MODULE = "assembly"
 
 
-def _ok(operation: str, input: object, result: object, options: Mapping[str, object] | None, warnings: tuple[str, ...] = ()) -> object:
+def _ok(
+    operation: str,
+    input: object,
+    result: object,
+    options: Mapping[str, object] | None,
+    warnings: tuple[str, ...] = (),
+) -> object:
     return candidate_ok(_MODULE, operation, input, result, options=options, warnings=warnings)
 
 
-def _not_implemented(operation: str, input: object, options: Mapping[str, object] | None, requires: str, message: str) -> object:
-    return candidate_not_implemented(_MODULE, operation, input, options=options, requires=requires, message=message)
+def _not_implemented(
+    operation: str, input: object, options: Mapping[str, object] | None, requires: str, message: str
+) -> object:
+    return candidate_not_implemented(
+        _MODULE, operation, input, options=options, requires=requires, message=message
+    )
 
 
 def _write_output(settings: Mapping[str, object], text: str) -> str | None:
@@ -49,7 +75,9 @@ def _write_output(settings: Mapping[str, object], text: str) -> str | None:
     return str(path)
 
 
-def add_genome_to_pangenome(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def add_genome_to_pangenome(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Add one genome's gene set as a new column of a gene presence/absence matrix.
 
     input: the existing pangenome as {genome: [genes]}, {gene: {genome: 0/1}} or
@@ -65,13 +93,27 @@ def add_genome_to_pangenome(input: object, *, options: Mapping[str, object] | No
     name = settings.get("genome")
     new_genes = settings.get("genes")
     if not isinstance(name, str) or not name:
-        raise ConfigurationError("options.genome must be the new genome's name.", code="ASSEMBLY_OPTION", hint="Pass options={'genome': 'G9', 'genes': [...]}.")
-    if not isinstance(new_genes, (list, tuple, set, frozenset)) or not all(isinstance(g, str) for g in new_genes):
-        raise ConfigurationError("options.genes must be a list of gene names.", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            "options.genome must be the new genome's name.",
+            code="ASSEMBLY_OPTION",
+            hint="Pass options={'genome': 'G9', 'genes': [...]}.",
+        )
+    if not isinstance(new_genes, (list, tuple, set, frozenset)) or not all(
+        isinstance(g, str) for g in new_genes
+    ):
+        raise ConfigurationError(
+            "options.genes must be a list of gene names.", code="ASSEMBLY_OPTION"
+        )
     if name in genomes:
-        raise ConfigurationError(f"genome {name!r} is already in the pangenome.", code="ASSEMBLY_OPTION", hint="Use a different genome name.")
+        raise ConfigurationError(
+            f"genome {name!r} is already in the pangenome.",
+            code="ASSEMBLY_OPTION",
+            hint="Use a different genome name.",
+        )
     present = set(new_genes)
-    updated_rows = [[*row, 1 if gene in present else 0] for gene, row in zip(genes, rows)]
+    updated_rows = [
+        [*row, 1 if gene in present else 0] for gene, row in zip(genes, rows, strict=False)
+    ]
     added = sorted(present - set(genes))
     updated_genes = [*genes, *added]
     updated_rows.extend([[0] * len(genomes) + [1] for _ in added])
@@ -85,11 +127,16 @@ def add_genome_to_pangenome(input: object, *, options: Mapping[str, object] | No
     return _ok("add_genome_to_pangenome", input, result, options)
 
 
-def build_chromosome_level_assembly(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def build_chromosome_level_assembly(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Not implemented: chromosome-level assembly needs Hi-C/optical-map/synteny scaffolding evidence."""
 
     return _not_implemented(
-        "build_chromosome_level_assembly", input, options, "scaffolding evidence (Hi-C contacts, optical maps or a reference) and a scaffolder such as YaHS/SALSA",
+        "build_chromosome_level_assembly",
+        input,
+        options,
+        "scaffolding evidence (Hi-C contacts, optical maps or a reference) and a scaffolder such as YaHS/SALSA",
         "Ordering and orienting contigs into chromosomes needs linking evidence that is not part of the input; use scaffold() with an explicit layout instead.",
     )
 
@@ -108,7 +155,11 @@ def _tool_settings(input: object, options: Mapping[str, object] | None) -> dict[
     settings.update(_impl.options_dict(options))
     tool = settings.get("tool")
     if tool not in _COMMAND_TOOLS:
-        raise ConfigurationError(f"tool must be one of {', '.join(sorted(_COMMAND_TOOLS))}; got {tool!r}.", code="ASSEMBLY_OPTION", hint="Pass {'tool': 'flye', 'reads': ..., 'output_directory': ...}.")
+        raise ConfigurationError(
+            f"tool must be one of {', '.join(sorted(_COMMAND_TOOLS))}; got {tool!r}.",
+            code="ASSEMBLY_OPTION",
+            hint="Pass {'tool': 'flye', 'reads': ..., 'output_directory': ...}.",
+        )
     for key in ("output_directory",):
         if not isinstance(settings.get(key), (str, Path)) or not str(settings[key]):
             raise ConfigurationError(f"{key} is required.", code="ASSEMBLY_OPTION")
@@ -123,7 +174,9 @@ def _threads(settings: Mapping[str, object]) -> int:
 def _required_path(settings: Mapping[str, object], key: str) -> str:
     value = settings.get(key)
     if not isinstance(value, (str, Path)) or not str(value) or "\x00" in str(value):
-        raise ConfigurationError(f"{key} is required for tool {settings.get('tool')!r}.", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            f"{key} is required for tool {settings.get('tool')!r}.", code="ASSEMBLY_OPTION"
+        )
     return str(value)
 
 
@@ -137,14 +190,35 @@ def _assembler_argv(settings: Mapping[str, object]) -> list[str]:
     if tool == "flye":
         platform = str(settings.get("platform", "nano-hq"))
         if platform not in {"nano-raw", "nano-hq", "pacbio-raw", "pacbio-hifi", "pacbio-corr"}:
-            raise ConfigurationError("platform must be a supported Flye read mode.", code="ASSEMBLY_OPTION")
+            raise ConfigurationError(
+                "platform must be a supported Flye read mode.", code="ASSEMBLY_OPTION"
+            )
         genome_size = settings.get("genome_size")
         if not isinstance(genome_size, str) or not genome_size:
-            raise ConfigurationError("genome_size (for example '5m') is required for flye.", code="ASSEMBLY_OPTION")
-        return [program, f"--{platform}", _required_path(settings, "reads"), "--genome-size", genome_size, "--out-dir", str(out), "--threads", str(threads)]
+            raise ConfigurationError(
+                "genome_size (for example '5m') is required for flye.", code="ASSEMBLY_OPTION"
+            )
+        return [
+            program,
+            f"--{platform}",
+            _required_path(settings, "reads"),
+            "--genome-size",
+            genome_size,
+            "--out-dir",
+            str(out),
+            "--threads",
+            str(threads),
+        ]
     if tool == "hifiasm":
         prefix = str(settings.get("prefix", "assembly"))
-        return [program, "-o", str(out / prefix), "-t", str(threads), _required_path(settings, "reads")]
+        return [
+            program,
+            "-o",
+            str(out / prefix),
+            "-t",
+            str(threads),
+            _required_path(settings, "reads"),
+        ]
     if tool == "megahit":
         argv = [program, "-o", str(out / "megahit"), "-t", str(threads)]
         min_len = _impl.get_int(settings, "min_contig_length", None, low=1, high=10_000_000)
@@ -152,16 +226,32 @@ def _assembler_argv(settings: Mapping[str, object]) -> list[str]:
             argv += ["--min-contig-len", str(min_len)]
         if settings.get("read2") is None:
             return [*argv, "-r", _required_path(settings, "read1")]
-        return [*argv, "-1", _required_path(settings, "read1"), "-2", _required_path(settings, "read2")]
+        return [
+            *argv,
+            "-1",
+            _required_path(settings, "read1"),
+            "-2",
+            _required_path(settings, "read2"),
+        ]
     if tool == "shasta":
-        argv = [program, "--input", _required_path(settings, "reads"), "--config", str(settings.get("config", "Nanopore-May2022")), "--assemblyDirectory", str(out)]
+        argv = [
+            program,
+            "--input",
+            _required_path(settings, "reads"),
+            "--config",
+            str(settings.get("config", "Nanopore-May2022")),
+            "--assemblyDirectory",
+            str(out),
+        ]
         if settings.get("threads") is not None:
             argv += ["--threads", str(threads)]
         return argv
     # unicycler
     mode = str(settings.get("mode", "normal"))
     if mode not in {"conservative", "normal", "bold"}:
-        raise ConfigurationError("mode must be conservative, normal or bold.", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            "mode must be conservative, normal or bold.", code="ASSEMBLY_OPTION"
+        )
     argv = [program]
     if settings.get("read1") is not None:
         argv += ["-1", _required_path(settings, "read1")]
@@ -189,7 +279,11 @@ def build_command(input: object, *, options: Mapping[str, object] | None = None)
 
     settings = _tool_settings(input, options)
     argv = _assembler_argv(settings)
-    result = {"tool": settings["tool"], "argv": argv, "command_line": " ".join(_quote(part) for part in argv)}
+    result = {
+        "tool": settings["tool"],
+        "argv": argv,
+        "command_line": " ".join(_quote(part) for part in argv),
+    }
     return _ok("build_command", input, result, options)
 
 
@@ -218,11 +312,16 @@ def build_graph_genome(input: object, *, options: Mapping[str, object] | None = 
     return _ok("build_graph_genome", input, result, options)
 
 
-def build_haplotype_assembly(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def build_haplotype_assembly(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Not implemented: haplotype-resolved assembly needs reads (HiFi/ONT, Hi-C or parental k-mers) and an assembler."""
 
     return _not_implemented(
-        "build_haplotype_assembly", input, options, "an assembler with phasing support (for example hifiasm) and sequencing reads",
+        "build_haplotype_assembly",
+        input,
+        options,
+        "an assembler with phasing support (for example hifiasm) and sequencing reads",
         "Haplotype-resolved assembly cannot be derived from contigs alone; run assemble_hifiasm on reads instead.",
     )
 
@@ -241,7 +340,11 @@ def build_pangenome(input: object, *, options: Mapping[str, object] | None = Non
     settings = _impl.options_dict(options)
     genomes, genes, rows = _impl.presence_matrix(input)
     partition = _impl.pangenome_partition(
-        genomes, genes, rows, _impl.core_threshold_option(settings), _impl.get_float(settings, "cloud_threshold", 0.15, low=0.0, high=1.0)
+        genomes,
+        genes,
+        rows,
+        _impl.core_threshold_option(settings),
+        _impl.get_float(settings, "cloud_threshold", 0.15, low=0.0, high=1.0),
     )
     unique = {g: sum(1 for row in rows if row[j] and sum(row) == 1) for j, g in enumerate(genomes)}
     result = {
@@ -257,7 +360,9 @@ def build_pangenome(input: object, *, options: Mapping[str, object] | None = Non
     return _ok("build_pangenome", input, result, options)
 
 
-def calculate_assembly_completeness(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def calculate_assembly_completeness(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Estimate assembly completeness as length ratio and/or reference k-mer recovery.
 
     input: assembly (FASTA text/path, {name: sequence}, list of sequences/lengths).
@@ -271,10 +376,14 @@ def calculate_assembly_completeness(input: object, *, options: Mapping[str, obje
 
     settings = _impl.options_dict(options)
     contigs = _impl.parse_contigs(input)
-    return _ok("calculate_assembly_completeness", input, _impl.completeness(contigs, settings), options)
+    return _ok(
+        "calculate_assembly_completeness", input, _impl.completeness(contigs, settings), options
+    )
 
 
-def calculate_busco_completeness(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def calculate_busco_completeness(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Compute BUSCO completeness percentages from BUSCO counts or a BUSCO short-summary line.
 
     input: a mapping with single (S), duplicated (D), fragmented (F), missing (M) integer counts,
@@ -286,7 +395,9 @@ def calculate_busco_completeness(input: object, *, options: Mapping[str, object]
     return _ok("calculate_busco_completeness", input, _impl.busco_completeness(input), options)
 
 
-def calculate_pangenome_openness(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def calculate_pangenome_openness(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Fit Heaps' law to the number of new genes per added genome to classify a pangenome as open or closed.
 
     input: gene presence/absence data (see build_pangenome; at least 4 genomes). Model: the mean
@@ -300,7 +411,12 @@ def calculate_pangenome_openness(input: object, *, options: Mapping[str, object]
     permutations = _impl.get_int(settings, "n_permutations", 100, low=0, high=10_000) or 0
     seed = _impl.get_int(settings, "seed", 0, low=0, high=2**32 - 1) or 0
     genomes, genes, rows = _impl.presence_matrix(input)
-    return _ok("calculate_pangenome_openness", input, _impl.pangenome_openness(genomes, genes, rows, permutations, seed), options)
+    return _ok(
+        "calculate_pangenome_openness",
+        input,
+        _impl.pangenome_openness(genomes, genes, rows, permutations, seed),
+        options,
+    )
 
 
 def check_input(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -321,9 +437,17 @@ def _assembly_pair(input: object, settings: Mapping[str, object]) -> tuple[objec
         return input["left"], input["right"]
     if isinstance(input, Mapping) and {"a", "b"} <= set(input):
         return input["a"], input["b"]
-    if isinstance(input, (list, tuple)) and len(input) == 2 and all(isinstance(x, (str, Path, Mapping, list, tuple)) for x in input):
+    if (
+        isinstance(input, (list, tuple))
+        and len(input) == 2
+        and all(isinstance(x, (str, Path, Mapping, list, tuple)) for x in input)
+    ):
         return input[0], input[1]
-    raise InputFormatError("compare_assemblies needs two assemblies.", code="ASSEMBLY_COMPARE_INPUT", hint="Pass [assembly_a, assembly_b], {'left': .., 'right': ..} or options={'other': assembly_b}.")
+    raise InputFormatError(
+        "compare_assemblies needs two assemblies.",
+        code="ASSEMBLY_COMPARE_INPUT",
+        hint="Pass [assembly_a, assembly_b], {'left': .., 'right': ..} or options={'other': assembly_b}.",
+    )
 
 
 def compare_assemblies(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -346,7 +470,9 @@ def compare_assemblies(input: object, *, options: Mapping[str, object] | None = 
         "left": ls,
         "right": rs,
         "difference_right_minus_left": {
-            key: rs[key] - ls[key] for key in ("contig_count", "total_length", "n50", "l50", "max_length") if key in ls and key in rs
+            key: rs[key] - ls[key]
+            for key in ("contig_count", "total_length", "n50", "l50", "max_length")
+            if key in ls and key in rs
         },
         "n50_ratio_right_to_left": rs["n50"] / ls["n50"],
     }
@@ -361,7 +487,9 @@ def compare_assemblies(input: object, *, options: Mapping[str, object] | None = 
     return _ok("compare_assemblies", input, result, options)
 
 
-def compare_assembly_graphs(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def compare_assembly_graphs(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Compare two GFA1 assembly graphs by segment and link content.
 
     input: [gfa_a, gfa_b] (GFA1 text or paths) or one GFA plus options.other. Segments are
@@ -376,25 +504,39 @@ def compare_assembly_graphs(input: object, *, options: Mapping[str, object] | No
     elif isinstance(input, (list, tuple)) and len(input) == 2:
         left_raw, right_raw = input
     else:
-        raise InputFormatError("compare_assembly_graphs needs two GFA graphs.", code="ASSEMBLY_COMPARE_INPUT", hint="Pass [gfa_a, gfa_b] or options={'other': gfa_b}.")
+        raise InputFormatError(
+            "compare_assembly_graphs needs two GFA graphs.",
+            code="ASSEMBLY_COMPARE_INPUT",
+            hint="Pass [gfa_a, gfa_b] or options={'other': gfa_b}.",
+        )
     result = _impl.compare_gfa(_impl.load_gfa(left_raw), _impl.load_gfa(right_raw))
     return _ok("compare_assembly_graphs", input, result, options)
 
 
-def detect_assembly_contamination(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def detect_assembly_contamination(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Not implemented: contamination screening needs a taxonomy/vector/adapter database or read coverage."""
 
     return _not_implemented(
-        "detect_assembly_contamination", input, options, "a taxonomic or contaminant reference database (for example BLAST nt, Kraken2, FCS-GX)",
+        "detect_assembly_contamination",
+        input,
+        options,
+        "a taxonomic or contaminant reference database (for example BLAST nt, Kraken2, FCS-GX)",
         "Deciding whether a contig is foreign requires comparison against reference databases; a GC or length outlier is not a contamination call.",
     )
 
 
-def detect_chimeric_contigs(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def detect_chimeric_contigs(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Not implemented: chimeric contig detection needs read or reference alignments."""
 
     return _not_implemented(
-        "detect_chimeric_contigs", input, options, "read alignments (BAM/PAF) to the contigs or a reference assembly",
+        "detect_chimeric_contigs",
+        input,
+        options,
+        "read alignments (BAM/PAF) to the contigs or a reference assembly",
         "Chimeras are detected from split or discordant alignments, which are not part of the input.",
     )
 
@@ -403,12 +545,17 @@ def detect_misassemblies(input: object, *, options: Mapping[str, object] | None 
     """Not implemented: misassembly detection needs a reference alignment or read-mapping evidence."""
 
     return _not_implemented(
-        "detect_misassemblies", input, options, "a reference genome alignment (QUAST/MUMmer) or read mappings (CRAQ/Inspector)",
+        "detect_misassemblies",
+        input,
+        options,
+        "a reference genome alignment (QUAST/MUMmer) or read mappings (CRAQ/Inspector)",
         "Misassemblies are defined relative to a reference or to read evidence, neither of which is part of the input.",
     )
 
 
-def estimate_heterozygosity(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def estimate_heterozygosity(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Estimate the SNP heterozygosity rate of a diploid from its k-mer spectrum (simple two-peak model).
 
     input: k-mer histogram ({coverage: distinct k-mers}, [[coverage, count], ...] or 'coverage count'
@@ -423,7 +570,13 @@ def estimate_heterozygosity(input: object, *, options: Mapping[str, object] | No
 
     settings = _impl.options_dict(options)
     hist = _impl.kmer_histogram(input, settings)
-    return _ok("estimate_heterozygosity", input, _impl.estimate_het(hist, settings), options, ("heuristic two-peak model; see docstring for assumptions",))
+    return _ok(
+        "estimate_heterozygosity",
+        input,
+        _impl.estimate_het(hist, settings),
+        options,
+        ("heuristic two-peak model; see docstring for assumptions",),
+    )
 
 
 def estimate_repeats(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -438,7 +591,13 @@ def estimate_repeats(input: object, *, options: Mapping[str, object] | None = No
 
     settings = _impl.options_dict(options)
     hist = _impl.kmer_histogram(input, settings)
-    return _ok("estimate_repeats", input, _impl.estimate_repeat_content(hist, settings), options, ("k-mer multiplicity estimate; assumes uniform coverage",))
+    return _ok(
+        "estimate_repeats",
+        input,
+        _impl.estimate_repeat_content(hist, settings),
+        options,
+        ("k-mer multiplicity estimate; assumes uniform coverage",),
+    )
 
 
 def estimate_size(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -457,7 +616,9 @@ def estimate_size(input: object, *, options: Mapping[str, object] | None = None)
     return _ok("estimate_size", input, _impl.estimate_genome_size(hist, settings), options)
 
 
-def extract_accessory_pangenome(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def extract_accessory_pangenome(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """List accessory pangenome genes: those present in fewer than core_threshold of the genomes, split into shell and cloud.
 
     input: gene presence/absence data (see build_pangenome). options: core_threshold (default 0.99);
@@ -467,11 +628,26 @@ def extract_accessory_pangenome(input: object, *, options: Mapping[str, object] 
     settings = _impl.options_dict(options)
     genomes, genes, rows = _impl.presence_matrix(input)
     partition = _impl.pangenome_partition(
-        genomes, genes, rows, _impl.core_threshold_option(settings), _impl.get_float(settings, "cloud_threshold", 0.15, low=0.0, high=1.0)
+        genomes,
+        genes,
+        rows,
+        _impl.core_threshold_option(settings),
+        _impl.get_float(settings, "cloud_threshold", 0.15, low=0.0, high=1.0),
     )
-    keep = ("genome_count", "total_genes", "core_threshold", "accessory_genes", "accessory_count", "shell_genes", "cloud_genes", "cloud_threshold")
+    keep = (
+        "genome_count",
+        "total_genes",
+        "core_threshold",
+        "accessory_genes",
+        "accessory_count",
+        "shell_genes",
+        "cloud_genes",
+        "cloud_threshold",
+    )
     result = {key: partition[key] for key in keep}
-    result["gene_fractions"] = {g: partition["gene_fractions"][g] for g in partition["accessory_genes"]}
+    result["gene_fractions"] = {
+        g: partition["gene_fractions"][g] for g in partition["accessory_genes"]
+    }
     return _ok("extract_accessory_pangenome", input, result, options)
 
 
@@ -484,8 +660,17 @@ def extract_core_pangenome(input: object, *, options: Mapping[str, object] | Non
 
     settings = _impl.options_dict(options)
     genomes, genes, rows = _impl.presence_matrix(input)
-    partition = _impl.pangenome_partition(genomes, genes, rows, _impl.core_threshold_option(settings))
-    keep = ("genome_count", "total_genes", "core_threshold", "core_min_genomes", "core_genes", "core_count")
+    partition = _impl.pangenome_partition(
+        genomes, genes, rows, _impl.core_threshold_option(settings)
+    )
+    keep = (
+        "genome_count",
+        "total_genes",
+        "core_threshold",
+        "core_min_genomes",
+        "core_genes",
+        "core_count",
+    )
     result = {key: partition[key] for key in keep}
     result["gene_fractions"] = {g: partition["gene_fractions"][g] for g in partition["core_genes"]}
     return _ok("extract_core_pangenome", input, result, options)
@@ -495,12 +680,17 @@ def identify_centromeres(input: object, *, options: Mapping[str, object] | None 
     """Not implemented: centromere calling has no precise sequence-only rule and needs satellite/repeat annotation."""
 
     return _not_implemented(
-        "identify_centromeres", input, options, "tandem-repeat/satellite annotation (TRF, SRF, RepeatMasker) and species-specific centromere repeat knowledge",
+        "identify_centromeres",
+        input,
+        options,
+        "tandem-repeat/satellite annotation (TRF, SRF, RepeatMasker) and species-specific centromere repeat knowledge",
         "Centromere positions are species-specific (satellite monomers, CENH3 ChIP, Hi-C); no universal documented rule exists to apply to bare contigs.",
     )
 
 
-def identify_repeats_in_assembly(input: object, *, options: Mapping[str, object] | None = None) -> object:
+def identify_repeats_in_assembly(
+    input: object, *, options: Mapping[str, object] | None = None
+) -> object:
     """Find repeated regions of an assembly as intervals covered by k-mers that occur at least min_copies times.
 
     input: assembly with sequences (FASTA text/path, {name: sequence}, list of sequences). Canonical
@@ -516,7 +706,12 @@ def identify_repeats_in_assembly(input: object, *, options: Mapping[str, object]
     copies = _impl.get_int(settings, "min_copies", 2, low=2, high=10**6) or 2
     min_length = _impl.get_int(settings, "min_length", k, low=1, high=10**9) or k
     contigs = _impl.parse_contigs(input, require_sequences=True)
-    return _ok("identify_repeats_in_assembly", input, _impl.repeats_in_assembly(contigs, k, copies, min_length), options)
+    return _ok(
+        "identify_repeats_in_assembly",
+        input,
+        _impl.repeats_in_assembly(contigs, k, copies, min_length),
+        options,
+    )
 
 
 def identify_telomeres(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -535,7 +730,12 @@ def identify_telomeres(input: object, *, options: Mapping[str, object] | None = 
     min_repeats = _impl.get_int(settings, "min_repeats", 5, low=2, high=10_000) or 5
     max_distance = _impl.get_int(settings, "max_distance", 100, low=0, high=10_000_000) or 0
     contigs = _impl.parse_contigs(input, require_sequences=True)
-    return _ok("identify_telomeres", input, _impl.telomeres(contigs, motif, min_repeats, max_distance), options)
+    return _ok(
+        "identify_telomeres",
+        input,
+        _impl.telomeres(contigs, motif, min_repeats, max_distance),
+        options,
+    )
 
 
 def parse_log(input: object, *, options: Mapping[str, object] | None = None) -> object:
@@ -569,7 +769,10 @@ def phase_assembly(input: object, *, options: Mapping[str, object] | None = None
     """Not implemented: phasing an assembly needs reads, Hi-C or parental data."""
 
     return _not_implemented(
-        "phase_assembly", input, options, "long reads, Hi-C or trio k-mers and a phasing assembler (hifiasm, HapCUT2, WhatsHap)",
+        "phase_assembly",
+        input,
+        options,
+        "long reads, Hi-C or trio k-mers and a phasing assembler (hifiasm, HapCUT2, WhatsHap)",
         "Assigning contigs or bases to haplotypes needs linking evidence that is not part of the input.",
     )
 
@@ -585,7 +788,12 @@ def plot_graph(input: object, *, options: Mapping[str, object] | None = None) ->
     settings = _impl.options_dict(options)
     graph = _impl.load_gfa(input)
     svg = _impl.graph_svg(graph)
-    result = {"svg": svg, "node_count": len(graph["segments"]), "edge_count": len(graph["links"]), "output_path": _write_output(settings, svg)}
+    result = {
+        "svg": svg,
+        "node_count": len(graph["segments"]),
+        "edge_count": len(graph["links"]),
+        "output_path": _write_output(settings, svg),
+    }
     return _ok("plot_graph", input, result, options)
 
 
@@ -593,7 +801,10 @@ def polish(input: object, *, options: Mapping[str, object] | None = None) -> obj
     """Not implemented: polishing needs reads aligned to the assembly and a polisher (Racon, Medaka, Pilon)."""
 
     return _not_implemented(
-        "polish", input, options, "sequencing reads, an aligner and a polishing tool (Racon, Medaka, Pilon, NextPolish)",
+        "polish",
+        input,
+        options,
+        "sequencing reads, an aligner and a polishing tool (Racon, Medaka, Pilon, NextPolish)",
         "Consensus correction is computed from read pileups, which are not part of the input.",
     )
 
@@ -602,7 +813,10 @@ def purge_haplotigs(input: object, *, options: Mapping[str, object] | None = Non
     """Not implemented: purging haplotigs needs read-depth and self-alignment evidence (purge_dups, Purge_Haplotigs)."""
 
     return _not_implemented(
-        "purge_haplotigs", input, options, "read coverage and contig self-alignments (purge_dups, Purge_Haplotigs)",
+        "purge_haplotigs",
+        input,
+        options,
+        "read coverage and contig self-alignments (purge_dups, Purge_Haplotigs)",
         "Haplotigs are identified from half-coverage and allelic alignment evidence that is not part of the input.",
     )
 
@@ -618,14 +832,22 @@ def remove_contamination(input: object, *, options: Mapping[str, object] | None 
 
     settings = _impl.options_dict(options)
     names = settings.get("contaminants")
-    if not isinstance(names, (list, tuple, set, frozenset)) or not all(isinstance(n, str) for n in names):
-        raise ConfigurationError("options.contaminants must be a list of contig names.", code="ASSEMBLY_OPTION", hint="Pass options={'contaminants': ['contig_3']}.")
+    if not isinstance(names, (list, tuple, set, frozenset)) or not all(
+        isinstance(n, str) for n in names
+    ):
+        raise ConfigurationError(
+            "options.contaminants must be a list of contig names.",
+            code="ASSEMBLY_OPTION",
+            hint="Pass options={'contaminants': ['contig_3']}.",
+        )
     contigs = _impl.parse_contigs(input)
     drop = set(names)
     kept = [c for c in contigs if c[0] not in drop]
     removed = [c[0] for c in contigs if c[0] in drop]
     if not kept:
-        raise ConfigurationError("removing these contigs would leave an empty assembly.", code="ASSEMBLY_OPTION")
+        raise ConfigurationError(
+            "removing these contigs would leave an empty assembly.", code="ASSEMBLY_OPTION"
+        )
     result: dict[str, object] = {
         "kept": [c[0] for c in kept],
         "removed": removed,
@@ -653,27 +875,64 @@ def run(input: object, *, options: Mapping[str, object] | None = None) -> object
     argv = _assembler_argv(settings)  # validates the settings and the tool-specific required keys
     program = argv[0]
     if shutil.which(program) is None:
-        return _not_implemented("run", input, options, f"{program} executable on PATH", f"The assembler program {program!r} is not installed or not on PATH, so nothing was run.")
+        return _not_implemented(
+            "run",
+            input,
+            options,
+            f"{program} executable on PATH",
+            f"The assembler program {program!r} is not installed or not on PATH, so nothing was run.",
+        )
     common = {"program": program, "verbose": False}
     if settings.get("timeout_seconds") is not None:
         common["timeout_seconds"] = float(settings["timeout_seconds"])  # type: ignore[arg-type]
     out = str(settings["output_directory"])
     threads = _threads(settings)
     if tool == "flye":
-        outcome = assemble_flye(_required_path(settings, "reads"), out, genome_size=str(settings["genome_size"]), platform=str(settings.get("platform", "nano-hq")), threads=threads, **common)  # type: ignore[arg-type]
+        outcome = assemble_flye(
+            _required_path(settings, "reads"),
+            out,
+            genome_size=str(settings["genome_size"]),
+            platform=str(settings.get("platform", "nano-hq")),
+            threads=threads,
+            **common,
+        )  # type: ignore[arg-type]
     elif tool == "hifiasm":
-        outcome = assemble_hifiasm(_required_path(settings, "reads"), out, threads=threads, prefix=str(settings.get("prefix", "assembly")), **common)  # type: ignore[arg-type]
+        outcome = assemble_hifiasm(
+            _required_path(settings, "reads"),
+            out,
+            threads=threads,
+            prefix=str(settings.get("prefix", "assembly")),
+            **common,
+        )  # type: ignore[arg-type]
     elif tool == "megahit":
         read2 = settings.get("read2")
-        outcome = assemble_megahit(_required_path(settings, "read1"), out, read2=None if read2 is None else str(read2), threads=threads, min_contig_length=_impl.get_int(settings, "min_contig_length", None, low=1, high=10_000_000), **common)  # type: ignore[arg-type]
+        outcome = assemble_megahit(
+            _required_path(settings, "read1"),
+            out,
+            read2=None if read2 is None else str(read2),
+            threads=threads,
+            min_contig_length=_impl.get_int(
+                settings, "min_contig_length", None, low=1, high=10_000_000
+            ),
+            **common,
+        )  # type: ignore[arg-type]
     elif tool == "shasta":
-        outcome = assemble_shasta(_required_path(settings, "reads"), out, config=str(settings.get("config", "Nanopore-May2022")), threads=None if settings.get("threads") is None else threads, **common)  # type: ignore[arg-type]
+        outcome = assemble_shasta(
+            _required_path(settings, "reads"),
+            out,
+            config=str(settings.get("config", "Nanopore-May2022")),
+            threads=None if settings.get("threads") is None else threads,
+            **common,
+        )  # type: ignore[arg-type]
     else:
         outcome = assemble_unicycler(
-            None if settings.get("read1") is None else str(settings["read1"]), out,
+            None if settings.get("read1") is None else str(settings["read1"]),
+            out,
             read2=None if settings.get("read2") is None else str(settings["read2"]),
             long_reads=None if settings.get("long_reads") is None else str(settings["long_reads"]),
-            mode=str(settings.get("mode", "normal")), threads=threads, **common,  # type: ignore[arg-type]
+            mode=str(settings.get("mode", "normal")),
+            threads=threads,
+            **common,  # type: ignore[arg-type]
         )
     return _ok("run", input, outcome, options)
 
@@ -691,7 +950,9 @@ def scaffold(input: object, *, options: Mapping[str, object] | None = None) -> o
     settings = _impl.options_dict(options)
     gap = _impl.get_int(settings, "gap", 100, low=0, high=10_000_000) or 0
     contigs = _impl.parse_contigs(input, require_sequences=True)
-    return _ok("scaffold", input, _impl.scaffold_layout(contigs, settings.get("layout"), gap), options)
+    return _ok(
+        "scaffold", input, _impl.scaffold_layout(contigs, settings.get("layout"), gap), options
+    )
 
 
 # Promote deterministic contiguity statistics to the formal local namespace;
@@ -702,9 +963,95 @@ calculate_ng50 = _calculate_ng50_native
 calculate_nx = _calculate_nx_native
 calculate_stats = _calculate_stats_native
 
-__all__ = ['add_genome_to_pangenome', 'assemble_flye', 'assemble_hifiasm', 'assemble_megahit', 'assemble_shasta', 'assemble_unicycler', 'build_chromosome_level_assembly', 'build_command', 'build_graph_genome', 'build_haplotype_assembly', 'build_pangenome', 'calculate_assembly_completeness', 'calculate_busco_completeness', 'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_pangenome_openness', 'calculate_stats', 'check_input', 'compare_assemblies', 'compare_assembly_graphs', 'detect_assembly_contamination', 'detect_chimeric_contigs', 'detect_misassemblies', 'estimate_heterozygosity', 'estimate_repeats', 'estimate_size', 'extract_accessory_pangenome', 'extract_core_pangenome', 'evaluate_merqury', 'identify_centromeres', 'identify_repeats_in_assembly', 'identify_telomeres', 'parse_log', 'parse_output', 'phase_assembly', 'plot_graph', 'polish', 'purge_haplotigs', 'remove_contamination', 'run', 'run_busco', 'scaffold']
+__all__ = [
+    "add_genome_to_pangenome",
+    "assemble_flye",
+    "assemble_hifiasm",
+    "assemble_megahit",
+    "assemble_shasta",
+    "assemble_unicycler",
+    "build_chromosome_level_assembly",
+    "build_command",
+    "build_graph_genome",
+    "build_haplotype_assembly",
+    "build_pangenome",
+    "calculate_assembly_completeness",
+    "calculate_busco_completeness",
+    "calculate_l50",
+    "calculate_n50",
+    "calculate_ng50",
+    "calculate_nx",
+    "calculate_pangenome_openness",
+    "calculate_stats",
+    "check_input",
+    "compare_assemblies",
+    "compare_assembly_graphs",
+    "detect_assembly_contamination",
+    "detect_chimeric_contigs",
+    "detect_misassemblies",
+    "estimate_heterozygosity",
+    "estimate_repeats",
+    "estimate_size",
+    "evaluate_merqury",
+    "extract_accessory_pangenome",
+    "extract_core_pangenome",
+    "identify_centromeres",
+    "identify_repeats_in_assembly",
+    "identify_telomeres",
+    "parse_log",
+    "parse_output",
+    "phase_assembly",
+    "plot_graph",
+    "polish",
+    "purge_haplotigs",
+    "remove_contamination",
+    "run",
+    "run_busco",
+    "scaffold",
+]
 
-__candidate_adapter_operations__ = set(['add_genome_to_pangenome', 'build_chromosome_level_assembly', 'build_command', 'build_graph_genome', 'build_haplotype_assembly', 'build_pangenome', 'calculate_assembly_completeness', 'calculate_busco_completeness', 'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_pangenome_openness', 'calculate_stats', 'check_input', 'compare_assemblies', 'compare_assembly_graphs', 'detect_assembly_contamination', 'detect_chimeric_contigs', 'detect_misassemblies', 'estimate_heterozygosity', 'estimate_repeats', 'estimate_size', 'extract_accessory_pangenome', 'extract_core_pangenome', 'identify_centromeres', 'identify_repeats_in_assembly', 'identify_telomeres', 'parse_log', 'parse_output', 'phase_assembly', 'plot_graph', 'polish', 'purge_haplotigs', 'remove_contamination', 'run', 'run_busco', 'scaffold']) - {'calculate_l50', 'calculate_n50', 'calculate_ng50', 'calculate_nx', 'calculate_stats'}
+__candidate_adapter_operations__ = set(
+    [
+        "add_genome_to_pangenome",
+        "build_chromosome_level_assembly",
+        "build_command",
+        "build_graph_genome",
+        "build_haplotype_assembly",
+        "build_pangenome",
+        "calculate_assembly_completeness",
+        "calculate_busco_completeness",
+        "calculate_l50",
+        "calculate_n50",
+        "calculate_ng50",
+        "calculate_nx",
+        "calculate_pangenome_openness",
+        "calculate_stats",
+        "check_input",
+        "compare_assemblies",
+        "compare_assembly_graphs",
+        "detect_assembly_contamination",
+        "detect_chimeric_contigs",
+        "detect_misassemblies",
+        "estimate_heterozygosity",
+        "estimate_repeats",
+        "estimate_size",
+        "extract_accessory_pangenome",
+        "extract_core_pangenome",
+        "identify_centromeres",
+        "identify_repeats_in_assembly",
+        "identify_telomeres",
+        "parse_log",
+        "parse_output",
+        "phase_assembly",
+        "plot_graph",
+        "polish",
+        "purge_haplotigs",
+        "remove_contamination",
+        "run",
+        "run_busco",
+        "scaffold",
+    ]
+) - {"calculate_l50", "calculate_n50", "calculate_ng50", "calculate_nx", "calculate_stats"}
 # Public integration of the reviewed P00–P45 operation packs.
 from .busco_p15_cli_functions import (
     busco_assess_completeness,

@@ -6,8 +6,9 @@ path; text subcommands (info, dataRange) return the printed text. Same contract 
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 from dnakit._verbosity import register_public as _register_public_verbose
 from dnakit.backends.external import execute_bounded_command
@@ -19,7 +20,9 @@ _SUB = "computeMatrixOperations"
 
 def _text(args: list[str], cwd: Path, deeptools_path: str | None) -> str:
     program = _program(_SUB, deeptools_path)
-    result = execute_bounded_command(program, [*args], backend_id=f"deeptools:{_SUB}", cwd=cwd, verbose=False)
+    result = execute_bounded_command(
+        program, [*args], backend_id=f"deeptools:{_SUB}", cwd=cwd, verbose=False
+    )
     if result.return_code != 0:
         raise ConfigurationError(f"computeMatrixOperations failed: {result.output[-500:]}")
     return result.output
@@ -70,7 +73,9 @@ def filter_strand(
     """Keep regions on one strand (computeMatrixOperations filterStrand)."""
     path = _existing(matrix, "matrix")
     out = _new(output, "output")
-    return _run(_SUB, ["filterStrand", "-m", str(path), "-o", str(out), "-s", strand], [out], deeptools_path)
+    return _run(
+        _SUB, ["filterStrand", "-m", str(path), "-o", str(out), "-s", strand], [out], deeptools_path
+    )
 
 
 def filter_values(
@@ -108,7 +113,15 @@ def sort_matrix(
     out = _new(output, "output")
     if not regions:
         raise ConfigurationError("sort_matrix needs the region file(s) that define the row order.")
-    args = ["sort", "-m", str(path), "-o", str(out), "-R", *[str(_existing(r, "regions")) for r in regions]]
+    args = [
+        "sort",
+        "-m",
+        str(path),
+        "-o",
+        str(out),
+        "-R",
+        *[str(_existing(r, "regions")) for r in regions],
+    ]
     return _run(_SUB, args, [out], deeptools_path)
 
 
@@ -134,7 +147,9 @@ def relabel_matrix(
     return _run(_SUB, args, [out], deeptools_path)
 
 
-def bind_rows(matrices: Sequence[str], output: str, *, deeptools_path: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def bind_rows(
+    matrices: Sequence[str], output: str, *, deeptools_path: str | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Stack computeMatrix outputs row-wise (computeMatrixOperations rbind)."""
     if len(matrices) < 2:
         raise ConfigurationError("bind_rows needs at least two matrices.")
@@ -143,7 +158,9 @@ def bind_rows(matrices: Sequence[str], output: str, *, deeptools_path: str | Non
     return _run(_SUB, ["rbind", "-m", *paths, "-o", str(out)], [out], deeptools_path)
 
 
-def bind_columns(matrices: Sequence[str], output: str, *, deeptools_path: str | None = None, verbose: bool = True) -> dict[str, Any]:
+def bind_columns(
+    matrices: Sequence[str], output: str, *, deeptools_path: str | None = None, verbose: bool = True
+) -> dict[str, Any]:
     """Join computeMatrix outputs column-wise (computeMatrixOperations cbind)."""
     if len(matrices) < 2:
         raise ConfigurationError("bind_columns needs at least two matrices.")

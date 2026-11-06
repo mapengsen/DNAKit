@@ -4,10 +4,24 @@ Nothing here executes a command, opens a network connection or modifies a file
 unless the caller passes an explicit output path.  A *workflow specification* is
 a plain mapping::
 
-    {"name": "wf",
-     "steps": [{"id": "qc", "command": ["fastqc", "reads.fq"], "depends_on": [],
-                "inputs": ["reads.fq"], "outputs": ["qc/"], "env": {"THREADS": "4"},
-                "cpus": 4, "memory_mb": 2048, "runtime_s": 600, "disk_mb": 100}, ...]}
+    {
+        "name": "wf",
+        "steps": [
+            {
+                "id": "qc",
+                "command": ["fastqc", "reads.fq"],
+                "depends_on": [],
+                "inputs": ["reads.fq"],
+                "outputs": ["qc/"],
+                "env": {"THREADS": "4"},
+                "cpus": 4,
+                "memory_mb": 2048,
+                "runtime_s": 600,
+                "disk_mb": 100,
+            },
+            ...,
+        ],
+    }
 
 ``steps`` may also be a mapping ``id -> step``.  ``needs`` is accepted as an alias of ``depends_on``.
 """
@@ -39,7 +53,9 @@ def canonical_json(value: object) -> str:
     """Compact, key-sorted JSON used for every digest in this module."""
 
     try:
-        return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+        )
     except (TypeError, ValueError) as exc:
         raise InputFormatError(
             "The value must be JSON-serializable (no NaN/Infinity, sets or custom objects).",
@@ -101,7 +117,9 @@ def load_document(value: object) -> tuple[dict[str, object], str]:
                 code="DOCUMENT_NOT_FOUND",
             )
         if path.stat().st_size > MAX_DOCUMENT_BYTES:
-            raise InputFormatError(f"File {path} exceeds {MAX_DOCUMENT_BYTES} bytes.", code="DOCUMENT_TOO_LARGE")
+            raise InputFormatError(
+                f"File {path} exceeds {MAX_DOCUMENT_BYTES} bytes.", code="DOCUMENT_TOO_LARGE"
+            )
         parsed = parse_text(path.read_text(encoding="utf-8"), source=str(path))
         source = str(path)
     elif isinstance(value, str):
@@ -114,7 +132,9 @@ def load_document(value: object) -> tuple[dict[str, object], str]:
             hint="Pass a mapping, JSON/YAML text or a file path.",
         )
     if not isinstance(parsed, dict):
-        raise InputFormatError("The document must contain a mapping at its top level.", code="INVALID_DOCUMENT")
+        raise InputFormatError(
+            "The document must contain a mapping at its top level.", code="INVALID_DOCUMENT"
+        )
     return parsed, source
 
 
@@ -122,14 +142,18 @@ def write_atomic(path: Path, payload: bytes, *, overwrite: bool) -> None:
     """Write ``payload`` through a temporary file in the target directory."""
 
     if not path.parent.is_dir():
-        raise ConfigurationError(f"Output directory does not exist: {path.parent}", code="OUTPUT_DIR_MISSING")
+        raise ConfigurationError(
+            f"Output directory does not exist: {path.parent}", code="OUTPUT_DIR_MISSING"
+        )
     if path.exists() and not overwrite:
         raise ConfigurationError(
             f"Refusing to overwrite existing file: {path}",
             code="OUTPUT_EXISTS",
             hint="Pass options={'overwrite': True} to replace it.",
         )
-    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
+    )
     temporary = Path(temporary_name)
     try:
         with os.fdopen(descriptor, "wb") as stream:
@@ -175,12 +199,19 @@ SECRET_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
         ),
     ),
 )
-_SECRET_NAME = re.compile(r"(?i)(password|passwd|secret|token|api[_-]?key|access[_-]?key|credential)")
+_SECRET_NAME = re.compile(
+    r"(?i)(password|passwd|secret|token|api[_-]?key|access[_-]?key|credential)"
+)
 _REFERENCE_VALUE = re.compile(r"^\s*(?:\$\{?[A-Za-z_]|<.*>|\{\{.*\}\}|\*+$|$)")
 
 # Commands that are rejected outright (error) ...
 DANGEROUS_COMMAND_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("RECURSIVE_DELETE_ROOT", re.compile(r"\brm\s+(?:-[A-Za-z]*[rR][A-Za-z]*\s+)+(?:--no-preserve-root\s+)?(?:/|~|\$HOME)(?:\s|$|\*)")),
+    (
+        "RECURSIVE_DELETE_ROOT",
+        re.compile(
+            r"\brm\s+(?:-[A-Za-z]*[rR][A-Za-z]*\s+)+(?:--no-preserve-root\s+)?(?:/|~|\$HOME)(?:\s|$|\*)"
+        ),
+    ),
     ("PIPE_TO_SHELL", re.compile(r"\b(?:curl|wget)\b[^|;&]*\|\s*(?:sudo\s+)?(?:ba|z|da)?sh\b")),
     ("FORK_BOMB", re.compile(r":\s*\(\s*\)\s*\{")),
     ("DISK_OVERWRITE", re.compile(r"\b(?:dd\s+[^;|&]*\bof=/dev/|mkfs(?:\.\w+)?\s|>\s*/dev/sd)")),
@@ -189,7 +220,16 @@ DANGEROUS_COMMAND_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 # ... and shell metacharacters that only warrant a warning (list-form commands never reach a shell).
 _SHELL_META = re.compile(r"[;&|`<>\n]|\$\(")
-SENSITIVE_PATH_PREFIXES = ("/etc/", "/root/", "/proc/", "/sys/", "/dev/", "/boot/", "/var/run/", "/var/lib/docker")
+SENSITIVE_PATH_PREFIXES = (
+    "/etc/",
+    "/root/",
+    "/proc/",
+    "/sys/",
+    "/dev/",
+    "/boot/",
+    "/var/run/",
+    "/var/lib/docker",
+)
 SENSITIVE_PATH_PARTS = (".ssh", ".aws", ".gnupg", ".kube", ".docker")
 
 
@@ -235,11 +275,21 @@ def scan_path(path: str) -> list[tuple[str, str, str]]:
         sensitive = normalized.startswith(SENSITIVE_PATH_PREFIXES) or normalized == "/"
         sensitive = sensitive or any(part in SENSITIVE_PATH_PARTS for part in parts)
         if sensitive:
-            findings.append(("error", "SENSITIVE_PATH", f"path {path!r} points to a sensitive location"))
+            findings.append(
+                ("error", "SENSITIVE_PATH", f"path {path!r} points to a sensitive location")
+            )
         else:
-            findings.append(("warning", "ABSOLUTE_PATH", f"path {path!r} is absolute; prefer paths relative to the workspace"))
+            findings.append(
+                (
+                    "warning",
+                    "ABSOLUTE_PATH",
+                    f"path {path!r} is absolute; prefer paths relative to the workspace",
+                )
+            )
     elif any(part in SENSITIVE_PATH_PARTS for part in parts):
-        findings.append(("error", "SENSITIVE_PATH", f"path {path!r} points to a sensitive location"))
+        findings.append(
+            ("error", "SENSITIVE_PATH", f"path {path!r} points to a sensitive location")
+        )
     return findings
 
 
@@ -263,7 +313,9 @@ def _finding(severity: str, code: str, message: str, step: str | None = None) ->
     return {"severity": severity, "code": code, "step": step, "message": message}
 
 
-def normalize_steps(document: Mapping[str, object]) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+def normalize_steps(
+    document: Mapping[str, object],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     """Return ``(steps, findings)``; each step keeps its fields and gets a list ``depends_on``."""
 
     findings: list[dict[str, object]] = []
@@ -274,39 +326,69 @@ def normalize_steps(document: Mapping[str, object]) -> tuple[list[dict[str, obje
     elif isinstance(raw, Sequence) and not isinstance(raw, (str, bytes, bytearray)):
         items = [(None, value) for value in raw]
     else:
-        return [], [_finding("error", "NO_STEPS", "the workflow needs a non-empty 'steps' list or mapping")]
+        return [], [
+            _finding("error", "NO_STEPS", "the workflow needs a non-empty 'steps' list or mapping")
+        ]
     if not items:
-        return [], [_finding("error", "NO_STEPS", "the workflow needs a non-empty 'steps' list or mapping")]
+        return [], [
+            _finding("error", "NO_STEPS", "the workflow needs a non-empty 'steps' list or mapping")
+        ]
     if len(items) > MAX_STEPS:
         raise InputFormatError(f"At most {MAX_STEPS} steps are supported.", code="TOO_MANY_STEPS")
     steps: list[dict[str, object]] = []
     seen: set[str] = set()
     for index, (key, value) in enumerate(items):
         if not isinstance(value, Mapping):
-            findings.append(_finding("error", "STEP_NOT_MAPPING", f"step {index} must be a mapping"))
+            findings.append(
+                _finding("error", "STEP_NOT_MAPPING", f"step {index} must be a mapping")
+            )
             continue
         step = {str(k): v for k, v in value.items()}
         identifier = step.get("id", key)
         if not isinstance(identifier, str) or not STEP_ID.match(identifier):
-            findings.append(_finding("error", "INVALID_STEP_ID", f"step {index} needs an id matching {STEP_ID.pattern}"))
+            findings.append(
+                _finding(
+                    "error",
+                    "INVALID_STEP_ID",
+                    f"step {index} needs an id matching {STEP_ID.pattern}",
+                )
+            )
             continue
         if identifier in seen:
-            findings.append(_finding("error", "DUPLICATE_STEP_ID", f"step id {identifier!r} is used more than once", identifier))
+            findings.append(
+                _finding(
+                    "error",
+                    "DUPLICATE_STEP_ID",
+                    f"step id {identifier!r} is used more than once",
+                    identifier,
+                )
+            )
             continue
         seen.add(identifier)
         step["id"] = identifier
         dependencies = step.get("depends_on", step.get("needs", []))
         if isinstance(dependencies, str):
             dependencies = [dependencies]
-        if not isinstance(dependencies, Sequence) or any(not isinstance(item, str) for item in dependencies):
-            findings.append(_finding("error", "INVALID_DEPENDENCIES", "depends_on must be a list of step ids", identifier))
+        if not isinstance(dependencies, Sequence) or any(
+            not isinstance(item, str) for item in dependencies
+        ):
+            findings.append(
+                _finding(
+                    "error",
+                    "INVALID_DEPENDENCIES",
+                    "depends_on must be a list of step ids",
+                    identifier,
+                )
+            )
             dependencies = []
         step["depends_on"] = list(dependencies)
         steps.append(step)
     return steps, findings
 
 
-def topological_order(steps: Sequence[Mapping[str, object]]) -> tuple[list[str] | None, list[dict[str, object]]]:
+def topological_order(
+    steps: Sequence[Mapping[str, object]],
+) -> tuple[list[str] | None, list[dict[str, object]]]:
     """Kahn ordering (ties broken by declaration order) plus dependency/cycle findings.
 
     Returns ``(order, findings)``; ``order`` is ``None`` when a dependency is unknown or a cycle exists.
@@ -320,9 +402,20 @@ def topological_order(steps: Sequence[Mapping[str, object]]) -> tuple[list[str] 
         identifier = str(step["id"])
         for dependency in step["depends_on"]:  # type: ignore[union-attr]
             if dependency == identifier:
-                findings.append(_finding("error", "SELF_DEPENDENCY", "a step cannot depend on itself", identifier))
+                findings.append(
+                    _finding(
+                        "error", "SELF_DEPENDENCY", "a step cannot depend on itself", identifier
+                    )
+                )
             elif dependency not in known:
-                findings.append(_finding("error", "UNKNOWN_DEPENDENCY", f"depends on unknown step {dependency!r}", identifier))
+                findings.append(
+                    _finding(
+                        "error",
+                        "UNKNOWN_DEPENDENCY",
+                        f"depends on unknown step {dependency!r}",
+                        identifier,
+                    )
+                )
             else:
                 graph[identifier].append(dependency)
     if findings:
@@ -365,7 +458,7 @@ def _find_cycle(graph: Mapping[str, Sequence[str]]) -> list[str]:
             advanced = False
             for neighbour in iterator:
                 if state.get(neighbour) == 1:
-                    return path[path.index(neighbour):] + [neighbour]
+                    return path[path.index(neighbour) :] + [neighbour]
                 if not state.get(neighbour):
                     state[neighbour] = 1
                     stack.append((neighbour, iter(graph[neighbour])))
@@ -404,20 +497,41 @@ def analyze_workflow(document: Mapping[str, object], *, security: bool = True) -
                     and bool(command[0].strip())
                 )
             if not valid:
-                findings.append(_finding("error", "INVALID_COMMAND", "command must be a non-empty string or list of strings", identifier))
+                findings.append(
+                    _finding(
+                        "error",
+                        "INVALID_COMMAND",
+                        "command must be a non-empty string or list of strings",
+                        identifier,
+                    )
+                )
         for field in ("cpus", "memory_mb", "runtime_s", "disk_mb"):
             if field not in step:
                 continue
             number = step[field]
             if not _is_number(number) or number < 0 or (field == "cpus" and number == 0):  # type: ignore[operator]
                 requirement = "positive" if field == "cpus" else "non-negative"
-                findings.append(_finding("error", "INVALID_RESOURCE", f"{field} must be a {requirement} finite number", identifier))
+                findings.append(
+                    _finding(
+                        "error",
+                        "INVALID_RESOURCE",
+                        f"{field} must be a {requirement} finite number",
+                        identifier,
+                    )
+                )
         for field in ("inputs", "outputs"):
             value = step.get(field, [])
             if isinstance(value, str):
                 value = [value]
             if not isinstance(value, Sequence) or any(not isinstance(item, str) for item in value):
-                findings.append(_finding("error", "INVALID_PATH_LIST", f"{field} must be a list of path strings", identifier))
+                findings.append(
+                    _finding(
+                        "error",
+                        "INVALID_PATH_LIST",
+                        f"{field} must be a list of path strings",
+                        identifier,
+                    )
+                )
         if "env" in step and not isinstance(step["env"], Mapping):
             findings.append(_finding("error", "INVALID_ENV", "env must be a mapping", identifier))
     if security:
@@ -431,7 +545,9 @@ def analyze_workflow(document: Mapping[str, object], *, security: bool = True) -
     }
 
 
-def _security_findings(document: Mapping[str, object], steps: Sequence[Mapping[str, object]]) -> list[dict[str, object]]:
+def _security_findings(
+    document: Mapping[str, object], steps: Sequence[Mapping[str, object]]
+) -> list[dict[str, object]]:
     findings: list[dict[str, object]] = []
     for step in steps:
         identifier = str(step["id"])
@@ -440,26 +556,68 @@ def _security_findings(document: Mapping[str, object], steps: Sequence[Mapping[s
             joined = command if isinstance(command, str) else " ".join(command_tokens(command))
             for code, pattern in DANGEROUS_COMMAND_PATTERNS:
                 if pattern.search(joined):
-                    findings.append(_finding("error", code, "command matches a dangerous-command rule", identifier))
+                    findings.append(
+                        _finding(
+                            "error", code, "command matches a dangerous-command rule", identifier
+                        )
+                    )
             if isinstance(command, str) and _SHELL_META.search(command):
-                findings.append(_finding("warning", "SHELL_METACHARACTERS", "string command contains shell metacharacters; use a list-form argv", identifier))
-            elif not isinstance(command, str) and any(_SHELL_META.search(token) for token in command_tokens(command)[:1]):
-                findings.append(_finding("warning", "SHELL_METACHARACTERS", "the program name contains shell metacharacters", identifier))
+                findings.append(
+                    _finding(
+                        "warning",
+                        "SHELL_METACHARACTERS",
+                        "string command contains shell metacharacters; use a list-form argv",
+                        identifier,
+                    )
+                )
+            elif not isinstance(command, str) and any(
+                _SHELL_META.search(token) for token in command_tokens(command)[:1]
+            ):
+                findings.append(
+                    _finding(
+                        "warning",
+                        "SHELL_METACHARACTERS",
+                        "the program name contains shell metacharacters",
+                        identifier,
+                    )
+                )
         for field in ("inputs", "outputs"):
             value = step.get(field, [])
-            for path in [value] if isinstance(value, str) else (value if isinstance(value, Sequence) else []):
+            for path in (
+                [value]
+                if isinstance(value, str)
+                else (value if isinstance(value, Sequence) else [])
+            ):
                 if isinstance(path, str):
                     for severity, code, message in scan_path(path):
                         findings.append(_finding(severity, code, message, identifier))
         env = step.get("env")
         if isinstance(env, Mapping):
             for name, value in env.items():
-                if _SECRET_NAME.search(str(name)) and isinstance(value, str) and not _REFERENCE_VALUE.match(value):
-                    findings.append(_finding("error", "SECRET_IN_ENV", f"env {name!r} holds a literal secret-like value ({_mask(value)})", identifier))
+                if (
+                    _SECRET_NAME.search(str(name))
+                    and isinstance(value, str)
+                    and not _REFERENCE_VALUE.match(value)
+                ):
+                    findings.append(
+                        _finding(
+                            "error",
+                            "SECRET_IN_ENV",
+                            f"env {name!r} holds a literal secret-like value ({_mask(value)})",
+                            identifier,
+                        )
+                    )
     for location, text in _walk_strings(document):
         step_id = _step_of(location, steps)
         for hit in scan_secrets(text):
-            findings.append(_finding("error", "SECRET_DETECTED", f"{hit['rule']} at {location}: {hit['masked']}", step_id))
+            findings.append(
+                _finding(
+                    "error",
+                    "SECRET_DETECTED",
+                    f"{hit['rule']} at {location}: {hit['masked']}",
+                    step_id,
+                )
+            )
     # Deduplicate (a literal env secret is reported by both the env rule and the generic scan).
     unique: dict[tuple[object, ...], dict[str, object]] = {}
     for item in findings:
@@ -530,10 +688,15 @@ def estimate_resources(
     for identifier in order:
         if end[identifier] > start[identifier]:
             step = by_id[identifier]
-            cpus, memory = resource(step, "cpus", default_cpus), resource(step, "memory_mb", default_memory_mb)
+            cpus, memory = (
+                resource(step, "cpus", default_cpus),
+                resource(step, "memory_mb", default_memory_mb),
+            )
             events.append((start[identifier], 1, cpus, memory))
             events.append((end[identifier], 0, -cpus, -memory))
-    events.sort(key=lambda item: (item[0], item[1]))  # at equal times, ends (0) are processed before starts (1)
+    events.sort(
+        key=lambda item: (item[0], item[1])
+    )  # at equal times, ends (0) are processed before starts (1)
     cpus_now = memory_now = peak_cpus = peak_memory = 0.0
     concurrent = peak_concurrent = 0
     for _, kind, cpu_delta, memory_delta in events:
@@ -546,7 +709,8 @@ def estimate_resources(
         "wall_time_s": wall,
         "critical_path": critical,
         "total_cpu_seconds": sum(
-            resource(by_id[item], "cpus", default_cpus) * resource(by_id[item], "runtime_s", default_runtime_s)
+            resource(by_id[item], "cpus", default_cpus)
+            * resource(by_id[item], "runtime_s", default_runtime_s)
             for item in order
         ),
         "peak_cpus": peak_cpus,

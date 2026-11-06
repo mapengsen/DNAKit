@@ -12,8 +12,8 @@ import pytest
 pytest.importorskip("umi_tools")
 pysam = pytest.importorskip("pysam")
 
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
-from dnakit.sequencing_qc import umi_tools_gap_wrappers as wrappers  # noqa: E402
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
+from dnakit.sequencing_qc import umi_tools_gap_wrappers as wrappers
 
 REPO = Path(__file__).resolve().parents[3]
 DATA = REPO / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
@@ -57,7 +57,9 @@ def tagged_bam(tmp_path: Path) -> Path:
     return sorted_bam
 
 
-def _cell_fastq(tmp_path: Path, name: str, cell_length: int = 8, umi_length: int = 4) -> tuple[Path, set[str]]:
+def _cell_fastq(
+    tmp_path: Path, name: str, cell_length: int = 8, umi_length: int = 4
+) -> tuple[Path, set[str]]:
     """Synthetic barcode reads: 30 real cells with 40-120 reads each, plus 300 barcodes with 1-2 reads.
 
     Read sequences come from the shared reads.fastq. Returns the FASTQ path and the set of real cell barcodes.
@@ -80,7 +82,9 @@ def _cell_fastq(tmp_path: Path, name: str, cell_length: int = 8, umi_length: int
     for index, cell in enumerate(plan):
         sequence = sequences[index % len(sequences)][:60]
         umi = random_bases(umi_length)
-        records.append(f"@read{index:05d}\n{cell}{umi}{sequence}\n+\n{'I' * (cell_length + umi_length + len(sequence))}\n")
+        records.append(
+            f"@read{index:05d}\n{cell}{umi}{sequence}\n+\n{'I' * (cell_length + umi_length + len(sequence))}\n"
+        )
     path = tmp_path / name
     path.write_text("".join(records))
     return path, set(true_cells)
@@ -93,8 +97,14 @@ def barcode_fastq(tmp_path: Path) -> tuple[Path, set[str]]:
 
 def test_count_per_gene_counts_umi_groups(tagged_bam: Path, tmp_path: Path) -> None:
     out = tmp_path / "gene_counts.tsv"
-    result = wrappers.umi_count_per_gene(str(tagged_bam), str(out), gene_tag="XT", extract_umi_method="tag",
-                                         umi_tag="RX", verbose=False)
+    result = wrappers.umi_count_per_gene(
+        str(tagged_bam),
+        str(out),
+        gene_tag="XT",
+        extract_umi_method="tag",
+        umi_tag="RX",
+        verbose=False,
+    )
     assert result["status"] == "completed", result["log_tail"]
     lines = out.read_text().splitlines()
     assert lines[0] == "gene\tcount"
@@ -107,8 +117,9 @@ def test_count_needs_a_gene_definition(tagged_bam: Path, tmp_path: Path) -> None
     with pytest.raises(ConfigurationError):
         wrappers.umi_count_per_gene(str(tagged_bam), str(tmp_path / "x.tsv"), verbose=False)
     with pytest.raises(ConfigurationError):
-        wrappers.umi_count_per_gene(str(tagged_bam), str(tmp_path / "y.tsv"), gene_tag="XT", per_contig=True,
-                                    verbose=False)
+        wrappers.umi_count_per_gene(
+            str(tagged_bam), str(tmp_path / "y.tsv"), gene_tag="XT", per_contig=True, verbose=False
+        )
 
 
 def test_count_table_counts_umis_per_gene(tmp_path: Path) -> None:
@@ -122,7 +133,9 @@ def test_count_table_counts_umis_per_gene(tmp_path: Path) -> None:
 
 def test_dedup_removes_duplicates(tagged_bam: Path, tmp_path: Path) -> None:
     out = tmp_path / "dedup.bam"
-    result = wrappers.umi_dedup_bam(str(tagged_bam), str(out), extract_umi_method="tag", umi_tag="RX", verbose=False)
+    result = wrappers.umi_dedup_bam(
+        str(tagged_bam), str(out), extract_umi_method="tag", umi_tag="RX", verbose=False
+    )
     assert result["status"] == "completed", result["log_tail"]
     before = sum(1 for _ in pysam.AlignmentFile(str(tagged_bam)))
     after = sum(1 for _ in pysam.AlignmentFile(str(out)))
@@ -132,8 +145,14 @@ def test_dedup_removes_duplicates(tagged_bam: Path, tmp_path: Path) -> None:
 def test_group_tags_reads_and_writes_the_table(tagged_bam: Path, tmp_path: Path) -> None:
     out = tmp_path / "grouped.bam"
     table = tmp_path / "grouped.tsv"
-    result = wrappers.umi_group_bam(str(tagged_bam), str(out), group_tsv=str(table), extract_umi_method="tag",
-                                    umi_tag="RX", verbose=False)
+    result = wrappers.umi_group_bam(
+        str(tagged_bam),
+        str(out),
+        group_tsv=str(table),
+        extract_umi_method="tag",
+        umi_tag="RX",
+        verbose=False,
+    )
     assert result["status"] == "completed", result["log_tail"]
     assert result["outputs"] == [str(out), str(table)]
     header = table.read_text().splitlines()[0].split("\t")
@@ -142,10 +161,14 @@ def test_group_tags_reads_and_writes_the_table(tagged_bam: Path, tmp_path: Path)
     assert tagged, "reads should carry the BX group tag"
 
 
-def test_extract_moves_the_barcode_into_read_names(barcode_fastq: tuple[Path, set[str]], tmp_path: Path) -> None:
+def test_extract_moves_the_barcode_into_read_names(
+    barcode_fastq: tuple[Path, set[str]], tmp_path: Path
+) -> None:
     source, _cells = barcode_fastq
     out = tmp_path / "extracted.fastq"
-    result = wrappers.umi_extract_to_names(str(source), str(out), bc_pattern="CCCCCCCCNNNN", verbose=False)
+    result = wrappers.umi_extract_to_names(
+        str(source), str(out), bc_pattern="CCCCCCCCNNNN", verbose=False
+    )
     assert result["status"] == "completed", result["log_tail"]
     first_header = out.read_text().splitlines()[0]
     raw_sequence = source.read_text().splitlines()[1]
@@ -153,31 +176,53 @@ def test_extract_moves_the_barcode_into_read_names(barcode_fastq: tuple[Path, se
     assert first_header == expected_header
 
 
-def test_extract_refuses_bad_arguments(tmp_path: Path, barcode_fastq: tuple[Path, set[str]]) -> None:
+def test_extract_refuses_bad_arguments(
+    tmp_path: Path, barcode_fastq: tuple[Path, set[str]]
+) -> None:
     source, _cells = barcode_fastq
     with pytest.raises(ConfigurationError):
-        wrappers.umi_extract_to_names(str(source), str(tmp_path / "a.fq"), bc_pattern="CCCCCCCC", verbose=False)
+        wrappers.umi_extract_to_names(
+            str(source), str(tmp_path / "a.fq"), bc_pattern="CCCCCCCC", verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        wrappers.umi_extract_to_names(str(source), str(tmp_path / "b.fq"), bc_pattern="CCCCNNNN",
-                                      read2_out=str(tmp_path / "r2.fq"), verbose=False)
+        wrappers.umi_extract_to_names(
+            str(source),
+            str(tmp_path / "b.fq"),
+            bc_pattern="CCCCNNNN",
+            read2_out=str(tmp_path / "r2.fq"),
+            verbose=False,
+        )
 
 
-def test_whitelist_recovers_the_real_cells(barcode_fastq: tuple[Path, set[str]], tmp_path: Path) -> None:
+def test_whitelist_recovers_the_real_cells(
+    barcode_fastq: tuple[Path, set[str]], tmp_path: Path
+) -> None:
     source, true_cells = barcode_fastq
     out = tmp_path / "whitelist.tsv"
-    result = wrappers.umi_whitelist_cells(str(source), str(out), bc_pattern="CCCCCCCCNNNN", verbose=False)
+    result = wrappers.umi_whitelist_cells(
+        str(source), str(out), bc_pattern="CCCCCCCCNNNN", verbose=False
+    )
     assert result["status"] == "completed", result["log_tail"]
     barcodes = {line.split("\t")[0] for line in out.read_text().splitlines() if line}
     assert barcodes == true_cells
 
 
-def test_whitelist_refuses_a_pattern_without_cell_bases(barcode_fastq: tuple[Path, set[str]], tmp_path: Path) -> None:
+def test_whitelist_refuses_a_pattern_without_cell_bases(
+    barcode_fastq: tuple[Path, set[str]], tmp_path: Path
+) -> None:
     source, _cells = barcode_fastq
     with pytest.raises(ConfigurationError):
-        wrappers.umi_whitelist_cells(str(source), str(tmp_path / "w.tsv"), bc_pattern="NNNNNNNN", verbose=False)
+        wrappers.umi_whitelist_cells(
+            str(source), str(tmp_path / "w.tsv"), bc_pattern="NNNNNNNN", verbose=False
+        )
     with pytest.raises(ConfigurationError):
-        wrappers.umi_whitelist_cells(str(source), str(tmp_path / "w2.tsv"), bc_pattern="CCCCCCCCNNNN",
-                                     knee_method="sideways", verbose=False)
+        wrappers.umi_whitelist_cells(
+            str(source),
+            str(tmp_path / "w2.tsv"),
+            bc_pattern="CCCCCCCCNNNN",
+            knee_method="sideways",
+            verbose=False,
+        )
 
 
 def test_prepare_for_rsem_writes_a_bam(tagged_bam: Path, tmp_path: Path) -> None:
@@ -190,13 +235,23 @@ def test_prepare_for_rsem_writes_a_bam(tagged_bam: Path, tmp_path: Path) -> None
 
 def test_missing_program_gives_install_hint(tmp_path: Path, tagged_bam: Path) -> None:
     with pytest.raises(BackendUnavailableError) as info:
-        wrappers.umi_count_per_gene(str(tagged_bam), str(tmp_path / "m.tsv"), gene_tag="XT",
-                                    umi_tools_path=str(tmp_path / "no-umi-tools"), verbose=False)
+        wrappers.umi_count_per_gene(
+            str(tagged_bam),
+            str(tmp_path / "m.tsv"),
+            gene_tag="XT",
+            umi_tools_path=str(tmp_path / "no-umi-tools"),
+            verbose=False,
+        )
     assert "pip install umi_tools" in info.value.hint
 
 
 def test_public_names_are_exported() -> None:
     assert set(wrappers.__all__) == {
-        "umi_count_per_gene", "umi_count_table", "umi_dedup_bam", "umi_extract_to_names",
-        "umi_group_bam", "umi_prepare_bam_for_rsem", "umi_whitelist_cells",
+        "umi_count_per_gene",
+        "umi_count_table",
+        "umi_dedup_bam",
+        "umi_extract_to_names",
+        "umi_group_bam",
+        "umi_prepare_bam_for_rsem",
+        "umi_whitelist_cells",
     }

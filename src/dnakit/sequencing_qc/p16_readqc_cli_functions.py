@@ -17,12 +17,33 @@ from dnakit.bioinformatics import _p16_cli as cli
 from dnakit.bioinformatics._common import require
 from dnakit.exceptions import ConfigurationError
 
-_FILTLONG = cli.Tool("filtlong", "filtlong", "Install Filtlong (conda install -c bioconda filtlong) and put it on PATH or pass filtlong_path.",
-                     "0.3.1", "https://github.com/rrwick/Filtlong", ("--version",), r"v(\d+(?:\.\d+)+)")
-_NANOFILT = cli.Tool("nanofilt", "NanoFilt", "Install NanoFilt (pip install nanofilt or conda install -c bioconda nanofilt) and put it on PATH or pass nanofilt_path.",
-                     "2.8.0", "https://doi.org/10.1093/bioinformatics/bty149", ("--version",), None)
-_PORECHOP = cli.Tool("porechop", "porechop", "Install Porechop (conda install -c bioconda porechop) and put it on PATH or pass porechop_path.",
-                     "0.2.4", "https://github.com/rrwick/Porechop", ("--version",), None)
+_FILTLONG = cli.Tool(
+    "filtlong",
+    "filtlong",
+    "Install Filtlong (conda install -c bioconda filtlong) and put it on PATH or pass filtlong_path.",
+    "0.3.1",
+    "https://github.com/rrwick/Filtlong",
+    ("--version",),
+    r"v(\d+(?:\.\d+)+)",
+)
+_NANOFILT = cli.Tool(
+    "nanofilt",
+    "NanoFilt",
+    "Install NanoFilt (pip install nanofilt or conda install -c bioconda nanofilt) and put it on PATH or pass nanofilt_path.",
+    "2.8.0",
+    "https://doi.org/10.1093/bioinformatics/bty149",
+    ("--version",),
+    None,
+)
+_PORECHOP = cli.Tool(
+    "porechop",
+    "porechop",
+    "Install Porechop (conda install -c bioconda porechop) and put it on PATH or pass porechop_path.",
+    "0.2.4",
+    "https://github.com/rrwick/Porechop",
+    ("--version",),
+    None,
+)
 
 
 def filter_long_reads_with_reference(
@@ -56,7 +77,9 @@ def filter_long_reads_with_reference(
     arguments: list[str] = []
     references = [illumina_reads_1 is not None, assembly is not None]
     if all(references) or (illumina_reads_2 is not None and illumina_reads_1 is None):
-        raise ConfigurationError("Give illumina_reads_1 (and optionally illumina_reads_2) or assembly, not both.")
+        raise ConfigurationError(
+            "Give illumina_reads_1 (and optionally illumina_reads_2) or assembly, not both."
+        )
     if illumina_reads_1 is not None:
         arguments += ["--short_1", str(cli.existing_file(illumina_reads_1, "illumina_reads_1"))]
     if illumina_reads_2 is not None:
@@ -72,18 +95,31 @@ def filter_long_reads_with_reference(
         if not has_reference:
             raise ConfigurationError("split needs a reference (illumina_reads_1 or assembly).")
         arguments += ["--split", str(cli.integer(split, "split", minimum=1))]
-    for flag, value, name, lower in (("--min_length", min_length, "min_length", 0), ("--max_length", max_length, "max_length", 1),
-                                     ("--target_bases", target_bases, "target_bases", 1)):
+    for flag, value, name, lower in (
+        ("--min_length", min_length, "min_length", 0),
+        ("--max_length", max_length, "max_length", 1),
+        ("--target_bases", target_bases, "target_bases", 1),
+    ):
         if value is not None:
             arguments += [flag, str(cli.integer(value, name, minimum=lower))]
     if min_mean_quality is not None:
-        arguments += ["--min_mean_q", str(cli.number(min_mean_quality, "min_mean_quality", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "--min_mean_q",
+            str(cli.number(min_mean_quality, "min_mean_quality", minimum=0.0, maximum=100.0)),
+        ]
     if keep_percent is not None:
-        arguments += ["--keep_percent", str(cli.number(keep_percent, "keep_percent", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "--keep_percent",
+            str(cli.number(keep_percent, "keep_percent", minimum=0.0, maximum=100.0)),
+        ]
     arguments.append(str(source))
-    record = cli.invoke(_FILTLONG, arguments, cwd=target.parent, stdout_to=target, explicit=filtlong_path)
+    record = cli.invoke(
+        _FILTLONG, arguments, cwd=target.parent, stdout_to=target, explicit=filtlong_path
+    )
     kept = sum(1 for index, _ in enumerate(cli.open_text(target)) if index % 4 == 0)
-    return cli.finish(record, "filter_long_reads_with_reference", reads_kept=kept, output=str(target))
+    return cli.finish(
+        record, "filter_long_reads_with_reference", reads_kept=kept, output=str(target)
+    )
 
 
 def filter_nanopore_reads_by_gc_summary(
@@ -124,11 +160,17 @@ def filter_nanopore_reads_by_gc_summary(
     if max_length is not None:
         arguments += ["--maxlength", str(cli.integer(max_length, "max_length", minimum=1))]
     if not arguments:
-        raise ConfigurationError("Give at least one filter (min_gc, max_gc, sequencing_summary, min_quality, ...).")
+        raise ConfigurationError(
+            "Give at least one filter (min_gc, max_gc, sequencing_summary, min_quality, ...)."
+        )
     arguments.append(str(source))
-    record = cli.invoke(_NANOFILT, arguments, cwd=target.parent, stdout_to=target, explicit=nanofilt_path)
+    record = cli.invoke(
+        _NANOFILT, arguments, cwd=target.parent, stdout_to=target, explicit=nanofilt_path
+    )
     kept = sum(1 for index, _ in enumerate(cli.open_text(target)) if index % 4 == 0)
-    return cli.finish(record, "filter_nanopore_reads_by_gc_summary", reads_kept=kept, output=str(target))
+    return cli.finish(
+        record, "filter_nanopore_reads_by_gc_summary", reads_kept=kept, output=str(target)
+    )
 
 
 def filter_nanopore_reads_by_start_time(
@@ -152,12 +194,15 @@ def filter_nanopore_reads_by_start_time(
     target = cli.new_file(output_path, "output_path")
     lower, upper = parser(cli.text(time_from, "time_from")), parser(cli.text(time_to, "time_to"))
     total = kept = 0
-    with gzip.open(source, "rt", encoding="utf-8") as handle, target.open("x", encoding="utf-8") as out:
+    with (
+        gzip.open(source, "rt", encoding="utf-8") as handle,
+        target.open("x", encoding="utf-8") as out,
+    ):
         while True:
             header = handle.readline()
             if not header:
                 break
-            sequence, plus, quality = handle.readline(), handle.readline(), handle.readline()
+            sequence, _plus, quality = handle.readline(), handle.readline(), handle.readline()
             if not header.startswith("@") or not quality:
                 raise ConfigurationError(f"{source.name} is not a four-line FASTQ file.")
             fields = [item for item in header[1:].split() if item.startswith("start_time")]
@@ -166,10 +211,21 @@ def filter_nanopore_reads_by_start_time(
             total += 1
             if lower <= parser(fields[0].split("=")[1]) <= upper:
                 kept += 1
-                out.write(header.rstrip("\n") + "\n" + sequence.rstrip("\n") + "\n+\n" + quality.rstrip("\n") + "\n")
+                out.write(
+                    header.rstrip("\n")
+                    + "\n"
+                    + sequence.rstrip("\n")
+                    + "\n+\n"
+                    + quality.rstrip("\n")
+                    + "\n"
+                )
     return {
-        "status": "completed", "backend": "nanofilt-scripts", "operation": "filter_nanopore_reads_by_start_time",
-        "reads_total": total, "reads_kept": kept, "outputs": [str(target)],
+        "status": "completed",
+        "backend": "nanofilt-scripts",
+        "operation": "filter_nanopore_reads_by_start_time",
+        "reads_total": total,
+        "reads_kept": kept,
+        "outputs": [str(target)],
         "provenance": {"tool": "NanoFilt scripts/timefilt.py", "reimplemented_in": "dnakit"},
     }
 
@@ -193,8 +249,12 @@ def trim_nanopore_adapters_discard_middle(
     arguments = ["-i", str(source), "-o", str(target), "-t", str(cli.threads_value(threads))]
     if cli.flag(discard_middle, "discard_middle"):
         arguments.append("--discard_middle")
-    record = cli.invoke(_PORECHOP, arguments, cwd=target.parent, expected=[target], explicit=porechop_path)
-    return cli.finish(record, "trim_nanopore_adapters_discard_middle", discard_middle=discard_middle)
+    record = cli.invoke(
+        _PORECHOP, arguments, cwd=target.parent, expected=[target], explicit=porechop_path
+    )
+    return cli.finish(
+        record, "trim_nanopore_adapters_discard_middle", discard_middle=discard_middle
+    )
 
 
 def demultiplex_nanopore_barcodes(
@@ -223,13 +283,23 @@ def demultiplex_nanopore_barcodes(
     if cli.flag(require_two_barcodes, "require_two_barcodes"):
         arguments.append("--require_two_barcodes")
     if barcode_threshold is not None:
-        arguments += ["--barcode_threshold", str(cli.number(barcode_threshold, "barcode_threshold", minimum=0.0, maximum=100.0))]
+        arguments += [
+            "--barcode_threshold",
+            str(cli.number(barcode_threshold, "barcode_threshold", minimum=0.0, maximum=100.0)),
+        ]
     if cli.flag(discard_unassigned, "discard_unassigned"):
         arguments.append("--discard_unassigned")
     out_dir.parent.mkdir(parents=True, exist_ok=True)
-    record = cli.invoke(_PORECHOP, arguments, cwd=out_dir.parent, expected=[out_dir], explicit=porechop_path)
-    bins = {p.name: sum(1 for i, _ in enumerate(p.open()) if i % 4 == 0) for p in sorted(out_dir.glob("*.fastq*"))}
-    return cli.finish(record, "demultiplex_nanopore_barcodes", reads_per_bin=bins, output_directory=str(out_dir))
+    record = cli.invoke(
+        _PORECHOP, arguments, cwd=out_dir.parent, expected=[out_dir], explicit=porechop_path
+    )
+    bins = {
+        p.name: sum(1 for i, _ in enumerate(p.open()) if i % 4 == 0)
+        for p in sorted(out_dir.glob("*.fastq*"))
+    }
+    return cli.finish(
+        record, "demultiplex_nanopore_barcodes", reads_per_bin=bins, output_directory=str(out_dir)
+    )
 
 
 __all__ = [

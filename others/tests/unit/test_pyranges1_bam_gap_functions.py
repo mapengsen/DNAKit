@@ -11,11 +11,12 @@ import pytest
 pysam = pytest.importorskip("pysam")
 pyranges1 = pytest.importorskip("pyranges1")
 
-from dnakit.annotation import pyranges1_bam_gap_functions as m  # noqa: E402
-from dnakit.exceptions import BackendUnavailableError, ConfigurationError  # noqa: E402
+from dnakit.annotation import pyranges1_bam_gap_functions as m
+from dnakit.exceptions import BackendUnavailableError, ConfigurationError
 
 DATA = (
-    Path(__file__).resolve().parents[3] / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
+    Path(__file__).resolve().parents[3]
+    / "paper/write_paper/figure/fig2/task_coverage/consistency/data"
 )
 SHARED_BAM = DATA / "reads.bam"
 HEADER = {

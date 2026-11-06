@@ -33,9 +33,37 @@ _TOOL = _cli.Tool(
 )
 _FORMATS = ("fastq", "fasta")
 _BAM_DUMP_FIELDS = (
-    "Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen",
-    "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup",
-    "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip",
+    "Read",
+    "Ref",
+    "Pos",
+    "EndPos",
+    "MapQual",
+    "Acc",
+    "Match",
+    "Mismatch",
+    "Ins",
+    "Del",
+    "AlnLen",
+    "ReadLen",
+    "RefLen",
+    "RefAln",
+    "RefCov",
+    "ReadAln",
+    "ReadCov",
+    "Strand",
+    "MeanQual",
+    "LeftClip",
+    "RightClip",
+    "Flags",
+    "IsSec",
+    "IsSup",
+    "ReadSeq",
+    "ReadAlnSeq",
+    "LeftSoftClipSeq",
+    "RightSoftClipSeq",
+    "RightSoftClip",
+    "LeftHardClip",
+    "RightHardClip",
 )
 _PASS = re.compile(r"Pass records:\s*(\d+)\s+Discarded lines:\s*(\d+)")
 _COMMON = re.compile(r"(\d+) common/shared sequences saved")
@@ -62,7 +90,12 @@ def _run(
 ) -> dict[str, Any]:
     arguments = [subcommand, *([] if keep_info else ["--quiet"]), *arguments]
     return _cli.invoke(
-        _TOOL, arguments, cwd=cwd, expected=expected, explicit=seqkit_path, timeout_seconds=timeout_seconds
+        _TOOL,
+        arguments,
+        cwd=cwd,
+        expected=expected,
+        explicit=seqkit_path,
+        timeout_seconds=timeout_seconds,
     )
 
 
@@ -108,21 +141,35 @@ def seqkit_faidx(
             raise ConfigurationError("output_path is required when regions are given.")
     if output_path is not None:
         if regions is None:
-            raise ConfigurationError("output_path needs regions; the index itself is written next to the FASTA file.")
+            raise ConfigurationError(
+                "output_path needs regions; the index itself is written next to the FASTA file."
+            )
         target = _cli.new_file(output_path, "output_path")
         flags += ["-o", str(target)]
         expected.append(target)
     index = source.with_name(source.name + (".seqkit.fai" if full_head else ".fai"))
     record = _run(
-        "faidx", [*flags, *positional], cwd=source.parent, expected=expected + [index], seqkit_path=seqkit_path,
+        "faidx",
+        [*flags, *positional],
+        cwd=source.parent,
+        expected=expected + [index],
+        seqkit_path=seqkit_path,
         timeout_seconds=timeout_seconds,
     )
     rows = _cli.read_table(
-        index, header=False, names=("name", "length", "offset", "line_bases", "line_width"), text_columns=frozenset({"name"})
+        index,
+        header=False,
+        names=("name", "length", "offset", "line_bases", "line_width"),
+        text_columns=frozenset({"name"}),
     )
     return _cli.finish(
-        record, "build_fasta_index", index_file=str(index), sequence_count=len(rows), index=rows[:10000],
-        output=str(target) if target else None, extracted_records=_count_records(target) if target else None,
+        record,
+        "build_fasta_index",
+        index_file=str(index),
+        sequence_count=len(rows),
+        index=rows[:10000],
+        output=str(target) if target else None,
+        extracted_records=_count_records(target) if target else None,
     )
 
 
@@ -157,17 +204,28 @@ def seqkit_sanitize_fastx(
         arguments += ["-O", _cli.choice(output_format, _FORMATS, "output_format")]
     if _cli.flag(allow_gaps, "allow_gaps"):
         arguments.append("-A")
-    arguments += ["-b", str(_cli.integer(quality_ascii_base, "quality_ascii_base", minimum=0, maximum=126))]
+    arguments += [
+        "-b",
+        str(_cli.integer(quality_ascii_base, "quality_ascii_base", minimum=0, maximum=126)),
+    ]
     arguments += ["-o", str(target), str(source)]
     record = _run(
-        "sana", arguments, cwd=target.parent, expected=[target], seqkit_path=seqkit_path, timeout_seconds=timeout_seconds,
+        "sana",
+        arguments,
+        cwd=target.parent,
+        expected=[target],
+        seqkit_path=seqkit_path,
+        timeout_seconds=timeout_seconds,
         keep_info=True,
     )
     match = _PASS.search(record["log_tail"])
     return _cli.finish(
-        record, "sanitize_broken_fastx", output=str(target),
+        record,
+        "sanitize_broken_fastx",
+        output=str(target),
         passed_records=int(match.group(1)) if match else None,
-        discarded_lines=int(match.group(2)) if match else None, output_record_count=_count_records(target),
+        discarded_lines=int(match.group(2)) if match else None,
+        output_record_count=_count_records(target),
     )
 
 
@@ -197,12 +255,22 @@ def seqkit_stream_directory(
     """
     folder = _cli.existing_directory(directory, "directory")
     target = _cli.new_file(output_path, "output_path")
-    arguments = ["-i", _cli.choice(format, _FORMATS, "format"), "-d", str(_cli.integer(minimum_size_increase_kb, "minimum_size_increase_kb", minimum=1))]
-    arguments += ["-b", str(_cli.integer(quality_ascii_base, "quality_ascii_base", minimum=0, maximum=126))]
+    arguments = [
+        "-i",
+        _cli.choice(format, _FORMATS, "format"),
+        "-d",
+        str(_cli.integer(minimum_size_increase_kb, "minimum_size_increase_kb", minimum=1)),
+    ]
+    arguments += [
+        "-b",
+        str(_cli.integer(quality_ascii_base, "quality_ascii_base", minimum=0, maximum=126)),
+    ]
     if _cli.flag(find_only, "find_only"):
         arguments.append("-f")
     elif time_limit is None:
-        raise ConfigurationError("time_limit is required unless find_only is True, otherwise scat would never stop.")
+        raise ConfigurationError(
+            "time_limit is required unless find_only is True, otherwise scat would never stop."
+        )
     if time_limit is not None:
         if not isinstance(time_limit, str) or not _DURATION.match(time_limit):
             raise ConfigurationError("time_limit must be a duration such as '30s', '5m' or '1h'.")
@@ -213,14 +281,21 @@ def seqkit_stream_directory(
         arguments += ["-r", _cli.free_text(file_pattern, "file_pattern")]
     arguments += ["-o", str(target)]
     record = _cli.invoke(
-        _TOOL, ["scat", *arguments, str(folder)], cwd=target.parent, expected=[target], explicit=seqkit_path,
+        _TOOL,
+        ["scat", *arguments, str(folder)],
+        cwd=target.parent,
+        expected=[target],
+        explicit=seqkit_path,
         timeout_seconds=timeout_seconds,
     )
     match = _PASS.search(record["log_tail"])
     return _cli.finish(
-        record, "realtime_fastx_directory_streaming", output=str(target),
+        record,
+        "realtime_fastx_directory_streaming",
+        output=str(target),
         passed_records=int(match.group(1)) if match else None,
-        discarded_lines=int(match.group(2)) if match else None, output_record_count=_count_records(target),
+        discarded_lines=int(match.group(2)) if match else None,
+        output_record_count=_count_records(target),
     )
 
 
@@ -266,10 +341,19 @@ def seqkit_common_records(
         arguments.append("-e")
     arguments += ["-o", str(target), *map(str, files)]
     record = _run(
-        "common", arguments, cwd=target.parent, expected=[target], seqkit_path=seqkit_path, timeout_seconds=timeout_seconds
+        "common",
+        arguments,
+        cwd=target.parent,
+        expected=[target],
+        seqkit_path=seqkit_path,
+        timeout_seconds=timeout_seconds,
     )
     return _cli.finish(
-        record, "common_records_by_id_name_or_sequence", output=str(target), key=chosen, input_file_count=len(files),
+        record,
+        "common_records_by_id_name_or_sequence",
+        output=str(target),
+        key=chosen,
+        input_file_count=len(files),
         shared_record_count=_count_records(target),
     )
 
@@ -307,7 +391,12 @@ def seqkit_replace_header(
     source = _cli.existing_file(input_path, "input_path")
     target = _cli.new_file(output_path, "output_path")
     arguments = _common_flags(threads)
-    arguments += ["-p", _cli.free_text(pattern, "pattern"), "-r", _cli.free_text(replacement, "replacement")]
+    arguments += [
+        "-p",
+        _cli.free_text(pattern, "pattern"),
+        "-r",
+        _cli.free_text(replacement, "replacement"),
+    ]
     if _cli.flag(ignore_case, "ignore_case"):
         arguments.append("-i")
     if key_value_file is not None:
@@ -326,12 +415,24 @@ def seqkit_replace_header(
             arguments.append("--f-use-regexp")
     arguments += ["-o", str(target), str(source)]
     record = _run(
-        "replace", arguments, cwd=target.parent, expected=[target], seqkit_path=seqkit_path, timeout_seconds=timeout_seconds
+        "replace",
+        arguments,
+        cwd=target.parent,
+        expected=[target],
+        seqkit_path=seqkit_path,
+        timeout_seconds=timeout_seconds,
     )
-    return _cli.finish(record, "replace_header_regex", output=str(target), output_record_count=_count_records(target))
+    return _cli.finish(
+        record,
+        "replace_header_regex",
+        output=str(target),
+        output_record_count=_count_records(target),
+    )
 
 
-def _toolbox(yaml: str, bam: Path, output: Path | None, seqkit_path: str | None, timeout: float) -> dict[str, Any]:
+def _toolbox(
+    yaml: str, bam: Path, output: Path | None, seqkit_path: str | None, timeout: float
+) -> dict[str, Any]:
     arguments = ["bam", "--quiet", "-Z", "-T", yaml]
     expected: list[Path] = []
     if output is not None:
@@ -339,7 +440,12 @@ def _toolbox(yaml: str, bam: Path, output: Path | None, seqkit_path: str | None,
         expected.append(output)
     arguments.append(str(bam))
     return _cli.invoke(
-        _TOOL, arguments, cwd=(output or bam).parent, expected=expected, explicit=seqkit_path, timeout_seconds=timeout
+        _TOOL,
+        arguments,
+        cwd=(output or bam).parent,
+        expected=expected,
+        explicit=seqkit_path,
+        timeout_seconds=timeout,
     )
 
 
@@ -378,9 +484,24 @@ def seqkit_bam_dump_records(
     record = _toolbox(yaml, bam, None, seqkit_path, timeout_seconds)
     if not tsv.is_file():
         raise ConfigurationError("SeqKit did not write the dump table.")
-    rows = _cli.read_table(tsv, text_columns=frozenset(name for name in chosen if name in {"Read", "Ref", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq"}))
+    rows = _cli.read_table(
+        tsv,
+        text_columns=frozenset(
+            name
+            for name in chosen
+            if name
+            in {"Read", "Ref", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq"}
+        ),
+    )
     record["outputs"] = [str(tsv)]
-    return _cli.finish(record, "bam_record_feature_dump", tsv=str(tsv), fields=chosen, row_count=len(rows), rows=rows[:10000])
+    return _cli.finish(
+        record,
+        "bam_record_feature_dump",
+        tsv=str(tsv),
+        fields=chosen,
+        row_count=len(rows),
+        rows=rows[:10000],
+    )
 
 
 def seqkit_bam_filter_by_alignment_context(
@@ -429,12 +550,21 @@ def seqkit_bam_filter_by_alignment_context(
     if tsv_path is not None:
         table = _cli.new_file(tsv_path, "tsv_path")
         parts.append(f"Tsv: {_yaml_text(str(table), 'tsv_path')}")
-    record = _toolbox("AlnContext: {" + ", ".join(parts) + "}", bam, target, seqkit_path, timeout_seconds)
-    rows = _cli.read_table(table, text_columns=frozenset({"Read", "Ref", "StartSeq", "EndSeq"})) if table and table.is_file() else []
+    record = _toolbox(
+        "AlnContext: {" + ", ".join(parts) + "}", bam, target, seqkit_path, timeout_seconds
+    )
+    rows = (
+        _cli.read_table(table, text_columns=frozenset({"Read", "Ref", "StartSeq", "EndSeq"}))
+        if table and table.is_file()
+        else []
+    )
     if table is not None and table.is_file():
         record["outputs"].append(str(table))
     return _cli.finish(
-        record, "bam_filter_by_alignment_context", output_bam=str(target), tsv=str(table) if table else None,
+        record,
+        "bam_filter_by_alignment_context",
+        output_bam=str(target),
+        tsv=str(table) if table else None,
         context_rows=rows[:10000],
     )
 
@@ -455,14 +585,23 @@ def seqkit_bam_accuracy_stats(
     """
     bam = _cli.existing_file(bam_path, "bam_path")
     tsv = _cli.new_file(tsv_path, "tsv_path")
-    record = _toolbox(f"AccStats: {{Tsv: {_yaml_text(str(tsv), 'tsv_path')}}}\nSink: true", bam, None, seqkit_path, timeout_seconds)
+    record = _toolbox(
+        f"AccStats: {{Tsv: {_yaml_text(str(tsv), 'tsv_path')}}}\nSink: true",
+        bam,
+        None,
+        seqkit_path,
+        timeout_seconds,
+    )
     if not tsv.is_file():
         raise ConfigurationError("SeqKit did not write the accuracy table.")
     rows = _cli.read_table(tsv)
     record["outputs"] = [str(tsv)]
     row = rows[0] if rows else {}
     return _cli.finish(
-        record, "bam_weighted_mean_accuracy", tsv=str(tsv), accuracy_mean=row.get("AccMean"),
+        record,
+        "bam_weighted_mean_accuracy",
+        tsv=str(tsv),
+        accuracy_mean=row.get("AccMean"),
         accuracy_weighted_mean=row.get("WeightedAccMean"),
     )
 
