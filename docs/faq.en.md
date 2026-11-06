@@ -132,7 +132,7 @@ The Levenshtein formulas follow Cherednichenko & Poptsova, *Data augmentation wi
 
 The article has an [official GitHub repository](https://github.com/powidla/nonB-DNA-structures-generation), with the relevant code in [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb). As of 2026-09-02, the repository declares no open-source license, and its notebook uses fixed 100-bp preprocessing, flattened one-hot/KDTree operations, and chunk-local calculations that do not fully match the published equations. DNAKit therefore does not copy that code: it independently implements the published formulas with its bounded Levenshtein routine, performs no implicit padding or truncation, and does not claim exact reproduction of the notebook values in Table 2.
 
-Levenshtein results are unnormalized counts of edit operations. Larger values mean greater diversity or greater distance from the reference library; compare datasets with similar sequence-length distributions.
+Levenshtein results are unnormalized counts of edit operations. Larger values mean greater diversity or greater distance from the reference library; compare datasets with similar sequence-length distributions. The reports also give a 0–1 version in which each pair's distance is divided by the longer length (`mean_pairwise_normalized_levenshtein_distance`, `mean_nearest_normalized_levenshtein_distance`), which can be compared across lengths.
 
 ## What are the calculation basis and references for physical and chemical properties? {#physicochemical-references}
 

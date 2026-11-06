@@ -717,7 +717,7 @@ print(report.metrics["mean_pairwise_levenshtein_distance"])
 3.0
 ```
 
-该值是未归一化的编辑操作数，越大表示集合内部序列差异越大；少于两条序列时公式无定义，返回 `None`。不同序列长度的数据集不宜直接比较。
+该值是未归一化的编辑操作数，越大表示集合内部序列差异越大；少于两条序列时公式无定义，返回 `None`。不同序列长度的数据集不宜直接比较原始值；同一报告中的 `mean_pairwise_normalized_levenshtein_distance` 把每对距离除以较长序列的长度，范围为 0–1，可用于跨长度比较。
 
 <a id="eval-008-novelty"></a>
 
@@ -759,7 +759,7 @@ print(report.metrics["mean_nearest_levenshtein_distance"])
 2.0
 ```
 
-该值是未归一化的编辑操作数，越大表示查询集合离参考集合越远。此模式不使用相似度、coverage 或 `copy_threshold`；逐条 `exact_match` 表示最近编辑距离为 `0`，汇总 `exact_match_rate` 表示完整序列精确一致的比例。DNAKit 不会自动填充或截断序列。
+该值是未归一化的编辑操作数，越大表示查询集合离参考集合越远；同一报告中的 `mean_nearest_normalized_levenshtein_distance` 是 0–1 的归一化版本。此模式不使用相似度、coverage 或 `copy_threshold`；逐条 `exact_match` 表示最近编辑距离为 `0`，汇总 `exact_match_rate` 表示完整序列精确一致的比例。DNAKit 不会自动填充或截断序列。
 
 ## 评价背景 5 {#evaluation-background-5}
 

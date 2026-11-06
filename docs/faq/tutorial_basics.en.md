@@ -703,7 +703,7 @@ print(report.metrics["mean_pairwise_levenshtein_distance"])
 3.0
 ```
 
-The value is an unnormalized count of edit operations; larger values mean greater within-set sequence differences. The formula is undefined for fewer than two records and returns `None`. Avoid directly comparing datasets with different sequence-length distributions.
+The value is an unnormalized count of edit operations; larger values mean greater within-set sequence differences. The formula is undefined for fewer than two records and returns `None`. Avoid directly comparing raw values across datasets with different sequence-length distributions; `mean_pairwise_normalized_levenshtein_distance` in the same report divides each pair's distance by the longer length, lies in 0–1, and can be compared across lengths.
 
 <a id="eval-008-novelty"></a>
 
@@ -745,7 +745,7 @@ print(report.metrics["mean_nearest_levenshtein_distance"])
 2.0
 ```
 
-The value is an unnormalized count of edit operations; larger values mean the queries are farther from the reference set. This mode does not use similarity, coverage, or `copy_threshold`; per-query `exact_match` means that the nearest edit distance is `0`, and `exact_match_rate` summarizes full-record exact equality. DNAKit does not pad or truncate sequences automatically.
+The value is an unnormalized count of edit operations; larger values mean the queries are farther from the reference set. `mean_nearest_normalized_levenshtein_distance` in the same report is its 0–1 normalized version. This mode does not use similarity, coverage, or `copy_threshold`; per-query `exact_match` means that the nearest edit distance is `0`, and `exact_match_rate` summarizes full-record exact equality. DNAKit does not pad or truncate sequences automatically.
 
 ## Evaluation background 5 {#evaluation-background-5}
 

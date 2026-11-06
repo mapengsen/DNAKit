@@ -142,6 +142,17 @@ def require_pairwise_compatible(sequence: DNASequence, *, role: str) -> None:
         )
 
 
+def normalized_edit_distance(distance: float, left_length: int, right_length: int) -> float:
+    """Divide a unit-cost edit distance by the longer length, giving a value in [0, 1].
+
+    A unit-cost Levenshtein distance never exceeds the longer sequence length, so the
+    ratio is bounded without clipping. Two empty sequences have distance 0.0.
+    """
+
+    longest = max(left_length, right_length)
+    return 0.0 if longest == 0 else distance / longest
+
+
 def pair_similarity(
     left: DNARecord,
     right: DNARecord,
@@ -166,8 +177,11 @@ def pair_similarity(
         )
     if method == "edit":
         distance_result = edit_distance(left, right, max_cells=max_alignment_cells)
-        denominator = max(left.sequence.symbol_length, right.sequence.symbol_length)
-        return (1.0 if denominator == 0 else 1.0 - distance_result.distance / denominator), None
+        return 1.0 - normalized_edit_distance(
+            distance_result.distance,
+            left.sequence.symbol_length,
+            right.sequence.symbol_length,
+        ), None
     if left.sequence.symbol_length < k or right.sequence.symbol_length < k:
         return (1.0 if left.sequence.symbols == right.sequence.symbols else 0.0), None
     return kmer_similarity(left, right, k=k, canonical=canonical).value, None

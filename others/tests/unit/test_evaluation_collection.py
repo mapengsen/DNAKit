@@ -81,14 +81,34 @@ def test_levenshtein_diversity_uses_the_published_mean_pairwise_formula() -> Non
     singleton = evaluate_diversity(_set(("only", "AAAA")), config=config)
 
     assert diversity.method == "mean-pairwise-levenshtein-distance"
-    assert diversity.algorithm_version == "eval-diversity-levenshtein-v1"
+    assert diversity.algorithm_version == "eval-diversity-levenshtein-v2"
     assert diversity.metrics["score"] == pytest.approx(4 / 3)
     assert diversity.metrics["mean_pairwise_levenshtein_distance"] == pytest.approx(4 / 3)
+    # Pair distances 1, 2, 1 over length 4.
+    assert diversity.metrics["mean_pairwise_normalized_levenshtein_distance"] == pytest.approx(
+        1 / 3
+    )
     assert "minimum_pairwise_levenshtein_distance" not in diversity.metrics
     assert "maximum_pairwise_levenshtein_distance" not in diversity.metrics
     assert diversity.metrics["pairwise_comparison_count"] == 3
     assert diversity.parameters["normalization"] == "none"
     assert singleton.metrics["score"] is None
+    assert singleton.metrics["mean_pairwise_normalized_levenshtein_distance"] is None
+
+
+def test_normalized_diversity_divides_each_pair_by_its_longer_length() -> None:
+    records = _set(("a", "AAAA"), ("b", "AA"), ("c", "CCCCCCCC"))
+
+    diversity = evaluate_diversity(records, config=DiversityEvaluationConfig(workers=1))
+
+    # Raw distances 2, 8, 8; longer lengths 4, 8, 8.
+    assert diversity.metrics["mean_pairwise_levenshtein_distance"] == pytest.approx(6.0)
+    assert diversity.metrics["mean_pairwise_normalized_levenshtein_distance"] == pytest.approx(
+        (0.5 + 1.0 + 1.0) / 3
+    )
+    # Dividing the mean distance by the mean length instead would exceed 1 here.
+    assert 6.0 / (14 / 3) > 1.0
+    assert "max(|x_i|,|x_j|)" in cast(str, diversity.parameters["normalized_formula"])
 
 
 def test_parallel_diversity_matches_serial_and_respects_limits() -> None:

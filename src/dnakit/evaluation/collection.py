@@ -23,6 +23,7 @@ from ._shared import (
     EvaluationInput,
     enforce_pair_limit,
     materialize_input,
+    normalized_edit_distance,
     pair_count,
     pair_similarity,
     record_for,
@@ -197,25 +198,37 @@ def _init_diversity_worker(sequences: tuple[str, ...], max_cells: int) -> None:
     _WORKER_MAX_CELLS = max_cells
 
 
-def _diversity_worker_distance(pair: tuple[int, int]) -> float:
+def _diversity_worker_distance(pair: tuple[int, int]) -> tuple[float, float]:
     left, right = pair
-    return edit_distance(
-        _WORKER_SEQUENCES[left],
-        _WORKER_SEQUENCES[right],
-        max_cells=_WORKER_MAX_CELLS,
-        verbose=False,
+    left_sequence = _WORKER_SEQUENCES[left]
+    right_sequence = _WORKER_SEQUENCES[right]
+    distance = edit_distance(
+        left_sequence, right_sequence, max_cells=_WORKER_MAX_CELLS, verbose=False
     ).distance
+    return distance, normalized_edit_distance(
+        distance, left_sequence.symbol_length, right_sequence.symbol_length
+    )
 
 
 def _diversity_pair_distances(
     records: tuple[DNARecord, ...], config: DiversityEvaluationConfig
-) -> Iterable[float]:
+) -> Iterable[tuple[float, float]]:
+    """Yield (raw, max-length-normalized) Levenshtein distance for every unordered pair."""
+
     comparisons = pair_count(len(records))
     if config.workers == 1 or comparisons < 2:
         for left, right in _pair_indices(len(records), show_progress=config.show_progress):
-            yield edit_distance(
+            distance = edit_distance(
                 records[left], records[right], max_cells=config.limits.max_alignment_cells
             ).distance
+            yield (
+                distance,
+                normalized_edit_distance(
+                    distance,
+                    records[left].sequence.symbol_length,
+                    records[right].sequence.symbol_length,
+                ),
+            )
         return
 
     longest = sorted(records, key=lambda record: record.sequence.symbol_length, reverse=True)[:2]
@@ -265,20 +278,27 @@ def _evaluate_levenshtein_diversity(
         require_pairwise_compatible(record.sequence, role="diversity")
     pair_distances: list[float] | None = [] if plot else None
     total_distance = 0.0
-    for distance in _diversity_pair_distances(records, config):
+    total_normalized = 0.0
+    for distance, normalized in _diversity_pair_distances(records, config):
         total_distance += distance
+        total_normalized += normalized
         if pair_distances is not None:
             pair_distances.append(distance)
     mean_distance = total_distance / comparisons if comparisons else None
+    mean_normalized = total_normalized / comparisons if comparisons else None
     result = report(
         name="diversity",
         method="mean-pairwise-levenshtein-distance",
-        version="eval-diversity-levenshtein-v1",
+        version="eval-diversity-levenshtein-v2",
         parameters={
             "calculation": config.calculation,
             "formula": "sum_{i != j} Levenshtein(x_i,x_j) / (n*(n-1))",
             "distance_units": "edit operations",
             "normalization": "none",
+            "normalized_formula": (
+                "sum_{i != j} [Levenshtein(x_i,x_j) / max(|x_i|,|x_j|)] / (n*(n-1))"
+            ),
+            "normalized_range": "[0, 1]; each pair is divided by its longer length",
             "sequence_preprocessing": "none; no padding or truncation",
             "ambiguity_policy": "literal IUPAC symbols",
             "topology_policy": "linearized at stored origin; no circular rotation",
@@ -294,6 +314,7 @@ def _evaluate_levenshtein_diversity(
             "record_count": len(records),
             "mean_pair_distance": mean_distance,
             "mean_pairwise_levenshtein_distance": mean_distance,
+            "mean_pairwise_normalized_levenshtein_distance": mean_normalized,
             "pairwise_comparison_count": comparisons,
         },
     )

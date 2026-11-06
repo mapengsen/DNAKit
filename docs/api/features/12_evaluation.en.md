@@ -4,7 +4,7 @@ Comprehensive evaluation of DNA sequences or data sets in terms of legality, uni
 
 Reference similarity and distribution similarity are listed separately in [similarity calculation](09_similarity_alignment.md) under data evaluation. Reference-library similarity and novelty use a caller-supplied `ReferenceLibrary`; reference-genome consistency uses a local FASTA or PAF. Novelty is not an experimental conclusion or task-model prediction.
 
-With default settings, Validity, Uniqueness, Diversity and Novelty follow published definitions: reference-genome consistency aligns with minimap2 and reports the BI/GI and aligned fraction of Huang et al.; Uniqueness uses `exact` deduplication (MOSES, seqme); Diversity and Novelty use raw Levenshtein distance (Jain et al. 2022; Cherednichenko & Poptsova 2025; D3LM). Each section gives the full references.
+With default settings, Validity, Uniqueness, Diversity and Novelty follow published definitions: reference-genome consistency aligns with minimap2 and reports the BI/GI and aligned fraction of Huang et al.; Uniqueness uses `exact` deduplication (MOSES, seqme); Diversity and Novelty use raw Levenshtein distance (Jain et al. 2022; Cherednichenko & Poptsova 2025; D3LM), and also report a 0–1 version in which each pair is divided by its longer length, for comparison across lengths. Each section gives the full references.
 
 The following API brackets list all direct call parameters; `[required]` and `[optional]` are parameter descriptions, not Python syntax.
 
@@ -154,11 +154,18 @@ print(report.metrics["duplicate_groups"])  # (("sequence_1", "sequence_2"),)
 ## 3) Diversity {#3-eval-006-diversity}
 
 - **Purpose:** Calculate the mean raw Levenshtein distance over all sequence pairs, measuring how different the members of a generated set are.
-- **Method:** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered pairs; returns `None` for fewer than two sequences.
+- **Method:** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered pairs; returns `None` for fewer than two sequences. The same run also reports the normalized version `Σ(i≠j) [Levenshtein(xᵢ,xⱼ) / max(|xᵢ|,|xⱼ|)] / [n(n−1)]`: each pair's distance is divided by the longer of the two lengths before averaging. An edit distance never exceeds the longer length, so every pair lies in 0–1 and so does the mean, without clipping. 0 means identical and 1 means completely different. The division must be per pair: dividing the mean distance by the mean length can exceed 1 when lengths differ.
 - **References:** The formula is equation (2) of Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022 ([PMLR](https://proceedings.mlr.press/v162/jain22a.html)); Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440 ([DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)) use Levenshtein distance as its distance for DNA generation, and D3LM (Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026) uses the same formula in Appendix B.
 - **API:**  `dnakit.evaluation.evaluate_diversity(value[required], config[optional], plot[optional])`; `config` uses `dnakit.evaluation.DiversityEvaluationConfig`.
 - **Input:**  `DNA([...])` or another DNA record collection; set `show_progress=True` to display pairwise progress. The default uses up to 16 processes. Set `DiversityEvaluationConfig(workers=8)` to adjust this, or `workers=1` for serial execution; the metric is unchanged.
-- **Output:** Returns `EvaluationReport`; `metrics` contains mean pairwise Levenshtein distance `mean_pairwise_levenshtein_distance` [Recommended metric].
+- **Output:** Returns `EvaluationReport`; `metrics` contains mean pairwise Levenshtein distance `mean_pairwise_levenshtein_distance` [Recommended metric] and its 0–1 normalized version `mean_pairwise_normalized_levenshtein_distance`. The first matches the published definition above and is directly comparable with paper results; the second is easier to read at a glance and compares across lengths.
+- **Random reference level for the normalized value:** For uniform random ACGT sequences (equal length, 50% GC), the mean pairwise normalized distance is listed below; use it as a reference line for "as spread out as random sequences". It is not an upper bound: sets mixing very different compositions (for example low- and high-GC sequences, or homopolymer runs) can exceed it. Real genomic sequences are usually below it, so a value close to random is not necessarily better; to judge where a model stands, compute the same metric on the reference set (real data) for comparison.
+
+| Sequence length | 50 bp | 100 bp | 200 bp | 500 bp | 1 kb | 2 kb | 5 kb |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Normalized distance of random sequences | 0.58 | 0.56 | 0.54 | 0.53 | 0.53 | 0.52 | 0.52 |
+
+Values are means over random sequence pairs (2,000 pairs up to 1 kb and 400 pairs for longer sequences, random seed 20261106). Biased composition lowers the random level: at 200 bp it is about 0.53 for 35% GC and 0.47 for 20% GC.
 - **Optional plots:** `plot=True` saves `diversity_mean_bar.png` and `diversity_pairwise_distance_histogram.png` in the current working directory (default `False`; existing files with the same names are overwritten). The histogram includes every unordered sequence pair; plotting requires `dnakit[bio-plots]`.
 - **Example code:**
 
@@ -168,7 +175,8 @@ from dnakit.evaluation import evaluate_diversity
 
 records = DNA(["AAAA", "AAAT", "CCCC"])
 report = evaluate_diversity(records)
-print(report.metrics["mean_pairwise_levenshtein_distance"])
+print(report.metrics["mean_pairwise_levenshtein_distance"])             # (1 + 4 + 4) / 3 = 3.0
+print(report.metrics["mean_pairwise_normalized_levenshtein_distance"])  # (1/4 + 4/4 + 4/4) / 3 = 0.75
 ```
 
 Multicore execution is the default. To change the process count, import `DiversityEvaluationConfig` from `dnakit.evaluation` and call `evaluate_diversity(records, config=DiversityEvaluationConfig(workers=8))`. This uses processes because the pure-Python edit-distance loop is limited by the GIL.
@@ -176,7 +184,8 @@ Multicore execution is the default. To change the process count, import `Diversi
 - **Example output:**
 
 ```text
-3
+3.0
+0.75
 ```
 
 For canonical k-mer Jaccard distance, use `evaluate_kmer_diversity(records, k=6)`. Its `mean_pair_distance` is the mean `1 − Jaccard` over unordered pairs; `mean_nearest_neighbor_distance` averages each sequence's shortest distance to another member. Both are `None` for fewer than two records. Reverse-complement canonicalization is enabled by default, and `EvaluationLimits` bounds pairwise work. This is a different metric from raw Levenshtein distance.
@@ -193,11 +202,12 @@ print(report.metrics["mean_nearest_neighbor_distance"])
 ## 4) Novelty {#4-eval-008-novelty}
 
 - **Purpose:** Measure how far generated sequences are from a reference library (usually the training set), and report the fraction of full-record exact copies alongside.
-- **Method:** By default (`novelty_calculation="levenshtein"`), each query's novelty is its raw Levenshtein distance to the nearest reference record, and `score` is the mean: `Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`, in edit operations without normalization. `exact_match_rate` is the fraction of queries literally equal to any full reference record; it checks every reference record, independently of nearest-hit ranking. The alternative `novelty_calculation="similarity"` reports `novelty = 1 - nearest-reference similarity` (0–1), with similarity set by `method` (k-mer by default). Neither method uses a `0.9` cutoff to produce `is_novel` or `novel_fraction`; `copy_threshold` applies only to memorization/near-copy evaluation.
+- **Method:** By default (`novelty_calculation="levenshtein"`), each query's novelty is its raw Levenshtein distance to the nearest reference record, and `score` is the mean: `Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`, in edit operations without normalization. The same run also reports the 0–1 normalized version `(1/N) Σᵢ minₛ [Levenshtein(xᵢ, sₛ) / max(|xᵢ|,|sₛ|)]`: each pair's distance is divided by the longer length, then the minimum is taken per query and averaged. The normalized minimum is selected on its own, so with references of different lengths it can come from a reference other than `nearest_reference_id`; it equals the result of `novelty_calculation="similarity", method="edit"`. `exact_match_rate` is the fraction of queries literally equal to any full reference record; it checks every reference record, independently of nearest-hit ranking. The alternative `novelty_calculation="similarity"` reports `novelty = 1 - nearest-reference similarity` (0–1), with similarity set by `method` (k-mer by default). Neither method uses a `0.9` cutoff to produce `is_novel` or `novel_fraction`; `copy_threshold` applies only to memorization/near-copy evaluation.
 - **References:** The default formula is equation (3) of Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022 ([PMLR](https://proceedings.mlr.press/v162/jain22a.html)); Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440 ([DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)) use Levenshtein distance for DNA, and D3LM (Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026) uses the same formula in Appendix B, equation (9). `exact_match_rate` is the complement of the Novelty of MOSES (Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644, [DOI](https://doi.org/10.3389/fphar.2020.565644)) and seqme (Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025) (the fraction of sequences absent from the reference set): their Novelty = `1 - exact_match_rate`.
 - **API:**  `dnakit.evaluation.evaluate_novelty(queries[required], reference[required], config[optional], plot[optional])`; `config` uses `dnakit.evaluation.ReferenceSearchConfig`.
 - **Input:**  a `DNA([...])` query collection and a non-empty `ReferenceLibrary`; `show_progress=True` displays progress. The default Levenshtein method computes an edit distance for every query–reference pair and uses up to 16 processes by default; set `ReferenceSearchConfig(workers=8)` to adjust this, or `workers=1` for serial execution. With fewer queries than processes, the reference library is split into blocks, so even one query runs in parallel. The result does not depend on the process count, and ties still resolve to the earliest reference record. Very large references can still take long; switch to `novelty_calculation="similarity"` for them. `workers` applies only to the Levenshtein novelty method.
-- **Output:** Returns `EvaluationReport`; `metrics` contains `score` [Recommended metric] (mean novelty), `exact_match_rate` and `exact_match_count`; the Levenshtein method also reports the mean, minimum and maximum nearest edit distance.
+- **Output:** Returns `EvaluationReport`; `metrics` contains `score` [Recommended metric] (mean novelty), `exact_match_rate` and `exact_match_count`; the Levenshtein method also reports the mean, minimum and maximum nearest edit distance, plus the 0–1 normalized mean `mean_nearest_normalized_levenshtein_distance`; each query's normalized value is `nearest_normalized_levenshtein_distance` in `entries`.
+- **Random reference level for the normalized value:** Novelty uses the distance to the nearest reference, so the larger the reference library, the lower the Novelty of random sequences. There is therefore no universal random level, and it is usually below the Diversity random level in the table above. For a reference line, generate random ACGT sequences with the same lengths as the queries, run `evaluate_novelty` against the same reference library, and read its `mean_nearest_normalized_levenshtein_distance`.
 - **Optional plots:** `plot=True` saves `novelty_batch_summary.png` (mean novelty and exact-match rate), `novelty_distribution.png` (per-query novelty), and `novelty_nearest_levenshtein.png` (raw nearest-reference edit distances) in the current working directory. The default is `False`; existing files with these names are overwritten. Nonempty text in query-record `metadata["batch"]` groups the summary bars by batch; otherwise they show one evaluated set. With the default Levenshtein method, per-query novelty already is the nearest raw edit distance, so the two histograms show the same distances; the similarity method performs an additional Levenshtein scan for the third plot. Plotting requires `dnakit[bio-plots]`.
 - **Example code:**
 
@@ -216,6 +226,7 @@ queries = DNA(["AAAA", "GGGG"])
 
 report = evaluate_novelty(queries, reference)
 print(report.metrics["score"])             # mean nearest edit distance: (0 + 4) / 2 = 2.0
+print(report.metrics["mean_nearest_normalized_levenshtein_distance"])  # (0/4 + 4/4) / 2 = 0.5
 print(report.metrics["exact_match_rate"])  # full-record exact-match rate: 0.5
 
 similarity = evaluate_novelty(
@@ -226,10 +237,11 @@ similarity = evaluate_novelty(
 print(similarity.metrics["score"])         # similarity method: mean 1 - identity = 0.5
 ```
 
-- **Example output：**
+- **Example output:**
 
 ```text
 2.0
+0.5
 0.5
 0.5
 ```

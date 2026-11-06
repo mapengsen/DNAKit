@@ -164,14 +164,18 @@ def test_levenshtein_novelty_uses_the_published_nearest_reference_formula() -> N
     )
 
     assert novelty.method == "mean-nearest-reference-levenshtein-distance"
-    assert novelty.algorithm_version == "eval-novelty-levenshtein-v2"
+    assert novelty.algorithm_version == "eval-novelty-levenshtein-v3"
     assert novelty.metrics["score"] == pytest.approx(5 / 3)
     assert novelty.metrics["mean_nearest_levenshtein_distance"] == pytest.approx(5 / 3)
+    assert novelty.metrics["mean_nearest_normalized_levenshtein_distance"] == pytest.approx(
+        (0.0 + 0.25 + 1.0) / 3
+    )
     assert novelty.metrics["exact_match_count"] == 1
     assert novelty.metrics["exact_match_rate"] == pytest.approx(1 / 3)
     assert novelty.metrics["pairwise_comparison_count"] == 6
     assert novelty.entries[0].metrics["nearest_levenshtein_distance"] == 0.0
     assert novelty.entries[1].metrics["nearest_levenshtein_distance"] == 1.0
+    assert novelty.entries[1].metrics["nearest_normalized_levenshtein_distance"] == 0.25
     assert novelty.entries[2].metrics["nearest_reference_id"] == "train-a"
     assert novelty.provenance.reference is not None
     assert novelty.provenance.reference.checksum == reference.digest
@@ -286,6 +290,32 @@ def test_novelty_defaults_to_mean_nearest_levenshtein_distance() -> None:
     assert [entry.metrics["novelty"] for entry in report.entries] == [0.0, 1.0, 4.0]
     assert report.metrics["score"] == pytest.approx(5 / 3)
     assert report.metrics["exact_match_rate"] == pytest.approx(1 / 3)
+
+
+@pytest.mark.parametrize("workers", [1, 4])
+def test_normalized_novelty_takes_its_own_nearest_reference(workers: int) -> None:
+    reference = create_reference_library(
+        _set(("short", "CCCC"), ("long", "AAAAAAAATT")),
+        name="training",
+        version="1",
+        source="local:test",
+    )
+    queries = _set(("query", "AAAA"))
+
+    report = evaluate_novelty(queries, reference, config=ReferenceSearchConfig(workers=workers))
+    entry = report.entries[0].metrics
+
+    # Raw nearest is "short" (4 edits); normalized nearest is "long" (6 / 10 < 4 / 4).
+    assert entry["nearest_reference_id"] == "short"
+    assert entry["nearest_levenshtein_distance"] == 4.0
+    assert entry["nearest_normalized_levenshtein_distance"] == pytest.approx(0.6)
+    assert report.metrics["mean_nearest_normalized_levenshtein_distance"] == pytest.approx(0.6)
+    edit_similarity = evaluate_novelty(
+        queries,
+        reference,
+        config=ReferenceSearchConfig(novelty_calculation="similarity", method="edit"),
+    )
+    assert edit_similarity.metrics["score"] == pytest.approx(0.6)
 
 
 def _novelty_fixture() -> tuple[DNASet, ReferenceLibrary]:

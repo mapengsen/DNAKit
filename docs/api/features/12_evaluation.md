@@ -4,7 +4,7 @@
 
 参考相似度和分布相似度在数据评价下单列于[相似度计算](09_similarity_alignment.md)。参考库相似度、新颖性等指标使用调用方提供的 `ReferenceLibrary`；参考基因组一致性使用本地 FASTA 或 PAF。novelty 不是实验结论或任务模型预测。
 
-默认设置下，Validity、Uniqueness、Diversity 和 Novelty 按以下文献的定义计算：参考基因组一致性默认用 minimap2 比对，报告 Huang et al. 的 BI/GI 与比对比例；Uniqueness 默认 `exact` 去重（MOSES、seqme）；Diversity 和 Novelty 默认使用原始 Levenshtein 距离（Jain et al. 2022；Cherednichenko & Poptsova 2025；D3LM）。各节列出完整引用。
+默认设置下，Validity、Uniqueness、Diversity 和 Novelty 按以下文献的定义计算：参考基因组一致性默认用 minimap2 比对，报告 Huang et al. 的 BI/GI 与比对比例；Uniqueness 默认 `exact` 去重（MOSES、seqme）；Diversity 和 Novelty 默认使用原始 Levenshtein 距离（Jain et al. 2022；Cherednichenko & Poptsova 2025；D3LM），并同时报告每对序列除以较长长度后的 0–1 版本，便于跨长度比较。各节列出完整引用。
 
 以下 API 括号内列出全部直接调用参数；`[必须]` 和 `[可选]` 是参数说明，不是 Python 语法。
 
@@ -154,11 +154,18 @@ print(report.metrics["duplicate_groups"])  # (("sequence_1", "sequence_2"),)
 ## 3) Diversity {#3-eval-006-diversity}
 
 - **作用：** 计算全部序列对的平均原始 Levenshtein 距离，衡量生成集合内部的差异。
-- **计算方法：** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对的原始编辑距离均值；少于两条序列时返回 `None`。
+- **计算方法：** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对的原始编辑距离均值；少于两条序列时返回 `None`。同一次计算还给出归一化版本 `Σ(i≠j) [Levenshtein(xᵢ,xⱼ) / max(|xᵢ|,|xⱼ|)] / [n(n−1)]`：每对的距离先除以两条中较长的长度，再取平均。编辑距离不会超过较长序列的长度，所以每对都在 0–1 之间，平均值也在 0–1 之间，不需要截断。0 表示完全相同，1 表示完全不同。必须逐对除，不能用平均距离除以平均长度：长度不一时后者可能超过 1。
 - **参考文献：** 公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (2)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将其中的距离设为 Levenshtein 距离用于 DNA 生成评价，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 使用相同公式。
 - **API：** `dnakit.evaluation.evaluate_diversity(value[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.DiversityEvaluationConfig`。
 - **输入：** `DNA([...])` 或其他 DNA 记录集合；可设置 `show_progress=True` 显示两两比较进度。默认最多使用 16 个进程并行计算；可通过 `DiversityEvaluationConfig(workers=8)` 调整，或设为 `workers=1` 使用单进程。结果不受进程数影响。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含平均成对 Levenshtein 距离 `mean_pairwise_levenshtein_distance`【推荐指标】。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含平均成对 Levenshtein 距离 `mean_pairwise_levenshtein_distance`【推荐指标】，以及 0–1 的归一化版本 `mean_pairwise_normalized_levenshtein_distance`。前者与上述论文的定义一致，可直接和论文结果比较；后者便于直接看水平和跨长度比较。
+- **归一化值的随机参考水平：** 均匀随机 ACGT 序列（等长、GC 50%）两两之间的归一化距离如下，可作为"和随机序列一样分散"的参考线。它不是上限：组成差别很大的序列（例如低 GC 与高 GC 混在一起、单碱基重复）可以高于这个值。真实基因组序列通常低于这个值，所以数值接近随机水平不一定更好；要判断模型处于什么水平，可以把参考集（真实数据）也用同样方法计算一次作对照。
+
+| 序列长度 | 50 bp | 100 bp | 200 bp | 500 bp | 1 kb | 2 kb | 5 kb |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 随机序列的归一化距离 | 0.58 | 0.56 | 0.54 | 0.53 | 0.53 | 0.52 | 0.52 |
+
+表中数值为随机序列对的平均值（≤1 kb 各 2000 对，更长各 400 对，随机种子 20261106）。碱基组成有偏时随机水平更低：200 bp 下 GC 35% 约 0.53，GC 20% 约 0.47。
 - **可选绘图：** `plot=True` 在当前工作目录保存 `diversity_mean_bar.png` 和 `diversity_pairwise_distance_histogram.png`（默认 `False`，同名文件会覆盖）。直方图统计所有无序序列对；绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
@@ -168,7 +175,8 @@ from dnakit.evaluation import evaluate_diversity
 
 records = DNA(["AAAA", "AAAT", "CCCC"])
 report = evaluate_diversity(records)
-print(report.metrics["mean_pairwise_levenshtein_distance"])
+print(report.metrics["mean_pairwise_levenshtein_distance"])             # (1 + 4 + 4) / 3 = 3.0
+print(report.metrics["mean_pairwise_normalized_levenshtein_distance"])  # (1/4 + 4/4 + 4/4) / 3 = 0.75
 ```
 
 默认即为多进程。调整进程数时，从 `dnakit.evaluation` 导入 `DiversityEvaluationConfig`，例如 `evaluate_diversity(records, config=DiversityEvaluationConfig(workers=8))`。纯 Python 编辑距离受 GIL 限制，因此这里使用多进程。
@@ -176,7 +184,8 @@ print(report.metrics["mean_pairwise_levenshtein_distance"])
 - **示例结果：**
 
 ```text
-3
+3.0
+0.75
 ```
 
 [FAQ：补充说明](../../faq/tutorial_basics.md#levenshtein-3)
@@ -193,11 +202,12 @@ print(report.metrics["mean_nearest_neighbor_distance"])
 ## 4) Novelty {#4-eval-008-novelty}
 
 - **作用：** 衡量生成序列离参考库（通常是训练集）有多远，并同时报告完整序列精确一致的比例。
-- **计算方法：** 默认（`novelty_calculation="levenshtein"`）对每条查询计算它到参考库中最近一条序列的原始 Levenshtein 距离，`score` 为其平均值：`Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`，单位是编辑操作数，不归一化。`exact_match_rate` 是与参考库任意一条完整记录逐字相同的查询比例，它独立检查所有参考记录，不依赖最近序列的排序。另一种方法 `novelty_calculation="similarity"` 计算 `novelty = 1 - 最近参考相似度`（0–1），相似度由 `method` 决定（默认 k-mer）。两种方法都不按 `0.9` 等阈值生成 `is_novel` 或 `novel_fraction`；`copy_threshold` 只用于记忆/近复制评价。
+- **计算方法：** 默认（`novelty_calculation="levenshtein"`）对每条查询计算它到参考库中最近一条序列的原始 Levenshtein 距离，`score` 为其平均值：`Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`，单位是编辑操作数，不归一化。同一次计算还给出 0–1 的归一化版本 `(1/N) Σᵢ minₛ [Levenshtein(xᵢ, sₛ) / max(|xᵢ|,|sₛ|)]`：每对距离先除以较长的长度，再对每条查询取最小值并平均。归一化最小值单独选取，参考序列长度不一时，可能来自另一条参考序列，而不是 `nearest_reference_id`；它与 `novelty_calculation="similarity", method="edit"` 的结果相同。`exact_match_rate` 是与参考库任意一条完整记录逐字相同的查询比例，它独立检查所有参考记录，不依赖最近序列的排序。另一种方法 `novelty_calculation="similarity"` 计算 `novelty = 1 - 最近参考相似度`（0–1），相似度由 `method` 决定（默认 k-mer）。两种方法都不按 `0.9` 等阈值生成 `is_novel` 或 `novel_fraction`；`copy_threshold` 只用于记忆/近复制评价。
 - **参考文献：** 默认公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (3)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将距离设为 Levenshtein 距离用于 DNA，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 式 (9) 使用相同公式。`exact_match_rate` 对应 MOSES（Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644，[DOI](https://doi.org/10.3389/fphar.2020.565644)）和 seqme（Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025）的 Novelty（不在参考集中的序列比例）的补数：那里的 Novelty = `1 - exact_match_rate`。
 - **API：** `dnakit.evaluation.evaluate_novelty(queries[必须], reference[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.ReferenceSearchConfig`。
 - **输入：** `DNA([...])` 查询集合和非空 `ReferenceLibrary`；可设置 `show_progress=True` 显示进度。默认的 Levenshtein 方法要对每一对查询和参考序列计算编辑距离，默认最多使用 16 个进程并行计算；可通过 `ReferenceSearchConfig(workers=8)` 调整，或设为 `workers=1` 使用单进程。查询条数少于进程数时，参考库会被分块，单条查询也能并行。结果不受进程数影响，距离相同时仍取参考库中靠前的一条。参考库很大时仍可能耗时较长，可改用 `novelty_calculation="similarity"`。`workers` 只用于 Novelty 的 Levenshtein 方法。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含 `score`【推荐指标】（平均新颖性）、`exact_match_rate` 和 `exact_match_count`；Levenshtein 方法另有最近编辑距离的平均值、最小值和最大值。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含 `score`【推荐指标】（平均新颖性）、`exact_match_rate` 和 `exact_match_count`；Levenshtein 方法另有最近编辑距离的平均值、最小值和最大值，以及 0–1 的归一化平均值 `mean_nearest_normalized_levenshtein_distance`，每条查询的归一化值在 `entries` 的 `nearest_normalized_levenshtein_distance`。
+- **归一化值的随机参考水平：** Novelty 取的是到最近参考序列的距离，参考库越大，随机序列的 Novelty 越低，因此没有通用的随机参考值，一般低于上文 Diversity 表中的随机水平。需要参考线时，可生成与查询等长的随机 ACGT 序列，用同一个参考库运行 `evaluate_novelty`，取它的 `mean_nearest_normalized_levenshtein_distance`。
 - **可选绘图：** `plot=True` 在当前工作目录保存 `novelty_batch_summary.png`（平均新颖性与精确匹配率）、`novelty_distribution.png`（逐条新颖性分布）和 `novelty_nearest_levenshtein.png`（最近参考原始编辑距离分布）；默认 `False`，同名文件会覆盖。查询记录的 `metadata["batch"]` 若为非空文本，汇总柱状图会按批次分组；否则显示一个查询集。默认的 Levenshtein 方法下，新颖性本身就是最近参考原始编辑距离，因此后两张直方图展示同一组距离；similarity 方法绘制第三张图时会额外计算 Levenshtein 距离。绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
@@ -216,6 +226,7 @@ queries = DNA(["AAAA", "GGGG"])
 
 report = evaluate_novelty(queries, reference)
 print(report.metrics["score"])             # 平均最近编辑距离：(0 + 4) / 2 = 2.0
+print(report.metrics["mean_nearest_normalized_levenshtein_distance"])  # (0/4 + 4/4) / 2 = 0.5
 print(report.metrics["exact_match_rate"])  # 完整序列精确一致比例：0.5
 
 similarity = evaluate_novelty(
@@ -230,6 +241,7 @@ print(similarity.metrics["score"])         # similarity 方法：平均 1 - iden
 
 ```text
 2.0
+0.5
 0.5
 0.5
 ```

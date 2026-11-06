@@ -132,7 +132,7 @@ Levenshtein 公式依据 Cherednichenko & Poptsova, *Data augmentation with gene
 
 文章有[官方 GitHub 仓库](https://github.com/powidla/nonB-DNA-structures-generation)，相关代码位于 [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb)。截至 2026-09-02，该仓库没有声明开源许可证，并且 notebook 使用固定 100 bp、展平 one-hot/KDTree 及分块计算，与正文公式并不完全一致。因此 DNAKit 没有复制该代码，而是用自身有界 Levenshtein 实现正文公式；不会隐式填充或截断序列，结果也不保证复现论文 Table 2 的 notebook 数值。
 
-Levenshtein 结果单位为“编辑操作数”，没有归一化；数值越大表示越多样或越远离参考库。比较不同数据集时应尽量保证序列长度分布一致。
+Levenshtein 结果单位为“编辑操作数”，没有归一化；数值越大表示越多样或越远离参考库。比较不同数据集时应尽量保证序列长度分布一致。报告同时给出每对距离除以较长序列长度的 0–1 版本（`mean_pairwise_normalized_levenshtein_distance`、`mean_nearest_normalized_levenshtein_distance`），可用于跨长度比较。
 
 ## 理化性质的计算依据和参考文献是什么？ {#physicochemical-references}
 

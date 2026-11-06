@@ -22,6 +22,7 @@ from ._shared import (
     enforce_pair_limit,
     materialize_input,
     mean,
+    normalized_edit_distance,
     pair_count,
     pair_similarity,
     record_for,
@@ -199,27 +200,41 @@ _NOVELTY_REFERENCES: tuple[DNASequence, ...] = ()
 _NOVELTY_MAX_CELLS = 0
 
 
+def _symbol_length(value: DNARecord | DNASequence) -> int:
+    return value.sequence.symbol_length if isinstance(value, DNARecord) else value.symbol_length
+
+
 def _nearest_in_range(
     query: DNARecord | DNASequence,
     references: tuple[DNARecord, ...] | tuple[DNASequence, ...],
     start: int,
     stop: int,
     max_cells: int,
-) -> tuple[float, int]:
-    """Return the smallest distance and its first reference index in ``[start, stop)``."""
+) -> tuple[float, int, float]:
+    """Scan references ``[start, stop)`` for one query.
 
+    Returns the smallest raw distance, its first reference index, and the smallest
+    max-length-normalized distance. The normalized minimum is taken on its own, so
+    with references of different lengths it may come from another reference.
+    """
+
+    query_length = _symbol_length(query)
     nearest_distance = float("inf")
     nearest_index = start
+    nearest_normalized = float("inf")
     for reference_index in range(start, stop):
+        reference = references[reference_index]
         distance = float(
-            edit_distance(
-                query, references[reference_index], max_cells=max_cells, verbose=False
-            ).distance
+            edit_distance(query, reference, max_cells=max_cells, verbose=False).distance
         )
         if distance < nearest_distance:
             nearest_distance = distance
             nearest_index = reference_index
-    return nearest_distance, nearest_index
+        nearest_normalized = min(
+            nearest_normalized,
+            normalized_edit_distance(distance, query_length, _symbol_length(reference)),
+        )
+    return nearest_distance, nearest_index, nearest_normalized
 
 
 def _init_novelty_worker(
@@ -231,7 +246,7 @@ def _init_novelty_worker(
     _NOVELTY_MAX_CELLS = max_cells
 
 
-def _novelty_worker_nearest(task: tuple[int, int, int]) -> tuple[float, int]:
+def _novelty_worker_nearest(task: tuple[int, int, int]) -> tuple[float, int, float]:
     query_index, start, stop = task
     return _nearest_in_range(
         _NOVELTY_QUERIES[query_index], _NOVELTY_REFERENCES, start, stop, _NOVELTY_MAX_CELLS
@@ -242,14 +257,15 @@ def _nearest_reference_distances(
     query_records: tuple[DNARecord, ...],
     reference_records: tuple[DNARecord, ...],
     config: ReferenceSearchConfig,
-) -> Iterator[tuple[float, int]]:
-    """Yield each query's nearest raw Levenshtein distance and reference index, in order.
+) -> Iterator[tuple[float, int, float]]:
+    """Yield each query's nearest raw distance, reference index and nearest normalized distance.
 
     With ``config.workers > 1`` the query-reference comparisons run in a process
     pool. Each task scans one query against one contiguous block of references;
     when there are fewer queries than workers, references are split into blocks
     so a single query still uses several processes. Blocks are reduced by
-    (distance, reference index), so results equal the serial scan exactly.
+    (distance, reference index) and by the normalized minimum, so results equal
+    the serial scan exactly.
     """
 
     max_cells = config.limits.max_alignment_cells
@@ -297,7 +313,9 @@ def _nearest_reference_distances(
             chunksize=max(1, min(16, len(tasks) // (config.workers * 4))),
         )
         for _ in query_records:
-            yield min(next(results) for _ in bounds)
+            block_results = [next(results) for _ in bounds]
+            distance, index = min((distance, index) for distance, index, _ in block_results)
+            yield distance, index, min(normalized for _, _, normalized in block_results)
 
 
 def _evaluate_levenshtein_novelty(
@@ -324,6 +342,7 @@ def _evaluate_levenshtein_novelty(
 
     entries: list[EvaluationEntry] = []
     distances: list[float] = []
+    normalized_distances: list[float] = []
     nearest = _nearest_reference_distances(query_records, reference_records, config)
     if config.show_progress:
         from dnakit._progress import track
@@ -331,9 +350,11 @@ def _evaluate_levenshtein_novelty(
         nearest = iter(
             track(nearest, description="Novelty Levenshtein queries", total=len(query_records))
         )
-    for (query_index, query_item), query_record, (nearest_distance, nearest_index) in zip(
-        enumerate(query_items), query_records, nearest, strict=True
-    ):
+    for (query_index, query_item), query_record, (
+        nearest_distance,
+        nearest_index,
+        nearest_normalized,
+    ) in zip(enumerate(query_items), query_records, nearest, strict=True):
         nearest_record = reference_records[nearest_index]
         longest = max(
             query_record.sequence.symbol_length,
@@ -349,6 +370,7 @@ def _evaluate_levenshtein_novelty(
             / longest
         )
         distances.append(nearest_distance)
+        normalized_distances.append(nearest_normalized)
         entries.append(
             EvaluationEntry(
                 query_item.subject_id,
@@ -358,6 +380,7 @@ def _evaluate_levenshtein_novelty(
                         "nearest_reference_id": nearest_record.id,
                         "nearest_reference_index": nearest_index,
                         "nearest_levenshtein_distance": nearest_distance,
+                        "nearest_normalized_levenshtein_distance": nearest_normalized,
                         "nearest_coverage": coverage,
                         "novelty": nearest_distance,
                         "exact_match": nearest_distance == 0.0,
@@ -372,12 +395,16 @@ def _evaluate_levenshtein_novelty(
     return report(
         name="novelty",
         method="mean-nearest-reference-levenshtein-distance",
-        version="eval-novelty-levenshtein-v2",
+        version="eval-novelty-levenshtein-v3",
         parameters={
             "novelty_calculation": config.novelty_calculation,
             "formula": "mean_i min_s Levenshtein(query_i,reference_s)",
             "distance_units": "edit operations",
             "normalization": "none",
+            "normalized_formula": (
+                "mean_i min_s [Levenshtein(query_i,reference_s) / max(|query_i|,|reference_s|)]"
+            ),
+            "normalized_range": "[0, 1]; each pair is divided by its longer length",
             "sequence_preprocessing": "none; no padding or truncation",
             "ambiguity_policy": "literal IUPAC symbols",
             "exact_match_rule": "nearest Levenshtein distance == 0",
@@ -398,6 +425,7 @@ def _evaluate_levenshtein_novelty(
             "exact_match_rate": exact_count / len(materialized) if materialized else None,
             "mean_novelty": mean_distance,
             "mean_nearest_levenshtein_distance": mean_distance,
+            "mean_nearest_normalized_levenshtein_distance": mean(normalized_distances),
             "minimum_nearest_levenshtein_distance": min(novelty_values) if novelty_values else None,
             "maximum_nearest_levenshtein_distance": max(novelty_values) if novelty_values else None,
             "pairwise_comparison_count": comparisons,
