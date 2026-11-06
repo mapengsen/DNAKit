@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import heapq
-from collections.abc import Iterable, Mapping
+import multiprocessing
+import threading
+from collections.abc import Iterable, Iterator, Mapping
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import replace
 
 from dnakit._verbosity import register_public as _register_public_verbose
-from dnakit.core import DNA, DNASet
+from dnakit.core import DNA, DNARecord, DNASequence, DNASet
 from dnakit.core._json import FrozenDict
 from dnakit.exceptions import ConfigurationError
 from dnakit.similarity import edit_distance
@@ -191,6 +194,112 @@ def _nearest_entries(
     return tuple(entries)
 
 
+_NOVELTY_QUERIES: tuple[DNASequence, ...] = ()
+_NOVELTY_REFERENCES: tuple[DNASequence, ...] = ()
+_NOVELTY_MAX_CELLS = 0
+
+
+def _nearest_in_range(
+    query: DNARecord | DNASequence,
+    references: tuple[DNARecord, ...] | tuple[DNASequence, ...],
+    start: int,
+    stop: int,
+    max_cells: int,
+) -> tuple[float, int]:
+    """Return the smallest distance and its first reference index in ``[start, stop)``."""
+
+    nearest_distance = float("inf")
+    nearest_index = start
+    for reference_index in range(start, stop):
+        distance = float(
+            edit_distance(
+                query, references[reference_index], max_cells=max_cells, verbose=False
+            ).distance
+        )
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_index = reference_index
+    return nearest_distance, nearest_index
+
+
+def _init_novelty_worker(
+    queries: tuple[str, ...], references: tuple[str, ...], max_cells: int
+) -> None:
+    global _NOVELTY_QUERIES, _NOVELTY_REFERENCES, _NOVELTY_MAX_CELLS
+    _NOVELTY_QUERIES = tuple(DNASequence(symbols, alphabet="iupac") for symbols in queries)
+    _NOVELTY_REFERENCES = tuple(DNASequence(symbols, alphabet="iupac") for symbols in references)
+    _NOVELTY_MAX_CELLS = max_cells
+
+
+def _novelty_worker_nearest(task: tuple[int, int, int]) -> tuple[float, int]:
+    query_index, start, stop = task
+    return _nearest_in_range(
+        _NOVELTY_QUERIES[query_index], _NOVELTY_REFERENCES, start, stop, _NOVELTY_MAX_CELLS
+    )
+
+
+def _nearest_reference_distances(
+    query_records: tuple[DNARecord, ...],
+    reference_records: tuple[DNARecord, ...],
+    config: ReferenceSearchConfig,
+) -> Iterator[tuple[float, int]]:
+    """Yield each query's nearest raw Levenshtein distance and reference index, in order.
+
+    With ``config.workers > 1`` the query-reference comparisons run in a process
+    pool. Each task scans one query against one contiguous block of references;
+    when there are fewer queries than workers, references are split into blocks
+    so a single query still uses several processes. Blocks are reduced by
+    (distance, reference index), so results equal the serial scan exactly.
+    """
+
+    max_cells = config.limits.max_alignment_cells
+    comparisons = len(query_records) * len(reference_records)
+    if config.workers == 1 or comparisons < 2:
+        for query in query_records:
+            yield _nearest_in_range(query, reference_records, 0, len(reference_records), max_cells)
+        return
+
+    # Raise the documented cell-limit error in the caller, not inside a worker.
+    longest_query = max(query_records, key=lambda record: record.sequence.symbol_length)
+    longest_reference = max(reference_records, key=lambda record: record.sequence.symbol_length)
+    if (longest_query.sequence.symbol_length + 1) * (
+        longest_reference.sequence.symbol_length + 1
+    ) > max_cells:
+        edit_distance(longest_query, longest_reference, max_cells=max_cells, verbose=False)
+
+    blocks = max(1, min(len(reference_records), -(-config.workers // len(query_records))))
+    block_size = -(-len(reference_records) // blocks)
+    bounds = tuple(
+        (start, min(start + block_size, len(reference_records)))
+        for start in range(0, len(reference_records), block_size)
+    )
+    tasks = tuple(
+        (query_index, start, stop)
+        for query_index in range(len(query_records))
+        for start, stop in bounds
+    )
+    # Forking a multi-threaded process (e.g. the MCP server) can deadlock the
+    # children on inherited locks, so spawn there; otherwise keep the default.
+    context = "spawn" if threading.active_count() > 1 else None
+    with ProcessPoolExecutor(
+        max_workers=min(config.workers, len(tasks)),
+        mp_context=multiprocessing.get_context(context),
+        initializer=_init_novelty_worker,
+        initargs=(
+            tuple(record.sequence.symbols for record in query_records),
+            tuple(record.sequence.symbols for record in reference_records),
+            max_cells,
+        ),
+    ) as executor:
+        results = executor.map(
+            _novelty_worker_nearest,
+            tasks,
+            chunksize=max(1, min(16, len(tasks) // (config.workers * 4))),
+        )
+        for _ in query_records:
+            yield min(next(results) for _ in bounds)
+
+
 def _evaluate_levenshtein_novelty(
     queries: EvaluationInput,
     reference: ReferenceLibrary,
@@ -209,30 +318,22 @@ def _evaluate_levenshtein_novelty(
     for record in reference_records:
         require_pairwise_compatible(record.sequence, role="reference")
 
+    query_records = tuple(record_for(item) for item in query_items)
+    for record in query_records:
+        require_pairwise_compatible(record.sequence, role="query")
+
     entries: list[EvaluationEntry] = []
     distances: list[float] = []
-    for query_index, query_item in _tracked_query_items(
-        query_items,
-        show_progress=config.show_progress,
-        description="Novelty Levenshtein queries",
+    nearest = _nearest_reference_distances(query_records, reference_records, config)
+    if config.show_progress:
+        from dnakit._progress import track
+
+        nearest = iter(
+            track(nearest, description="Novelty Levenshtein queries", total=len(query_records))
+        )
+    for (query_index, query_item), query_record, (nearest_distance, nearest_index) in zip(
+        enumerate(query_items), query_records, nearest, strict=True
     ):
-        query_record = record_for(query_item)
-        require_pairwise_compatible(query_record.sequence, role="query")
-        nearest_distance: float | None = None
-        nearest_index = 0
-        for reference_index, reference_record in enumerate(reference_records):
-            distance = float(
-                edit_distance(
-                    query_record,
-                    reference_record,
-                    max_cells=config.limits.max_alignment_cells,
-                ).distance
-            )
-            if nearest_distance is None or distance < nearest_distance:
-                nearest_distance = distance
-                nearest_index = reference_index
-        if nearest_distance is None:
-            raise AssertionError("A non-empty reference must produce one nearest distance.")
         nearest_record = reference_records[nearest_index]
         longest = max(
             query_record.sequence.symbol_length,
@@ -284,6 +385,7 @@ def _evaluate_levenshtein_novelty(
             "topology_policy": "linearized at stored origin; no circular rotation",
             "tie_break": "distance-asc,reference-input-index-asc",
             "show_progress": config.show_progress,
+            "workers": config.workers,
             "limits": config.limits,
             "reference": reference.to_dict(),
             "definition_reference": "https://doi.org/10.1016/j.compbiomed.2024.109440",

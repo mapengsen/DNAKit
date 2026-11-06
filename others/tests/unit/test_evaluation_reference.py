@@ -286,3 +286,65 @@ def test_novelty_defaults_to_mean_nearest_levenshtein_distance() -> None:
     assert [entry.metrics["novelty"] for entry in report.entries] == [0.0, 1.0, 4.0]
     assert report.metrics["score"] == pytest.approx(5 / 3)
     assert report.metrics["exact_match_rate"] == pytest.approx(1 / 3)
+
+
+def _novelty_fixture() -> tuple[DNASet, ReferenceLibrary]:
+    references = ("AAAAAAAA", "CCCCCCCC", "AAAAAAAT", "AAAAAAAA", "GGGGTTTT", "ACGTACGT")
+    reference = create_reference_library(
+        _set(*((f"ref-{index}", symbols) for index, symbols in enumerate(references))),
+        name="training",
+        version="1",
+        source="local:test",
+    )
+    queries = _set(
+        ("copy", "AAAAAAAA"),
+        ("tie", "AAAAAATT"),
+        ("far", "TTTTTTTT"),
+        ("short", "ACG"),
+        ("mixed", "GGGGAAAA"),
+    )
+    return queries, reference
+
+
+@pytest.mark.parametrize("query_count", [1, 2, 5])
+def test_parallel_levenshtein_novelty_matches_serial_scan(query_count: int) -> None:
+    queries, reference = _novelty_fixture()
+    subset = DNASet(list(queries)[:query_count])
+
+    serial = evaluate_novelty(subset, reference, config=ReferenceSearchConfig(workers=1))
+    parallel = evaluate_novelty(subset, reference, config=ReferenceSearchConfig(workers=4))
+
+    assert [entry.metrics for entry in parallel.entries] == [
+        entry.metrics for entry in serial.entries
+    ]
+    assert parallel.metrics == serial.metrics
+    assert parallel.parameters["workers"] == 4
+    # Equal distances keep the first reference: "copy" matches ref-0, not its duplicate ref-3.
+    assert parallel.entries[0].metrics["nearest_reference_id"] == "ref-0"
+
+
+def test_novelty_defaults_to_sixteen_workers_and_tracks_progress() -> None:
+    queries, reference = _novelty_fixture()
+    assert ReferenceSearchConfig().workers == 16
+    report = evaluate_novelty(queries, reference, config=ReferenceSearchConfig(show_progress=True))
+    assert report.parameters["workers"] == 16
+    assert [entry.metrics["novelty"] for entry in report.entries] == [0.0, 1.0, 4.0, 5.0, 4.0]
+
+
+def test_parallel_novelty_reports_cell_limit_in_caller() -> None:
+    queries, reference = _novelty_fixture()
+    with pytest.raises(ConfigurationError) as error:
+        evaluate_novelty(
+            queries,
+            reference,
+            config=ReferenceSearchConfig(
+                workers=2, limits=EvaluationLimits(max_alignment_cells=20)
+            ),
+        )
+    assert error.value.code == "EDIT_DISTANCE_CELL_LIMIT"
+
+
+@pytest.mark.parametrize("workers", [0, -1, True, 1.5, 257])
+def test_reference_search_rejects_invalid_worker_counts(workers: object) -> None:
+    with pytest.raises(ConfigurationError):
+        ReferenceSearchConfig(workers=workers)  # type: ignore[arg-type]

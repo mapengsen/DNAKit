@@ -300,6 +300,7 @@ class ReferenceSearchConfig:
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
     novelty_calculation: NoveltyCalculation = "levenshtein"
     show_progress: bool = False
+    workers: int = 16
 
     def __post_init__(self) -> None:
         if self.method not in {"exact", "identity", "edit", "kmer"}:
@@ -321,6 +322,7 @@ class ReferenceSearchConfig:
             raise ConfigurationError("Unknown novelty calculation.")
         if not isinstance(self.show_progress, bool):
             raise ConfigurationError("show_progress must be boolean.")
+        _positive_int(self.workers, "workers", 256)
 
 
 @dataclass(frozen=True, slots=True)
