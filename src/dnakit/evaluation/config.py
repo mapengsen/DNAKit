@@ -298,7 +298,7 @@ class ReferenceSearchConfig:
     min_coverage: float = 0.0
     copy_threshold: float = 0.9
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
-    novelty_calculation: NoveltyCalculation = "similarity"
+    novelty_calculation: NoveltyCalculation = "levenshtein"
     show_progress: bool = False
 
     def __post_init__(self) -> None:

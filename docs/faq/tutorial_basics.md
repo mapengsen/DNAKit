@@ -723,7 +723,7 @@ print(report.metrics["mean_pairwise_levenshtein_distance"])
 
 ## Levenshtein 评价：Novelty {#levenshtein-4}
 
-- **第二种方法（平均最近参考 Levenshtein 距离）：**
+- **默认方法（平均最近参考 Levenshtein 距离）：**
 
 ```python
 from dnakit import DNARecord, DNASequence, DNASet

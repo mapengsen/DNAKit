@@ -99,6 +99,7 @@ def execute_bounded_command(
     monitored_output_paths: Iterable[str | Path] = (),
     max_monitored_output_bytes: int = 100_000_000,
     environment_overrides: Mapping[str, str] | None = None,
+    stdout_path: str | Path | None = None,
     verbose: bool = True,
 ) -> BoundedCommandResult:
     """Run an explicit executable without a shell under time and output limits.
@@ -106,7 +107,9 @@ def execute_bounded_command(
     Domain adapters remain responsible for constructing a fixed command
     whitelist. This executor only accepts an absolute resolved executable,
     bounds the argument vector and captured output, isolates a POSIX process
-    group, and monitors declared output artifacts inside ``cwd``.
+    group, and monitors declared output artifacts inside ``cwd``. With
+    ``stdout_path`` (inside ``cwd``), standard output is written to that file
+    as a monitored artifact and only standard error is captured in ``output``.
     """
 
     if not isinstance(backend_id, str) or not backend_id.strip():
@@ -170,6 +173,11 @@ def execute_bounded_command(
             code="EXTERNAL_OUTPUT_PATH_LIMIT_EXCEEDED",
             context={"max_paths": _MAX_MONITORED_OUTPUTS},
         )
+    if stdout_path is not None:
+        try:
+            monitored = (*monitored, Path(stdout_path).expanduser())
+        except (TypeError, ValueError) as exc:
+            raise ConfigurationError("stdout_path must be a filesystem path.") from exc
     resolved_monitored: tuple[Path, ...] = tuple(
         path.resolve(strict=False) if path.is_absolute() else (working_directory / path).resolve()
         for path in monitored
@@ -206,30 +214,38 @@ def execute_bounded_command(
     invocation_path = Path(executable_path).expanduser().absolute()
     command = (str(invocation_path), *resolved_arguments)
     deadline = time.monotonic() + float(timeout_seconds)
+    stdout_file: BinaryIO | None = None
     try:
+        if stdout_path is not None:
+            stdout_file = resolved_monitored[-1].open("wb")
         process = subprocess.Popen(
             command,
             cwd=str(working_directory),
             env=environment,
             stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE if stdout_file is None else stdout_file,
+            stderr=subprocess.STDOUT if stdout_file is None else subprocess.PIPE,
             shell=False,
             close_fds=True,
             start_new_session=os.name == "posix",
         )
     except OSError as exc:
+        if stdout_file is not None:
+            stdout_file.close()
         raise BackendExecutionError(
             "External backend command could not be started.",
             code="BACKEND_COMMAND_EXECUTION_FAILED",
             context={"backend_id": backend_id, "error_type": type(exc).__name__},
         ) from exc
-    if process.stdout is None:  # pragma: no cover - guaranteed by stdout=PIPE.
+    if stdout_file is not None:
+        stdout_file.close()
+    captured = process.stdout if stdout_file is None else process.stderr
+    if captured is None:  # pragma: no cover - guaranteed by the PIPE arguments.
         process.kill()
         process.wait()
         raise BackendExecutionError("External backend output pipe could not be created.")
 
-    stdout = cast(BinaryIO, process.stdout)
+    stdout = cast(BinaryIO, captured)
     output = bytearray()
     output_too_large = threading.Event()
 

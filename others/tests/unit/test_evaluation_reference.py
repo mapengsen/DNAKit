@@ -135,7 +135,9 @@ def test_nearest_reference_top_k_heap_is_bounded_and_stable(
 def test_novelty_memorization_and_reference_similarity_share_reference_contract() -> None:
     reference = _reference()
     queries = _set(("copy", "AAAA"), ("novel", "GGGG"))
-    config = ReferenceSearchConfig(method="identity", copy_threshold=0.9)
+    config = ReferenceSearchConfig(
+        method="identity", copy_threshold=0.9, novelty_calculation="similarity"
+    )
     novelty = evaluate_novelty(queries, reference, config=config)
     memorization = evaluate_memorization(queries, reference, config=config)
     similarity = evaluate_reference_similarity(queries, reference, config=config)
@@ -238,7 +240,11 @@ def test_novelty_exact_match_rate_is_independent_of_nearest_kmer_ties() -> None:
         version="1",
         source="local:test",
     )
-    report = evaluate_novelty(_set(("query", "AAAACCCC")), reference)
+    report = evaluate_novelty(
+        _set(("query", "AAAACCCC")),
+        reference,
+        config=ReferenceSearchConfig(novelty_calculation="similarity"),
+    )
 
     assert report.entries[0].metrics["nearest_reference_id"] == "reverse"
     assert report.entries[0].metrics["novelty"] == 0.0
@@ -250,13 +256,33 @@ def test_novelty_score_and_exact_fraction_ignore_copy_threshold() -> None:
     reference = _reference()
     queries = _set(("copy", "AAAA"), ("near", "AAAT"))
     low = evaluate_novelty(
-        queries, reference, config=ReferenceSearchConfig(method="identity", copy_threshold=0.0)
+        queries,
+        reference,
+        config=ReferenceSearchConfig(
+            method="identity", copy_threshold=0.0, novelty_calculation="similarity"
+        ),
     )
     high = evaluate_novelty(
-        queries, reference, config=ReferenceSearchConfig(method="identity", copy_threshold=1.0)
+        queries,
+        reference,
+        config=ReferenceSearchConfig(
+            method="identity", copy_threshold=1.0, novelty_calculation="similarity"
+        ),
     )
 
     assert low.metrics["score"] == high.metrics["score"] == pytest.approx(0.125)
     assert low.metrics["exact_match_rate"] == high.metrics["exact_match_rate"] == 0.5
     assert low.entries[1].metrics["novelty"] == pytest.approx(0.25)
     assert low.entries[1].metrics["exact_match"] is False
+
+
+def test_novelty_defaults_to_mean_nearest_levenshtein_distance() -> None:
+    """Default novelty follows mean_i min_s Levenshtein(query_i, reference_s)."""
+
+    reference = _reference()
+    report = evaluate_novelty(_set(("copy", "AAAA"), ("near", "AAAT"), ("far", "GGGG")), reference)
+
+    assert report.parameters["novelty_calculation"] == "levenshtein"
+    assert [entry.metrics["novelty"] for entry in report.entries] == [0.0, 1.0, 4.0]
+    assert report.metrics["score"] == pytest.approx(5 / 3)
+    assert report.metrics["exact_match_rate"] == pytest.approx(1 / 3)

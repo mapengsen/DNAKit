@@ -121,14 +121,14 @@ guide 超出序列边界时不命中；默认排除含模糊碱基的 guide。�
 
 ## Diversity 和 Novelty 有哪些计算方法与参考文献？ {#diversity-novelty-references}
 
-DNAKit 的 Diversity 使用论文中的原始 Levenshtein 距离公式；Novelty 提供两种计算方法：
+DNAKit 的 Diversity 使用论文中的原始 Levenshtein 距离公式；Novelty 默认也使用 Levenshtein 公式，另提供相似度方法：
 
 | 指标 | 计算方法 | 可选方法 |
 | --- | --- | --- |
 | Diversity | `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对原始编辑距离的平均值。 | 无 |
-| Novelty | `novelty_calculation="similarity"`：每条查询为 `1 - nearest_reference_similarity`。 | `novelty_calculation="levenshtein"`：`meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`。 |
+| Novelty | 默认 `novelty_calculation="levenshtein"`：`meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`。 | `novelty_calculation="similarity"`：每条查询为 `1 - nearest_reference_similarity`。 |
 
-Levenshtein 公式依据 Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440，[DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440)，其中第 2.8 节公式 (20) 和 (21) 将距离说明为 Levenshtein 距离。该文沿用了 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022，[PMLR 论文页](https://proceedings.mlr.press/v162/jain22a.html)中的术语。
+Levenshtein 公式依据 Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440，[DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440)，其中第 2.8 节公式 (20) 和 (21) 将距离说明为 Levenshtein 距离。两个公式最早见于 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022，[PMLR 论文页](https://proceedings.mlr.press/v162/jain22a.html)的式 (2)（Diversity）和式 (3)（Novelty）。D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 对 DNA 生成也使用相同的两个公式。
 
 文章有[官方 GitHub 仓库](https://github.com/powidla/nonB-DNA-structures-generation)，相关代码位于 [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb)。截至 2026-09-02，该仓库没有声明开源许可证，并且 notebook 使用固定 100 bp、展平 one-hot/KDTree 及分块计算，与正文公式并不完全一致。因此 DNAKit 没有复制该代码，而是用自身有界 Levenshtein 实现正文公式；不会隐式填充或截断序列，结果也不保证复现论文 Table 2 的 notebook 数值。
 

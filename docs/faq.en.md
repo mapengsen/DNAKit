@@ -121,14 +121,14 @@ Matches must be consecutive and identical, no breaks, mismatches, or indels allo
 
 ## What calculation methods and references are available for Diversity and Novelty? {#diversity-novelty-references}
 
-DNAKit uses the paper's raw Levenshtein-distance formula for Diversity; Novelty offers two methods:
+DNAKit uses the paper's raw Levenshtein-distance formula for Diversity; Novelty uses the Levenshtein formula by default and also offers a similarity method:
 
 | Metric | Calculation | Optional method |
 | --- | --- | --- |
 | Diversity | `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered sequence pairs. | None |
-| Novelty | `novelty_calculation="similarity"`: each query receives `1 - nearest_reference_similarity`. | `novelty_calculation="levenshtein"`: `meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`. |
+| Novelty | Default `novelty_calculation="levenshtein"`: `meanᵢ minₛ Levenshtein(queryᵢ, referenceₛ)`. | `novelty_calculation="similarity"`: each query receives `1 - nearest_reference_similarity`. |
 
-The Levenshtein formulas follow Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440, [DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440). Section 2.8, equations (20) and (21), specifies Levenshtein distance. The terminology is inherited from Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022, [PMLR paper page](https://proceedings.mlr.press/v162/jain22a.html).
+The Levenshtein formulas follow Cherednichenko & Poptsova, *Data augmentation with generative models improves detection of Non-B DNA structures*, **Computers in Biology and Medicine** 184 (2025) 109440, [DOI 10.1016/j.compbiomed.2024.109440](https://doi.org/10.1016/j.compbiomed.2024.109440). Section 2.8, equations (20) and (21), specifies Levenshtein distance. Both formulas first appear in Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022, [PMLR paper page](https://proceedings.mlr.press/v162/jain22a.html), as equations (2) (Diversity) and (3) (Novelty). D3LM (Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026) uses the same two formulas for DNA generation in Appendix B.
 
 The article has an [official GitHub repository](https://github.com/powidla/nonB-DNA-structures-generation), with the relevant code in [`seq_analysis.ipynb`](https://github.com/powidla/nonB-DNA-structures-generation/blob/ea61a37f95c5a1effe64324af366c781755fe4c8/notebooks/seq_analysis.ipynb). As of 2026-09-02, the repository declares no open-source license, and its notebook uses fixed 100-bp preprocessing, flattened one-hot/KDTree operations, and chunk-local calculations that do not fully match the published equations. DNAKit therefore does not copy that code: it independently implements the published formulas with its bounded Levenshtein routine, performs no implicit padding or truncation, and does not claim exact reproduction of the notebook values in Table 2.
 

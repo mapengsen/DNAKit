@@ -147,3 +147,39 @@ def test_bounded_executor_confines_monitored_outputs_to_cwd(tmp_path: Path) -> N
         )
 
     assert error.value.code == "UNSAFE_EXTERNAL_OUTPUT_PATH"
+
+
+def test_bounded_executor_writes_stdout_to_file_and_captures_stderr(tmp_path: Path) -> None:
+    executable = tmp_path / "split-streams"
+    executable.write_text("#!/bin/sh\necho result-line\necho progress-line >&2\n", encoding="utf-8")
+    executable.chmod(0o700)
+
+    result = execute_bounded_command(
+        executable, (), backend_id="fake", cwd=tmp_path, stdout_path=tmp_path / "out.paf"
+    )
+
+    assert result.return_code == 0
+    assert (tmp_path / "out.paf").read_text(encoding="utf-8") == "result-line\n"
+    assert result.output == "progress-line\n"
+
+
+def test_bounded_executor_bounds_and_confines_stdout_file(tmp_path: Path) -> None:
+    executable = tmp_path / "large-output"
+    executable.write_text("#!/bin/sh\nhead -c 4096 /dev/zero\n", encoding="utf-8")
+    executable.chmod(0o700)
+
+    with pytest.raises(ConfigurationError) as error:
+        execute_bounded_command(
+            executable, (), backend_id="fake", cwd=tmp_path, stdout_path=tmp_path.parent / "x"
+        )
+    assert error.value.code == "UNSAFE_EXTERNAL_OUTPUT_PATH"
+    with pytest.raises(BackendExecutionError) as limit:
+        execute_bounded_command(
+            executable,
+            (),
+            backend_id="fake",
+            cwd=tmp_path,
+            stdout_path=tmp_path / "out.bin",
+            max_monitored_output_bytes=1024,
+        )
+    assert limit.value.code == "BACKEND_ARTIFACT_OUTPUT_LIMIT"

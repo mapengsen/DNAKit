@@ -4,6 +4,8 @@ Comprehensive evaluation of DNA sequences or data sets in terms of legality, uni
 
 Reference similarity and distribution similarity are listed separately in [similarity calculation](09_similarity_alignment.md) under data evaluation. Reference-library similarity and novelty use a caller-supplied `ReferenceLibrary`; reference-genome consistency uses a local FASTA or PAF. Novelty is not an experimental conclusion or task-model prediction.
 
+With default settings, Validity, Uniqueness, Diversity and Novelty follow published definitions: reference-genome consistency aligns with minimap2 and reports the BI/GI and aligned fraction of Huang et al.; Uniqueness uses `exact` deduplication (MOSES, seqme); Diversity and Novelty use raw Levenshtein distance (Jain et al. 2022; Cherednichenko & Poptsova 2025; D3LM). Each section gives the full references.
+
 The following API brackets list all direct call parameters; `[required]` and `[optional]` are parameter descriptions, not Python syntax.
 
 For DNA sequence evaluation, use `DNA(["ACGT", "ACGA", ...])` as the standard batch input. To retain custom IDs or metadata, pass record mappings to `DNA`. A bare `list[str]` is not a shared evaluation input type. Per-sequence results appear in `report.entries`, and aggregate metrics in `report.metrics`. Collection-level measures such as uniqueness, diversity, fragment similarity, and distribution distance are not averages of per-sequence scores. Reference comparisons still require a reference library or a second `DNA` collection; numeric matrices, FASTQ paths, and scorecards keep their specialized input types.
@@ -14,7 +16,7 @@ For DNA sequence evaluation, use `DNA(["ACGT", "ACGA", ...])` as the standard ba
 | One `DNA` collection | `evaluate_uniqueness`, `evaluate_diversity`, `evaluate_kmer_diversity`, `evaluate_redundancy` | Collection-level `metrics` |
 | `DNA` + `ReferenceLibrary` | `nearest_reference`, `evaluate_novelty`, `evaluate_memorization`, `evaluate_reference_similarity` | Per-query nearest-reference results and summary metrics |
 | Two `DNA` collections | `evaluate_fragment_similarity`, `evaluate_snn`, `evaluate_distribution_similarity`, `evaluate_frechet_distance` | SNN has per-query entries; the others are mainly collection-level |
-| `DNA` + reference FASTA/PAF | `evaluate_reference_consistency` | Per-query rates and overall mean |
+| `DNA` + reference FASTA/PAF | `evaluate_reference_consistency` | Per-query rates, BI/GI and set-level summary |
 
 `evaluate_scorecard` takes a mapping from metric names to values or reports, rather than DNA sequences.
 For other operations that work on a single sequence, pass `DNA([...])` to [`run_batch`](14_engineering.en.md#3-eng-006-batch-calculation) and apply the operation per record; those operations do not implicitly return a collection mean.
@@ -52,12 +54,20 @@ print([(entry.subject_id, entry.metrics["is_valid"]) for entry in report.entries
 
 ### 1.2 Reference-genome consistency {#1-2-reference-consistency}
 
-- **Purpose:** Measure how closely a group of DNA sequences matches a specified reference genome. Return a consistency rate for each query and the mean over all input queries.
-- **Method:** Choose the primary alignment with the highest matched-base fraction for each query. Per-query consistency rate = `PAF matching bases / query length`; a query without a primary alignment contributes `0`. Overall `consistency_rate` is the mean across all input queries, or `None` for empty input. Unaligned bases remain in the query-length denominator.
-- **API:** `dnakit.evaluation.evaluate_reference_consistency(queries[required], paf_path[optional], *, reference_fasta[optional], reference_dir[optional], reference_name[optional], reference_version[optional], reference_sha256[optional], config[optional], verbose[optional])`; `config` uses `dnakit.evaluation.ReferenceConsistencyConfig`.
-- **Input:** `DNA([...])` or a DNA record collection. By default, DNAKit downloads and reuses the hg38 reference FASTA. You can supply a local `reference_fasta`; both paths require minimap2. For an existing `paf_path`, also provide `reference_name` and `reference_version`, and ensure PAF query IDs and lengths match the input.
-- **Output:** Returns an `EvaluationReport`. `report.metrics["consistency_rate"]` is the mean over all input queries; each item's `metrics["consistency_rate"]` in `report.entries` is that query's rate.
-- **Example code:** This illustrative PAF shows how the mean is calculated.
+- **Purpose:** Measure how closely a group of DNA sequences matches a specified reference genome (or a training or real-sequence set). Besides the per-query consistency rate, the report carries the alignment scores used by Huang et al. (*Pangenome-Informed Language Models for Synthetic Genome Sequence Generation*, bioRxiv 10.1101/2024.09.18.612131): BLAST identity, gap-compressed identity and the fraction of aligned queries.
+- **Method:** Each query's primary alignments are grouped by reference sequence; wfmash splits long queries into several fragments, and fragments on the same reference are pooled. The reference with the highest consistency rate is the query's best match ("best match against the entire dataset").
+  - **Consistency rate** `consistency_rate` = query positions covered by matching bases / query length; a query without a primary alignment contributes `0`. The overall value is the mean over all input queries, or `None` for empty input.
+  - **BLAST identity (BI)** = matching bases / alignment columns (total M/=/X/I/D length in the CIGAR).
+  - **Gap-compressed identity (GI)** = matching bases / (total M/=/X length + number of I/D runs), so a run of consecutive gaps counts as one difference. The paper's Fig. 4 example (10 columns, 7 matches, one 2-base gap) gives BI = 7/10 and GI = 7/9.
+  - **Aligned fraction** `aligned_fraction` (the paper's Align %) = queries whose best match covers at least `min_query_coverage` of the query / all queries; the default `min_query_coverage=0.0` counts any primary alignment.
+  - **Weighted scores** `weighted_blast_identity` and `weighted_gap_compressed_identity` pool matches and columns over aligned queries before dividing (alignment-length weighting, the paper's weighted GI/BI); they are `None` when no query aligns.
+  - wfmash PAF records carry `bi:f` and `gi:f` tags; the BI and GI that DNAKit computes from the CIGAR equal these tags.
+- **Defaults:** Without `config`, alignment uses minimap2 (`preset="sr"`) against hg38 or the supplied `reference_fasta`.
+- **API:** `dnakit.evaluation.evaluate_reference_consistency(queries[required], paf_path[optional], *, reference_fasta[optional], reference_dir[optional], reference_name[optional], reference_version[optional], reference_sha256[optional], config[optional], verbose[optional])`; `config` uses `dnakit.evaluation.ReferenceConsistencyConfig`, where `aligner` is `"minimap2"` (default) or `"wfmash"`, `wfmash_args` are extra options passed verbatim to wfmash, and `min_query_coverage` is the coverage threshold for counting a query as aligned.
+- **Input:** `DNA([...])` or a DNA record collection. By default, DNAKit downloads and reuses the hg38 reference FASTA. You can supply a local `reference_fasta` (for example the training set); both paths require the selected aligner. For an existing `paf_path` (minimap2 `-c` or wfmash output), also provide `reference_name` and `reference_version`, and ensure PAF query IDs and lengths match the input.
+- **Choosing the aligner:** minimap2 suits short sequences (default `preset="sr"`). wfmash matches the paper but targets kilobase-scale and longer sequences: with default settings, queries shorter than about 10 kb usually get no alignment and all score 0; lower the thresholds through `wfmash_args` (for example `("-S", "1000")`). Sequences of a few hundred bases usually stay unaligned even then; use minimap2 for them. wfmash options differ between releases: the paper's segment length is `-s` in early versions and corresponds to the window length `-w` in current ones, so check `wfmash -h` for the installed version. wfmash needs a `.fai` index of the reference FASTA; DNAKit writes one next to the FASTA and reuses it (or in a temporary directory when that folder is read-only).
+- **Output:** Returns an `EvaluationReport`. `report.metrics` contains `consistency_rate`, `aligned_fraction`, `aligned_count`, `query_count`, `weighted_blast_identity` and `weighted_gap_compressed_identity`. Each item's `metrics` in `report.entries` contains `consistency_rate`, `aligned`, `blast_identity`, `gap_compressed_identity`, `query_coverage` and `best_target`; both identities are `None` without an alignment.
+- **Example code:** This illustrative PAF is demo data; the alignment of `sequence_2` is the paper's Fig. 4 example.
 
 ```python
 from pathlib import Path
@@ -71,7 +81,7 @@ with TemporaryDirectory() as folder:
     paf = Path(folder) / "example.paf"
     paf.write_text(
         "sequence_1\t8\t0\t8\t+\tchr1\t100\t20\t28\t8\t8\t60\ttp:A:P\tcg:Z:8M\n"
-        "sequence_2\t8\t0\t8\t-\tchr2\t100\t30\t38\t7\t8\t30\ttp:A:P\tcg:Z:8M\n",
+        "sequence_2\t8\t0\t8\t+\tchr2\t100\t30\t40\t7\t10\t60\ttp:A:P\tcg:Z:3=1X2D4=\n",
         encoding="utf-8",
     )
     report = evaluate_reference_consistency(
@@ -79,21 +89,45 @@ with TemporaryDirectory() as folder:
         verbose=False,
     )
 
-print(report.metrics["consistency_rate"])
-print([(entry.subject_id, entry.metrics["consistency_rate"]) for entry in report.entries])
+print({key: report.metrics[key] for key in (
+    "consistency_rate", "aligned_fraction",
+    "weighted_blast_identity", "weighted_gap_compressed_identity",
+)})
+for entry in report.entries:
+    m = entry.metrics
+    print(entry.subject_id, m["consistency_rate"], m["aligned"],
+          m["blast_identity"], m["gap_compressed_identity"])
 ```
 
 - **Example output:**
 
 ```text
-0.625
-[('sequence_1', 1.0), ('sequence_2', 0.875), ('sequence_3', 0.0)]
+{'consistency_rate': 0.625, 'aligned_fraction': 0.6666666666666666, 'weighted_blast_identity': 0.8333333333333334, 'weighted_gap_compressed_identity': 0.8823529411764706}
+sequence_1 1.0 True 1.0 1.0
+sequence_2 0.875 True 0.7 0.7777777777777778
+sequence_3 0.0 False None None
+```
+
+With wfmash (the aligner used by Huang et al.):
+
+```python
+from dnakit.evaluation import ReferenceConsistencyConfig
+
+report = evaluate_reference_consistency(
+    generated,                       # DNA([...]) of kilobase-scale or longer sequences
+    reference_fasta="training.fa",   # training or real-sequence FASTA; hg38 if omitted
+    config=ReferenceConsistencyConfig(
+        aligner="wfmash",
+        wfmash_args=("-w", "1000"),  # optional; see wfmash -h of the installed version
+    ),
+)
 ```
 
 ## 2) Uniqueness {#2-eval-005-uniqueness}
 
 - **Purpose:** Group sequences according to exact, reverse complement, IUPAC or approximate equivalent rules, return the number of unique sequences, proportions and repeat groups, used to measure the proportion of independent records in the set.
 - **Method:** Deduplicate using the equivalence rule and divide the unique count by the total count.
+- **References:** With the default `exact` rule this is the Unique@k metric of MOSES (Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644, [DOI](https://doi.org/10.3389/fphar.2020.565644)) and the Uniqueness of seqme (Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025): the fraction of distinct sequences in the generated set. Reverse-complement, IUPAC and approximate equivalence are DNAKit extensions for DNA.
 - **API:**  `dnakit.evaluation.evaluate_uniqueness(value[required], config[optional], plot[optional])`; `config` uses `dnakit.evaluation.UniquenessEvaluationConfig`.
 - **Input:**  `DNA([...])` or another DNA record collection; optional equivalence rules, methods and thresholds.
 - **Output:** Returns `EvaluationReport`; `metrics` contains the uniqueness score and duplicate groups.
@@ -119,8 +153,9 @@ print(report.metrics["duplicate_groups"])  # (("sequence_1", "sequence_2"),)
 
 ## 3) Diversity {#3-eval-006-diversity}
 
-- **Purpose:** Calculate the mean raw Levenshtein distance over all sequence pairs using the paper's formula.
+- **Purpose:** Calculate the mean raw Levenshtein distance over all sequence pairs, measuring how different the members of a generated set are.
 - **Method:** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`, equivalent to the mean raw edit distance over all unordered pairs; returns `None` for fewer than two sequences.
+- **References:** The formula is equation (2) of Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022 ([PMLR](https://proceedings.mlr.press/v162/jain22a.html)); Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440 ([DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)) use Levenshtein distance as its distance for DNA generation, and D3LM (Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026) uses the same formula in Appendix B.
 - **API:**  `dnakit.evaluation.evaluate_diversity(value[required], config[optional], plot[optional])`; `config` uses `dnakit.evaluation.DiversityEvaluationConfig`.
 - **Input:**  `DNA([...])` or another DNA record collection; set `show_progress=True` to display pairwise progress. The default uses up to 16 processes. Set `DiversityEvaluationConfig(workers=8)` to adjust this, or `workers=1` for serial execution; the metric is unchanged.
 - **Output:** Returns `EvaluationReport`; `metrics` contains mean pairwise Levenshtein distance.
@@ -157,12 +192,13 @@ print(report.metrics["mean_nearest_neighbor_distance"])
 
 ## 4) Novelty {#4-eval-008-novelty}
 
-- **Purpose:** Report continuous novelty and full-record exact-match rate side by side. By default, each query has `novelty = 1 - nearest-reference similarity`, and `score` is their mean. `exact_match_rate` is the fraction of queries literally equal to any full reference record. A second method reports each query's minimum raw Levenshtein distance and its mean, alongside the exact-match rate.
-- **Method:** Check literal equality against every reference record independently of nearest-hit ranking. Novelty no longer uses a `0.9` cutoff to produce `is_novel` or `novel_fraction`. `copy_threshold` applies only to memorization/near-copy evaluation and has no effect on these novelty results.
+- **Purpose:** Measure how far generated sequences are from a reference library (usually the training set), and report the fraction of full-record exact copies alongside.
+- **Method:** By default (`novelty_calculation="levenshtein"`), each query's novelty is its raw Levenshtein distance to the nearest reference record, and `score` is the mean: `Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`, in edit operations without normalization. `exact_match_rate` is the fraction of queries literally equal to any full reference record; it checks every reference record, independently of nearest-hit ranking. The alternative `novelty_calculation="similarity"` reports `novelty = 1 - nearest-reference similarity` (0–1), with similarity set by `method` (k-mer by default). Neither method uses a `0.9` cutoff to produce `is_novel` or `novel_fraction`; `copy_threshold` applies only to memorization/near-copy evaluation.
+- **References:** The default formula is equation (3) of Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022 ([PMLR](https://proceedings.mlr.press/v162/jain22a.html)); Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440 ([DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)) use Levenshtein distance for DNA, and D3LM (Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026) uses the same formula in Appendix B, equation (9). `exact_match_rate` is the complement of the Novelty of MOSES (Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644, [DOI](https://doi.org/10.3389/fphar.2020.565644)) and seqme (Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025) (the fraction of sequences absent from the reference set): their Novelty = `1 - exact_match_rate`.
 - **API:**  `dnakit.evaluation.evaluate_novelty(queries[required], reference[required], config[optional], plot[optional])`; `config` uses `dnakit.evaluation.ReferenceSearchConfig`.
-- **Input:**  a `DNA([...])` query collection and a non-empty `ReferenceLibrary`; the default is `novelty_calculation="similarity"`, while the paper method uses `novelty_calculation="levenshtein"`; `show_progress=True` is optional.
-- **Output:** Returns `EvaluationReport`; `metrics` contains mean novelty score and exact-match rate.
-- **Optional plots:** `plot=True` saves `novelty_batch_summary.png` (mean novelty and exact-match rate), `novelty_distribution.png` (per-query novelty), and `novelty_nearest_levenshtein.png` (raw nearest-reference edit distances) in the current working directory. The default is `False`; existing files with these names are overwritten. Nonempty text in query-record `metadata["batch"]` groups the summary bars by batch; otherwise they show one evaluated set. The third plot performs an additional Levenshtein scan in similarity mode. Plotting requires `dnakit[bio-plots]`. In Levenshtein mode, per-query novelty already is the nearest raw edit distance, so the two histograms show the same distances.
+- **Input:**  a `DNA([...])` query collection and a non-empty `ReferenceLibrary`; `show_progress=True` is optional. The default Levenshtein method computes an edit distance for every query–reference pair, so large references take long; switch to `novelty_calculation="similarity"` for them.
+- **Output:** Returns `EvaluationReport`; `metrics` contains `score` (mean novelty), `exact_match_rate` and `exact_match_count`; the Levenshtein method also reports the mean, minimum and maximum nearest edit distance.
+- **Optional plots:** `plot=True` saves `novelty_batch_summary.png` (mean novelty and exact-match rate), `novelty_distribution.png` (per-query novelty), and `novelty_nearest_levenshtein.png` (raw nearest-reference edit distances) in the current working directory. The default is `False`; existing files with these names are overwritten. Nonempty text in query-record `metadata["batch"]` groups the summary bars by batch; otherwise they show one evaluated set. With the default Levenshtein method, per-query novelty already is the nearest raw edit distance, so the two histograms show the same distances; the similarity method performs an additional Levenshtein scan for the third plot. Plotting requires `dnakit[bio-plots]`.
 - **Example code:**
 
 ```python
@@ -178,18 +214,22 @@ reference = create_reference_library(
 )
 queries = DNA(["AAAA", "GGGG"])
 
-report = evaluate_novelty(
+report = evaluate_novelty(queries, reference)
+print(report.metrics["score"])             # mean nearest edit distance: (0 + 4) / 2 = 2.0
+print(report.metrics["exact_match_rate"])  # full-record exact-match rate: 0.5
+
+similarity = evaluate_novelty(
     queries,
     reference,
-    config=ReferenceSearchConfig(method="identity"),
+    config=ReferenceSearchConfig(novelty_calculation="similarity", method="identity"),
 )
-print(report.metrics["score"])             # mean novelty: 0.5
-print(report.metrics["exact_match_rate"])  # full-record exact-match rate: 0.5
+print(similarity.metrics["score"])         # similarity method: mean 1 - identity = 0.5
 ```
 
-- **Example output:**
+- **Example output：**
 
 ```text
+2.0
 0.5
 0.5
 ```

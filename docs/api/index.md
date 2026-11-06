@@ -321,7 +321,7 @@ assert alignment.query_coverage == 1.0
 
 ::: dnakit.evaluation
 
-reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 默认定义为相对于该库的 `1 - nearest_similarity`，也可选择论文中的平均最近参考 Levenshtein 距离；diversity 使用全部序列对的平均原始 Levenshtein 距离。memorization 是 exact 或显式阈值近似复制。
+reference-based 方法必须先调用 `create_reference_library()` 绑定名称、版本、来源、日期、filter、索引参数和内容 digest。novelty 默认为到该库最近序列的平均原始 Levenshtein 距离（Jain et al. 2022 式 (3)），也可选择 `1 - nearest_similarity`；diversity 使用全部序列对的平均原始 Levenshtein 距离。memorization 是 exact 或显式阈值近似复制。
 
 `evaluate_synthesis_risk()` 的输出是透明规则和命中位置，不是供应商接单规则、结构预测或实验成功概率。`evaluate_scorecard()` 保留每一分项、归一化方向、权重、缺失策略和贡献。
 

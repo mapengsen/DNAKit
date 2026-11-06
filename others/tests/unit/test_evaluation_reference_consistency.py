@@ -64,7 +64,16 @@ def test_batch_dna_reports_per_sequence_and_aggregate_validity(
         sum(entry.metrics["is_valid"] for entry in syntax.entries) / 3
     )
     assert syntax.metrics["valid_fraction"] == pytest.approx(2 / 3)
-    assert set(reference.metrics) == {"consistency_rate"}
+    assert set(reference.metrics) == {
+        "consistency_rate",
+        "query_count",
+        "aligned_count",
+        "aligned_fraction",
+        "weighted_blast_identity",
+        "weighted_gap_compressed_identity",
+    }
+    assert reference.metrics["aligned_fraction"] == pytest.approx(2 / 3)
+    assert reference.metrics["weighted_blast_identity"] == pytest.approx(15 / 16)
     assert reference.metrics["consistency_rate"] == pytest.approx((1 + 7 / 8 + 0) / 3)
     assert [entry.metrics["consistency_rate"] for entry in reference.entries] == pytest.approx(
         [1, 7 / 8, 0]
@@ -95,7 +104,10 @@ def test_reference_consistency_distinguishes_exact_partial_and_unmapped(tmp_path
     assert [entry.metrics["consistency_rate"] for entry in report.entries] == pytest.approx(
         [1, 7 / 8, 0]
     )
-    assert all(set(entry.metrics) == {"consistency_rate"} for entry in report.entries)
+    assert [entry.metrics["aligned"] for entry in report.entries] == [True, True, False]
+    assert [entry.metrics["best_target"] for entry in report.entries] == ["chr1", "chr2", None]
+    assert report.entries[2].metrics["blast_identity"] is None
+    assert report.entries[2].metrics["query_coverage"] == 0.0
     assert report.provenance.reference is not None
     assert report.provenance.reference.checksum == "a" * 64
     assert json.loads(json.dumps(report.to_dict()))["metrics"]["consistency_rate"] == pytest.approx(
@@ -277,3 +289,191 @@ def test_missing_minimap2_fails_before_any_download(monkeypatch: pytest.MonkeyPa
     with pytest.raises(BackendUnavailableError) as error:
         evaluate_reference_consistency(DNASequence("ACGT"))
     assert error.value.code == "MINIMAP2_UNAVAILABLE"
+
+
+def test_paper_example_blast_and_gap_compressed_identity(tmp_path: Path) -> None:
+    """Huang et al. Fig. 4: 10 columns, 7 matches, one 2-base gap -> BI 7/10, GI 7/9."""
+
+    path = _paf(
+        tmp_path / "paper.paf",
+        ["query\t8\t0\t8\t+\tref\t100\t20\t30\t7\t10\t60\tcg:Z:3=1X2D4="],
+    )
+    report = evaluate_reference_consistency(
+        DNASet([DNARecord(DNASequence("ACGTACGT"), "query")]),
+        path,
+        reference_name="example",
+        reference_version="1",
+    )
+    entry = report.entries[0].metrics
+    assert entry["blast_identity"] == pytest.approx(0.7)
+    assert entry["gap_compressed_identity"] == pytest.approx(7 / 9)
+    assert entry["consistency_rate"] == pytest.approx(7 / 8)
+    assert report.metrics["weighted_blast_identity"] == pytest.approx(0.7)
+    assert report.metrics["weighted_gap_compressed_identity"] == pytest.approx(7 / 9)
+    assert report.metrics["aligned_fraction"] == 1.0
+
+
+def test_minimap2_m_cigar_uses_alignment_columns_and_gap_runs(tmp_path: Path) -> None:
+    # 6M2I2M: 8 aligned pairs, 2 inserted query bases in one run, 7 matches.
+    path = _paf(
+        tmp_path / "m.paf",
+        ["query\t10\t0\t10\t+\tchr1\t100\t0\t8\t7\t10\t60\ttp:A:P\tcg:Z:6M2I2M"],
+    )
+    report = evaluate_reference_consistency(
+        DNASet([DNARecord(DNASequence("ACGTACGTAC"), "query")]),
+        path,
+        reference_name="human",
+        reference_version="GRCh38",
+    )
+    entry = report.entries[0].metrics
+    assert entry["blast_identity"] == pytest.approx(7 / 10)
+    assert entry["gap_compressed_identity"] == pytest.approx(7 / 9)
+    assert entry["consistency_rate"] == pytest.approx(7 / 10)
+
+
+def test_wfmash_fragments_pool_per_target_and_pick_best_target(tmp_path: Path) -> None:
+    # wfmash splits one 10 bp query into overlapping fragments on chrA (with =/X
+    # CIGARs, no tp:A tag); a weaker single hit on chrB must not be chosen.
+    path = _paf(
+        tmp_path / "wfmash.paf",
+        [
+            "q\t10\t0\t6\t+\tchrA\t100\t0\t6\t5\t6\t60\tgi:f:0.83\tcg:Z:2=1X3=",
+            "q\t10\t4\t10\t+\tchrA\t100\t4\t10\t6\t6\t60\tgi:f:1\tcg:Z:6=",
+            "q\t10\t0\t10\t-\tchrB\t100\t0\t10\t6\t10\t60\tcg:Z:6=4X",
+        ],
+    )
+    report = evaluate_reference_consistency(
+        DNASet([DNARecord(DNASequence("ACGTACGTAC"), "q")]),
+        path,
+        reference_name="training",
+        reference_version="1",
+    )
+    entry = report.entries[0].metrics
+    assert entry["best_target"] == "chrA"
+    # Matched query positions: 0-2 and 3-6 from the first fragment, 4-10 from the second.
+    assert entry["consistency_rate"] == pytest.approx(9 / 10)
+    assert entry["query_coverage"] == 1.0
+    assert entry["blast_identity"] == pytest.approx(11 / 12)
+    assert entry["gap_compressed_identity"] == pytest.approx(11 / 12)
+
+
+def test_reverse_strand_eq_cigar_maps_matches_from_query_end(tmp_path: Path) -> None:
+    path = _paf(
+        tmp_path / "minus.paf",
+        ["q\t10\t2\t8\t-\tchr1\t100\t0\t6\t4\t6\t60\tcg:Z:4=2X"],
+    )
+    report = evaluate_reference_consistency(
+        DNASet([DNARecord(DNASequence("ACGTACGTAC"), "q")]),
+        path,
+        reference_name="r",
+        reference_version="1",
+    )
+    assert report.entries[0].metrics["consistency_rate"] == pytest.approx(0.4)
+    assert report.entries[0].metrics["query_coverage"] == pytest.approx(0.6)
+
+
+def test_min_query_coverage_controls_aligned_fraction(tmp_path: Path) -> None:
+    path = _paf(
+        tmp_path / "coverage.paf",
+        [
+            "full\t8\t0\t8\t+\tchr1\t100\t0\t8\t8\t8\t60\tcg:Z:8M",
+            "half\t8\t0\t4\t+\tchr1\t100\t0\t4\t3\t4\t60\tcg:Z:4M",
+        ],
+    )
+    queries = DNASet(
+        [
+            DNARecord(DNASequence("ACGTACGT"), "full"),
+            DNARecord(DNASequence("ACGTACGT"), "half"),
+        ]
+    )
+    loose = evaluate_reference_consistency(queries, path, reference_name="r", reference_version="1")
+    strict = evaluate_reference_consistency(
+        queries,
+        path,
+        reference_name="r",
+        reference_version="1",
+        config=ReferenceConsistencyConfig(min_query_coverage=0.9),
+    )
+    assert loose.metrics["aligned_fraction"] == 1.0
+    assert loose.metrics["weighted_blast_identity"] == pytest.approx(11 / 12)
+    assert strict.metrics["aligned_fraction"] == 0.5
+    assert strict.metrics["weighted_blast_identity"] == 1.0
+    assert [entry.metrics["aligned"] for entry in strict.entries] == [True, False]
+    # The consistency rate does not depend on the threshold.
+    assert loose.metrics["consistency_rate"] == strict.metrics["consistency_rate"]
+
+
+def test_reference_consistency_rejects_cigar_inconsistent_with_paf(tmp_path: Path) -> None:
+    path = _paf(
+        tmp_path / "bad.paf",
+        ["q\t8\t0\t8\t+\tchr1\t100\t0\t8\t8\t8\t60\tcg:Z:6M"],
+    )
+    with pytest.raises(ConfigurationError) as error:
+        evaluate_reference_consistency(
+            DNASet([DNARecord(DNASequence("ACGTACGT"), "q")]),
+            path,
+            reference_name="r",
+            reference_version="1",
+        )
+    assert error.value.code == "INVALID_REFERENCE_CONSISTENCY_PAF"
+
+
+def test_wfmash_config_validation() -> None:
+    assert ReferenceConsistencyConfig(aligner="wfmash", wfmash_args=("-w", "1000")).aligner == (
+        "wfmash"
+    )
+    with pytest.raises(ConfigurationError):
+        ReferenceConsistencyConfig(aligner="bwa")
+    with pytest.raises(ConfigurationError):
+        ReferenceConsistencyConfig(aligner="wfmash", wfmash_args=("--sam",))
+    with pytest.raises(ConfigurationError):
+        ReferenceConsistencyConfig(wfmash_args=["-w", "1000"])  # type: ignore[arg-type]
+    with pytest.raises(ConfigurationError):
+        ReferenceConsistencyConfig(min_query_coverage=1.5)
+
+
+def test_wfmash_runs_on_indexed_reference_and_reads_stdout_paf(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = import_module("dnakit.evaluation.reference_consistency")
+    fasta = tmp_path / "training.fa"
+    fasta.write_text(">ref1 desc\nACGTAC\nGTAC\n>ref2\nTTTT\n", encoding="ascii")
+    calls: list[tuple[str, ...]] = []
+
+    def fake_execute(executable: str, args: tuple[str, ...], **kwargs: object) -> SimpleNamespace:
+        calls.append(args)
+        query = Path(args[1])
+        assert Path(str(query) + ".fai").read_text(encoding="ascii") == "sequence\t4\t10\t4\t5\n"
+        assert kwargs["backend_id"] == "wfmash"
+        Path(str(kwargs["stdout_path"])).write_text(
+            "sequence\t4\t0\t4\t+\tref1\t10\t0\t4\t4\t4\t255\tcg:Z:4=\n",
+            encoding="ascii",
+        )
+        return SimpleNamespace(return_code=0, output="")
+
+    monkeypatch.setattr(module.shutil, "which", lambda _: "/usr/bin/true")
+    monkeypatch.setattr(module, "execute_bounded_command", fake_execute)
+    report = evaluate_reference_consistency(
+        DNASequence("ACGT"),
+        reference_fasta=fasta,
+        config=ReferenceConsistencyConfig(aligner="wfmash", wfmash_args=("-S", "0")),
+    )
+    assert calls[0][0] == str(fasta)
+    assert calls[0][2:] == ("-t", "1", "--quiet", "-S", "0")
+    assert (tmp_path / "training.fa.fai").read_text(encoding="ascii") == (
+        "ref1\t10\t11\t6\t7\nref2\t4\t29\t4\t5\n"
+    )
+    assert report.metrics["consistency_rate"] == 1.0
+    assert report.parameters["aligner"] == "wfmash"
+    assert report.parameters["alignment_source"] == "wfmash-generated"
+    assert tuple(report.parameters["wfmash_args"]) == ("-S", "0")
+
+
+def test_missing_wfmash_reports_its_own_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = import_module("dnakit.evaluation.reference_consistency")
+    monkeypatch.setattr(module.shutil, "which", lambda _: None)
+    with pytest.raises(BackendUnavailableError) as error:
+        evaluate_reference_consistency(
+            DNASequence("ACGT"), config=ReferenceConsistencyConfig(aligner="wfmash")
+        )
+    assert error.value.code == "WFMASH_UNAVAILABLE"

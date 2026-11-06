@@ -4,6 +4,8 @@
 
 参考相似度和分布相似度在数据评价下单列于[相似度计算](09_similarity_alignment.md)。参考库相似度、新颖性等指标使用调用方提供的 `ReferenceLibrary`；参考基因组一致性使用本地 FASTA 或 PAF。novelty 不是实验结论或任务模型预测。
 
+默认设置下，Validity、Uniqueness、Diversity 和 Novelty 按以下文献的定义计算：参考基因组一致性默认用 minimap2 比对，报告 Huang et al. 的 BI/GI 与比对比例；Uniqueness 默认 `exact` 去重（MOSES、seqme）；Diversity 和 Novelty 默认使用原始 Levenshtein 距离（Jain et al. 2022；Cherednichenko & Poptsova 2025；D3LM）。各节列出完整引用。
+
 以下 API 括号内列出全部直接调用参数；`[必须]` 和 `[可选]` 是参数说明，不是 Python 语法。
 
 对 DNA 序列评价，普通批量输入统一使用 `DNA(["ACGT", "ACGA", ...])`；需要保留自定义 ID 或 metadata 时，可用 `DNA` 的记录字典输入。直接传原始 `list[str]` 不是评价函数的统一接口。逐条评价的结果在 `report.entries`，整体统计在 `report.metrics`。唯一性、多样性、片段/分布距离等是集合级指标，其整体值不等于逐条分数的平均。与参考数据比较时，仍需额外提供参考库或第二组 `DNA`；数值矩阵、FASTQ 路径和 scorecard 则继续使用各自的专用输入类型。
@@ -14,7 +16,7 @@
 | 一组 `DNA` | `evaluate_uniqueness`、`evaluate_diversity`、`evaluate_kmer_diversity`、`evaluate_redundancy` | 集合级 `metrics` |
 | `DNA` + `ReferenceLibrary` | `nearest_reference`、`evaluate_novelty`、`evaluate_memorization`、`evaluate_reference_similarity` | 逐条最近参考结果与汇总指标 |
 | 两组 `DNA` | `evaluate_fragment_similarity`、`evaluate_snn`、`evaluate_distribution_similarity`、`evaluate_frechet_distance` | SNN 有逐条结果；其余主要是集合级结果 |
-| `DNA` + 参考 FASTA/PAF | `evaluate_reference_consistency` | 逐条一致率及全体平均值 |
+| `DNA` + 参考 FASTA/PAF | `evaluate_reference_consistency` | 逐条一致率、BI/GI 及全体汇总 |
 
 `evaluate_scorecard` 接收的是指标名到数值或报告的映射，不直接接收 DNA 序列。
 其他只处理单条序列的操作可将 `DNA([...])` 交给[批量计算 `run_batch`](14_engineering.md#3-eng-006)，由回调逐条处理；它们不会自动改成返回集合平均值。
@@ -52,12 +54,20 @@ print([(entry.subject_id, entry.metrics["is_valid"]) for entry in report.entries
 
 ### 1.2 参考基因组一致性 {#1-2-reference-consistency}
 
-- **作用：** 衡量一组 DNA 序列与指定参考基因组的匹配程度，返回每条序列的一致率及所有输入序列的平均一致率。
-- **计算方法：** 为每条序列选取匹配碱基比例最高的主比对。单条一致率 = `PAF 匹配碱基数 / 该序列长度`；没有主比对时记为 `0`。总体 `consistency_rate` 是所有输入序列的一致率平均值，空输入时为 `None`。未参与比对的碱基仍包含在序列长度中。
-- **API：** `dnakit.evaluation.evaluate_reference_consistency(queries[必须], paf_path[可选], *, reference_fasta[可选], reference_dir[可选], reference_name[可选], reference_version[可选], reference_sha256[可选], config[可选], verbose[可选])`；`config` 使用 `dnakit.evaluation.ReferenceConsistencyConfig`。
-- **输入：** `DNA([...])` 或 DNA 记录集合。默认下载并复用 hg38 参考 FASTA；也可传入本地 `reference_fasta`，这两种方式需要 minimap2。传入已有 `paf_path` 时，需同时指定 `reference_name` 和 `reference_version`，且 PAF 的序列 ID 和长度须与输入一致。
-- **输出：** 返回 `EvaluationReport`。`report.metrics["consistency_rate"]` 是全部输入序列的平均一致率；`report.entries` 中每条记录的 `metrics["consistency_rate"]` 是该序列的一致率。
-- **示例代码：** 以下 PAF 是演示数据，用来展示平均值的计算。
+- **作用：** 衡量一组 DNA 序列与指定参考基因组（或训练集、真实序列）的匹配程度。除逐条一致率外，同时报告 Huang et al.（*Pangenome-Informed Language Models for Synthetic Genome Sequence Generation*，bioRxiv 10.1101/2024.09.18.612131）使用的比对分数：BLAST identity、gap-compressed identity 和比对上的序列比例。
+- **计算方法：** 每条序列的全部主比对按参考序列分组；wfmash 会把长序列切成多段比对，同一参考上的分段合并计算。取一致率最高的参考作为该序列的最佳匹配（"best match against the entire dataset"）。
+  - **一致率** `consistency_rate` = 匹配碱基覆盖的查询位置数 / 序列长度；没有主比对时记为 `0`。总体值是所有输入序列的平均值，空输入时为 `None`。
+  - **BLAST identity（BI）** = 匹配碱基数 / 比对列数（CIGAR 中 M/=/X/I/D 的总长）。
+  - **Gap-compressed identity（GI）** = 匹配碱基数 / (M/=/X 总长 + I/D 段数)，即连续 gap 只算一个差异。论文图 4 的例子（10 列、7 个匹配、1 个长 2 的 gap）得到 BI = 7/10、GI = 7/9。
+  - **比对比例** `aligned_fraction`（论文的 Align %）= 最佳匹配的查询覆盖率 ≥ `min_query_coverage` 的序列数 / 序列总数；默认 `min_query_coverage=0.0`，即有任意主比对就算比对上。
+  - **加权分数** `weighted_blast_identity`、`weighted_gap_compressed_identity`：对比对上的序列合并匹配数和列数后再相除（按比对长度加权，对应论文的 weighted GI/BI）；没有比对上的序列时为 `None`。
+  - wfmash 输出的 PAF 自带 `bi:f` 和 `gi:f` 标签，DNAKit 按 CIGAR 计算的 BI/GI 与这两个标签一致。
+- **默认设置：** 不传 `config` 时使用 minimap2（`preset="sr"`）比对，参考为 hg38 或传入的 `reference_fasta`。
+- **API：** `dnakit.evaluation.evaluate_reference_consistency(queries[必须], paf_path[可选], *, reference_fasta[可选], reference_dir[可选], reference_name[可选], reference_version[可选], reference_sha256[可选], config[可选], verbose[可选])`；`config` 使用 `dnakit.evaluation.ReferenceConsistencyConfig`，其中 `aligner` 为 `"minimap2"`（默认）或 `"wfmash"`，`wfmash_args` 为原样传给 wfmash 的额外参数，`min_query_coverage` 为"比对上"的覆盖率阈值。
+- **输入：** `DNA([...])` 或 DNA 记录集合。默认下载并复用 hg38 参考 FASTA；也可传入本地 `reference_fasta`（例如训练集）。这两种方式需要安装所选的比对工具。传入已有 `paf_path`（minimap2 `-c` 或 wfmash 的输出）时，需同时指定 `reference_name` 和 `reference_version`，且 PAF 的序列 ID 和长度须与输入一致。
+- **比对工具的选择：** minimap2 适合短序列（默认 `preset="sr"`）。wfmash 与论文一致，但面向 kb 级以上的长序列：默认参数下短于约 10 kb 的序列通常没有比对结果，会全部记为 0，可通过 `wfmash_args` 调低（例如 `("-S", "1000")`）。几百 bp 的序列即使调低参数通常也比对不上，应使用 minimap2。不同版本的 wfmash 参数不同：论文中的 segment length 在早期版本是 `-s`，在当前版本对应窗口长度 `-w`，请以已安装版本的 `wfmash -h` 为准。wfmash 需要参考 FASTA 的 `.fai` 索引，DNAKit 会自动生成并缓存在 FASTA 旁边（目录不可写时生成在临时目录）。
+- **输出：** 返回 `EvaluationReport`。`report.metrics` 包含 `consistency_rate`、`aligned_fraction`、`aligned_count`、`query_count`、`weighted_blast_identity` 和 `weighted_gap_compressed_identity`。`report.entries` 中每条记录的 `metrics` 包含 `consistency_rate`、`aligned`、`blast_identity`、`gap_compressed_identity`、`query_coverage` 和 `best_target`；没有比对时两个 identity 为 `None`。
+- **示例代码：** 以下 PAF 是演示数据；`sequence_2` 的比对就是论文图 4 的例子。
 
 ```python
 from pathlib import Path
@@ -71,7 +81,7 @@ with TemporaryDirectory() as folder:
     paf = Path(folder) / "example.paf"
     paf.write_text(
         "sequence_1\t8\t0\t8\t+\tchr1\t100\t20\t28\t8\t8\t60\ttp:A:P\tcg:Z:8M\n"
-        "sequence_2\t8\t0\t8\t-\tchr2\t100\t30\t38\t7\t8\t30\ttp:A:P\tcg:Z:8M\n",
+        "sequence_2\t8\t0\t8\t+\tchr2\t100\t30\t40\t7\t10\t60\ttp:A:P\tcg:Z:3=1X2D4=\n",
         encoding="utf-8",
     )
     report = evaluate_reference_consistency(
@@ -79,21 +89,45 @@ with TemporaryDirectory() as folder:
         verbose=False,
     )
 
-print(report.metrics["consistency_rate"])
-print([(entry.subject_id, entry.metrics["consistency_rate"]) for entry in report.entries])
+print({key: report.metrics[key] for key in (
+    "consistency_rate", "aligned_fraction",
+    "weighted_blast_identity", "weighted_gap_compressed_identity",
+)})
+for entry in report.entries:
+    m = entry.metrics
+    print(entry.subject_id, m["consistency_rate"], m["aligned"],
+          m["blast_identity"], m["gap_compressed_identity"])
 ```
 
 - **示例结果：**
 
 ```text
-0.625
-[('sequence_1', 1.0), ('sequence_2', 0.875), ('sequence_3', 0.0)]
+{'consistency_rate': 0.625, 'aligned_fraction': 0.6666666666666666, 'weighted_blast_identity': 0.8333333333333334, 'weighted_gap_compressed_identity': 0.8823529411764706}
+sequence_1 1.0 True 1.0 1.0
+sequence_2 0.875 True 0.7 0.7777777777777778
+sequence_3 0.0 False None None
+```
+
+使用 wfmash（与 Huang et al. 相同的比对工具）：
+
+```python
+from dnakit.evaluation import ReferenceConsistencyConfig
+
+report = evaluate_reference_consistency(
+    generated,                       # DNA([...])，长序列（kb 级以上）
+    reference_fasta="training.fa",   # 训练集或真实序列 FASTA；不传则用 hg38
+    config=ReferenceConsistencyConfig(
+        aligner="wfmash",
+        wfmash_args=("-w", "1000"),  # 可选：按已安装版本的 wfmash -h 设置窗口/分段长度等
+    ),
+)
 ```
 
 ## 2) Uniqueness {#2-eval-005-uniqueness}
 
 - **作用：** 按精确、反向互补、IUPAC 或近似等价规则对序列分组，返回唯一序列数量、比例及重复组，用于衡量集合中独立记录的占比。
 - **计算方法：** 按等价规则去重；唯一记录数除以总记录数得到唯一性分数。
+- **参考文献：** 默认 `exact` 规则下即 MOSES（Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644，[DOI](https://doi.org/10.3389/fphar.2020.565644)）的 Unique@k 指标和 seqme（Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025）的 Uniqueness：生成集合中互不相同的序列所占比例。反向互补、IUPAC 和近似等价规则是 DNAKit 针对 DNA 增加的扩展。
 - **API：** `dnakit.evaluation.evaluate_uniqueness(value[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.UniquenessEvaluationConfig`。
 - **输入：** `DNA([...])`；也支持 `DNASet` 等记录集合。可选等价规则、方法和阈值。
 - **输出：** 返回 `EvaluationReport`；`metrics` 包含唯一性分数和重复组。
@@ -119,8 +153,9 @@ print(report.metrics["duplicate_groups"])  # (("sequence_1", "sequence_2"),)
 
 ## 3) Diversity {#3-eval-006-diversity}
 
-- **作用：** 按论文公式计算全部序列对的平均原始 Levenshtein 距离。
+- **作用：** 计算全部序列对的平均原始 Levenshtein 距离，衡量生成集合内部的差异。
 - **计算方法：** `Σ(i≠j) Levenshtein(xᵢ,xⱼ) / [n(n−1)]`，等价于所有无序序列对的原始编辑距离均值；少于两条序列时返回 `None`。
+- **参考文献：** 公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (2)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将其中的距离设为 Levenshtein 距离用于 DNA 生成评价，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 使用相同公式。
 - **API：** `dnakit.evaluation.evaluate_diversity(value[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.DiversityEvaluationConfig`。
 - **输入：** `DNA([...])` 或其他 DNA 记录集合；可设置 `show_progress=True` 显示两两比较进度。默认最多使用 16 个进程并行计算；可通过 `DiversityEvaluationConfig(workers=8)` 调整，或设为 `workers=1` 使用单进程。结果不受进程数影响。
 - **输出：** 返回 `EvaluationReport`；`metrics` 包含平均成对 Levenshtein 距离。
@@ -157,12 +192,13 @@ print(report.metrics["mean_nearest_neighbor_distance"])
 
 ## 4) Novelty {#4-eval-008-novelty}
 
-- **作用：** 并列报告连续的新颖性值与完整序列精确一致比例。默认每条序列的 `novelty = 1 - 最近参考相似度`，汇总 `score` 为其平均值；`exact_match_rate` 是与参考库任意一条完整记录逐字相同的查询比例。第二种方法按论文公式报告每条查询到参考库的最小原始 Levenshtein 距离及其平均值，同时报告精确一致比例。
-- **计算方法：** 精确一致独立检查所有参考记录，不依赖最近相似序列的排序；不按 `0.9` 等阈值生成 `is_novel` 或 `novel_fraction`。`copy_threshold` 只用于记忆/近复制评价，对 Novelty 的两个结果无效。
+- **作用：** 衡量生成序列离参考库（通常是训练集）有多远，并同时报告完整序列精确一致的比例。
+- **计算方法：** 默认（`novelty_calculation="levenshtein"`）对每条查询计算它到参考库中最近一条序列的原始 Levenshtein 距离，`score` 为其平均值：`Nov = (1/N) Σᵢ minₛ Levenshtein(xᵢ, sₛ)`，单位是编辑操作数，不归一化。`exact_match_rate` 是与参考库任意一条完整记录逐字相同的查询比例，它独立检查所有参考记录，不依赖最近序列的排序。另一种方法 `novelty_calculation="similarity"` 计算 `novelty = 1 - 最近参考相似度`（0–1），相似度由 `method` 决定（默认 k-mer）。两种方法都不按 `0.9` 等阈值生成 `is_novel` 或 `novel_fraction`；`copy_threshold` 只用于记忆/近复制评价。
+- **参考文献：** 默认公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (3)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将距离设为 Levenshtein 距离用于 DNA，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 式 (9) 使用相同公式。`exact_match_rate` 对应 MOSES（Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644，[DOI](https://doi.org/10.3389/fphar.2020.565644)）和 seqme（Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025）的 Novelty（不在参考集中的序列比例）的补数：那里的 Novelty = `1 - exact_match_rate`。
 - **API：** `dnakit.evaluation.evaluate_novelty(queries[必须], reference[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.ReferenceSearchConfig`。
-- **输入：** `DNA([...])` 查询集合和非空 `ReferenceLibrary`；默认 `novelty_calculation="similarity"`，论文方法使用 `novelty_calculation="levenshtein"`；可设置 `show_progress=True`。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含平均新颖性分数和精确匹配率。
-- **可选绘图：** `plot=True` 在当前工作目录保存 `novelty_batch_summary.png`（平均新颖性与精确匹配率）、`novelty_distribution.png`（逐条新颖性分布）和 `novelty_nearest_levenshtein.png`（最近参考原始编辑距离分布）；默认 `False`，同名文件会覆盖。查询记录的 `metadata["batch"]` 若为非空文本，汇总柱状图会按批次分组；否则显示一个查询集。相似度模式绘制第三张图时会额外计算 Levenshtein 距离。绘图需要 `dnakit[bio-plots]`。Levenshtein 模式下，新颖性本身就是最近参考原始编辑距离，因此后两张直方图展示同一组距离。
+- **输入：** `DNA([...])` 查询集合和非空 `ReferenceLibrary`；可设置 `show_progress=True`。默认的 Levenshtein 方法要对每一对查询和参考序列计算编辑距离，参考库很大时耗时较长，可改用 `novelty_calculation="similarity"`。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含 `score`（平均新颖性）、`exact_match_rate` 和 `exact_match_count`；Levenshtein 方法另有最近编辑距离的平均值、最小值和最大值。
+- **可选绘图：** `plot=True` 在当前工作目录保存 `novelty_batch_summary.png`（平均新颖性与精确匹配率）、`novelty_distribution.png`（逐条新颖性分布）和 `novelty_nearest_levenshtein.png`（最近参考原始编辑距离分布）；默认 `False`，同名文件会覆盖。查询记录的 `metadata["batch"]` 若为非空文本，汇总柱状图会按批次分组；否则显示一个查询集。默认的 Levenshtein 方法下，新颖性本身就是最近参考原始编辑距离，因此后两张直方图展示同一组距离；similarity 方法绘制第三张图时会额外计算 Levenshtein 距离。绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
 ```python
@@ -178,18 +214,22 @@ reference = create_reference_library(
 )
 queries = DNA(["AAAA", "GGGG"])
 
-report = evaluate_novelty(
+report = evaluate_novelty(queries, reference)
+print(report.metrics["score"])             # 平均最近编辑距离：(0 + 4) / 2 = 2.0
+print(report.metrics["exact_match_rate"])  # 完整序列精确一致比例：0.5
+
+similarity = evaluate_novelty(
     queries,
     reference,
-    config=ReferenceSearchConfig(method="identity"),
+    config=ReferenceSearchConfig(novelty_calculation="similarity", method="identity"),
 )
-print(report.metrics["score"])             # 平均 novelty：0.5
-print(report.metrics["exact_match_rate"])  # 完整序列精确一致比例：0.5
+print(similarity.metrics["score"])         # similarity 方法：平均 1 - identity = 0.5
 ```
 
 - **示例结果：**
 
 ```text
+2.0
 0.5
 0.5
 ```

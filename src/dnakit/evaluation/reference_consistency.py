@@ -1,4 +1,10 @@
-"""Reference-genome alignment summaries from FASTA or minimap2 PAF."""
+"""Reference-genome alignment summaries from FASTA or minimap2/wfmash PAF.
+
+Besides the matched-base consistency rate, each report carries the alignment
+scores of Huang et al. (bioRxiv 10.1101/2024.09.18.612131): BLAST identity
+(matches / alignment columns), gap-compressed identity (consecutive gaps count
+as one difference) and the fraction of aligned queries.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +13,7 @@ import math
 import re
 import shutil
 import tempfile
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import cast
@@ -24,16 +30,35 @@ from .config import EvaluationLimits
 from .results import EvaluationEntry, EvaluationReport
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+_CIGAR = re.compile(r"(\d+)([MIDNSHP=X])")
+_ALIGNERS = frozenset({"minimap2", "wfmash"})
+_WFMASH_RESERVED = frozenset(
+    {"-a", "--sam", "-m", "--approx-mapping", "-t", "--threads", "-i", "--align-paf", "-h"}
+)
 
 
 @dataclass(frozen=True, slots=True)
 class ReferenceConsistencyConfig:
-    """Resource limits and minimap2 settings for reference consistency."""
+    """Aligner choice, aligner settings and resource limits for reference consistency.
+
+    ``aligner`` selects minimap2 (default; suitable for short sequences) or
+    wfmash (the aligner used by Huang et al.; intended for kilobase-scale and
+    longer sequences). ``wfmash_args`` are extra wfmash options passed
+    verbatim, e.g. ``("-w", "1000", "-S", "1000")``; wfmash options differ
+    between releases, so check ``wfmash -h`` for the installed version.
+    ``min_query_coverage`` is the aligned query fraction a query's best target
+    needs for the query to count as aligned in ``aligned_fraction`` and the
+    weighted identities; ``0.0`` counts every reported primary alignment.
+    """
 
     max_paf_bytes: int = 200_000_000
     max_alignments: int = 1_000_000
+    aligner: str = "minimap2"
     minimap2_executable: str = "minimap2"
+    wfmash_executable: str = "wfmash"
     preset: str = "sr"
+    wfmash_args: tuple[str, ...] = ()
+    min_query_coverage: float = 0.0
     threads: int = 1
     timeout_seconds: float = 3600.0
     limits: EvaluationLimits = field(default_factory=EvaluationLimits)
@@ -47,12 +72,27 @@ class ReferenceConsistencyConfig:
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= maximum:
                 raise ConfigurationError(f"{name} must be an integer in [1, {maximum}].")
-        if (
-            not isinstance(self.minimap2_executable, str)
-            or not self.minimap2_executable.strip()
-            or "\x00" in self.minimap2_executable
+        if self.aligner not in _ALIGNERS:
+            raise ConfigurationError("aligner must be 'minimap2' or 'wfmash'.")
+        for name in ("minimap2_executable", "wfmash_executable"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip() or "\x00" in value:
+                raise ConfigurationError(f"{name} must be non-empty text.")
+        if not isinstance(self.wfmash_args, tuple) or any(
+            not isinstance(argument, str) or not argument or "\x00" in argument
+            for argument in self.wfmash_args
         ):
-            raise ConfigurationError("minimap2_executable must be non-empty text.")
+            raise ConfigurationError("wfmash_args must be a tuple of non-empty strings.")
+        if _WFMASH_RESERVED.intersection(self.wfmash_args):
+            raise ConfigurationError(
+                "wfmash_args must not change the PAF output, threads, or alignment mode."
+            )
+        if (
+            isinstance(self.min_query_coverage, bool)
+            or not isinstance(self.min_query_coverage, (int, float))
+            or not 0.0 <= self.min_query_coverage <= 1.0
+        ):
+            raise ConfigurationError("min_query_coverage must be in [0, 1].")
         if self.preset not in {"sr", "asm5", "asm10", "asm20", "map-hifi", "map-ont"}:
             raise ConfigurationError("Unsupported minimap2 preset.")
         if (
@@ -69,27 +109,56 @@ class ReferenceConsistencyConfig:
 @dataclass(frozen=True, slots=True)
 class _PafHit:
     target: str
-    strand: str
     query_start: int
     query_end: int
-    target_start: int
-    target_end: int
     matches: int
-    block_length: int
+    columns: int
+    gap_compressed_columns: int
     mapq: int
-    query_length: int
+    match_intervals: tuple[tuple[int, int], ...] | None
 
-    @property
-    def identity(self) -> float:
-        return self.matches / self.block_length
 
-    @property
-    def query_coverage(self) -> float:
-        return (self.query_end - self.query_start) / self.query_length
+def _cigar_scores(
+    cigar: str, strand: str, query_start: int, query_end: int, paf_matches: int
+) -> tuple[int, int, int, tuple[tuple[int, int], ...] | None]:
+    """Return matches, alignment columns, gap-compressed columns and '=' query intervals.
 
-    @property
-    def matched_fraction(self) -> float:
-        return self.matches / self.query_length
+    Columns are M/=/X/I/D bases (BLAST identity denominator); gap-compressed
+    columns count each I/D run once. With =/X operations the matches and
+    matched query intervals come from the CIGAR (wfmash); with M operations the
+    PAF match count is used and matched positions are unknown (minimap2).
+    """
+
+    operations = [(int(count), op) for count, op in _CIGAR.findall(cigar)]
+    if "".join(f"{count}{op}" for count, op in operations) != cigar:
+        raise ValueError("Malformed cg:Z CIGAR")
+    pairs = sum(count for count, op in operations if op in "M=X")
+    gaps = sum(count for count, op in operations if op in "ID")
+    gap_runs = sum(1 for count, op in operations if op in "ID" and count)
+    query_span = sum(count for count, op in operations if op in "M=XI")
+    if pairs == 0 or query_span != query_end - query_start:
+        raise ValueError("CIGAR does not span the PAF query interval")
+    if not any(op in "=X" for _, op in operations):
+        if paf_matches > pairs:
+            raise ValueError("PAF match count exceeds CIGAR aligned pairs")
+        return paf_matches, pairs + gaps, pairs + gap_runs, None
+    intervals: list[tuple[int, int]] = []
+    position = query_start if strand == "+" else query_end
+    for count, op in operations:
+        if op not in "M=XI":
+            continue
+        if strand == "+":
+            interval = (position, position + count)
+            position += count
+        else:
+            interval = (position - count, position)
+            position -= count
+        if op == "=":
+            intervals.append(interval)
+        elif op == "M":
+            raise ValueError("CIGAR mixes M with =/X operations")
+    matches = sum(stop - begin for begin, stop in intervals)
+    return matches, pairs + gaps, pairs + gap_runs, tuple(intervals)
 
 
 def _parse_paf_line(
@@ -97,8 +166,8 @@ def _parse_paf_line(
 ) -> tuple[str, _PafHit | None]:
     columns = line.rstrip("\r\n").split("\t")
     try:
-        if len(columns) < 14:
-            raise ValueError("Expected PAF columns with tp:A and cg:Z tags")
+        if len(columns) < 13:
+            raise ValueError("Expected 12 PAF columns plus a cg:Z tag")
         query = columns[0]
         if query not in lengths:
             raise ValueError("Query ID is absent from the input sequences")
@@ -119,19 +188,74 @@ def _parse_paf_line(
         ):
             raise ValueError("Invalid PAF lengths, coordinates, strand, or match count")
         types = [tag[5:] for tag in columns[12:] if tag.startswith("tp:A:")]
-        if len(types) != 1 or types[0] not in {"P", "I", "S", "i"}:
-            raise ValueError("Expected exactly one valid minimap2 tp:A tag")
+        if len(types) > 1 or (types and types[0] not in {"P", "I", "S", "i"}):
+            raise ValueError("Expected at most one valid tp:A tag")
         cigars = [tag[5:] for tag in columns[12:] if tag.startswith("cg:Z:")]
         if len(cigars) != 1 or not cigars[0]:
-            raise ValueError("Expected a cg:Z tag from base-level alignment (-c)")
+            raise ValueError("Expected a cg:Z tag from base-level alignment")
+        scores = _cigar_scores(cigars[0], strand, qs, qe, matches)
     except ValueError as exc:
         raise ConfigurationError(
             f"Invalid PAF at line {line_number}: {exc}.",
             code="INVALID_REFERENCE_CONSISTENCY_PAF",
         ) from exc
-    if types[0] in {"S", "i"}:
+    if types and types[0] in {"S", "i"}:
         return query, None
-    return query, _PafHit(target, strand, qs, qe, ts, te, matches, block_length, mapq, qlen)
+    return query, _PafHit(target, qs, qe, *scores[:3], mapq, scores[3])
+
+
+def _union_length(intervals: Iterable[tuple[int, int]]) -> int:
+    total = 0
+    reach = -1
+    for begin, stop in sorted(intervals):
+        if stop <= reach:
+            continue
+        total += stop - max(begin, reach)
+        reach = stop
+    return total
+
+
+@dataclass(frozen=True, slots=True)
+class _QueryAlignment:
+    """All primary records of one query against its best-matching target."""
+
+    target: str
+    consistency_rate: float
+    query_coverage: float
+    matches: int
+    columns: int
+    gap_compressed_columns: int
+    mapq: int
+
+    @property
+    def blast_identity(self) -> float:
+        return self.matches / self.columns
+
+    @property
+    def gap_compressed_identity(self) -> float:
+        return self.matches / self.gap_compressed_columns
+
+    @classmethod
+    def pool(cls, target: str, hits: list[_PafHit], query_length: int) -> _QueryAlignment:
+        if all(hit.match_intervals is not None for hit in hits):
+            matched = _union_length(
+                interval for hit in hits for interval in hit.match_intervals or ()
+            )
+        else:
+            matched = min(query_length, sum(hit.matches for hit in hits))
+        return cls(
+            target,
+            matched / query_length,
+            _union_length((hit.query_start, hit.query_end) for hit in hits) / query_length,
+            sum(hit.matches for hit in hits),
+            sum(hit.columns for hit in hits),
+            sum(hit.gap_compressed_columns for hit in hits),
+            max(hit.mapq for hit in hits),
+        )
+
+    @property
+    def rank(self) -> tuple[float, float, float, int]:
+        return (self.consistency_rate, self.blast_identity, self.query_coverage, self.mapq)
 
 
 def _sha256_file(path: Path) -> str:
@@ -140,6 +264,78 @@ def _sha256_file(path: Path) -> str:
         while block := stream.read(1_048_576):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _write_fai(fasta: Path, destination: Path) -> None:
+    """Write a samtools-compatible .fai index for an uncompressed FASTA."""
+
+    records: list[str] = []
+    name: str | None = None
+    length = offset = line_bases = line_width = 0
+    short_line_seen = False
+    position = 0
+
+    def finish() -> None:
+        if name is not None:
+            records.append(f"{name}\t{length}\t{offset}\t{line_bases}\t{line_width}\n")
+
+    with fasta.open("rb") as stream:
+        for raw in stream:
+            if raw.startswith(b">"):
+                finish()
+                fields = raw[1:].split()
+                if not fields:
+                    raise ConfigurationError(f"FASTA record without a name in {fasta}.")
+                name = fields[0].decode("utf-8", errors="strict")
+                length = line_bases = line_width = 0
+                short_line_seen = False
+                offset = position + len(raw)
+            elif name is not None:
+                bases = len(raw.rstrip(b"\r\n"))
+                if bases:
+                    if short_line_seen or (line_bases and bases > line_bases):
+                        raise ConfigurationError(
+                            f"FASTA {fasta} has uneven line lengths; index it with samtools faidx.",
+                            code="REFERENCE_FASTA_NOT_INDEXABLE",
+                        )
+                    if not line_bases:
+                        line_bases, line_width = bases, len(raw)
+                    elif bases < line_bases:
+                        short_line_seen = True
+                    length += bases
+            position += len(raw)
+    finish()
+    if not records:
+        raise ConfigurationError(f"FASTA {fasta} contains no records.")
+    temporary = destination.with_name(destination.name + ".tmp")
+    temporary.write_text("".join(records), encoding="utf-8")
+    temporary.replace(destination)
+
+
+def _indexed_reference(fasta: Path, work: Path) -> Path:
+    """Return a reference path whose .fai index wfmash can open.
+
+    An existing ``<fasta>.fai`` is used as is; otherwise one is written next to
+    the FASTA (cached for later runs) or, when that directory is read-only,
+    beside a symlink inside the temporary work directory.
+    """
+
+    index = fasta.with_name(fasta.name + ".fai")
+    if index.is_file() and index.stat().st_mtime >= fasta.stat().st_mtime:
+        return fasta
+    if fasta.suffix in {".gz", ".bgz"}:
+        raise ConfigurationError(
+            "wfmash needs an index for compressed FASTA; run samtools faidx on the bgzip file.",
+            code="REFERENCE_FASTA_NOT_INDEXABLE",
+        )
+    try:
+        _write_fai(fasta, index)
+        return fasta
+    except OSError:
+        link = work / "reference.fa"
+        link.symlink_to(fasta)
+        _write_fai(fasta, work / "reference.fa.fai")
+        return link
 
 
 def _cached_hg38(directory: Path) -> tuple[Path, str] | None:
@@ -206,12 +402,13 @@ def _evaluate_from_fasta(
         if item.sequence.topology is Topology.CIRCULAR:
             raise ConfigurationError("Circular queries must be linearized before alignment.")
 
-    executable = shutil.which(config.minimap2_executable)
+    wfmash = config.aligner == "wfmash"
+    executable = shutil.which(config.wfmash_executable if wfmash else config.minimap2_executable)
     if executable is None:
         raise BackendUnavailableError(
-            "minimap2 is required for direct reference consistency evaluation.",
-            code="MINIMAP2_UNAVAILABLE",
-            hint="Install minimap2 or set config.minimap2_executable.",
+            f"{config.aligner} is required for direct reference consistency evaluation.",
+            code="WFMASH_UNAVAILABLE" if wfmash else "MINIMAP2_UNAVAILABLE",
+            hint=f"Install {config.aligner} or set config.{config.aligner}_executable.",
         )
 
     if reference_fasta is None:
@@ -242,29 +439,50 @@ def _evaluate_from_fasta(
             for item in items:
                 stream.write(f">{item.subject_id}\n{item.sequence.symbols}\n")
         paf_path = work / "alignments.paf"
-        command = execute_bounded_command(
-            executable,
-            (
-                "-x",
-                config.preset,
-                "-c",
-                "-t",
-                str(config.threads),
-                "-o",
-                str(paf_path),
-                str(fasta),
-                str(query_path),
-            ),
-            backend_id="minimap2",
-            cwd=work,
-            timeout_seconds=config.timeout_seconds,
-            max_output_bytes=1_000_000,
-            monitored_output_paths=(paf_path,),
-            max_monitored_output_bytes=config.max_paf_bytes,
-        )
+        if wfmash:
+            _write_fai(query_path, query_path.with_name(query_path.name + ".fai"))
+            target = _indexed_reference(fasta, work)
+            command = execute_bounded_command(
+                executable,
+                (
+                    str(target),
+                    str(query_path),
+                    "-t",
+                    str(config.threads),
+                    "--quiet",
+                    *config.wfmash_args,
+                ),
+                backend_id="wfmash",
+                cwd=work,
+                timeout_seconds=config.timeout_seconds,
+                max_output_bytes=1_000_000,
+                stdout_path=paf_path,
+                max_monitored_output_bytes=config.max_paf_bytes,
+            )
+        else:
+            command = execute_bounded_command(
+                executable,
+                (
+                    "-x",
+                    config.preset,
+                    "-c",
+                    "-t",
+                    str(config.threads),
+                    "-o",
+                    str(paf_path),
+                    str(fasta),
+                    str(query_path),
+                ),
+                backend_id="minimap2",
+                cwd=work,
+                timeout_seconds=config.timeout_seconds,
+                max_output_bytes=1_000_000,
+                monitored_output_paths=(paf_path,),
+                max_monitored_output_bytes=config.max_paf_bytes,
+            )
         if command.return_code or not paf_path.is_file():
             raise BackendExecutionError(
-                "minimap2 did not produce a PAF alignment file.",
+                f"{config.aligner} did not produce a PAF alignment file.",
                 code="REFERENCE_CONSISTENCY_MAPPING_FAILED",
                 context={"return_code": command.return_code, "output": command.output[-2000:]},
             )
@@ -279,11 +497,12 @@ def _evaluate_from_fasta(
     parameters = dict(result.parameters)
     parameters.update(
         {
-            "alignment_source": "minimap2-generated",
+            "alignment_source": f"{config.aligner}-generated",
+            "aligner": config.aligner,
             "paf_path": None,
             "reference_fasta_path": str(fasta),
-            "preset": config.preset,
             "threads": config.threads,
+            **({"wfmash_args": config.wfmash_args} if wfmash else {"preset": config.preset}),
         }
     )
     return replace(result, parameters=FrozenDict(parameters))
@@ -301,7 +520,7 @@ def evaluate_reference_consistency(
     config: ReferenceConsistencyConfig | None = None,
     verbose: bool = True,
 ) -> EvaluationReport:
-    """Average each query's matched-base fraction over every input query.
+    """Score each query's alignment to a reference and summarize the set.
 
     Without PAF, align to a local FASTA or download and cache hg38. A supplied
     PAF is parsed directly and must have explicit reference metadata. Queries
@@ -345,7 +564,7 @@ def evaluate_reference_consistency(
             "PAF exceeds max_paf_bytes.", code="REFERENCE_CONSISTENCY_PAF_LIMIT"
         )
 
-    best: dict[str, _PafHit] = {}
+    hits: dict[str, dict[str, list[_PafHit]]] = {}
     digest = hashlib.sha256()
     byte_count = 0
     alignment_count = 0
@@ -374,28 +593,63 @@ def evaluate_reference_consistency(
             query, hit = _parse_paf_line(line, line_number, lengths)
             if hit is None:
                 continue
-            current = best.get(query)
-            rank = (hit.matched_fraction, hit.identity, hit.query_coverage, hit.mapq)
-            if current is None or rank > (
-                current.matched_fraction,
-                current.identity,
-                current.query_coverage,
-                current.mapq,
-            ):
-                best[query] = hit
+            hits.setdefault(query, {}).setdefault(hit.target, []).append(hit)
 
+    best: dict[str, _QueryAlignment] = {}
+    for query, by_target in hits.items():
+        for target, target_hits in by_target.items():
+            candidate = _QueryAlignment.pool(target, target_hits, lengths[query])
+            if query not in best or candidate.rank > best[query].rank:
+                best[query] = candidate
     scores = tuple(
-        hit.matched_fraction if (hit := best.get(item.subject_id)) is not None else 0.0
+        alignment.consistency_rate if (alignment := best.get(item.subject_id)) else 0.0
         for item in items
     )
+    aligned = {
+        query: alignment
+        for query, alignment in best.items()
+        if alignment.query_coverage >= resolved.min_query_coverage
+    }
+
+    def _entry_metrics(subject_id: str, score: float) -> FrozenDict:
+        alignment = best.get(subject_id)
+        return FrozenDict(
+            {
+                "consistency_rate": score,
+                "aligned": subject_id in aligned,
+                "blast_identity": None if alignment is None else alignment.blast_identity,
+                "gap_compressed_identity": (
+                    None if alignment is None else alignment.gap_compressed_identity
+                ),
+                "query_coverage": 0.0 if alignment is None else alignment.query_coverage,
+                "best_target": None if alignment is None else alignment.target,
+            }
+        )
+
     result_entries = tuple(
-        EvaluationEntry(item.subject_id, index, FrozenDict({"consistency_rate": scores[index]}))
+        EvaluationEntry(item.subject_id, index, _entry_metrics(item.subject_id, scores[index]))
         for index, item in enumerate(items)
     )
+    pooled = tuple(aligned.values())
+    matched_total = sum(alignment.matches for alignment in pooled)
+    metrics = {
+        "consistency_rate": mean(scores),
+        "query_count": len(items),
+        "aligned_count": len(aligned),
+        "aligned_fraction": len(aligned) / len(items) if items else None,
+        "weighted_blast_identity": (
+            matched_total / sum(alignment.columns for alignment in pooled) if pooled else None
+        ),
+        "weighted_gap_compressed_identity": (
+            matched_total / sum(alignment.gap_compressed_columns for alignment in pooled)
+            if pooled
+            else None
+        ),
+    }
     return EvaluationReport(
         "reference_consistency",
-        "primary-minimap2-paf-best-hit",
-        "eval-reference-consistency-v2",
+        "primary-paf-best-hit",
+        "eval-reference-consistency-v3",
         FrozenDict(
             cast(
                 Mapping[str, object],
@@ -408,17 +662,32 @@ def evaluate_reference_consistency(
                         "paf_sha256": digest.hexdigest(),
                         "paf_alignment_count": alignment_count,
                         "best_hit_rule": (
-                            "max matched_fraction, identity, coverage, MAPQ; first on ties"
+                            "pool each query's primary records per target; keep the target "
+                            "with max consistency_rate, BLAST identity, coverage, MAPQ; "
+                            "first on ties"
                         ),
                         "consistency_rate_definition": (
-                            "mean(PAF nmatch / query_length for each query; no primary hit = 0)"
+                            "mean(matched query bases / query_length for each query; "
+                            "no primary hit = 0)"
                         ),
+                        "blast_identity_definition": (
+                            "matches / alignment columns (CIGAR M/=/X/I/D bases)"
+                        ),
+                        "gap_compressed_identity_definition": (
+                            "matches / (CIGAR M/=/X bases + number of I/D runs)"
+                        ),
+                        "aligned_definition": ("best-target query_coverage >= min_query_coverage"),
+                        "weighting": (
+                            "weighted identities pool matches and columns over aligned queries"
+                        ),
+                        "min_query_coverage": resolved.min_query_coverage,
+                        "metric_reference": "Huang et al., bioRxiv 10.1101/2024.09.18.612131",
                         "limits": resolved.limits,
                     }
                 ),
             )
         ),
-        FrozenDict({"consistency_rate": mean(scores)}),
+        FrozenDict(metrics),
         result_entries,
         Provenance(
             reference=ReferenceInfo(

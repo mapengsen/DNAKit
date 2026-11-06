@@ -77,7 +77,7 @@ def test_similarity_plot_receives_nearest_reference_edit_distances(monkeypatch) 
     evaluate_novelty(
         queries,
         _reference(),
-        config=ReferenceSearchConfig(method="identity"),
+        config=ReferenceSearchConfig(method="identity", novelty_calculation="similarity"),
         plot=True,
         verbose=False,
     )

@@ -709,7 +709,7 @@ The value is an unnormalized count of edit operations; larger values mean greate
 
 ## Levenshtein evaluation: Novelty {#levenshtein-4}
 
-- **Second method (mean nearest-reference Levenshtein distance):**
+- **Default method (mean nearest-reference Levenshtein distance):**
 
 ```python
 from dnakit import DNARecord, DNASequence, DNASet

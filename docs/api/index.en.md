@@ -327,7 +327,7 @@ Features include exact/reverse-complement/circular/IUPAC/approximate deduplicati
 
 ::: dnakit.evaluation
 
-Reference-based methods must first call `create_reference_library()` to bind name, version, source, date, filters, index parameters, and a content digest. Novelty defaults to `1 - nearest_similarity`, with the paper's mean nearest-reference Levenshtein distance available as a second method; diversity uses the mean raw Levenshtein distance over all sequence pairs. Memorization means an exact or explicit-threshold near copy.
+Reference-based methods must first call `create_reference_library()` to bind name, version, source, date, filters, index parameters, and a content digest. Novelty defaults to the mean raw Levenshtein distance to the nearest library record (Jain et al. 2022, equation (3)), with `1 - nearest_similarity` available as a second method; diversity uses the mean raw Levenshtein distance over all sequence pairs. Memorization means an exact or explicit-threshold near copy.
 
 The output of `evaluate_synthesis_risk()` is transparent rules and hit locations, not supplier order taking rules, structure predictions, or experiment success probabilities. `evaluate_scorecard()` Retain each component, normalization direction, weight, missing strategy and contribution.
 
