@@ -130,7 +130,7 @@ report = evaluate_reference_consistency(
 - **参考文献：** 默认 `exact` 规则下即 MOSES（Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644，[DOI](https://doi.org/10.3389/fphar.2020.565644)）的 Unique@k 指标和 seqme（Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025）的 Uniqueness：生成集合中互不相同的序列所占比例。反向互补、IUPAC 和近似等价规则是 DNAKit 针对 DNA 增加的扩展。
 - **API：** `dnakit.evaluation.evaluate_uniqueness(value[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.UniquenessEvaluationConfig`。
 - **输入：** `DNA([...])`；也支持 `DNASet` 等记录集合。可选等价规则、方法和阈值。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含唯一性分数和重复组。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含唯一性分数 `uniqueness_score`【推荐指标】和重复组 `duplicate_groups`。
 - **可选绘图：** `plot=True` 在当前工作目录保存 `uniqueness_ratio.png`（默认 `False`，同名文件会覆盖）。默认等价规则为 `exact`，图题为“Exact uniqueness”；其他等价规则的图题会标明实际规则。绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
@@ -158,7 +158,7 @@ print(report.metrics["duplicate_groups"])  # (("sequence_1", "sequence_2"),)
 - **参考文献：** 公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (2)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将其中的距离设为 Levenshtein 距离用于 DNA 生成评价，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 使用相同公式。
 - **API：** `dnakit.evaluation.evaluate_diversity(value[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.DiversityEvaluationConfig`。
 - **输入：** `DNA([...])` 或其他 DNA 记录集合；可设置 `show_progress=True` 显示两两比较进度。默认最多使用 16 个进程并行计算；可通过 `DiversityEvaluationConfig(workers=8)` 调整，或设为 `workers=1` 使用单进程。结果不受进程数影响。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含平均成对 Levenshtein 距离。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含平均成对 Levenshtein 距离 `mean_pairwise_levenshtein_distance`【推荐指标】。
 - **可选绘图：** `plot=True` 在当前工作目录保存 `diversity_mean_bar.png` 和 `diversity_pairwise_distance_histogram.png`（默认 `False`，同名文件会覆盖）。直方图统计所有无序序列对；绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
@@ -197,7 +197,7 @@ print(report.metrics["mean_nearest_neighbor_distance"])
 - **参考文献：** 默认公式来自 Jain et al., *Biological Sequence Design with GFlowNets*, ICML 2022（[PMLR](https://proceedings.mlr.press/v162/jain22a.html)）的式 (3)；Cherednichenko & Poptsova, *Computers in Biology and Medicine* 184 (2025) 109440（[DOI](https://doi.org/10.1016/j.compbiomed.2024.109440)）将距离设为 Levenshtein 距离用于 DNA，D3LM（Yang et al., [arXiv:2603.01780](https://arxiv.org/abs/2603.01780), 2026）附录 B 式 (9) 使用相同公式。`exact_match_rate` 对应 MOSES（Polykovskiy et al., *Frontiers in Pharmacology* 11 (2020) 565644，[DOI](https://doi.org/10.3389/fphar.2020.565644)）和 seqme（Møller-Larsen et al., [arXiv:2511.04239](https://arxiv.org/abs/2511.04239), 2025）的 Novelty（不在参考集中的序列比例）的补数：那里的 Novelty = `1 - exact_match_rate`。
 - **API：** `dnakit.evaluation.evaluate_novelty(queries[必须], reference[必须], config[可选], plot[可选])`；`config` 使用 `dnakit.evaluation.ReferenceSearchConfig`。
 - **输入：** `DNA([...])` 查询集合和非空 `ReferenceLibrary`；可设置 `show_progress=True`。默认的 Levenshtein 方法要对每一对查询和参考序列计算编辑距离，参考库很大时耗时较长，可改用 `novelty_calculation="similarity"`。
-- **输出：** 返回 `EvaluationReport`；`metrics` 包含 `score`（平均新颖性）、`exact_match_rate` 和 `exact_match_count`；Levenshtein 方法另有最近编辑距离的平均值、最小值和最大值。
+- **输出：** 返回 `EvaluationReport`；`metrics` 包含 `score`【推荐指标】（平均新颖性）、`exact_match_rate` 和 `exact_match_count`；Levenshtein 方法另有最近编辑距离的平均值、最小值和最大值。
 - **可选绘图：** `plot=True` 在当前工作目录保存 `novelty_batch_summary.png`（平均新颖性与精确匹配率）、`novelty_distribution.png`（逐条新颖性分布）和 `novelty_nearest_levenshtein.png`（最近参考原始编辑距离分布）；默认 `False`，同名文件会覆盖。查询记录的 `metadata["batch"]` 若为非空文本，汇总柱状图会按批次分组；否则显示一个查询集。默认的 Levenshtein 方法下，新颖性本身就是最近参考原始编辑距离，因此后两张直方图展示同一组距离；similarity 方法绘制第三张图时会额外计算 Levenshtein 距离。绘图需要 `dnakit[bio-plots]`。
 - **示例代码：**
 
