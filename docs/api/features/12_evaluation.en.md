@@ -59,7 +59,7 @@ print([(entry.subject_id, entry.metrics["is_valid"]) for entry in report.entries
   - **Consistency rate** `consistency_rate` = query positions covered by matching bases / query length; a query without a primary alignment contributes `0`. The overall value is the mean over all input queries, or `None` for empty input.
   - **BLAST identity (BI)** = matching bases / alignment columns (total M/=/X/I/D length in the CIGAR).
   - **Gap-compressed identity (GI)** = matching bases / (total M/=/X length + number of I/D runs), so a run of consecutive gaps counts as one difference. The paper's Fig. 4 example (10 columns, 7 matches, one 2-base gap) gives BI = 7/10 and GI = 7/9.
-  - **Aligned fraction** `aligned_fraction` (the paper's Align %) = queries whose best match covers at least `min_query_coverage` of the query / all queries; the default `min_query_coverage=0.0` counts any primary alignment.
+  - **Aligned fraction** `aligned_fraction` [Recommended metric] (the paper's Align %) = queries whose best match covers at least `min_query_coverage` of the query / all queries; the default `min_query_coverage=0.0` counts any primary alignment.
   - **Weighted scores** `weighted_blast_identity` and `weighted_gap_compressed_identity` pool matches and columns over aligned queries before dividing (alignment-length weighting, the paper's weighted GI/BI); they are `None` when no query aligns.
   - wfmash PAF records carry `bi:f` and `gi:f` tags; the BI and GI that DNAKit computes from the CIGAR equal these tags.
 - **Defaults:** Without `config`, alignment uses minimap2 (`preset="sr"`) against hg38 or the supplied `reference_fasta`.

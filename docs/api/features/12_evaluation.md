@@ -59,7 +59,7 @@ print([(entry.subject_id, entry.metrics["is_valid"]) for entry in report.entries
   - **一致率** `consistency_rate` = 匹配碱基覆盖的查询位置数 / 序列长度；没有主比对时记为 `0`。总体值是所有输入序列的平均值，空输入时为 `None`。
   - **BLAST identity（BI）** = 匹配碱基数 / 比对列数（CIGAR 中 M/=/X/I/D 的总长）。
   - **Gap-compressed identity（GI）** = 匹配碱基数 / (M/=/X 总长 + I/D 段数)，即连续 gap 只算一个差异。论文图 4 的例子（10 列、7 个匹配、1 个长 2 的 gap）得到 BI = 7/10、GI = 7/9。
-  - **比对比例** `aligned_fraction`（论文的 Align %）= 最佳匹配的查询覆盖率 ≥ `min_query_coverage` 的序列数 / 序列总数；默认 `min_query_coverage=0.0`，即有任意主比对就算比对上。
+  - **比对比例** `aligned_fraction`【推荐指标】（论文的 Align %）= 最佳匹配的查询覆盖率 ≥ `min_query_coverage` 的序列数 / 序列总数；默认 `min_query_coverage=0.0`，即有任意主比对就算比对上。
   - **加权分数** `weighted_blast_identity`、`weighted_gap_compressed_identity`：对比对上的序列合并匹配数和列数后再相除（按比对长度加权，对应论文的 weighted GI/BI）；没有比对上的序列时为 `None`。
   - wfmash 输出的 PAF 自带 `bi:f` 和 `gi:f` 标签，DNAKit 按 CIGAR 计算的 BI/GI 与这两个标签一致。
 - **默认设置：** 不传 `config` 时使用 minimap2（`preset="sr"`）比对，参考为 hg38 或传入的 `reference_fasta`。
