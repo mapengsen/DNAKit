@@ -67,3 +67,38 @@
     padding-inline-start: 2.7rem;
   }
 }
+
+/* Home page: headline counts */
+.dnakit-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.6rem;
+  margin: 1.2em 0;
+}
+
+.dnakit-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.7rem 0.3rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.3rem;
+  text-align: center;
+}
+
+.dnakit-stats strong {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--md-primary-fg-color);
+}
+
+.dnakit-stats span {
+  font-size: 0.68rem;
+  color: var(--md-default-fg-color--light);
+}
+
+@media screen and (max-width: 44.9375em) {
+  .dnakit-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

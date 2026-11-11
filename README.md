@@ -66,23 +66,39 @@
 
 # What is DNAKit?
 
-DNAKit is a reproducible Python toolkit for DNA sequence analysis, positioned as an "RDKit for
-DNA." It covers standardization, sequence and annotation formats, basic operations, descriptors,
-pattern scanning, thermodynamics, fingerprints, similarity analysis, clustering and dataset
-splitting, comprehensive evaluation, molecular-biology simulation, and visualization. DNA
-foundation models can optionally be used for direct property prediction or to extract
-representations for k-means clustering. Full documentation, tutorials and API references are at
-[mapengsen.github.io/DNAKit](https://mapengsen.github.io/DNAKit/en/).
+DNAKit is a unified toolkit for DNA analysis. It brings the functions of 284 existing software packages, web services and agent tool collections under one set of conventions and provides 6,698 operations, so researchers and AI agents can use the same functions for a whole analysis, from data download to model training. It is positioned as an "RDKit for DNA." Full documentation, tutorials and API references are at [mapengsen.github.io/DNAKit](https://mapengsen.github.io/DNAKit/en/).
 
-It provides:
+| **6,698** | **12** | **148** | **107** | **48** | **7** |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| operations | DNA analysis domains | file formats | public databases | DNA foundation models | interfaces |
 
-1. **Data preparation:** DNA sequence and annotation file I/O, database downloads and queries, and validation.
-2. **Data processing:** sequence standardization and editing, transcription and translation, deduplication and clustering, and dataset splitting.
-3. **Data analysis:** DNA descriptors, representations and fingerprints, sequence and pattern searches, physicochemical and thermodynamic properties, and deep-learning property prediction.
-4. **Data evaluation:** validity, uniqueness, diversity and novelty, plus similarity, distance, and sequence alignment.
-5. **Visualization:** sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots.
-6. **Large language model tools:** a [Python API](docs/llm_tools/python_api.en.md), [MCP integration](docs/llm_tools/mcp.en.md), [Skills workflows](docs/llm_tools/skills.en.md), and a built-in [Agent](docs/llm_tools/agent.en.md) for general-purpose LLM calls and natural-language task execution.
-7. **Graphical interface and web app:** the [web app](https://dnakit.mapengsen.asia) runs in a browser with nothing to install; the [desktop app](docs/gui.en.md) (`dnakit gui`) runs on Windows, macOS and Linux with sequence and dataset tools, search and execution of every function, and the Skills catalog.
+# Why DNAKit
+
+- **One set of conventions, no per-tool adapters:** every operation uses the same naming, data formats, return values and error messages, so you no longer write glue code between tools.
+- **Install once, use it seven ways:** the [Python API](docs/llm_tools/python_api.en.md), the command line, the [web app](https://dnakit.mapengsen.asia), the [desktop app](docs/gui.en.md), [MCP](docs/llm_tools/mcp.en.md), [Skills](docs/llm_tools/skills.en.md) and the built-in [Agent](docs/llm_tools/agent.en.md) share one implementation and give the same results.
+- **DNA tools ready for AI agents:** 6,120 operations can be called through MCP, and 575 workflow Skills are included; the same request gives the same answer in Codex, Claude Code and Gemini CLI.
+- **No coding required:** the web app runs in a browser with nothing to install; the desktop app (`dnakit gui`) runs on Windows, macOS and Linux.
+- **Every step is traceable:** each operation is one explicit function call, and its inputs, parameters, backend and reference database are recorded so that an analysis can be checked and reproduced.
+- **Extend it yourself:** a Python function with type annotations and a docstring is registered as a tool; you can also describe what you need in plain language and let the Agent generate the tool, which is registered after it passes the checks.
+
+# What it can do
+
+| Domain | Operations | Examples |
+|:---|---:|:---|
+| Data & databases | 692 | Reading, writing and converting 148 file formats such as FASTA, BAM, VCF and BED; querying and downloading from 107 databases such as NCBI, Ensembl, ENCODE and ClinVar |
+| Sequence analysis | 251 | Reverse complement, transcription and translation, ORF finding, k-mers and sequence composition, DNA descriptors |
+| Alignment & homology | 328 | Sequence alignment, similarity and distance, BLAST homology search |
+| Reads & assembly | 566 | Read trimming and quality control, UMI handling, read mapping, genome assembly |
+| Variants & clinical | 907 | Variant calling, VEP annotation, ClinVar clinical significance, structural variants |
+| Population & GWAS | 680 | Population-genetic statistics, haplotypes and linkage disequilibrium, genome-wide association analysis |
+| Genes & expression | 1,009 | Gene annotation and orthologs, expression and enrichment analysis, single-cell and spatial transcriptomics |
+| Regulation & epigenome | 666 | Motif scanning, peak analysis, methylation, Hi-C contact matrices |
+| Evolution & microbiome | 452 | Phylogenetic trees, dN/dS, pangenomes, metagenomics and taxonomy |
+| Design & engineering | 389 | Primer design, melting temperature and thermodynamics, restriction digestion, Golden Gate assembly, CRISPR design |
+| Sequence machine learning | 195 | Dataset deduplication, clustering and splitting, fingerprints and features, training property-prediction models |
+| DNA foundation models | 233 | Representation extraction, fine-tuning and prediction with 48 models, including AlphaGenome and Evo 2 |
+
+DNAKit also evaluates generated sequences (validity, uniqueness, diversity and novelty) and draws figures (sequence text plots, position highlighting, linear and circular DNA maps, and alignment plots). A further 330 generic operations, such as infrastructure and literature search, fall outside these domains. The full list is in the [function tree](https://mapengsen.github.io/DNAKit/en/api/features/function_tree/).
 
 # Use DNAKit from Python, AI agents and Skills
 
@@ -127,7 +143,7 @@ in Codex, Claude Code and Gemini CLI. See the [MCP guide](docs/llm_tools/mcp.en.
 dnakit skills install dnakit --agent codex    # or --agent claude-code, --agent cursor
 ```
 
-DNAKit bundles more than 570 curated DNA and genomics workflow Skills. Given a question, the agent
+DNAKit bundles 575 curated DNA and genomics workflow Skills. Given a question, the agent
 searches them, picks a suitable Skill and returns the actual query results. In the example below it
 uses the `ensembl-rest` Skill to annotate variant rs7903146, and all five reported fields match
 the ClinVar record. See the [Skills guide](docs/llm_tools/skills.en.md).
