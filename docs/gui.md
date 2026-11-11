@@ -7,6 +7,33 @@ DNAKit 的图形界面调用的函数与 Python API、`dnakit` 命令行和 MCP 
   或调用外部程序的函数，经用户确认后执行。
 - **网页版**：同一页面部署在服务器上，用浏览器就能试用。共享 CPU、单次调用限时，不执行有副作用的函数。
 
+## 下载桌面程序
+
+桌面程序可以直接下载使用，不需要安装 Python：
+
+| 系统 | 下载 | 打开方式 |
+|---|---|---|
+| Windows 10 / 11（64 位） | [DNAKit-windows-x64.zip](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-windows-x64.zip) | 解压后进入 `DNAKit` 文件夹，双击 `DNAKit.exe` |
+| macOS（Apple 芯片） | [DNAKit-macos-arm64.dmg](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-arm64.dmg) | 打开磁盘映像，把 **DNAKit** 拖进“应用程序”后打开 |
+| macOS（Intel） | [DNAKit-macos-x64.dmg](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-x64.dmg) | 同上 |
+| Linux x86-64（glibc 2.35 及以上，如 Ubuntu 22.04） | [DNAKit-linux-x64.tar.gz](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-linux-x64.tar.gz) | `tar -xzf DNAKit-linux-x64.tar.gz && ./DNAKit/DNAKit` |
+
+程序没有代码签名，第一次打开时系统会要求确认一次：
+
+- **Windows：** 在“Windows 已保护你的电脑”对话框中点“更多信息”，再点“仍要运行”。
+- **macOS：** 出现“无法验证 DNAKit”的提示后，打开“系统设置”→“隐私与安全性”，点“仍要打开”
+  （macOS 14 及更早版本：右键点击程序，选“打开”）。也可以运行
+  `xattr -dr com.apple.quarantine /Applications/DNAKit.app`。
+
+下载版把上传的文件和结果保存在用户主目录下的 `DNAKit` 文件夹；双击启动时，运行信息写入其中的
+`DNAKit/desktop.log`。下载版包含界面和 `pip install "dnakit[gui]"` 所带的函数。依赖可选软件包
+（深度学习模型、`bio` 系列依赖组）或外部程序的函数会提示缺少什么，这些函数请使用下文的 pip 安装。
+在终端中带参数启动时，该程序就是 `dnakit` 命令行，例如 `DNAKit describe ACGT`。
+
+下载文件由 [Desktop app 工作流](https://github.com/mapengsen/DNAKit/actions/workflows/desktop.yml)
+从 `main` 分支构建，构建方法见
+[`desktop-app/`](https://github.com/mapengsen/DNAKit/tree/main/desktop-app)。
+
 ## 安装与启动
 
 ```bash

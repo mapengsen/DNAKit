@@ -9,6 +9,35 @@ and the MCP server, without writing code. It comes in two forms built from one c
 - **Web app**: the same page hosted on a server for trying DNAKit in a browser. It runs on a
   shared CPU with time limits and does not execute functions with side effects.
 
+## Download the desktop app
+
+The desktop app can be downloaded as a ready-to-run program that needs no Python:
+
+| System | Download | Start |
+|---|---|---|
+| Windows 10 / 11 (64-bit) | [DNAKit-windows-x64.zip](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-windows-x64.zip) | Unpack the zip, open the `DNAKit` folder and double-click `DNAKit.exe` |
+| macOS, Apple silicon | [DNAKit-macos-arm64.dmg](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-arm64.dmg) | Open the disk image, drag **DNAKit** to Applications and open it |
+| macOS, Intel | [DNAKit-macos-x64.dmg](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-x64.dmg) | As above |
+| Linux x86-64 (glibc 2.35 or later, e.g. Ubuntu 22.04) | [DNAKit-linux-x64.tar.gz](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-linux-x64.tar.gz) | `tar -xzf DNAKit-linux-x64.tar.gz && ./DNAKit/DNAKit` |
+
+The apps are not code-signed, so the system asks for one confirmation at the first start:
+
+- **Windows:** in the *Windows protected your PC* dialog click *More info*, then *Run anyway*.
+- **macOS:** after the message that DNAKit cannot be verified, open *System Settings* →
+  *Privacy & Security* and click *Open Anyway* (macOS 14 and earlier: right-click the app and
+  choose *Open*). Alternatively run `xattr -dr com.apple.quarantine /Applications/DNAKit.app`.
+
+The downloaded app keeps uploaded inputs and results in the `DNAKit` folder of your home
+directory and, when started by double click, writes its messages to `DNAKit/desktop.log` there.
+It contains the interface and the functions of a plain `pip install "dnakit[gui]"`. Functions
+that need optional packages (deep-learning models, the `bio` extras) or external programs report
+what is missing; use the pip installation below for those. Started from a terminal with
+arguments, the program is the `dnakit` command line, for example `DNAKit describe ACGT`.
+
+The downloads are rebuilt from the `main` branch by the
+[Desktop app workflow](https://github.com/mapengsen/DNAKit/actions/workflows/desktop.yml); the
+build recipe is in [`desktop-app/`](https://github.com/mapengsen/DNAKit/tree/main/desktop-app).
+
 ## Install and start
 
 ```bash

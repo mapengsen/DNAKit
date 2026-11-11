@@ -167,10 +167,17 @@ programs are not executed.
 
 | **System** | <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
 |:---|:---:|:---:|:---:|
-| **1. Install** | `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
-| **2. Open the app** | `dnakit gui` | `dnakit gui` | `dnakit gui` |
+| **Download the app** | [<img src="https://img.shields.io/badge/Download-.zip-2ea44f" alt="Download DNAKit for Windows">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-windows-x64.zip) | [<img src="https://img.shields.io/badge/Download-Apple%20silicon%20.dmg-2ea44f" alt="Download DNAKit for Macs with Apple silicon">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-arm64.dmg)<br>[<img src="https://img.shields.io/badge/Download-Intel%20.dmg-2ea44f" alt="Download DNAKit for Intel Macs">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-x64.dmg) | [<img src="https://img.shields.io/badge/Download-.tar.gz-2ea44f" alt="Download DNAKit for Linux">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-linux-x64.tar.gz) |
+| **or install it with pip** | `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
+| **and open it with** | `dnakit gui` | `dnakit gui` | `dnakit gui` |
 
-Until the next PyPI release, install the desktop app from GitHub with
+The downloads need no Python: unpack the file and double-click **DNAKit** (on macOS, drag it to
+Applications first). They contain the interface and DNAKit's core functions; functions that need
+optional packages, such as deep-learning models, need the pip installation. The apps are not
+code-signed, so the first start asks for one confirmation: on Windows click *More info* →
+*Run anyway*; on macOS open *System Settings* → *Privacy & Security* and click *Open Anyway*.
+
+Until the next PyPI release, the pip installation is
 `pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"` (Linux: `gui-qt`). The app uses WebView2 on Windows and WebKit on macOS; on Linux it uses
 GTK WebKit or the Qt backend, and on a server without a display it opens in a browser. See the
 [graphical interface guide](https://github.com/mapengsen/DNAKit/blob/main/docs/gui.en.md).

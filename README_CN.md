@@ -162,10 +162,15 @@ Python 和 MCP 调用），以及 Skills 目录。
 
 | **系统** | <img src="https://img.shields.io/badge/-Windows%2010%20%7C%2011-0078D6?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg==" alt="Windows"> | <img src="https://img.shields.io/badge/-macOS-000000?logo=apple&logoColor=white" alt="macOS"> | <img src="https://img.shields.io/badge/-Linux-FCC624?logo=linux&logoColor=black" alt="Linux"> |
 |:---|:---:|:---:|:---:|
-| **1. 安装** | `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
-| **2. 打开桌面版** | `dnakit gui` | `dnakit gui` | `dnakit gui` |
+| **直接下载** | [<img src="https://img.shields.io/badge/下载-.zip-2ea44f" alt="下载 Windows 版 DNAKit">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-windows-x64.zip) | [<img src="https://img.shields.io/badge/下载-Apple%20芯片%20.dmg-2ea44f" alt="下载 Apple 芯片 Mac 版 DNAKit">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-arm64.dmg)<br>[<img src="https://img.shields.io/badge/下载-Intel%20.dmg-2ea44f" alt="下载 Intel Mac 版 DNAKit">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-macos-x64.dmg) | [<img src="https://img.shields.io/badge/下载-.tar.gz-2ea44f" alt="下载 Linux 版 DNAKit">](https://github.com/mapengsen/DNAKit/releases/download/desktop/DNAKit-linux-x64.tar.gz) |
+| **或用 pip 安装** | `pip install "dnakit[gui]"` | `pip install "dnakit[gui]"` | `pip install "dnakit[gui-qt]"` |
+| **再用命令打开** | `dnakit gui` | `dnakit gui` | `dnakit gui` |
 
-在 PyPI 发布下一个版本之前，可以从 GitHub 安装：`pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"`（Linux 用 `gui-qt`）。桌面版在 Windows 上
+下载版不需要安装 Python：解压后双击 **DNAKit** 即可（macOS 先把它拖进“应用程序”）。下载版包含界面和
+DNAKit 的核心函数；依赖可选软件包的函数（如深度学习模型）需要用 pip 安装。软件没有代码签名，第一次打开
+需要确认一次：Windows 点“更多信息”→“仍要运行”；macOS 打开“系统设置”→“隐私与安全性”，点“仍要打开”。
+
+在 PyPI 发布下一个版本之前，pip 安装请从 GitHub 获取：`pip install "dnakit[gui] @ git+https://github.com/mapengsen/DNAKit"`（Linux 用 `gui-qt`）。桌面版在 Windows 上
 使用 WebView2，在 macOS 上使用 WebKit；Linux 上使用 GTK WebKit 或 Qt 后端，没有显示器的服务器会改用
 浏览器打开。详见[图形界面说明](https://github.com/mapengsen/DNAKit/blob/main/docs/gui.md)。
 
