@@ -52,7 +52,8 @@ jobs:
       - name: Install Linux display and Qt libraries
         if: runner.os == 'Linux'
         run: >-
-          sudo apt-get update && sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-cursor0
+          sudo apt-get -o Acquire::Retries=5 update &&
+          sudo apt-get -o Acquire::Retries=5 install -y xvfb libxkbcommon-x11-0 libxcb-cursor0
           libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0
           libxcb-image0 libxcb-render-util0 libegl1 libnss3 libasound2
 
@@ -78,6 +79,7 @@ jobs:
           name: test-${{ matrix.os }}
           path: |
             desktop-app/dist/smoke-report.json
+            desktop-app/dist/test-output.log
             desktop-app/dist/window-*.png
           if-no-files-found: warn
 

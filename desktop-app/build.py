@@ -78,11 +78,29 @@ def bundle() -> Path:
     return DIST / "DNAKit" / ("DNAKit.exe" if SYSTEM == "windows" else "DNAKit")
 
 
-def run_app(program: Path, args: list[str], env: dict[str, str]) -> int:
-    """Start the packaged app the way a double click does and return its exit code."""
+def fail(message: str, detail: str = "") -> None:
+    """Stop the build; on GitHub Actions also show the reason as an error annotation."""
+
+    if os.environ.get("GITHUB_ACTIONS"):
+        text = f"{message}\n{detail[-6000:]}".strip()
+        escaped = text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print(f"::error title=DNAKit desktop app ({SYSTEM}-{ARCH})::{escaped}", flush=True)
+    sys.exit(f"{message}\n{detail}".strip())
+
+
+def run_app(
+    program: Path, args: list[str], env: dict[str, str], capture: Path | None = None
+) -> int:
+    """Start the packaged app and return its exit code.
+
+    Without ``capture`` the app starts the way a double click starts it. With ``capture`` its
+    messages are written to that file, which is how a failed start is diagnosed.
+    """
 
     print("+", program.name, " ".join(args), flush=True)
-    if SYSTEM == "windows":  # Start-Process gives the app no console and no standard streams
+    output = None if capture is None else capture.open("w", encoding="utf-8")
+    if SYSTEM == "windows" and capture is None:
+        # Start-Process gives the app no console and no standard streams.
         quoted = ",".join("'\"" + a.replace("'", "''") + "\"'" for a in args)
         script = (
             f"$p = Start-Process -FilePath '{program}' -ArgumentList @({quoted}) "
@@ -95,7 +113,23 @@ def run_app(program: Path, args: list[str], env: dict[str, str]) -> int:
             if shutil.which("xvfb-run") is None:
                 sys.exit("No display: install xvfb or pass --skip-tests.")
             command = ["xvfb-run", "-a", "-s", "-screen 0 1400x1000x24", *command]
-    return subprocess.run(command, env=env, cwd=WORK, check=False).returncode
+    try:
+        done = subprocess.run(
+            command,
+            env=env,
+            cwd=WORK,
+            stdin=subprocess.DEVNULL if output else None,
+            stdout=output,
+            stderr=subprocess.STDOUT if output else None,
+            timeout=900,
+            check=False,
+        )
+        return done.returncode
+    except subprocess.TimeoutExpired:
+        return 124
+    finally:
+        if output is not None:
+            output.close()
 
 
 def test(program: Path) -> None:
@@ -105,16 +139,28 @@ def test(program: Path) -> None:
     if SYSTEM == "linux" and os.geteuid() == 0:
         env.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox")
     report = DIST / "smoke-report.json"
-    code = run_app(program, [str(HERE / "smoke_test.py"), str(report)], env)
-    if report.exists():
-        print(report.read_text(encoding="utf-8"))
-    if code != 0 or not report.exists() or not json.loads(report.read_text("utf-8"))["ok"]:
-        sys.exit(f"The packaged app failed its checks (exit code {code}).")
+    log = DIST / "test-output.log"
+    smoke = [str(HERE / "smoke_test.py"), str(report)]
+    code = run_app(program, smoke, env)
+    checks = json.loads(report.read_text("utf-8")) if report.exists() else {}
+    if code != 0 or not checks.get("ok"):
+        errors = [
+            f"{name}: {value['error']}"
+            for name, value in checks.items()
+            if isinstance(value, dict) and not value.get("ok")
+        ]
+        if not errors:  # the app stopped before it wrote the report
+            run_app(program, smoke, env, capture=log)
+            errors = [log.read_text("utf-8", errors="replace")]
+        fail(f"The packaged app failed its checks (exit code {code}).", "\n".join(errors))
+    print(json.dumps(checks, indent=2))
     screenshot = DIST / f"window-{SYSTEM}-{ARCH}.png"
     window = ["gui", "--workdir", str(WORK / "gui-work"), "--self-test", "180"]
     code = run_app(program, [*window, "--screenshot", str(screenshot)], env)
     if code != 0:
-        sys.exit(f"The packaged app did not open its window (exit code {code}).")
+        run_app(program, window, env, capture=log)
+        detail = log.read_text("utf-8", errors="replace")
+        fail(f"The packaged app did not open its window (exit code {code}).", detail)
 
 
 def package() -> Path:
