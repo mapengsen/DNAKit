@@ -67,16 +67,16 @@ def check_tool_worker() -> Any:
     from dnakit.gui._worker import ToolWorker
 
     worker = ToolWorker()
-    try:
-        with tempfile.TemporaryDirectory() as folder:
+    with tempfile.TemporaryDirectory() as folder:
+        try:
             ok, result = worker.call(
                 "dnakit.ops.reverse_complement",
                 {"value": "AACGT"},
                 Path(folder),
                 timeout=300,
             )
-    finally:
-        worker.stop()
+        finally:  # the worker's current directory is this folder; stop it before removal
+            worker.stop()
     assert ok and "ACGTT" in json.dumps(result), result
     return "ACGTT"
 
