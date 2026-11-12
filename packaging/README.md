@@ -106,6 +106,11 @@ Galaxy Tool Shed 包装器位于 [`galaxy/dnakit/`](../galaxy/dnakit/) 中。Gal
 `dnakit==0.2.0`，由 `deploy.sh` 把源码中的 `src/dnakit/gui` 复制到服务器；发布新版本后把
 `requirements.txt` 改为 `dnakit[gui,bio-analysis,bio-formats,bio-plots]==<新版本>`。
 
+Chat 标签页由服务器用访问者填写的 API key 向所选平台发请求，因此服务器必须能访问这些平台的接口
+（如 `api.deepseek.com`、`dashscope.aliyuncs.com`、`api.moonshot.cn`、`openrouter.ai`）。访问不到的
+平台会在对话中报告无法连接；需要经代理访问时，在 `dnakit-web.service` 中设置 `HTTPS_PROXY`
+（并用 `NO_PROXY` 列出不走代理的域名）。key 不落盘，nginx 也不记录请求体。
+
 本地预览（与服务器相同的限制）：
 
 ```bash

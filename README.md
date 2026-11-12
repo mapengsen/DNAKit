@@ -157,7 +157,10 @@ the ClinVar record. See the [Skills guide](docs/llm_tools/skills.en.md).
 DNAKit also runs without writing code. The web app and the desktop app share one interface:
 sequence tools (descriptors, ORFs, motifs, comparison), dataset tools (deduplication,
 train/valid/test split, format conversion, descriptor feature tables), every Agent-callable
-function with its equivalent Python and MCP call, and the Skills catalog.
+function with its equivalent Python and MCP call, and the Skills catalog. In the **Chat** tab
+you describe a task in plain language and a language model (DeepSeek, Grok, Qwen, Kimi, or GPT,
+Gemini and Claude through OpenRouter, or any OpenAI-compatible API, with your own API key) finds and runs the DNAKit
+functions and Skills for you.
 
 **Web app:** open [https://dnakit.mapengsen.asia](https://dnakit.mapengsen.asia) in a browser, with nothing to install. It runs on a shared CPU,
 so calls have a time limit and functions that write files, download models or run external

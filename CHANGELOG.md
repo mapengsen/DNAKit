@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- 图形界面新增 **Chat (AI agent)** 标签页（网页版和桌面版共用）：选择平台（DeepSeek、Grok、通义千问、Kimi、OpenRouter（可用 GPT、Gemini、Claude）或任何兼容 OpenAI chat-completions 格式的接口）、填入自己的 API key 后，用自然语言描述任务，模型通过 DNAKit MCP 服务器的同一组工具（检索、查看和调用函数，检索和阅读 Skills）完成任务，每次工具调用的参数和结果都显示在对话中，并附 6 个示例请求。工具调用遵守界面原有限制：网页版只运行无副作用的函数、单次限时 60 秒、路径只能在访问者目录内，自定义接口地址必须是公网 HTTPS 地址；桌面版勾选授权后可运行有副作用的函数，也可连接本机部署的模型。key 只用于当前请求，不保存、不写日志；一条消息最多请求模型 16 次。
 - 新增可直接下载的桌面程序：Windows（zip）、macOS（Apple 芯片与 Intel 的 dmg）和 Linux（tar.gz），解压后双击即可使用，不需要安装 Python；文件放在 GitHub 的 `desktop` release 中，README 的桌面版表格提供下载按钮。程序用 PyInstaller 打包 `dnakit[gui]`，构建脚本、打包配置和打包后自检都在 `desktop-app/`（`python desktop-app/build.py --install`），`Desktop app` 工作流在三个系统上构建、运行自检并更新下载文件。程序没有代码签名，首次打开需在系统提示中确认一次。
 - 将 615 个原先只返回输入摘要、状态却为 `ok` 的候选函数改为真实实现，涉及 `io_formats`、`variants`、`clinical`、`gwas`、`singlecell_spatial`、`transcriptomics`、`ml_models`、`knowledge_graph`、`sequencing_qc`、`assembly`、`microbiome` 等 29 个模块。约 518 个函数按各自文档定义计算结果或校验输入；97 个在不带选项的普通调用下返回 `status: "not_implemented"`，并附 `required_dependency` 和 `message` 说明缺少什么（外部数据库、训练好的模型、比对或变异检测软件、必要选项，或函数名没有确定含义），不再返回伪成功。启发式或近似算法（如基于规则的 CRISPR 打分、k-mer 近似 ANI、KING 亲缘系数）在函数说明里写明定义。
 - 重命名三个名字与实际行为不符的函数：`variants.impute_missing_genotypes` 改为 `fill_missing_genotypes_with_mode`（按位点取最常见基因型），`variants.calculate_identity_by_descent` 改为 `calculate_kinship_king`（KING 亲缘系数，不是 IBD 片段），`ml_models.export_uncertainty_model` 改为 `export_conformal_uncertainty_model`（split-conformal 区间）。旧名在 0.2.0 中只是不能工作的占位函数，不保留别名。

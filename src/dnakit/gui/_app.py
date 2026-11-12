@@ -22,6 +22,7 @@ from dnakit.gui._backend import (
     mark_selected,
     pick_first_column,
 )
+from dnakit.gui._chat import build_chat_tab
 from dnakit.gui._settings import GuiSettings
 
 # System fonts only: available on every platform, and no web-font download (Google Fonts is
@@ -298,6 +299,9 @@ def build_app(settings: GuiSettings) -> gr.Blocks:
                         [ds_file, ds_example, state],
                         [state, ft_head, ft_table, ft_files, ft_code],
                     )
+
+        with gr.Tab("Chat (AI agent)"):
+            build_chat_tab(backend, state, files_label)
 
         counts = catalog_counts()
         listed = backend.stats["agent_compatible"]

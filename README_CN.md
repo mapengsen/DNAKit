@@ -153,7 +153,9 @@ DNAKit 内置 575 个经过整理的 DNA 与基因组学工作流 Skills。收�
 
 不写代码也能使用 DNAKit。网页版和桌面版使用同一套界面：单序列工具（描述符、ORF、motif、序列比较）、
 数据集工具（去重、训练/验证/测试集划分、格式转换、描述符特征表）、全部 Agent 可调用函数（附等价的
-Python 和 MCP 调用），以及 Skills 目录。
+Python 和 MCP 调用），以及 Skills 目录。在 **Chat** 标签页中用自然语言描述任务，由大模型（DeepSeek、
+Grok、通义千问、Kimi，经 OpenRouter 使用 GPT、Gemini、Claude，或任何兼容 OpenAI 格式的接口，使用你自己的 API key）
+检索并运行 DNAKit 函数和 Skills。
 
 **网页版：** 浏览器打开 [https://dnakit.mapengsen.asia](https://dnakit.mapengsen.asia)，无需安装。网页运行在共享 CPU 上，单次调用限时，
 不执行写文件、下载模型或调用外部程序的函数。

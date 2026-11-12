@@ -63,12 +63,55 @@ Linux（glibc 2.28 及以上）和系统库 `libxcb-cursor0`。没有显示器�
 |---|---|
 | Sequence (Example) | 反向互补链、240 个描述符、六框 ORF、IUPAC/正则 motif 搜索、序列比较、序列校验 |
 | Dataset (Example) | 去重（完全相同或反向互补）、训练/验证/测试集划分、格式转换、每条记录的描述符特征表 |
+| Chat (AI agent) | 用自然语言描述任务，由所选平台的大模型检索并运行 DNAKit 函数和 Skills（见[与大模型对话](#与大模型对话)） |
 | Function explorer | 检索全部 Agent 可调用函数，跳转到本文档中对应的章节，查看参数说明，用 JSON 参数直接运行 |
 | MCP tools | 检索第三方 MCP 服务器中的 DNA 与基因工具；点击某个工具可查看参数、源码仓库和 `call_mcp_tool` 调用写法，*docs* 链接打开它在 MCP 工具目录中的条目 |
 | Skills | 检索和阅读内置 DNA 工作流 Skills；*docs* 链接打开它在 Skills 目录中的条目 |
 
 每个结果都会给出等价的命令行和 Python 调用；函数检索页还给出 agent 发送的 MCP 请求，
 在界面里试过的操作可以直接写成脚本。
+
+## 与大模型对话
+
+**Chat (AI agent)** 标签页提供对话式的 DNAKit：输入一句请求，例如“找出这条序列中不短于 60 nt 的全部
+ORF，并翻译最长的一个”，大模型会自己规划步骤、调用 DNAKit，并根据运行结果回答。
+
+1. 选择**平台**：DeepSeek、Grok（xAI）、通义千问（Qwen）、Kimi、OpenRouter，
+   或任何兼容 OpenAI chat-completions 格式的接口（填写它的 base URL）。GPT、Gemini、Claude 等模型通过
+   OpenRouter 使用。
+2. 填入自己在该平台的 **API key**。填好后界面会从平台读取模型列表，从中选择一个模型，也可以直接输入
+   模型名。
+3. 输入请求（或点击一个示例），按 **Send**。
+
+模型使用的就是 [DNAKit MCP 服务器](llm_tools/mcp.md)的工具：`search_dnakit_tools`、
+`describe_dnakit_tool`、`call_dnakit_tool`、`search_dnakit_skills`、`read_dnakit_skill`，另有
+`list_session_files` 用来查看用户添加的文件。每次工具调用连同参数和返回结果都显示在对话中，可以看到
+答案出自哪些函数；函数返回的图直接显示为图片。在对话下方添加的文件保存在工作目录中，请求里写文件名
+即可；目录中始终有一个 `example.fasta`（26 条记录）。
+
+| 示例请求 | 模型的做法 |
+|---|---|
+| 求一条序列的反向互补链，并报告 GC 含量和熔解温度 | 调用序列与热力学函数 |
+| 在六个读码框中找出不短于 60 nt 的 ORF，并翻译最长的一个 | 六框 ORF 扫描和翻译函数 |
+| 查找 CpG 岛以及 EcoRI / BamHI / HindIII 酶切位点 | `dnakit.patterns.find_cpg_islands`、`dnakit.patterns.scan_restriction_sites` |
+| 为目标序列设计 CRISPR-Cas9 向导 RNA | `dnakit.design_crispr.design` 及排序 |
+| 统计 `example.fasta` 的记录数，找出互为反向互补的重复序列 | `dnakit.fasta_fastq.count_records`、`dnakit.datasets.deduplicate` |
+| 哪些 Skills 与变异注释有关 | 检索 Skills 目录并概括其中一个 Skill |
+
+使用须知：
+
+- **key 和数据。** 请求由运行界面的那台电脑（网页版即服务器）发往所选平台，使用你的 key，费用由你的
+  账户承担。key 只用于当前这条消息的请求，不保存，也不写入日志。对话内容（包括序列和工具返回的结果）
+  会发送给该平台。
+- **限制。** 工具调用遵守所在界面的规则（见下一节）。网页版只运行没有副作用的函数，单次调用限时
+  60 秒，自定义接口地址必须是公网 HTTPS 地址。桌面程序中，勾选 *Allow tools with side effects* 后才
+  运行会写文件、下载模型权重或调用外部程序的函数；也可以使用本机部署的模型（例如
+  `http://localhost:11434/v1`），此时不需要 key。
+- **用量。** 一条消息最多向模型请求 16 次，最后一次必须给出回答。输入框下方显示所用模型、工具调用次数、
+  耗时，以及平台返回的 token 用量。对话过长时先丢弃较早的工具结果。
+- **连通性。** 所选平台必须能从运行界面的那台电脑访问。在线网页版可以访问 DeepSeek、通义千问、Kimi 和
+  OpenRouter，不能直接访问 Grok 的接口；在网页版使用 Grok 请通过 OpenRouter 或兼容 OpenAI 格式的中转地址
+  （*Other OpenAI-compatible API*），或者使用桌面程序。
 
 ## 桌面程序与网页版的区别
 
@@ -78,6 +121,7 @@ Linux（glibc 2.28 及以上）和系统库 `libxcb-cursor0`。没有显示器�
 | 单次调用时间 | 不限（可用 **Stop** 按钮中止） | 60 秒 |
 | 上传大小 | 不限 | 20 MB |
 | 写文件、下载模型、调用外部程序的函数 | 确认后执行 | 不执行 |
+| 对话：接口地址 | 任意 HTTP(S) 地址，包括本机部署的模型 | 预设平台，或公网 HTTPS 地址 |
 | 路径参数 | 任意路径 | 只能指向访问者自己的目录 |
 
 单序列工具最多接受 30,000 nt，因为序列通过命令行参数传递（Windows 命令行上限为 32,767 个字符）；
